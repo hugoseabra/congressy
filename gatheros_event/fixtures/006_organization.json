@@ -1,0 +1,102 @@
+[
+  {
+    "model": "gatheros_event.organization",
+    "pk": 1,
+    "fields": {
+      "name": "Landare",
+      "description": "",
+      "avatar_width": 1014,
+      "avatar_height": 571,
+      "avatar": "g3195.png",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": false
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 2,
+    "fields": {
+      "name": "In2",
+      "description": "",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": false
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 3,
+    "fields": {
+      "name": "Gatheros Community",
+      "description": "",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": false
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 4,
+    "fields": {
+      "name": "SENAR/AR-GO",
+      "description": "",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": false
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 5,
+    "fields": {
+      "name": "Diego Toletino",
+      "description": "",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": true
+    }
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "model": "gatheros_event.segment",
+    "pk": 1,
+    "fields": {
+      "name": "Horticultura",
+      "active": true,
+      "description": "Hortifruti."
+    }
+  },
+  {
+    "model": "gatheros_event.segment",
+    "pk": 2,
+    "fields": {
+      "name": "Aquicultura",
+      "active": true,
+      "description": ""
+    }
+  },
+  {
+    "model": "gatheros_event.segment",
+    "pk": 3,
+    "fields": {
+      "name": "Cana-de-a\u00e7ucar",
+      "active": true,
+      "description": ""
+    }
+  },
+  {
+    "model": "gatheros_event.segment",
+    "pk": 4,
+    "fields": {
+      "name": "Cereais, Fibras e Oleaginosas",
+      "active": true,
+      "description": ""
+    }
+  },
+  {
+    "model": "gatheros_event.segment",
+    "pk": 5,
+    "fields": {
+      "name": "Pecu\u00e1ria de Corte",
+      "active": true,
+      "description": ""
+    }
+  },
+  {
+    "model": "gatheros_event.segment",
+    "pk": 6,
+    "fields": {
+      "name": "Pecu\u00e1ria de Leite",
+      "active": true,
+      "description": ""
+    }
+  },
+  {
+    "model": "gatheros_event.segment",
+    "pk": 7,
+    "fields": {
+      "name": "Pesca",
+      "active": true,
+      "description": ""
+    }
+  }
+]

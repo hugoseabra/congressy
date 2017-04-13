@@ -1,0 +1,186 @@
+[
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 1,
+    "fields": {
+      "name": "Administrador de Empresa",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 2,
+    "fields": {
+      "name": "Advogado",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 3,
+    "fields": {
+      "name": "Agente de Sa\u00fade",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 4,
+    "fields": {
+      "name": "Agrimensor",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 5,
+    "fields": {
+      "name": "Agr\u00f4nomo",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 6,
+    "fields": {
+      "name": "Analista de Estoque",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 7,
+    "fields": {
+      "name": "Analista de Mercado",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 8,
+    "fields": {
+      "name": "Antrop\u00f3logo",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 9,
+    "fields": {
+      "name": "Aposentado",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 10,
+    "fields": {
+      "name": "Artes\u00e3o",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 11,
+    "fields": {
+      "name": "Assessor de Imprensa",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 12,
+    "fields": {
+      "name": "Assistente T\u00e9cnico",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 13,
+    "fields": {
+      "name": "Audiovisual",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 14,
+    "fields": {
+      "name": "Aut\u00f4nomo",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 15,
+    "fields": {
+      "name": "Auxiliar Administrativo",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 16,
+    "fields": {
+      "name": "Banc\u00e1rio",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 17,
+    "fields": {
+      "name": "Bi\u00f3logo",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 18,
+    "fields": {
+      "name": "Bioqu\u00edmico",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 19,
+    "fields": {
+      "name": "Ci\u00eancias Cont\u00e1beis",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 20,
+    "fields": {
+      "name": "Cinegrafista",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 21,
+    "fields": {
+      "name": "Comunica\u00e7\u00e3o Social",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 22,
+    "fields": {
+      "name": "Consultor",
+      "active": true
+    }
+  },
+  {
+    "model": "gatheros_event.occupation",
+    "pk": 23,
+    "fields": {
+      "name": "Produtor Rural",
+      "active": true
+    }
+  }
+]

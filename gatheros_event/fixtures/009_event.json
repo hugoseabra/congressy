@@ -1,0 +1,97 @@
+[
+  {
+    "model": "gatheros_event.event",
+    "pk": 1,
+    "fields": {
+      "name": "Dia de Inova\u00e7\u00e3o Spa\u00e7o Agr\u00edcola",
+      "organization": 1,
+      "category": 5,
+      "subscription_type": "disabled",
+      "date_start": "2017-05-02T00:00:00",
+      "date_end": "2017-05-03T00:00:00",
+      "place": 4,
+      "description": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null
+    }
+  },
+  {
+    "model": "gatheros_event.event",
+    "pk": 2,
+    "fields": {
+      "name": "Dia de Inova\u00e7\u00e3o Semear",
+      "organization": 1,
+      "category": 5,
+      "subscription_type": "on",
+      "date_start": "2017-04-22T00:00:00",
+      "date_end": "2017-04-23T00:00:00",
+      "place": 4,
+      "description": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null
+    }
+  },
+  {
+    "model": "gatheros_event.event",
+    "pk": 3,
+    "fields": {
+      "name": "FAEG/SENAR em A\u00e7\u00e3o - Jaupaci",
+      "organization": 4,
+      "category": 1,
+      "subscription_type": "disabled",
+      "date_start": "2017-05-07T00:00:00",
+      "date_end": "2017-05-08T00:00:00",
+      "place": 5,
+      "description": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null
+    }
+  },
+  {
+    "model": "gatheros_event.event",
+    "pk": 4,
+    "fields": {
+      "name": "Semin\u00e1rios Regionais de E-Social",
+      "organization": 4,
+      "category": 7,
+      "subscription_type": "on",
+      "date_start": "2017-05-12T00:00:00",
+      "date_end": "2017-05-13T00:00:00",
+      "place": 5,
+      "description": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null
+    }
+  },
+  {
+    "model": "gatheros_event.event",
+    "pk": 5,
+    "fields": {
+      "name": "Curso de Python",
+      "organization": 5,
+      "category": 3,
+      "subscription_type": "on",
+      "date_start": "2017-04-02T00:00:00",
+      "date_end": "2017-04-03T00:00:00",
+      "place": 6,
+      "description": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null
+    }
+  }
+]

@@ -1,0 +1,92 @@
+[
+{
+    "model": "gatheros_event.subject",
+    "pk": 1,
+    "fields": {
+        "name": "Gr\u00e3os",
+        "active": true,
+        "description": ""
+    }
+},
+{
+    "model": "gatheros_event.subject",
+    "pk": 2,
+    "fields": {
+        "name": "Soja, Milho, Sorgo, Outros",
+        "active": true,
+        "description": ""
+    }
+},
+{
+    "model": "gatheros_event.subject",
+    "pk": 3,
+    "fields": {
+        "name": "Assuntos Econ\u00f4micos",
+        "active": true,
+        "description": ""
+    }
+},
+{
+    "model": "gatheros_event.subject",
+    "pk": 4,
+    "fields": {
+        "name": "Com\u00e9rcio de Sementes",
+        "active": true,
+        "description": ""
+    }
+},
+{
+    "model": "gatheros_event.subject",
+    "pk": 6,
+    "fields": {
+        "name": "Com\u00e9rcio de M\u00e1quinas",
+        "active": true,
+        "description": ""
+    }
+},
+{
+    "model": "gatheros_event.subject",
+    "pk": 5,
+    "fields": {
+        "name": "Com\u00e9rcio de Insumos",
+        "active": true,
+        "description": ""
+    }
+},
+{
+    "model": "gatheros_event.subject",
+    "pk": 6,
+    "fields": {
+        "name": "Ind\u00fastria",
+        "active": true,
+        "description": ""
+    }
+},
+{
+    "model": "gatheros_event.subject",
+    "pk": 7,
+    "fields": {
+        "name": "Comercializa\u00e7\u00e3o Agr\u00edcola",
+        "active": true,
+        "description": ""
+    }
+},
+{
+    "model": "gatheros_event.subject",
+    "pk": 8,
+    "fields": {
+        "name": "Prestadores de Servi\u00e7o de Agricultura",
+        "active": true,
+        "description": ""
+    }
+},
+{
+    "model": "gatheros_event.subject",
+    "pk": 9,
+    "fields": {
+        "name": "Pol\u00edticas Agropecu\u00e1rias",
+        "active": true,
+        "description": ""
+    }
+}
+]

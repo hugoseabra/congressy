@@ -1,0 +1,62 @@
+[
+  {
+    "model": "gatheros_event.info",
+    "pk": 5,
+    "fields": {
+      "text": "Info sobre o curso python",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "video": ""
+    }
+  },
+  {
+    "model": "gatheros_event.info",
+    "pk": 2,
+    "fields": {
+      "text": "Sobre Dia de Inova\u00e7\u00e3o Semear",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "video": ""
+    }
+  },
+  {
+    "model": "gatheros_event.info",
+    "pk": 1,
+    "fields": {
+      "text": "Sobre Dia de Inova\u00e7\u00e3o Spa\u00e7o Agr\u00edcola",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "video": ""
+    }
+  },
+  {
+    "model": "gatheros_event.info",
+    "pk": 3,
+    "fields": {
+      "text": "Sobre o campo sa\u00fade de Jaupaci-GO",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "video": ""
+    }
+  },
+  {
+    "model": "gatheros_event.info",
+    "pk": 4,
+    "fields": {
+      "text": "Sobre Semin\u00e1rio de E-social",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "video": ""
+    }
+  }
+]
