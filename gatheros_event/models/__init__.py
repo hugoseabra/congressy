@@ -8,3 +8,4 @@ from .member import Member
 from .place import Place
 from .event import Event
 from .info import Info
+from .invitation import Invitation
