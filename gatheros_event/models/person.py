@@ -13,14 +13,10 @@ class TextFieldWithInputText(models.TextField):
         return super(TextFieldWithInputText, self).formfield(**kwargs)
 
 
+# @TODO verificação de unicidade se dará apenas por CPF e nada mais
+
 class Person(models.Model):
     RESOURCE_URI = '/api/core/people/'
-
-    RECORD_TYPE = (
-        ('participant', 'Participante'),
-        ('event_helper', 'Auxiliar de evento'),
-        ('event_manager', 'Realizador de evento'),
-    )
 
     GENDER_CHOICES = (
         ('M', 'Masculino'),
@@ -61,8 +57,6 @@ class Person(models.Model):
     email = TextFieldWithInputText(blank=True, null=True, verbose_name='email')
     phone = TextFieldWithInputText(blank=True, null=True, verbose_name='telefone')
 
-    record_type = models.CharField(max_length=25, choices=RECORD_TYPE, verbose_name='tipo de registro', blank=True,
-                                   null=True)
     user = models.OneToOneField(User, on_delete=models.PROTECT, blank=True, null=True, verbose_name='usuário')
     avatar = models.ImageField(blank=True, null=True, verbose_name='foto')
     cpf = models.CharField(max_length=11, blank=True, null=True, verbose_name='CPF')

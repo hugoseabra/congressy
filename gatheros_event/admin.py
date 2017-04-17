@@ -17,7 +17,7 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'genre', 'record_type', 'user')
+    list_display = ('name', 'genre', 'user')
     readonly_fields = ['synchronized', 'term_version', 'politics_version']
 
 
