@@ -1,47 +1,47 @@
 from django.contrib import admin
-from .models import Segment, Subject, Occupation, Category, Person, Organization, Member, Place, Event, Info
+from .models import Segment, Subject, Occupation, Category, Person, Organization, Member, Place, Event, Info, Invitation
 
 
-class NamePKAdmin(admin.ModelAdmin):
-    list_display = ('name', 'pk')
-
-
+@admin.register(Segment)
+@admin.register(Subject)
+@admin.register(Occupation)
+@admin.register(Category)
 class NameActivePKAdmin(admin.ModelAdmin):
     list_display = ('name', 'active', 'pk')
 
 
+@admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = ('name', 'organization', 'subscription_type', 'category', 'place', 'pk')
 
 
+@admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'genre', 'record_type', 'user')
     readonly_fields = ['synchronized', 'term_version', 'politics_version']
 
 
+@admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('name', 'active', 'internal')
 
 
+@admin.register(Place)
 class PlaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'organization', 'pk')
 
 
+@admin.register(Info)
 class EventInfoAdmin(admin.ModelAdmin):
     list_display = ('event', 'pk')
 
 
+@admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('person', 'organization', 'group', 'pk')
 
 
-admin.site.register(Segment, NameActivePKAdmin)
-admin.site.register(Subject, NameActivePKAdmin)
-admin.site.register(Occupation, NameActivePKAdmin)
-admin.site.register(Category, NameActivePKAdmin)
-admin.site.register(Person, PersonAdmin)
-admin.site.register(Organization, OrganizationAdmin)
-admin.site.register(Member, MemberAdmin)
-admin.site.register(Place, PlaceAdmin)
-admin.site.register(Event, EventAdmin)
-admin.site.register(Info, EventInfoAdmin)
+@admin.register(Invitation)
+class InvitationAdmin(admin.ModelAdmin):
+    list_display = ('author', 'to', 'organization', 'created', 'expired')
+    readonly_fields = ['created', 'expired']
