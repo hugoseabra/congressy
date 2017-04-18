@@ -1,10 +1,13 @@
 import uuid
 
 from django import forms
-from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.db import models
 from kanu_locations.models import City
+
 from . import Occupation
+from ..lib.validators import CpfValidator, EmailValidator, PhoneValidator
 
 
 class TextFieldWithInputText(models.TextField):
@@ -50,14 +53,15 @@ class Person(models.Model):
     name = TextFieldWithInputText(verbose_name='nome')
     genre = models.CharField(max_length=1, choices=GENDER_CHOICES, verbose_name='sexo')
 
+    email = TextFieldWithInputText(unique=True, blank=True, null=True, verbose_name='email')
     city = models.ForeignKey(City, null=True, verbose_name='cidade')
     zip_code = models.CharField(max_length=8, blank=True, null=True, verbose_name='CEP')
     street = TextFieldWithInputText(blank=True, null=True, verbose_name='endereço')
     village = TextFieldWithInputText(blank=True, null=True, verbose_name='bairro')
-    email = TextFieldWithInputText(blank=True, null=True, verbose_name='email')
     phone = TextFieldWithInputText(blank=True, null=True, verbose_name='telefone')
 
-    user = models.OneToOneField(User, on_delete=models.PROTECT, blank=True, null=True, verbose_name='usuário')
+    user = models.OneToOneField(User, on_delete=models.PROTECT, blank=True, null=True, verbose_name='usuário',
+                                related_name='person')
     avatar = models.ImageField(blank=True, null=True, verbose_name='foto')
     cpf = models.CharField(max_length=11, blank=True, null=True, verbose_name='CPF')
     birth_date = models.DateField(blank=True, null=True, verbose_name='data nascimento')
@@ -76,6 +80,7 @@ class Person(models.Model):
     twitter = models.CharField(max_length=255, null=True, blank=True)
     linkedin = models.CharField(max_length=255, null=True, blank=True)
     skype = models.CharField(max_length=255, null=True, blank=True)
+    has_user = models.BooleanField(verbose_name='vincular usuario?', default=False)
 
     class Meta:
         verbose_name = 'pessoa'
@@ -84,6 +89,32 @@ class Person(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+    def clean(self):
+
+        fields = {'email': EmailValidator, 'cpf': CpfValidator, 'phone': PhoneValidator}
+        errors = {}
+
+        for f in self._meta.fields:
+
+            if f.attname not in fields.keys():
+                continue
+
+            value = getattr(self, f.attname)
+
+            if not value:
+                continue
+
+            try:
+                obj = fields[f.attname]()
+                obj.validate(value)
+                setattr(self, f.attname, obj.clean_data(value))
+
+            except ValidationError as e:
+                errors[f.attname] = e.message
+
+        if errors:
+            raise ValidationError(errors)
 
     def get_cpf_display(self):
         cpf = str(self.cpf)
