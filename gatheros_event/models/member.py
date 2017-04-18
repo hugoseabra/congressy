@@ -3,13 +3,17 @@ from . import Organization, Person
 
 
 class Member(models.Model):
+
+    ADMIN = 'admin'
+    HELPER = 'helper'
+
     GROUP_CHOICES = (
-        ('admin', 'Administrador'),
-        ('helper', 'Auxiliar'),
+        (ADMIN, 'Administrador'),
+        (HELPER, 'Auxiliar'),
     )
 
-    person = models.ForeignKey(Person, verbose_name='pessoa')
-    organization = models.ForeignKey(Organization, verbose_name='organização')
+    person = models.ForeignKey(Person, verbose_name='pessoa', related_name='members')
+    organization = models.ForeignKey(Organization, verbose_name='organização', related_name='members')
     group = models.CharField(max_length=20, choices=GROUP_CHOICES, verbose_name='grupo')
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
     created_by = models.PositiveIntegerField(verbose_name='criado por')  # ID do usuário
