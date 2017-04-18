@@ -1,0 +1,33 @@
+[
+  {
+    "model": "gatheros_event.person",
+    "pk": "0ef90d46-c316-4f81-b768-36e3080cecf0",
+    "fields": {
+      "name": "Flavia Silva",
+      "genre": "F",
+      "city": 5413,
+      "zip_code": null,
+      "street": null,
+      "village": null,
+      "email": null,
+      "phone": null,
+      "user": null,
+      "avatar": null,
+      "cpf": null,
+      "birth_date": null,
+      "rg": null,
+      "orgao_expedidor": null,
+      "created": "2017-04-11T11:52:52.558",
+      "modified": "2017-04-13T18:36:29.308",
+      "synchronized": false,
+      "term_version": null,
+      "politics_version": null,
+      "occupation": null,
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null
+    }
+  }
+]
