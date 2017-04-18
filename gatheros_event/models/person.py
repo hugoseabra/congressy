@@ -90,9 +90,33 @@ class Person(models.Model):
     def __str__(self):
         return str(self.name)
 
-    def clean(self):
+    def save(self, *args, **kwargs):
+        if not self.email:
+            self.email = None
 
-        fields = {'email': EmailValidator, 'cpf': CpfValidator, 'phone': PhoneValidator}
+        self.full_clean()
+        super(Person, self).save(*args, **kwargs)
+
+    def clean(self):
+        self._validate_fields()
+
+    def get_cpf_display(self):
+        cpf = str(self.cpf)
+        if not cpf:
+            return ''
+        return '{0}.{1}.{2}-{3}'.format(cpf[:3], cpf[3:6], cpf[6:9], cpf[9:11])
+
+    def get_birth_date_display(self):
+        if not self.birth_date:
+            return '--'
+        return self.birth_date.strftime('%d/%m/%Y')
+
+    def _validate_fields(self):
+        fields = {
+            'email': EmailValidator,
+            'cpf': CpfValidator,
+            'phone': PhoneValidator
+        }
         errors = {}
 
         for f in self._meta.fields:
@@ -108,21 +132,10 @@ class Person(models.Model):
             try:
                 obj = fields[f.attname]()
                 obj.validate(value)
-                setattr(self, f.attname, obj.clean_data(value))
+                setattr(self, f.attname, obj.normalize(value))
 
             except ValidationError as e:
                 errors[f.attname] = e.message
 
         if errors:
             raise ValidationError(errors)
-
-    def get_cpf_display(self):
-        cpf = str(self.cpf)
-        if not cpf:
-            return ''
-        return '{0}.{1}.{2}-{3}'.format(cpf[:3], cpf[3:6], cpf[6:9], cpf[9:11])
-
-    def get_birth_date_display(self):
-        if not self.birth_date:
-            return '--'
-        return self.birth_date.strftime('%d/%m/%Y')

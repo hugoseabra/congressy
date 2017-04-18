@@ -5,7 +5,7 @@ class ValidatorInterface(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def clean_data(self, data):
+    def normalize(self, data):
         raise Exception('Você deve de implementar clean_data()')
 
     @abstractmethod

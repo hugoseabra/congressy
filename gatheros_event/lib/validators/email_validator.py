@@ -5,7 +5,7 @@ from .validator_interface import ValidatorInterface
 
 
 class EmailValidator(ValidatorInterface):
-    def clean_data(self, data):
+    def normalize(self, data):
         return data.lower()
 
     def is_valid(self, data):
@@ -17,6 +17,6 @@ class EmailValidator(ValidatorInterface):
 
     def validate(self, data):
         try:
-            validate_email(self.clean_data(data))
+            validate_email(self.normalize(data))
         except ValidationError as e:
             raise e

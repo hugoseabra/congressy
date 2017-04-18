@@ -11,7 +11,7 @@ class PhoneValidator(ValidatorInterface):
     def parse_number(self, number):
         return phonenumbers.parse(number, self.COUNTRY_CODE)
 
-    def clean_data(self, data):
+    def normalize(self, data):
         return self.parse_number(data).national_number
 
     def is_valid(self, data):
