@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
-from .models import Person
+from gatheros_event.models import Person
 
 
 def split_name(name):
@@ -14,26 +15,29 @@ def split_name(name):
 
 
 @receiver(pre_save, sender=Person)
-def check_user_related_fields(sender, instance, raw, **_):
+def add_related_user_when_has_user(sender, instance, raw, **_):
     """
     Verifica se a instância de Person possui informações necessárias para vincular User
 
     :param sender:
     :param instance:
-    :param created:
     :param raw:
     :param _:
     :return:
     """
+    # Disable when loaded by fixtures
+    if raw is True:
+        return
+
     if instance.has_user:
         if not instance.email:
-            raise AttributeError('Informe o e-mail para vincular um usuário')
+            raise ValidationError({'email': ['Informe o e-mail para vincular um usuário']})
 
         if instance.user and instance.user.email == instance.email:
             return None
 
         if User.objects.filter(username=instance.email).count() > 0:
-            raise AttributeError('Já existe um outro usuário com este e-mail. Tente outro.')
+            raise ValidationError({'email': ['Informe o e-mail para vincular um usuário']})
 
         names = split_name(instance.name)
 
@@ -48,14 +52,9 @@ def check_user_related_fields(sender, instance, raw, **_):
                 is_active=False
             )
 
-    else:
-        instance.has_user = False
-        instance.user = None
-        # @TODO verificar forma de excluir o usuário que não possuem vínculo com Person
-
 
 @receiver(post_save, sender=Person)
-def update_person_related_user(sender, instance, created, raw, **_):
+def update_user_related_name(sender, instance, created, raw, **_):
     """
     Atualiza o nome de Usuário assim que o nome da pessoa é atualizado.
 
@@ -66,6 +65,9 @@ def update_person_related_user(sender, instance, created, raw, **_):
     :param _:
     :return:
     """
+    # Disable when loaded by fixtures
+    if raw is True:
+        return
 
     names = split_name(instance.name)
 
@@ -75,18 +77,3 @@ def update_person_related_user(sender, instance, created, raw, **_):
     instance.user.first_name = names.get('first')
     instance.user.last_name = names.get('last')
     instance.user.save()
-
-
-@receiver(post_save, sender=Person)
-def update_person_related_organization(sender, instance, created, raw, **_):
-    """
-    Atualiza nomes de Organização e Usuário assim que o nome da
-    pessoa é atualizado.
-    """
-
-    for member in instance.members.all():
-        if not member.organization.internal:
-            continue
-
-        member.organization.name = instance.name
-        member.organization.save()
