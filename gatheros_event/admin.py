@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Segment, Subject, Occupation, Category, Person, Organization, Member, Place, Event, Info, Invitation
+
+from .models import Category, Event, Info, Invitation, Member, Occupation, Organization, Person, Place, Segment, Subject
 
 
 @admin.register(Segment)
@@ -17,7 +18,8 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'genre', 'user')
+    list_display = ('name', 'genre', 'user', 'created')
+    ordering = ('created', 'name')
     readonly_fields = ['user', 'synchronized', 'term_version', 'politics_version']
 
 
@@ -38,7 +40,14 @@ class EventInfoAdmin(admin.ModelAdmin):
 
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
-    list_display = ('person', 'organization', 'group', 'pk')
+    list_display = ('organization', 'person', 'group', 'pk')
+    ordering = ('organization', 'person')
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "person":
+            kwargs["queryset"] = Person.objects.filter(has_user=True).order_by('name')
+
+        return super(MemberAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(Invitation)
