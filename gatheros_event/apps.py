@@ -6,4 +6,4 @@ class GatherosEventConfig(AppConfig):
     verbose_name = 'Eventos'
 
     def ready(self):
-        import gatheros_event.person_signals
+        import gatheros_event.signals
