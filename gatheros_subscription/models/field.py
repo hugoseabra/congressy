@@ -14,16 +14,27 @@ class FieldManager(models.Manager):
 
 
 class Field(models.Model):
+
+    FIELD_INPUT_TEXT = 'input-text'
+    FIELD_INPUT_DATE = 'input-date'
+    FIELD_INPUT_EMAIL = 'input-email'
+    FIELD_INPUT_PHONE = 'input-phone'
+    FIELD_BOOLEAN = 'boolean'
+    FIELD_SELECT = 'select'
+    FIELD_SELECT_MULTIPLE = 'select-multiple'
+    FIELD_CHECKBOX_GROUP = 'checkbox-group'
+    FIELD_RADIO_GROUP = 'radio-group'
+
     TYPES = (
-        ('input-text', 'INPUT-TEXT'),
-        ('input-date', 'INPUT-DATE'),
-        ('input-email', 'INPUT-EMAIL'),
-        ('input-phone', 'INPUT-PHONE'),
-        ('boolean', 'SIM/NÃO'),
-        ('select', 'SELECT'),
-        ('select-multiple', 'SELECT-MULTIPLE'),
-        ('checkbox-group', 'CHECKBOX-GROUP'),
-        ('radio-group', 'RADIO-GROUP'),
+        (FIELD_INPUT_TEXT, 'INPUT-TEXT'),
+        (FIELD_INPUT_DATE, 'INPUT-DATE'),
+        (FIELD_INPUT_EMAIL, 'INPUT-EMAIL'),
+        (FIELD_INPUT_PHONE, 'INPUT-PHONE'),
+        (FIELD_BOOLEAN, 'SIM/NÃO'),
+        (FIELD_SELECT, 'SELECT'),
+        (FIELD_SELECT_MULTIPLE, 'SELECT-MULTIPLE'),
+        (FIELD_CHECKBOX_GROUP, 'CHECKBOX-GROUP'),
+        (FIELD_RADIO_GROUP, 'RADIO-GROUP'),
     )
 
     form = models.ForeignKey(Form, on_delete=models.CASCADE, verbose_name='formulário', related_name='fields')

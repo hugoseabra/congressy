@@ -1,9 +1,9 @@
 import uuid
-
-from django.db import models
+from datetime import datetime
+from django.db import IntegrityError, models
 from django.db.models import Max
 
-from gatheros_event.models import Person, Event
+from gatheros_event.models import Event, Person
 from . import Lot
 
 
@@ -24,10 +24,15 @@ class SubscriptionManager(models.Manager):
                 return code
 
 
+# @TODO - verificar se evento irá emitir certificado. Se sim, exigir CPF da pessoa na inscrição
+
 class Subscription(models.Model):
+    DEVICE_ORIGIN_WEB = 'web'
+    DEVICE_ORIGIN_OFFLINE = 'offline'
+
     DEVICE_ORIGINS = (
-        ('web', 'WEB'),
-        ('offline', 'Sincronização Off-line'),
+        (DEVICE_ORIGIN_WEB, 'WEB'),
+        (DEVICE_ORIGIN_OFFLINE, 'Sincronização Off-line'),
     )
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
@@ -63,10 +68,21 @@ class Subscription(models.Model):
 
         self.event = self.lot.event
 
+        if self.attended is True:
+            self.attended_on = datetime.now()
+        else:
+            self.attended_on = None
+
         if self._state.adding:
             self.code = Subscription.objects.generate_code(self.event)
 
+        self.full_clean()
         super(Subscription, self).save(*args, **kwargs)
+
+    def clean(self):
+
+        if self.lot.limit and int(self.lot.limit) > 0 and int(self.lot.subscriptions.count()) >= self.lot.limit:
+            raise IntegrityError('Este lote atingiu o limite de inscrições.')
 
     def get_count_display(self):
         if not self.count:
