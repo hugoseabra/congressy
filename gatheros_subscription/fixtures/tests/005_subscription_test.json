@@ -1,0 +1,92 @@
+[
+  {
+    "model": "gatheros_subscription.subscription",
+    "pk": "16730725-26ca-4e0c-ab32-5e080c12d9cf",
+    "fields": {
+      "person": "0ef90d46-c316-4f81-b768-36e3080cecf0",
+      "event": 2,
+      "lot": 2,
+      "origin": "web",
+      "created_by": 1,
+      "attended": false,
+      "code": "0ef90d46",
+      "count": 1,
+      "attended_on": "2017-04-12T17:07:15",
+      "created": "2017-04-12T17:07:20.398",
+      "modified": "2017-04-12T17:07:20.398",
+      "synchronized": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.subscription",
+    "pk": "5149ce74-9a2d-4f43-90a7-c9e7884bd6ef",
+    "fields": {
+      "person": "1560f30e-6270-47e9-a9ed-6ae1e3134ddf",
+      "event": 2,
+      "lot": 2,
+      "origin": "web",
+      "created_by": 1,
+      "attended": false,
+      "code": "C971E2E9",
+      "count": 2,
+      "attended_on": "2017-04-12T17:07:15",
+      "created": "2017-04-12T17:07:20.398",
+      "modified": "2017-04-12T17:07:20.398",
+      "synchronized": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.subscription",
+    "pk": "7497429a-baa3-4706-86d9-6828d68d60cf",
+    "fields": {
+      "person": "1f2cfdf8-0ccb-4387-adf9-be4684a73f0c",
+      "event": 5,
+      "lot": 5,
+      "origin": "web",
+      "created_by": 1,
+      "attended": false,
+      "code": "C971E2E9",
+      "count": 1,
+      "attended_on": "2017-04-12T17:07:15",
+      "created": "2017-04-12T17:07:20.398",
+      "modified": "2017-04-12T17:07:20.398",
+      "synchronized": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.subscription",
+    "pk": "d124f6ef-8ca3-4334-ba35-f01927f4929d",
+    "fields": {
+      "person": "4181aa5b-8684-4aad-a0a1-673906a8c3fb",
+      "event": 5,
+      "lot": 5,
+      "origin": "web",
+      "created_by": 1,
+      "attended": false,
+      "code": "d124f6ef",
+      "count": 2,
+      "attended_on": "2017-04-12T17:07:15",
+      "created": "2017-04-12T17:07:20.398",
+      "modified": "2017-04-12T17:07:20.398",
+      "synchronized": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.subscription",
+    "pk": "6f796c89-7a14-4794-873a-8248e36750ed",
+    "fields": {
+      "person": "5c76d747-f22a-4d27-9211-3b9929fb908d",
+      "event": 5,
+      "lot": 6,
+      "origin": "web",
+      "created_by": 1,
+      "attended": false,
+      "code": "5c76d747",
+      "count": 1,
+      "attended_on": "2017-04-12T17:07:15",
+      "created": "2017-04-12T17:07:20.398",
+      "modified": "2017-04-12T17:07:20.398",
+      "synchronized": false
+    }
+  }
+]
