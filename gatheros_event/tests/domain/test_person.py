@@ -3,11 +3,19 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from kanu_locations.models import City
 
-from ..models import Person
+from gatheros_event.models import Member, Person
 
 
 class PersonModelTest(TestCase):
-    fixtures = ['005_person_test', '006_organization_test', '007_member_test']
+    fixtures = [
+        'kanu_locations_city_test',
+        '003_occupation',
+        '004_category',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member'
+    ]
 
     def test_edit_person_with_invalid_cpf(self):
         person = Person.objects.last()
@@ -16,7 +24,7 @@ class PersonModelTest(TestCase):
         with self.assertRaises(ValidationError) as e:
             person.save()
 
-        self.assertEqual(dict(e.exception).get('cpf'), ['CPF é inválido'])
+        self.assertTrue('cpf' in dict(e.exception).keys())
 
     def test_add_person_with_invalid_cpf(self):
         person = Person(
@@ -29,7 +37,7 @@ class PersonModelTest(TestCase):
         with self.assertRaises(ValidationError) as e:
             person.save()
 
-        self.assertEqual(dict(e.exception).get('cpf'), ['CPF é inválido'])
+        self.assertTrue('cpf' in dict(e.exception).keys())
 
     def test_invalid_phone(self):
         person = Person.objects.last()
@@ -38,7 +46,7 @@ class PersonModelTest(TestCase):
         with self.assertRaises(ValidationError) as e:
             person.save()
 
-        self.assertEqual(dict(e.exception).get('phone'), ['Telefone é inválido'])
+        self.assertTrue('phone' in dict(e.exception).keys())
 
     def test_valid_email(self):
         person = Person.objects.last()
@@ -49,32 +57,31 @@ class PersonModelTest(TestCase):
         self.assertEqual(person.email, email)
 
     def test_invalid_email(self):
-        person = Person.objects.last()
+        person = Person.objects.first()
         person.email = 'gmail.com'
 
         with self.assertRaises(ValidationError) as e:
             person.save()
 
-        self.assertEqual(dict(e.exception).get('email'), ['Informe um endereço de email válido.'])
+        self.assertTrue('email' in dict(e.exception).keys())
 
         person.email = 'me@gmail.'
-
         with self.assertRaises(ValidationError) as e:
             person.save()
 
-        self.assertEqual(dict(e.exception).get('email'), ['Informe um endereço de email válido.'])
+        self.assertTrue('email' in dict(e.exception).keys())
 
     def test_has_user_and_not_email(self):
         person = Person.objects.last()
         person.has_user = True
 
-        with self.assertRaises(AttributeError) as e:
+        with self.assertRaises(ValidationError) as e:
             person.save()
 
-        self.assertEqual(str(e.exception), 'Informe o e-mail para vincular um usuário')
+        self.assertTrue('email' in dict(e.exception).keys())
 
     def test_add_remove_user(self):
-        person = Person.objects.last()
+        person = Person.objects.first()
         person.has_user = True
         person.email = 'me@gmail.com'
         person.save()
@@ -90,16 +97,18 @@ class PersonModelTest(TestCase):
         self.assertIsNone(person.user)
 
     def test_change_person_organization_name(self):
-        person = Person.objects.last()
+        person = Person.objects.get(pk='a7c5f518-7669-4b71-a83b-2a7107e9c313')
         person.name = 'Another Test'
         person.save()
 
-        organization = person.members.last().organization
+        member = person.members.first()
+        organization = member.organization
 
+        self.assertEqual(member.group, Member.ADMIN)
         self.assertEqual(person.name, organization.name)
 
     def test_change_person_user_name(self):
-        person = Person.objects.last()
+        person = Person.objects.first()
         person.name = 'Another Test'
         person.email = 'me@gmail.com'
         person.has_user = True
