@@ -1,0 +1,92 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "hugoseabra19@gmail.com",
+      "first_name": "Hugo Seabra",
+      "last_name": "Batista",
+      "email": "hugoseabra19@gmail.com",
+      "is_staff": false,
+      "is_active": false,
+      "date_joined": "2017-04-20T17:53:52.107",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "diegotolentino@gmail.com",
+      "first_name": "Diego",
+      "last_name": "Tolentino",
+      "email": "diegotolentino@gmail.com",
+      "is_staff": false,
+      "is_active": false,
+      "date_joined": "2017-04-20T17:56:11.281",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 4,
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "lucianasilva@gmail.com",
+      "first_name": "Luciana",
+      "last_name": "Silva",
+      "email": "lucianasilva@gmail.com",
+      "is_staff": false,
+      "is_active": false,
+      "date_joined": "2017-04-20T17:59:35.410",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 5,
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "flavia@in2web.com.br",
+      "first_name": "Flavia",
+      "last_name": "Silva",
+      "email": "flavia@in2web.com.br",
+      "is_staff": false,
+      "is_active": false,
+      "date_joined": "2017-04-20T18:00:06.209",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 6,
+    "fields": {
+      "password": "",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "jackelinda11@gmail.com",
+      "first_name": "Jackeline de",
+      "last_name": "Sousa",
+      "email": "jackelinda11@gmail.com",
+      "is_staff": false,
+      "is_active": false,
+      "date_joined": "2017-04-20T18:00:26.864",
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]

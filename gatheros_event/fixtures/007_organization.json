@@ -3,91 +3,11 @@
     "model": "gatheros_event.organization",
     "pk": 1,
     "fields": {
-      "name": "Landare",
-      "description": null,
-      "avatar_width": 1014,
-      "avatar_height": 571,
-      "avatar": "g3195.png",
-      "website": null,
-      "facebook": null,
-      "twitter": null,
-      "linkedin": null,
-      "skype": null,
-      "cash_provider": null,
-      "cash_data": null,
-      "active": true,
-      "internal": false
-    }
-  },
-  {
-    "model": "gatheros_event.organization",
-    "pk": 2,
-    "fields": {
-      "name": "In2",
-      "description": null,
+      "name": "Diego Tolentino",
+      "description": "",
       "avatar_width": null,
       "avatar_height": null,
-      "avatar": null,
-      "website": null,
-      "facebook": null,
-      "twitter": null,
-      "linkedin": null,
-      "skype": null,
-      "cash_provider": null,
-      "cash_data": null,
-      "active": true,
-      "internal": false
-    }
-  },
-  {
-    "model": "gatheros_event.organization",
-    "pk": 3,
-    "fields": {
-      "name": "Gatheros Community",
-      "description": null,
-      "avatar_width": null,
-      "avatar_height": null,
-      "avatar": null,
-      "website": null,
-      "facebook": null,
-      "twitter": null,
-      "linkedin": null,
-      "skype": null,
-      "cash_provider": null,
-      "cash_data": null,
-      "active": true,
-      "internal": false
-    }
-  },
-  {
-    "model": "gatheros_event.organization",
-    "pk": 4,
-    "fields": {
-      "name": "SENAR/AR-GO",
-      "description": null,
-      "avatar_width": null,
-      "avatar_height": null,
-      "avatar": null,
-      "website": null,
-      "facebook": null,
-      "twitter": null,
-      "linkedin": null,
-      "skype": null,
-      "cash_provider": null,
-      "cash_data": null,
-      "active": true,
-      "internal": false
-    }
-  },
-  {
-    "model": "gatheros_event.organization",
-    "pk": 5,
-    "fields": {
-      "name": "Diego Toletino",
-      "description": null,
-      "avatar_width": null,
-      "avatar_height": null,
-      "avatar": null,
+      "avatar": "",
       "website": null,
       "facebook": null,
       "twitter": null,
@@ -97,6 +17,126 @@
       "cash_data": null,
       "active": true,
       "internal": true
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 2,
+    "fields": {
+      "name": "Luciana Silva",
+      "description": "",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": true
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 3,
+    "fields": {
+      "name": "Flavia Silva",
+      "description": "",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": true
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 4,
+    "fields": {
+      "name": "Jackeline de Sousa",
+      "description": "",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": true
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 5,
+    "fields": {
+      "name": "In2 Web Solu\u00e7\u00f5es e Servi\u00e7os",
+      "description": "",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": false
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 6,
+    "fields": {
+      "name": "/MNT",
+      "description": "",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": false
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 7,
+    "fields": {
+      "name": "Paroquias Unidas",
+      "description": "",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": false
     }
   }
 ]
