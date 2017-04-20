@@ -25,6 +25,7 @@ class Person(models.Model):
         ('M', 'Masculino'),
         ('F', 'Feminino'),
     )
+
     FORM_FIELDS = [
         'name',
         'genre',
@@ -57,13 +58,14 @@ class Person(models.Model):
     city = models.ForeignKey(City, null=True, verbose_name='cidade')
     zip_code = models.CharField(max_length=8, blank=True, null=True, verbose_name='CEP')
     street = TextFieldWithInputText(blank=True, null=True, verbose_name='endereço')
+    complement = TextFieldWithInputText(blank=True, null=True, verbose_name='complemento')
     village = TextFieldWithInputText(blank=True, null=True, verbose_name='bairro')
     phone = TextFieldWithInputText(blank=True, null=True, verbose_name='telefone')
 
     user = models.OneToOneField(User, on_delete=models.PROTECT, blank=True, null=True, verbose_name='usuário',
                                 related_name='person')
     avatar = models.ImageField(blank=True, null=True, verbose_name='foto')
-    cpf = models.CharField(max_length=11, blank=True, null=True, verbose_name='CPF')
+    cpf = models.CharField(max_length=11, blank=True, null=True, unique=True, verbose_name='CPF')
     birth_date = models.DateField(blank=True, null=True, verbose_name='data nascimento')
     rg = TextFieldWithInputText(blank=True, null=True, verbose_name='rg')
     orgao_expedidor = TextFieldWithInputText(blank=True, null=True, verbose_name='orgão expedidor')
@@ -93,6 +95,13 @@ class Person(models.Model):
     def save(self, *args, **kwargs):
         if not self.email:
             self.email = None
+
+        if not self.cpf:
+            self.cpf = None
+
+        # @TODO verificar forma de excluir o usuário que não possuem vínculo com Person
+        if self.has_user is False:
+            self.user = None
 
         self.full_clean()
         super(Person, self).save(*args, **kwargs)

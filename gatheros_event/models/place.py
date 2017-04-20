@@ -1,7 +1,11 @@
 from django.db import models
 from kanu_locations.models import City
+
 from . import Organization
 
+
+# @TODO Colocar telefone
+# @TODO Colocar coordenadas
 
 class Place(models.Model):
     name = models.CharField(max_length=255, verbose_name='nome')
@@ -9,7 +13,7 @@ class Place(models.Model):
                                      related_name='addresses')
     city = models.ForeignKey(City, on_delete=models.PROTECT, verbose_name='cidade')
 
-    zip_code = models.CharField(max_length=255, verbose_name='CEP', blank=True, null=True)
+    zip_code = models.CharField(max_length=8, verbose_name='CEP', blank=True, null=True)
     street = models.CharField(max_length=255, verbose_name='logradouro (rua, avenida, etc.)', blank=True, null=True)
     complement = models.CharField(max_length=255, verbose_name='complemento', blank=True, null=True)
     village = models.CharField(max_length=255, verbose_name='bairro', blank=True, null=True)
