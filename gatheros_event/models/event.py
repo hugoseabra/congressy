@@ -59,5 +59,8 @@ class Event(models.Model):
         if self.date_end < self.date_start:
             raise ValidationError({'date_start': ['Data inicial deve anterior a data final']})
 
+        if self.place and self.place.organization != self.organization:
+            raise ValidationError({'place': ['Local do evento não pertence a sua organização']})
+
     def __str__(self):
         return str(self.name)
