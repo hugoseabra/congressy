@@ -9,9 +9,6 @@ export PYTHONPATH=$BASE_DIR
 $BASE_DIR/bin/dropdb.sh || exit 1;
 $BASE_DIR/bin/createdb.sh || exit 1;
 
-# Rodando demais migrações de todas as apps
-python $BASE_DIR/manage.py migrate
-
 # Importando fixtures
 
 # User
