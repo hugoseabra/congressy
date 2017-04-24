@@ -1,0 +1,46 @@
+[
+{
+    "model": "gatheros_event.invitation",
+    "pk": 1,
+    "fields": {
+        "author": 5,
+        "to": 2,
+        "created": "2017-04-24T14:16:14.870",
+        "expired": "2017-04-30T14:16:14.870",
+        "type": "helper"
+    }
+},
+{
+    "model": "gatheros_event.invitation",
+    "pk": 2,
+    "fields": {
+        "author": 5,
+        "to": 3,
+        "created": "2017-04-24T14:16:28.606",
+        "expired": "2017-04-30T14:16:28.606",
+        "type": "helper"
+    }
+},
+{
+    "model": "gatheros_event.invitation",
+    "pk": 3,
+    "fields": {
+        "author": 7,
+        "to": 3,
+        "created": "2017-04-24T14:16:54.969",
+        "expired": "2017-04-30T14:16:54.969",
+        "type": "helper"
+    }
+},
+{
+    "model": "gatheros_event.invitation",
+    "pk": 4,
+    "fields": {
+        "author": 10,
+        "to": 4,
+        "created": "2017-04-24T14:20:26.746",
+        "expired": "2017-04-30T14:20:26.746",
+        "type": "helper"
+    }
+}
+]
