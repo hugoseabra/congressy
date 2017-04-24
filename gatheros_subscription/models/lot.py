@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models
 
@@ -37,7 +38,7 @@ class Lot(models.Model):
 
     def save(self, **kwargs):
         if not self.date_end:
-            self.date_end = self.event.date_start
+            self.date_end = self.event.date_start - timedelta(seconds=1)
 
         self.full_clean()
         return super(Lot, self).save(**kwargs)
