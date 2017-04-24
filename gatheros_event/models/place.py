@@ -4,14 +4,17 @@ from kanu_locations.models import City
 from . import Organization
 
 
-# @TODO Colocar telefone
-# @TODO Colocar coordenadas
+# @TODO Usar GeoDjango para coodenadas
 
 class Place(models.Model):
     name = models.CharField(max_length=255, verbose_name='nome')
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, verbose_name='organização',
-                                     related_name='addresses')
+                                     related_name='places')
     city = models.ForeignKey(City, on_delete=models.PROTECT, verbose_name='cidade')
+
+    phone = models.CharField(max_length=9, blank=True, null=True, verbose_name='telefone')
+    long = models.DecimalField(max_digits=8, decimal_places=3, blank=True, null=True)
+    lat = models.DecimalField(max_digits=8, decimal_places=3, blank=True, null=True)
 
     zip_code = models.CharField(max_length=8, verbose_name='CEP', blank=True, null=True)
     street = models.CharField(max_length=255, verbose_name='logradouro (rua, avenida, etc.)', blank=True, null=True)
