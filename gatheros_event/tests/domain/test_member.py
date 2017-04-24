@@ -30,7 +30,7 @@ class OrganizationModelTest(TestCase):
             cpf="28488214421"
         )
 
-        with self.assertRaises(IntegrityError) as e:
+        with self.assertRaises(IntegrityError):
             Member.objects.create(
                 organization=organization,
                 person=person,
@@ -52,34 +52,12 @@ class OrganizationModelTest(TestCase):
             has_user=True,
             email='test@test.me'
         )
+        # Person has user
+        self.assertIsNotNone(person.user)
 
         organization = Organization.objects.create(name=person.name, internal=True)
-        member = Member.objects.create(
-            organization=organization,
-            person=person,
-            group=Member.HELPER,
-            created_by=1,
-            invited_on=datetime.datetime.now()
-        )
 
-        self.assertEqual(member.group, Member.ADMIN)
-
-        member.group = Member.HELPER
-        member.save()
-
-        # @TODO Verificar se é melhor gerar exceção
-        self.assertNotEqual(member.group, Member.HELPER)
-
-    def test_member_with_no_user_not_allowed(self):
-        person = Person.objects.create(
-            name="Person Test",
-            genre="M",
-            city=City.objects.get(pk=5413),
-            cpf="28488214421",
-            has_user=False
-        )
-
-        organization = Organization.objects.create(name=person.name, internal=True)
+        # Trying to insert member as HELPER in internal organization
         with self.assertRaises(IntegrityError):
             Member.objects.create(
                 organization=organization,
@@ -89,3 +67,31 @@ class OrganizationModelTest(TestCase):
                 invited_on=datetime.datetime.now()
             )
 
+    def test_member_with_no_user_not_allowed(self):
+        person = Person.objects.create(
+            name="Person Test",
+            genre="M",
+            city=City.objects.get(pk=5413),
+            cpf="28488214421",
+            has_user=False
+        )
+        self.assertIsNone(person.user)
+
+        organization = Organization.objects.create(name=person.name, internal=True)
+
+        # Trying to insert member from a person without USER
+        with self.assertRaises(IntegrityError):
+            Member.objects.create(
+                organization=organization,
+                person=person,
+                group=Member.ADMIN,
+                created_by=1,
+                invited_on=datetime.datetime.now()
+            )
+
+    def test_internal_org_must_have_member(self):
+        person = Person.objects.get(pk='a7c5f518-7669-4b71-a83b-2a7107e9c313')
+        member = person.members.first()
+
+        with self.assertRaises(IntegrityError):
+            member.delete()
