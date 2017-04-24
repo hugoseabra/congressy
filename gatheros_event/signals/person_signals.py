@@ -15,7 +15,7 @@ def split_name(name):
 
 
 @receiver(pre_save, sender=Person)
-def add_related_user_when_has_user(sender, instance, raw, **_):
+def add_related_user_when_has_user(instance, raw, **_):
     """
     Verifica se a instância de Person possui informações necessárias para vincular User
 
@@ -54,16 +54,10 @@ def add_related_user_when_has_user(sender, instance, raw, **_):
 
 
 @receiver(post_save, sender=Person)
-def update_user_related_name(sender, instance, created, raw, **_):
+def update_user_related_name(instance, raw, **_):
     """
     Atualiza o nome de Usuário assim que o nome da pessoa é atualizado.
-
-    :param sender:
-    :param instance:
-    :param created:
-    :param raw:
-    :param _:
-    :return:
+    
     """
     # Disable when loaded by fixtures
     if raw is True:
