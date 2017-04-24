@@ -7,7 +7,7 @@ from gatheros_event.models import Event
 from gatheros_subscription.models import Lot
 
 i = 0
-ref_days = [-10, 10, 20, 25, 30]
+ref_days = [-10, 10, 20, 25, 30, 45, 45, 50, 60, 70, 80]
 events = Event.objects.all()
 for i, day in enumerate(ref_days):
     event = events[i]
