@@ -8,7 +8,9 @@ from gatheros_subscription.models import Lot
 
 i = 0
 ref_days = [-10, 10, 20, 25, 30]
-for event in Event.objects.all():
+events = Event.objects.all()
+for i, day in enumerate(ref_days):
+    event = events[i]
     event.date_start = date.today() + timedelta(days=ref_days[i])
     event.date_end = date.today() + timedelta(days=ref_days[i] + 1)
     event.save()
