@@ -16,8 +16,6 @@ class TextFieldWithInputText(models.TextField):
         return super(TextFieldWithInputText, self).formfield(**kwargs)
 
 
-# @TODO verificação de unicidade se dará apenas por CPF e nada mais
-
 class Person(models.Model):
     RESOURCE_URI = '/api/core/people/'
 

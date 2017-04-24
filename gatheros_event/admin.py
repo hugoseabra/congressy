@@ -52,5 +52,20 @@ class MemberAdmin(admin.ModelAdmin):
 
 @admin.register(Invitation)
 class InvitationAdmin(admin.ModelAdmin):
-    list_display = ('author', 'to', 'organization', 'created', 'expired')
+    list_display = ('author', 'get_user', 'get_organization', 'created', 'expired')
     readonly_fields = ['created', 'expired']
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "author":
+            kwargs["queryset"] = Member.objects.filter(group=Member.ADMIN, organization__internal=False)
+
+        return super(InvitationAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def get_organization(self, instance):
+        return instance.author.organization
+
+    def get_user(self, instance):
+        return '{} {} ({})'.format(instance.to.first_name, instance.to.last_name, instance.to.email)
+
+    get_organization.__name__ = 'organização'
+    get_user.__name__ = 'convidado'
