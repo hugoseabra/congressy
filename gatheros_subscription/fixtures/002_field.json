@@ -1,402 +1,210 @@
 [
-  {
+{
     "model": "gatheros_subscription.field",
     "pk": 1,
     "fields": {
-      "form": 1,
-      "name": "name",
-      "label": "Nome Completo",
-      "type": "input-text",
-      "order": 1,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
-      "placeholder": "Nome completo",
-      "default_value": ""
+        "form": 1,
+        "name": "name",
+        "label": "Nome Completo",
+        "type": "input-text",
+        "order": 1,
+        "form_default_field": true,
+        "required": true,
+        "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+        "placeholder": "Nome completo",
+        "default_value": ""
     }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 2,
     "fields": {
-      "form": 1,
-      "name": "email",
-      "label": "E-mail",
-      "type": "input-email",
-      "order": 2,
-      "form_default_field": true,
-      "required": false,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
+        "form": 1,
+        "name": "email",
+        "label": "E-mail",
+        "type": "input-email",
+        "order": 2,
+        "form_default_field": true,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": ""
     }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 3,
     "fields": {
-      "form": 1,
-      "name": "phone",
-      "label": "Celular",
-      "type": "input-phone",
-      "order": 3,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
+        "form": 1,
+        "name": "phone",
+        "label": "Celular",
+        "type": "input-phone",
+        "order": 3,
+        "form_default_field": true,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": ""
     }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 4,
     "fields": {
-      "form": 1,
-      "name": "city",
-      "label": "Cidade",
-      "type": "input-text",
-      "order": 4,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
+        "form": 1,
+        "name": "city",
+        "label": "Cidade",
+        "type": "input-text",
+        "order": 4,
+        "form_default_field": true,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": ""
     }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 5,
     "fields": {
-      "form": 2,
-      "name": "name",
-      "label": "Nome Completo",
-      "type": "input-text",
-      "order": 1,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
-      "placeholder": "Nome completo",
-      "default_value": ""
+        "form": 2,
+        "name": "name",
+        "label": "Nome Completo",
+        "type": "input-text",
+        "order": 1,
+        "form_default_field": true,
+        "required": true,
+        "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+        "placeholder": "Nome completo",
+        "default_value": ""
     }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 6,
     "fields": {
-      "form": 2,
-      "name": "email",
-      "label": "E-mail",
-      "type": "input-email",
-      "order": 2,
-      "form_default_field": true,
-      "required": false,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
+        "form": 2,
+        "name": "email",
+        "label": "E-mail",
+        "type": "input-email",
+        "order": 2,
+        "form_default_field": true,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": ""
     }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 7,
     "fields": {
-      "form": 2,
-      "name": "phone",
-      "label": "Celular",
-      "type": "input-phone",
-      "order": 3,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
+        "form": 2,
+        "name": "phone",
+        "label": "Celular",
+        "type": "input-phone",
+        "order": 3,
+        "form_default_field": true,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": ""
     }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 8,
     "fields": {
-      "form": 2,
-      "name": "city",
-      "label": "Cidade",
-      "type": "input-text",
-      "order": 4,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
+        "form": 2,
+        "name": "city",
+        "label": "Cidade",
+        "type": "input-text",
+        "order": 4,
+        "form_default_field": true,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": ""
     }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 9,
-    "fields": {
-      "form": 3,
-      "name": "name",
-      "label": "Nome Completo",
-      "type": "input-text",
-      "order": 1,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
-      "placeholder": "Nome completo",
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 10,
-    "fields": {
-      "form": 3,
-      "name": "email",
-      "label": "E-mail",
-      "type": "input-email",
-      "order": 2,
-      "form_default_field": true,
-      "required": false,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 11,
-    "fields": {
-      "form": 3,
-      "name": "phone",
-      "label": "Celular",
-      "type": "input-phone",
-      "order": 3,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 12,
-    "fields": {
-      "form": 3,
-      "name": "city",
-      "label": "Cidade",
-      "type": "input-text",
-      "order": 4,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 13,
-    "fields": {
-      "form": 4,
-      "name": "name",
-      "label": "Nome Completo",
-      "type": "input-text",
-      "order": 1,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
-      "placeholder": "Nome completo",
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 14,
-    "fields": {
-      "form": 4,
-      "name": "email",
-      "label": "E-mail",
-      "type": "input-email",
-      "order": 2,
-      "form_default_field": true,
-      "required": false,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 15,
-    "fields": {
-      "form": 4,
-      "name": "phone",
-      "label": "Celular",
-      "type": "input-phone",
-      "order": 3,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 16,
-    "fields": {
-      "form": 4,
-      "name": "city",
-      "label": "Cidade",
-      "type": "input-text",
-      "order": 4,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 17,
     "fields": {
-      "form": 1,
-      "name": "nivel-educacional",
-      "label": "N\u00edvel Educacional",
-      "type": "select",
-      "order": 5,
-      "form_default_field": false,
-      "required": false,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
+        "form": 1,
+        "name": "nivel-educacional",
+        "label": "N\u00edvel Educacional",
+        "type": "select",
+        "order": 5,
+        "form_default_field": false,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": ""
     }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 18,
     "fields": {
-      "form": 1,
-      "name": "atividades",
-      "label": "Atividades",
-      "type": "select-multiple",
-      "order": 6,
-      "form_default_field": false,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
+        "form": 1,
+        "name": "atividades",
+        "label": "Atividades",
+        "type": "select-multiple",
+        "order": 6,
+        "form_default_field": false,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": ""
     }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 19,
     "fields": {
-      "form": 1,
-      "name": "insumos-utilizados",
-      "label": "Insumos Utilizados",
-      "type": "checkbox-group",
-      "order": 7,
-      "form_default_field": false,
-      "required": false,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
+        "form": 1,
+        "name": "insumos-utilizados",
+        "label": "Insumos Utilizados",
+        "type": "checkbox-group",
+        "order": 7,
+        "form_default_field": false,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": ""
     }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 20,
     "fields": {
-      "form": 1,
-      "name": "proxima-cultura-principal",
-      "label": "Pr\u00f3xima Cultura Principal",
-      "type": "radio-group",
-      "order": 8,
-      "form_default_field": false,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
+        "form": 1,
+        "name": "proxima-cultura-principal",
+        "label": "Pr\u00f3xima Cultura Principal",
+        "type": "radio-group",
+        "order": 8,
+        "form_default_field": false,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": ""
     }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 21,
-    "fields": {
-      "form": 5,
-      "name": "name",
-      "label": "Nome Completo",
-      "type": "input-text",
-      "order": 1,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
-      "placeholder": "Nome completo",
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 22,
-    "fields": {
-      "form": 5,
-      "name": "email",
-      "label": "E-mail",
-      "type": "input-email",
-      "order": 2,
-      "form_default_field": true,
-      "required": false,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 23,
-    "fields": {
-      "form": 5,
-      "name": "phone",
-      "label": "Celular",
-      "type": "input-phone",
-      "order": 3,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 24,
-    "fields": {
-      "form": 5,
-      "name": "city",
-      "label": "Cidade",
-      "type": "input-text",
-      "order": 4,
-      "form_default_field": true,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
-  },
-  {
+},
+{
     "model": "gatheros_subscription.field",
     "pk": 25,
     "fields": {
-      "form": 5,
-      "name": "tem-conhecimento-de-programacao",
-      "label": "Tem conhecimento de programa\u00e7\u00e3o",
-      "type": "boolean",
-      "order": 5,
-      "form_default_field": false,
-      "required": true,
-      "instruction": "Informe se conhece l\u00f3gica de programa\u00e7\u00e3o, mesmo o basico",
-      "placeholder": null,
-      "default_value": ""
+        "form": 10,
+        "name": "tem-conhecimento-de-programacao",
+        "label": "Tem conhecimento de programa\u00e7\u00e3o",
+        "type": "boolean",
+        "order": 5,
+        "form_default_field": false,
+        "required": true,
+        "instruction": "Informe se conhece l\u00f3gica de programa\u00e7\u00e3o, mesmo o basico",
+        "placeholder": null,
+        "default_value": ""
     }
-  }
+}
 ]
