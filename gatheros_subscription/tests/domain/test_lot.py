@@ -18,8 +18,9 @@ class LotModelTest(TestCase):
     ]
 
     def test_date_start_date_end_before_event_date_start(self):
-        event = self._create_event()
-        lot = Lot(name='Lot tests', event=event, date_start=datetime.now() + timedelta(hours=1))
+        event = self._create_event(type=Event.SUBSCRIPTION_SIMPLE)
+        lot = event.lots.first()
+        lot.date_start = datetime.now() + timedelta(hours=1)
 
         with self.assertRaises(ValidationError) as e:
             lot.save()
@@ -33,6 +34,19 @@ class LotModelTest(TestCase):
             lot.save()
 
         self.assertTrue('date_end' in dict(e.exception).keys())
+
+    def test_add_lot_in_event_with_disabled_subscription(self):
+        event = self._create_event(type=Event.SUBSCRIPTION_DISABLED)
+        lot = Lot(
+            name='default',
+            event=event,
+            date_start=datetime.now() - timedelta(days=10)
+        )
+
+        with self.assertRaises(ValidationError) as e:
+            lot.save()
+
+        self.assertTrue('event' in dict(e.exception).keys())
 
     def test_internal_when_subscription_simple(self):
         event = self._create_event(type=Event.SUBSCRIPTION_SIMPLE)
@@ -81,7 +95,7 @@ class LotModelTest(TestCase):
         event.subscription_type = Event.SUBSCRIPTION_BY_LOTS
         event.save()
 
-        # Lot is internal
+        # Lot is external (converted by signal)
         lot = event.lots.first()
         lot.price = price
         lot.limit = 100
@@ -102,8 +116,22 @@ class LotModelTest(TestCase):
 
         self.assertTrue('internal' in dict(e.exception).keys())
 
-    def _create_event(self, type=Event.SUBSCRIPTION_DISABLED):
-        return Event.objects.create(
+    def test_private_must_generate_code(self):
+        event = self._create_event(type=Event.SUBSCRIPTION_BY_LOTS)
+        lot = event.lots.first()
+
+        # No code was generated yet
+        self.assertIsNone(lot.promo_code)
+
+        # Turn to private
+        lot.private = True
+        lot.save()
+
+        # Code has been generated
+        self.assertIsNotNone(lot.promo_code)
+
+    def _create_event(self, type=Event.SUBSCRIPTION_DISABLED, persist=True):
+        event = Event(
             name='Event tests',
             organization=Organization.objects.first(),
             category=Category.objects.first(),
@@ -111,3 +139,8 @@ class LotModelTest(TestCase):
             date_start=datetime.now(),
             date_end=datetime.now() + timedelta(days=1)
         )
+
+        if persist:
+            event.save()
+
+        return event
