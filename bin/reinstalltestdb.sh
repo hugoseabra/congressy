@@ -11,10 +11,11 @@ $BASE_DIR/bin/createdb.sh || exit 1;
 
 # Importando fixtures
 # User
+
+# @TODO Decidir como ficará o usuário admin padrão
 python $BASE_DIR/manage.py loaddata 001_user
 
 ## gatheros_event
-python $BASE_DIR/manage.py loaddata 001_segment 002_subject 003_occupation 004_category
 python $BASE_DIR/manage.py loaddata 005_user 006_person 007_organization 008_member 009_place
 python $BASE_DIR/manage.py loaddata 010_event 011_info
 python $BASE_DIR/manage.py loaddata 012_invitation
