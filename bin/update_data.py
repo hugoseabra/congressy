@@ -1,25 +1,91 @@
-from datetime import timedelta, date
+from datetime import date, datetime, time, timedelta
 
 import django
 
 django.setup()
 from gatheros_event.models import Event
-from gatheros_subscription.models import Lot
 
-i = 0
-ref_days = [-10, 10, 20, 25, 30, 45, 45, 50, 60, 70, 80]
-events = Event.objects.all()
-for i, day in enumerate(ref_days):
+"""
+11 eventos com datas reajustadas com referência a data de hoje
+"""
+ref_days = [
+    {'days_before_now': -10, 'days_of_event': 1},
+    {'days_before_now': -5, 'days_of_event': 1},
+    {'days_before_now': 0, 'days_of_event': 1},
+    {'days_before_now': 3, 'days_of_event': 1},
+    {'days_before_now': 5, 'days_of_event': 1},
+    {'days_before_now': 8, 'days_of_event': 1},
+    {'days_before_now': 10, 'days_of_event': 1},
+    {'days_before_now': 15, 'days_of_event': 1},
+    {'days_before_now': 25, 'days_of_event': 1},
+    {'days_before_now': 30, 'days_of_event': 1},
+    {'days_before_now': 35, 'days_of_event': 3},
+]
+
+events = Event.objects.all().order_by('pk')
+for i, dict_day in enumerate(ref_days):
     event = events[i]
-    event.date_start = date.today() + timedelta(days=ref_days[i])
-    event.date_end = date.today() + timedelta(days=ref_days[i] + 1)
-    event.save()
-    i += 1
+    start = datetime.today() + timedelta(days=dict_day.get('days_before_now'))
 
-i = 0
-lot_ref_days = [[0, 15], [16, 22], [23, 30]]
-for lot in Lot.objects.filter(event__pk=4):
-    lot.date_start = date.today() + timedelta(days=lot_ref_days[i][0])
-    lot.date_end = date.today() + timedelta(days=lot_ref_days[i][1])
-    lot.save()
-    i += 1
+    end = start + timedelta(days=dict_day.get('days_of_event') - 1)
+
+    event.date_start = start.replace(hour=8, minute=0, second=0)
+    event.date_end = end.replace(hour=18, minute=0, second=0)
+    event.save()
+
+"""
+Datas dos lotes devem começar e terminar antes da data inicial do evento.
+
+São 11 eventos com seus respectivos lotes organizados nos fixtures.
+"""
+lots_dates = [
+    [{'days_before_event': 15, 'days': 15}],
+    [{'days_before_event': 15, 'days': 15}],
+    None,
+    None,
+    None,
+    [
+        {'days_before_event': 45, 'days': 15},  # Lote 1
+        {'days_before_event': 30, 'days': 15},  # Lote 2
+        {'days_before_event': 15, 'days': 15},  # Lote 3
+        {'days_before_event': 45, 'days': 45},  # Parceiros
+    ],
+    [
+        {'days_before_event': 20, 'days': 20},  # Parceiros
+        {'days_before_event': 20, 'days': 30},  # Lote 1
+    ],
+    [{'days_before_event': 5, 'days': 5}],
+    [{'days_before_event': 30, 'days': 30}],
+    [{'days_before_event': 50, 'days': 50}],
+    [
+        {'days_before_event': 60, 'days': 30},  # Lote 1
+        {'days_before_event': 30, 'days': 30},  # Lote 2
+    ],
+]
+
+for i, dict_dates in enumerate(lots_dates):
+    event = events[i]
+
+    if dict_dates is None:
+        continue
+
+    ii = 0
+    for lot in event.lots.all():
+        if not dict_dates[ii]:
+            raise Exception('Configuração errada para {}'.format(lot))
+
+        ref = dict_dates[ii]
+
+        start = event.date_start - timedelta(days=ref.get('days_before_event')-1)
+        end = start + timedelta(days=ref.get('days')-1)
+
+        if end >= event.date_start:
+            end = event.date_start - timedelta(seconds=1)
+        else:
+            end = end.replace(hour=23, minute=59, second=59)
+
+        lot.date_start = start.replace(hour=0, minute=0, second=0)
+        lot.date_end = end
+        lot.save()
+
+        ii += 1
