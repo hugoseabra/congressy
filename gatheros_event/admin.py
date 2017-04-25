@@ -13,7 +13,8 @@ class NameActivePKAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('name', 'organization', 'subscription_type', 'category', 'place', 'pk')
+    list_display = ('name', 'organization', 'subscription_type', 'category', 'place', 'date_start', 'date_end', 'pk')
+    ordering = ['pk', 'name']
 
 
 @admin.register(Person)
