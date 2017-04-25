@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from . import Category, Organization, Place
+from ..signals import track_data
 
 
 class TextFieldWithInputText(models.TextField):
@@ -11,6 +12,7 @@ class TextFieldWithInputText(models.TextField):
         return super(TextFieldWithInputText, self).formfield(**kwargs)
 
 
+@track_data('subscription_type')
 class Event(models.Model):
     RESOURCE_URI = '/api/core/events/'
 
