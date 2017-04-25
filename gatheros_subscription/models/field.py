@@ -4,13 +4,11 @@ from . import Form
 
 class FieldManager(models.Manager):
     def append_field(self, field):
-        last_two = self.order_by('-pk')[0:3]
-        if not last_two:
-            return 1
-        elif field.pk:
-            return last_two[1].order + 1
+        last_field = Field.objects.filter(form=field.form).order_by('-order').first()
+        if last_field:
+            return int(last_field.order) + 1
         else:
-            return last_two[0].order + 1
+            return 1
 
 
 class Field(models.Model):
@@ -49,6 +47,8 @@ class Field(models.Model):
     placeholder = models.CharField(max_length=100, verbose_name='placeholder', null=True, blank=True)
     default_value = models.TextField(verbose_name='valor padrão', null=True, blank=True)
 
+    objects = FieldManager()
+
     class Meta:
         verbose_name = 'Campo de Formulário'
         verbose_name_plural = 'Campos de Formulário'
@@ -56,7 +56,7 @@ class Field(models.Model):
 
     def save(self, **kwargs):
         if self._state.adding and self.order is None:
-            self.order = self._append_field()
+            self.order = Field.objects.append_field(self)
 
         return super(Field, self).save(**kwargs)
 
