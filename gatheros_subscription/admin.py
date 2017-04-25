@@ -35,7 +35,7 @@ class LotAdmin(admin.ModelAdmin):
         if db_field.name == "event":
             events = Event.objects.annotate(num_lots=Count('lots')).filter(
                 Q(subscription_type=Event.SUBSCRIPTION_SIMPLE, num_lots__exact=0) |
-                Q(subscription_type=Event.SUBSCRIPTION_BY_LOTS)
+                Q(subscription_type=Event.SUBSCRIPTION_BY_LOTS, num_lots__exact=0)
             )
 
             for event in events:
@@ -58,7 +58,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 class FormAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "event":
-            kwargs["queryset"] = Event.objects.filter('')
+            kwargs["queryset"] = Event.objects.filter(form=None).exclude(subscription_type=Event.SUBSCRIPTION_DISABLED)
 
         return super(FormAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
