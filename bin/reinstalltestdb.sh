@@ -10,7 +10,6 @@ $BASE_DIR/bin/dropdb.sh || exit 1;
 $BASE_DIR/bin/createdb.sh || exit 1;
 
 # Importando fixtures
-
 # User
 python $BASE_DIR/manage.py loaddata 001_user
 
@@ -22,6 +21,7 @@ python $BASE_DIR/manage.py loaddata 012_invitation
 
 ## gatheros_subscription
 python $BASE_DIR/manage.py loaddata 001_form 002_field 003_field_option
+python $BASE_DIR/manage.py loaddata 004_lot 005_subscription
 
 # Atualizando a data dos eventos
 python $BASE_DIR/bin/update_data.py
