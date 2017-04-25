@@ -36,9 +36,9 @@ class Subscription(models.Model):
     )
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
-    person = models.ForeignKey(Person, verbose_name='pessoa', on_delete=models.CASCADE, related_name='subscriptions')
-    event = models.ForeignKey(Event, verbose_name='evento', related_name='subscriptions', blank=True, editable=False)
     lot = models.ForeignKey(Lot, verbose_name='lote', related_name='subscriptions')
+    event = models.ForeignKey(Event, verbose_name='evento', related_name='subscriptions', blank=True, editable=False)
+    person = models.ForeignKey(Person, verbose_name='pessoa', on_delete=models.CASCADE, related_name='subscriptions')
     origin = models.CharField(max_length=15, choices=DEVICE_ORIGINS, default='web', verbose_name='origem')
     created_by = models.PositiveIntegerField(verbose_name='criado por')
 
