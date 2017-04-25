@@ -1,5 +1,4 @@
-from django.db import models
-from django.forms.fields import BooleanField
+from django.db import IntegrityError, models
 
 from gatheros_event.models import Event
 
@@ -13,8 +12,19 @@ class Form(models.Model):
         verbose_name_plural = 'formulários de eventos'
         ordering = ['event']
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super(Form, self).save(*args, **kwargs)
+
     def __str__(self):
         return self.event.name
+
+    def clean(self):
+        if self.event.subscription_type == Event.SUBSCRIPTION_DISABLED:
+            raise IntegrityError(
+                'O evento {} estão com inscrições desativadas, portanto não pode ter um formulário vinculado'
+                .format(self.event.name)
+            )
 
     @property
     def additional_fields(self):

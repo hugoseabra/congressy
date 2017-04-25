@@ -49,21 +49,19 @@ class Field(models.Model):
     placeholder = models.CharField(max_length=100, verbose_name='placeholder', null=True, blank=True)
     default_value = models.TextField(verbose_name='valor padrão', null=True, blank=True)
 
-    objects = FieldManager()
-
     class Meta:
         verbose_name = 'Campo de Formulário'
         verbose_name_plural = 'Campos de Formulário'
         ordering = ['form__id', 'order', 'name']
 
     def save(self, **kwargs):
-        if self.order is None:
-            self.order = Field.objects.append_field(self)
+        if self._state.adding and self.order is None:
+            self.order = self._append_field()
 
         return super(Field, self).save(**kwargs)
 
     def __str__(self):
-        return self.label
+        return '{} ({})'.format(self.label, self.form)
 
     @property
     def options(self):
