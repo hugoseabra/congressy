@@ -2,12 +2,11 @@ import uuid
 
 from django import forms
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.db import models
 from kanu_locations.models import City
 
 from . import Occupation
-from ..lib.validators import CpfValidator, EmailValidator, PhoneValidator
+from ..lib import validators
 
 
 class TextFieldWithInputText(models.TextField):
@@ -48,39 +47,56 @@ class Person(models.Model):
         'politics_version'
     ]
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True,
+                            primary_key=True)
     name = TextFieldWithInputText(verbose_name='nome')
-    genre = models.CharField(max_length=1, choices=GENDER_CHOICES, verbose_name='sexo')
+    genre = models.CharField(max_length=1, choices=GENDER_CHOICES,
+                             verbose_name='sexo')
 
-    email = TextFieldWithInputText(unique=True, blank=True, null=True, verbose_name='email')
+    email = models.EmailField(unique=True, blank=True, null=True,
+                              verbose_name='email')
     city = models.ForeignKey(City, null=True, verbose_name='cidade')
-    zip_code = models.CharField(max_length=8, blank=True, null=True, verbose_name='CEP')
-    street = TextFieldWithInputText(blank=True, null=True, verbose_name='endereço')
-    complement = TextFieldWithInputText(blank=True, null=True, verbose_name='complemento')
-    village = TextFieldWithInputText(blank=True, null=True, verbose_name='bairro')
-    phone = TextFieldWithInputText(blank=True, null=True, verbose_name='telefone')
+    zip_code = models.CharField(max_length=8, blank=True, null=True,
+                                verbose_name='CEP')
+    street = TextFieldWithInputText(blank=True, null=True,
+                                    verbose_name='endereço')
+    complement = TextFieldWithInputText(blank=True, null=True,
+                                        verbose_name='complemento')
+    village = TextFieldWithInputText(blank=True, null=True,
+                                     verbose_name='bairro')
+    phone = models.TextField(blank=True, null=True, verbose_name='telefone',
+                             validators=[validators.phone_validator])
 
-    user = models.OneToOneField(User, on_delete=models.PROTECT, blank=True, null=True, verbose_name='usuário',
+    user = models.OneToOneField(User, on_delete=models.PROTECT, blank=True,
+                                null=True, verbose_name='usuário',
                                 related_name='person')
     avatar = models.ImageField(blank=True, null=True, verbose_name='foto')
-    cpf = models.CharField(max_length=11, blank=True, null=True, unique=True, verbose_name='CPF')
-    birth_date = models.DateField(blank=True, null=True, verbose_name='data nascimento')
+    cpf = models.CharField(max_length=11, blank=True, null=True, unique=True,
+                           verbose_name='CPF',
+                           validators=[validators.cpf_validator])
+    birth_date = models.DateField(blank=True, null=True,
+                                  verbose_name='data nascimento')
     rg = TextFieldWithInputText(blank=True, null=True, verbose_name='rg')
-    orgao_expedidor = TextFieldWithInputText(blank=True, null=True, verbose_name='orgão expedidor')
+    orgao_expedidor = TextFieldWithInputText(blank=True, null=True,
+                                             verbose_name='orgão expedidor')
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     modified = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     synchronized = models.NullBooleanField(default=False)
-    term_version = models.IntegerField(verbose_name='versão do termo de uso', blank=True, null=True)
-    politics_version = models.IntegerField(verbose_name='versão da política de privacidade', blank=True, null=True)
-    occupation = models.ForeignKey(Occupation, verbose_name='profissão', blank=True, null=True)
+    term_version = models.IntegerField(verbose_name='versão do termo de uso',
+                                       blank=True, null=True)
+    politics_version = models.IntegerField(
+        verbose_name='versão da política de privacidade', blank=True, null=True)
+    occupation = models.ForeignKey(Occupation, verbose_name='profissão',
+                                   blank=True, null=True)
 
     website = models.CharField(max_length=255, null=True, blank=True)
     facebook = models.CharField(max_length=255, null=True, blank=True)
     twitter = models.CharField(max_length=255, null=True, blank=True)
     linkedin = models.CharField(max_length=255, null=True, blank=True)
     skype = models.CharField(max_length=255, null=True, blank=True)
-    has_user = models.BooleanField(verbose_name='vincular usuario?', default=False)
+    has_user = models.BooleanField(verbose_name='vincular usuario?',
+                                   default=False)
 
     class Meta:
         verbose_name = 'pessoa'
@@ -104,9 +120,6 @@ class Person(models.Model):
         self.full_clean()
         super(Person, self).save(*args, **kwargs)
 
-    def clean(self):
-        self._validate_fields()
-
     def get_cpf_display(self):
         cpf = str(self.cpf)
         if not cpf:
@@ -117,32 +130,3 @@ class Person(models.Model):
         if not self.birth_date:
             return '--'
         return self.birth_date.strftime('%d/%m/%Y')
-
-    def _validate_fields(self):
-        fields = {
-            'email': EmailValidator,
-            'cpf': CpfValidator,
-            'phone': PhoneValidator
-        }
-        errors = {}
-
-        for f in self._meta.fields:
-
-            if f.attname not in fields.keys():
-                continue
-
-            value = getattr(self, f.attname)
-
-            if not value:
-                continue
-
-            try:
-                obj = fields[f.attname]()
-                obj.validate(value)
-                setattr(self, f.attname, obj.normalize(value))
-
-            except ValidationError as e:
-                errors[f.attname] = e.message
-
-        if errors:
-            raise ValidationError(errors)
