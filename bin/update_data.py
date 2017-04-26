@@ -31,7 +31,7 @@ for i, dict_day in enumerate(ref_days):
 
     event.date_start = start.replace(hour=8, minute=0, second=0)
     event.date_end = end.replace(hour=18, minute=0, second=0)
-    event.save()
+    event.save(raw=True)
 
 """
 Datas dos lotes devem começar e terminar antes da data inicial do evento.
