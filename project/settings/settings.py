@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     # GATHEROS_APPS
     'gatheros_event',
     'gatheros_subscription',
+    'gatheros_front',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -42,7 +43,9 @@ ROOT_URLCONF = 'project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'template'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -101,3 +104,7 @@ FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'gatheros_event/tests/fixtures'),
     os.path.join(BASE_DIR, 'gatheros_subscription/tests/fixtures'),
 ]
+
+LOGIN_URL = '/entrar/'
+LOGIN_REDIRECT_URL = '/inicio/'
+LOGOUT_REDIRECT_URL = '/entrar/'
