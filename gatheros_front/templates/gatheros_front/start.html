@@ -1,0 +1,9 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+
+    <h1>Você entrou, bem vindo {{ user.email }}</h1>
+    <a href="{% url 'gatheros_front:logout' %}">Sair do sistema</a>
+
+{% endblock %}

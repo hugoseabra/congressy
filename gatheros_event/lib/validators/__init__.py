@@ -1,3 +1,2 @@
-from .cpf_validator import CpfValidator
-from .phone_validator import PhoneValidator
-from .email_validator import EmailValidator
+from .cpf_validator import cpf_validator
+from .phone_validator import phone_validator
