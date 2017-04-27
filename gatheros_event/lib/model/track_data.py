@@ -1,8 +1,6 @@
 from django.db.models.signals import post_init
 
 
-# @TODO Verificar melhor local para libs como esta
-
 # from https://gist.github.com/dcramer/730765
 def track_data(*fields):
     """
@@ -25,7 +23,7 @@ def track_data(*fields):
 
     def _store(self):
         """Updates a local copy of attributes values"""
-        if self.id:
+        if self.pk:
             self.__data = dict((f, getattr(self, f)) for f in fields)
         else:
             self.__data = UNSAVED
@@ -53,7 +51,7 @@ def track_data(*fields):
             changed = {}
             if self.__data is UNSAVED:
                 return changed
-            for k, v in self.__data.iteritems():
+            for k, v in self.__data.items():
                 if v != getattr(self, k):
                     changed[k] = v
             return changed
