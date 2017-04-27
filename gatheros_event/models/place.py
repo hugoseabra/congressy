@@ -5,6 +5,7 @@ from . import Organization
 
 
 # @TODO Usar GeoDjango para coodenadas
+# @TODO Adicionar campo 'numero'
 
 class Place(models.Model):
     name = models.CharField(max_length=255, verbose_name='nome')

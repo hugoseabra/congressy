@@ -1,6 +1,8 @@
 from django.db import models
 from . import Event
 
+# @TODO inserir banner cumprido caso queira apresentar uma imagem só
+
 
 class Info(models.Model):
     """ Informações de evento """
