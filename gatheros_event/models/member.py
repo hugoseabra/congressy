@@ -1,8 +1,10 @@
 from django.db import IntegrityError, models
 
 from . import Organization, Person
+from gatheros_event.models.rules import member as rule
 
 
+# @TODO Adicionar campo 'accepted_on'
 class Member(models.Model):
     ADMIN = 'admin'
     HELPER = 'helper'
@@ -34,27 +36,10 @@ class Member(models.Model):
         super(Member, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        self._check_remove_if_internal_organization_member()
+        rule.rule_4_nao_remover_member_organizacao_interna(self)
         super(Member, self).delete(*args, **kwargs)
 
     def clean(self):
-        self._configure_if_internal()
-
-        if self.person.user is None:
-            raise IntegrityError('Pessoas sem vínculo com usuários não podem ser participar de organizações')
-
-    def _configure_if_internal(self):
-        if not self.organization.internal:
-            return
-
-        if self not in self.organization.members.all() and self.organization.members.count() > 0:
-            raise IntegrityError('Organizações internas não podem ter membros')
-
-        if self.group == self.HELPER:
-            raise IntegrityError('Membro de organização interna não pode ser \'%s\'' % self.get_group_display())
-
-    def _check_remove_if_internal_organization_member(self):
-        if self.organization.internal is True:
-            raise IntegrityError(
-                'Impossível remover membro. Organização interna deve possuir um membro ADMIN principal.'
-            )
+        rule.rule_1_membros_deve_ter_usuarios(self)
+        rule.rule_2_organizacao_interna_apenas_1_membro(self, self._state.adding)
+        rule.rule_3_organizacao_interna_unico_membro_admin(self, self._state.adding)

@@ -1,9 +1,9 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from . import Category, Organization, Place
-from ..signals import track_data
+from gatheros_event.lib.model import track_data
+from .rules import event as rule
 
 
 class TextFieldWithInputText(models.TextField):
@@ -11,6 +11,11 @@ class TextFieldWithInputText(models.TextField):
         kwargs.update({"widget": forms.TextInput})
         return super(TextFieldWithInputText, self).formfield(**kwargs)
 
+
+# @TODO Cores: encontrar as 2 cores (primária e secundária) mais evidentes das imagens e persisti-las
+
+# @TODO gerar slug (único) do nome do evento
+# @TODO imagens: banner de topo e banner principal
 
 @track_data('subscription_type')
 class Event(models.Model):
@@ -27,8 +32,9 @@ class Event(models.Model):
     )
 
     name = TextFieldWithInputText(verbose_name='nome')
-    organization = models.ForeignKey(Organization, verbose_name='organização')
-    category = models.ForeignKey(Category, verbose_name='categoria')
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, verbose_name='organização',
+                                     related_name='events')
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='categoria')
 
     subscription_type = models.CharField(max_length=15, choices=SUBSCRIPTION_CHOICES, default=SUBSCRIPTION_SIMPLE,
                                          verbose_name='inscrições')
@@ -58,11 +64,8 @@ class Event(models.Model):
         super(Event, self).save(*args, **kwargs)
 
     def clean(self):
-        if self.date_end < self.date_start:
-            raise ValidationError({'date_start': ['Data inicial deve anterior a data final']})
-
-        if self.place and self.place.organization != self.organization:
-            raise ValidationError({'place': ['Local do evento não pertence a sua organização']})
+        rule.rule_1_data_inicial_antes_da_data_final(self)
+        rule.rule_2_local_deve_ser_da_mesma_organizacao_do_evento(self)
 
     def __str__(self):
         return str(self.name)
