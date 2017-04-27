@@ -1,6 +1,8 @@
 from django.db import models
 
 
+# @TODO Estratégia de resgate de infos sociais da organização. Possível transferência de dados de membro em caso de interno ou get_<field>_display() para resgatar os dados.
+# @TODO gerar slug único do nome
 class Organization(models.Model):
     """ Organização """
     name = models.CharField(max_length=100, verbose_name='nome')
@@ -29,3 +31,23 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_members(self, group=None):
+        if not group:
+            return self.members.all()
+
+        return self.members.filter(group=group)
+
+    def is_member(self, person, group=None):
+        for member in self.get_members(group=group):
+            if member.person == person:
+                return True
+
+        return False
+
+    def get_member_by_person(self, person, group=None):
+        for member in self.get_members(group=group):
+            if member.person == person:
+                return member
+
+        return None
