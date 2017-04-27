@@ -9,10 +9,10 @@ urlpatterns = [
         name='login'),
 
     url(r'^sair/$', auth_views.LogoutView.as_view(), name='logout'),
-    url(r'^inicio/$', TemplateView.as_view(template_name='gatheros_front/start.html'),
-        name='start'),
-    url(r'^$', TemplateView.as_view(template_name='gatheros_front/home.html'),
-        name='home'),
-    # url(r'^$', views.Home.as_view(), name='home'),
+
+    url(r'^inicio/$', views.Start.as_view(), name='start'),
+    url(r'^$', views.Home.as_view(), name='home'),
 
 ]
+
+
