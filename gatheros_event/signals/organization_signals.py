@@ -15,9 +15,6 @@ def update_person_related_organization(instance, raw, **_):
     if raw is True:
         return
 
-    for member in instance.members.all():
-        if member.organization.internal is False:
-            continue
-
+    for member in instance.members.filter(organization__internal=True):
         member.organization.name = instance.name
         member.organization.save()
