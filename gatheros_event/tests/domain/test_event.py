@@ -1,54 +1,77 @@
 from datetime import datetime, timedelta
 
-from django.core.exceptions import ValidationError
-from django.test import TestCase
+from kanu_locations.models import City
 
-from gatheros_event.models import Category, Event, Organization
+from gatheros_event.lib.test import GatherosTestCase
+from gatheros_event.models import Category, Event, Organization, Place
+from gatheros_event.models.rules import event as rule
 
 
-class EventModelTest(TestCase):
+class EventModelTest(GatherosTestCase):
     fixtures = [
         'kanu_locations_city_test',
-        '003_occupation',
         '004_category',
-        '005_user',
-        '006_person',
         '007_organization',
-        '009_place',
     ]
 
-    def test_date_start_before_date_end(self):
-        event = Event(
-            name='Event tests',
-            organization=Organization.objects.first(),
-            category=Category.objects.first(),
-            subscription_type=Event.SUBSCRIPTION_DISABLED,
-            date_start=datetime.now(),
-            date_end=datetime.now() - timedelta(days=1)
-        )
+    def setUp(self):
+        self.event = self._create_event(persist=False)
+        self.organization = self._create_organization(persist=False)
 
-        with self.assertRaises(ValidationError) as e:
-            event.save()
+    def _create_event(self, persist=True, **kwargs):
+        data = {
+            "name": 'Event tests',
+            "organization": Organization.objects.first(),
+            "category": Category.objects.first(),
+            "subscription_type": Event.SUBSCRIPTION_DISABLED,
+            "date_start": datetime.now(),
+            "date_end": datetime.now() + timedelta(hours=8)
+        }
+        return self._create_model(Model=Event, data=data, persist=persist, **kwargs)
 
-        self.assertTrue('date_start' in dict(e.exception).keys())
+    def _create_organization(self, persist=True, **kwargs):
+        data = {"name": 'Org test'}
+        return self._create_model(Model=Organization, data=data, persist=persist, **kwargs)
 
-    def test_place_of_organization_in_event(self):
-        event = Event.objects.create(
-            name='Event tests',
-            organization=Organization.objects.first(),
-            category=Category.objects.first(),
-            subscription_type=Event.SUBSCRIPTION_DISABLED,
-            date_start=datetime.now(),
-            date_end=datetime.now() + timedelta(days=5)
-        )
+    def _create_place(self, organization=None, persist=True, **kwargs):
+        if not organization:
+            organization = self._create_organization()
 
-        # Grabs a different organization
-        organization = Organization.objects.last()
+        data = {
+            "name": "Modul Coworking",
+            "organization": organization,
+            "city": City.objects.get(pk=5413),
+            "phone": None,
+            "long": None,
+            "lat": None,
+            "zip_code": "74120080",
+            "street": "Rua 18, 282",
+            "complement": "Galeria Marfim, Sl 7",
+            "village": "Setor Oeste",
+            "reference": None
+        }
+        return self._create_model(Model=Place, data=data, persist=persist, **kwargs)
+
+    def test_rule_1_data_inicial_antes_da_data_final(self):
+        rule_callback = rule.rule_1_data_inicial_antes_da_data_final
+
+        self.event.date_start = datetime.now()
+        self.event.date_end = datetime.now() - timedelta(days=1)
+
+        """ REGRA """
+        self._trigger_validation_error(callback=rule_callback, params=[self.event], field='date_start')
+
+        """ MODEL """
+        self._trigger_validation_error(callback=self.event.save, field='date_start')
+
+    def test_rule_2_local_deve_ser_da_mesma_organizacao_do_evento(self):
+        rule_callback = rule.rule_2_local_deve_ser_da_mesma_organizacao_do_evento
 
         # Adds a place which does not belong to its organization
-        event.place = organization.places.first()
+        self.event.place = self._create_place()
 
-        with self.assertRaises(ValidationError) as e:
-            event.save()
+        """ REGRA """
+        self._trigger_validation_error(callback=rule_callback, params=[self.event], field='place')
 
-        self.assertTrue('place' in dict(e.exception).keys())
+        """ MODEL """
+        self._trigger_validation_error(callback=self.event.save, field='place')

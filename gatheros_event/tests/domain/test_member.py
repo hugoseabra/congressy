@@ -1,13 +1,11 @@
-import datetime
+from datetime import datetime
 
-from django.db import IntegrityError
-from django.test import TestCase
-from kanu_locations.models import City
-
+from gatheros_event.lib.test import GatherosTestCase
 from gatheros_event.models import Member, Organization, Person
+from gatheros_event.models.rules import member as rule
 
 
-class OrganizationModelTest(TestCase):
+class MemberModelTest(GatherosTestCase):
     fixtures = [
         'kanu_locations_city_test',
         '003_occupation',
@@ -18,80 +16,95 @@ class OrganizationModelTest(TestCase):
         '008_member'
     ]
 
-    def test_internal_organization_only_one_member(self):
-        organization = Organization.objects.first()
+    def _get_organization(self, internal=False):
+        return Organization.objects.filter(internal=internal).first()
 
-        self.assertTrue(organization.internal)
+    def _get_person(self, has_user=True):
+        return Person.objects.filter(has_user=has_user).first()
 
-        person = Person.objects.create(
-            name="Person Test",
-            genre="M",
-            city=City.objects.get(pk=5413),
-            cpf="28488214421"
+    def _create_organization(self, internal=True, persist=True):
+        data = {'name': 'Org Test', 'internal': internal}
+        return self._create_model(Model=Organization, data=data, persist=persist)
+
+    def _create_member(self, person=None, organization=None, group=Member.ADMIN, persist=True):
+        if person is None:
+            person = self._get_person()
+
+        if organization is None:
+            organization = self._get_organization()
+
+        data = {
+            'organization': organization,
+            'person': person,
+            'group': group,
+            'created_by': 1,
+            'invited_on': datetime.now()
+        }
+
+        return self._create_model(Model=Member, data=data, persist=persist)
+
+    def test_rule_1_membros_deve_ter_usuarios(self):
+        rule_callback = rule.rule_1_membros_deve_ter_usuarios
+
+        member = self._create_member(person=self._get_person(has_user=False), persist=False)
+
+        """ REGRA """
+        self._trigger_integrity_error(rule_callback, [member])
+
+        """ MODEL """
+        self._trigger_integrity_error(member.save)
+
+        # Insere usuário
+        member.person.has_user = True
+        member.person.save()
+
+        # Agora funciona
+        member.save()
+
+    def test_rule_2_organizacao_interna_apenas_1_membro(self):
+        rule_callback = rule.rule_2_organizacao_interna_apenas_1_membro
+
+        member = self._create_member(organization=self._get_organization(internal=True), persist=False)
+
+        """ REGRA """
+        self._trigger_integrity_error(rule_callback, [member])
+
+        """ MODEL """
+        self._trigger_integrity_error(member.save)
+
+        # Muda organização do membro
+        member.organization = self._get_organization(internal=False)
+
+        # Agora funciona
+        member.save()
+
+    def test_rule_3_organizacao_interna_unico_membro_admin(self):
+        rule_callback = rule.rule_3_organizacao_interna_unico_membro_admin
+
+        # Pega uma pessoa sem usuário e logo cria um para ele
+        person = self._get_person(has_user=False)
+        person.has_user = True
+        person.save()
+
+        member = self._create_member(
+            person=person,
+            organization=self._create_organization(internal=True),
+            group=Member.HELPER,
+            persist=False
         )
 
-        with self.assertRaises(IntegrityError):
-            Member.objects.create(
-                organization=organization,
-                person=person,
-                group=Member.ADMIN,
-                created_by=1,
-                invited_on=datetime.datetime.now()
-            )
+        """ REGRA """
+        self._trigger_integrity_error(rule_callback, [member, True])
 
-    def test_internal_member_is_admin(self):
-        """
-        Mesmo tendo selecionado um outro grupo que não ADMIN, organizações internas
-        sempre terão seu membro principal como ADMIN
-        """
-        person = Person.objects.create(
-            name="Person Test",
-            genre="M",
-            city=City.objects.get(pk=5413),
-            cpf="28488214421",
-            has_user=True,
-            email='test@test.me'
-        )
-        # Person has user
-        self.assertIsNotNone(person.user)
+        """ MODEL """
+        self._trigger_integrity_error(member.save)
 
-        organization = Organization.objects.create(name=person.name, internal=True)
+    def test_rule_4_nao_remover_member_organizacao_interna(self):
+        rule_callback = rule.rule_4_nao_remover_member_organizacao_interna
+        member = self._create_member(organization=self._create_organization(internal=True))
 
-        # Trying to insert member as HELPER in internal organization
-        with self.assertRaises(IntegrityError):
-            Member.objects.create(
-                organization=organization,
-                person=person,
-                group=Member.HELPER,
-                created_by=1,
-                invited_on=datetime.datetime.now()
-            )
+        """ REGRA """
+        self._trigger_integrity_error(rule_callback, [member])
 
-    def test_member_with_no_user_not_allowed(self):
-        person = Person.objects.create(
-            name="Person Test",
-            genre="M",
-            city=City.objects.get(pk=5413),
-            cpf="28488214421",
-            has_user=False
-        )
-        self.assertIsNone(person.user)
-
-        organization = Organization.objects.create(name=person.name, internal=True)
-
-        # Trying to insert member from a person without USER
-        with self.assertRaises(IntegrityError):
-            Member.objects.create(
-                organization=organization,
-                person=person,
-                group=Member.ADMIN,
-                created_by=1,
-                invited_on=datetime.datetime.now()
-            )
-
-    def test_internal_org_must_have_member(self):
-        person = Person.objects.get(pk='a7c5f518-7669-4b71-a83b-2a7107e9c313')
-        member = person.members.first()
-
-        with self.assertRaises(IntegrityError):
-            member.delete()
+        """ MODEL """
+        self._trigger_integrity_error(member.delete)
