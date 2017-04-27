@@ -1,1 +1,1 @@
-# @TODO verificação de unicidade se dará apenas por CPF e nada mais
+# verificação de unicidade se dará apenas por CPF e nada mais
