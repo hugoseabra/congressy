@@ -16,5 +16,12 @@ def update_person_related_organization(instance, raw, **_):
         return
 
     for member in instance.members.filter(organization__internal=True):
-        member.organization.name = instance.name
-        member.organization.save()
+        organization = member.organization
+        organization.name = instance.name
+        organization.website = instance.website
+        organization.facebook = instance.facebook
+        organization.twitter = instance.twitter
+        organization.linkedin = instance.linkedin
+        organization.skype = instance.skype
+
+        organization.save()
