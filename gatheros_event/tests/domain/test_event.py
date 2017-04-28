@@ -75,3 +75,7 @@ class EventModelTest(GatherosTestCase):
 
         """ MODEL """
         self._trigger_validation_error(callback=self.event.save, field='place')
+
+    def test_slug_gerado(self):
+        event = self._create_event(persist=True)
+        self.assertIsNotNone(event.slug)
