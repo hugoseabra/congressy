@@ -17,9 +17,6 @@ class TextFieldWithInputText(models.TextField):
         return super(TextFieldWithInputText, self).formfield(**kwargs)
 
 
-# @TODO Adicionar campo 'numero' no endereço
-# @TODO Desativar usuário quando desvinculado
-
 @track_data('name', 'has_user', 'user', 'email')
 class Person(models.Model):
     RESOURCE_URI = '/api/core/people/'
@@ -62,13 +59,14 @@ class Person(models.Model):
     city = models.ForeignKey(City, null=True, verbose_name='cidade')
     zip_code = models.CharField(max_length=8, blank=True, null=True, verbose_name='CEP')
     street = TextFieldWithInputText(blank=True, null=True, verbose_name='endereço')
+    number = models.CharField(max_length=20, verbose_name='número', blank=True, null=True,
+                              help_text="Caso não tenha, informar S/N.")
     complement = TextFieldWithInputText(blank=True, null=True, verbose_name='complemento')
     village = TextFieldWithInputText(blank=True, null=True, verbose_name='bairro')
     phone = models.CharField(max_length=11, blank=True, null=True, verbose_name='telefone',
                              validators=[phone_validator])
 
-    user = models.OneToOneField(User, on_delete=models.PROTECT, blank=True,
-                                null=True, verbose_name='usuário',
+    user = models.OneToOneField(User, on_delete=models.PROTECT, blank=True, null=True, verbose_name='usuário',
                                 related_name='person')
     avatar = models.ImageField(blank=True, null=True, verbose_name='foto')
     cpf = models.CharField(max_length=11, blank=True, null=True, unique=True, verbose_name='CPF',
