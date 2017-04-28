@@ -9,7 +9,8 @@
       "created": "2017-04-20T18:42:19.715",
       "created_by": 1,
       "invited_on": "2017-04-20T18:42:07",
-      "invitation_accepted": true,
+      "accepted": true,
+      "accepted_on": "2017-04-20T18:42:27",
       "active": true
     }
   },
@@ -23,7 +24,8 @@
       "created": "2017-04-20T18:42:29.136",
       "created_by": 1,
       "invited_on": "2017-04-20T18:42:27",
-      "invitation_accepted": true,
+      "accepted": true,
+      "accepted_on": "2017-04-20T18:42:27",
       "active": true
     }
   },
@@ -37,7 +39,8 @@
       "created": "2017-04-20T18:43:07.899",
       "created_by": 1,
       "invited_on": "2017-04-20T18:43:06",
-      "invitation_accepted": true,
+      "accepted": true,
+      "accepted_on": "2017-04-20T18:42:27",
       "active": true
     }
   },
@@ -51,7 +54,8 @@
       "created": "2017-04-20T18:43:18.567",
       "created_by": 1,
       "invited_on": "2017-04-20T18:43:17",
-      "invitation_accepted": true,
+      "accepted": true,
+      "accepted_on": "2017-04-20T18:42:27",
       "active": true
     }
   },
@@ -65,7 +69,8 @@
       "created": "2017-04-20T18:45:06.468",
       "created_by": 1,
       "invited_on": "2017-04-20T18:45:03",
-      "invitation_accepted": true,
+      "accepted": true,
+      "accepted_on": "2017-04-20T18:42:27",
       "active": true
     }
   },
@@ -79,7 +84,8 @@
       "created": "2017-04-20T18:47:48.591",
       "created_by": 1,
       "invited_on": "2017-04-20T18:45:42",
-      "invitation_accepted": true,
+      "accepted": true,
+      "accepted_on": "2017-04-20T18:42:27",
       "active": true
     }
   },
@@ -93,7 +99,8 @@
       "created": "2017-04-20T18:48:36.819",
       "created_by": 1,
       "invited_on": "2017-04-20T18:48:35",
-      "invitation_accepted": true,
+      "accepted": true,
+      "accepted_on": "2017-04-20T18:42:27",
       "active": true
     }
   },
@@ -107,7 +114,8 @@
       "created": "2017-04-20T18:48:52.783",
       "created_by": 1,
       "invited_on": "2017-04-20T18:48:47",
-      "invitation_accepted": false,
+      "accepted": false,
+      "accepted_on": null,
       "active": true
     }
   },
@@ -121,7 +129,8 @@
       "created": "2017-04-20T18:49:11.825",
       "created_by": 1,
       "invited_on": "2017-04-20T18:49:08",
-      "invitation_accepted": true,
+      "accepted": true,
+      "accepted_on": "2017-04-20T18:42:27",
       "active": true
     }
   },
@@ -135,7 +144,8 @@
       "created": "2017-04-20T18:49:24.275",
       "created_by": 1,
       "invited_on": "2017-04-20T18:49:18",
-      "invitation_accepted": true,
+      "accepted": true,
+      "accepted_on": "2017-04-20T18:42:27",
       "active": true
     }
   },
@@ -149,7 +159,8 @@
       "created": "2017-04-20T18:49:35.800",
       "created_by": 1,
       "invited_on": "2017-04-20T18:49:33",
-      "invitation_accepted": true,
+      "accepted": true,
+      "accepted_on": "2017-04-20T18:42:27",
       "active": true
     }
   }
