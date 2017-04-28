@@ -1,10 +1,11 @@
-from django.db import IntegrityError, models
+from datetime import datetime
 
-from . import Organization, Person
+from django.db import models
+
 from gatheros_event.models.rules import member as rule
+from . import Organization, Person
 
 
-# @TODO Adicionar campo 'accepted_on'
 class Member(models.Model):
     ADMIN = 'admin'
     HELPER = 'helper'
@@ -20,7 +21,8 @@ class Member(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
     created_by = models.PositiveIntegerField(verbose_name='criado por')  # ID do usuário
     invited_on = models.DateTimeField(auto_now_add=True, verbose_name='convidado em')
-    invitation_accepted = models.BooleanField(default=False, verbose_name='convite aceito')
+    accepted = models.BooleanField(default=False, verbose_name='convite aceito')
+    accepted_on = models.DateTimeField(null=True, blank=True, verbose_name='aceito em')
     active = models.BooleanField(default=True, verbose_name='ativo')
 
     def __str__(self):
@@ -32,6 +34,9 @@ class Member(models.Model):
         ordering = ['person', 'organization']
 
     def save(self, *args, **kwargs):
+        if self.accepted:
+            self.accepted_on = datetime.now()
+
         self.full_clean()
         super(Member, self).save(*args, **kwargs)
 
