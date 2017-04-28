@@ -5,7 +5,7 @@ from . import Organization
 
 
 # @TODO Usar GeoDjango para coodenadas
-# @TODO Adicionar campo 'numero'
+# @TODO Ver integração com Google Maps
 
 class Place(models.Model):
     name = models.CharField(max_length=255, verbose_name='nome')
@@ -19,9 +19,19 @@ class Place(models.Model):
 
     zip_code = models.CharField(max_length=8, verbose_name='CEP', blank=True, null=True)
     street = models.CharField(max_length=255, verbose_name='logradouro (rua, avenida, etc.)', blank=True, null=True)
+    number = models.CharField(max_length=20, verbose_name='número', blank=True, null=True,
+                              help_text="Caso não tenha, informar S/N.")
     complement = models.CharField(max_length=255, verbose_name='complemento', blank=True, null=True)
     village = models.CharField(max_length=255, verbose_name='bairro', blank=True, null=True)
-    reference = models.CharField(max_length=255, verbose_name='referência', blank=True, null=True)
+    reference = models.CharField(max_length=255, verbose_name='referência', blank=True, null=True,
+                                 help_text="Alguma informação para ajudar a chegar ao local.")
+
+    google_street_view_link = models.TextField(
+        verbose_name='Link do Google StreetView',
+        blank=True,
+        null=True,
+        help_text="Informações do Google StreetView para exibir imagens do local no site."
+    )
 
     class Meta:
         verbose_name = 'local de Evento'
