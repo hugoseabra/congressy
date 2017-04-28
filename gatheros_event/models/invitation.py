@@ -4,11 +4,9 @@ from django.contrib.auth.models import User
 from django.db import models
 
 from gatheros_event.lib.model import track_data
-from .rules import invitation as rule
 from . import Member
+from .rules import invitation as rule
 
-
-# @TODO Se já existe convite anterior, verificar se type é diferente e editar
 
 @track_data('author', 'to')
 class Invitation(models.Model):

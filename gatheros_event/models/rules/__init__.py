@@ -1,1 +1,1 @@
-from . import event, person, member, invitation
+from . import event, person, member, invitation, info
