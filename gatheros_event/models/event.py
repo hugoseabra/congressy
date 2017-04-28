@@ -49,7 +49,7 @@ class Event(models.Model):
     date_start = models.DateTimeField(verbose_name='data inicial')
     date_end = models.DateTimeField(verbose_name='data final')
 
-    place = models.ForeignKey(Place, on_delete=models.PROTECT, verbose_name='local', blank=True, null=True,
+    place = models.ForeignKey(Place, on_delete=models.SET_NULL, verbose_name='local', blank=True, null=True,
                               help_text="Deixar em branco se o evento é apenas on-line.")
     description = models.TextField(null=True, blank=True, verbose_name='descrição')
 

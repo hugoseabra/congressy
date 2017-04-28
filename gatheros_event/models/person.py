@@ -56,7 +56,7 @@ class Person(models.Model):
 
     email = models.EmailField(unique=True, blank=True, null=True, verbose_name='email')
 
-    city = models.ForeignKey(City, null=True, verbose_name='cidade')
+    city = models.ForeignKey(City, on_delete=models.PROTECT, null=True, verbose_name='cidade')
     zip_code = models.CharField(max_length=8, blank=True, null=True, verbose_name='CEP')
     street = TextFieldWithInputText(blank=True, null=True, verbose_name='endereço')
     number = models.CharField(max_length=20, verbose_name='número', blank=True, null=True,
@@ -82,7 +82,7 @@ class Person(models.Model):
     synchronized = models.NullBooleanField(default=False)
     term_version = models.IntegerField(verbose_name='versão do termo de uso', blank=True, null=True)
     politics_version = models.IntegerField(verbose_name='versão da política de privacidade', blank=True, null=True)
-    occupation = models.ForeignKey(Occupation, verbose_name='profissão', blank=True, null=True)
+    occupation = models.ForeignKey(Occupation, on_delete=models.SET_NULL, verbose_name='profissão', blank=True, null=True)
 
     website = models.CharField(max_length=255, null=True, blank=True)
     facebook = models.CharField(max_length=255, null=True, blank=True)
