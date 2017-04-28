@@ -109,6 +109,10 @@ class Person(models.Model):
         self.full_clean()
         super(Person, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        rule.rule_4_desativa_usuario_ao_deletar_pessoa(self)
+        super(Person, self).delete(*args, **kwargs)
+
     def clean(self):
         rule.rule_1_has_user_deve_ter_email(self)
         rule.rule_2_ja_existe_outro_usuario_com_mesmo_email(self)
