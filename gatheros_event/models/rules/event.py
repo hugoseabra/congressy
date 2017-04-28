@@ -11,4 +11,4 @@ def rule_2_local_deve_ser_da_mesma_organizacao_do_evento(entity):
     Um evento não pode ter um local que seja de outra organização.
     """
     if entity.place and entity.place.organization != entity.organization:
-        raise ValidationError({'place': ['Local do evento não pertence a sua organização']})
+        raise ValidationError({'place': ['Evento e Local não são da mesma organização.']})

@@ -4,7 +4,7 @@ from django.db import IntegrityError
 
 def rule_1_organizacao_internas_nao_pode_ter_convites(entity):
     if entity.author.organization.internal is True:
-        raise IntegrityError('Organizações internas não aceitam convites')
+        raise IntegrityError('Você não criar convites para uma organização interna.')
 
 
 def rule_2_nao_pode_mudar_autor(entity):
@@ -18,12 +18,11 @@ def rule_3_nao_pode_mudar_convidado(entity):
 
 
 def rule_4_autor_convida_a_si_mesmo(entity):
-    author_person = entity.author.person
-    invited_person = entity.to.person
+    author = entity.author.person
 
-    if author_person == invited_person:
+    if author == entity.to.person:
         raise ValidationError(
-            {'to': ['O autor \'{}\' não pode convidar a si mesmo para uma organização'.format(author_person.name)]}
+            {'to': ['O author do convite não pode convidar a si mesmo para organizações.'.format(author.name)]}
         )
 
 
@@ -46,7 +45,7 @@ def rule_6_autor_deve_ser_membro_admin(entity, adding=True):
     group = entity.author.ADMIN
 
     if adding and _is_organization_member(organization=organization, person=person, group=group) is False:
-        raise ValidationError({'author': ['O autor do convite deve ser um membro administrador da organização']})
+        raise ValidationError({'author': ['O autor do convite deve ser um membro administrador da organização.']})
 
 
 def rule_7_convidado_ja_membro_da_organizacao(entity, adding=True):
@@ -54,7 +53,8 @@ def rule_7_convidado_ja_membro_da_organizacao(entity, adding=True):
     person = entity.to.person
 
     if adding and _is_organization_member(organization=organization, person=person) is True:
-        raise ValidationError({'to': ['\'{}\' já é membro da organização \'{}\''.format(person.name, organization.name)]})
+        raise ValidationError(
+            {'to': ['\'{}\' já é membro da organização \'{}\'.'.format(person.name, organization.name)]})
 
 
 def _is_organization_member(organization, person, group=None):

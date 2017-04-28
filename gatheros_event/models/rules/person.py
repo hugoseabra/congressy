@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 def rule_1_has_user_deve_ter_email(entity):
     if entity.has_user and not entity.email:
-        raise ValidationError({'email': ['Informe o e-mail para vincular um usuário']})
+        raise ValidationError({'email': ['Informe um e-mail para vincular a pessoa a um usuário']})
 
 
 def rule_2_ja_existe_outro_usuario_com_mesmo_email(entity):

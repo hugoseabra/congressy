@@ -31,7 +31,7 @@ def rule_2_4_imagens_somente(info):
         field_obj = getattr(info, field)
         name = getattr(field_obj, 'name')
         if not name:
-            errors[field] = ['Você deve inserir uma image']
+            errors[field] = ['Você deve inserir uma imagem.']
 
     if errors:
         raise ValidationError(errors)
