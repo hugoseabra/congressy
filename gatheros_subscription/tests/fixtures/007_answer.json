@@ -1,83 +1,416 @@
 [
-{
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 1,
+    "fields": {
+      "subscription": "953ddca3-e8a7-4107-8da3-2d7ef48882f0",
+      "field": 33,
+      "value": "{\"value\": \"Sim\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 2,
+    "fields": {
+      "subscription": "953ddca3-e8a7-4107-8da3-2d7ef48882f0",
+      "field": 34,
+      "value": "{\"value\": \"Frutas\"}"
+    }
+  },
+  {
     "model": "gatheros_subscription.answer",
     "pk": 3,
     "fields": {
-        "subscription": "ec8e7f3a-d63c-4b02-b56d-177c484d4ff8",
-        "field": 25,
-        "value": "{\"value\": \"Sim\"}"
+      "subscription": "953ddca3-e8a7-4107-8da3-2d7ef48882f0",
+      "field": 35,
+      "value": "{\"value\": [\"Insumos\",\"Equipamentos\",\"Irriga\u00e7\u00e3o\"]}"
     }
-},
-{
+  },
+  {
     "model": "gatheros_subscription.answer",
     "pk": 4,
     "fields": {
-        "subscription": "ba5641b1-19e8-4a8e-8205-9b718f17048c",
-        "field": 25,
-        "value": "{\"display\": \"Tem conhecimento de programa\u00e7\u00e3o\", \"value\": true}"
+      "subscription": "953ddca3-e8a7-4107-8da3-2d7ef48882f0",
+      "field": 38,
+      "value": "{\"value\": \"2017-02-01\"}"
     }
-},
-{
+  },
+  {
     "model": "gatheros_subscription.answer",
     "pk": 5,
     "fields": {
-        "subscription": "f9870a6f-724d-47ef-8768-fc8b0571149f",
-        "field": 25,
-        "value": "{\"display\": \"sim\", \"value\": true}"
+      "subscription": "953ddca3-e8a7-4107-8da3-2d7ef48882f0",
+      "field": 39,
+      "value": "{\"value\": \"2017-06-25T08:00:00 \"}"
     }
-},
-{
+  },
+  {
     "model": "gatheros_subscription.answer",
     "pk": 6,
     "fields": {
-        "subscription": "0ddffc69-6da3-4083-9bb3-94e53934c5fd",
-        "field": 25,
-        "value": "{\"display\": \"sim\", \"value\": true}"
+      "subscription": "436fcf1e-3a58-455c-9d0f-d0632b690a77",
+      "field": 33,
+      "value": "{\"value\": \"N\u00e3o\"}"
     }
-},
-{
+  },
+  {
     "model": "gatheros_subscription.answer",
     "pk": 7,
     "fields": {
-        "subscription": "c6ebbadc-3982-48ee-a6fc-62e38f348d0c",
-        "field": 17,
-        "value": "{\"display\": \"Ensino M\u00e9dio\", \"value\": \"ensino-medio\"}"
+      "subscription": "436fcf1e-3a58-455c-9d0f-d0632b690a77",
+      "field": 34,
+      "value": "{\"value\": \"Tomate\"}"
     }
-},
-{
+  },
+  {
     "model": "gatheros_subscription.answer",
     "pk": 8,
     "fields": {
-        "subscription": "c6ebbadc-3982-48ee-a6fc-62e38f348d0c",
-        "field": 18,
-        "value": "[{\"display\": \"Soja\", \"value\": \"soja\"}, {\"display\": \"Sorgo\", \"value\": \"sorgo\"}]"
+      "subscription": "436fcf1e-3a58-455c-9d0f-d0632b690a77",
+      "field": 35,
+      "value": "{\"value\": [\"Insumos\",\"Ferramentas\"]}"
     }
-},
-{
+  },
+  {
     "model": "gatheros_subscription.answer",
     "pk": 9,
     "fields": {
-        "subscription": "c6ebbadc-3982-48ee-a6fc-62e38f348d0c",
-        "field": 20,
-        "value": "{\"display\": \"Plantio de Gr\u00e3os\", \"value\": \"plantio-de-graos\"}"
+      "subscription": "436fcf1e-3a58-455c-9d0f-d0632b690a77",
+      "field": 39,
+      "value": "{\"value\": \"2017-08-02T14:00:00 \"}"
     }
-},
-{
+  },
+  {
     "model": "gatheros_subscription.answer",
     "pk": 10,
     "fields": {
-        "subscription": "de22c35f-962f-45c4-8207-b54de6f2ba1e",
-        "field": 18,
-        "value": "{\"value\": [\"Feij\u00e3o\", \"Pecu\u00e1ria de Leite\", \"Soja\", \"Sorgo\"]}"
+      "subscription": "04c188f9-7547-461f-ac88-83db23987ba8",
+      "field": 33,
+      "value": "{\"value\": \"Sim\"}"
     }
-},
-{
+  },
+  {
     "model": "gatheros_subscription.answer",
     "pk": 11,
     "fields": {
-        "subscription": "de22c35f-962f-45c4-8207-b54de6f2ba1e",
-        "field": 20,
-        "value": "{\"name\": \"Pecu\u00e1ria\", \"value\": \"pecuaria\"}"
+      "subscription": "04c188f9-7547-461f-ac88-83db23987ba8",
+      "field": 34,
+      "value": "{\"value\": \"Arroz\"}"
     }
-}
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 12,
+    "fields": {
+      "subscription": "04c188f9-7547-461f-ac88-83db23987ba8",
+      "field": 35,
+      "value": "{\"value\": [\"Insumos\"]}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 13,
+    "fields": {
+      "subscription": "04c188f9-7547-461f-ac88-83db23987ba8",
+      "field": 38,
+      "value": "{\"value\": \"2016-08-01\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 14,
+    "fields": {
+      "subscription": "04c188f9-7547-461f-ac88-83db23987ba8",
+      "field": 39,
+      "value": "{\"value\": \"2017-06-10T18:00:00 \"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 15,
+    "fields": {
+      "subscription": "ed6f3d53-5070-4362-95ab-dd863d1587bf",
+      "field": 33,
+      "value": "{\"value\": \"Sim\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 16,
+    "fields": {
+      "subscription": "ed6f3d53-5070-4362-95ab-dd863d1587bf",
+      "field": 34,
+      "value": "{\"value\": \"Alface\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 17,
+    "fields": {
+      "subscription": "ed6f3d53-5070-4362-95ab-dd863d1587bf",
+      "field": 35,
+      "value": "{\"value\": [\"Insumos\",\"Adubo\",\"Solo\"]}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 18,
+    "fields": {
+      "subscription": "ed6f3d53-5070-4362-95ab-dd863d1587bf",
+      "field": 38,
+      "value": "{\"value\": \"2016-09-20\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 19,
+    "fields": {
+      "subscription": "ed6f3d53-5070-4362-95ab-dd863d1587bf",
+      "field": 39,
+      "value": "{\"value\": \"2017-06-10T14:00:00 \"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 20,
+    "fields": {
+      "subscription": "bb233b5a-2edc-4f1b-bce4-13ea85830887",
+      "field": 46,
+      "value": "{\"value\": \"Ensino Superior\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 21,
+    "fields": {
+      "subscription": "953ca975-ce70-4677-8865-639e3a8d7b3d",
+      "field": 46,
+      "value": "{\"value\": \"Ensino M\u00e9dio\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 22,
+    "fields": {
+      "subscription": "f5a9eecf-21b2-4b8f-a624-0a92bca5f3c3",
+      "field": 46,
+      "value": "{\"value\": \"Mestrado\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 23,
+    "fields": {
+      "subscription": "47ce11bd-145c-4139-9b14-dbb29b6c64a9",
+      "field": 46,
+      "value": "{\"value\":\"Doutorado\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 24,
+    "fields": {
+      "subscription": "7fead9ea-fb4b-4e29-8f7c-c6145ba5b699",
+      "field": 36,
+      "value": "{\"value\": \"Sim\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 25,
+    "fields": {
+      "subscription": "7fead9ea-fb4b-4e29-8f7c-c6145ba5b699",
+      "field": 37,
+      "value": "{\"value\": \"An\u00e1lise de Sistemas\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 26,
+    "fields": {
+      "subscription": "7fead9ea-fb4b-4e29-8f7c-c6145ba5b699",
+      "field": 40,
+      "value": "{\"value\": \"hugo@landare.com.br\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 27,
+    "fields": {
+      "subscription": "7fead9ea-fb4b-4e29-8f7c-c6145ba5b699",
+      "field": 41,
+      "value": "{\"value\": \"62998558545\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 28,
+    "fields": {
+      "subscription": "7fead9ea-fb4b-4e29-8f7c-c6145ba5b699",
+      "field": 42,
+      "value": "{\"value\": \"Minha hist\u00f3ria desde o in\u00edcio...\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 29,
+    "fields": {
+      "subscription": "7fead9ea-fb4b-4e29-8f7c-c6145ba5b699",
+      "field": 43,
+      "value": "{\"value\": [\"Java\",\"Javascript\",\"C\",\"PHP\",\"Python\"]}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 30,
+    "fields": {
+      "subscription": "0b9c07c0-7f7b-4a81-95c1-64c8a264e420",
+      "field": 36,
+      "value": "{\"value\": \"N\u00e3o\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 31,
+    "fields": {
+      "subscription": "0b9c07c0-7f7b-4a81-95c1-64c8a264e420",
+      "field": 37,
+      "value": "{\"value\": \"Secretaria Executivo\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 32,
+    "fields": {
+      "subscription": "0b9c07c0-7f7b-4a81-95c1-64c8a264e420",
+      "field": 42,
+      "value": "{\"value\": \"Minha hist\u00f3ria simples\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 33,
+    "fields": {
+      "subscription": "0b9c07c0-7f7b-4a81-95c1-64c8a264e420",
+      "field": 43,
+      "value": "{\"value\": \"C\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 34,
+    "fields": {
+      "subscription": "0b9c07c0-7f7b-4a81-95c1-64c8a264e420",
+      "field": 45,
+      "value": "{\"value\": \"L\u00f3gica\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 35,
+    "fields": {
+      "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
+      "field": 36,
+      "value": "{\"value\": \"Sim\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 36,
+    "fields": {
+      "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
+      "field": 42,
+      "value": "{\"value\": \"Minha linda hist\u00f3ria...\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 37,
+    "fields": {
+      "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
+      "field": 45,
+      "value": "{\"value\": \"Python\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 38,
+    "fields": {
+      "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
+      "field": 44,
+      "value": "{\"value\": [\"PHP\", \"Python\", \"Javascript\"]}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 39,
+    "fields": {
+      "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
+      "field": 43,
+      "value": "{\"value\": \"PHP\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 40,
+    "fields": {
+      "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
+      "field": 40,
+      "value": "{\"value\": \"luciana@in2web.com.br\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 41,
+    "fields": {
+      "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
+      "field": 37,
+      "value": "{\"value\": \"Letras\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 42,
+    "fields": {
+      "subscription": "ed372352-d869-4c3b-a878-208894500bad",
+      "field": 36,
+      "value": "{\"value\": \"Sim\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 43,
+    "fields": {
+      "subscription": "ed372352-d869-4c3b-a878-208894500bad",
+      "field": 42,
+      "value": "{\"value\": \"N\u00e3o tenho muito a dizer!\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 44,
+    "fields": {
+      "subscription": "ed372352-d869-4c3b-a878-208894500bad",
+      "field": 45,
+      "value": "{\"value\": \"L\u00f3gica\"}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 45,
+    "fields": {
+      "subscription": "ed372352-d869-4c3b-a878-208894500bad",
+      "field": 44,
+      "value": "{\"value\": [\"PHP\", \"Javascript\", \"Ruby\"]}"
+    }
+  },
+  {
+    "model": "gatheros_subscription.answer",
+    "pk": 46,
+    "fields": {
+      "subscription": "ed372352-d869-4c3b-a878-208894500bad",
+      "field": 37,
+      "value": "{\"value\": \"Ci\u00eancias da Computa\u00e7\u00e3o\"}"
+    }
+  }
 ]

@@ -54,10 +54,10 @@ class FieldOptionAdmin(admin.ModelAdmin):
 
         return super(FieldOptionAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
-    def get_field_label(self, instance):
+    def get_field_label( self, instance ):
         return '{} [ {} ]'.format(instance.field.label, instance.field.get_type_display())
 
-    def get_event_form(self, instance):
+    def get_event_form( self, instance ):
         return instance.field.form
 
     get_field_label.__name__ = 'campo'
@@ -68,7 +68,7 @@ class FieldOptionAdmin(admin.ModelAdmin):
 class LotAdmin(admin.ModelAdmin):
     list_display = ('name', 'event', 'price', 'date_start', 'date_end', 'private', 'internal', 'pk')
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
         if db_field.name == "event":
             events = Event.objects.annotate(num_lots=Count('lots')).filter(
                 Q(subscription_type=Event.SUBSCRIPTION_SIMPLE, num_lots__exact=0) |
@@ -93,21 +93,21 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(Form)
 class FormAdmin(admin.ModelAdmin):
-    def get_form(self, request, obj=None, **kwargs):
+    def get_form( self, request, obj=None, **kwargs ):
         self.pk = None
         if obj:
             self.pk = obj.id
 
         return super(FormAdmin, self).get_form(request, obj, **kwargs)
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
 
         if not self.pk and db_field.name == "event":
             kwargs["queryset"] = Event.objects.filter(form=None).exclude(subscription_type=Event.SUBSCRIPTION_DISABLED)
 
         return super(FormAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
-    def has_additional_fields(self, instance):
+    def has_additional_fields( self, instance ):
         return instance.has_additional_fields
 
     has_additional_fields.__name__ = 'campos adicionais'
@@ -118,32 +118,35 @@ class FormAdmin(admin.ModelAdmin):
 
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ['subscription', 'field', 'get_value']
+    list_display = ['get_event', 'get_subscription', 'get_field', 'get_value']
+    ordering = ['field__form', 'subscription__person', 'field__order']
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "field":
-            kwargs["queryset"] = Field.objects.filter(form_default_field=False)
+    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
         if db_field.name == "subscription":
-            kwargs["queryset"] = Subscription.objects.filter(event__form__fields__form_default_field=False).distinct()
+            kwargs["queryset"] = Subscription.objects \
+                .annotate(num_answers=Count('answers')) \
+                .filter(event__form__fields__form_default_field=False) \
+                .order_by('event__name') \
+                .distinct()
+
+        if db_field.name == "field":
+            kwargs["queryset"] = Field.objects.filter(form_default_field=False).order_by('form__event', '-required')
 
         return super(AnswerAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
-    def get_value(self, instance):
-        data = json.loads(instance.value)
-        has_options = instance.field.options.count() > 0
+    def get_event( self, instance ):
+        return instance.field.form
 
-        def format_result(dict, has_options=False):
-            if has_options:
-                return dict['name']
-            else:
-                return dict['value']
+    def get_subscription( self, instance ):
+        return instance.subscription.person
 
-        if type(data) is list:
-            result = []
-            for v in data:
-                result.append(format_result(v, has_options))
-            return ', '.join(result)
-        else:
-            return format_result(data, has_options)
+    def get_field( self, instance ):
+        return instance.field.label + ' [ '+instance.field.get_type_display()+' ]'
 
+    def get_value( self, instance ):
+        return instance.get_display_value()
+
+    get_event.__name__ = 'event'
+    get_subscription.__name__ = 'inscrição'
+    get_field.__name__ = 'campo'
     get_value.__name__ = 'valor'

@@ -295,5 +295,50 @@
         "name": "Experi\u00eancias de profissionais mais antigos",
         "value": "Experi\u00eancias de profissionais mais antigos"
     }
+},
+{
+    "model": "gatheros_subscription.fieldoption",
+    "pk": 34,
+    "fields": {
+        "field": 46,
+        "name": "Ensino Fundamental",
+        "value": "Ensino Fundamental"
+    }
+},
+{
+    "model": "gatheros_subscription.fieldoption",
+    "pk": 35,
+    "fields": {
+        "field": 46,
+        "name": "Ensino M\u00e9dio",
+        "value": "Ensino M\u00e9dio"
+    }
+},
+{
+    "model": "gatheros_subscription.fieldoption",
+    "pk": 36,
+    "fields": {
+        "field": 46,
+        "name": "Ensino Superior",
+        "value": "Ensino Superior"
+    }
+},
+{
+    "model": "gatheros_subscription.fieldoption",
+    "pk": 37,
+    "fields": {
+        "field": 46,
+        "name": "Mestrado",
+        "value": "Mestrado"
+    }
+},
+{
+    "model": "gatheros_subscription.fieldoption",
+    "pk": 38,
+    "fields": {
+        "field": 46,
+        "name": "Doutorado",
+        "value": "Doutorado"
+    }
 }
 ]
