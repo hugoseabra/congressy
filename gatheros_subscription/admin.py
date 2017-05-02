@@ -4,12 +4,43 @@ from django.contrib import admin
 from django.db.models import Count, Q
 
 from gatheros_event.models import Event
-from .models import Answer, Field, FieldOption, Form, Lot, Subscription
+from .models import Answer, Field, FieldOption, Form, Lot, Subscription, DefaultField
+
+
+@admin.register(DefaultField)
+class DefaultFieldAdmin(admin.ModelAdmin):
+    list_display = ('label', 'type', 'required', 'pk')
+    fields = [
+        'name',
+        'label',
+        'type',
+        'order',
+        'required',
+        'instruction',
+        'placeholder',
+        'default_value',
+        'active',
+    ]
 
 
 @admin.register(Field)
 class FieldAdmin(admin.ModelAdmin):
-    list_display = ('form', 'order', 'label', 'type', 'required', 'form_default_field', 'pk')
+    list_display = ('form', 'order', 'label', 'type', 'required', 'form_default_field', 'with_options', 'pk')
+    readonly_fields = ['form_default_field', 'with_options']
+    fields = [
+        'form',
+        'name',
+        'label',
+        'type',
+        'order',
+        'required',
+        'instruction',
+        'placeholder',
+        'default_value',
+        'active',
+        'with_options',
+        'form_default_field',
+    ]
 
 
 @admin.register(FieldOption)
@@ -17,8 +48,14 @@ class FieldOptionAdmin(admin.ModelAdmin):
     list_display = ('name', 'value', 'get_field_label', 'get_event_form', 'pk')
     ordering = ['field', 'name', 'value']
 
+    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
+        if db_field.name == "field":
+            kwargs["queryset"] = Field.objects.filter(with_options=True).all()
+
+        return super(FieldOptionAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
     def get_field_label(self, instance):
-        return '{} [{}]'.format(instance.field.label, instance.field.type)
+        return '{} [ {} ]'.format(instance.field.label, instance.field.get_type_display())
 
     def get_event_form(self, instance):
         return instance.field.form
@@ -35,7 +72,7 @@ class LotAdmin(admin.ModelAdmin):
         if db_field.name == "event":
             events = Event.objects.annotate(num_lots=Count('lots')).filter(
                 Q(subscription_type=Event.SUBSCRIPTION_SIMPLE, num_lots__exact=0) |
-                Q(subscription_type=Event.SUBSCRIPTION_BY_LOTS, num_lots__exact=0)
+                Q(subscription_type=Event.SUBSCRIPTION_BY_LOTS)
             )
 
             for event in events:
@@ -56,8 +93,16 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(Form)
 class FormAdmin(admin.ModelAdmin):
+    def get_form(self, request, obj=None, **kwargs):
+        self.pk = None
+        if obj:
+            self.pk = obj.id
+
+        return super(FormAdmin, self).get_form(request, obj, **kwargs)
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "event":
+
+        if not self.pk and db_field.name == "event":
             kwargs["queryset"] = Event.objects.filter(form=None).exclude(subscription_type=Event.SUBSCRIPTION_DISABLED)
 
         return super(FormAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
