@@ -8,7 +8,7 @@ from .rules import lot as rule
 
 
 class LotManager(models.Manager):
-    def generate_promo_code( self, lot ):
+    def generate_promo_code( self ):
         while True:
             code = str(uuid.uuid4()).split('-')[0].upper()
             try:
