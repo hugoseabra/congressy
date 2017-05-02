@@ -1,2 +1,1 @@
-from .organization_signals import *
-from .person_signals import *
+from . import organization_signals, person_signals

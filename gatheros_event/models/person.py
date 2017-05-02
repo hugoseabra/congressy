@@ -26,30 +26,6 @@ class Person(models.Model):
         ('F', 'Feminino'),
     )
 
-    FORM_FIELDS = [
-        'name',
-        'genre',
-        'birth_date',
-        'education',
-        'cpf',
-        'rg',
-        'orgao_expedidor',
-        'city',
-        'zip_code',
-        'street',
-        'village',
-        'email',
-        'phone',
-        'occupation',
-        'website'
-        'facebook'
-        'twitter'
-        'linkedin'
-        'skype'
-        'term_version'
-        'politics_version'
-    ]
-
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     name = models.CharField(max_length=255, verbose_name='nome')
     genre = models.CharField(max_length=1, choices=GENDER_CHOICES, verbose_name='sexo')
