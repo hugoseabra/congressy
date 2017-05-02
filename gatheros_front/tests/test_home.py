@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import  reverse
 
 
-class InvitationModelTest(TestCase):
+class HomeTest(TestCase):
     def setUp(self):
         self.result = self.client.get(reverse('gatheros_front:home'))
 
