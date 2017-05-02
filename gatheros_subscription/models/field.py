@@ -35,7 +35,11 @@ class Field(AbstractField):
         return super(Field, self).save(**kwargs)
 
     def __str__( self ):
-        return '{} - {} ({})'.format(self.label, self.get_type_display(), self.form)
+        required = ''
+        if self.required:
+            required = '* '
+
+        return required + '{} - {} ({})'.format(self.label, self.get_type_display(), self.form)
 
     def _accepts_options( self ):
         self.with_options = self.type in [
