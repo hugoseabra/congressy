@@ -9,29 +9,29 @@ from gatheros_subscription.models import Lot
 
 
 @receiver(post_save, sender=Event)
-def manage_related_lot_when_subscription_enabled(sender, instance, created, raw, **_):
+def manage_related_lot_when_subscription_enabled( instance, created, raw, **_ ):
     # Disable when loaded by fixtures
     if raw is True:
         return
 
-    # Process only if subscription_type is changed
+    # Process only if, in edition, subscription_type is changed
     if created is False and instance.has_changed('subscription_type') is False:
         return
 
-    if instance.subscription_type not in [sender.SUBSCRIPTION_SIMPLE, sender.SUBSCRIPTION_BY_LOTS]:
+    if instance.subscription_type == Event.SUBSCRIPTION_DISABLED:
         _remove_lots(event=instance)
         return
 
     num_lots = Lot.objects.filter(event=instance).count()
 
-    if instance.subscription_type == sender.SUBSCRIPTION_SIMPLE:
+    if instance.subscription_type == Event.SUBSCRIPTION_SIMPLE:
         if num_lots > 0:
             _merge_lots_and_subscriptions(event=instance)
             return
 
         _create_internal_lot(event=instance)
 
-    elif instance.subscription_type == sender.SUBSCRIPTION_BY_LOTS:
+    elif instance.subscription_type == Event.SUBSCRIPTION_BY_LOTS:
         if num_lots > 0:
             _convert_internal_lot_to_external(event=instance)
             return
@@ -39,22 +39,22 @@ def manage_related_lot_when_subscription_enabled(sender, instance, created, raw,
         _create_external_lot(event=instance)
 
 
-def _remove_lots(event):
+def _remove_lots( event ):
     for lot in event.lots.all():
         if lot.subscriptions.count() > 0:
-            raise Exception('Você já possui inscrições. Exclua os lotes primeiro para depois desativar as inscrições.')
+            raise Exception('Lote já possui inscrições. Não desativar as inscrições.')
 
     event.lots.all().delete()
 
 
-def _get_lot_date_start(event):
+def _get_lot_date_start( event ):
     if event.date_start > datetime.now():
-        return event.date_start
+        return datetime.now()
 
     return event.date_start - timedelta(days=1)
 
 
-def _create_internal_lot(event):
+def _create_internal_lot( event ):
     Lot.objects.create(
         name=Lot.INTERNAL_DEFAULT_NAME,
         event=event,
@@ -63,7 +63,7 @@ def _create_internal_lot(event):
     )
 
 
-def _create_external_lot(event):
+def _create_external_lot( event ):
     Lot.objects.create(
         name='Lote 1',
         event=event,
@@ -72,7 +72,7 @@ def _create_external_lot(event):
     )
 
 
-def _merge_lots_and_subscriptions(event):
+def _merge_lots_and_subscriptions( event ):
     """
     1. check if lot(s) has(have) subscription(s)
     2. find the most recent lot
@@ -95,11 +95,11 @@ def _merge_lots_and_subscriptions(event):
 
         subscriptions += subs
 
-    for lot in lots[1:]:
-        lot.delete()
-
     # normalize
     _merge_subscriptions(most_recent_lot, subscriptions)
+
+    for lot in lots[1:]:
+        lot.delete()
 
     most_recent_lot.name = Lot.INTERNAL_DEFAULT_NAME
     most_recent_lot.internal = True
@@ -107,7 +107,7 @@ def _merge_lots_and_subscriptions(event):
     most_recent_lot.save()
 
 
-def _merge_subscriptions(lot, subscriptions):
+def _merge_subscriptions( lot, subscriptions ):
     # normalize
     subscription_counter = 0
     for sub in subscriptions:
@@ -123,7 +123,7 @@ def _merge_subscriptions(lot, subscriptions):
             subscription_counter += 1
 
 
-def _convert_internal_lot_to_external(event):
+def _convert_internal_lot_to_external( event ):
     lots = event.lots.all().order_by('pk')
 
     if lots.count() == 0:
