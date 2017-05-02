@@ -56,7 +56,7 @@ class Lot(models.Model):
             self.date_end = self.event.date_start - timedelta(seconds=1)
 
         if self.private and not self.promo_code:
-            self.promo_code = Lot.objects.generate_promo_code(self)
+            self.promo_code = Lot.objects.generate_promo_code()
 
         self.full_clean()
         return super(Lot, self).save(**kwargs)
