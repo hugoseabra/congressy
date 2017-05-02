@@ -12,7 +12,7 @@ class LotManager(models.Manager):
         while True:
             code = str(uuid.uuid4()).split('-')[0].upper()
             try:
-                self.get(pk=lot.pk, promo_code=code)
+                self.get(promo_code=code)
             except Lot.DoesNotExist:
                 return code
 
