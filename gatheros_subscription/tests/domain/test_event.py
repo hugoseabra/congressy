@@ -17,8 +17,8 @@ class EventModelTest(TestCase):
         '007_organization',
         '009_place',
         '010_event',
-        '004_lot',
-        '005_subscription',
+        '005_lot',
+        '006_subscription',
     ]
 
     def test_disabled_subscription_no_lots(self):

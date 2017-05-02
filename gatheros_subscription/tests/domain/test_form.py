@@ -1,24 +1,58 @@
-from django.test import TestCase
-
-from django.db import IntegrityError
+from gatheros_event.lib.test import GatherosTestCase
 from gatheros_event.models import Event
 from gatheros_subscription.models import Form
+from gatheros_subscription.models.rules import form as rule
 
 
-class FormModelTest(TestCase):
+class FormModelTest(GatherosTestCase):
     fixtures = [
         'kanu_locations_city_test',
-        '003_occupation',
+        '001_default_field',
         '004_category',
-        '005_user',
-        '006_person',
         '007_organization',
         '009_place',
         '010_event'
     ]
 
-    def test_no_form_for_event_with_disabled_subscription(self):
-        form = Form(event=Event.objects.filter(subscription_type=Event.SUBSCRIPTION_DISABLED).first())
+    def _get_event(self, subscription_type=Event.SUBSCRIPTION_SIMPLE):
+        return Event.objects.filter(subscription_type=subscription_type).first()
 
-        with self.assertRaises(IntegrityError):
-            form.save()
+    def _create_form(self, event=None, persist=False):
+        if not event:
+            event = self._get_event()
+
+        data = {'event': event}
+        return self._create_model(Model=Form, data=data, persist=persist)
+
+    def test_rule_1_form_em_event_inscricao_desativada(self):
+        rule_callback = rule.rule_1_form_em_event_inscricao_desativada
+
+        event = self._get_event(subscription_type=Event.SUBSCRIPTION_DISABLED)
+        form = self._create_form(event=event)
+
+        """ RULE """
+        self._trigger_integrity_error(rule_callback, [form])
+
+        """ MODEL """
+        self._trigger_integrity_error(form.save)
+
+        """ FUNCIONANDO """
+        form.event.subscription_type = Event.SUBSCRIPTION_SIMPLE
+        form.event.save()
+        form.save()
+
+    def test_rule_2_form_possui_todos_campos_padrao(self):
+        rule_callback = rule.rule_2_form_possui_todos_campos_padrao
+
+        form = self._create_form()
+        form.save()
+
+        # Error
+        # Remover 1 dos campos padrão.
+        field = form.fields.first()
+        field.delete()
+        self._trigger_integrity_error(rule_callback, [form])
+
+        # Garante todos os campos novamente
+        form.save()
+        rule_callback(form)

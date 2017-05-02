@@ -1,9 +1,8 @@
-from django.test import TestCase
-
+from gatheros_event.lib.test import GatherosTestCase
 from gatheros_subscription.models import Field, Form
 
 
-class FieldModelTest(TestCase):
+class FieldModelTest(GatherosTestCase):
     fixtures = [
         'kanu_locations_city_test',
         '003_occupation',
@@ -13,19 +12,29 @@ class FieldModelTest(TestCase):
         '007_organization',
         '009_place',
         '010_event',
-        '001_form',
-        '002_field'
+        '002_form',
+        '003_field'
     ]
 
-    def test_new_field_always_last_one(self):
+    def _get_form( self ):
+        return Form.objects.first()
+
+    def _create_field( self, form=None, persist=False, **kwargs ):
+        if not form:
+            form = self._get_form()
+
+        data = {
+            'form': form,
+            'type': Field.FIELD_INPUT_TEXT,
+            'label': 'New one',
+            'name': 'new field tests'
+        }
+        return self._create_model(Model=Field, data=data, persist=persist, **kwargs)
+
+    def test_new_field_always_last_one( self ):
         form = Form.objects.first()
         last_order = form.fields.order_by('-order').first().order
 
-        field = Field.objects.create(
-            form=form,
-            name='new field tests',
-            label='New one',
-            type=Field.FIELD_INPUT_TEXT,
-        )
+        field = self._create_field(form=form, persist=True)
 
         self.assertEqual(field.order, last_order + 1)

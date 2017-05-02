@@ -1,13 +1,12 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-from django.core.exceptions import ValidationError
-from django.test import TestCase
-
+from gatheros_event.lib.test import GatherosTestCase
 from gatheros_event.models import Category, Event, Organization
 from gatheros_subscription.models import Lot
+from gatheros_subscription.models.rules import lot as rule
 
 
-class LotModelTest(TestCase):
+class LotModelTest(GatherosTestCase):
     fixtures = [
         'kanu_locations_city_test',
         '003_occupation',
@@ -15,132 +14,231 @@ class LotModelTest(TestCase):
         '005_user',
         '006_person',
         '007_organization',
+        '009_place',
+        '010_event',
+        '005_lot',
     ]
 
-    def test_date_start_date_end_before_event_date_start(self):
-        event = self._create_event(type=Event.SUBSCRIPTION_SIMPLE)
-        lot = event.lots.first()
-        lot.date_start = datetime.now() + timedelta(hours=1)
+    def setUp( self ):
+        self.event_data = {
+            "name": "Event Test",
+            "organization": Organization.objects.get(pk=5),
+            "category": Category.objects.get(pk=4),
+            "subscription_type": Event.SUBSCRIPTION_BY_LOTS,
+            "subscription_offline": True,
+            "date_start": "2017-04-25T08:00:00",
+            "date_end": "2017-04-25T12:00:00",
+            "place": None,
+            "description": None,
+            "website": "http://in2web.com.br",
+            "facebook": None,
+            "twitter": None,
+            "linkedin": None,
+            "skype": None
+        }
+        self.lot_data = {
+            "name": "Lot Test",
+            "date_start": "2017-04-01T00:00:00",
+            "date_end": "2017-04-10T23:59:59",
+            "limit": 10,
+            "price": "50.00",
+            "tax": None,
+            "discount_type": "percent",
+            "discount": None,
+            "promo_code": None,
+            "transfer_tax": False,
+            "private": False,
+            "internal": False,
+            "created": "2017-04-24T17:18:55.745"
+        }
 
-        with self.assertRaises(ValidationError) as e:
-            lot.save()
+    def _create_event( self, persist=False, **kwargs ):
+        return self._create_model(Model=Event, data=self.event_data, persist=persist, **kwargs)
 
-        self.assertTrue('date_start' in dict(e.exception).keys())
+    def _create_lot( self, **kwargs ):
+        if not hasattr(kwargs, 'event'):
+            kwargs.update({'event': self._create_event(persist=True)})
 
-        lot.date_start = datetime.now() - timedelta(days=3)
-        lot.date_end = datetime.now() + timedelta(hours=1)
+        return self._create_model(Model=Lot, data=self.lot_data, **kwargs)
 
-        with self.assertRaises(ValidationError) as e:
-            lot.save()
+    def test_rule_1_event_inscricao_desativada( self ):
+        rule_callback = rule.rule_1_event_inscricao_desativada
 
-        self.assertTrue('date_end' in dict(e.exception).keys())
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_DISABLED, persist=True)
+        lot = self._create_lot(event=event)
 
-    def test_add_lot_in_event_with_disabled_subscription(self):
-        event = self._create_event(type=Event.SUBSCRIPTION_DISABLED)
-        lot = Lot(
-            name='default',
-            event=event,
-            date_start=datetime.now() - timedelta(days=10)
-        )
+        """ RULE """
+        self._trigger_validation_error(callback=rule_callback, params=[lot], field='event')
 
-        with self.assertRaises(ValidationError) as e:
-            lot.save()
+        """ MODEL """
+        self._trigger_validation_error(callback=lot.save, field='event')
 
-        self.assertTrue('event' in dict(e.exception).keys())
+        """ FUNCIONANDO """
+        lot.event.subscription_type = Event.SUBSCRIPTION_BY_LOTS
+        lot.event.save()
+        lot.save()
 
-    def test_internal_when_subscription_simple(self):
-        event = self._create_event(type=Event.SUBSCRIPTION_SIMPLE)
+    def test_rule_2_mais_de_1_lote_evento_inscricao_simples( self ):
+        rule_callback = rule.rule_2_mais_de_1_lote_evento_inscricao_simples
+
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_SIMPLE, persist=True)
+        lot = self._create_lot(event=event)
+
+        """ RULE """
+        self._trigger_integrity_error(callback=rule_callback, params=[lot])
+
+        """ MODEL """
+        self._trigger_integrity_error(callback=lot.save)
+
+        """ FUNCIONANDO """
+        lot.event.subscription_type = Event.SUBSCRIPTION_BY_LOTS
+        lot.event.save()
+        lot.save()
+
+    def test_rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo( self ):
+        rule_callback = rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo
+
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_SIMPLE, persist=True)
         lot = event.lots.first()
         lot.internal = False
 
-        with self.assertRaises(ValidationError) as e:
-            lot.save()
+        """ RULE """
+        self._trigger_validation_error(callback=rule_callback, params=[lot], field='internal')
 
-        self.assertTrue('internal' in dict(e.exception).keys())
+        """ MODEL """
+        self._trigger_validation_error(callback=lot.save, field='internal')
 
-    def test_paid_lot_with_limit(self):
-        price = 55.00
-        limit = 10
-
-        event = self._create_event(type=Event.SUBSCRIPTION_BY_LOTS)
-        # Lot is external
-        lot = event.lots.first()
-        lot.price = 55.00
-
-        # Paid lots MUST HAVE limit
-        with self.assertRaises(ValidationError) as e:
-            lot.save()
-
-        self.assertTrue('limit' in dict(e.exception).keys())
-
-        lot.limit = limit
-        lot.save()
-        self.assertEqual(lot.price, price)
-        self.assertEqual(lot.limit, limit)
-
-    def test_paied_lot_must_be_external(self):
-        price = 55.00
-
-        event = self._create_event(type=Event.SUBSCRIPTION_SIMPLE)
-        # Lot is internal
-        lot = event.lots.first()
-        lot.price = price
-
-        # internal lots must be FREE, it means, empty price
-        with self.assertRaises(ValidationError) as e:
-            lot.save()
-
-        self.assertTrue('price' in dict(e.exception).keys())
-
-        event.subscription_type = Event.SUBSCRIPTION_BY_LOTS
-        event.save()
-
-        # Lot is external (converted by signal)
-        lot = event.lots.first()
-        lot.price = price
-        lot.limit = 100
+        """ FUNCIONANDO """
+        lot.event.subscription_type = Event.SUBSCRIPTION_BY_LOTS
+        lot.event.save()
         lot.save()
 
-        # external lots MAY BE paied
-        self.assertEqual(lot.price, price)
+    def test_rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno( self ):
+        rule_callback = rule.rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno
 
-    def test_lot_must_not_be_internal_when_subscription_by_lots(self):
-        event = self._create_event(type=Event.SUBSCRIPTION_BY_LOTS)
-        # Lot is external
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_BY_LOTS, persist=True)
         lot = event.lots.first()
         lot.internal = True
 
-        # Event with SUBSCRIPTION_BY_LOTS MUST NOT have internal lots
-        with self.assertRaises(ValidationError) as e:
-            lot.save()
+        """ RULE """
+        self._trigger_validation_error(callback=rule_callback, params=[lot], field='internal')
 
-        self.assertTrue('internal' in dict(e.exception).keys())
+        """ MODEL """
+        self._trigger_validation_error(callback=lot.save, field='internal')
 
-    def test_private_must_generate_code(self):
-        event = self._create_event(type=Event.SUBSCRIPTION_BY_LOTS)
+        """ FUNCIONANDO """
+        # Ao mudar tipo, o único lote que sobra é interno
+        lot.event.subscription_type = Event.SUBSCRIPTION_SIMPLE
+        lot.event.save()
+        self.assertTrue(event.lots.first().internal)
+
+    def test_rule_5_data_inicial_antes_data_final( self ):
+        rule_callback = rule.rule_5_data_inicial_antes_data_final
+
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_BY_LOTS, persist=True)
         lot = event.lots.first()
+        lot.date_start = lot.date_end + timedelta(hours=1)
 
-        # No code was generated yet
-        self.assertIsNone(lot.promo_code)
+        """ RULE """
+        self._trigger_validation_error(callback=rule_callback, params=[lot], field='date_start')
 
-        # Turn to private
+        """ MODEL """
+        self._trigger_validation_error(callback=lot.save, field='date_start')
+
+        """ FUNCIONANDO """
+        lot.date_start = lot.date_end - timedelta(hours=8)
+        lot.save()
+
+    def test_rule_6_data_inicial_antes_data_inicial_evento( self ):
+        rule_callback = rule.rule_6_data_inicial_antes_data_inicial_evento
+
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_BY_LOTS, persist=True)
+        lot = event.lots.first()
+        lot.date_start = lot.event.date_start + timedelta(hours=1)
+        lot.date_end = lot.date_start + timedelta(hours=1)
+
+        """ RULE """
+        self._trigger_validation_error(callback=rule_callback, params=[lot], field='date_start')
+
+        """ MODEL """
+        self._trigger_validation_error(callback=lot.save, field='date_start')
+
+        """ FUNCIONANDO """
+        lot.date_start = lot.event.date_start - timedelta(days=1)
+        lot.date_end = lot.event.date_start - timedelta(minutes=1)
+        lot.save()
+
+    def test_rule_7_data_final_antes_data_inicial_evento( self ):
+        rule_callback = rule.rule_7_data_final_antes_data_inicial_evento
+
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_BY_LOTS, persist=True)
+        lot = event.lots.first()
+        lot.date_end = lot.event.date_start + timedelta(hours=1)
+
+        """ RULE """
+        self._trigger_validation_error(callback=rule_callback, params=[lot], field='date_end')
+
+        """ MODEL """
+        self._trigger_validation_error(callback=lot.save, field='date_end')
+
+        """ FUNCIONANDO """
+        lot.date_end = lot.event.date_start - timedelta(minutes=1)
+        lot.save()
+
+    def test_rule_8_lot_interno_nao_pode_ter_preco( self ):
+        rule_callback = rule.rule_8_lot_interno_nao_pode_ter_preco
+
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_SIMPLE, persist=True)
+        lot = event.lots.first()
+        lot.price = 55.00
+
+        """ RULE """
+        self._trigger_validation_error(callback=rule_callback, params=[lot], field='price')
+
+        """ MODEL """
+        self._trigger_validation_error(callback=lot.save, field='price')
+
+        """ FUNCIONANDO """
+        lot.price = None
+        lot.save()
+
+        lot.event.subscription_type = Event.SUBSCRIPTION_BY_LOTS
+        lot.event.save()
+        lot = event.lots.first()
+        lot.price = 55.00
+        lot.limit = 100
+        lot.save()
+
+    def test_rule_9_lote_pago_deve_ter_limite( self ):
+        rule_callback = rule.rule_9_lote_pago_deve_ter_limite
+
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_BY_LOTS, persist=True)
+        lot = event.lots.first()
+        lot.price = 55.00
+
+        """ RULE """
+        self._trigger_validation_error(callback=rule_callback, params=[lot], field='limit')
+
+        """ MODEL """
+        self._trigger_validation_error(callback=lot.save, field='limit')
+
+        """ FUNCIONANDO """
+        lot.limit = 100
+        lot.save()
+
+    def test_rule_10_lote_privado_deve_ter_codigo_promocional( self ):
+        rule_callback = rule.rule_10_lote_privado_deve_ter_codigo_promocional
+
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_BY_LOTS, persist=True)
+        lot = event.lots.first()
         lot.private = True
+
+        """ RULE """
+        self._trigger_validation_error(callback=rule_callback, params=[lot], field='promo_code')
+
+        """ MODEL FUNCIONANDO """
+        # Gera código ao salvar como privado
         lot.save()
 
         # Code has been generated
         self.assertIsNotNone(lot.promo_code)
-
-    def _create_event(self, type=Event.SUBSCRIPTION_DISABLED, persist=True):
-        event = Event(
-            name='Event tests',
-            organization=Organization.objects.first(),
-            category=Category.objects.first(),
-            subscription_type=type,
-            date_start=datetime.now(),
-            date_end=datetime.now() + timedelta(days=1)
-        )
-
-        if persist:
-            event.save()
-
-        return event
