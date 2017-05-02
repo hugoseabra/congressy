@@ -5,7 +5,7 @@
     "fields": {
         "subscription": "ec8e7f3a-d63c-4b02-b56d-177c484d4ff8",
         "field": 25,
-        "value": "{\"name\": \"Tem conhecimento de programa\u00e7\u00e3o\", \"value\": true}"
+        "value": "{\"value\": \"Sim\"}"
     }
 },
 {
@@ -14,7 +14,7 @@
     "fields": {
         "subscription": "ba5641b1-19e8-4a8e-8205-9b718f17048c",
         "field": 25,
-        "value": "{\"name\": \"Tem conhecimento de programa\u00e7\u00e3o\", \"value\": true}"
+        "value": "{\"display\": \"Tem conhecimento de programa\u00e7\u00e3o\", \"value\": true}"
     }
 },
 {
@@ -23,7 +23,7 @@
     "fields": {
         "subscription": "f9870a6f-724d-47ef-8768-fc8b0571149f",
         "field": 25,
-        "value": "{\"name\": \"Tem conhecimento de programa\u00e7\u00e3o\", \"value\": true}"
+        "value": "{\"display\": \"sim\", \"value\": true}"
     }
 },
 {
@@ -32,7 +32,7 @@
     "fields": {
         "subscription": "0ddffc69-6da3-4083-9bb3-94e53934c5fd",
         "field": 25,
-        "value": "{\"name\": \"Tem conhecimento de programa\u00e7\u00e3o\", \"value\": false}"
+        "value": "{\"display\": \"sim\", \"value\": true}"
     }
 },
 {
@@ -41,7 +41,7 @@
     "fields": {
         "subscription": "c6ebbadc-3982-48ee-a6fc-62e38f348d0c",
         "field": 17,
-        "value": "{\"name\": \"Ensino M\u00e9dio\", \"value\": \"ensino-medio\"}"
+        "value": "{\"display\": \"Ensino M\u00e9dio\", \"value\": \"ensino-medio\"}"
     }
 },
 {
@@ -50,7 +50,7 @@
     "fields": {
         "subscription": "c6ebbadc-3982-48ee-a6fc-62e38f348d0c",
         "field": 18,
-        "value": "[{\"name\": \"Soja\", \"value\": \"soja\"}, {\"name\": \"Sorgo\", \"value\": \"sorgo\"}]"
+        "value": "[{\"display\": \"Soja\", \"value\": \"soja\"}, {\"display\": \"Sorgo\", \"value\": \"sorgo\"}]"
     }
 },
 {
@@ -59,7 +59,7 @@
     "fields": {
         "subscription": "c6ebbadc-3982-48ee-a6fc-62e38f348d0c",
         "field": 20,
-        "value": "{\"name\": \"Plantio de Gr\u00e3os\", \"value\": \"plantio-de-graos\"}"
+        "value": "{\"display\": \"Plantio de Gr\u00e3os\", \"value\": \"plantio-de-graos\"}"
     }
 },
 {
@@ -68,7 +68,7 @@
     "fields": {
         "subscription": "de22c35f-962f-45c4-8207-b54de6f2ba1e",
         "field": 18,
-        "value": "[{\"name\": \"Feij\u00e3o\", \"value\": \"feijao\"}, {\"name\": \"Pecu\u00e1ria de Leite\", \"value\": \"pecuaria-de-leite\"}, {\"name\": \"Soja\", \"value\": \"soja\"}, {\"name\": \"Sorgo\", \"value\": \"sorgo\"}]"
+        "value": "{\"value\": [\"Feij\u00e3o\", \"Pecu\u00e1ria de Leite\", \"Soja\", \"Sorgo\"]}"
     }
 },
 {

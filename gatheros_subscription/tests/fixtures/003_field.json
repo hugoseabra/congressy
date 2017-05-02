@@ -1,0 +1,546 @@
+[
+{
+    "model": "gatheros_subscription.field",
+    "pk": 1,
+    "fields": {
+        "name": "name",
+        "label": "Nome Completo",
+        "type": "input-text",
+        "order": 1,
+        "required": true,
+        "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+        "placeholder": "Nome completo",
+        "default_value": "",
+        "form": 1,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 2,
+    "fields": {
+        "name": "email",
+        "label": "E-mail",
+        "type": "input-email",
+        "order": 2,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 1,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 3,
+    "fields": {
+        "name": "phone",
+        "label": "Celular",
+        "type": "input-phone",
+        "order": 3,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 1,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 4,
+    "fields": {
+        "name": "city",
+        "label": "Cidade",
+        "type": "input-text",
+        "order": 4,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 1,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 5,
+    "fields": {
+        "name": "name",
+        "label": "Nome Completo",
+        "type": "input-text",
+        "order": 1,
+        "required": true,
+        "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+        "placeholder": "Nome completo",
+        "default_value": "",
+        "form": 2,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 6,
+    "fields": {
+        "name": "email",
+        "label": "E-mail",
+        "type": "input-email",
+        "order": 2,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 2,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 7,
+    "fields": {
+        "name": "phone",
+        "label": "Celular",
+        "type": "input-phone",
+        "order": 3,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 2,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 8,
+    "fields": {
+        "name": "city",
+        "label": "Cidade",
+        "type": "input-text",
+        "order": 4,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 2,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 9,
+    "fields": {
+        "name": "name",
+        "label": "Nome Completo",
+        "type": "input-text",
+        "order": 1,
+        "required": true,
+        "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+        "placeholder": "Nome completo",
+        "default_value": "",
+        "form": 3,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 10,
+    "fields": {
+        "name": "email",
+        "label": "E-mail",
+        "type": "input-email",
+        "order": 2,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 3,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 11,
+    "fields": {
+        "name": "phone",
+        "label": "Celular",
+        "type": "input-phone",
+        "order": 3,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 3,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 12,
+    "fields": {
+        "name": "city",
+        "label": "Cidade",
+        "type": "input-text",
+        "order": 4,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 3,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 13,
+    "fields": {
+        "name": "name",
+        "label": "Nome Completo",
+        "type": "input-text",
+        "order": 1,
+        "required": true,
+        "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+        "placeholder": "Nome completo",
+        "default_value": "",
+        "form": 4,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 14,
+    "fields": {
+        "name": "email",
+        "label": "E-mail",
+        "type": "input-email",
+        "order": 2,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 4,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 15,
+    "fields": {
+        "name": "phone",
+        "label": "Celular",
+        "type": "input-phone",
+        "order": 3,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 4,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 16,
+    "fields": {
+        "name": "city",
+        "label": "Cidade",
+        "type": "input-text",
+        "order": 4,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 4,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 17,
+    "fields": {
+        "name": "name",
+        "label": "Nome Completo",
+        "type": "input-text",
+        "order": 1,
+        "required": true,
+        "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+        "placeholder": "Nome completo",
+        "default_value": "",
+        "form": 5,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 18,
+    "fields": {
+        "name": "email",
+        "label": "E-mail",
+        "type": "input-email",
+        "order": 2,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 5,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 19,
+    "fields": {
+        "name": "phone",
+        "label": "Celular",
+        "type": "input-phone",
+        "order": 3,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 5,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 20,
+    "fields": {
+        "name": "city",
+        "label": "Cidade",
+        "type": "input-text",
+        "order": 4,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 5,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 21,
+    "fields": {
+        "name": "name",
+        "label": "Nome Completo",
+        "type": "input-text",
+        "order": 1,
+        "required": true,
+        "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+        "placeholder": "Nome completo",
+        "default_value": "",
+        "form": 6,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 22,
+    "fields": {
+        "name": "email",
+        "label": "E-mail",
+        "type": "input-email",
+        "order": 2,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 6,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 23,
+    "fields": {
+        "name": "phone",
+        "label": "Celular",
+        "type": "input-phone",
+        "order": 3,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 6,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 24,
+    "fields": {
+        "name": "city",
+        "label": "Cidade",
+        "type": "input-text",
+        "order": 4,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 6,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 25,
+    "fields": {
+        "name": "name",
+        "label": "Nome Completo",
+        "type": "input-text",
+        "order": 1,
+        "required": true,
+        "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+        "placeholder": "Nome completo",
+        "default_value": "",
+        "form": 7,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 26,
+    "fields": {
+        "name": "email",
+        "label": "E-mail",
+        "type": "input-email",
+        "order": 2,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 7,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 27,
+    "fields": {
+        "name": "phone",
+        "label": "Celular",
+        "type": "input-phone",
+        "order": 3,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 7,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 28,
+    "fields": {
+        "name": "city",
+        "label": "Cidade",
+        "type": "input-text",
+        "order": 4,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 7,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 29,
+    "fields": {
+        "name": "name",
+        "label": "Nome Completo",
+        "type": "input-text",
+        "order": 1,
+        "required": true,
+        "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+        "placeholder": "Nome completo",
+        "default_value": "",
+        "form": 8,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 30,
+    "fields": {
+        "name": "email",
+        "label": "E-mail",
+        "type": "input-email",
+        "order": 2,
+        "required": false,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 8,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 31,
+    "fields": {
+        "name": "phone",
+        "label": "Celular",
+        "type": "input-phone",
+        "order": 3,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 8,
+        "form_default_field": true,
+        "active": true
+    }
+},
+{
+    "model": "gatheros_subscription.field",
+    "pk": 32,
+    "fields": {
+        "name": "city",
+        "label": "Cidade",
+        "type": "input-text",
+        "order": 4,
+        "required": true,
+        "instruction": "",
+        "placeholder": null,
+        "default_value": "",
+        "form": 8,
+        "form_default_field": true,
+        "active": true
+    }
+}
+]

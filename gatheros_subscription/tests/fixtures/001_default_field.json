@@ -1,0 +1,58 @@
+[
+  {
+    "model": "gatheros_subscription.defaultfield",
+    "pk": 1,
+    "fields": {
+      "name": "name",
+      "label": "Nome Completo",
+      "type": "input-text",
+      "order": 1,
+      "required": true,
+      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+      "placeholder": "Nome completo",
+      "default_value": ""
+    }
+  },
+  {
+    "model": "gatheros_subscription.defaultfield",
+    "pk": 2,
+    "fields": {
+      "name": "email",
+      "label": "E-mail",
+      "type": "input-email",
+      "order": 2,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": ""
+    }
+  },
+  {
+    "model": "gatheros_subscription.defaultfield",
+    "pk": 3,
+    "fields": {
+      "name": "phone",
+      "label": "Celular",
+      "type": "input-phone",
+      "order": 3,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": ""
+    }
+  },
+  {
+    "model": "gatheros_subscription.defaultfield",
+    "pk": 4,
+    "fields": {
+      "name": "city",
+      "label": "Cidade",
+      "type": "input-text",
+      "order": 4,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": ""
+    }
+  }
+]
