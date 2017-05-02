@@ -21,7 +21,7 @@ class GatherosTestCase(TestCase):
         if field:
             self.assertTrue(field in dict(e.exception).keys())
 
-    def _create_model(self, Model, data, persist=True, **kwargs):
+    def _create_model(self, Model, data, persist=False, **kwargs):
         data.update(**kwargs)
         entity = Model(**data)
 
