@@ -1,8 +1,10 @@
-from django.db import IntegrityError, models
+from django.db import models
 
 from gatheros_event.models import Event
+from .rules import form as rule
 
 
+# @TODO Campos pre-definidos cadastrados a parte e inseridos na criação de novo form
 class Form(models.Model):
     event = models.OneToOneField(Event, on_delete=models.CASCADE, verbose_name='evento', related_name='form')
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
@@ -20,16 +22,12 @@ class Form(models.Model):
         return self.event.name
 
     def clean(self):
-        if self.event.subscription_type == Event.SUBSCRIPTION_DISABLED:
-            raise IntegrityError(
-                'O evento {} estão com inscrições desativadas, portanto não pode ter um formulário vinculado'
-                .format(self.event.name)
-            )
+        rule.rule_1_form_em_event_inscricao_desativada(self)
 
     @property
-    def additional_fields(self):
+    def get_additional_fields(self):
         return self.fields.filter(form_default_field=False)
 
     @property
     def has_additional_fields(self):
-        return self.additional_fields.count() > 0
+        return self.get_additional_fields.count() > 0

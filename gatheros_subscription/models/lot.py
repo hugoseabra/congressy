@@ -1,14 +1,14 @@
 import uuid
 from datetime import timedelta
 
-from django.core.exceptions import ValidationError
-from django.db import IntegrityError, models
+from django.db import models
 
 from gatheros_event.models import Event
+from .rules import lot as rule
 
 
 class LotManager(models.Manager):
-    def generate_promo_code(self, lot):
+    def generate_promo_code( self, lot ):
         while True:
             code = str(uuid.uuid4()).split('-')[0].upper()
             try:
@@ -37,7 +37,8 @@ class Lot(models.Model):
     discount = models.DecimalField(max_digits=8, null=True, blank=True, decimal_places=2, verbose_name='desconto')
     promo_code = models.CharField(max_length=15, null=True, blank=True, verbose_name='código promocional', )
     transfer_tax = models.BooleanField(default=False, verbose_name='trasferir taxa para participante')
-    private = models.BooleanField(default=False, verbose_name='privado')
+    private = models.BooleanField(default=False, verbose_name='privado',
+                                  help_text="Não estará explícito para o participante no site do evento")
 
     internal = models.BooleanField(default=False, verbose_name='gerado internamente')
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
@@ -50,7 +51,7 @@ class Lot(models.Model):
         ordering = ['pk', 'name', 'event']
         unique_together = (("name", "event"),)
 
-    def save(self, **kwargs):
+    def save( self, **kwargs ):
         if not self.date_end:
             self.date_end = self.event.date_start - timedelta(seconds=1)
 
@@ -60,43 +61,16 @@ class Lot(models.Model):
         self.full_clean()
         return super(Lot, self).save(**kwargs)
 
-    def clean(self):
-        # if new
-        if self._state.adding and self.event.subscription_type == self.event.SUBSCRIPTION_SIMPLE and self.event.lots.count() > 0:
-            raise IntegrityError(
-                'O evento possui inscrições simples,'
-                + ' Portanto, não é possível inserir mais de um lote no mesmo.'
-            )
+    def clean( self ):
+        rule.rule_1_event_inscricao_desativada(self)
+        rule.rule_2_mais_de_1_lote_evento_inscricao_simples(self)
+        rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)
+        rule.rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(self)
+        rule.rule_5_data_inicial_antes_data_final(self)
+        rule.rule_6_data_inicial_antes_data_inicial_evento(self)
+        rule.rule_7_data_final_antes_data_inicial_evento(self)
+        rule.rule_8_lot_interno_nao_pode_ter_preco(self)
+        rule.rule_9_lote_pago_deve_ter_limite(self)
 
-        if self.event.subscription_type == Event.SUBSCRIPTION_DISABLED:
-            raise ValidationError({'event': ['O evento selecionado possui inscrições desativadas']})
-
-        if self.date_start > self.event.date_start:
-            raise ValidationError({'date_start': ['A data inicial do lote deve ser anterior a data inicial do evento']})
-
-        if self.date_end and self.date_end > self.event.date_start:
-            raise ValidationError({'date_end': ['A data final do lote deve ser anterior a data inicial do evento']})
-
-        if self.date_end and self.date_start > self.date_end:
-            raise ValidationError({'date_start': ['Data inicial do lote deve anterior a data final']})
-
-        if self.event.subscription_type == self.event.SUBSCRIPTION_SIMPLE and self.internal is False:
-            raise ValidationError(
-                {'internal': ['O evento possui inscrições simples, portanto, o lote deve ser interno.']})
-
-        if self.event.subscription_type == self.event.SUBSCRIPTION_SIMPLE and self.price:
-            raise ValidationError({'price': ['O evento possui inscrições simples. O preço deve estar vazio.']})
-
-        if self.event.subscription_type == self.event.SUBSCRIPTION_BY_LOTS and self.internal is True:
-            raise ValidationError(
-                {'internal': ['O evento possui inscrições por lotes, portanto o lote não pode ser interno.']}
-            )
-
-        if self.internal and self.price:
-            raise ValidationError({'price': ['Lotes internos devem ser gratuitos. Deixe o preço vazio.']})
-
-        if self.price and not self.limit:
-            raise ValidationError({'limit': ['Lotes com inscrições pagas devem possuir um limite de público.']})
-
-    def __str__(self):
+    def __str__( self ):
         return '{} - {}'.format(self.event.name, self.name)
