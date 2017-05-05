@@ -21,16 +21,16 @@
     "model": "auth.user",
     "pk": 3,
     "fields": {
-      "password": "",
-      "last_login": null,
+      "password": "pbkdf2_sha256$36000$ZtBKp6S1U3IT$/PLo+i69WsaFgZ3LBQRKm4z2rrzyvjE5luvkV+L+0/s=",
+      "last_login": "2017-05-04T20:29:44.229",
       "is_superuser": false,
       "username": "diegotolentino@gmail.com",
       "first_name": "Diego",
       "last_name": "Tolentino",
       "email": "diegotolentino@gmail.com",
       "is_staff": false,
-      "is_active": false,
-      "date_joined": "2017-04-20T17:56:11.281",
+      "is_active": true,
+      "date_joined": "2017-04-20T17:56:11",
       "groups": [],
       "user_permissions": []
     }
@@ -39,16 +39,16 @@
     "model": "auth.user",
     "pk": 4,
     "fields": {
-      "password": "",
-      "last_login": null,
+      "password": "pbkdf2_sha256$36000$a00q3GKiWnvN$25kAJ4ghaSGyU9CcajY1i3gXbNLXGFne/vfZRy/0CYM=",
+      "last_login": "2017-05-04T21:23:38.984",
       "is_superuser": false,
       "username": "lucianasilva@gmail.com",
       "first_name": "Luciana",
       "last_name": "Silva",
       "email": "lucianasilva@gmail.com",
       "is_staff": false,
-      "is_active": false,
-      "date_joined": "2017-04-20T17:59:35.410",
+      "is_active": true,
+      "date_joined": "2017-04-20T17:59:35",
       "groups": [],
       "user_permissions": []
     }

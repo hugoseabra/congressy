@@ -1,167 +1,167 @@
 [
-  {
+{
     "model": "gatheros_event.member",
     "pk": 1,
     "fields": {
-      "organization": 1,
-      "person": "a7c5f518-7669-4b71-a83b-2a7107e9c313",
-      "group": "admin",
-      "created": "2017-04-20T18:42:19.715",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:42:07",
-      "accepted": true,
-      "accepted_on": "2017-04-20T18:42:27",
-      "active": true
+        "organization": 1,
+        "person": "a7c5f518-7669-4b71-a83b-2a7107e9c313",
+        "group": "admin",
+        "created": "2017-04-20T18:42:19.715",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:42:07",
+        "accepted": true,
+        "accepted_on": "2017-04-20T18:42:27",
+        "active": true
     }
-  },
-  {
+},
+{
     "model": "gatheros_event.member",
     "pk": 2,
     "fields": {
-      "organization": 3,
-      "person": "0ef90d46-c316-4f81-b768-36e3080cecf0",
-      "group": "admin",
-      "created": "2017-04-20T18:42:29.136",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:42:27",
-      "accepted": true,
-      "accepted_on": "2017-04-20T18:42:27",
-      "active": true
+        "organization": 3,
+        "person": "0ef90d46-c316-4f81-b768-36e3080cecf0",
+        "group": "admin",
+        "created": "2017-04-20T18:42:29.136",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:42:27",
+        "accepted": true,
+        "accepted_on": "2017-04-20T18:42:27",
+        "active": true
     }
-  },
-  {
+},
+{
     "model": "gatheros_event.member",
     "pk": 3,
     "fields": {
-      "organization": 4,
-      "person": "1f2cfdf8-0ccb-4387-adf9-be4684a73f0c",
-      "group": "admin",
-      "created": "2017-04-20T18:43:07.899",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:43:06",
-      "accepted": true,
-      "accepted_on": "2017-04-20T18:42:27",
-      "active": true
+        "organization": 4,
+        "person": "1f2cfdf8-0ccb-4387-adf9-be4684a73f0c",
+        "group": "admin",
+        "created": "2017-04-20T18:43:07.899",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:43:06",
+        "accepted": true,
+        "accepted_on": "2017-04-20T18:42:27",
+        "active": true
     }
-  },
-  {
+},
+{
     "model": "gatheros_event.member",
     "pk": 4,
     "fields": {
-      "organization": 2,
-      "person": "5c76d747-f22a-4d27-9211-3b9929fb908d",
-      "group": "admin",
-      "created": "2017-04-20T18:43:18.567",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:43:17",
-      "accepted": true,
-      "accepted_on": "2017-04-20T18:42:27",
-      "active": true
+        "organization": 2,
+        "person": "5c76d747-f22a-4d27-9211-3b9929fb908d",
+        "group": "admin",
+        "created": "2017-04-20T18:43:18.567",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:43:17",
+        "accepted": true,
+        "accepted_on": "2017-04-20T18:42:27",
+        "active": true
     }
-  },
-  {
+},
+{
     "model": "gatheros_event.member",
     "pk": 5,
     "fields": {
-      "organization": 5,
-      "person": "5c76d747-f22a-4d27-9211-3b9929fb908d",
-      "group": "admin",
-      "created": "2017-04-20T18:45:06.468",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:45:03",
-      "accepted": true,
-      "accepted_on": "2017-04-20T18:42:27",
-      "active": true
+        "organization": 5,
+        "person": "5c76d747-f22a-4d27-9211-3b9929fb908d",
+        "group": "admin",
+        "created": "2017-04-20T18:45:06.468",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:45:03",
+        "accepted": true,
+        "accepted_on": "2017-04-20T18:42:27",
+        "active": true
     }
-  },
-  {
+},
+{
     "model": "gatheros_event.member",
     "pk": 6,
     "fields": {
-      "organization": 5,
-      "person": "0ef90d46-c316-4f81-b768-36e3080cecf0",
-      "group": "helper",
-      "created": "2017-04-20T18:47:48.591",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:45:42",
-      "accepted": true,
-      "accepted_on": "2017-04-20T18:42:27",
-      "active": true
+        "organization": 5,
+        "person": "0ef90d46-c316-4f81-b768-36e3080cecf0",
+        "group": "helper",
+        "created": "2017-04-20T18:47:48.591",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:45:42",
+        "accepted": true,
+        "accepted_on": "2017-04-20T18:42:27",
+        "active": true
     }
-  },
-  {
+},
+{
     "model": "gatheros_event.member",
     "pk": 7,
     "fields": {
-      "organization": 6,
-      "person": "5c76d747-f22a-4d27-9211-3b9929fb908d",
-      "group": "admin",
-      "created": "2017-04-20T18:48:36.819",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:48:35",
-      "accepted": true,
-      "accepted_on": "2017-04-20T18:42:27",
-      "active": true
+        "organization": 6,
+        "person": "5c76d747-f22a-4d27-9211-3b9929fb908d",
+        "group": "helper",
+        "created": "2017-04-20T18:48:36.819",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:48:35",
+        "accepted": true,
+        "accepted_on": "2017-05-04T21:23:25.959",
+        "active": true
     }
-  },
-  {
+},
+{
     "model": "gatheros_event.member",
     "pk": 8,
     "fields": {
-      "organization": 6,
-      "person": "1560f30e-6270-47e9-a9ed-6ae1e3134ddf",
-      "group": "helper",
-      "created": "2017-04-20T18:48:52.783",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:48:47",
-      "accepted": false,
-      "accepted_on": null,
-      "active": true
+        "organization": 6,
+        "person": "1560f30e-6270-47e9-a9ed-6ae1e3134ddf",
+        "group": "admin",
+        "created": "2017-04-20T18:48:52.783",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:48:47",
+        "accepted": false,
+        "accepted_on": null,
+        "active": true
     }
-  },
-  {
+},
+{
     "model": "gatheros_event.member",
     "pk": 9,
     "fields": {
-      "organization": 7,
-      "person": "1f2cfdf8-0ccb-4387-adf9-be4684a73f0c",
-      "group": "admin",
-      "created": "2017-04-20T18:49:11.825",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:49:08",
-      "accepted": true,
-      "accepted_on": "2017-04-20T18:42:27",
-      "active": true
+        "organization": 7,
+        "person": "1f2cfdf8-0ccb-4387-adf9-be4684a73f0c",
+        "group": "admin",
+        "created": "2017-04-20T18:49:11.825",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:49:08",
+        "accepted": true,
+        "accepted_on": "2017-04-20T18:42:27",
+        "active": true
     }
-  },
-  {
+},
+{
     "model": "gatheros_event.member",
     "pk": 10,
     "fields": {
-      "organization": 7,
-      "person": "0ef90d46-c316-4f81-b768-36e3080cecf0",
-      "group": "admin",
-      "created": "2017-04-20T18:49:24.275",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:49:18",
-      "accepted": true,
-      "accepted_on": "2017-04-20T18:42:27",
-      "active": true
+        "organization": 7,
+        "person": "0ef90d46-c316-4f81-b768-36e3080cecf0",
+        "group": "admin",
+        "created": "2017-04-20T18:49:24.275",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:49:18",
+        "accepted": true,
+        "accepted_on": "2017-04-20T18:42:27",
+        "active": true
     }
-  },
-  {
+},
+{
     "model": "gatheros_event.member",
     "pk": 11,
     "fields": {
-      "organization": 7,
-      "person": "1560f30e-6270-47e9-a9ed-6ae1e3134ddf",
-      "group": "helper",
-      "created": "2017-04-20T18:49:35.800",
-      "created_by": 1,
-      "invited_on": "2017-04-20T18:49:33",
-      "accepted": true,
-      "accepted_on": "2017-04-20T18:42:27",
-      "active": true
+        "organization": 7,
+        "person": "1560f30e-6270-47e9-a9ed-6ae1e3134ddf",
+        "group": "helper",
+        "created": "2017-04-20T18:49:35.800",
+        "created_by": 1,
+        "invited_on": "2017-04-20T18:49:33",
+        "accepted": true,
+        "accepted_on": "2017-04-20T18:42:27",
+        "active": true
     }
-  }
+}
 ]
