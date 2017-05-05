@@ -2,9 +2,10 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import Count
-from gatheros_event.models.rules import invitation as rule
-from gatheros_event.lib.test import GatherosTestCase
+
+from core.tests import GatherosTestCase
 from gatheros_event.models import Invitation, Member, Organization
+from gatheros_event.models.rules import invitation as rule
 
 
 class InvitationModelTest(GatherosTestCase):
@@ -17,7 +18,7 @@ class InvitationModelTest(GatherosTestCase):
         '012_invitation',
     ]
 
-    def _create_invitation(self, author=None, to=None, persist=False, **kwargs):
+    def _create_invitation( self, author=None, to=None, persist=False, **kwargs ):
 
         while to is None:
             if not author:
@@ -25,7 +26,8 @@ class InvitationModelTest(GatherosTestCase):
 
             if not to:
                 invitation_user_pks = [pk for pk in map(lambda inv: inv.to.pk, Invitation.objects.all())]
-                members_user_pks = [pk for pk in map(lambda member: member.person.user.pk, author.organization.members.all())]
+                members_user_pks = [pk for pk in
+                                    map(lambda member: member.person.user.pk, author.organization.members.all())]
 
                 pks = invitation_user_pks + members_user_pks
                 pks.append(author.person.user.pk)
@@ -38,7 +40,7 @@ class InvitationModelTest(GatherosTestCase):
         }
         return self._create_model(Model=Invitation, data=data, persist=persist, **kwargs)
 
-    def test_rule_1_organizacao_internas_nao_pode_ter_convites(self):
+    def test_rule_1_organizacao_internas_nao_pode_ter_convites( self ):
         rule_callback = rule.rule_1_organizacao_internas_nao_pode_ter_convites
         organization = Organization.objects.filter(internal=True).first()
         member = organization.members.filter(group=Member.ADMIN).first()
@@ -57,7 +59,7 @@ class InvitationModelTest(GatherosTestCase):
         organization.save()
         invitation.save()
 
-    def test_rule_2_nao_pode_mudar_autor(self):
+    def test_rule_2_nao_pode_mudar_autor( self ):
         rule_callback = rule.rule_2_nao_pode_mudar_autor
         invitation = Invitation.objects.filter(author__organization__internal=False).first()
         invitation.author = Member.objects.filter(organization__internal=False).exclude(pk=invitation.author.pk).first()
@@ -68,7 +70,7 @@ class InvitationModelTest(GatherosTestCase):
         """ MODEL """
         self._trigger_validation_error(invitation.save, field='author')
 
-    def test_rule_3_nao_pode_mudar_convidado(self):
+    def test_rule_3_nao_pode_mudar_convidado( self ):
         rule_callback = rule.rule_3_nao_pode_mudar_convidado
         invitation = Invitation.objects.filter(author__organization__internal=False).first()
         invitation.to = Member.objects \
@@ -82,7 +84,7 @@ class InvitationModelTest(GatherosTestCase):
         """ MODEL """
         self._trigger_validation_error(invitation.save, field='to')
 
-    def test_rule_4_autor_convida_a_si_mesmo(self):
+    def test_rule_4_autor_convida_a_si_mesmo( self ):
         rule_callback = rule.rule_4_autor_convida_a_si_mesmo
         invitation = self._create_invitation()
         invited_user = invitation.to
@@ -98,7 +100,7 @@ class InvitationModelTest(GatherosTestCase):
         invitation.to = invited_user
         invitation.save()
 
-    def test_rule_5_convite_ja_existente(self):
+    def test_rule_5_convite_ja_existente( self ):
         rule_callback = rule.rule_5_convite_ja_existente
         invitation = self._create_invitation(persist=True)
 
@@ -114,7 +116,7 @@ class InvitationModelTest(GatherosTestCase):
         invitation.delete()
         invitation2.save()
 
-    def test_rule_6_autor_deve_ser_membro_admin(self):
+    def test_rule_6_autor_deve_ser_membro_admin( self ):
         rule_callback = rule.rule_6_autor_deve_ser_membro_admin
 
         author = Member.objects.filter(group=Member.HELPER).first()
@@ -126,7 +128,7 @@ class InvitationModelTest(GatherosTestCase):
         """ MODEL """
         self._trigger_validation_error(invitation.save, field='author')
 
-    def test_rule_7_convidado_ja_membro_da_organizacao(self):
+    def test_rule_7_convidado_ja_membro_da_organizacao( self ):
         rule_callback = rule.rule_7_convidado_ja_membro_da_organizacao
 
         # Pegar alguma organização com mais de 1 membro
@@ -147,7 +149,7 @@ class InvitationModelTest(GatherosTestCase):
         """ MODEL """
         self._trigger_validation_error(invitation.save, field='to')
 
-    def no_invitation_for_internal_organization(self):
+    def no_invitation_for_internal_organization( self ):
         invitation = Invitation(
             author=Member.objects.get(pk=1, group=Member.ADMIN),
             to=User.objects.get(pk=3),
@@ -158,7 +160,7 @@ class InvitationModelTest(GatherosTestCase):
         with self.assertRaises(IntegrityError) as e:
             invitation.save()
 
-    def invitation_has_already_been_created(self):
+    def invitation_has_already_been_created( self ):
         member = Member.objects.get(pk=5, group=Member.ADMIN)
         invited = User.objects.get(pk=3)
 
@@ -177,7 +179,7 @@ class InvitationModelTest(GatherosTestCase):
 
         self.assertTrue('to' in dict(e.exception).keys())
 
-    def author_must_be_admin_member_of_organization(self):
+    def author_must_be_admin_member_of_organization( self ):
         helper = Organization.objects.get(pk=5).members.filter(group=Member.HELPER).first()
 
         # Invitation created by helper
@@ -193,7 +195,7 @@ class InvitationModelTest(GatherosTestCase):
 
         self.assertTrue('author' in dict(e.exception).keys())
 
-    def invited_not_member(self):
+    def invited_not_member( self ):
         member = Member.objects.get(pk=5, group=Member.ADMIN)
         organization = Organization.objects.get(pk=5)
         invited = User.objects.get(pk=3)
@@ -229,7 +231,7 @@ class InvitationModelTest(GatherosTestCase):
 
         self.assertTrue('to' in dict(e.exception).keys())
 
-    def invited_author_not_the_same(self):
+    def invited_author_not_the_same( self ):
         member = Member.objects.get(pk=5)
 
         invitation = Invitation(

@@ -5,10 +5,6 @@ from django.views.generic import TemplateView
 
 # @TODO Colocar collection de Member na sessão do usuário para saber se ele é membro de alguma organização
 
-class Home(TemplateView):
-    template_name = 'gatheros_front/home.html'
-
-
 class Start(LoginRequiredMixin, TemplateView):
     template_name = 'gatheros_front/start.html'
 

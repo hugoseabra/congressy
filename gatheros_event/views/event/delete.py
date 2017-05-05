@@ -1,14 +1,15 @@
 # from django.http import Http404
-from django.urls import reverse_lazy, reverse
-
-from gatheros_event.lib.view.organization_permission import OrganizationPermissionViewMixin
-from gatheros_event.lib.view.delete import DeleteViewMixin
-from gatheros_event.models import Event, Member
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
+
+from core.view.delete import DeleteViewMixin
+from core.view.organization_context_check import OrganizationContextCheckMixin
+from gatheros_event.models import Event, Member
 
 
-class EventDeleteView(DeleteViewMixin, OrganizationPermissionViewMixin):
+class EventDeleteView(LoginRequiredMixin, OrganizationContextCheckMixin, DeleteViewMixin):
     model = Event
     template_name = 'gatheros_event/event/event_confirm_delete.html'
     success_url = reverse_lazy('gatheros_event:event-list')

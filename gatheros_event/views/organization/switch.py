@@ -2,6 +2,7 @@ from django.views.generic import RedirectView
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from django.contrib import messages
+from django.urls import reverse_lazy
 
 from gatheros_event.models import Organization
 
@@ -11,10 +12,12 @@ class NotAllowedOrganization(IntegrityError):
         super(NotAllowedOrganization, self).__init__(*args, **kwargs)
 
 
+# @TODO Refatorar para inserir dados em sessão e mudança de contexto
+
 class OrganizationSwitch(RedirectView):
     def post( self, request, *args, **kwargs ):
         pk = request.POST.get('organization-context-pk', None)
-        from_path = request.POST.get('from_path', '/inicio/')
+        next_path = request.POST.get('next', reverse_lazy('gatheros_front:home'))
         if not pk:
             return
 
@@ -43,7 +46,7 @@ class OrganizationSwitch(RedirectView):
 
         messages.info(request, "Agora você {}.".format(context))
 
-        self.url = from_path
+        self.url = next_path
         return super(OrganizationSwitch, self).post(request, *args, **kwargs)
 
     def _get_member_group( self, organization, person ):

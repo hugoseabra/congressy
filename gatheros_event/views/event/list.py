@@ -1,10 +1,11 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 
-from gatheros_event.lib.view.organization_permission import OrganizationPermissionViewMixin
+from core.view.organization_context_check import OrganizationContextCheckMixin
 from gatheros_event.models import Event, Member
 
 
-class EventListView(ListView, OrganizationPermissionViewMixin):
+class EventListView(LoginRequiredMixin, OrganizationContextCheckMixin, ListView):
     model = Event
     template_name = 'gatheros_event/event/list.html'
     ordering = ['name']
@@ -17,10 +18,6 @@ class EventListView(ListView, OrganizationPermissionViewMixin):
             return qs
 
         return qs.filter(organization__pk=self.organization.get('pk'))
-
-    def dispatch( self, request, *args, **kwargs ):
-        self.check(request)
-        return super(EventListView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data( self, **kwargs ):
         context = super(EventListView, self).get_context_data(**kwargs)

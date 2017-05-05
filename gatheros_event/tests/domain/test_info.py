@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
-from gatheros_event.lib.test import GatherosTestCase
 
+from core.tests import GatherosTestCase
+from gatheros_event.models import Category, Event, Info, Organization
 from gatheros_event.models.rules import info as rule
-
-from gatheros_event.models import Event, Info, Organization, Category
 
 
 class InfoModelTest(GatherosTestCase):
@@ -15,7 +14,7 @@ class InfoModelTest(GatherosTestCase):
         '010_event',
     ]
 
-    def _create_event(self, persist=False, **kwargs):
+    def _create_event( self, persist=False, **kwargs ):
         data = {
             "name": 'Event tests',
             "organization": Organization.objects.first(),
@@ -26,7 +25,7 @@ class InfoModelTest(GatherosTestCase):
         }
         return self._create_model(Model=Event, data=data, persist=persist, **kwargs)
 
-    def _create_info(self, event=None, persist=False, **kwargs):
+    def _create_info( self, event=None, persist=False, **kwargs ):
         if not event:
             event = self._create_event(persist=True)
 
@@ -44,7 +43,7 @@ class InfoModelTest(GatherosTestCase):
 
         return self._create_model(Model=Info, data=data, persist=persist, **kwargs)
 
-    def _populate_files(self, info):
+    def _populate_files( self, info ):
         info.image_main = 'some_main_image.jpg'
         info.image1 = 'image1.jpg'
         info.image2 = 'image2.jpg'
@@ -52,7 +51,7 @@ class InfoModelTest(GatherosTestCase):
         info.image4 = 'image4.jpg'
         info.youtube_video_id = 'some youtube id'
 
-    def test_rule_1_imagem_unica_somente(self):
+    def test_rule_1_imagem_unica_somente( self ):
         rule_callback = rule.rule_1_imagem_unica_somente
 
         info = self._create_info(config_type=Info.CONFIG_TYPE_MAIN_IMAGE)
@@ -74,7 +73,7 @@ class InfoModelTest(GatherosTestCase):
         self.assertIsNone(info.image4.name)
         self.assertIsNone(info.youtube_video_id)
 
-    def test_rule_2_4_imagens_somente(self):
+    def test_rule_2_4_imagens_somente( self ):
         rule_callback = rule.rule_2_4_imagens_somente
 
         info = self._create_info(config_type=Info.CONFIG_TYPE_4_IMAGES)
@@ -103,7 +102,7 @@ class InfoModelTest(GatherosTestCase):
         self.assertIsNone(info.image_main.name)
         self.assertIsNone(info.youtube_video_id)
 
-    def test_rule_3_youtube_video_somente(self):
+    def test_rule_3_youtube_video_somente( self ):
         rule_callback = rule.rule_3_youtube_video_somente
 
         info = self._create_info(config_type=Info.CONFIG_TYPE_VIDEO)

@@ -38,7 +38,7 @@
                                             value="{{ org.pk }}">{{ org.name }}
                                     </option>
                                 {% endfor %}
-                                <input type="hidden" name="from_path" value="{{ request.path }}"/>
+                                <input type="hidden" name="next" value="{{ request.path }}"/>
                             </select>
                             |
                             <a href="{% url 'gatheros_front:logout' %}">Sair</a>
