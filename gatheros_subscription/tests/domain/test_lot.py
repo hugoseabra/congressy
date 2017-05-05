@@ -1,6 +1,6 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
-from gatheros_event.lib.test import GatherosTestCase
+from core.tests import GatherosTestCase
 from gatheros_event.models import Category, Event, Organization
 from gatheros_subscription.models import Lot
 from gatheros_subscription.models.rules import lot as rule
@@ -26,39 +26,26 @@ class LotModelTest(GatherosTestCase):
             "category": Category.objects.get(pk=4),
             "subscription_type": Event.SUBSCRIPTION_BY_LOTS,
             "subscription_offline": True,
-            "date_start": "2017-04-25T08:00:00",
-            "date_end": "2017-04-25T12:00:00",
-            "place": None,
-            "description": None,
-            "website": "http://in2web.com.br",
-            "facebook": None,
-            "twitter": None,
-            "linkedin": None,
-            "skype": None
+            "date_start": datetime.now() + timedelta(days=1),
+            "date_end": datetime.now() + timedelta(days=1, hours=8)
         }
         self.lot_data = {
             "name": "Lot Test",
-            "date_start": "2017-04-01T00:00:00",
-            "date_end": "2017-04-10T23:59:59",
-            "limit": 10,
-            "price": "50.00",
-            "tax": None,
-            "discount_type": "percent",
-            "discount": None,
-            "promo_code": None,
-            "transfer_tax": False,
+            "date_start": datetime.now() - timedelta(days=10),
+            "limit": None,
+            "price": None,
             "private": False,
-            "internal": False,
-            "created": "2017-04-24T17:18:55.745"
+            "internal": False
         }
 
-    def _create_event( self, persist=False, **kwargs ):
-        return self._create_model(Model=Event, data=self.event_data, persist=persist, **kwargs)
+    def _create_event( self, **kwargs ):
+        return self._create_model(Model=Event, data=self.event_data, **kwargs)
 
-    def _create_lot( self, **kwargs ):
-        if not hasattr(kwargs, 'event'):
-            kwargs.update({'event': self._create_event(persist=True)})
+    def _create_lot( self, event=None, **kwargs ):
+        if not event:
+            event = self._create_event(persist=True)
 
+        self.lot_data.update({'event': event})
         return self._create_model(Model=Lot, data=self.lot_data, **kwargs)
 
     def test_rule_1_event_inscricao_desativada( self ):
@@ -242,3 +229,25 @@ class LotModelTest(GatherosTestCase):
 
         # Code has been generated
         self.assertIsNotNone(lot.promo_code)
+
+    def test_rule_11_lot_apos_data_final_evento( self ):
+        rule_callback = rule.rule_11_lot_apos_data_final_evento
+
+        event = self._create_event(subscription_type=Event.SUBSCRIPTION_BY_LOTS, persist=True)
+        event.date_start = datetime.now() - timedelta(hours=8)
+        event.date_end = datetime.now() - timedelta(minutes=1)
+        event.save()
+
+        lot = self._create_lot(event=event)
+
+        """ RULE """
+        self._trigger_integrity_error(callback=rule_callback, params=[lot])
+
+        """ MODEL """
+        self._trigger_integrity_error(callback=lot.save)
+
+        """ FUNCIONANDO """
+        event.date_start = datetime.now() - timedelta(hours=2)
+        event.date_end = datetime.now() + timedelta(minutes=10)
+        event.save()
+        lot.save()

@@ -1,4 +1,4 @@
-from gatheros_event.lib.test import GatherosTestCase
+from core.tests import GatherosTestCase
 from gatheros_event.models import Event
 from gatheros_subscription.models import Answer, Field, Subscription
 from gatheros_subscription.models.rules import answer as rule

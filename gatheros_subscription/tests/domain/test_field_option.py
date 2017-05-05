@@ -1,7 +1,7 @@
-from gatheros_event.lib.test import GatherosTestCase
-
-from gatheros_subscription.models.rules import field_option as rule
+from core.tests import GatherosTestCase
 from gatheros_subscription.models import Field, FieldOption
+from gatheros_subscription.models.rules import field_option as rule
+
 
 class TestModelFieldOption(GatherosTestCase):
     fixtures = [
@@ -14,7 +14,7 @@ class TestModelFieldOption(GatherosTestCase):
         '003_field',
     ]
 
-    def _get_field(self):
+    def _get_field( self ):
         field = Field.objects.last()
         # Forcing to test
         field.type = Field.FIELD_SELECT
@@ -22,7 +22,7 @@ class TestModelFieldOption(GatherosTestCase):
         field.save()
         return field
 
-    def _create_field_option(self, field=None, **kwargs):
+    def _create_field_option( self, field=None, **kwargs ):
         if not field:
             field = self._get_field()
         data = {

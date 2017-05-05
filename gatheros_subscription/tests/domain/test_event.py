@@ -21,8 +21,15 @@ class EventModelTest(TestCase):
         '006_subscription',
     ]
 
-    def test_disabled_subscription_no_lots(self):
-        event = Event.objects.get(pk=5)
+    def _get_event( self, **kwargs ):
+        event = Event.objects.get(**kwargs)
+        event.date_start = datetime.now() - timedelta(days=10)
+        event.date_end = datetime.now() + timedelta(days=1)
+        event.save()
+        return event
+
+    def test_disabled_subscription_no_lots( self ):
+        event = self._get_event(pk=5)
         # Fixture is SUBSCRIPTION_DISABLED
         self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_DISABLED)
 
@@ -48,8 +55,8 @@ class EventModelTest(TestCase):
         # When returning to disabled, all lots are deleted
         self.assertEqual(event.lots.count(), 0)
 
-    def test_disable_subscription_with_subscriptions(self):
-        event = Event.objects.get(pk=1)
+    def test_disable_subscription_with_subscriptions( self ):
+        event = self._get_event(pk=1)
         # Fixture is SUBSCRIPTION_SIMPLE
         self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_SIMPLE)
         self.assertEqual(event.lots.count(), 1)
@@ -62,7 +69,7 @@ class EventModelTest(TestCase):
             event.subscription_type = Event.SUBSCRIPTION_DISABLED
             event.save()
 
-    def test_simple_subscription_one_internal_lot(self):
+    def test_simple_subscription_one_internal_lot( self ):
         """
         1. Inscrições simples não podem ter mais de um lote
         2. O único lote deve ser interno
@@ -89,8 +96,8 @@ class EventModelTest(TestCase):
                 internal=True
             )
 
-    def test_subscription_by_lot_creates_external_lot(self):
-        event = Event.objects.get(pk=5)
+    def test_subscription_by_lot_creates_external_lot( self ):
+        event = self._get_event(pk=5)
         # Fixture is SUBSCRIPTION_DISABLED
         self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_DISABLED)
 
@@ -102,8 +109,8 @@ class EventModelTest(TestCase):
         lot = event.lots.first()
         self.assertFalse(lot.internal)
 
-    def test_enable_simple_subscription_no_lots(self):
-        event = Event.objects.get(pk=5)
+    def test_enable_simple_subscription_no_lots( self ):
+        event = self._get_event(pk=5)
         # Fixture is SUBSCRIPTION_DISABLED
         self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_DISABLED)
 
@@ -115,7 +122,7 @@ class EventModelTest(TestCase):
         lot = event.lots.first()
         self.assertTrue(lot.internal)
 
-    def test_enable_simples_subscription_lots_with_no_subscriptions(self):
+    def test_enable_simples_subscription_lots_with_no_subscriptions( self ):
         # Fixture is SUBSCRIPTION_BY_LOTS
         event = Event.objects.get(pk=6)
 
@@ -132,7 +139,7 @@ class EventModelTest(TestCase):
         # Merge lots into ONE
         self.assertEqual(event.lots.count(), 1)
 
-    def test_enable_simples_subscription_lots_with_subscriptions(self):
+    def test_enable_simples_subscription_lots_with_subscriptions( self ):
         # Fixture is SUBSCRIPTION_BY_LOTS
         event = Event.objects.get(pk=11)
         # Fixture has 2 lot related
@@ -160,8 +167,8 @@ class EventModelTest(TestCase):
         lot = event.lots.first()
         self.assertEqual(lot.subscriptions.count(), subscription_counter)
 
-    def test_enable_subscription_by_lots_no_lots(self):
-        event = Event.objects.get(pk=5)
+    def test_enable_subscription_by_lots_no_lots( self ):
+        event = self._get_event(pk=5)
         # Fixture is SUBSCRIPTION_DISABLED
         self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_DISABLED)
 
@@ -177,7 +184,7 @@ class EventModelTest(TestCase):
         lot = event.lots.first()
         self.assertFalse(lot.internal)
 
-    def test_enable_subscription_by_lots_with_lots(self):
+    def test_enable_subscription_by_lots_with_lots( self ):
         event = Event.objects.get(pk=1)
 
         # Fixture is SUBSCRIPTION_SIMPLE

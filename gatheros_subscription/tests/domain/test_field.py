@@ -1,4 +1,4 @@
-from gatheros_event.lib.test import GatherosTestCase
+from core.tests import GatherosTestCase
 from gatheros_subscription.models import Field, Form
 
 

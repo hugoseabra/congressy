@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from kanu_locations.models import City
 
-from gatheros_event.lib.test import GatherosTestCase
+from core.tests import GatherosTestCase
 from gatheros_event.models import Category, Event, Organization, Person
 from gatheros_subscription.models import Lot, Subscription
 from gatheros_subscription.models.rules import subscription as rule
@@ -166,3 +166,28 @@ class SubscriptionModelTest(GatherosTestCase):
         subscription.save()
         self.assertFalse(subscription.attended)
         self.assertIsNone(subscription.attended_on)
+
+    def test_rule_5_inscricao_apos_data_final_evento( self ):
+        rule_callback = rule.rule_5_inscricao_apos_data_final_evento
+
+        lot = self._create_lot(persist=True)
+
+        lot.event.date_start = datetime.now() - timedelta(hours=8)
+        lot.event.date_end = datetime.now() - timedelta(minutes=1)
+        lot.event.save()
+
+        subscription = self._create_subscription(lot=lot)
+
+        """ RULE """
+        self._trigger_integrity_error(callback=rule_callback, params=[subscription, True])
+
+        """ MODEL """
+        self._trigger_integrity_error(callback=subscription.save)
+
+        # """ FUNCIONANDO """
+        lot.event.date_start = datetime.now() - timedelta(hours=2)
+        lot.event.date_end = datetime.now() + timedelta(minutes=10)
+        lot.event.save()
+
+        subscription = self._create_subscription(lot=lot, person=self._create_person(cpf='53026113336', persist=True))
+        subscription.save()
