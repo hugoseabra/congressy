@@ -5,25 +5,21 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 
 from core.view.delete import DeleteViewMixin
-from core.view.organization_context_check import OrganizationContextCheckMixin
+from core.view.user_context import UserContextMixin
 from gatheros_event.models import Event, Member
 
 
-class EventDeleteView(LoginRequiredMixin, OrganizationContextCheckMixin, DeleteViewMixin):
+class EventDeleteView(LoginRequiredMixin, UserContextMixin, DeleteViewMixin):
     model = Event
     template_name = 'gatheros_event/event/event_confirm_delete.html'
     success_url = reverse_lazy('gatheros_event:event-list')
     delete_message = "Não é possível excluir o evento '{name}' possivelmente porque há lotes com inscrições." \
                      " Exporte, gerencie e exclua os lotes antes de excluir este evento."
 
-    def dispatch( self, request, *args, **kwargs ):
-        self.check(request)
-        return super(EventDeleteView, self).dispatch(request, *args, **kwargs)
-
     def render_to_response( self, context, **response_kwargs ):
-        # if not self.can_delete():
-            # messages.success(self.request, "Você não tem permissão para excluir este evento")
-            # return redirect(self.success_url.format(**self.object.__dict__))
+        if not self.can_delete():
+            messages.success(self.request, "Você não tem permissão para excluir este evento")
+            return redirect(self.success_url.format(**self.object.__dict__))
 
         return super(EventDeleteView, self).render_to_response(context=context, **response_kwargs)
 

@@ -1,1 +1,4 @@
 # test_simple_subscription_with_limit
+# test_lista_devolve_somente_eventos_do_usuario
+# test_se_helper_nao_pode_visualizar_link_exclusao
+# test_se_helper_nao_pode_excluir
