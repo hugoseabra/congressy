@@ -1,0 +1,59 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block title %}Gatheros - Eventos{% endblock %}
+
+{% block content %}
+    <h1>Lista de Eventos</h1>
+
+    <div style="background: #DDD">
+        <table width="100%">
+            {% for event in object_list %}
+                <tr>
+                    <td width="1%" style="background-color: {% if event.published %}green{% else %}gray{% endif %}">
+                        &ensp;
+                    </td>
+                    <td style="background: #FFF;padding:10px;margin-bottom: 3px">
+                        <div>{{ forloop.counter }} -
+                            {% if event.published %}
+                                <a href="{% url 'gatheros_event:event-panel' event.pk %}">{{ event.name }}</a>
+                            {% else %}
+                                {{ event.name }}
+                            {% endif %}
+                            <span style="font-size: medium;color:dimgray">({{ event.organization.name }})</span>
+                        </div>
+                        <hr/>
+                        <div style="text-indent: 10px;">
+                            <p><strong>{{ event.category.name }}</strong></p>
+                            <p>
+                                <strong>Descrição:</strong>
+                                <span style="color: dimgray;text-align: justify">{{ event.description|truncatechars:150 }}</span>
+                            </p>
+                            <p><strong>Quando:</strong> {{ event.get_period }}</p>
+                            {% if event.place %}
+                                <p>
+                                    <strong>Local:</strong> {{ event.place.name }}
+                                <p style="color:dimgray;text-indent: 20px;">{{ event.place.get_complete_address }}</p>
+                                </p>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td width="5%" style="background: #FFF;padding:10px;margin-bottom: 3px">
+                        {% if can_edit %}
+                        <a href="{% url 'gatheros_event:event-edit' event.pk %}">Editar</a>
+                        {% endif %}
+                        {% if can_delete %}
+                        <br/><br/>
+                        <a href="{% url 'gatheros_event:event-delete' event.pk %}">Excluir</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <div style="background: #FFF;padding:10px;margin-bottom: 3px">
+                    Nenhum evento
+                </div>
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}

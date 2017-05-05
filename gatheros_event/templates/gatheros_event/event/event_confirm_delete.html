@@ -1,0 +1,28 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+
+{% block content %}
+    <h2>Excluir '{{ model_name }}'</h2>
+
+    {% if protected %}
+        {% if delete_message %}
+            {{ delete_message }}
+        {% endif %}
+        <br />
+        <br />
+        <a href="{% url 'gatheros_event:event-list' %}" class="button cancel-link">Voltar</a>
+    {% else %}
+        Você está prestes a excluir o {{ model_name }} '{{ object.name }}'. Deseja realmente continuar?
+        <br />
+        <br />
+        <form method="post">{% csrf_token %}
+            <div>
+                <input type="hidden" name="post" value="yes"/>
+                <input type="submit" value="{% trans "Yes, I'm sure" %}"/>
+                <a href="{% url 'gatheros_event:event-list' %}" class="button cancel-link">{% trans "No, take me back" %}</a>
+            </div>
+        </form>
+
+    {% endif %}
+{% endblock %}
