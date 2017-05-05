@@ -5,7 +5,7 @@
 
 <head>
 
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}Gatheros{% endblock %}</title>
 
     {% block extrastyle %}{% endblock %}
 
@@ -22,6 +22,41 @@
 
 <!-- Container -->
 <div id="container">
+
+    {% block user %}
+        <div style="background-color: #DDD;padding:10px">
+            <div style="float:left"><a href="{% url 'gatheros_front:start' %}">Início</a></div>
+            <div style="float:right">
+                <div>
+                    {% if request.session.organizations and request.session.organizations|length > 1 %}
+                        <form action="{% url 'gatheros_event:organization-switch' %}" method="post" id="organization-context-pk">{% csrf_token %}
+                            <select name="organization-context-pk" id="organization-context-pk" onchange="submit()">
+                                {% for org in request.session.organizations %}
+                                    {{ org }}
+                                    <option
+                                            {% if request.session.organization_context.pk == org.pk %}selected="selected"{% endif %}
+                                            value="{{ org.pk }}">{{ org.name }}
+                                    </option>
+                                {% endfor %}
+                                <input type="hidden" name="from_path" value="{{ request.path }}"/>
+                            </select>
+                            |
+                            <a href="{% url 'gatheros_front:logout' %}">Sair</a>
+                        </form>
+                    {% elif request.session.organizations and request.session.organizations|length == 1 %}
+                        <strong>{{ request.session.organization_context.name }}</strong>
+                        |
+                        <a href="{% url 'gatheros_front:logout' %}">Sair</a>
+                    {% else %}
+                        <strong>{{ request.user.get_full_name }}</strong>
+                        |
+                        <a href="{% url 'gatheros_front:logout' %}">Sair</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div style="clear:both"></div>
+        </div>
+    {% endblock %}
 
     {% block messages %}
         {% if messages %}

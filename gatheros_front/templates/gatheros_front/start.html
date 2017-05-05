@@ -4,6 +4,11 @@
 {% block content %}
 
     <h1>Você entrou, bem vindo {{ user.email }}</h1>
+
+    <ul>
+        <li><a href="{% url 'gatheros_event:event-list' %}">Eventos</a></li>
+    </ul>
+
     <a href="{% url 'gatheros_front:logout' %}">Sair do sistema</a>
 
 {% endblock %}
