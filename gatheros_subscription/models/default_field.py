@@ -7,5 +7,5 @@ class DefaultField(AbstractField):
         verbose_name_plural = 'Campos Padrão'
         ordering = ['order']
 
-    def __str__(self):
+    def __str__( self ):
         return self.label

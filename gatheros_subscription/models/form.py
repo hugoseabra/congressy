@@ -14,20 +14,20 @@ class Form(models.Model):
         verbose_name_plural = 'formulários de eventos'
         ordering = ['event']
 
-    def save(self, *args, **kwargs):
+    def save( self, *args, **kwargs ):
         self.full_clean()
         super(Form, self).save(*args, **kwargs)
 
-    def __str__(self):
+    def __str__( self ):
         return self.event.name
 
-    def clean(self):
+    def clean( self ):
         rule.rule_1_form_em_event_inscricao_desativada(self)
 
     @property
-    def get_additional_fields(self):
+    def get_additional_fields( self ):
         return self.fields.filter(form_default_field=False)
 
     @property
-    def has_additional_fields(self):
+    def has_additional_fields( self ):
         return self.get_additional_fields.count() > 0

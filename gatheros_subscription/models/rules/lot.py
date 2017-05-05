@@ -1,5 +1,8 @@
-from django.db import IntegrityError
+from datetime import datetime
+
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+
 from gatheros_event.models import Event
 
 
@@ -64,3 +67,8 @@ def rule_9_lote_pago_deve_ter_limite( lot ):
 def rule_10_lote_privado_deve_ter_codigo_promocional( lot ):
     if lot.private and not lot.promo_code:
         raise ValidationError({'promo_code': ['Lotes privados devem possui um código promocional para acessá-lo.']})
+
+
+def rule_11_lot_apos_data_final_evento( lot ):
+    if not lot.pk and lot.event.date_end < datetime.now():
+        raise IntegrityError('O evento já foi encerrado e não pode mais ter novos lotes.')

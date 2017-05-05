@@ -1,4 +1,5 @@
 import json
+
 from django.db import models
 
 from gatheros_subscription.models.rules import answer as rule

@@ -66,6 +66,11 @@ class Subscription(models.Model):
         return '{} - {}'.format(self.person.name, self.event.name)
 
     def save( self, *args, **kwargs ):
+        self.full_clean()
+        super(Subscription, self).save(*args, **kwargs)
+
+    def clean( self ):
+        rule.rule_1_limite_lote_excedido(self)
 
         self.event = self.lot.event
 
@@ -83,11 +88,7 @@ class Subscription(models.Model):
         else:
             self.attended_on = None
 
-        self.full_clean()
-        super(Subscription, self).save(*args, **kwargs)
-
-    def clean( self ):
-        rule.rule_1_limite_lote_excedido(self)
+        rule.rule_5_inscricao_apos_data_final_evento(self, self._state.adding)
 
     def get_count_display( self ):
         if not self.count:

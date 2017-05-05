@@ -59,7 +59,9 @@ class Lot(models.Model):
             self.promo_code = Lot.objects.generate_promo_code()
 
         self.full_clean()
-        return super(Lot, self).save(**kwargs)
+        super(Lot, self).save(**kwargs)
+
+        rule.rule_10_lote_privado_deve_ter_codigo_promocional(self)
 
     def clean( self ):
         rule.rule_1_event_inscricao_desativada(self)
@@ -71,6 +73,7 @@ class Lot(models.Model):
         rule.rule_7_data_final_antes_data_inicial_evento(self)
         rule.rule_8_lot_interno_nao_pode_ter_preco(self)
         rule.rule_9_lote_pago_deve_ter_limite(self)
+        rule.rule_11_lot_apos_data_final_evento(self)
 
     def __str__( self ):
         return '{} - {}'.format(self.event.name, self.name)

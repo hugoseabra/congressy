@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import IntegrityError
 
 
@@ -23,3 +25,8 @@ def rule_4_inscricao_confirmada_com_data_confirmacao( subscription ):
     attended_on = subscription.attended_on
     if (attended and not attended_on) or (not attended and attended_on):
         raise IntegrityError('Inscrições com confirmação de presença precisam ter data de confirmação e vice-versa.')
+
+
+def rule_5_inscricao_apos_data_final_evento( subscription, adding=False ):
+    if adding and subscription.lot.event.date_end < datetime.now():
+        raise IntegrityError('O evento já foi encerrado e não pode mais ter inscrições.')
