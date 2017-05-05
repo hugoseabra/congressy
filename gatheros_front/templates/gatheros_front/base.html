@@ -28,13 +28,13 @@
             <div style="float:left"><a href="{% url 'gatheros_front:start' %}">Início</a></div>
             <div style="float:right">
                 <div>
-                    {% if request.session.organizations and request.session.organizations|length > 1 %}
+                    {% if user_context.organizations and user_context.organizations|length > 1 %}
                         <form action="{% url 'gatheros_event:organization-switch' %}" method="post" id="organization-context-pk">{% csrf_token %}
                             <select name="organization-context-pk" id="organization-context-pk" onchange="submit()">
-                                {% for org in request.session.organizations %}
+                                {% for org in user_context.organizations %}
                                     {{ org }}
                                     <option
-                                            {% if request.session.organization_context.pk == org.pk %}selected="selected"{% endif %}
+                                            {% if user_context.active_organization.pk == org.pk %}selected="selected"{% endif %}
                                             value="{{ org.pk }}">{{ org.name }}
                                     </option>
                                 {% endfor %}
@@ -43,8 +43,8 @@
                             |
                             <a href="{% url 'gatheros_front:logout' %}">Sair</a>
                         </form>
-                    {% elif request.session.organizations and request.session.organizations|length == 1 %}
-                        <strong>{{ request.session.organization_context.name }}</strong>
+                    {% elif user_context.organizations and user_context.organizations|length == 1 %}
+                        <strong>{{ user_context.active_organization.name }}</strong>
                         |
                         <a href="{% url 'gatheros_front:logout' %}">Sair</a>
                     {% else %}
