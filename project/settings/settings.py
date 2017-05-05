@@ -104,5 +104,5 @@ FIXTURE_DIRS = [
 ]
 
 LOGIN_URL = '/entrar/'
-LOGIN_REDIRECT_URL = '/inicio/'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/entrar/'
