@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from gatheros_event.models import Person
 
 
-def split_name(name):
+def split_name( name ):
     names = name.split(' ')
     last_name = names[-1]
     names.pop()
@@ -15,7 +15,7 @@ def split_name(name):
 
 
 @receiver(pre_save, sender=Person)
-def add_related_user_when_has_user(instance, raw, **_):
+def add_related_user_when_has_user( instance, raw, **_ ):
     """
     Verifica se a instância de Person possui informações necessárias para vincular User
 
@@ -73,7 +73,7 @@ def add_related_user_when_has_user(instance, raw, **_):
 
 
 @receiver(post_save, sender=Person)
-def update_user_related_name(instance, raw, **_):
+def update_user_related_name( instance, raw, **_ ):
     """
     Atualiza o nome de Usuário assim que o nome da pessoa é atualizado.
     
