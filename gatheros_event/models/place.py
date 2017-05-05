@@ -38,5 +38,48 @@ class Place(models.Model):
         verbose_name_plural = 'locais de Evento'
         ordering = ['name']
 
-    def __str__(self):
+    def __str__( self ):
         return '{} ({})'.format(self.name, self.organization.name)
+
+    def _add_prefix( self, *args, prefix=', ' ):
+        for arg in args:
+            if arg:
+                return prefix
+
+        return ''
+
+    def get_formatted_zip_code( self ):
+        zc = self.zip_code
+        return '{0}.{1}-{2}'.format(zc[:2], zc[2:5], zc[5:])
+
+    def get_complete_address( self ):
+        address = ''
+        if self.street:
+            address += self.street
+
+        if self.number:
+            address += self._add_prefix(self.street) + 'Nº. ' + self.number
+
+        if self.complement:
+            address += self._add_prefix(self.street, self.number) + self.complement
+
+        if self.village:
+            address += self._add_prefix(self.street, self.number, self.complement) + self.village
+
+        if self.zip_code:
+            address += self._add_prefix(self.street, self.number, self.complement, self.village) \
+                       + 'CEP: ' + self.get_formatted_zip_code()
+
+        address += self._add_prefix(
+            self.street,
+            self.number,
+            self.complement,
+            self.village,
+            self.zip_code,
+            prefix=' - '
+        ) + self.city.name + '-' + self.city.uf + '.'
+
+        if self.reference:
+            address += ' Referência: ' + self.reference
+
+        return address

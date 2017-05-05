@@ -4,11 +4,11 @@ from django.db import models
 from gatheros_event.lib.model import track_data
 from . import Category, Organization, Place
 from .rules import event as rule
-from ..lib.model import gatheros_slugify
+from ..lib.model import gatheros_slugify, deletable
 
 
 class TextFieldWithInputText(models.TextField):
-    def formfield(self, **kwargs):
+    def formfield( self, **kwargs ):
         kwargs.update({"widget": forms.TextInput})
         return super(TextFieldWithInputText, self).formfield(**kwargs)
 
@@ -21,7 +21,7 @@ class TextFieldWithInputText(models.TextField):
 # @TODO redimensionar banner de topo para altura e largura corretas - 1920 x 900
 
 @track_data('subscription_type')
-class Event(models.Model):
+class Event(models.Model, deletable.DeletableModel):
     RESOURCE_URI = '/api/core/events/'
 
     SUBSCRIPTION_BY_LOTS = 'by_lots'
@@ -75,17 +75,33 @@ class Event(models.Model):
         verbose_name_plural = 'eventos'
         ordering = ('name', 'pk', 'category__name')
 
-    def save(self, *args, **kwargs):
+    def save( self, *args, **kwargs ):
         self._create_unique_slug()
         self.full_clean()
         super(Event, self).save(*args, **kwargs)
 
-    def clean(self):
+    def clean( self ):
         rule.rule_1_data_inicial_antes_da_data_final(self)
         rule.rule_2_local_deve_ser_da_mesma_organizacao_do_evento(self)
 
-    def __str__(self):
+    def __str__( self ):
         return str(self.name)
 
-    def _create_unique_slug(self):
+    def _create_unique_slug( self ):
         self.slug = gatheros_slugify(model_class=Event, slugify_from=self.name, pk=self.pk)
+
+    def get_period( self ):
+        start_date = self.date_start.date()
+        end_date = self.date_end.date()
+        start_time = self.date_start.time()
+        end_time = self.date_end.time()
+
+        if start_date < end_date:
+            return 'De '+self.date_start.strftime('%d/%m/%Y %Hh%M')+' a '+self.date_end.strftime('%d/%m/%Y %Hh%M')
+
+        if start_date == end_date:
+            return self.date_start.strftime('%d/%m/%Y')\
+                   + ' das '\
+                   +start_time.strftime('%Hh%M')\
+                   +' às '\
+                   +end_time.strftime('%Hh%M')
