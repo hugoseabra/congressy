@@ -1,5 +1,6 @@
 from django.db import models
-from ..lib.model import gatheros_slugify
+
+from core.util import slugify
 
 
 class Organization(models.Model):
@@ -33,30 +34,30 @@ class Organization(models.Model):
         verbose_name_plural = 'organizações'
         ordering = ['name']
 
-    def __str__(self):
+    def __str__( self ):
         return self.name
 
-    def save(self, *args, **kwargs):
+    def save( self, *args, **kwargs ):
         self._create_unique_slug()
         super(Organization, self).save(*args, **kwargs)
 
-    def _create_unique_slug(self):
-        self.slug = gatheros_slugify(model_class=Organization, slugify_from=self.name, pk=self.pk)
+    def _create_unique_slug( self ):
+        self.slug = slugify(model_class=Organization, slugify_from=self.name, pk=self.pk)
 
-    def get_members(self, group=None):
+    def get_members( self, group=None ):
         if not group:
             return self.members.all()
 
         return self.members.filter(group=group)
 
-    def is_member(self, person, group=None):
+    def is_member( self, person, group=None ):
         for member in self.get_members(group=group):
             if member.person == person:
                 return True
 
         return False
 
-    def get_member_by_person(self, person, group=None):
+    def get_member_by_person( self, person, group=None ):
         for member in self.get_members(group=group):
             if member.person == person:
                 return member

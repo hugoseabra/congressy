@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.db import models
 
-from gatheros_event.lib.model import track_data
+from core.model import track_data
 from . import Member
 from .rules import invitation as rule
 
@@ -28,7 +28,7 @@ class Invitation(models.Model):
     expired = models.DateTimeField(verbose_name='expira em', blank=True, null=True)
     type = models.CharField(max_length=10, choices=INVITATION_TYPES, verbose_name='tipo', default='helper')
 
-    def save(self, *args, **kwargs):
+    def save( self, *args, **kwargs ):
         if self._state.adding:
             self.created = datetime.now()
             self.expired = self.created + timedelta(days=self.DEFAULT_DAYS_FOR_EXPIRATION)
@@ -36,7 +36,7 @@ class Invitation(models.Model):
         self.full_clean()
         super(Invitation, self).save(*args, **kwargs)
 
-    def clean(self):
+    def clean( self ):
         rule.rule_1_organizacao_internas_nao_pode_ter_convites(self)
         rule.rule_2_nao_pode_mudar_autor(self)
         rule.rule_3_nao_pode_mudar_convidado(self)
@@ -51,11 +51,11 @@ class Invitation(models.Model):
         ordering = ('created', 'author',)
         unique_together = (('author', 'to'),)
 
-    def validate_unique(self, exclude=None):
+    def validate_unique( self, exclude=None ):
         super(Invitation, self).validate_unique(exclude=exclude)
 
-    def __str__(self):
+    def __str__( self ):
         return '{} ({}) - {}'.format(self.to.first_name, self.author.organization.name, self.created)
 
-    def has_previous(self):
+    def has_previous( self ):
         return Invitation.objects.filter(author__organization=self.author.organization, to=self.to).exists()

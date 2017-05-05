@@ -1,8 +1,8 @@
-from django.template.defaultfilters import slugify
+from django.template.defaultfilters import slugify as lib_slugify
 
 
-def gatheros_slugify(model_class, slugify_from, pk=None):
-    slug = slugify(slugify_from)
+def slugify(model_class, slugify_from, pk=None):
+    slug = lib_slugify(slugify_from)
 
     suffix = None
     while model_class.objects.filter(slug=slug).exclude(id=pk).exists():

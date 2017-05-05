@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.db import migrations, models
 
-from gatheros_event.lib import validators
+from core.model import validator
 import gatheros_event.models.event
 import gatheros_event.models.person
 
@@ -185,11 +185,11 @@ class Migration(migrations.Migration):
                 ('village',
                  gatheros_event.models.person.TextFieldWithInputText(blank=True, null=True, verbose_name='bairro')),
                 ('phone', models.CharField(blank=True, max_length=11, null=True,
-                                           validators=[validators.phone_validator],
+                                           validators=[validator.phone_validator],
                                            verbose_name='telefone')),
                 ('avatar', models.ImageField(blank=True, null=True, upload_to='', verbose_name='foto')),
                 ('cpf', models.CharField(blank=True, max_length=11, null=True, unique=True,
-                                         validators=[validators.cpf_validator],
+                                         validators=[validator.cpf_validator],
                                          verbose_name='CPF')),
                 ('birth_date', models.DateField(blank=True, null=True, verbose_name='data nascimento')),
                 ('rg', gatheros_event.models.person.TextFieldWithInputText(blank=True, null=True, verbose_name='rg')),

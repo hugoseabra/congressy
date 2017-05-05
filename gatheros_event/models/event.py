@@ -1,10 +1,10 @@
 from django import forms
 from django.db import models
 
-from gatheros_event.lib.model import track_data
+from core.model import deletable, track_data
+from core.util import slugify
 from . import Category, Organization, Place
 from .rules import event as rule
-from ..lib.model import gatheros_slugify, deletable
 
 
 class TextFieldWithInputText(models.TextField):
@@ -88,7 +88,7 @@ class Event(models.Model, deletable.DeletableModel):
         return str(self.name)
 
     def _create_unique_slug( self ):
-        self.slug = gatheros_slugify(model_class=Event, slugify_from=self.name, pk=self.pk)
+        self.slug = slugify(model_class=Event, slugify_from=self.name, pk=self.pk)
 
     def get_period( self ):
         start_date = self.date_start.date()
@@ -97,11 +97,11 @@ class Event(models.Model, deletable.DeletableModel):
         end_time = self.date_end.time()
 
         if start_date < end_date:
-            return 'De '+self.date_start.strftime('%d/%m/%Y %Hh%M')+' a '+self.date_end.strftime('%d/%m/%Y %Hh%M')
+            return 'De ' + self.date_start.strftime('%d/%m/%Y %Hh%M') + ' a ' + self.date_end.strftime('%d/%m/%Y %Hh%M')
 
         if start_date == end_date:
-            return self.date_start.strftime('%d/%m/%Y')\
-                   + ' das '\
-                   +start_time.strftime('%Hh%M')\
-                   +' às '\
-                   +end_time.strftime('%Hh%M')
+            return self.date_start.strftime('%d/%m/%Y') \
+                   + ' das ' \
+                   + start_time.strftime('%Hh%M') \
+                   + ' às ' \
+                   + end_time.strftime('%Hh%M')

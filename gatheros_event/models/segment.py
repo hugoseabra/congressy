@@ -13,5 +13,5 @@ class Segment(models.Model):
         verbose_name_plural = 'Cadeias Produtivas'
         ordering = ['name']
 
-    def __str__(self):
+    def __str__( self ):
         return self.name

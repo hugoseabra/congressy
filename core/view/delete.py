@@ -1,6 +1,7 @@
-from gatheros_event.lib.model.deletable import NotDeletableError
-from django.views.generic import DeleteView
 from django.contrib import messages
+from django.views.generic import DeleteView
+
+from core.model.deletable import NotDeletableError
 
 
 class DeleteViewMixin(DeleteView):

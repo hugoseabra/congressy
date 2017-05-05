@@ -1,7 +1,6 @@
 from django.db import models
 
 from . import Event
-
 from .rules import info as rule
 
 
@@ -43,14 +42,14 @@ class Info(models.Model):
         verbose_name_plural = 'Infomações de Eventos'
         ordering = ['event']
 
-    def __str__(self):
+    def __str__( self ):
         return self.event.name
 
-    def save(self, *args, **kwargs):
+    def save( self, *args, **kwargs ):
         self.full_clean()
         super(Info, self).save(*args, **kwargs)
 
-    def clean(self):
+    def clean( self ):
         rule.rule_1_imagem_unica_somente(self)
         rule.rule_2_4_imagens_somente(self)
         rule.rule_3_youtube_video_somente(self)

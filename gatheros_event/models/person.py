@@ -5,14 +5,14 @@ from django.contrib.auth.models import User
 from django.db import models
 from kanu_locations.models import City
 
+from core.model import track_data
 from . import Occupation
 from .rules import person as rule
-from ..lib.validators import cpf_validator, phone_validator
-from ..lib.model import track_data
+from core.model.validator import cpf_validator, phone_validator
 
 
 class TextFieldWithInputText(models.TextField):
-    def formfield(self, **kwargs):
+    def formfield( self, **kwargs ):
         kwargs.update({"widget": forms.TextInput})
         return super(TextFieldWithInputText, self).formfield(**kwargs)
 
@@ -58,7 +58,8 @@ class Person(models.Model):
     synchronized = models.NullBooleanField(default=False)
     term_version = models.IntegerField(verbose_name='versão do termo de uso', blank=True, null=True)
     politics_version = models.IntegerField(verbose_name='versão da política de privacidade', blank=True, null=True)
-    occupation = models.ForeignKey(Occupation, on_delete=models.SET_NULL, verbose_name='profissão', blank=True, null=True)
+    occupation = models.ForeignKey(Occupation, on_delete=models.SET_NULL, verbose_name='profissão', blank=True,
+                                   null=True)
 
     website = models.CharField(max_length=255, null=True, blank=True)
     facebook = models.CharField(max_length=255, null=True, blank=True)
@@ -72,10 +73,10 @@ class Person(models.Model):
         verbose_name_plural = 'pessoas'
         ordering = ['name']
 
-    def __str__(self):
+    def __str__( self ):
         return str(self.name)
 
-    def save(self, *args, **kwargs):
+    def save( self, *args, **kwargs ):
         if not self.email:
             self.email = None
 
@@ -85,22 +86,22 @@ class Person(models.Model):
         self.full_clean()
         super(Person, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
+    def delete( self, *args, **kwargs ):
         rule.rule_4_desativa_usuario_ao_deletar_pessoa(self)
         super(Person, self).delete(*args, **kwargs)
 
-    def clean(self):
+    def clean( self ):
         rule.rule_1_has_user_deve_ter_email(self)
         rule.rule_2_ja_existe_outro_usuario_com_mesmo_email(self)
         rule.rule_3_nao_remove_usuario_uma_vez_relacionado(self)
 
-    def get_cpf_display(self):
+    def get_cpf_display( self ):
         cpf = str(self.cpf)
         if not cpf:
             return ''
         return '{0}.{1}.{2}-{3}'.format(cpf[:3], cpf[3:6], cpf[6:9], cpf[9:11])
 
-    def get_birth_date_display(self):
+    def get_birth_date_display( self ):
         if not self.birth_date:
             return '--'
         return self.birth_date.strftime('%d/%m/%Y')

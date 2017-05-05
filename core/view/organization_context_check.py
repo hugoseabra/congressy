@@ -1,3 +1,5 @@
+from django.views.generic.base import View
+
 """
 Verifica credenciais de membro de usuário dentro da organização. 
 
@@ -13,12 +15,16 @@ USE:
 """
 
 
-class OrganizationPermissionViewMixin(object):
+class OrganizationContextCheckMixin(View):
     organization = None
     members = []
     organizations = []
     super_user = False
     member_group = None
+
+    def dispatch( self, request, *args, **kwargs ):
+        self.check(request)
+        return super(OrganizationContextCheckMixin, self).dispatch(request, *args, **kwargs)
 
     def check( self, request ):
         user = request.user
@@ -27,7 +33,7 @@ class OrganizationPermissionViewMixin(object):
         if user.is_superuser:
             self.super_user = True
 
-    def get_organization_context(self):
+    def get_organization_context( self ):
         return {
             'organization': self.organization,
             'member_group': self.member_group,
@@ -37,6 +43,8 @@ class OrganizationPermissionViewMixin(object):
     def _retrieve_info_from_session( self, session ):
         if 'organization_context' not in session:
             return
+
+        # @TODO verificar se há as informações
 
         self.organization = session['organization_context']
         self.organizations = session['organizations']
