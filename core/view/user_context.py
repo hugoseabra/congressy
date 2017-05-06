@@ -16,11 +16,6 @@ USE:
 
 
 class UserContextMixin(View):
-    organization = None
-    members = []
-    organizations = []
-    super_user = False
-    member_group = None
     user_context = {
         'active_organization': None,
         'active_member_group': None,
