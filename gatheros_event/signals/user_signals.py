@@ -21,5 +21,6 @@ def destroy_user_context( request, **_ ):
         return
 
     session = request.session
-    if hasattr(session, 'user_context'):
+    if 'user_context' in session:
         del request.session['user_context']
+        request.session.modified = True
