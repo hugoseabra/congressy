@@ -8,8 +8,8 @@ def get_user_context( request ):
     return UserRequest(request)
 
 
-def update_user_context( request, organization=None ):
-    return UserRequest.update(request, organization)
+def update_user_context( request, organization_pk=None ):
+    return UserRequest.update(request, organization_pk)
 
 
 class UserRequest(object):
