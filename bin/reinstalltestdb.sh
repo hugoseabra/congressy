@@ -25,7 +25,7 @@ python $BASE_DIR/manage.py loaddata 012_invitation
 ## gatheros_subscription
 python $BASE_DIR/manage.py loaddata 001_default_field 002_form 003_field 004_field_option
 python $BASE_DIR/manage.py loaddata 005_lot 006_subscription
-#python $BASE_DIR/manage.py loaddata 007_answer
+python $BASE_DIR/manage.py loaddata 007_answer
 
 # Atualizando a data dos eventos
 python $BASE_DIR/bin/update_data.py
