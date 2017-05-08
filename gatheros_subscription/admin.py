@@ -67,6 +67,29 @@ class FieldOptionAdmin(admin.ModelAdmin):
 @admin.register(Lot)
 class LotAdmin(admin.ModelAdmin):
     list_display = ('name', 'event', 'price', 'date_start', 'date_end', 'private', 'internal', 'pk')
+    fieldsets = (
+        (None, {
+            'fields': (
+                'name',
+                'event',
+                'date_start',
+                'date_end',
+                'limit',
+                'private',
+                'internal',
+            ),
+        }),
+        ('Preços e Formas de recebimento', {
+            'fields': (
+                'promo_code',
+                'price',
+                'tax',
+                'discount',
+                'discount_type',
+                'transfer_tax',
+            ),
+        }),
+    )
 
     def formfield_for_foreignkey( self, db_field, request, **kwargs ):
         if db_field.name == "event":
