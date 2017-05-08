@@ -9,15 +9,9 @@ from gatheros_event.acl import gatheros_user_context
 
 @receiver(user_logged_in, sender=User)
 def add_user_context( user, request, **_ ):
-    if request.path == '/admin/login/' or not hasattr(user, 'person'):
-        return
-
     gatheros_user_context.update_user_context(request)
 
 
 @receiver(user_logged_out, sender=User)
 def destroy_user_context( request, **_ ):
-    if request.path == '/admin/login/':
-        return
-
     gatheros_user_context.clean_user_context(request)
