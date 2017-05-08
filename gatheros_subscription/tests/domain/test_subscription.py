@@ -25,7 +25,7 @@ class SubscriptionModelTest(GatherosTestCase):
     def _create_person( self, **kwargs ):
         data = {
             'name': 'Test',
-            'genre': 'M',
+            'gender': 'M',
             'city': City.objects.get(pk=5413),
             'cpf': '82247263631'
         }

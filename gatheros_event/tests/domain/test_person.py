@@ -29,7 +29,7 @@ class PersonModelTest(GatherosTestCase):
     def _create_person( self, persist=True, **kwargs ):
         data = {
             'name': 'Test',
-            'genre': 'M',
+            'gender': 'M',
             'city': City.objects.get(pk=5413)
         }
         return self._create_model(Model=Person, data=data, persist=persist, **kwargs)
