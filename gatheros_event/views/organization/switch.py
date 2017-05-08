@@ -2,7 +2,9 @@ from django.contrib import messages
 from django.db import IntegrityError
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView
+from django.shortcuts import get_object_or_404
 
+from gatheros_event.models import Organization
 from gatheros_event.acl.gatheros_user_context import update_user_context
 
 
@@ -16,13 +18,15 @@ class NotAllowedOrganization(IntegrityError):
 class OrganizationSwitch(RedirectView):
     def post( self, request, *args, **kwargs ):
         pk = request.POST.get('organization-context-pk', None)
-        next_path = request.POST.get('next',
-                                     reverse_lazy('gatheros_front:home'))
+        next_path = request.POST.get(
+            'next',
+            reverse_lazy('gatheros_front:home')
+        )
         if not pk:
             return
 
-        user_context = update_user_context(request, pk)
-        organization = user_context.organization
+        organization = get_object_or_404(Organization, pk=pk)
+        update_user_context(request, organization)
 
         if organization.internal is True:
             context = 'não está em organização'

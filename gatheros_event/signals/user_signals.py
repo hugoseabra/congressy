@@ -20,7 +20,4 @@ def destroy_user_context( request, **_ ):
     if request.path == '/admin/login/':
         return
 
-    session = request.session
-    if 'user_context' in session:
-        del request.session['user_context']
-        request.session.modified = True
+    gatheros_user_context.clean_user_context(request)

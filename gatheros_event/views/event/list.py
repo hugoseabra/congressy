@@ -31,18 +31,20 @@ class EventListView(
         return context
 
     def get_event_list_context( self ):
+        member_group = self.user_context.get('active_member_group')
+
         def can_edit():
-            return self.super_user or (
-                self.member_group and self.member_group['group'] in [
+            return self.user_context.get('superuser', False) or (
+                member_group and member_group['group'] in [
                     Member.ADMIN,
                     Member.HELPER
                 ]
             )
 
         def can_delete():
-            return self.super_user or (
-                self.member_group
-                and self.member_group['group'] == Member.ADMIN
+            return self.user_context.get('superuser', False) or (
+                member_group
+                and member_group.get('active_member_group') == Member.ADMIN
             )
 
         return {
