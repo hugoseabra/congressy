@@ -171,7 +171,7 @@ class Migration(migrations.Migration):
                 ('uuid',
                  models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
                 ('name', models.CharField(max_length=255, verbose_name='nome')),
-                ('genre',
+                ('gender',
                  models.CharField(choices=[('M', 'Masculino'), ('F', 'Feminino')], max_length=1, verbose_name='sexo')),
                 ('email', models.EmailField(blank=True, max_length=254, null=True, unique=True, verbose_name='email')),
                 ('zip_code', models.CharField(blank=True, max_length=8, null=True, verbose_name='CEP')),

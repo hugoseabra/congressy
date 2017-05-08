@@ -28,7 +28,7 @@ class Person(models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, primary_key=True)
     name = models.CharField(max_length=255, verbose_name='nome')
-    genre = models.CharField(max_length=1, choices=GENDER_CHOICES, verbose_name='sexo')
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, verbose_name='sexo')
 
     email = models.EmailField(unique=True, blank=True, null=True, verbose_name='email')
 
