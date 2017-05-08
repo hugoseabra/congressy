@@ -32,7 +32,6 @@
                         <form action="{% url 'gatheros_event:organization-switch' %}" method="post" id="organization-context-pk">{% csrf_token %}
                             <select name="organization-context-pk" id="organization-context-pk" onchange="submit()">
                                 {% for org in user_context.organizations %}
-                                    {{ org }}
                                     <option
                                             {% if user_context.active_organization.pk == org.pk %}selected="selected"{% endif %}
                                             value="{{ org.pk }}">{{ org.name }}

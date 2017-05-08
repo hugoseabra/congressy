@@ -2,12 +2,11 @@
 {% load i18n static %}
 
 {% block content %}
-    <a href="{% url 'gatheros_event:event-list' %}">Voltar</a>
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:event-list' %}">Voltar</a>
+    </div>
     <hr />
     <h1>Painel do Evento</h1>
     <h2>{{ event.name }}</h2>
-
-
-
 
 {% endblock %}

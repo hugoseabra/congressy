@@ -5,14 +5,17 @@
 
 {% block content %}
     <h1>Lista de Eventos</h1>
-
+    {% if can_add %}
+        <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
+            <a href="{% url 'gatheros_event:event-add' %}">Adicionar</a>
+        </div>
+    {% endif %}
     <div style="background: #DDD">
         <table width="100%">
             {% for event in object_list %}
                 <tr>
-                    <td width="1%" style="background-color: {% if event.published %}green{% else %}gray{% endif %}">
-                        &ensp;
-                    </td>
+                    <td width="1%"
+                        style="background-color: {% if event.published %}green{% else %}gray{% endif %}"></td>
                     <td style="background: #FFF;padding:10px;margin-bottom: 3px">
                         <div>{{ forloop.counter }} -
                             {% if event.published %}
@@ -20,7 +23,9 @@
                             {% else %}
                                 {{ event.name }}
                             {% endif %}
-                            <span style="font-size: medium;color:dimgray">({{ event.organization.name }})</span>
+                            {% if user.is_superuser %}
+                                <span style="font-size: medium;color:dimgray">({{ event.organization.name }})</span>
+                            {% endif %}
                         </div>
                         <hr/>
                         <div style="text-indent: 10px;">
@@ -29,7 +34,8 @@
                                 <strong>Descrição:</strong>
                                 <span style="color: dimgray;text-align: justify">{{ event.description|truncatechars:150 }}</span>
                             </p>
-                            <p><strong>Quando:</strong> {{ event.get_period }}</p>
+                            <p><strong>Quando:</strong> {{ event.get_period }}
+                            </p>
                             {% if event.place %}
                                 <p>
                                     <strong>Local:</strong> {{ event.place.name }}
@@ -38,13 +44,14 @@
                             {% endif %}
                         </div>
                     </td>
-                    <td width="5%" style="background: #FFF;padding:10px;margin-bottom: 3px">
+                    <td width="5%"
+                        style="background: #FFF;padding:10px;margin-bottom: 3px">
                         {% if can_edit %}
-                        <a href="{% url 'gatheros_event:event-edit' event.pk %}">Editar</a>
+                            <a href="{% url 'gatheros_event:event-edit' event.pk %}">Editar</a>
                         {% endif %}
                         {% if can_delete %}
-                        <br/><br/>
-                        <a href="{% url 'gatheros_event:event-delete' event.pk %}">Excluir</a>
+                            <br/><br/>
+                            <a href="{% url 'gatheros_event:event-delete' event.pk %}">Excluir</a>
                         {% endif %}
                     </td>
                 </tr>
