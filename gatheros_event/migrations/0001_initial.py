@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
                                                              verbose_name='ativar inscrições off-line')),
                 ('date_start', models.DateTimeField(verbose_name='data inicial')),
                 ('date_end', models.DateTimeField(verbose_name='data final')),
-                ('description', models.TextField(blank=True, null=True, verbose_name='descrição')),
+                ('description', models.TextField(blank=True, help_text='Descrição que irá aparecer nos sites de busca e redes sociais. Quanto mais detalhada, melhor!', null=True, verbose_name='descrição')),
                 ('banner_slide',
                  models.ImageField(blank=True, help_text='Banner pequeno para destaque (tamanho: 1140px x 500px)',
                                    null=True, upload_to='', verbose_name='banner destaque')),
