@@ -18,6 +18,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
 
+''    # THIRD PARTY
+    'formtools',
+
     # KANU_APPS
     'kanu_locations',
 
@@ -36,6 +39,10 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # GATHEROS_MIDLWARE_CLASSES
+    'core.helper.account.middleware.CurrentSessionMiddleware',
+    'core.helper.account.middleware.CurrentUserMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -51,6 +58,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # Gatheros user_context processor
                 'gatheros_front.processor.user_context'
             ],
         },
@@ -96,7 +105,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-
 
 FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'fixtures'),
