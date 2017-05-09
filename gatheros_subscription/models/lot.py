@@ -8,7 +8,7 @@ from .rules import lot as rule
 
 
 class LotManager(models.Manager):
-    def generate_promo_code( self ):
+    def generate_promo_code(self):
         while True:
             code = str(uuid.uuid4()).split('-')[0].upper()
             try:
@@ -25,22 +25,75 @@ class Lot(models.Model):
         ('money', 'R$'),
     )
 
-    name = models.CharField(max_length=255, verbose_name='nome')
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, verbose_name='evento', related_name='lots')
+    name = models.CharField(
+        max_length=255,
+        verbose_name='nome'
+    )
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        verbose_name='evento',
+        related_name='lots'
+    )
     date_start = models.DateTimeField(verbose_name='data inicial')
-    date_end = models.DateTimeField(verbose_name='data final', null=True, blank=True)
-    limit = models.PositiveIntegerField(null=True, blank=True, verbose_name='vaga(s)')
-    price = models.DecimalField(max_digits=8, null=True, blank=True, decimal_places=2, verbose_name='preco')
-    tax = models.DecimalField(max_digits=5, null=True, blank=True, decimal_places=2, verbose_name='taxa')
-    discount_type = models.CharField(max_length=15, choices=DISCOUNT_TYPE, default='percent',
-                                     verbose_name='tipo de desconto', null=True, blank=True)
-    discount = models.DecimalField(max_digits=8, null=True, blank=True, decimal_places=2, verbose_name='desconto')
-    promo_code = models.CharField(max_length=15, null=True, blank=True, verbose_name='código promocional', )
-    transfer_tax = models.BooleanField(default=False, verbose_name='trasferir taxa para participante')
-    private = models.BooleanField(default=False, verbose_name='privado',
-                                  help_text="Não estará explícito para o participante no site do evento")
+    date_end = models.DateTimeField(
+        verbose_name='data final',
+        null=True,
+        blank=True
+    )
+    limit = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name='vaga(s)'
+    )
+    price = models.DecimalField(
+        max_digits=8,
+        null=True,
+        blank=True,
+        decimal_places=2,
+        verbose_name='preco'
+    )
+    tax = models.DecimalField(
+        max_digits=5,
+        null=True, blank=True,
+        decimal_places=2,
+        verbose_name='taxa'
+    )
+    discount_type = models.CharField(
+        max_length=15,
+        choices=DISCOUNT_TYPE,
+        default='percent',
+        verbose_name='tipo de desconto',
+        null=True,
+        blank=True
+    )
+    discount = models.DecimalField(
+        max_digits=8,
+        null=True,
+        blank=True,
+        decimal_places=2,
+        verbose_name='desconto'
+    )
+    promo_code = models.CharField(
+        max_length=15,
+        null=True,
+        blank=True,
+        verbose_name='código promocional'
+    )
+    transfer_tax = models.BooleanField(
+        default=False,
+        verbose_name='trasferir taxa para participante'
+    )
+    private = models.BooleanField(
+        default=False,
+        verbose_name='privado',
+        help_text="Não estará explícito para o participante no site do evento"
+    )
 
-    internal = models.BooleanField(default=False, verbose_name='gerado internamente')
+    internal = models.BooleanField(
+        default=False,
+        verbose_name='gerado internamente'
+    )
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
 
     objects = LotManager()
@@ -51,19 +104,21 @@ class Lot(models.Model):
         ordering = ['pk', 'name', 'event']
         unique_together = (("name", "event"),)
 
-    def save( self, **kwargs ):
+    def save(self, **kwargs):
+        self.full_clean()
+        self.check_rules()
+        super(Lot, self).save(**kwargs)
+
+        rule.rule_10_lote_privado_deve_ter_codigo_promocional(self)
+
+    def clean(self):
         if not self.date_end:
             self.date_end = self.event.date_start - timedelta(seconds=1)
 
         if self.private and not self.promo_code:
             self.promo_code = Lot.objects.generate_promo_code()
 
-        self.full_clean()
-        super(Lot, self).save(**kwargs)
-
-        rule.rule_10_lote_privado_deve_ter_codigo_promocional(self)
-
-    def clean( self ):
+    def check_rules(self):
         rule.rule_1_event_inscricao_desativada(self)
         rule.rule_2_mais_de_1_lote_evento_inscricao_simples(self)
         rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)
@@ -75,5 +130,5 @@ class Lot(models.Model):
         rule.rule_9_lote_pago_deve_ter_limite(self)
         rule.rule_11_lot_apos_data_final_evento(self)
 
-    def __str__( self ):
+    def __str__(self):
         return '{} - {}'.format(self.event.name, self.name)

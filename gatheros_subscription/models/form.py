@@ -6,7 +6,12 @@ from .rules import form as rule
 
 # @TODO Campos pre-definidos cadastrados a parte e inseridos na criação de novo form
 class Form(models.Model):
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, verbose_name='evento', related_name='form')
+    event = models.OneToOneField(
+        Event,
+        on_delete=models.CASCADE,
+        verbose_name='evento',
+        related_name='form'
+    )
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
 
     class Meta:
@@ -14,20 +19,20 @@ class Form(models.Model):
         verbose_name_plural = 'formulários de eventos'
         ordering = ['event']
 
-    def save( self, *args, **kwargs ):
-        self.full_clean()
+    def save(self, *args, **kwargs):
+        self.check_rules()
         super(Form, self).save(*args, **kwargs)
 
-    def __str__( self ):
+    def __str__(self):
         return self.event.name
 
-    def clean( self ):
+    def check_rules(self):
         rule.rule_1_form_em_event_inscricao_desativada(self)
 
     @property
-    def get_additional_fields( self ):
+    def get_additional_fields(self):
         return self.fields.filter(form_default_field=False)
 
     @property
-    def has_additional_fields( self ):
+    def has_additional_fields(self):
         return self.get_additional_fields.count() > 0

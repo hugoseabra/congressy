@@ -1,22 +1,25 @@
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 
 
-def rule_1_campo_inscricao_formulario_mesmo_evento( answer ):
+def rule_1_campo_inscricao_formulario_mesmo_evento(answer):
     answer_event = answer.subscription.event
     field_event = answer.field.form.event
     if answer_event != field_event:
         raise ValidationError(
-            {'field': ['Campo não pertence ao evento \'{}\'.'.format(field_event.name)]}
+            {'field': ['Campo não pertence ao evento \'{}\'.'.format(
+                field_event.name
+            )]}
         )
 
 
-def rule_2_resposta_apenas_se_campo_adicional( answer ):
+def rule_2_resposta_apenas_se_campo_adicional(answer):
     if answer.field.form_default_field is True:
-        raise ValidationError({'field': ['Campo selecionado não é adicional ao formulário.']})
+        raise ValidationError({'field': [
+            'Campo selecionado não é adicional ao formulário.'
+        ]})
 
 
-def rule_3_resposta_com_tipo_correto( answer ):
+def rule_3_resposta_com_tipo_correto(answer):
     value = answer.get_value()
     if not value:
         return
@@ -24,7 +27,8 @@ def rule_3_resposta_com_tipo_correto( answer ):
     field = answer.field
     if field.type in [field.FIELD_CHECKBOX_GROUP] and type(value) is not list:
         raise ValidationError({'value': [
-            'Tipo de valor incorreto: O campo \'{}\' exige um registro de valor do tipo \'list\''.format(field.label)
+            'Tipo de valor incorreto: O campo \'{}\' exige um registro de valor'
+            ' do tipo \'list\''.format(field.label)
         ]})
 
     if field.type in [
@@ -39,5 +43,6 @@ def rule_3_resposta_com_tipo_correto( answer ):
         field.FIELD_TEXTAREA,
     ] and type(value) is not str:
         raise ValidationError({'value': [
-            'Tipo de valor incorreto: O campo \'{}\' exige um registro de valor do tipo \'string\''.format(field.label)
+            'Tipo de valor incorreto: O campo \'{}\' exige um registro de valor'
+            ' do tipo \'string\''.format(field.label)
         ]})

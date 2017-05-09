@@ -10,7 +10,9 @@ def rule_1_imagem_unica_somente(info):
         return
 
     if not info.image_main:
-        raise ValidationError({'image_main': ['Você deve inserir a imagem principal.']})
+        raise ValidationError({'image_main': [
+            'Você deve inserir a imagem principal.'
+        ]})
 
     for field in ['image1', 'image2', 'image3', 'image4']:
         value = getattr(info, field)
@@ -48,7 +50,9 @@ def rule_3_youtube_video_somente(info):
         return
 
     if not info.youtube_video_id:
-        raise ValidationError({'youtube_video_id': ['Você deve informar o ID do vídeo do youtube.']})
+        raise ValidationError({'youtube_video_id': [
+            'Você deve informar o ID do vídeo do youtube.'
+        ]})
 
     for field in ['image_main', 'image1', 'image2', 'image3', 'image4']:
         value = getattr(info, field)

@@ -7,16 +7,25 @@ from . import Field, Subscription
 
 
 class Answer(models.Model):
-    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE, verbose_name='inscrição',
-                                     related_name='answers')
-    field = models.ForeignKey(Field, on_delete=models.CASCADE, verbose_name='campo', related_name='answers')
+    subscription = models.ForeignKey(
+        Subscription,
+        on_delete=models.CASCADE,
+        verbose_name='inscrição',
+        related_name='answers'
+    )
+    field = models.ForeignKey(
+        Field,
+        on_delete=models.CASCADE,
+        verbose_name='campo',
+        related_name='answers'
+    )
     value = models.TextField(verbose_name='valor', null=True, blank=True)
 
-    def save( self, *args, **kwargs ):
-        self.full_clean()
+    def save(self, *args, **kwargs):
+        self.check_rules()
         super(Answer, self).save(*args, **kwargs)
 
-    def clean( self ):
+    def check_rules(self):
         rule.rule_1_campo_inscricao_formulario_mesmo_evento(self)
         rule.rule_2_resposta_apenas_se_campo_adicional(self)
         rule.rule_3_resposta_com_tipo_correto(self)
@@ -27,10 +36,10 @@ class Answer(models.Model):
         ordering = ['field']
         unique_together = (('subscription', 'field'),)
 
-    def __str__( self ):
+    def __str__(self):
         return '{} - {}'.format(self.field, self.value)
 
-    def get_display_value( self ):
+    def get_display_value(self):
         if not self.value:
             return None
 
@@ -49,7 +58,7 @@ class Answer(models.Model):
 
         return result
 
-    def get_value( self ):
+    def get_value(self):
         if not self.value:
             return None
 

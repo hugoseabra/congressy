@@ -26,15 +26,46 @@ class AbstractField(models.Model):
         (FIELD_RADIO_GROUP, 'Escolha única'),
     )
 
-    name = models.CharField(max_length=255, verbose_name='nome')
-    label = models.CharField(max_length=255, verbose_name='rótulo')
-    type = models.CharField(max_length=20, choices=TYPES, default='input-text', verbose_name='tipo')
-    order = models.PositiveIntegerField(verbose_name='ordem', null=True, blank=True)
+    name = models.CharField(
+        max_length=255,
+        verbose_name='nome'
+    )
+    label = models.CharField(
+        max_length=255,
+        verbose_name='rótulo'
+    )
+    type = models.CharField(
+        max_length=20,
+        choices=TYPES,
+        default='input-text',
+        verbose_name='tipo'
+    )
+    order = models.PositiveIntegerField(
+        verbose_name='ordem',
+        null=True,
+        blank=True
+    )
 
-    required = models.BooleanField(default=False, verbose_name='obrigatório')
-    instruction = models.TextField(verbose_name='instrução', null=True, blank=True)
-    placeholder = models.CharField(max_length=100, verbose_name='placeholder', null=True, blank=True)
-    default_value = models.TextField(verbose_name='valor padrão', null=True, blank=True)
+    required = models.BooleanField(
+        default=False,
+        verbose_name='obrigatório'
+    )
+    instruction = models.TextField(
+        verbose_name='instrução',
+        null=True,
+        blank=True
+    )
+    placeholder = models.CharField(
+        max_length=100,
+        verbose_name='placeholder',
+        null=True,
+        blank=True
+    )
+    default_value = models.TextField(
+        verbose_name='valor padrão',
+        null=True,
+        blank=True
+    )
     active = models.BooleanField(default=True, verbose_name='ativo')
 
     class Meta:

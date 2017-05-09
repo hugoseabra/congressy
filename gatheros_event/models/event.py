@@ -131,10 +131,10 @@ class Event(models.Model, deletable.DeletableModel):
 
     def save( self, *args, **kwargs ):
         self._create_unique_slug()
-        self.full_clean()
+        self.check_rules()
         super(Event, self).save(*args, **kwargs)
 
-    def clean( self ):
+    def check_rules(self):
         rule.rule_1_data_inicial_antes_da_data_final(self)
         rule.rule_2_local_deve_ser_da_mesma_organizacao_do_evento(self)
 
