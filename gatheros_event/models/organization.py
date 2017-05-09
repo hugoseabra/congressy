@@ -1,6 +1,7 @@
 from django.db import models
 
 from core.util import slugify
+from .member import Member
 
 
 class Organization(models.Model):
@@ -57,36 +58,33 @@ class Organization(models.Model):
         verbose_name_plural = 'organizações'
         ordering = ['name']
 
-    def __str__( self ):
+    def __str__(self):
         return self.name
 
-    def save( self, *args, **kwargs ):
+    def save(self, *args, **kwargs):
         self._create_unique_slug()
         super(Organization, self).save(*args, **kwargs)
 
-    def _create_unique_slug( self ):
+    def _create_unique_slug(self):
         self.slug = slugify(
             model_class=Organization,
             slugify_from=self.name,
             pk=self.pk
         )
 
-    def get_members( self, group=None ):
-        if not group:
-            return self.members.all()
+    def get_members(self, group=None, person=None):
+        qs = self.members.all()
 
-        return self.members.filter(group=group)
+        if group:
+            qs = qs.filter(group=group)
 
-    def is_member( self, person, group=None ):
-        for member in self.get_members(group=group):
-            if member.person == person:
-                return True
+        if person:
+            qs = qs.filter(person=person)
 
-        return False
+        return qs
 
-    def get_member_by_person( self, person, group=None ):
-        for member in self.get_members(group=group):
-            if member.person == person:
-                return member
+    def is_member(self, person):
+        return self.get_members(person=person).exists()
 
-        return None
+    def is_admin(self, person):
+        return self.get_members(group=Member.ADMIN, person=person).exists()

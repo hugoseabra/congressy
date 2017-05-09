@@ -3,7 +3,7 @@ from datetime import datetime
 from django.db import models
 
 from gatheros_event.models.rules import member as rule
-from . import Organization, Person
+from . import Person
 
 
 class Member(models.Model):
@@ -16,13 +16,14 @@ class Member(models.Model):
     )
 
     organization = models.ForeignKey(
-        Organization,
+        'gatheros_event.Organization',
         on_delete=models.CASCADE,
         verbose_name='organização',
         related_name='members'
     )
     person = models.ForeignKey(
-        Person, on_delete=models.CASCADE,
+        Person,
+        on_delete=models.CASCADE,
         verbose_name='pessoa',
         related_name='members'
     )
