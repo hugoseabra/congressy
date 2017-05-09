@@ -11,7 +11,7 @@ USER_CONTEXT_KEYS = (
 )
 
 
-def is_user_context_configured( request ):
+def is_user_context_configured(request):
     if 'user_context' not in request.session:
         return False
 
@@ -24,7 +24,7 @@ def is_user_context_configured( request ):
     return True
 
 
-def get_user_context( request ):
+def get_user_context(request):
     user_request = UserRequest(request.user)
     if not is_user_context_configured(request):
         return update_user_context(request, None, user_request)
@@ -32,7 +32,7 @@ def get_user_context( request ):
     return user_request
 
 
-def update_user_context( request, organization=None, user_context=None ):
+def update_user_context(request, organization=None, user_context=None):
     if not user_context:
         user_context = UserRequest(request.user)
 
@@ -51,7 +51,7 @@ def update_user_context( request, organization=None, user_context=None ):
     return user_context
 
 
-def clean_user_context( request ):
+def clean_user_context(request):
     if 'user_context' in request.session:
         del request.session['user_context']
 
@@ -68,7 +68,7 @@ class UserRequest(object):
     active_organization = None
     active_member_group = None
 
-    def __init__( self, user ):
+    def __init__(self, user):
         self.logged_user = user
         self.superuser = user.is_superuser
         self.organization = None
@@ -77,10 +77,7 @@ class UserRequest(object):
 
         self._extract_data_from_logged_user()
 
-    def update_active_context( self, organization ):
-        active_org_pks = [org.get('pk') for org in self.organizations]
-        active_member_pks = [member.get('pk') for member in self.members]
-
+    def update_active_context(self, organization):
         if not self.superuser and not hasattr(self.logged_user, 'person'):
             raise SuspiciousOperation(
                 'O usuário logado não possui vinculo com pessoa no sistema.'
@@ -88,14 +85,15 @@ class UserRequest(object):
 
         try:
             organization.members.get(person=self.person)
+            member = organization.members.get(person=self.person)
 
             self.organization = organization
             self.active_organization = self.extract_organization_data(
-                organization
+                organization,
+                member.group
             )
-            self.active_member_group = self.extract_member_data(
-                organization.members.get(person=self.person)
-            )
+            self.active_member_group = self.extract_member_data(member
+                                                                )
         except Member.DoesNotExist:
             raise SuspiciousOperation(
                 'Você está tentando entrar em uma organização na qual você não'
@@ -104,7 +102,7 @@ class UserRequest(object):
 
         return self
 
-    def _extract_data_from_logged_user( self ):
+    def _extract_data_from_logged_user(self):
         if not hasattr(self.logged_user, 'person'):
             return
 
@@ -114,7 +112,10 @@ class UserRequest(object):
                 .filter(organization__active=True) \
                 .order_by('-organization__internal', 'organization__name'):
 
-            org_data = self.extract_organization_data(member.organization)
+            org_data = self.extract_organization_data(
+                member.organization,
+                member.group
+            )
             member_data = self.extract_member_data(member)
             self.organizations.append(org_data)
             self.members.append(member_data)
@@ -126,17 +127,21 @@ class UserRequest(object):
             if not self.active_member_group:
                 self.active_member_group = member_data
 
-    def extract_organization_data( self, organization ):
+    def extract_organization_data(self, organization, group):
         return {
             'pk': organization.pk,
             'name': organization.name,
-            'internal': organization.internal
+            'internal': organization.internal,
+            'group': group
         }
 
-    def extract_member_data( self, member ):
+    def extract_member_data(self, member):
         return {
             'pk': member.pk,
             'group_name': member.get_group_display(),
             'group': member.group,
-            'organization': self.extract_organization_data(member.organization)
+            'organization': self.extract_organization_data(
+                member.organization,
+                member.group
+            )
         }

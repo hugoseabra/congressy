@@ -12,7 +12,7 @@ from .rules import person as rule
 
 
 class TextFieldWithInputText(models.TextField):
-    def formfield( self, **kwargs ):
+    def formfield(self, **kwargs):
         kwargs.update({"widget": forms.TextInput})
         return super(TextFieldWithInputText, self).formfield(**kwargs)
 
@@ -147,10 +147,10 @@ class Person(models.Model):
         verbose_name_plural = 'pessoas'
         ordering = ['name']
 
-    def __str__( self ):
+    def __str__(self):
         return str(self.name)
 
-    def save( self, *args, **kwargs ):
+    def save(self, *args, **kwargs):
         if not self.email:
             self.email = None
 
@@ -158,9 +158,10 @@ class Person(models.Model):
             self.cpf = None
 
         self.check_rules()
+        self.full_clean()
         super(Person, self).save(*args, **kwargs)
 
-    def delete( self, *args, **kwargs ):
+    def delete(self, *args, **kwargs):
         rule.rule_4_desativa_usuario_ao_deletar_pessoa(self)
         super(Person, self).delete(*args, **kwargs)
 
@@ -169,13 +170,13 @@ class Person(models.Model):
         rule.rule_2_ja_existe_outro_usuario_com_mesmo_email(self)
         rule.rule_3_nao_remove_usuario_uma_vez_relacionado(self)
 
-    def get_cpf_display( self ):
+    def get_cpf_display(self):
         cpf = str(self.cpf)
         if not cpf:
             return ''
         return '{0}.{1}.{2}-{3}'.format(cpf[:3], cpf[3:6], cpf[6:9], cpf[9:11])
 
-    def get_birth_date_display( self ):
+    def get_birth_date_display(self):
         if not self.birth_date:
             return '--'
         return self.birth_date.strftime('%d/%m/%Y')

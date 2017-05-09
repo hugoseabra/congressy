@@ -118,8 +118,8 @@ class PersonModelTest(GatherosTestCase):
         self.assertEqual(person.cpf, cpf)
 
     def test_telefone_invalido( self ):
-        person = self._create_person(phone='985525588584558464', persist=False)
-        person.phone = '985525588584558464 55'
+        person = self._create_person(phone='98552558555', persist=False)
+        person.phone = '9855255a as b55'
 
         self._trigger_validation_error(callback=person.save, field='phone')
 
