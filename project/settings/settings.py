@@ -18,13 +18,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
 
-''    # THIRD PARTY
+    # THIRD PARTY
     'formtools',
 
     # KANU_APPS
     'kanu_locations',
 
     # GATHEROS_APPS
+    'core',
     'gatheros_event',
     'gatheros_subscription',
     'gatheros_front',
