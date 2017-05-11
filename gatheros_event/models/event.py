@@ -1,16 +1,9 @@
-from django import forms
 from django.db import models
 
 from core.model import deletable, track_data
 from core.util import slugify
 from . import Category, Organization, Place
 from .rules import event as rule
-
-
-class TextFieldWithInputText(models.TextField):
-    def formfield( self, **kwargs ):
-        kwargs.update({"widget": forms.TextInput})
-        return super(TextFieldWithInputText, self).formfield(**kwargs)
 
 
 # @TODO Cores: encontrar as 2 cores (primária e secundária) mais evidentes das imagens e persisti-las
@@ -34,7 +27,7 @@ class Event(models.Model, deletable.DeletableModel):
         (SUBSCRIPTION_BY_LOTS, 'Gerenciar por lotes'),
     )
 
-    name = TextFieldWithInputText(verbose_name='nome')
+    name = models.CharField(max_length=255, verbose_name='nome')
 
     organization = models.ForeignKey(
         Organization,
@@ -129,7 +122,7 @@ class Event(models.Model, deletable.DeletableModel):
         verbose_name_plural = 'eventos'
         ordering = ('name', 'pk', 'category__name')
 
-    def save( self, *args, **kwargs ):
+    def save(self, *args, **kwargs):
         self._create_unique_slug()
         self.check_rules()
         super(Event, self).save(*args, **kwargs)
@@ -139,14 +132,14 @@ class Event(models.Model, deletable.DeletableModel):
         rule.rule_2_local_deve_ser_da_mesma_organizacao_do_evento(self)
         rule.rule_3_evento_data_final_posterior_atual(self)
 
-    def __str__( self ):
+    def __str__(self):
         return str(self.name)
 
-    def _create_unique_slug( self ):
+    def _create_unique_slug(self):
         self.slug = slugify(model_class=Event, slugify_from=self.name,
                             pk=self.pk)
 
-    def get_period( self ):
+    def get_period(self):
         start_date = self.date_start.date()
         end_date = self.date_end.date()
         start_time = self.date_start.time()

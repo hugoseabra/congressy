@@ -39,13 +39,13 @@ def update_user_context(request, organization=None, user_context=None):
     if organization:
         user_context.update_active_context(organization)
 
-    request.session.update({'user_context': {
+    request.session['user_context'] = {
         'active_organization': user_context.active_organization,
         'active_member_group': user_context.active_member_group,
         'organizations': user_context.organizations,
         'members': user_context.members,
         'superuser': user_context.superuser
-    }})
+    }
     request.session.modified = True
 
     return user_context
@@ -54,6 +54,7 @@ def update_user_context(request, organization=None, user_context=None):
 def clean_user_context(request):
     if 'user_context' in request.session:
         del request.session['user_context']
+        request.session.modified = True
 
 
 class UserRequest(object):
@@ -65,8 +66,23 @@ class UserRequest(object):
     members = []
 
     # Organização ativa no contexto da sessão do usuário
-    active_organization = None
-    active_member_group = None
+    active_organization = {
+        'pk': None,
+        'name': None,
+        'internal': False,
+        'group': None
+    }
+    active_member_group = {
+        'pk': None,
+        'group_name': None,
+        'group': None,
+        'organization': {
+            'pk': None,
+            'name': None,
+            'internal': False,
+            'group': None
+        }
+    }
 
     def __init__(self, user):
         self.logged_user = user
@@ -84,7 +100,6 @@ class UserRequest(object):
             )
 
         try:
-            organization.members.get(person=self.person)
             member = organization.members.get(person=self.person)
 
             self.organization = organization
@@ -92,8 +107,8 @@ class UserRequest(object):
                 organization,
                 member.group
             )
-            self.active_member_group = self.extract_member_data(member
-                                                                )
+            self.active_member_group = self.extract_member_data(member)
+
         except Member.DoesNotExist:
             raise SuspiciousOperation(
                 'Você está tentando entrar em uma organização na qual você não'
@@ -120,11 +135,11 @@ class UserRequest(object):
             self.organizations.append(org_data)
             self.members.append(member_data)
 
-            if not self.active_organization:
+            if self.active_organization['pk'] is None:
                 self.active_organization = org_data
                 self.organization = member.organization
 
-            if not self.active_member_group:
+            if self.active_member_group['pk'] is None:
                 self.active_member_group = member_data
 
     def extract_organization_data(self, organization, group):

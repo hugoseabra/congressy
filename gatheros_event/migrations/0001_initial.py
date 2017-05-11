@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
             name='Event',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', gatheros_event.models.event.TextFieldWithInputText(verbose_name='nome')),
+                ('name', models.CharField(max_length=255, verbose_name='nome')),
                 ('subscription_type', models.CharField(
                     choices=[('disabled', 'Desativadas'), ('simple', 'Simples (gratuitas)'),
                              ('by_lots', 'Gerenciar por lotes')], default='simple',
