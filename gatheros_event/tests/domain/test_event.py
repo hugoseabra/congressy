@@ -97,7 +97,7 @@ class EventModelTest(GatherosTestCase):
         """ REGRA """
         self._trigger_validation_error(
             callback=rule_callback,
-            params=[self.event],
+            params=[self.event, True],
             field='date_end'
         )
 

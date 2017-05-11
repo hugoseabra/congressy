@@ -130,7 +130,7 @@ class Event(models.Model, deletable.DeletableModel):
     def check_rules(self):
         rule.rule_1_data_inicial_antes_da_data_final(self)
         rule.rule_2_local_deve_ser_da_mesma_organizacao_do_evento(self)
-        rule.rule_3_evento_data_final_posterior_atual(self)
+        rule.rule_3_evento_data_final_posterior_atual(self, self._state.adding)
 
     def __str__(self):
         return str(self.name)
