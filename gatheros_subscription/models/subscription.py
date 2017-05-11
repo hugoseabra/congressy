@@ -141,7 +141,8 @@ class Subscription(models.Model):
         else:
             self.attended_on = None
 
-        rule.rule_5_inscricao_apos_data_final_evento(self, self._state.adding)
+        rule.rule_5_inscricao_apos_data_final_lote(self, self._state.adding)
+        rule.rule_6_inscricao_apos_data_final_evento(self, self._state.adding)
 
     def get_count_display(self):
         if not self.count:
