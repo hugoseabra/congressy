@@ -14,7 +14,7 @@ class DeleteViewMixin(LoginRequiredMixin, UserContextViewMixin, DeleteView):
     success_message = "Registro excluído com sucesso!"
     not_allowed_message = 'Você não tem permissão para excluir este registro.'
 
-    def render_to_response( self, context, **response_kwargs ):
+    def render_to_response(self, context, **response_kwargs):
         if self._not_allowed():
             messages.warning(self.request, self.not_allowed_message)
             return redirect(self.success_url.format(**self.object.__dict__))
@@ -24,7 +24,7 @@ class DeleteViewMixin(LoginRequiredMixin, UserContextViewMixin, DeleteView):
             **response_kwargs
         )
 
-    def get_context_data( self, **kwargs ):
+    def get_context_data(self, **kwargs):
         context = super(DeleteViewMixin, self).get_context_data(**kwargs)
         context['protected'] = self.protected
 
@@ -32,7 +32,7 @@ class DeleteViewMixin(LoginRequiredMixin, UserContextViewMixin, DeleteView):
         context['delete_message'] = self.delete_message.format(**data)
         return context
 
-    def get_object( self, queryset=None ):
+    def get_object(self, queryset=None):
         obj = super(DeleteViewMixin, self).get_object(queryset=queryset)
 
         try:
@@ -42,7 +42,7 @@ class DeleteViewMixin(LoginRequiredMixin, UserContextViewMixin, DeleteView):
 
         return obj
 
-    def post( self, request, *args, **kwargs ):
+    def post(self, request, *args, **kwargs):
         if self._not_allowed():
             messages.warning(self.request, self.not_allowed_message)
             return redirect(self.success_url.format(**self.object.__dict__))
@@ -50,9 +50,9 @@ class DeleteViewMixin(LoginRequiredMixin, UserContextViewMixin, DeleteView):
         messages.success(request, self.success_message)
         return super(DeleteViewMixin, self).post(request, *args, **kwargs)
 
-    def can_delete( self ):
+    def can_delete(self):
         raise NotImplementedError('`can_delete()` deve ser implementado.')
 
-    def _not_allowed( self ):
-        return self.user_context.get('superuser', False) is False \
+    def _not_allowed(self):
+        return self.request.user.is_superuser \
                and self.can_delete() is False

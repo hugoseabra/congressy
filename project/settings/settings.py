@@ -42,6 +42,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # GATHEROS_MIDLWARE_CLASSES
+    'core.helper.account.middleware.CurrentUserContextMiddleware',
     'core.helper.account.middleware.CurrentSessionMiddleware',
     'core.helper.account.middleware.CurrentUserMiddleware',
 ]
