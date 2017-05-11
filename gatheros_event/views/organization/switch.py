@@ -18,10 +18,7 @@ class NotAllowedOrganization(IntegrityError):
 class OrganizationSwitch(RedirectView):
     def post(self, request, *args, **kwargs):
         pk = request.POST.get('organization-context-pk', None)
-        next_path = request.POST.get(
-            'next',
-            reverse_lazy('gatheros_front:home')
-        )
+
         if not pk:
             return
 
@@ -35,5 +32,11 @@ class OrganizationSwitch(RedirectView):
 
         messages.info(request, "Agora você {}.".format(context))
 
-        self.url = next_path
         return super(OrganizationSwitch, self).post(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return self.request.POST.get(
+            'next',
+            reverse_lazy('gatheros_front:home')
+        )
+
