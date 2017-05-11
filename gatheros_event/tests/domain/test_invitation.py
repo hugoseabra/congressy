@@ -28,10 +28,10 @@ class InvitationModelTest(GatherosTestCase):
             if not to:
                 invitation_user_pks = [
                     e.to.pk for e in Invitation.objects.all()
-                    ]
+                ]
                 members_user_pks = [
                     e.person.user.pk for e in author.organization.members.all()
-                    ]
+                ]
 
                 pks = invitation_user_pks + members_user_pks
                 pks.append(author.person.user.pk)

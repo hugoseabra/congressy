@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.views.generic import DeleteView
 
@@ -7,7 +6,7 @@ from core.model.deletable import NotDeletableError
 from core.view.user_context import UserContextViewMixin
 
 
-class DeleteViewMixin(LoginRequiredMixin, UserContextViewMixin, DeleteView):
+class DeleteViewMixin(UserContextViewMixin, DeleteView):
     protected = False
     message = None
     delete_message = 'Tem certeza que deseja excluir?'

@@ -21,13 +21,13 @@ class AnswerModelTest(GatherosTestCase):
         '006_subscription',
     ]
 
-    def _get_field( self ):
+    def _get_field(self):
         return Field.objects.filter(form_default_field=False).first()
 
-    def _get_subscription( self, event ):
+    def _get_subscription(self, event):
         return Subscription.objects.filter(event=event).first()
 
-    def _create_answer( self, field=None, subscription=None, **kwargs ):
+    def _create_answer(self, field=None, subscription=None, **kwargs):
         if not field:
             field = self._get_field()
 
@@ -41,7 +41,7 @@ class AnswerModelTest(GatherosTestCase):
         }
         return self._create_model(Model=Answer, data=data, **kwargs)
 
-    def test_rule_1_campo_inscricao_formulario_mesmo_evento( self ):
+    def test_rule_1_campo_inscricao_formulario_mesmo_evento(self):
         rule_callback = rule.rule_1_campo_inscricao_formulario_mesmo_evento
 
         event1 = Event.objects.get(pk=1)
@@ -53,7 +53,11 @@ class AnswerModelTest(GatherosTestCase):
         answer = self._create_answer(field=field, subscription=subscription)
 
         """ RULE """
-        self._trigger_validation_error(callback=rule_callback, params=[answer], field='field')
+        self._trigger_validation_error(
+            callback=rule_callback,
+            params=[answer],
+            field='field'
+        )
 
         """ MODEL """
         self._trigger_validation_error(callback=answer.save, field='field')
@@ -62,7 +66,7 @@ class AnswerModelTest(GatherosTestCase):
         answer.subscription = Subscription.objects.filter(event=event1).first()
         answer.save()
 
-    def test_rule_2_resposta_apenas_se_campo_adicional( self ):
+    def test_rule_2_resposta_apenas_se_campo_adicional(self):
         rule_callback = rule.rule_2_resposta_apenas_se_campo_adicional
 
         event = Event.objects.get(pk=1)
@@ -72,7 +76,11 @@ class AnswerModelTest(GatherosTestCase):
         answer = self._create_answer(field=field, subscription=subscription)
 
         """ RULE """
-        self._trigger_validation_error(callback=rule_callback, params=[answer], field='field')
+        self._trigger_validation_error(
+            callback=rule_callback,
+            params=[answer],
+            field='field'
+        )
 
         """ MODEL """
         self._trigger_validation_error(callback=answer.save, field='field')
@@ -82,17 +90,25 @@ class AnswerModelTest(GatherosTestCase):
         field.save()
         answer.save()
 
-    def test_rule_3_resposta_com_tipo_correto( self ):
+    def test_rule_3_resposta_com_tipo_correto(self):
         rule_callback = rule.rule_3_resposta_com_tipo_correto
 
-        def check_value_type_as_list( type ):
+        def check_value_type_as_list(type):
             event = Event.objects.get(pk=1)
-            field = event.form.fields.filter(form_default_field=False, type=type).first()
+            field = event.form.fields.filter(
+                form_default_field=False,
+                type=type
+            ).first()
+
             subscription = Subscription.objects.filter(event=event).first()
             answer = self._create_answer(field=field, subscription=subscription)
 
             """ RULE """
-            self._trigger_validation_error(callback=rule_callback, params=[answer], field='value')
+            self._trigger_validation_error(
+                callback=rule_callback,
+                params=[answer],
+                field='value'
+            )
 
             """ MODEL """
             self._trigger_validation_error(callback=answer.save, field='value')
@@ -102,15 +118,23 @@ class AnswerModelTest(GatherosTestCase):
             field.save()
             answer.save()
 
-        def check_value_type_as_string( type ):
+        def check_value_type_as_string(type):
             event = Event.objects.get(pk=2)
-            field = event.form.fields.filter(form_default_field=False, type=type).first()
+            field = event.form.fields.filter(
+                form_default_field=False,
+                type=type
+            ).first()
+
             subscription = Subscription.objects.filter(event=event).first()
             answer = self._create_answer(field=field, subscription=subscription)
             answer.value = '{"value": ["A", "B"]}'
 
             """ RULE """
-            self._trigger_validation_error(callback=rule_callback, params=[answer], field='value')
+            self._trigger_validation_error(
+                callback=rule_callback,
+                params=[answer],
+                field='value'
+            )
 
             """ MODEL """
             self._trigger_validation_error(callback=answer.save, field='value')

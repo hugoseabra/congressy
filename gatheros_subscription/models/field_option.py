@@ -34,6 +34,9 @@ class FieldOption(models.Model):
         rule.rule_1_somente_campos_com_opcoes(self)
 
     def __str__(self):
-        return '{} [{}] - {} ({})'.format(self.name, self.value,
-                                          self.field.label,
-                                          self.field.form.event.name)
+        return '{} [{}] - {} ({})'.format(
+            self.name,
+            self.value,
+            self.field.label,
+            self.field.form.event.name
+        )

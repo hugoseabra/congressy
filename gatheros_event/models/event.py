@@ -115,7 +115,8 @@ class Event(models.Model, deletable.DeletableModel):
         default=False,
         verbose_name='publicado',
         help_text='Eventos não publicados e com data futura serão considerados'
-                  ' rascunhos.')
+                  ' rascunhos.'
+    )
 
     class Meta:
         verbose_name = 'evento'
@@ -136,8 +137,11 @@ class Event(models.Model, deletable.DeletableModel):
         return str(self.name)
 
     def _create_unique_slug(self):
-        self.slug = slugify(model_class=Event, slugify_from=self.name,
-                            pk=self.pk)
+        self.slug = slugify(
+            model_class=Event,
+            slugify_from=self.name,
+            pk=self.pk
+        )
 
     def get_period(self):
         start_date = self.date_start.date()
@@ -146,13 +150,14 @@ class Event(models.Model, deletable.DeletableModel):
         end_time = self.date_end.time()
 
         if start_date < end_date:
-            return 'De ' + self.date_start.strftime(
-                '%d/%m/%Y %Hh%M') + ' a ' + self.date_end.strftime(
-                '%d/%m/%Y %Hh%M')
+            period = 'De ' + self.date_start.strftime('%d/%m/%Y %Hh%M')
+            period += ' a ' + self.date_end.strftime('%d/%m/%Y %Hh%M')
 
         if start_date == end_date:
-            return self.date_start.strftime('%d/%m/%Y') \
-                   + ' das ' \
-                   + start_time.strftime('%Hh%M') \
-                   + ' às ' \
-                   + end_time.strftime('%Hh%M')
+            period = self.date_start.strftime('%d/%m/%Y')
+            period += ' das '
+            period += start_time.strftime('%Hh%M')
+            period += ' às '
+            period += end_time.strftime('%Hh%M')
+
+        return period

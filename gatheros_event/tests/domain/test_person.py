@@ -17,36 +17,38 @@ class PersonModelTest(GatherosTestCase):
         '008_member'
     ]
 
-    def _get_person_with_no_user( self ):
+    def _get_person_with_no_user(self):
         return Person.objects.get(pk='e50e56e7-2686-497f-82b1-a2500243f12b')
 
-    def _get_person_with_internal_organization( self ):
+    def _get_person_with_internal_organization(self):
         return Person.objects.get(pk='a7c5f518-7669-4b71-a83b-2a7107e9c313')
 
-    def _get_person_with_external_organization( self ):
+    def _get_person_with_external_organization(self):
         return Person.objects.get(pk='5c76d747-f22a-4d27-9211-3b9929fb908d')
 
-    def _create_person( self, persist=True, **kwargs ):
+    def _create_person(self, persist=True, **kwargs):
         data = {
             'name': 'Test',
             'gender': 'M',
             'city': City.objects.get(pk=5413)
         }
-        return self._create_model(Model=Person, data=data, persist=persist, **kwargs)
+        return self._create_model(Model=Person, data=data, persist=persist,
+                                  **kwargs)
 
-    def test_rule_1_has_user_deve_ter_email( self ):
+    def test_rule_1_has_user_deve_ter_email(self):
         rule_callback = rule.rule_1_has_user_deve_ter_email
 
         person = self._get_person_with_no_user()
         person.has_user = True
 
         """ REGRA """
-        self._trigger_validation_error(callback=rule_callback, params=[person], field='email')
+        self._trigger_validation_error(callback=rule_callback, params=[person],
+                                       field='email')
 
         """ MODEL """
         self._trigger_validation_error(callback=person.save, field='email')
 
-    def test_rule_2_ja_existe_outro_usuario_com_mesmo_email( self ):
+    def test_rule_2_ja_existe_outro_usuario_com_mesmo_email(self):
         rule_callback = rule.rule_2_ja_existe_outro_usuario_com_mesmo_email
 
         user = User.objects.first()
@@ -56,12 +58,13 @@ class PersonModelTest(GatherosTestCase):
         person.email = user.email
 
         """ REGRA """
-        self._trigger_validation_error(callback=rule_callback, params=[person], field='email')
+        self._trigger_validation_error(callback=rule_callback, params=[person],
+                                       field='email')
 
         """ MODEL """
         self._trigger_validation_error(callback=person.save, field='email')
 
-    def test_rule_3_nao_remove_usuario_uma_vez_relacionado( self ):
+    def test_rule_3_nao_remove_usuario_uma_vez_relacionado(self):
         rule_callback = rule.rule_3_nao_remove_usuario_uma_vez_relacionado
 
         person = self._get_person_with_no_user()
@@ -73,12 +76,13 @@ class PersonModelTest(GatherosTestCase):
         person.has_user = False
 
         """ REGRA """
-        self._trigger_validation_error(callback=rule_callback, params=[person], field='has_user')
+        self._trigger_validation_error(callback=rule_callback, params=[person],
+                                       field='has_user')
 
         """ MODEL """
         self._trigger_validation_error(callback=person.save, field='has_user')
 
-    def test_rule_4_desativa_usuario_ao_deletar_pessoa( self ):
+    def test_rule_4_desativa_usuario_ao_deletar_pessoa(self):
         rule_callback = rule.rule_4_desativa_usuario_ao_deletar_pessoa
 
         def create_person_with_active_user():
@@ -106,7 +110,7 @@ class PersonModelTest(GatherosTestCase):
         user = User.objects.get(pk=user_pk)
         self.assertFalse(user.is_active)
 
-    def test_cpf_invalido( self ):
+    def test_cpf_invalido(self):
         person = self._create_person(cpf='84188838737', persist=False)
 
         self._trigger_validation_error(callback=person.save, field='cpf')
@@ -117,7 +121,7 @@ class PersonModelTest(GatherosTestCase):
         person.save()
         self.assertEqual(person.cpf, cpf)
 
-    def test_telefone_invalido( self ):
+    def test_telefone_invalido(self):
         person = self._create_person(phone='98552558555', persist=False)
         person.phone = '9855255a as b55'
 
@@ -128,7 +132,7 @@ class PersonModelTest(GatherosTestCase):
         person.phone = phone
         person.save()
 
-    def test_email_invalido( self ):
+    def test_email_invalido(self):
         person = self._create_person()
 
         # Sem nick e @
@@ -144,7 +148,7 @@ class PersonModelTest(GatherosTestCase):
         person.email = email
         self.assertEqual(person.email, email)
 
-    def test_muda_nome_de_pessoa_e_de_organizacao( self ):
+    def test_muda_nome_de_pessoa_e_de_organizacao(self):
         # Test if internal organization name is edited
         person = self._get_person_with_internal_organization()
         person.name = 'Edited name'
@@ -161,7 +165,8 @@ class PersonModelTest(GatherosTestCase):
         # Test if external organization name is edited
         person = self._get_person_with_external_organization()
 
-        member = person.members.filter(group=Member.ADMIN, organization__internal=False).first()
+        member = person.members.filter(group=Member.ADMIN,
+                                       organization__internal=False).first()
         self.assertIsNotNone(member)
 
         person.name = 'Edited name'
@@ -173,7 +178,7 @@ class PersonModelTest(GatherosTestCase):
         self.assertNotEqual(person.name, organization.name)
         self.assertNotEqual(person.name, org_name)
 
-    def test_muda_nome_de_pessoa_e_de_usuario( self ):
+    def test_muda_nome_de_pessoa_e_de_usuario(self):
         person = self._create_person(
             name='Another Test',
             has_user=True,

@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -22,11 +21,7 @@ def add_new_place(wizard):
     return form.add_new_place is True
 
 
-class ManagerView(
-    LoginRequiredMixin,
-    UserContextViewMixin,
-    SessionWizardView
-):
+class ManagerView(UserContextViewMixin, SessionWizardView):
     model_name = 'event'
     template_name = 'gatheros_event/event/wizard/wizard.html'
 

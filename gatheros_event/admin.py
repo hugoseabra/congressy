@@ -181,7 +181,7 @@ class MemberAdmin(admin.ModelAdmin):
     ordering = ('organization', 'person')
     readonly_fields = ['accepted_on']
 
-    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "person":
             kwargs["queryset"] = Person.objects.filter(has_user=True).order_by(
                 'name')
@@ -197,7 +197,7 @@ class InvitationAdmin(admin.ModelAdmin):
         'author', 'get_user', 'get_organization', 'created', 'expired')
     readonly_fields = ['created', 'expired']
 
-    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "author":
             kwargs["queryset"] = Member.objects.filter(group=Member.ADMIN,
                                                        organization__internal=False)
@@ -206,10 +206,10 @@ class InvitationAdmin(admin.ModelAdmin):
                                                                      request,
                                                                      **kwargs)
 
-    def get_organization( self, instance ):
+    def get_organization(self, instance):
         return instance.author.organization
 
-    def get_user( self, instance ):
+    def get_user(self, instance):
         return '{} {} ({})'.format(instance.to.first_name,
                                    instance.to.last_name, instance.to.email)
 

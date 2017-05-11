@@ -4,7 +4,7 @@ from django.test import TestCase
 
 
 class GatherosTestCase(TestCase):
-    def _trigger_validation_error( self, callback, params=None, field=None ):
+    def _trigger_validation_error(self, callback, params=None, field=None):
         self._trigger_error(
             error_class=ValidationError,
             callback=callback,
@@ -12,14 +12,14 @@ class GatherosTestCase(TestCase):
             field=field
         )
 
-    def _trigger_integrity_error( self, callback, params=None ):
+    def _trigger_integrity_error(self, callback, params=None):
         self._trigger_error(
             error_class=IntegrityError,
             callback=callback,
             params=params
         )
 
-    def _trigger_error( self, error_class, callback, params, field=None ):
+    def _trigger_error(self, error_class, callback, params, field=None):
         if not params:
             params = []
 
@@ -29,7 +29,7 @@ class GatherosTestCase(TestCase):
         if field:
             self.assertTrue(field in dict(e.exception))
 
-    def _create_model( self, Model, data, persist=False, **kwargs ):
+    def _create_model(self, Model, data, persist=False, **kwargs):
         data.update(**kwargs)
         entity = Model(**data)
 

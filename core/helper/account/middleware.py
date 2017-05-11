@@ -91,7 +91,9 @@ class CurrentUserContextMiddleware(object):
 
 
 def get_user_context():
-    return _user_context.value if hasattr(
+    uc = _user_context.value if hasattr(
         _user_context,
         'value'
-    ) else UserContext()
+    ) else None
+
+    return UserContext() if not uc else uc

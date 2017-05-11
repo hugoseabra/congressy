@@ -14,7 +14,7 @@ class TestModelFieldOption(GatherosTestCase):
         '003_field',
     ]
 
-    def _get_field( self ):
+    def _get_field(self):
         field = Field.objects.last()
         # Forcing to test
         field.type = Field.FIELD_SELECT
@@ -22,7 +22,7 @@ class TestModelFieldOption(GatherosTestCase):
         field.save()
         return field
 
-    def _create_field_option( self, field=None, **kwargs ):
+    def _create_field_option(self, field=None, **kwargs):
         if not field:
             field = self._get_field()
         data = {
@@ -32,7 +32,7 @@ class TestModelFieldOption(GatherosTestCase):
         }
         return self._create_model(Model=FieldOption, data=data, **kwargs)
 
-    def test_rule_1_somente_campos_com_opcoes( self ):
+    def test_rule_1_somente_campos_com_opcoes(self):
         rule_callback = rule.rule_1_somente_campos_com_opcoes
 
         field_option = self._create_field_option()
@@ -40,10 +40,17 @@ class TestModelFieldOption(GatherosTestCase):
         field_option.field.save()
 
         """ RULE """
-        self._trigger_validation_error(callback=rule_callback, params=[field_option], field='field')
+        self._trigger_validation_error(
+            callback=rule_callback,
+            params=[field_option],
+            field='field'
+        )
 
         """ MODEL """
-        self._trigger_validation_error(callback=field_option.save, field='field')
+        self._trigger_validation_error(
+            callback=field_option.save,
+            field='field'
+        )
 
         """ FUNCIONANDO """
         field_option.field.type = Field.FIELD_RADIO_GROUP
