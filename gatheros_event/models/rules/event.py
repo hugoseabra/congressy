@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.core.exceptions import ValidationError
 
 
@@ -15,4 +17,11 @@ def rule_2_local_deve_ser_da_mesma_organizacao_do_evento(entity):
     if entity.place and entity.place.organization != entity.organization:
         raise ValidationError({'place': [
             'Evento e Local não são da mesma organização.'
+        ]})
+
+
+def rule_3_evento_data_final_posterior_atual(entity):
+    if entity.date_end < datetime.now():
+        raise ValidationError({'date_end': [
+            'Não é possível cadastrar eventos que já tenha se encerrado.'
         ]})

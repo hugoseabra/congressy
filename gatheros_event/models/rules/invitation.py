@@ -27,7 +27,7 @@ def rule_4_administrador_nao_pode_se_convidar(entity):
         raise ValidationError(
             {'to': [
                 'Não é permitido um administrador se convidar para uma '
-                'organização.'.format(author.name)
+                'organização.'
             ]}
         )
 
