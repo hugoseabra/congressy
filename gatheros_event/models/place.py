@@ -22,7 +22,7 @@ class Place(models.Model):
     )
 
     phone = models.CharField(
-        max_length=9,
+        max_length=12,
         blank=True,
         null=True,
         verbose_name='telefone'

@@ -9,9 +9,9 @@ from django.conf import settings
 from django.core.management import call_command
 from django.db import migrations, models
 
-from core.model import validator
 import gatheros_event.models.event
 import gatheros_event.models.person
+from core.model import validator
 
 
 def load_initial_data(*_):
@@ -184,7 +184,7 @@ class Migration(migrations.Migration):
                                                                                    verbose_name='complemento')),
                 ('village',
                  gatheros_event.models.person.TextFieldWithInputText(blank=True, null=True, verbose_name='bairro')),
-                ('phone', models.CharField(blank=True, max_length=11, null=True,
+                ('phone', models.CharField(blank=True, max_length=12, null=True,
                                            validators=[validator.phone_validator],
                                            verbose_name='telefone')),
                 ('avatar', models.ImageField(blank=True, null=True, upload_to='', verbose_name='foto')),
@@ -227,7 +227,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255, verbose_name='nome')),
-                ('phone', models.CharField(blank=True, max_length=9, null=True, verbose_name='telefone')),
+                ('phone', models.CharField(blank=True, max_length=12, null=True,
+                                           verbose_name='telefone')),
                 ('long', models.DecimalField(blank=True, decimal_places=3, max_digits=8, null=True)),
                 ('lat', models.DecimalField(blank=True, decimal_places=3, max_digits=8, null=True)),
                 ('zip_code', models.CharField(blank=True, max_length=8, null=True, verbose_name='CEP')),

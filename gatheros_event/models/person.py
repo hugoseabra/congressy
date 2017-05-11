@@ -81,7 +81,7 @@ class Person(models.Model):
         verbose_name='bairro'
     )
     phone = models.CharField(
-        max_length=11,
+        max_length=12,
         blank=True,
         null=True,
         verbose_name='telefone',
