@@ -1,0 +1,17 @@
+{% extends "gatheros_event/event/wizard/base_wizard.html" %}
+{% load i18n static %}
+
+{% block wizard_form %}
+    {% block html_pre_form %}{% endblock %}
+    {{ wizard.form.media }}
+    {{ wizard.management_form }}
+    {% if wizard.form.forms %}
+        {{ wizard.form.management_form }}
+        {% for form in wizard.form.forms %}
+            {{ form }}
+        {% endfor %}
+    {% else %}
+        {{ wizard.form }}
+    {% endif %}
+    {% block html_post_form %}{% endblock %}
+{% endblock %}

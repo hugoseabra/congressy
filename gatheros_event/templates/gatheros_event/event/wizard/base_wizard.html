@@ -1,0 +1,36 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+    {{ wizard.form.media }}
+{% endblock %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:event-list' %}">Cancelar</a>
+    </div>
+    <hr/>
+    <h1>Adicionar Evento</h1>
+    <p>Passo {{ wizard.steps.step1 }} de {{ wizard.steps.count }}</p>
+
+    <form action="" method="post">{% csrf_token %}
+        <table>
+            {% block wizard_form %}{% endblock %}
+        </table>
+        <br>
+        <hr/>
+        {% if wizard.steps.prev %}
+            <button name="wizard_goto_step" type="submit"
+                    value="{{ wizard.steps.first }}" formnovalidate>Início
+            </button>
+            <button name="wizard_goto_step" type="submit"
+                    value="{{ wizard.steps.prev }}" formnovalidate>Anterior
+            </button>
+        {% endif %}
+        {% if wizard.steps.step1 == wizard.steps.count %}
+            <input type="submit" value="Salvar"/>
+        {% else %}
+            <input type="submit" value="Próximo"/>
+        {% endif %}
+    </form>
+{% endblock %}
