@@ -35,7 +35,11 @@ class EventModelTest(TestCase):
 
         event.subscription_type = Event.SUBSCRIPTION_SIMPLE
         event.save()
-        # When configuring to SUBSCRIPTION_SIMPLE, one internal lot is created automatically
+
+        """
+        When configuring to SUBSCRIPTION_SIMPLE, one internal lot is created
+        automatically
+        """
         self.assertEqual(event.lots.count(), 1)
 
         event.subscription_type = Event.SUBSCRIPTION_DISABLED
@@ -116,7 +120,11 @@ class EventModelTest(TestCase):
 
         event.subscription_type = Event.SUBSCRIPTION_SIMPLE
         event.save()
-        # When configuring to SUBSCRIPTION_SIMPLE, one internal lot is created automatically
+
+        """
+        When configuring to SUBSCRIPTION_SIMPLE, one internal lot is created
+        automatically
+        """
         self.assertEqual(event.lots.count(), 1)
 
         lot = event.lots.first()
@@ -124,7 +132,7 @@ class EventModelTest(TestCase):
 
     def test_enable_simples_subscription_lots_with_no_subscriptions( self ):
         # Fixture is SUBSCRIPTION_BY_LOTS
-        event = Event.objects.get(pk=6)
+        event = self._get_event(pk=6)
 
         # Fixture has 4 lots related
         self.assertEqual(event.lots.count(), 4)
@@ -141,7 +149,7 @@ class EventModelTest(TestCase):
 
     def test_enable_simples_subscription_lots_with_subscriptions( self ):
         # Fixture is SUBSCRIPTION_BY_LOTS
-        event = Event.objects.get(pk=11)
+        event = self._get_event(pk=11)
         # Fixture has 2 lot related
         self.assertEqual(event.lots.count(), 2)
 
@@ -177,7 +185,10 @@ class EventModelTest(TestCase):
 
         event.subscription_type = Event.SUBSCRIPTION_BY_LOTS
         event.save()
-        # When configuring to SUBSCRIPTION_SUBSCRIPTION_BY_LOTS, one external lot is created automatically
+        """
+        When configuring to SUBSCRIPTION_SUBSCRIPTION_BY_LOTS, one external lot
+        is created automatically
+        """
         self.assertEqual(event.lots.count(), 1)
 
         # Lot must be external
@@ -185,7 +196,7 @@ class EventModelTest(TestCase):
         self.assertFalse(lot.internal)
 
     def test_enable_subscription_by_lots_with_lots( self ):
-        event = Event.objects.get(pk=1)
+        event = self._get_event(pk=1)
 
         # Fixture is SUBSCRIPTION_SIMPLE
         self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_SIMPLE)
@@ -200,7 +211,10 @@ class EventModelTest(TestCase):
         event.subscription_type = Event.SUBSCRIPTION_BY_LOTS
         event.save()
 
-        # When configuring to SUBSCRIPTION_SUBSCRIPTION_BY_LOTS, lot is converted to external
+        """
+        When configuring to SUBSCRIPTION_SUBSCRIPTION_BY_LOTS, lot is converted
+        to external
+        """
         # Event MUST have ONE LOT
         self.assertEqual(event.lots.count(), 1)
 

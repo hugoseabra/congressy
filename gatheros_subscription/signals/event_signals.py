@@ -9,7 +9,7 @@ from gatheros_subscription.models import Lot
 
 
 @receiver(post_save, sender=Event)
-def manage_related_lot_when_subscription_enabled( instance, created, raw, **_ ):
+def manage_related_lot_when_subscription_enabled(instance, created, raw, **_):
     # Disable when loaded by fixtures
     if raw is True:
         return
@@ -39,22 +39,24 @@ def manage_related_lot_when_subscription_enabled( instance, created, raw, **_ ):
         _create_external_lot(event=instance)
 
 
-def _remove_lots( event ):
+def _remove_lots(event):
     for lot in event.lots.all():
         if lot.subscriptions.count() > 0:
-            raise Exception('Lote já possui inscrições. Não desativar as inscrições.')
+            raise Exception(
+                'Lote já possui inscrições. Não desativar as inscrições.'
+            )
 
     event.lots.all().delete()
 
 
-def _get_lot_date_start( event ):
+def _get_lot_date_start(event):
     if event.date_start > datetime.now():
         return datetime.now()
 
     return event.date_start - timedelta(days=1)
 
 
-def _create_internal_lot( event ):
+def _create_internal_lot(event):
     Lot.objects.create(
         name=Lot.INTERNAL_DEFAULT_NAME,
         event=event,
@@ -63,7 +65,7 @@ def _create_internal_lot( event ):
     )
 
 
-def _create_external_lot( event ):
+def _create_external_lot(event):
     Lot.objects.create(
         name='Lote 1',
         event=event,
@@ -72,7 +74,7 @@ def _create_external_lot( event ):
     )
 
 
-def _merge_lots_and_subscriptions( event ):
+def _merge_lots_and_subscriptions(event):
     """
     1. check if lot(s) has(have) subscription(s)
     2. find the most recent lot
@@ -104,10 +106,12 @@ def _merge_lots_and_subscriptions( event ):
     most_recent_lot.name = Lot.INTERNAL_DEFAULT_NAME
     most_recent_lot.internal = True
     most_recent_lot.price = None
+    most_recent_lot.date_start = _get_lot_date_start(event)
+    most_recent_lot.date_end = None
     most_recent_lot.save()
 
 
-def _merge_subscriptions( lot, subscriptions ):
+def _merge_subscriptions(lot, subscriptions):
     # normalize
     subscription_counter = 0
     for sub in subscriptions:
@@ -123,7 +127,7 @@ def _merge_subscriptions( lot, subscriptions ):
             subscription_counter += 1
 
 
-def _convert_internal_lot_to_external( event ):
+def _convert_internal_lot_to_external(event):
     lots = event.lots.all().order_by('pk')
 
     if lots.count() == 0:

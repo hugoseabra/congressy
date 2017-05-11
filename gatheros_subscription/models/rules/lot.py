@@ -92,7 +92,10 @@ def rule_10_lote_privado_deve_ter_codigo_promocional(lot):
         ]})
 
 
-def rule_11_lot_apos_data_final_evento(lot):
-    if not lot.pk and lot.event.date_end < datetime.now():
+def rule_11_evento_encerrado_nao_pode_ter_novo(lot, adding=True):
+    if adding is True and datetime.now() > lot.event.date_end:
         raise IntegrityError(
-            'O evento já foi encerrado e não pode mais ter novos lotes.')
+            'O evento \'{}\' já foi encerrado e não pode ter novo lote'.format(
+                lot.event.name
+            )
+        )

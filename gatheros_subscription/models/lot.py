@@ -128,7 +128,10 @@ class Lot(models.Model):
         rule.rule_7_data_final_antes_data_inicial_evento(self)
         rule.rule_8_lot_interno_nao_pode_ter_preco(self)
         rule.rule_9_lote_pago_deve_ter_limite(self)
-        rule.rule_11_lot_apos_data_final_evento(self)
+        rule.rule_11_evento_encerrado_nao_pode_ter_novo(
+            self,
+            self._state.adding
+        )
 
     def __str__(self):
         return '{} - {}'.format(self.event.name, self.name)
