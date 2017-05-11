@@ -1,4 +1,8 @@
-def user_context( request ):
+from core.helper.account.middleware import UserContext
+
+
+def user_context(request):
+    uc = UserContext(request.session)
     return {
-        'user_context': request.session.get('user_context', {})
+        'user_context': uc.__dict__
     }

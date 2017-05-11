@@ -1,22 +1,22 @@
 from django.contrib import messages
 from django.db import IntegrityError
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView
-from django.shortcuts import get_object_or_404
 
-from gatheros_event.models import Organization
 from gatheros_event.acl.gatheros_user_context import update_user_context
+from gatheros_event.models import Organization
 
 
 class NotAllowedOrganization(IntegrityError):
-    def __init__( self, *args, **kwargs ):
+    def __init__(self, *args, **kwargs):
         super(NotAllowedOrganization, self).__init__(*args, **kwargs)
 
 
 # @TODO Refatorar para inserir dados em sessão e mudança de contexto
 
 class OrganizationSwitch(RedirectView):
-    def post( self, request, *args, **kwargs ):
+    def post(self, request, *args, **kwargs):
         pk = request.POST.get('organization-context-pk', None)
         next_path = request.POST.get(
             'next',

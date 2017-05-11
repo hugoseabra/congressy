@@ -17,7 +17,7 @@ class EventDeleteView(DeleteViewMixin):
 
     success_message = "Evento excluído com sucesso!"
 
-    def can_delete( self ):
+    def can_delete(self):
         event = self.get_object()
         organization = event.organization
         active_organization = self.user_context['active_organization']
