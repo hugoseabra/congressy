@@ -21,7 +21,6 @@ class EventDeleteTest(TestCase):
     ]
 
     def setUp(self):
-        self.user_password = '123'
         self.event_pk = 6
 
     def _remove_subscriptions(self):
@@ -61,20 +60,19 @@ class EventDeleteTest(TestCase):
         assert member is not None
         user = member.person.user
         user.is_active = True
-        user.set_password(self.user_password)
         user.save()
         return user
 
     def _event_owner_login(self):
         user = self._get_user(Member.ADMIN)
         assert user is not None
-        self.client.login(username=user.username, password=self.user_password)
+        assert self.client.login(testcase_user=user)
         self._switch_context(group=Member.ADMIN)
 
     def _event_helper_login(self):
         user = self._get_user(group=Member.HELPER)
         assert user is not None
-        self.client.login(username=user.username, password=self.user_password)
+        assert self.client.login(testcase_user=user)
         self._switch_context(group=Member.HELPER)
 
     def _process_delete(self, remove=True):

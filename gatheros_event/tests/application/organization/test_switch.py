@@ -1,9 +1,8 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from django.contrib.auth.models import User
-from core.model.deletable import NotDeletableError
-from gatheros_event.models import Event, Organization, Member
+from gatheros_event.models import Organization
 
 
 class OrganizationSwitchTest(TestCase):
@@ -21,24 +20,13 @@ class OrganizationSwitchTest(TestCase):
 
     def setUp(self):
         # Usuário com várias organizações
-        self.user_pk = 4
-        self.user_password = '123'
+        self.user = User.objects.get(pk=4)
+        assert self.user is not None
+
         self.url = reverse('gatheros_event:organization-switch')
 
-    def _get_user(self):
-        user = User.objects.get(pk=self.user_pk)
-        assert user is not None
-        user.set_password(self.user_password)
-        user.save()
-        return user
-
     def _login(self):
-        user = self._get_user()
-        assert self.client.login(
-            username=user.username,
-            password=self.user_password
-        )
-        return user
+        assert self.client.login(testcase_user=self.user)
 
     def _get_user_context(self):
         return self.client.session['user_context']

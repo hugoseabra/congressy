@@ -1,4 +1,3 @@
-# test_internal_edition_not_allowed
 from unittest import skip
 
 from django.contrib.auth.models import User
