@@ -1,9 +1,10 @@
 from django.core.exceptions import ImproperlyConfigured
 from permission import add_permission_logic
+from permission.compat import is_authenticated
 from permission.logics.base import PermissionLogic
 from permission.utils.field_lookup import field_lookup
 
-from .models import Organization, Person
+from .models import Member, Organization, Person
 
 
 class CustomPermissionLogic(PermissionLogic):
@@ -27,6 +28,9 @@ class CustomPermissionLogic(PermissionLogic):
         self.field_organization = field_organization
 
     def has_perm(self, user_obj, perm, obj=None):
+        if not is_authenticated(user_obj):
+            return False
+
         if self.field_organization:
             obj = field_lookup(obj, self.field_organization)
 
@@ -68,3 +72,8 @@ add_permission_logic(Organization, logic)
 # Organização -> Membro
 logic = CustomPermissionLogic(is_member, ['can_view', ])
 add_permission_logic(Organization, logic)
+
+# Organização -> Admin -> membros
+logic = CustomPermissionLogic(is_admin_not_internal, ['delete_member', ],
+                              'organization')
+add_permission_logic(Member, logic)
