@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView
@@ -12,8 +12,6 @@ from gatheros_event.models import Organization
 
 class OrganizationSwitch(RedirectView):
     def post(self, request, *args, **kwargs):
-        if not hasattr(request.user, 'person'):
-            raise SuspiciousOperation('Usuário não possui vínculo com pessoa.')
 
         pk = request.POST.get('organization-context-pk', None)
 
@@ -22,7 +20,7 @@ class OrganizationSwitch(RedirectView):
             return self.get(request, *args, **kwargs)
 
         organization = get_object_or_404(Organization, pk=pk)
-        if not organization.is_member(request.user.person):
+        if not organization.is_member(request.user):
             raise PermissionDenied('Você não é membro desta organização.')
 
         update_user_context(request, organization)
