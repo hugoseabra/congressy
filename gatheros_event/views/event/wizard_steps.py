@@ -1,5 +1,5 @@
 from django.forms import ModelForm, Widget, fields as form_fields
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.utils.safestring import mark_safe
 
 from core.view.user_context import UserContextFormMixin
@@ -41,18 +41,18 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
         return get_object_or_404(Organization, pk=self.organization.pk)
 
     def clean_place(self):
-        pk = self.cleaned_data['place']
+        place_pk = self.cleaned_data['place']
 
-        if pk == 'add-place':
+        if place_pk == 'add-place':
             EventFormPlaceNew.add_new_place = True
-        elif pk:
-            return get_object_or_404(Place, pk=pk)
+        elif place_pk:
+            return get_object_or_404(Place, pk=place_pk)
 
     def _create_organization_field(self):
         organization = self.user_context.active_organization
 
         class OrganizationWidget(Widget):
-            def render(self, **kwargs):
+            def render(self, name, value, attrs=None, renderer=None):
                 return mark_safe(organization.name)
 
         self.fields['organization'] = form_fields.CharField(
@@ -64,8 +64,7 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
     def _filter_place_field(self):
 
         organization = self.user_context.active_organization
-        places = Place.objects.filter(organization__pk=organization.pk)
-        # places = [(place.pk, place.name) for place in places]
+        places = get_list_or_404(Place, organization__pk=organization.pk)
 
         if self.instance.pk:
             place_choices = ([(place.pk, place.name) for place in places])

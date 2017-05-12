@@ -1,4 +1,3 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import classonlymethod
 from django.views.generic import ListView, View
 
@@ -7,15 +6,15 @@ from core.view.user_context import UserContextViewMixin
 from gatheros_event.models import Event, Member
 
 
-class ManagerView(LoginRequiredMixin, UserContextViewMixin, ListView):
+class ManagerView(UserContextViewMixin, ListView):
     model = Event
     template_name = 'gatheros_event/event/list.html'
     ordering = ['name']
 
     def get_queryset(self):
-        qs = super(ManagerView, self).get_queryset()
+        query_set = super(ManagerView, self).get_queryset()
         organization = self.user_context.active_organization
-        return qs.filter(organization__pk=organization.pk)
+        return query_set.filter(organization__pk=organization.pk)
 
     def get_context_data(self, **kwargs):
         context = super(ManagerView, self).get_context_data(**kwargs)
@@ -50,22 +49,15 @@ class ManagerView(LoginRequiredMixin, UserContextViewMixin, ListView):
         }
 
 
-class SuperUserView(
-    LoginRequiredMixin,
-    UserContextViewMixin,
-    ListView
-):
+class SuperUserView(UserContextViewMixin, ListView):
     model = Event
     template_name = 'gatheros_event/event/list_superuser.html'
     ordering = ['name']
 
-    def get_context_data(self, **kwargs):
-        return super(SuperUserView, self).get_context_data(**kwargs)
-
 
 class EventListView(View):
     @classonlymethod
-    def as_view(cls):
+    def as_view(cls, **initkwargs):
         super_view = SuperUserView.as_view()
         manager_view = ManagerView.as_view()
 

@@ -25,7 +25,16 @@ class DefaultFieldAdmin(admin.ModelAdmin):
 
 @admin.register(Field)
 class FieldAdmin(admin.ModelAdmin):
-    list_display = ('form', 'order', 'label', 'type', 'required', 'form_default_field', 'with_options', 'pk')
+    list_display = (
+        'form',
+        'order',
+        'label',
+        'type',
+        'required',
+        'form_default_field',
+        'with_options',
+        'pk'
+    )
     readonly_fields = ['form_default_field', 'with_options']
     fields = [
         'form',
@@ -45,17 +54,30 @@ class FieldAdmin(admin.ModelAdmin):
 
 @admin.register(FieldOption)
 class FieldOptionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'value', 'get_field_label', 'get_event_form', 'pk')
+    list_display = (
+        'name',
+        'value',
+        'get_field_label',
+        'get_event_form',
+        'pk'
+    )
     ordering = ['field', 'name', 'value']
 
     def formfield_for_foreignkey( self, db_field, request, **kwargs ):
         if db_field.name == "field":
             kwargs["queryset"] = Field.objects.filter(with_options=True).all()
 
-        return super(FieldOptionAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super(FieldOptionAdmin, self).formfield_for_foreignkey(
+            db_field,
+            request,
+            **kwargs
+        )
 
     def get_field_label( self, instance ):
-        return '{} [ {} ]'.format(instance.field.label, instance.field.get_type_display())
+        return '{} [ {} ]'.format(
+            instance.field.label,
+            instance.field.get_type_display()
+        )
 
     def get_event_form( self, instance ):
         return instance.field.form
@@ -66,7 +88,16 @@ class FieldOptionAdmin(admin.ModelAdmin):
 
 @admin.register(Lot)
 class LotAdmin(admin.ModelAdmin):
-    list_display = ('name', 'event', 'price', 'date_start', 'date_end', 'private', 'internal', 'pk')
+    list_display = (
+        'name',
+        'event',
+        'price',
+        'date_start',
+        'date_end',
+        'private',
+        'internal',
+        'pk'
+    )
     fieldsets = (
         (None, {
             'fields': (
@@ -94,8 +125,12 @@ class LotAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey( self, db_field, request, **kwargs ):
         if db_field.name == "event":
             events = Event.objects.annotate(num_lots=Count('lots')).filter(
-                Q(subscription_type=Event.SUBSCRIPTION_SIMPLE, num_lots__exact=0) |
-                Q(subscription_type=Event.SUBSCRIPTION_BY_LOTS)
+                Q(
+                    subscription_type=Event.SUBSCRIPTION_SIMPLE,
+                    num_lots__exact=0
+                ) | Q(
+                    subscription_type=Event.SUBSCRIPTION_BY_LOTS
+                )
             )
 
             for event in events:
@@ -110,7 +145,14 @@ class LotAdmin(admin.ModelAdmin):
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('person', 'count', 'lot', 'code', 'attended',)
-    readonly_fields = ['event', 'code', 'count', 'attended', 'attended_on', 'synchronized']
+    readonly_fields = [
+        'event',
+        'code',
+        'count',
+        'attended',
+        'attended_on',
+        'synchronized'
+    ]
     ordering = ('lot', 'count', 'person',)
 
 
@@ -126,9 +168,15 @@ class FormAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey( self, db_field, request, **kwargs ):
 
         if not self.pk and db_field.name == "event":
-            kwargs["queryset"] = Event.objects.filter(form=None).exclude(subscription_type=Event.SUBSCRIPTION_DISABLED)
+            kwargs["queryset"] = Event.objects.filter(form=None).exclude(
+                subscription_type=Event.SUBSCRIPTION_DISABLED
+            )
 
-        return super(FormAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super(FormAdmin, self).formfield_for_foreignkey(
+            db_field,
+            request,
+            **kwargs
+        )
 
     def has_additional_fields( self, instance ):
         return instance.has_additional_fields
@@ -153,9 +201,15 @@ class AnswerAdmin(admin.ModelAdmin):
                 .distinct()
 
         if db_field.name == "field":
-            kwargs["queryset"] = Field.objects.filter(form_default_field=False).order_by('form__event', '-required')
+            kwargs["queryset"] = Field.objects.filter(
+                form_default_field=False
+            ).order_by('form__event', '-required')
 
-        return super(AnswerAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super(AnswerAdmin, self).formfield_for_foreignkey(
+            db_field,
+            request,
+            **kwargs
+        )
 
     def get_event( self, instance ):
         return instance.field.form
@@ -164,7 +218,9 @@ class AnswerAdmin(admin.ModelAdmin):
         return instance.subscription.person
 
     def get_field( self, instance ):
-        return instance.field.label + ' [ '+instance.field.get_type_display()+' ]'
+        field = instance.field.label
+        field += ' [ '+instance.field.get_type_display()+' ]'
+        return field
 
     def get_value( self, instance ):
         return instance.get_display_value()

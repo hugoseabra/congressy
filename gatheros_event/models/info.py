@@ -76,10 +76,10 @@ class Info(models.Model):
         verbose_name_plural = 'Infomações de Eventos'
         ordering = ['event']
 
-    def __str__( self ):
+    def __str__(self):
         return self.event.name
 
-    def save( self, *args, **kwargs ):
+    def save(self, *args, **kwargs):
         self.check_rules()
         super(Info, self).save(*args, **kwargs)
 

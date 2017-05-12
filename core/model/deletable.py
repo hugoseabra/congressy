@@ -3,8 +3,7 @@ from django.db.models.deletion import Collector
 
 
 class NotDeletableError(IntegrityError):
-    def __init__(self, *args, **kwargs):
-        super(NotDeletableError, self).__init__(*args, **kwargs)
+    pass
 
 
 class CheckerCollector(Collector):
@@ -18,7 +17,7 @@ class CheckerCollector(Collector):
         except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
 
-    def can_fast_delete(self, *args, **kwargs):
+    def can_fast_delete(self, objs, from_field=None):
         """
         We always want to load the objects into memory so that we can display
         them to the user in confirm page.

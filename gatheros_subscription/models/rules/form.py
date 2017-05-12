@@ -4,7 +4,7 @@ from gatheros_event.models import Event
 from .. import DefaultField
 
 
-def rule_1_form_em_event_inscricao_desativada( form ):
+def rule_1_form_em_event_inscricao_desativada(form):
     event = form.event
     if event.subscription_type == Event.SUBSCRIPTION_DISABLED:
         raise IntegrityError(
@@ -13,7 +13,7 @@ def rule_1_form_em_event_inscricao_desativada( form ):
         )
 
 
-def rule_2_form_possui_todos_campos_padrao( form ):
+def rule_2_form_possui_todos_campos_padrao(form):
     """
     Garantia de que todas as inscrição terão as informações exigidas pelo
     sistema.
@@ -25,6 +25,6 @@ def rule_2_form_possui_todos_campos_padrao( form ):
     for default_field in DefaultField.objects.all():
         if default_field.name not in existing_fields:
             raise IntegrityError(
-                'O evento {} não possui os campos obrigatórios necessários.'
-                    .format(form.event.name)
+                'O evento {} não possui os campos obrigatórios'
+                ' necessários.'.format(form.event.name)
             )

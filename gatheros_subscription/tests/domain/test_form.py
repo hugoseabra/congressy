@@ -16,21 +16,24 @@ class FormModelTest(GatherosTestCase):
         '010_event'
     ]
 
-    def _get_event( self, subscription_type=Event.SUBSCRIPTION_SIMPLE ):
-        event = Event.objects.filter(subscription_type=subscription_type).first()
+    def _get_event(self, subscription_type=Event.SUBSCRIPTION_SIMPLE):
+        event = Event.objects.filter(
+            subscription_type=subscription_type
+        ).first()
+
         event.date_start = datetime.now() - timedelta(days=10)
         event.date_end = datetime.now() + timedelta(days=1)
         event.save()
         return event
 
-    def _create_form( self, event=None, persist=False ):
+    def _create_form(self, event=None, persist=False):
         if not event:
             event = self._get_event()
 
         data = {'event': event}
         return self._create_model(Model=Form, data=data, persist=persist)
 
-    def test_rule_1_form_em_event_inscricao_desativada( self ):
+    def test_rule_1_form_em_event_inscricao_desativada(self):
         rule_callback = rule.rule_1_form_em_event_inscricao_desativada
 
         event = self._get_event(subscription_type=Event.SUBSCRIPTION_DISABLED)
@@ -47,7 +50,7 @@ class FormModelTest(GatherosTestCase):
         form.event.save()
         form.save()
 
-    def test_rule_2_form_possui_todos_campos_padrao( self ):
+    def test_rule_2_form_possui_todos_campos_padrao(self):
         rule_callback = rule.rule_2_form_possui_todos_campos_padrao
 
         form = self._create_form()

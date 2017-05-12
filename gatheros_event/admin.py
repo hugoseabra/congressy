@@ -62,8 +62,12 @@ class EventAdmin(admin.ModelAdmin):
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'gender', 'user', 'created')
     ordering = ('created', 'name')
-    readonly_fields = ['user', 'synchronized', 'term_version',
-                       'politics_version']
+    readonly_fields = [
+        'user',
+        'synchronized',
+        'term_version',
+        'politics_version'
+    ]
 
     fieldsets = (
         (None, {
@@ -181,14 +185,16 @@ class MemberAdmin(admin.ModelAdmin):
     ordering = ('organization', 'person')
     readonly_fields = ['accepted_on']
 
-    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "person":
-            kwargs["queryset"] = Person.objects.filter(has_user=True).order_by(
-                'name')
+            query_set = Person.objects.filter(has_user=True).order_by('name')
+            kwargs["queryset"] = query_set
 
-        return super(MemberAdmin, self).formfield_for_foreignkey(db_field,
-                                                                 request,
-                                                                 **kwargs)
+        return super(MemberAdmin, self).formfield_for_foreignkey(
+            db_field,
+            request,
+            **kwargs
+        )
 
 
 @admin.register(Invitation)
@@ -197,21 +203,28 @@ class InvitationAdmin(admin.ModelAdmin):
         'author', 'get_user', 'get_organization', 'created', 'expired')
     readonly_fields = ['created', 'expired']
 
-    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "author":
-            kwargs["queryset"] = Member.objects.filter(group=Member.ADMIN,
-                                                       organization__internal=False)
+            kwargs["queryset"] = Member.objects.filter(
+                group=Member.ADMIN,
+                organization__internal=False
+            )
 
-        return super(InvitationAdmin, self).formfield_for_foreignkey(db_field,
-                                                                     request,
-                                                                     **kwargs)
+        return super(InvitationAdmin, self).formfield_for_foreignkey(
+            db_field,
+            request,
+            **kwargs
+        )
 
-    def get_organization( self, instance ):
+    def get_organization(self, instance):
         return instance.author.organization
 
-    def get_user( self, instance ):
-        return '{} {} ({})'.format(instance.to.first_name,
-                                   instance.to.last_name, instance.to.email)
+    def get_user(self, instance):
+        return '{} {} ({})'.format(
+            instance.to.first_name,
+            instance.to.last_name,
+            instance.to.email
+        )
 
     get_organization.__name__ = 'organização'
     get_user.__name__ = 'convidado'

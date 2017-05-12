@@ -16,10 +16,10 @@ class FieldModelTest(GatherosTestCase):
         '003_field'
     ]
 
-    def _get_form( self ):
+    def _get_form(self):
         return Form.objects.first()
 
-    def _create_field( self, form=None, persist=False, **kwargs ):
+    def _create_field(self, form=None, persist=False, **kwargs):
         if not form:
             form = self._get_form()
 
@@ -29,9 +29,14 @@ class FieldModelTest(GatherosTestCase):
             'label': 'New one',
             'name': 'new field tests'
         }
-        return self._create_model(Model=Field, data=data, persist=persist, **kwargs)
+        return self._create_model(
+            Model=Field,
+            data=data,
+            persist=persist,
+            **kwargs
+        )
 
-    def test_new_field_always_last_one( self ):
+    def test_new_field_always_last_one(self):
         form = Form.objects.first()
         last_order = form.fields.order_by('-order').first().order
 

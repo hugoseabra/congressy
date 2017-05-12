@@ -14,8 +14,10 @@ class OrganizationModelTest(TestCase):
         '010_event',
     ]
 
-    def test_nao_exclui_se_possui_eventos( self ):
-        organization = Organization.objects.annotate(num_events=Count('events')).filter(num_events__gt=0).first()
+    def test_nao_exclui_se_possui_eventos(self):
+        organization = Organization.objects.annotate(
+            num_events=Count('events')
+        ).filter(num_events__gt=0).first()
 
         with self.assertRaises(ProtectedError):
             organization.delete()

@@ -16,17 +16,27 @@ class MemberModelTest(GatherosTestCase):
         '008_member'
     ]
 
-    def _get_organization( self, internal=False ):
+    def _get_organization(self, internal=False):
         return Organization.objects.filter(internal=internal).first()
 
-    def _get_person( self, has_user=True ):
+    def _get_person(self, has_user=True):
         return Person.objects.filter(has_user=has_user).first()
 
-    def _create_organization( self, internal=True, persist=True ):
+    def _create_organization(self, internal=True, persist=True):
         data = {'name': 'Org Test', 'internal': internal}
-        return self._create_model(Model=Organization, data=data, persist=persist)
+        return self._create_model(
+            Model=Organization,
+            data=data,
+            persist=persist
+        )
 
-    def _create_member( self, person=None, organization=None, group=Member.ADMIN, persist=True ):
+    def _create_member(
+            self,
+            person=None,
+            organization=None,
+            group=Member.ADMIN,
+            persist=True
+    ):
         if person is None:
             person = self._get_person()
 
@@ -43,10 +53,11 @@ class MemberModelTest(GatherosTestCase):
 
         return self._create_model(Model=Member, data=data, persist=persist)
 
-    def test_rule_1_membros_deve_ter_usuarios( self ):
+    def test_rule_1_membros_deve_ter_usuarios(self):
         rule_callback = rule.rule_1_membros_deve_ter_usuarios
 
-        member = self._create_member(person=self._get_person(has_user=False), persist=False)
+        member = self._create_member(person=self._get_person(has_user=False),
+                                     persist=False)
 
         """ REGRA """
         self._trigger_integrity_error(rule_callback, [member])
@@ -61,10 +72,11 @@ class MemberModelTest(GatherosTestCase):
         # Agora funciona
         member.save()
 
-    def test_rule_2_organizacao_interna_apenas_1_membro( self ):
+    def test_rule_2_organizacao_interna_apenas_1_membro(self):
         rule_callback = rule.rule_2_organizacao_interna_apenas_1_membro
 
-        member = self._create_member(organization=self._get_organization(internal=True), persist=False)
+        member = self._create_member(
+            organization=self._get_organization(internal=True), persist=False)
 
         """ REGRA """
         self._trigger_integrity_error(rule_callback, [member])
@@ -78,7 +90,7 @@ class MemberModelTest(GatherosTestCase):
         # Agora funciona
         member.save()
 
-    def test_rule_3_organizacao_interna_unico_membro_admin( self ):
+    def test_rule_3_organizacao_interna_unico_membro_admin(self):
         rule_callback = rule.rule_3_organizacao_interna_unico_membro_admin
 
         # Pega uma pessoa sem usuário e logo cria um para ele
@@ -99,9 +111,11 @@ class MemberModelTest(GatherosTestCase):
         """ MODEL """
         self._trigger_integrity_error(member.save)
 
-    def test_rule_4_nao_remover_member_organizacao_interna( self ):
+    def test_rule_4_nao_remover_member_organizacao_interna(self):
         rule_callback = rule.rule_4_nao_remover_member_organizacao_interna
-        member = self._create_member(organization=self._create_organization(internal=True))
+        member = self._create_member(
+            organization=self._create_organization(internal=True)
+        )
 
         """ REGRA """
         self._trigger_integrity_error(rule_callback, [member])

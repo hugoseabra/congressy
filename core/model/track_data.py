@@ -9,14 +9,14 @@ def track_data(*fields):
     The changed list of properties is refreshed on model initialization
     and save.
 
-    >>> @track_data('name')
-    >>> class Post(models.Model):
-    >>>     name = models.CharField(...)
-    >>> 
-    >>>     @classmethod
-    >>>     def post_save(cls, sender, instance, created, **kwargs):
-    >>>         if instance.has_changed('name'):
-    >>>             print "Hooray!"
+    @track_data('name')
+    class Post(models.Model):
+        name = models.CharField(...)
+
+        @classmethod
+        def post_save(cls, sender, instance, created, **kwargs):
+            if instance.has_changed('name'):
+                print "Hooray!"
     """
 
     UNSAVED = dict()
