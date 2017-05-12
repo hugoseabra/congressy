@@ -39,6 +39,11 @@ url_organization = [
         views.OrganizationSwitch.as_view(),
         name='organization-switch'
     ),
+    url(
+        r'^',
+        views.OrganizationPanelView.as_view(),
+        name='organization-panel'
+    ),
 ]
 
 urlpatterns = [
