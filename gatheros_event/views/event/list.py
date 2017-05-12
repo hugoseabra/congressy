@@ -34,7 +34,6 @@ class ManagerView(UserContextViewMixin, ListView):
         def can_edit():
             return member_group.group in [
                 Member.ADMIN,
-                Member.HELPER,
             ]
 
         def can_delete():

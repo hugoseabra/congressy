@@ -20,9 +20,6 @@ class EventDeleteView(DeleteViewMixin):
     def can_delete(self):
         event = self.get_object()
         organization = event.organization
-        active_organization = self.user_context['active_organization']
-        active_member = self.user_context['active_member_group']
+        active = self.user_context.active_organization
 
-        return organization.pk == active_organization['pk'] and (
-            active_member and active_member['group'] == Member.ADMIN
-        )
+        return organization.pk == active.pk and active.group == Member.ADMIN
