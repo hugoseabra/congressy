@@ -163,6 +163,9 @@ class Migration(migrations.Migration):
                 'verbose_name': 'organização',
                 'verbose_name_plural': 'organizações',
                 'ordering': ['name'],
+                'permissions': (
+                    ("can_invite", "Can invite members"),
+                ),
             },
         ),
         migrations.CreateModel(

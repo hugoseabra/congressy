@@ -46,5 +46,11 @@ class DeleteViewMixin(UserContextViewMixin, DeleteView):
         return super(DeleteViewMixin, self).post(request, *args, **kwargs)
 
     def can_delete(self):
-        raise NotImplementedError('`can_delete()` deve ser implementado.')
+        obj = self.get_object()
+
+        app_label = obj._meta.app_label
+        model_name = obj._meta.object_name.lower()
+        full_name = "%s.%s_%s" % (app_label, 'delete', model_name)
+
+        return self.request.user.has_perm(full_name, self.get_object())
 

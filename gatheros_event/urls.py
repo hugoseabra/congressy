@@ -1,34 +1,47 @@
-from django.conf.urls import url
+from django.conf.urls import include, url
 
 from . import views
 
-urlpatterns = [
+url_events = [
     url(
-        r'^org/switch/$',
-        views.OrganizationSwitch.as_view(),
-        name='organization-switch'
-    ),
-    url(r'^events/$', views.EventListView.as_view(), name='event-list'),
-    url(
-        r'^events/(?P<pk>[\d]+)/$',
+        r'^(?P<pk>[\d]+)/$',
         views.EventPanelView.as_view(),
         name='event-panel'
     ),
     url(
-        r'^events/add/$',
-        views.EventWizardView.as_view(condition_dict={
-            'step2': views.add_new_place
-        }),
+        r'^add/$',
+        views.EventWizardView.as_view(
+            condition_dict={
+                'step2': views.add_new_place
+            }),
         name='event-add'
     ),
     url(
-        r'^events/(?P<pk>[\d]+)/edit/$',
+        r'^(?P<pk>[\d]+)/edit/$',
         views.EventEditView.as_view(),
         name='event-edit'
     ),
     url(
-        r'^events/(?P<pk>[\d]+)/delete/$',
+        r'^(?P<pk>[\d]+)/delete/$',
         views.EventDeleteView.as_view(),
         name='event-delete'
     ),
+    url(
+        r'^',
+        views.EventListView.as_view(),
+        name='event-list'
+    ),
+]
+
+url_organization = [
+    url(
+        r'^switch/',
+        views.OrganizationSwitch.as_view(),
+        name='organization-switch'
+    ),
+]
+
+urlpatterns = [
+    url(r'^org/', include(url_organization)),
+    url(r'^events/', include(url_events)),
 ]

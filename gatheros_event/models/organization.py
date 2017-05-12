@@ -1,7 +1,9 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 from core.util import slugify
 from .member import Member
+from .person import Person
 
 
 class Organization(models.Model):
@@ -58,6 +60,11 @@ class Organization(models.Model):
         verbose_name_plural = 'organizações'
         ordering = ['name']
 
+        permissions = (
+            ("can_invite", "Can invite members"),
+            ("can_view", "Can view"),
+        )
+
     def __str__(self):
         return self.name
 
@@ -79,12 +86,33 @@ class Organization(models.Model):
             qs = qs.filter(group=group)
 
         if person:
+            if isinstance(person, User):
+                person = Person.objects.get(user=person)
+
             qs = qs.filter(person=person)
 
         return qs
 
     def is_member(self, person):
+        """
+        Verifica se a pessoa ou usuário é membro da organização
+
+        :param person: Pessoa ou usuário que é membro
+        :return:
+        """
+        if isinstance(person, User):
+            person = Person.objects.get(user=person)
+
         return self.get_members(person=person).exists()
 
     def is_admin(self, person):
+        """
+        Verifica se a pessoa ou usuário é administrador da organização
+
+        :param person: Pessoa ou usuário que é membro
+        :return:
+        """
+        if isinstance(person, User):
+            person = Person.objects.get(user=person)
+
         return self.get_members(group=Member.ADMIN, person=person).exists()
