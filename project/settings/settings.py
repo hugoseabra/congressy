@@ -20,6 +20,7 @@ INSTALLED_APPS = [
 
     # THIRD PARTY
     'formtools',
+    'permission',
 
     # KANU_APPS
     'kanu_locations',
@@ -49,12 +50,25 @@ MIDDLEWARE_CLASSES = [
 
 ROOT_URLCONF = 'project.urls'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # default
+    'permission.backends.PermissionBackend',  # django-permission
+]
+
+
+class InvalidTemplateVariable(str):
+    def __mod__(self, other):
+        from django.template.base import TemplateSyntaxError
+        raise TemplateSyntaxError("Invalid variable : '%s'" % other)
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
+            'string_if_invalid': InvalidTemplateVariable("%s"),
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -63,6 +77,9 @@ TEMPLATES = [
 
                 # Gatheros user_context processor
                 'gatheros_front.processor.user_context'
+            ],
+            'builtins': [
+                'permission.templatetags.permissionif',
             ],
         },
     },
