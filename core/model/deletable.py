@@ -3,7 +3,12 @@ from django.db.models.deletion import Collector
 
 
 class NotDeletableError(IntegrityError):
-    pass
+    def __init__(self, *args, **kwargs):
+        super(NotDeletableError, self).__init__(
+            'Você não pode excluir este registro.',
+            * args,
+            **kwargs
+        )
 
 
 class CheckerCollector(Collector):

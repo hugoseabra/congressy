@@ -1,8 +1,8 @@
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.views.generic import DeleteView
 
-from core.model.deletable import NotDeletableError
 from core.view.user_context import UserContextViewMixin
 
 
@@ -14,7 +14,7 @@ class DeleteViewMixin(UserContextViewMixin, DeleteView):
     not_allowed_message = 'Você não tem permissão para excluir este registro.'
 
     def render_to_response(self, context, **response_kwargs):
-        if self._not_allowed():
+        if not self.can_delete():
             messages.warning(self.request, self.not_allowed_message)
             return redirect(self.success_url.format(**self.object.__dict__))
 
@@ -33,18 +33,14 @@ class DeleteViewMixin(UserContextViewMixin, DeleteView):
 
     def get_object(self, queryset=None):
         obj = super(DeleteViewMixin, self).get_object(queryset=queryset)
-
-        try:
-            obj.check_deletable()
-        except NotDeletableError:
-            self.protected = True
-
+        obj.check_deletable()
         return obj
 
     def post(self, request, *args, **kwargs):
-        if self._not_allowed():
-            messages.warning(self.request, self.not_allowed_message)
-            return redirect(self.success_url.format(**self.object.__dict__))
+        self.object = self.get_object()
+
+        if self.can_delete() is False:
+            raise PermissionDenied('Você não pode excluir este registro.')
 
         messages.success(request, self.success_message)
         return super(DeleteViewMixin, self).post(request, *args, **kwargs)
@@ -52,6 +48,3 @@ class DeleteViewMixin(UserContextViewMixin, DeleteView):
     def can_delete(self):
         raise NotImplementedError('`can_delete()` deve ser implementado.')
 
-    def _not_allowed(self):
-        return self.request.user.is_superuser \
-               and self.can_delete() is False
