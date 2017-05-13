@@ -33,7 +33,7 @@
                             <select name="organization-context-pk" id="organization-context-pk" onchange="submit()">
                                 {% for org in organizations %}
                                     <option
-                                            {% if organizationx.pk == org.pk %}selected="selected"{% endif %}
+                                            {% if organization.pk == org.pk %}selected="selected"{% endif %}
                                             value="{{ org.pk }}">{{ org.name }}
                                     </option>
                                 {% endfor %}

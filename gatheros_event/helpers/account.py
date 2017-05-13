@@ -2,6 +2,14 @@ from django.core.exceptions import SuspiciousOperation
 
 from gatheros_event.models import Organization, Person
 
+__is_configured = False
+
+
+def is_configured():
+    global __is_configured
+
+    return __is_configured
+
 
 def get_organization(request):
     if not hasattr(request, '_cached_organization'):
@@ -54,6 +62,8 @@ def set_organization(request, organization):
     Pk da organização ativa da sessão
     :return:
     """
+    global __is_configured
+
     if hasattr(request, '_cached_organization'):
         del request._cached_organization
 
@@ -64,9 +74,10 @@ def set_organization(request, organization):
         organization = organization.pk
 
     request.session['account'].update({'organization': organization})
+    __is_configured = True
 
 
-def update_session_account(request, organization=None):
+def update_account(request, organization=None):
     """
     Atualiza as informações das organizações e marca a organização principal
     como ativa na sessao
@@ -110,13 +121,15 @@ def update_session_account(request, organization=None):
     })
 
 
-def clean_session_account(request):
+def clean_account(request):
     """
     Remove as informações de conta da sessão
 
     :param request:
     :return:
     """
+    global __is_configured
+
     if 'account' in request.session:
         del request.session['account']
 
@@ -128,3 +141,5 @@ def clean_session_account(request):
 
     if hasattr(request, '_cached_member'):
         del request._cached_member
+
+    __is_configured = False

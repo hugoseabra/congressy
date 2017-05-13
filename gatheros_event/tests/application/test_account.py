@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import SuspiciousOperation
 from django.test import TestCase
 
 from gatheros_event.helpers import account
 from gatheros_event.models import Member, Organization
+from gatheros_event.views.mixins import AccountMixin
 
 
 class MockSession(object):
@@ -24,9 +26,6 @@ class MockSession(object):
     def get(self, item):
         return self._iter.get(item)
 
-    def update(self, data):
-        self._iter.update(data)
-
 
 class MockRequest(object):
     session = MockSession()
@@ -35,7 +34,7 @@ class MockRequest(object):
         self.user = user
 
 
-class TestLoginUser(TestCase):
+class AccountHelperTest(TestCase):
     fixtures = [
         '001_user',
         '003_occupation',
@@ -48,7 +47,7 @@ class TestLoginUser(TestCase):
     def _set_user(self, username):
         self.user = User.objects.get(username=username)
         self.request = MockRequest(self.user)
-        account.update_session_account(self.request)
+        account.update_account(self.request)
 
     def _get_organization(self):
         return account.get_organization(self.request)
@@ -120,6 +119,8 @@ class TestLoginUser(TestCase):
                     return False
             return True
 
+        self.assertTrue(compare_lists(organizations1, organizations1))
+        self.assertFalse(compare_lists(organizations1, []))
         self.assertFalse(compare_lists(organizations1, organizations2))
 
     def test_clear_account(self):
@@ -133,7 +134,7 @@ class TestLoginUser(TestCase):
         self.assertTrue(hasattr(self.request, '_cached_organizations'))
 
         # Executa o clean
-        account.clean_session_account(self.request)
+        account.clean_account(self.request)
 
         # Account apagada da sessão
         self.assertNotIn('account', self.request.session)
@@ -142,3 +143,77 @@ class TestLoginUser(TestCase):
         self.assertFalse(hasattr(self.request, '_cached_organization'))
         self.assertFalse(hasattr(self.request, '_cached_member'))
         self.assertFalse(hasattr(self.request, '_cached_organizations'))
+
+    def test_user_without_person(self):
+        with self.assertRaises(SuspiciousOperation):
+            self._set_user('kanu')
+
+
+class AccountHelperIsConfiguredTest(TestCase):
+    fixtures = [
+        '001_user',
+        '003_occupation',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+    ]
+
+    def setUp(self):
+        self.user = User.objects.get(username="lucianasilva@gmail.com")
+        self.request = MockRequest(self.user)
+        account.clean_account(self.request)
+
+    def test_configured_on_login(self):
+        self.assertFalse(account.is_configured())
+        self.client.login(testcase_user=self.user)
+        self.assertTrue(account.is_configured())
+
+    def test_configured_on_update_account(self):
+        self.assertFalse(account.is_configured())
+        account.update_account(self.request)
+        self.assertTrue(account.is_configured())
+
+    def test_not_configured_after_clean_account(self):
+        self.assertFalse(account.is_configured())
+        account.update_account(self.request)
+        self.assertTrue(account.is_configured())
+        account.clean_account(self.request)
+        self.assertFalse(account.is_configured())
+
+
+class AccountMixinTest(TestCase):
+    fixtures = [
+        '001_user',
+        '003_occupation',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+    ]
+
+    def setUp(self):
+        self.user = User.objects.get(username="lucianasilva@gmail.com")
+        self.client.login(testcase_user=self.user)
+        self.view = AccountMixin(request=self.client.request().wsgi_request)
+
+    def test_organizations(self):
+        self.assertTrue(hasattr(self.view, 'organizations'))
+        self.assertEqual(
+            self.view.organizations,
+            account.get_organizations(self.client.request().wsgi_request)
+        )
+
+    def test_organization(self):
+        self.assertTrue(hasattr(self.view, 'organization'))
+        self.assertEqual(
+            self.view.organization,
+            account.get_organization(self.client.request().wsgi_request)
+        )
+
+    def test_member(self):
+        self.assertTrue(hasattr(self.view, 'member'))
+        self.assertEqual(
+            self.view.member,
+            account.get_member(self.client.request().wsgi_request)
+        )

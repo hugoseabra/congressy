@@ -47,17 +47,21 @@ class CustomPermissionLogic(PermissionLogic):
 # Handlers
 def is_admin(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
-    return organization.is_admin(person)
+    return organization \
+           and organization.is_admin(person)
 
 
 def is_admin_not_internal(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
-    return organization.is_admin(person) and not organization.internal
+    return organization \
+           and organization.is_admin(person) \
+           and not organization.internal
 
 
 def is_member(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
-    return organization.is_member(person)
+    return organization \
+           and organization.is_member(person)
 
 
 # Lógicas de permissões

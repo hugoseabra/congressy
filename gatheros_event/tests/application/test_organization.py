@@ -1,6 +1,5 @@
-from unittest import skip
-
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.urls import reverse
 
@@ -44,6 +43,15 @@ class OrganizationAdminInternalPermissionsTest(TestCase):
         self.assertTrue(self.organization.is_admin(self.user))
         self.assertFalse(self.user.has_perm('gatheros_event.can_invite',
                                             self.organization))
+
+    def test_check_improperly_permission(self):
+        with self.assertRaises(ImproperlyConfigured):
+            self.assertFalse(
+                self.user.has_perm(
+                    'gatheros_event.can_invite',
+                    self.user
+                )
+            )
 
 
 class OrganizationAdminNotInternalPermissionsTest(TestCase):

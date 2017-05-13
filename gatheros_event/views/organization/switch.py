@@ -23,7 +23,7 @@ class OrganizationSwitch(RedirectView):
         if not organization.is_member(request.user.person):
             raise PermissionDenied('Você não é membro desta organização.')
 
-        account.set_organization(request, organization)
+        account.update_account(request, organization)
 
         if organization.internal is True:
             context = 'não está em organização'

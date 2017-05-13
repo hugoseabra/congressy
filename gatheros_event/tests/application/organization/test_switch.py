@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 
@@ -27,7 +28,7 @@ class OrganizationSwitchTest(TestCase):
 
     def _get_organization(self, wsgi_request=None):
         if wsgi_request is None:
-            wsgi_request=self.client.request().wsgi_request
+            wsgi_request = self.client.request().wsgi_request
         return account.get_organization(wsgi_request)
 
     def _get_organization_other(self, organization):
@@ -47,12 +48,12 @@ class OrganizationSwitchTest(TestCase):
         organization1 = self._get_organization()
 
         # Switch
-        other = self._get_organization_other(organization1)
-        result = self.client.post(self.url, {'organization-context-pk': other.pk}, )
+        other = self._get_organization_other(organization1).pk
+        result = self.client.post(self.url, {'organization-context-pk': other})
 
         # Check if changed
         organization2 = self._get_organization(result.wsgi_request)
-        self.assertEqual(other.pk, organization2.pk)
+        self.assertEqual(other, organization2.pk)
 
     def test_not_allowed_organization(self):
         org = self._get_organization_not_member()
@@ -62,3 +63,30 @@ class OrganizationSwitchTest(TestCase):
     def test_not_exist_organization(self):
         result = self.client.post(self.url, {'organization-context-pk': 9999})
         self.assertEqual(result.status_code, 404)
+
+    def test_presentation(self):
+        # First organization
+        organization = self._get_organization()
+        response = self.client.post(
+            self.url,
+            {'organization-context-pk': organization.pk}
+        )
+        messages = [m for m in get_messages(response.wsgi_request)]
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            "Agora você não está em organização.",
+            str(messages[0])
+        )
+
+        # Second organization
+        organization = self._get_organization_other(organization)
+        response= self.client.post(
+            self.url,
+            {'organization-context-pk': organization.pk}
+        )
+        messages = [m for m in get_messages(response.wsgi_request)]
+        self.assertEqual(len(messages), 1)
+        self.assertInHTML(
+            "Agora você está na organização '%s'." % organization.name,
+            str(messages[0])
+        )
