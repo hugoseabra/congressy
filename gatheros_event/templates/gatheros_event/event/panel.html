@@ -5,8 +5,184 @@
     <div style="padding:10px">
         <a href="{% url 'gatheros_event:event-list' %}">Voltar</a>
     </div>
-    <hr />
+'    <hr/>
     <h1>Painel do Evento</h1>
     <h2>{{ event.name }}</h2>
+    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
+        <a href="{% url 'gatheros_event:event-add' %}">Editar</a>
+        &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
+        <a href="{% url 'gatheros_event:event-add' %}">Excluir</a>
+    </div>
 
+    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td width="15%" style="vertical-align: top">
+                <div style="background-color: #DDDDDD;border: 1px solid #DDD">
+                    <div style="padding:0 5px">
+                        <p><strong>Realizador:</strong></p>
+                        <p><a href="#">Fulano</a></p>
+                    </div>
+                    <div style="padding:0 5px">
+                        <p><strong>Tipo de Acesso:</strong></p>
+                        <p>Auxiliar</p>
+                    </div>
+                </div>
+                <br />
+                <div style="background-color: whitesmoke;border: 1px solid #DDD;">
+                    <div style="padding:15px">&rightarrow; <a href="#">Página do evento</a></div>
+                    <div style="padding:15px">&rightarrow; <a href="#">Lotes</a></div>
+                    <div style="padding:15px">&rightarrow; <a href="#">Inscrições</a></div>
+                </div>
+            </td>
+            <td style="vertical-align: top;padding:0 10px">
+                <table width="100%" border="1" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td width="40%" style="vertical-align: top;">
+                            ssdf
+                        </td>
+                        <td style="vertical-align: top;padding: 0 15px">
+                            sdf
+                        </td>
+                    </tr>
+                </table>
+                <table width="100%" border="1" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td width="40%" style="vertical-align: top;">
+                            <img src="/media/Evento_Banner_pequeno.png" width="99%" style="border:1px solid #DDD" />
+                        </td>
+                        <td style="vertical-align: top;padding: 0 15px">
+                            <h3>Congresso</h3>
+                            <hr/>
+                            <h2>{{ event.name }}</h2>
+
+                            <div>
+                                <strong>Período:</strong> {{ event.get_period }}
+                            </div>
+                            <div>
+                                <p>
+                                    <strong>Local:</strong> {{ event.place.name }}
+                                </p>
+                                <p style="color:dimgray;text-indent: 20px;">{{ event.place.get_complete_address }}</p>
+                            </div>
+                            <div>
+                                <p>
+                                    <strong>Descrição:</strong>
+                                </p>
+                                <p style="color:dimgray;text-indent: 20px;text-align: justify;line-height: 24px;">{{ event.description }}</p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+
+                <br /><br /><br /><br /><br />
+                <hr />
+                <pre>
+                    = Estatísticas (quantitativas) de incrição (se ativo). Se inativo, apresentar a mensagem (desativado). Infos:
+                      > Total de inscritos
+                      > Total de credenciados
+                      > Lotes limitados (se houver): preenchidos
+                      > PNEs
+                    = Vagas do evento (se inscrições ativadas). Se inativado, não exibir. Se ativado e for simples,
+                    apresentar um gráfico simples de vagas preenchidas. Se por lotes, apresentar o mesmo gráfico com o botão "Detalhar"
+                </pre>
+
+
+
+
+
+
+
+
+            </td>
+            <td width="20%" style="vertical-align: top">
+                <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                    <div style="text-align: left;"><strong>Status:</strong></div>
+                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">Não realizado</div>
+                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                        <a href="#">Alterar data</a>
+                    </div>
+                </div>
+                <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                    <div style="text-align: left;"><strong>Página:</strong></div>
+                    <div style="font-weight: bold;font-size: 20px;color: darkred;padding: 10px 0">Não publicada</div>
+                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                        <a href="#">Publicar</a>
+                    </div>
+                </div>
+                <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                    <div style="text-align: left;"><strong>Página:</strong></div>
+                    <div style="font-weight: bold;font-size: 20px;color: darkgreen;padding: 10px 0">Publicada</div>
+                    <div style="color: dimgray;padding:10px">
+                        Desde <strong>22/05/2017 18h00</strong>
+                    </div>
+                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                        <a href="#">Despublicar</a>
+                    </div>
+                </div>
+
+                <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                    <div style="text-align: left;"><strong>Status:</strong></div>
+                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">Não realizado</div>
+                    <div style="color: dimgray;padding:10px">
+                        Faltam <strong>5dias 19h 22m</strong>
+                    </div>
+                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                        <a href="#">Alterar data</a>
+                    </div>
+                </div>
+                <div style="padding: 10px 0 30px;text-align: center;border-bottom: 1px solid #DDDDDD">
+                    <div style="text-align: left;"><strong>Status:</strong></div>
+                    <div style="font-weight: bold;font-size: 20px;color: darkgreen;padding: 10px 0">Em andamento</div>
+                </div>
+                <div style="padding: 10px 0 30px;text-align: center;border-bottom: 1px solid #DDDDDD">
+                    <div style="text-align: left;"><strong>Status:</strong></div>
+                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">Encerrado</div>
+                </div>
+
+                <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                    <div style="text-align: left;"><strong>Total de Inscrições:</strong></div>
+                    <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">1000/1035</div>
+                    <div style="color: dimgray;padding:10px">Limitadas</div>
+                </div>
+                <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                    <div style="text-align: left;"><strong>Total de Inscrições:</strong></div>
+                    <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">1000/1035</div>
+                    <div style="color: dimgray;padding:10px">Limitadas</div>
+                </div>
+
+                <div style="padding: 10px 0 30px;text-align: center">
+                    <div style="text-align: left;"><strong>Tipo de inscrição:</strong></div>
+                    <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">Gratuitas</div>
+                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
+                        <a href="#">Alterar data</a>
+                    </div>
+                </div>
+                <div style="padding: 10px 0 30px;text-align: center">
+                    <div style="text-align: left;"><strong>Tipo de inscrição:</strong></div>
+                    <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">Mistas</div>
+                    <div style="color: dimgray;padding:10px">Gratuitas e pagas</div>
+                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
+                        <a href="#">Alterar data</a>
+                    </div>
+                </div>
+{#                <div style="background-color: whitesmoke;border: 1px solid #DDD;">#}
+{#                    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">#}
+{#                        <a href="#">Publicar evento</a>#}
+{#                    </div>#}
+{#                    <div style="padding:15px"><strong>Tipo de inscrição:</strong> gratuitas [<a href="#">Alterar</a>]</div>#}
+{#                    <div style="padding:15px">#}
+{#                        <strong>Website e Redes sociais:</strong>#}
+{#                        <ul>#}
+{#                            <li style="padding: 5px"><strong>Website:</strong> asdf</li>#}
+{#                            <li style="padding: 5px"><strong>Facebook</strong> asdf</li>#}
+{#                            <li style="padding: 5px"><strong>Twitter</strong> asf</li>#}
+{#                            <li style="padding: 5px"><strong>Linkedin</strong> asdf</li>#}
+{#                            <li style="padding: 5px"><strong>Skype</strong> asdf</li>#}
+{#                        </ul>#}
+{#                    </div>#}
+{#                </div>#}
+            </td>
+        </tr>
+    </table>
 {% endblock %}
