@@ -200,6 +200,7 @@ class SubscriptionModelTest(GatherosTestCase):
         event = Event.objects.get(pk=2)
         event.date_start = datetime.now() - timedelta(days=2)
         event.date_end = datetime.now() + timedelta(hours=2)
+        event.published = False
         event.save()
 
         lot = self._create_lot(event=event, persist=True)
@@ -236,6 +237,8 @@ class SubscriptionModelTest(GatherosTestCase):
         rule_callback = rule.rule_6_inscricao_apos_data_final_evento
 
         event = Event.objects.get(pk=2)
+        event.published = False
+
         lot = event.lots.first()
 
         subscription = self._create_subscription(lot=lot)

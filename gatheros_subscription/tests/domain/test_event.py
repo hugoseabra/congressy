@@ -25,6 +25,7 @@ class EventModelTest(TestCase):
         event = Event.objects.get(**kwargs)
         event.date_start = datetime.now() - timedelta(days=10)
         event.date_end = datetime.now() + timedelta(days=1)
+        event.published = False
         event.save()
         return event
 
