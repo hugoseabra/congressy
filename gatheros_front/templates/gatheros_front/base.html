@@ -25,30 +25,42 @@
 
     {% block user %}
         <div style="background-color: #DDD;padding:10px">
-            <div style="float:left"><a href="{% url 'gatheros_front:start' %}">Início</a></div>
-            <div style="float:right">
+            <div style="float:left"><a href="{% url 'gatheros_front:start' %}">Início</a>
+            </div>
+            <div style="float:right;margin-right:30px">
                 <div>
                     {% if user_context.organizations and user_context.organizations|length > 1 %}
-                        <form action="{% url 'gatheros_event:organization-switch' %}" method="post" id="organization-context-pk">{% csrf_token %}
-                            <select name="organization-context-pk" id="organization-context-pk" onchange="submit()">
+                        <form action="{% url 'gatheros_event:organization-switch' %}"
+                              method="post"
+                              id="organization-context-pk">{% csrf_token %}
+                            <select name="organization-context-pk"
+                                    id="organization-context-pk"
+                                    onchange="submit()">
                                 {% for org in user_context.organizations %}
                                     <option
                                             {% if user_context.active_organization.pk == org.pk %}selected="selected"{% endif %}
                                             value="{{ org.pk }}">{{ org.name }}
                                     </option>
                                 {% endfor %}
-                                <input type="hidden" name="next" value="{{ request.path }}"/>
+                                <input type="hidden" name="next"
+                                       value="{{ request.path }}"/>
                             </select>
-                            |
+                            {% if not user_context.active_organization.internal %}
+                                &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp
+                                &nbsp
+                                <a href="#">Gerenciar</a>
+                            {% endif %}
+
+                            &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
                             <a href="{% url 'gatheros_front:logout' %}">Sair</a>
                         </form>
                     {% elif user_context.organizations and user_context.organizations|length == 1 %}
                         <strong>{{ user_context.active_organization.name }}</strong>
-                        |
+                        &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
                         <a href="{% url 'gatheros_front:logout' %}">Sair</a>
                     {% else %}
                         <strong>{{ request.user.get_full_name }}</strong>
-                        |
+                        &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
                         <a href="{% url 'gatheros_front:logout' %}">Sair</a>
                     {% endif %}
                 </div>

@@ -131,6 +131,10 @@ class Person(models.Model):
         blank=True,
         null=True
     )
+    pne = models.BooleanField(
+        verbose_name='portador de necessidades especiais',
+        default=False
+    )
 
     website = models.CharField(max_length=255, null=True, blank=True)
     facebook = models.CharField(max_length=255, null=True, blank=True)

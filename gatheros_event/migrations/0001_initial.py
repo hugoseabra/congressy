@@ -164,7 +164,8 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'organizações',
                 'ordering': ['name'],
                 'permissions': (
-                    ("can_invite", "Can invite members"),
+                    ('can_invite', 'Can invite members'),
+                    ('can_view', 'Can view')
                 ),
             },
         ),
@@ -204,6 +205,7 @@ class Migration(migrations.Migration):
                 ('term_version', models.IntegerField(blank=True, null=True, verbose_name='versão do termo de uso')),
                 ('politics_version',
                  models.IntegerField(blank=True, null=True, verbose_name='versão da política de privacidade')),
+                ('pne', models.BooleanField(default=False, verbose_name='portador de necessidades especiais')),
                 ('website', models.CharField(blank=True, max_length=255, null=True)),
                 ('facebook', models.CharField(blank=True, max_length=255, null=True)),
                 ('twitter', models.CharField(blank=True, max_length=255, null=True)),
