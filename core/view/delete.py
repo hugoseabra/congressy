@@ -3,10 +3,10 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.views.generic import DeleteView
 
-from core.view.user_context import UserContextViewMixin
+from gatheros_event.views.mixins import AccountMixin
 
 
-class DeleteViewMixin(UserContextViewMixin, DeleteView):
+class DeleteViewMixin(AccountMixin, DeleteView):
     protected = False
     message = None
     delete_message = 'Tem certeza que deseja excluir?'

@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 
 from core.view.delete import DeleteViewMixin
-from gatheros_event.models import Event, Member
+from gatheros_event.models import Event
 
 
 class EventDeleteView(DeleteViewMixin):
@@ -16,10 +16,3 @@ class EventDeleteView(DeleteViewMixin):
     not_allowed_message = "Você não tem permissão para excluir este evento"
 
     success_message = "Evento excluído com sucesso!"
-
-    def can_delete(self):
-        event = self.get_object()
-        organization = event.organization
-        active = self.user_context.active_organization
-
-        return organization.pk == active.pk and active.group == Member.ADMIN

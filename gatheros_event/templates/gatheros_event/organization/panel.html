@@ -12,7 +12,7 @@
     <h2>Organização: {{ organization.name }} </h2>
     <h2>Usuário: {{ user.username }} </h2>
 
-    {% if can_invite %}
+    {% if user has 'gatheros_event.can_invite' of organization %}
         <a href="">Convidar membros</a>
     {% else %}
         <b>Não pode convidar membros</b>

@@ -7,11 +7,8 @@ from django.urls import reverse_lazy
 from django.views.generic import UpdateView
 from formtools.wizard.views import SessionWizardView
 
-from core.view.user_context import UserContextViewMixin
-from gatheros_event.models import Member
-from .wizard_steps import \
-    EventFormBasicData, \
-    EventFormPlaceNew
+from gatheros_event.views.mixins import AccountMixin
+from .wizard_steps import EventFormBasicData, EventFormPlaceNew
 
 
 # @TODO RESOLVER: Super usuário não consegue criar evento por causa do contexto
@@ -21,7 +18,7 @@ def add_new_place(wizard):
     return form.add_new_place is True
 
 
-class ManagerView(UserContextViewMixin, SessionWizardView):
+class ManagerView(AccountMixin, SessionWizardView):
     model_name = 'event'
     template_name = 'gatheros_event/event/wizard/wizard.html'
 
@@ -30,11 +27,6 @@ class ManagerView(UserContextViewMixin, SessionWizardView):
         ('step2', EventFormPlaceNew),
     ]
     file_storage = FileSystemStorage(settings.MEDIA_ROOT)
-
-    def get_context_data(self, form, **kwargs):
-        context = super(ManagerView, self).get_context_data(form, **kwargs)
-        context['organization'] = self.user_context.active_organization
-        return context
 
     def get_template_names(self):
         form = self.get_form()
@@ -65,12 +57,10 @@ class ManagerView(UserContextViewMixin, SessionWizardView):
         )
 
     def can_add(self):
-        # @TODO Aplicar ACL
-        if self.request.user.is_superuser:
-            return True
-
-        active_member = self.user_context.active_member_group
-        return active_member.group == Member.ADMIN
+        return self.request.user.has_perm(
+            'gatheros_event.can_add_event',
+            self.organization
+        )
 
     def _save_data(self, form_list):
         dict_data = self._group_data_by_model(form_list)
@@ -115,7 +105,7 @@ class ManagerView(UserContextViewMixin, SessionWizardView):
         return dict_data
 
 
-class EventEditView(UserContextViewMixin, UpdateView):
+class EventEditView(AccountMixin, UpdateView):
     form_class = EventFormBasicData
     model = EventFormBasicData.Meta.model
     template_name = 'gatheros_event/event/form_edit.html'
@@ -140,15 +130,10 @@ class EventEditView(UserContextViewMixin, UpdateView):
         )
 
     def can_edit(self):
-        # @TODO Aplicar ACL
-        if self.request.user.is_superuser:
-            return True
-
-        active_member = self.user_context.active_member_group
-        return active_member.group in [
-            Member.ADMIN,
-            Member.HELPER,
-        ]
+        return self.request.user.has_perm(
+            'gatheros_event.edit_event',
+            self.get_object()
+        )
 
 
 class EventWizardView(ManagerView):

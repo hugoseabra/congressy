@@ -4,31 +4,49 @@ from django.urls import reverse
 
 
 class LoginTest(TestCase):
+    fixtures = [
+        '001_user',
+        '003_occupation',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+    ]
+
     def setUp(self):
-        self.data = {
-            'username': 'pedro',
-            'password': 'password'
-        }
-        User.objects.create_user(**self.data)
+        self.user = User.objects.get(username='lucianasilva@gmail.com')
 
     def test_get_login_is_200_ok(self):
         self.result = self.client.get(reverse('gatheros_front:login'))
         self.assertEqual(self.result.status_code, 200)
 
     def test_if_login_ok_redirect(self):
-        self.client.login(**self.data)
+        self.client.login(testcase_user=self.user)
         self.result = self.client.get(reverse('gatheros_front:login'))
         self.assertRedirects(self.result, reverse('gatheros_front:start'))
 
     def test_check_login_ok(self):
-        self.result = self.client.post(reverse('gatheros_front:login'),
-                                       data=self.data)
+        password = '12345'
+        self.user.set_password(password)
+        self.user.save()
+        data = {
+            'username': self.user.username,
+            'password': password
+        }
+        self.result = self.client.post(
+            reverse('gatheros_front:login'),
+            data=data
+        )
         self.assertRedirects(self.result, reverse('gatheros_front:start'))
 
     def test_check_login_fail(self):
-        data = self.data
-        data['username'] = 'jose'
-        self.result = self.client.post(reverse('gatheros_front:login'),
-                                       data=data)
+        data = {
+            'username': 'jose que nao existe',
+            'password': 'senha'
+        }
+        self.result = self.client.post(
+            reverse('gatheros_front:login'),
+            data=data
+        )
         self.assertEqual(self.result.status_code, 200)
         self.assertContains(self.result, 'errornote')

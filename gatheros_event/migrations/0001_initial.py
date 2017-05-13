@@ -165,6 +165,8 @@ class Migration(migrations.Migration):
                 'ordering': ['name'],
                 'permissions': (
                     ("can_invite", "Can invite members"),
+                    ('can_view', 'Can view'),
+                    ('can_add_event', 'Can add event')
                 ),
             },
         ),

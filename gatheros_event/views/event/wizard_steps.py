@@ -1,14 +1,12 @@
 from django.forms import ModelForm, Widget, fields as form_fields
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 from django.utils.safestring import mark_safe
 
-from core.view.user_context import UserContextFormMixin
-from gatheros_event.models import Event, Organization, Place
+from gatheros_event.models import Event, Place
+from gatheros_event.views.mixins import AccountMixin
 
 
-class EventFormBasicData(UserContextFormMixin, ModelForm):
-    organization = None
-
+class EventFormBasicData(AccountMixin, ModelForm):
     class Meta:
         model = Event
         fields = [
@@ -25,7 +23,6 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(EventFormBasicData, self).__init__(*args, **kwargs)
-        self.organization = self.user_context.active_organization
         self._create_organization_field()
         self._filter_place_field()
         self._set_initial_data()
@@ -38,7 +35,7 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
         self.fields['description'].initial = 'Descrição qualquer'
 
     def clean_organization(self):
-        return get_object_or_404(Organization, pk=self.organization.pk)
+        return self.organization
 
     def clean_place(self):
         place_pk = self.cleaned_data['place']
@@ -49,11 +46,9 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
             return get_object_or_404(Place, pk=place_pk)
 
     def _create_organization_field(self):
-        organization = self.user_context.active_organization
-
         class OrganizationWidget(Widget):
             def render(self, name, value, attrs=None, renderer=None):
-                return mark_safe(organization.name)
+                return mark_safe(self.organization.name)
 
         self.fields['organization'] = form_fields.CharField(
             label='Realizador',
@@ -62,9 +57,7 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
         )
 
     def _filter_place_field(self):
-
-        organization = self.user_context.active_organization
-        places = get_list_or_404(Place, organization__pk=organization.pk)
+        places = get_list_or_404(Place, organization=self.organization)
 
         if self.instance.pk:
             place_choices = ([(place.pk, place.name) for place in places])
@@ -83,8 +76,7 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
         )
 
 
-class EventFormPlaceNew(UserContextFormMixin, ModelForm):
-    organization = None
+class EventFormPlaceNew(AccountMixin, ModelForm):
     add_new_place = False
     template_name = 'gatheros_event/event/wizard/steps/place.html'
 
@@ -108,12 +100,10 @@ class EventFormPlaceNew(UserContextFormMixin, ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(EventFormPlaceNew, self).__init__(*args, **kwargs)
-        self.organization = self.user_context.active_organization
         self._set_initial_data()
 
     def _set_initial_data(self):
         self.fields['organization'].initial = self.organization.pk
-
         self.fields['name'].initial = 'Um lugar qualquer'
         self.fields['phone'].initial = '9855258'
         self.fields['zip_code'].initial = '75400000'

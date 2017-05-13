@@ -4,11 +4,9 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView
 
-from gatheros_event.acl.gatheros_user_context import update_user_context
+from gatheros_event.helpers import account
 from gatheros_event.models import Organization
 
-
-# @TODO Refatorar para inserir dados em sessão e mudança de contexto
 
 class OrganizationSwitch(RedirectView):
     def post(self, request, *args, **kwargs):
@@ -25,7 +23,7 @@ class OrganizationSwitch(RedirectView):
         if not organization.is_member(request.user.person):
             raise PermissionDenied('Você não é membro desta organização.')
 
-        update_user_context(request, organization)
+        account.set_organization(request, organization)
 
         if organization.internal is True:
             context = 'não está em organização'
