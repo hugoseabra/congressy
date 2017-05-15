@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from core.model.deletable import NotDeletableError
 from gatheros_event.models import Event, Member
 
 
@@ -102,10 +101,9 @@ class EventDeleteTest(TestCase):
 
         self.assertTrue(self._event_exists())
 
-        with self.assertRaises(NotDeletableError):
-            result = self._process_delete(remove=False)
-            self.assertTrue(self._event_exists())
-            self.assertRedirects(result, self._get_event_list_url())
+        result = self._process_delete(remove=False)
+        self.assertEqual(403, result.status_code)
+        self.assertTrue(self._event_exists())
 
         # Processando com remoção de inscrições
         self.assertTrue(self._event_exists())
