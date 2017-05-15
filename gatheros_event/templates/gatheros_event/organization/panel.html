@@ -1,0 +1,21 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:event-list' %}">Voltar</a>
+    </div>
+    <hr/>
+
+    <h1>Visão geral</h1>
+
+    <h2>Organização: {{ organization.name }} </h2>
+    <h2>Usuário: {{ user.username }} </h2>
+
+    {% if user has 'gatheros_event.can_invite' of organization %}
+        <a href="">Convidar membros</a>
+    {% else %}
+        <b>Não pode convidar membros</b>
+    {% endif %}
+
+{% endblock %}

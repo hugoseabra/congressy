@@ -193,7 +193,7 @@ class InvitationModelTest(GatherosTestCase):
         """ MODEL """
         self._trigger_validation_error(invitation.save, field='to')
 
-    def no_invitation_for_internal_organization(self):
+    def test_no_invitation_for_internal_organization(self):
         invitation = Invitation(
             author=Member.objects.get(pk=1, group=Member.ADMIN),
             to=User.objects.get(pk=3),
@@ -205,6 +205,7 @@ class InvitationModelTest(GatherosTestCase):
             invitation.save()
 
     def invitation_has_already_been_created(self):
+        # @todo rever teste, está desligado e confuso e não consegui arrumar
         member = Member.objects.get(pk=5, group=Member.ADMIN)
         invited = User.objects.get(pk=3)
 
@@ -223,7 +224,7 @@ class InvitationModelTest(GatherosTestCase):
 
         self.assertTrue('to' in dict(e.exception).keys())
 
-    def author_must_be_admin_member_of_organization(self):
+    def test_author_must_be_admin_member_of_organization(self):
         helper = Organization.objects.get(pk=5).get_members(
             group=Member.HELPER
         ).first()
@@ -241,7 +242,7 @@ class InvitationModelTest(GatherosTestCase):
 
         self.assertTrue('author' in dict(e.exception).keys())
 
-    def invited_not_member(self):
+    def test_invited_not_member(self):
         member = Member.objects.get(pk=5, group=Member.ADMIN)
         organization = Organization.objects.get(pk=5)
         invited = User.objects.get(pk=3)
@@ -277,7 +278,7 @@ class InvitationModelTest(GatherosTestCase):
 
         self.assertTrue('to' in dict(e.exception).keys())
 
-    def invited_author_not_the_same(self):
+    def test_invited_author_not_the_same(self):
         member = Member.objects.get(pk=5)
 
         invitation = Invitation(

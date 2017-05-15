@@ -6,14 +6,16 @@
     <h2>Excluir evento</h2>
 
     {% if protected %}
-        {% if delete_message %}
-            {{ delete_message }}
+        {% if not_allowed_message %}
+            {{ not_allowed_message }}
         {% endif %}
         <br />
         <br />
         <a href="{% url 'gatheros_event:event-list' %}" class="button cancel-link">Voltar</a>
     {% else %}
-        Você está prestes a excluir o {{ model_name }} '{{ object.name }}'. Deseja realmente continuar?
+        {% if delete_message %}
+            {{ delete_message }}
+        {% endif %}
         <br />
         <br />
         <form method="post">{% csrf_token %}

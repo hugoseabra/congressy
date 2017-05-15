@@ -37,7 +37,7 @@ def rule_4_running_published_event_cannot_change_date_start(event):
     """
     now = datetime.now()
     published = event.published
-    running = now >= event.date_start or now <= event.date_end
+    running = event.date_start <= now <= event.date_end
 
     if published and running and event.has_changed('date_start'):
         raise ValidationError({'date_start': [

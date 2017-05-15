@@ -2,16 +2,23 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
 
-from gatheros_event.acl import gatheros_user_context
+from gatheros_event.helpers import account
+from gatheros_event.models import Person
 
 
 @receiver(user_logged_in, sender=User)
-def add_user_context(user, request, **_):
-    # Se usuário está logado, força a existência do mesmo na requisição
+def update_account(request, user, **_):
+    # Adiciona o usuário na requisição pois os helpers de account precisam
     request.user = user
-    gatheros_user_context.update_user_context(request)
+
+    try:
+        user.person is not None
+    except Person.DoesNotExist:
+        return None
+
+    account.update_account(request)
 
 
-@receiver(user_logged_out, sender=User)
-def destroy_user_context(request, **_):
-    gatheros_user_context.clean_user_context(request)
+@receiver(user_logged_out)
+def clean_account(request, **_):
+    account.clean_account(request)

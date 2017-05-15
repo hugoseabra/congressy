@@ -1,14 +1,24 @@
 from django.forms import ModelForm, Widget, fields as form_fields
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 from django.utils.safestring import mark_safe
 
-from core.view.user_context import UserContextFormMixin
-from gatheros_event.models import Event, Organization, Place
+from gatheros_event.models import Event, Place
 
 
-class EventFormBasicData(UserContextFormMixin, ModelForm):
+class BaseAccountForm(object):
     organization = None
+    user = None
 
+    def populate_acount_data(self, initkwargs):
+        for attr in ['user', 'organization']:
+            if attr in initkwargs:
+                setattr(self, attr, initkwargs[attr])
+                del initkwargs[attr]
+
+        return initkwargs
+
+
+class EventFormBasicData(ModelForm, BaseAccountForm):
     class Meta:
         model = Event
         fields = [
@@ -24,21 +34,14 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        kwargs = self.populate_acount_data(kwargs)
         super(EventFormBasicData, self).__init__(*args, **kwargs)
-        self.organization = self.user_context.active_organization
+
         self._create_organization_field()
         self._filter_place_field()
-        self._set_initial_data()
-
-    def _set_initial_data(self):
-        self.fields['category'].initial = 2
-        self.fields['name'].initial = 'Event Teste'
-        self.fields['date_start'].initial = '2017-05-25 08:00'
-        self.fields['date_end'].initial = '2017-05-25 18:00'
-        self.fields['description'].initial = 'Descrição qualquer'
 
     def clean_organization(self):
-        return get_object_or_404(Organization, pk=self.organization.pk)
+        return self.organization
 
     def clean_place(self):
         place_pk = self.cleaned_data['place']
@@ -49,7 +52,7 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
             return get_object_or_404(Place, pk=place_pk)
 
     def _create_organization_field(self):
-        organization = self.user_context.active_organization
+        organization = self.organization
 
         class OrganizationWidget(Widget):
             def render(self, name, value, attrs=None, renderer=None):
@@ -62,9 +65,7 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
         )
 
     def _filter_place_field(self):
-
-        organization = self.user_context.active_organization
-        places = get_list_or_404(Place, organization__pk=organization.pk)
+        places = get_list_or_404(Place, organization=self.organization)
 
         if self.instance.pk:
             place_choices = ([(place.pk, place.name) for place in places])
@@ -79,12 +80,12 @@ class EventFormBasicData(UserContextFormMixin, ModelForm):
             label='Local',
             choices=place_choices,
             required=False,
-            help_text="Se o evento for apenas on-line, deixe em branco."
+            help_text="Se o evento for apenas on-line, deixe em branco.",
+            initial=self.instance.place.pk if self.instance.place else None
         )
 
 
-class EventFormPlaceNew(UserContextFormMixin, ModelForm):
-    organization = None
+class EventFormPlaceNew(ModelForm, BaseAccountForm):
     add_new_place = False
     template_name = 'gatheros_event/event/wizard/steps/place.html'
 
@@ -107,19 +108,5 @@ class EventFormPlaceNew(UserContextFormMixin, ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        kwargs = self.populate_acount_data(kwargs)
         super(EventFormPlaceNew, self).__init__(*args, **kwargs)
-        self.organization = self.user_context.active_organization
-        self._set_initial_data()
-
-    def _set_initial_data(self):
-        self.fields['organization'].initial = self.organization.pk
-
-        self.fields['name'].initial = 'Um lugar qualquer'
-        self.fields['phone'].initial = '9855258'
-        self.fields['zip_code'].initial = '75400000'
-        self.fields['city'].initial = 5413
-        self.fields['street'].initial = 'Rua dos bobos'
-        self.fields['number'].initial = '010'
-        self.fields['complement'].initial = 'Qd. 00, Lt. 100'
-        self.fields['village'].initial = 'Bairro Feliz'
-        self.fields['reference'].initial = 'Próximo da rua das crianças'

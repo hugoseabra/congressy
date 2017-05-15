@@ -41,11 +41,6 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # GATHEROS_MIDLWARE_CLASSES
-    'core.helper.account.middleware.CurrentUserContextMiddleware',
-    'core.helper.account.middleware.CurrentSessionMiddleware',
-    'core.helper.account.middleware.CurrentUserMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -74,9 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-
-                # Gatheros user_context processor
-                'gatheros_front.processor.user_context'
+                'gatheros_event.context_processors.account',
             ],
             'builtins': [
                 'permission.templatetags.permissionif',

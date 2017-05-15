@@ -9,8 +9,6 @@ from django.conf import settings
 from django.core.management import call_command
 from django.db import migrations, models
 
-import gatheros_event.models.event
-import gatheros_event.models.person
 from core.model import validator
 
 
@@ -29,15 +27,29 @@ class Migration(migrations.Migration):
         ('kanu_locations', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
-
     operations = [
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
-                ('active', models.BooleanField(default=True, verbose_name='ativo')),
-                ('description', models.TextField(blank=True, null=True, verbose_name='descrição')),
+                ('id', models.AutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
+                ('name', models.CharField(
+                    max_length=255,
+                    verbose_name='nome'
+                )),
+                ('active', models.BooleanField(
+                    default=True,
+                    verbose_name='ativo'
+                )),
+                ('description', models.TextField(
+                    blank=True,
+                    null=True,
+                    verbose_name='descrição'
+                )),
             ],
             options={
                 'verbose_name': 'Categoria de Evento',
@@ -48,37 +60,102 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Event',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
                 ('name', models.CharField(max_length=255, verbose_name='nome')),
                 ('subscription_type', models.CharField(
-                    choices=[('disabled', 'Desativadas'), ('simple', 'Simples (gratuitas)'),
-                             ('by_lots', 'Gerenciar por lotes')], default='simple',
-                    help_text='Como gostaria de gerenciar as inscrições de seu evento?', max_length=15,
-                    verbose_name='inscrições')),
-                ('subscription_offline', models.BooleanField(default=False,
-                                                             help_text='Ativar a sincronização para usar off-line no dia do evento.',
-                                                             verbose_name='ativar inscrições off-line')),
-                ('date_start', models.DateTimeField(verbose_name='data inicial')),
+                    choices=[
+                        ('disabled', 'Desativadas'),
+                        ('simple', 'Simples (gratuitas)'),
+                        ('by_lots', 'Gerenciar por lotes')
+                    ],
+                    default='simple',
+                    help_text='Como gostaria de gerenciar as inscrições de seu'
+                              ' evento?',
+                    max_length=15,
+                    verbose_name='inscrições'
+                )),
+                ('subscription_offline', models.BooleanField(
+                    default=False,
+                    help_text='Ativar a sincronização para usar off-line no dia'
+                              ' do evento.',
+                    verbose_name='ativar inscrições off-line'
+                )),
+                ('date_start',
+                 models.DateTimeField(verbose_name='data inicial')),
                 ('date_end', models.DateTimeField(verbose_name='data final')),
-                ('description', models.TextField(blank=True, help_text='Descrição que irá aparecer nos sites de busca e redes sociais. Quanto mais detalhada, melhor!', null=True, verbose_name='descrição')),
-                ('banner_slide',
-                 models.ImageField(blank=True, help_text='Banner pequeno para destaque (tamanho: 1140px x 500px)',
-                                   null=True, upload_to='', verbose_name='banner destaque')),
-                ('banner_small', models.ImageField(blank=True,
-                                                   help_text='Banner pequeno para apresentação geral (tamanho: 580px x 422px)',
-                                                   null=True, upload_to='', verbose_name='banner pequeno')),
-                ('banner_top', models.ImageField(blank=True,
-                                                 help_text='Banner para o topo do site do evento (tamanho: 1920px x 900px)',
-                                                 null=True, upload_to='', verbose_name='banner topo do site')),
-                ('website', models.CharField(blank=True, max_length=255, null=True)),
-                ('facebook', models.CharField(blank=True, max_length=255, null=True)),
-                ('twitter', models.CharField(blank=True, max_length=255, null=True)),
-                ('linkedin', models.CharField(blank=True, max_length=255, null=True)),
-                ('skype', models.CharField(blank=True, max_length=255, null=True)),
-                ('published', models.BooleanField(default=False,
-                                                  help_text='Eventos não publicados e com data futura serão considerados rascunhos.',
-                                                  verbose_name='publicado')),
-                ('slug', models.CharField(editable=False, max_length=128, unique=True, verbose_name='permalink')),
+                ('description', models.TextField(
+                    blank=True,
+                    help_text='Descrição que irá aparecer nos sites de busca e'
+                              ' redes sociais. Quanto mais detalhada, melhor!',
+                    null=True,
+                    verbose_name='descrição'
+                )),
+                ('banner_slide', models.ImageField(
+                    blank=True,
+                    help_text='Banner pequeno para destaque'
+                              ' (tamanho: 1140px x 500px)',
+                    null=True,
+                    upload_to='',
+                    verbose_name='banner destaque'
+                )),
+                ('banner_small', models.ImageField(
+                    blank=True,
+                    help_text='Banner pequeno para apresentação geral'
+                              ' (tamanho: 580px x 422px)',
+                    null=True,
+                    upload_to='',
+                    verbose_name='banner pequeno'
+                )),
+                ('banner_top', models.ImageField(
+                    blank=True,
+                    help_text='Banner para o topo do site do evento'
+                              ' (tamanho: 1920px x 900px)',
+                    null=True,
+                    upload_to='',
+                    verbose_name='banner topo do site'
+                )),
+                ('website', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('facebook', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('twitter', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('linkedin', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('skype', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('published', models.BooleanField(
+                    default=False,
+                    help_text='Eventos não publicados e com data futura serão'
+                              ' considerados rascunhos.',
+                    verbose_name='publicado'
+                )),
+                ('slug', models.CharField(
+                    editable=False,
+                    max_length=128,
+                    unique=True,
+                    verbose_name='permalink'
+                )),
             ],
             options={
                 'verbose_name': 'evento',
@@ -89,12 +166,27 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Invitation',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
                 ('created', models.DateTimeField(verbose_name='criado em')),
-                ('expired', models.DateTimeField(blank=True, null=True, verbose_name='expira em')),
-                ('type',
-                 models.CharField(choices=[('helper', 'Auxiliar'), ('admin', 'Administrador')], default='helper',
-                                  max_length=10, verbose_name='tipo')),
+                ('expired', models.DateTimeField(
+                    blank=True,
+                    null=True,
+                    verbose_name='expira em'
+                )),
+                ('type', models.CharField(
+                    choices=[
+                        ('helper', 'Auxiliar'),
+                        ('admin', 'Administrador')
+                    ],
+                    default='helper',
+                    max_length=10,
+                    verbose_name='tipo'
+                )),
             ],
             options={
                 'verbose_name': 'convite',
@@ -105,15 +197,44 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Member',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('group', models.CharField(choices=[('admin', 'Administrador'), ('helper', 'Auxiliar')], max_length=20,
-                                           verbose_name='grupo')),
-                ('created', models.DateTimeField(auto_now_add=True, verbose_name='criado em')),
-                ('created_by', models.PositiveIntegerField(verbose_name='criado por')),
-                ('invited_on', models.DateTimeField(auto_now_add=True, verbose_name='convidado em')),
-                ('accepted', models.BooleanField(default=False, verbose_name='convite aceito')),
-                ('accepted_on', models.DateTimeField(blank=True, null=True, verbose_name='aceito em')),
-                ('active', models.BooleanField(default=True, verbose_name='ativo')),
+                ('id', models.AutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
+                ('group', models.CharField(
+                    choices=[
+                        ('admin', 'Administrador'),
+                        ('helper', 'Auxiliar')
+                    ],
+                    max_length=20,
+                    verbose_name='grupo'
+                )),
+                ('created', models.DateTimeField(
+                    auto_now_add=True,
+                    verbose_name='criado em'
+                )),
+                ('created_by', models.PositiveIntegerField(
+                    verbose_name='criado por'
+                )),
+                ('invited_on', models.DateTimeField(
+                    auto_now_add=True,
+                    verbose_name='convidado em'
+                )),
+                ('accepted', models.BooleanField(
+                    default=False,
+                    verbose_name='convite aceito'
+                )),
+                ('accepted_on', models.DateTimeField(
+                    blank=True,
+                    null=True,
+                    verbose_name='aceito em'
+                )),
+                ('active', models.BooleanField(
+                    default=True,
+                    verbose_name='ativo'
+                )),
             ],
             options={
                 'verbose_name': 'membro',
@@ -124,9 +245,20 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Occupation',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True, verbose_name='nome')),
-                ('active', models.BooleanField(default=True, verbose_name='ativo')),
+                ('id', models.AutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
+                ('name', models.CharField(
+                    max_length=100, unique=True,
+                    verbose_name='nome'
+                )),
+                ('active', models.BooleanField(
+                    default=True,
+                    verbose_name='ativo'
+                )),
             ],
             options={
                 'verbose_name': 'Profissão',
@@ -137,89 +269,258 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Organization',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
                 ('name', models.CharField(max_length=100, verbose_name='nome')),
-                ('description', models.TextField(blank=True, null=True, verbose_name='descrição')),
-                ('avatar_width', models.PositiveIntegerField(blank=True, null=True)),
-                ('avatar_height', models.PositiveIntegerField(blank=True, null=True)),
-                ('avatar', models.ImageField(blank=True, height_field='avatar_height', null=True, upload_to='',
-                                             verbose_name='foto', width_field='avatar_width')),
-                ('website', models.CharField(blank=True, max_length=255, null=True)),
-                ('facebook', models.CharField(blank=True, max_length=255, null=True)),
-                ('twitter', models.CharField(blank=True, max_length=255, null=True)),
-                ('linkedin', models.CharField(blank=True, max_length=255, null=True)),
-                ('skype', models.CharField(blank=True, max_length=255, null=True)),
-                ('cash_provider',
-                 models.CharField(blank=True, max_length=10, null=True, verbose_name='provedor de recebimento')),
-                ('cash_data',
-                 models.CharField(blank=True, max_length=10, null=True, verbose_name='dados para recebimento')),
-                ('active', models.BooleanField(default=True, verbose_name='ativo')),
-                ('internal', models.BooleanField(default=True, verbose_name='gerado internamente')),
+                ('description', models.TextField(
+                    blank=True,
+                    null=True,
+                    verbose_name='descrição'
+                )),
+                ('avatar_width', models.PositiveIntegerField(
+                    blank=True,
+                    null=True
+                )),
+                ('avatar_height', models.PositiveIntegerField(
+                    blank=True,
+                    null=True
+                )),
+                ('avatar', models.ImageField(
+                    blank=True,
+                    height_field='avatar_height',
+                    null=True,
+                    upload_to='',
+                    verbose_name='foto',
+                    width_field='avatar_width'
+                )),
+                ('website', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('facebook', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('twitter', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('linkedin', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('skype', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('cash_provider', models.CharField(
+                    blank=True,
+                    max_length=10,
+                    null=True,
+                    verbose_name='provedor de recebimento'
+                )),
+                ('cash_data', models.CharField(
+                    blank=True,
+                    max_length=10,
+                    null=True,
+                    verbose_name='dados para recebimento'
+                )),
+                ('active', models.BooleanField(
+                    default=True,
+                    verbose_name='ativo'
+                )),
+                ('internal', models.BooleanField(
+                    default=True,
+                    verbose_name='gerado internamente'
+                )),
                 ('slug', models.CharField(
-                    max_length=128, unique=True, verbose_name='permalink',
-                    help_text='Link que aparecerá para exibir as informações da organizações: https://gatheros.com/<permalink>')),
+                    max_length=128,
+                    unique=True,
+                    verbose_name='permalink',
+                    help_text='Link que aparecerá para exibir as informações da'
+                              ' organizações: https://gatheros.com/<permalink>'
+                )),
             ],
             options={
                 'verbose_name': 'organização',
                 'verbose_name_plural': 'organizações',
                 'ordering': ['name'],
                 'permissions': (
-                    ('can_invite', 'Can invite members'),
-                    ('can_view', 'Can view')
+                    ("can_invite", "Can invite members"),
+                    ('can_view', 'Can view'),
+                    ('can_add_event', 'Can add event')
                 ),
             },
         ),
         migrations.CreateModel(
             name='Person',
             fields=[
-                ('uuid',
-                 models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
+                ('uuid', models.UUIDField(
+                    default=uuid.uuid4,
+                    editable=False,
+                    primary_key=True,
+                    serialize=False,
+                    unique=True
+                )),
                 ('name', models.CharField(max_length=255, verbose_name='nome')),
-                ('gender',
-                 models.CharField(choices=[('M', 'Masculino'), ('F', 'Feminino')], max_length=1, verbose_name='sexo')),
-                ('email', models.EmailField(blank=True, max_length=254, null=True, unique=True, verbose_name='email')),
-                ('zip_code', models.CharField(blank=True, max_length=8, null=True, verbose_name='CEP')),
-                ('street',
-                 gatheros_event.models.person.TextFieldWithInputText(blank=True, null=True, verbose_name='endereço')),
-                ('number',
-                 models.CharField(blank=True, help_text='Caso não tenha, informar S/N.', max_length=20, null=True,
-                                  verbose_name='número')),
-                ('complement', gatheros_event.models.person.TextFieldWithInputText(blank=True, null=True,
-                                                                                   verbose_name='complemento')),
-                ('village',
-                 gatheros_event.models.person.TextFieldWithInputText(blank=True, null=True, verbose_name='bairro')),
-                ('phone', models.CharField(blank=True, max_length=12, null=True,
-                                           validators=[validator.phone_validator],
-                                           verbose_name='telefone')),
-                ('avatar', models.ImageField(blank=True, null=True, upload_to='', verbose_name='foto')),
-                ('cpf', models.CharField(blank=True, max_length=11, null=True, unique=True,
-                                         validators=[validator.cpf_validator],
-                                         verbose_name='CPF')),
-                ('birth_date', models.DateField(blank=True, null=True, verbose_name='data nascimento')),
-                ('rg', gatheros_event.models.person.TextFieldWithInputText(blank=True, null=True, verbose_name='rg')),
-                ('orgao_expedidor', gatheros_event.models.person.TextFieldWithInputText(blank=True, null=True,
-                                                                                        verbose_name='orgão expedidor')),
+                ('gender', models.CharField(
+                    choices=[
+                        ('M', 'Masculino'),
+                        ('F', 'Feminino')
+                    ],
+                    max_length=1,
+                    verbose_name='sexo'
+                )),
+                ('email', models.EmailField(
+                    blank=True,
+                    max_length=254,
+                    null=True,
+                    unique=True,
+                    verbose_name='email'
+                )),
+                ('zip_code', models.CharField(
+                    blank=True,
+                    max_length=8,
+                    null=True,
+                    verbose_name='CEP'
+                )),
+                ('street', models.CharField(
+                    max_length=255,
+                    blank=True,
+                    null=True,
+                    verbose_name='endereço'
+                )),
+                ('number', models.CharField(
+                    blank=True,
+                    help_text='Caso não tenha, informar S/N.',
+                    max_length=20,
+                    null=True,
+                    verbose_name='número'
+                )),
+                ('complement', models.CharField(
+                    max_length=255,
+                    blank=True,
+                    null=True,
+                    verbose_name='complemento'
+                )),
+                ('village', models.CharField(
+                    max_length=255,
+                    blank=True,
+                    null=True,
+                    verbose_name='bairro'
+                )),
+                ('phone', models.CharField(
+                    blank=True,
+                    max_length=12,
+                    null=True,
+                    validators=[validator.phone_validator],
+                    verbose_name='telefone'
+                )),
+                ('avatar', models.ImageField(
+                    blank=True,
+                    null=True,
+                    upload_to='',
+                    verbose_name='foto'
+                )),
+                ('cpf', models.CharField(
+                    blank=True,
+                    max_length=11,
+                    null=True,
+                    unique=True,
+                    validators=[validator.cpf_validator],
+                    verbose_name='CPF')),
+                ('birth_date', models.DateField(
+                    blank=True,
+                    null=True,
+                    verbose_name='data nascimento'
+                )),
+                ('rg', models.CharField(
+                    max_length=255,
+                    blank=True,
+                    null=True,
+                    verbose_name='rg'
+                )),
+                ('orgao_expedidor', models.CharField(
+                    max_length=255,
+                    blank=True,
+                    null=True,
+                    verbose_name='orgão expedidor'
+                )),
                 ('created', models.DateTimeField(auto_now_add=True, null=True)),
                 ('modified', models.DateTimeField(auto_now=True, null=True)),
                 ('synchronized', models.NullBooleanField(default=False)),
-                ('term_version', models.IntegerField(blank=True, null=True, verbose_name='versão do termo de uso')),
-                ('politics_version',
-                 models.IntegerField(blank=True, null=True, verbose_name='versão da política de privacidade')),
-                ('pne', models.BooleanField(default=False, verbose_name='portador de necessidades especiais')),
-                ('website', models.CharField(blank=True, max_length=255, null=True)),
-                ('facebook', models.CharField(blank=True, max_length=255, null=True)),
-                ('twitter', models.CharField(blank=True, max_length=255, null=True)),
-                ('linkedin', models.CharField(blank=True, max_length=255, null=True)),
-                ('skype', models.CharField(blank=True, max_length=255, null=True)),
-                ('has_user', models.BooleanField(default=False, verbose_name='vincular usuario?')),
-                ('city',
-                 models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='kanu_locations.City',
-                                   verbose_name='cidade')),
-                ('occupation', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
-                                                 to='gatheros_event.Occupation', verbose_name='profissão')),
-                ('user', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT,
-                                              related_name='person', to=settings.AUTH_USER_MODEL,
-                                              verbose_name='usuário')),
+                ('term_version', models.IntegerField(
+                    blank=True, null=True,
+                    verbose_name='versão do termo de uso'
+                )),
+                ('politics_version', models.IntegerField(
+                    blank=True,
+                    null=True,
+                    verbose_name='versão da política de privacidade'
+                )),
+                ('pne', models.BooleanField(
+                    default=False,
+                    verbose_name='portador de necessidades especiais'
+                )),
+                ('website', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('facebook', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('twitter', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('linkedin', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('skype', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True
+                )),
+                ('has_user', models.BooleanField(
+                    default=False,
+                    verbose_name='vincular usuario?'
+                )),
+                ('city', models.ForeignKey(
+                    null=True,
+                    on_delete=django.db.models.deletion.PROTECT,
+                    to='kanu_locations.City',
+                    verbose_name='cidade'
+                )),
+                ('occupation', models.ForeignKey(
+                    blank=True,
+                    null=True,
+                    on_delete=django.db.models.deletion.SET_NULL,
+                    to='gatheros_event.Occupation',
+                    verbose_name='profissão'
+                )),
+                ('user', models.OneToOneField(
+                    blank=True,
+                    null=True,
+                    on_delete=django.db.models.deletion.PROTECT,
+                    related_name='person',
+                    to=settings.AUTH_USER_MODEL,
+                    verbose_name='usuário'
+                )),
             ],
             options={
                 'verbose_name': 'pessoa',
@@ -230,31 +531,90 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Place',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
-                ('phone', models.CharField(blank=True, max_length=12, null=True,
-                                           verbose_name='telefone')),
-                ('long', models.DecimalField(blank=True, decimal_places=3, max_digits=8, null=True)),
-                ('lat', models.DecimalField(blank=True, decimal_places=3, max_digits=8, null=True)),
-                ('zip_code', models.CharField(blank=True, max_length=8, null=True, verbose_name='CEP')),
-                ('street', models.CharField(blank=True, max_length=255, null=True,
-                                            verbose_name='logradouro (rua, avenida, etc.)')),
-                ('number',
-                 models.CharField(blank=True, help_text='Caso não tenha, informar S/N.', max_length=20, null=True,
-                                  verbose_name='número')),
-                ('complement', models.CharField(blank=True, max_length=255, null=True, verbose_name='complemento')),
-                ('village', models.CharField(blank=True, max_length=255, null=True, verbose_name='bairro')),
-                ('reference', models.CharField(blank=True, help_text='Alguma informação para ajudar a chegar ao local.',
-                                               max_length=255, null=True, verbose_name='referência')),
+                ('id', models.AutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
+                ('name', models.CharField(
+                    max_length=255,
+                    verbose_name='nome'
+                )),
+                ('phone', models.CharField(
+                    blank=True,
+                    max_length=12,
+                    null=True,
+                    verbose_name='telefone'
+                )),
+                ('long', models.DecimalField(
+                    blank=True,
+                    decimal_places=3,
+                    max_digits=8,
+                    null=True
+                )),
+                ('lat', models.DecimalField(
+                    blank=True,
+                    decimal_places=3,
+                    max_digits=8,
+                    null=True
+                )),
+                ('zip_code', models.CharField(
+                    blank=True,
+                    max_length=8,
+                    null=True,
+                    verbose_name='CEP'
+                )),
+                ('street', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True,
+                    verbose_name='logradouro (rua, avenida, etc.)'
+                )),
+                ('number', models.CharField(
+                    blank=True,
+                    help_text='Caso não tenha, informar S/N.',
+                    max_length=20,
+                    null=True,
+                    verbose_name='número'
+                )),
+                ('complement', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True,
+                    verbose_name='complemento'
+                )),
+                ('village', models.CharField(
+                    blank=True,
+                    max_length=255,
+                    null=True,
+                    verbose_name='bairro'
+                )),
+                ('reference', models.CharField(
+                    blank=True,
+                    help_text='Alguma informação para ajudar a chegar ao'
+                              ' local.',
+                    max_length=255,
+                    null=True,
+                    verbose_name='referência'
+                )),
                 ('google_street_view_link', models.TextField(
                     blank=True,
-                    help_text='Informações do Google StreetView para exibir imagens do local no site.',
-                    null=True, verbose_name='Link do Google StreetView')
-                 ),
-                ('city', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='kanu_locations.City',
-                                           verbose_name='cidade')),
-                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='places',
-                                                   to='gatheros_event.Organization', verbose_name='organização')),
+                    help_text='Informações do Google StreetView para exibir'
+                              ' imagens do local no site.',
+                    null=True, verbose_name='Link do Google StreetView'
+                )),
+                ('city', models.ForeignKey(
+                    on_delete=django.db.models.deletion.PROTECT,
+                    to='kanu_locations.City',
+                    verbose_name='cidade'
+                )),
+                ('organization', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE,
+                    related_name='places',
+                    to='gatheros_event.Organization',
+                    verbose_name='organização'
+                )),
             ],
             options={
                 'verbose_name': 'local de Evento',
@@ -265,10 +625,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Segment',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
                 ('name', models.CharField(max_length=255, verbose_name='nome')),
-                ('active', models.BooleanField(default=True, verbose_name='ativo')),
-                ('description', models.TextField(blank=True, null=True, verbose_name='descrição')),
+                ('active', models.BooleanField(
+                    default=True,
+                    verbose_name='ativo'
+                )),
+                ('description', models.TextField(
+                    blank=True,
+                    null=True,
+                    verbose_name='descrição'
+                )),
             ],
             options={
                 'verbose_name': 'Cadeia Produtiva',
@@ -279,10 +651,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Subject',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
                 ('name', models.CharField(max_length=255, verbose_name='nome')),
-                ('active', models.BooleanField(default=True, verbose_name='ativo')),
-                ('description', models.TextField(blank=True, null=True, verbose_name='descrição')),
+                ('active', models.BooleanField(
+                    default=True,
+                    verbose_name='ativo'
+                )),
+                ('description', models.TextField(
+                    blank=True,
+                    null=True,
+                    verbose_name='descrição'
+                )),
             ],
             options={
                 'verbose_name': 'Assunto',
@@ -294,28 +678,72 @@ class Migration(migrations.Migration):
             name='Info',
             fields=[
                 ('text', models.TextField(verbose_name='texto')),
-                ('event',
-                 models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False,
-                                      to='gatheros_event.Event', verbose_name='evento')),
-                ('config_type', models.CharField(blank=True,
-                                                 choices=[('image_main', 'Imagem única (Largura 360px, Altura: livre)'),
-                                                          ('4_images', '4 imagens pequenas (Tamanho: 300px x 300px)'),
-                                                          ('video', 'Vídeo (Youtube)')], max_length=15, null=True,
-                                                 verbose_name='Exibição')),
-                ('image_main',
-                 models.ImageField(blank=True, help_text='Imagem única da descrição do evento (Largura: 360px).',
-                                   null=True, upload_to='', verbose_name='imagem principal')),
-                ('image1', models.ImageField(blank=True, help_text='Tamanho: 300px x 300px', null=True, upload_to='',
-                                             verbose_name='imagem pequena #1')),
-                ('image2', models.ImageField(blank=True, help_text='Tamanho: 300px x 300px', null=True, upload_to='',
-                                             verbose_name='imagem pequena #2')),
-                ('image3', models.ImageField(blank=True, help_text='Tamanho: 300px x 300px', null=True, upload_to='',
-                                             verbose_name='imagem pequena #3')),
-                ('image4', models.ImageField(blank=True, help_text='Tamanho: 300px x 300px', null=True, upload_to='',
-                                             verbose_name='imagem pequena #4')),
-                ('youtube_video_id',
-                 models.TextField(blank=True, help_text='x: https://www.youtube.com/watch?v=xxxx', null=True,
-                                  verbose_name='ID do Youtube')),
+                ('event', models.OneToOneField(
+                    on_delete=django.db.models.deletion.CASCADE,
+                    primary_key=True,
+                    serialize=False,
+                    to='gatheros_event.Event',
+                    verbose_name='evento'
+                )),
+                ('config_type', models.CharField(
+                    blank=True,
+                    choices=[
+                        (
+                            'image_main',
+                            'Imagem única (Largura 360px, Altura: livre)'
+                        ),
+                        (
+                            '4_images',
+                            '4 imagens pequenas (Tamanho: 300px x 300px)'
+                        ),
+                        ('video', 'Vídeo (Youtube)')
+                    ],
+                    max_length=15,
+                    null=True,
+                    verbose_name='Exibição'
+                )),
+                ('image_main', models.ImageField(
+                    blank=True,
+                    help_text='Imagem única da descrição do evento'
+                              ' (Largura: 360px).',
+                    null=True,
+                    upload_to='',
+                    verbose_name='imagem principal'
+                )),
+                ('image1', models.ImageField(
+                    blank=True,
+                    help_text='Tamanho: 300px x 300px',
+                    null=True,
+                    upload_to='',
+                    verbose_name='imagem pequena #1'
+                )),
+                ('image2', models.ImageField(
+                    blank=True,
+                    help_text='Tamanho: 300px x 300px',
+                    null=True,
+                    upload_to='',
+                    verbose_name='imagem pequena #2'
+                )),
+                ('image3', models.ImageField(
+                    blank=True,
+                    help_text='Tamanho: 300px x 300px',
+                    null=True,
+                    upload_to='',
+                    verbose_name='imagem pequena #3'
+                )),
+                ('image4', models.ImageField(
+                    blank=True,
+                    help_text='Tamanho: 300px x 300px',
+                    null=True,
+                    upload_to='',
+                    verbose_name='imagem pequena #4'
+                )),
+                ('youtube_video_id', models.TextField(
+                    blank=True,
+                    help_text='x: https://www.youtube.com/watch?v=xxxx',
+                    null=True,
+                    verbose_name='ID do Youtube'
+                )),
 
             ],
             options={
@@ -327,49 +755,76 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='member',
             name='organization',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='members',
-                                    to='gatheros_event.Organization', verbose_name='organização'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='members',
+                to='gatheros_event.Organization',
+                verbose_name='organização'
+            ),
         ),
         migrations.AddField(
             model_name='member',
             name='person',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='members',
-                                    to='gatheros_event.Person', verbose_name='pessoa'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='members',
+                to='gatheros_event.Person',
+                verbose_name='pessoa'
+            ),
         ),
         migrations.AddField(
             model_name='invitation',
             name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='gatheros_event.Member',
-                                    verbose_name='autor'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to='gatheros_event.Member',
+                verbose_name='autor'
+            ),
         ),
         migrations.AddField(
             model_name='invitation',
             name='to',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='invitations',
-                                    to=settings.AUTH_USER_MODEL, verbose_name='convidado'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='invitations',
+                to=settings.AUTH_USER_MODEL,
+                verbose_name='convidado'
+            ),
         ),
         migrations.AddField(
             model_name='event',
             name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='gatheros_event.Category',
-                                    verbose_name='categoria'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                to='gatheros_event.Category',
+                verbose_name='categoria'
+            ),
         ),
         migrations.AddField(
             model_name='event',
             name='organization',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='events',
-                                    to='gatheros_event.Organization', verbose_name='organização'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name='events',
+                to='gatheros_event.Organization',
+                verbose_name='organização'
+            ),
         ),
         migrations.AddField(
             model_name='event',
             name='place',
-            field=models.ForeignKey(blank=True, help_text='Deixar em branco se o evento é apenas on-line.', null=True,
-                                    on_delete=django.db.models.deletion.SET_NULL, to='gatheros_event.Place',
-                                    verbose_name='local'),
+            field=models.ForeignKey(
+                blank=True,
+                help_text='Deixar em branco se o evento é apenas on-line.',
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to='gatheros_event.Place',
+                verbose_name='local'
+            ),
         ),
         migrations.AlterUniqueTogether(
             name='invitation',
-            unique_together=set([('author', 'to')]),
+            unique_together=[('author', 'to')],
         ),
         migrations.RunPython(load_initial_data)
     ]

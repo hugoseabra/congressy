@@ -58,12 +58,14 @@
                             <div>
                                 <strong>Período:</strong> {{ event.get_period }}
                             </div>
+                            {% if event.place %}
                             <div>
                                 <p>
                                     <strong>Local:</strong> {{ event.place.name }}
                                 </p>
                                 <p style="color:dimgray;text-indent: 20px;">{{ event.place.get_complete_address }}</p>
                             </div>
+                            {% endif %}
                             <div>
                                 <p>
                                     <strong>Descrição:</strong>

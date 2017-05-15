@@ -5,7 +5,7 @@
 
 {% block content %}
     <h1>Lista de Eventos</h1>
-    {% if can_add %}
+    {% if user has 'gatheros_event.can_add_event' of organization %}
         <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
             <a href="{% url 'gatheros_event:event-add' %}">Adicionar</a>
         </div>
@@ -42,10 +42,10 @@
                     </td>
                     <td width="5%"
                         style="background: #FFF;padding:10px;margin-bottom: 3px">
-                        {% if can_edit %}
+                        {% if user has 'gatheros_event.change_event' of event %}
                             <a href="{% url 'gatheros_event:event-edit' event.pk %}">Editar</a>
                         {% endif %}
-                        {% if event.is_deletable and can_delete %}
+                        {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
                             <br/><br/>
                             <a href="{% url 'gatheros_event:event-delete' event.pk %}">Excluir</a>
                         {% endif %}

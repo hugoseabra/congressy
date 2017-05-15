@@ -63,6 +63,7 @@ class Organization(models.Model):
         permissions = (
             ("can_invite", "Can invite members"),
             ("can_view", "Can view"),
+            ("can_add_event", "Can add event"),
         )
 
     def __str__(self):

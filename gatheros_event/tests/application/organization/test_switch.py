@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
+from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 
+from gatheros_event.helpers import account
 from gatheros_event.models import Organization
 
 
@@ -20,72 +22,71 @@ class OrganizationSwitchTest(TestCase):
 
     def setUp(self):
         # Usuário com várias organizações
-        self.user = User.objects.get(pk=4)
-        assert self.user is not None
-
+        self.user = User.objects.get(username="lucianasilva@gmail.com")
+        self.client.login(testcase_user=self.user)
         self.url = reverse('gatheros_event:organization-switch')
 
-    def _login(self):
-        assert self.client.login(testcase_user=self.user)
+    def _get_organization(self, wsgi_request=None):
+        if wsgi_request is None:
+            wsgi_request = self.client.request().wsgi_request
+        return account.get_organization(wsgi_request)
 
-    def _get_user_context(self):
-        return self.client.session['user_context']
-
-    def _get_active_organization(self):
-        uc = self._get_user_context()
-        active = uc.get('active_organization')
-        assert active
-        assert active.get('pk') is not None
-        return active
-
-    def _get_organization(self):
-        self._login()
-        active = self._get_active_organization()
-        assert active.get('pk') is not None
-
-        organization = Organization.objects.get(pk=active.get('pk'))
-        assert organization is not None
-        return organization
-
-    def _get_other_organization_pk(self, organization):
-        user_context = self._get_user_context()
-        orgs = user_context['organizations']
+    def _get_organization_other(self, organization):
+        orgs = account.get_organizations(self.client.request().wsgi_request)
         assert len(orgs) > 1
 
-        other = [org for org in orgs if org['pk'] != organization.pk][0]
-        assert other.get('pk') is not None
-        return other.get('pk')
+        return [org for org in orgs if org.pk != organization.pk][0]
 
-    def _get_not_member_organization_pk(self):
-        user_context = self._get_user_context()
-        orgs = user_context['organizations']
-        assert len(orgs) > 1
-
-        pks = [org.get('pk') for org in orgs]
-        return Organization.objects.exclude(pk__in=pks).first().pk
+    def _get_organization_not_member(self):
+        orgs = account.get_organizations(self.client.request().wsgi_request)
+        return Organization.objects \
+            .exclude(pk__in=[org.pk for org in orgs]) \
+            .first()
 
     def test_switch_organization(self):
         # First organization
-        organization = self._get_organization()
-        active = self._get_active_organization()
-        self.assertEqual(active.get('pk'), organization.pk)
+        organization1 = self._get_organization()
 
         # Switch
-        other_pk = self._get_other_organization_pk(organization)
-        self.client.post(self.url, {'organization-context-pk': other_pk})
+        other = self._get_organization_other(organization1).pk
+        result = self.client.post(self.url, {'organization-context-pk': other})
 
-        # Other organization
-        organization = self._get_organization()
-        active = self._get_active_organization()
-        self.assertEqual(active.get('pk'), organization.pk)
+        # Check if changed
+        organization2 = self._get_organization(result.wsgi_request)
+        self.assertEqual(other, organization2.pk)
 
     def test_not_allowed_organization(self):
+        org = self._get_organization_not_member()
+        result = self.client.post(self.url, {'organization-context-pk': org.pk})
+        self.assertEqual(result.status_code, 403)
+
+    def test_not_exist_organization(self):
+        result = self.client.post(self.url, {'organization-context-pk': 9999})
+        self.assertEqual(result.status_code, 404)
+
+    def test_presentation(self):
         # First organization
         organization = self._get_organization()
-        active = self._get_active_organization()
-        self.assertEqual(active.get('pk'), organization.pk)
+        response = self.client.post(
+            self.url,
+            {'organization-context-pk': organization.pk}
+        )
+        messages = [m for m in get_messages(response.wsgi_request)]
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            "Agora você não está em organização.",
+            str(messages[0])
+        )
 
-        # Switch
-        other = self._get_not_member_organization_pk()
-        result = self.client.post(self.url, {'organization-context-pk': other})
-        self.assertEqual(result.status_code, 403)
+        # Second organization
+        organization = self._get_organization_other(organization)
+        response= self.client.post(
+            self.url,
+            {'organization-context-pk': organization.pk}
+        )
+        messages = [m for m in get_messages(response.wsgi_request)]
+        self.assertEqual(len(messages), 1)
+        self.assertInHTML(
+            "Agora você está na organização '%s'." % organization.name,
+            str(messages[0])
+        )

@@ -63,7 +63,7 @@ class EventDeleteTest(TestCase):
         user.save()
         return user
 
-    def _event_owner_login(self):
+    def _event_admin_login(self):
         user = self._get_user(Member.ADMIN)
         assert user is not None
         assert self.client.login(testcase_user=user)
@@ -90,7 +90,7 @@ class EventDeleteTest(TestCase):
         self.assertRedirects(result, self._get_login_url() + '?next=' + url)
 
         # Authenticated
-        self._event_owner_login()
+        self._event_admin_login()
 
         self.assertTrue(self._event_exists())
         result = self._process_delete()
@@ -98,7 +98,7 @@ class EventDeleteTest(TestCase):
         self.assertRedirects(result, self._get_event_list_url())
 
     def test_event_with_subscriptions_cannot_be_deleted(self):
-        self._event_owner_login()
+        self._event_admin_login()
 
         self.assertTrue(self._event_exists())
 
@@ -113,15 +113,15 @@ class EventDeleteTest(TestCase):
         self.assertFalse(self._event_exists())
         self.assertRedirects(result, self._get_event_list_url())
 
-    def test_owner_deletes_event_and_returns_success(self):
-        self._event_owner_login()
+    def test_admin_can_delete(self):
+        self._event_admin_login()
 
         self.assertTrue(self._event_exists())
         result = self._process_delete()
         self.assertFalse(self._event_exists())
         self.assertRedirects(result, self._get_event_list_url())
 
-    def test_helper_deletes_event_and_returns_error(self):
+    def test_helper_cannot_delete(self):
         self._event_helper_login()
 
         self.assertTrue(self._event_exists())
