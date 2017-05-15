@@ -14,7 +14,7 @@ def update_account(request, user, **_):
     try:
         user.person is not None
     except Person.DoesNotExist:
-        return None
+        return
 
     account.update_account(request)
 

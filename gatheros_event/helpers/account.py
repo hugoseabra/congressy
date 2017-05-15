@@ -2,24 +2,26 @@ from django.core.exceptions import SuspiciousOperation
 
 from gatheros_event.models import Organization, Person
 
-__is_configured = False
 
+def is_configured(request):
+    configured = 'account' in request.session
+    if not configured:
+        clean_account(request)
 
-def is_configured():
-    global __is_configured
-
-    return __is_configured
+    return configured
 
 
 def get_organization(request):
-    if not hasattr(request, '_cached_organization'):
+    if not hasattr(request, 'cached_organization'):
         account = request.session.get('account')
         try:
-            request._cached_organization = Organization.objects \
-                .get(pk=account.get('organization'))
+            org = Organization.objects.get(pk=account.get('organization'))
+            request.cached_organization = org
+
         except Organization.DoesNotExist:
             return None
-    return request._cached_organization
+
+    return request.cached_organization
 
 
 def get_organizations(request):
@@ -29,12 +31,15 @@ def get_organizations(request):
     :param request:
     :return:
     """
-    if not hasattr(request, '_cached_organizations'):
+    if not hasattr(request, 'cached_organizations'):
         account = request.session.get('account')
-        request._cached_organizations = list(
-            Organization.objects.filter(pk__in=account.get('organizations'))
+        request.cached_organizations = list(
+            Organization.objects.filter(
+                pk__in=account.get('organizations')
+            ).order_by('-internal', 'name')
         )
-    return request._cached_organizations
+
+    return request.cached_organizations
 
 
 def get_member(request):
@@ -44,13 +49,16 @@ def get_member(request):
     :param request:
     :return:
     """
-    if not hasattr(request, '_cached_member'):
+    if not hasattr(request, 'cached_member'):
         try:
-            request._cached_member = get_organization(request).members \
-                .get(person=request.user.person)
+            request.cached_member = get_organization(request).members.get(
+                person=request.user.person
+            )
+
         except Organization.DoesNotExist:
             return None
-    return request._cached_member
+
+    return request.cached_member
 
 
 def set_organization(request, organization):
@@ -62,19 +70,13 @@ def set_organization(request, organization):
     Pk da organização ativa da sessão
     :return:
     """
-    global __is_configured
-
-    if hasattr(request, '_cached_organization'):
-        del request._cached_organization
-
-    if hasattr(request, '_cached_member'):
-        del request._cached_member
+    clean_cache(request)
 
     if isinstance(organization, Organization):
         organization = organization.pk
 
     request.session['account'].update({'organization': organization})
-    __is_configured = True
+    request.session.modified = True
 
 
 def update_account(request, organization=None):
@@ -87,7 +89,7 @@ def update_account(request, organization=None):
     Pk da organização ativa da sessão
     :return:
     """
-    if not hasattr(request.session, 'account'):
+    if not is_configured(request):
         request.session['account'] = {}
 
     # Definindo a organização ativa na sessão
@@ -95,6 +97,7 @@ def update_account(request, organization=None):
         # Tenta definir a organização se não houver
         try:
             person = request.user.person
+
         except Person.DoesNotExist:
             raise SuspiciousOperation(
                 'Usuário %s não está vinculado a uma pessoa.' % request.user
@@ -111,14 +114,19 @@ def update_account(request, organization=None):
 
     set_organization(request, organization)
 
-    # Definindo todas organizações na sessão
-    organizations = Organization.objects.filter(
-        members__person=request.user.person
-    )
+    if request.session['account'].get('organizations') is None:
+        clean_cache(request)
 
-    request.session['account'].update({
-        'organizations': [o.pk for o in organizations]
-    })
+        # Definindo todas organizações na sessão
+        organizations = Organization.objects.filter(
+            members__person=request.user.person
+        )
+
+        request.session['account'].update({
+            'organizations': [o.pk for o in organizations]
+        })
+        request.session.modified = True
+        clean_cache(request)
 
 
 def clean_account(request):
@@ -128,18 +136,18 @@ def clean_account(request):
     :param request:
     :return:
     """
-    global __is_configured
-
     if 'account' in request.session:
         del request.session['account']
 
-    if hasattr(request, '_cached_organizations'):
-        del request._cached_organizations
+    clean_cache(request)
 
-    if hasattr(request, '_cached_organization'):
-        del request._cached_organization
 
-    if hasattr(request, '_cached_member'):
-        del request._cached_member
+def clean_cache(request):
+    if hasattr(request, 'cached_organizations'):
+        del request.cached_organizations
 
-    __is_configured = False
+    if hasattr(request, 'cached_organization'):
+        del request.cached_organization
+
+    if hasattr(request, 'cached_member'):
+        del request.cached_member
