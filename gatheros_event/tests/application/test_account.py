@@ -1,13 +1,12 @@
 from django.contrib.auth.models import User
+from django.contrib.sessions.backends.db import SessionStore
 from django.core.exceptions import SuspiciousOperation
+from django.http import HttpRequest
 from django.test import TestCase
 
 from gatheros_event.helpers import account
 from gatheros_event.models import Member, Organization
 from gatheros_event.views.mixins import AccountMixin
-
-from django.http import HttpRequest
-from django.contrib.sessions.backends.db import SessionStore
 
 
 class MockSession(SessionStore):
@@ -16,10 +15,11 @@ class MockSession(SessionStore):
 
 
 class MockRequest(HttpRequest):
-    # session = MockSession()
-
-    def __init__(self, user, session):
+    def __init__(self, user, session=None):
         self.user = user
+        if not session:
+            session = MockSession()
+
         self.session = session
         super(MockRequest, self).__init__()
 
