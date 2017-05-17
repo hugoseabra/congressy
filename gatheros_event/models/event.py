@@ -118,6 +118,15 @@ class Event(models.Model, deletable.DeletableModel):
                   ' rascunhos.'
     )
 
+    @property
+    def limit(self):
+        limit = 0
+        for lot in self.lots.all():
+            if lot.limit:
+                limit += lot.limit
+
+        return limit
+
     class Meta:
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'

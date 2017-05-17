@@ -39,7 +39,7 @@
                                 {% endfor %}
                                 <input type="hidden" name="next" value="{{ request.path }}"/>
                             </select>
-                            {% if not user_context.active_organization.internal %}
+                            {% if not organization.internal %}
                                 &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp
                                 &nbsp
                                 <a href="#">Gerenciar</a>
@@ -47,15 +47,18 @@
 
                             &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
                             <a href="{% url 'gatheros_front:logout' %}">Sair</a>
+                            &nbsp &nbsp &nbsp &nbsp
                         </form>
-                    {% elif user_context.organizations and user_context.organizations|length == 1 %}
-                        <strong>{{ user_context.active_organization.name }}</strong>
+                    {% elif organizations and organizations|length == 1 %}
+                        <strong>{{ organization.name }}</strong>
                         &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
                         <a href="{% url 'gatheros_front:logout' %}">Sair</a>
+                        &nbsp &nbsp &nbsp &nbsp
                     {% else %}
                         <strong>{{ request.user.get_full_name }}</strong>
                         &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
                         <a href="{% url 'gatheros_front:logout' %}">Sair</a>
+                        &nbsp &nbsp &nbsp &nbsp
                     {% endif %}
                 </div>
             </div>
