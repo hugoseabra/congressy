@@ -47,7 +47,7 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         app_label = obj._meta.app_label
         model_name = obj._meta.model_name
         full_name = "%s.%s_%s" % (app_label, 'delete', model_name)
-        can_delete = self.request.user.has_perm(full_name, self.get_object())
+        can_delete = self.request.user.has_perm(full_name, obj)
 
         return obj.is_deletable() and can_delete
 

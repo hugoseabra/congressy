@@ -27,7 +27,7 @@ class GatherosTestCase(TestCase):
             callback(*params)
 
         if field:
-            self.assertTrue(field in dict(e.exception))
+            self.assertIn(field, dict(e.exception))
 
     def _create_model(self, Model, data, persist=False, **kwargs):
         data.update(**kwargs)

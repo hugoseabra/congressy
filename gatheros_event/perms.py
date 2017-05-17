@@ -7,7 +7,7 @@ from permission.utils.field_lookup import field_lookup
 from .models import Event, Member, Organization, Person
 
 
-class CustomPermissionLogic(PermissionLogic):
+class MemberPermissionLogic(PermissionLogic):
     def __init__(self, handler, permissions=None, field_organization=None):
         """
         Construtor
@@ -23,7 +23,7 @@ class CustomPermissionLogic(PermissionLogic):
             Qual campo de 'obj' em has_perm está a organização, se None o
             próprio 'obj' é uma organização
         """
-        self.hadler = handler
+        self.handler = handler
         self.permissions = permissions
         self.field_organization = field_organization
 
@@ -40,25 +40,25 @@ class CustomPermissionLogic(PermissionLogic):
                 'Verfique o parametro "field_organization" em '
                 'add_permission_logic')
 
-        return self.hadler(user_obj=user_obj, organization=obj) \
+        return self.handler(user_obj=user_obj, organization=obj) \
                and perm.split('.')[1] in self.permissions
 
 
 # Handlers
-def is_admin(user_obj, organization=None):
+def member_is_admin(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
     return organization \
            and organization.is_admin(person)
 
 
-def is_admin_not_internal(user_obj, organization=None):
+def member_is_admin_not_internal(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
     return organization \
            and organization.is_admin(person) \
            and not organization.internal
 
 
-def is_member(user_obj, organization=None):
+def member_is_member(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
     return organization \
            and organization.is_member(person)
@@ -66,44 +66,44 @@ def is_member(user_obj, organization=None):
 
 # Lógicas de permissões
 # Organização -> Admin
-logic = CustomPermissionLogic(
-    is_admin,
+logic = MemberPermissionLogic(
+    member_is_admin,
     ['can_view', 'can_add_event'],
 )
 add_permission_logic(Organization, logic)
 
 # Organização -> Admin -> Não Interno
-logic = CustomPermissionLogic(
-    is_admin_not_internal,
+logic = MemberPermissionLogic(
+    member_is_admin_not_internal,
     ['can_invite'],
 )
 add_permission_logic(Organization, logic)
 
 # Organização -> Membro
-logic = CustomPermissionLogic(
-    is_member,
+logic = MemberPermissionLogic(
+    member_is_member,
     ['can_view', ],
 )
 add_permission_logic(Organization, logic)
 
 # Organização -> Admin -> membros
-logic = CustomPermissionLogic(
-    is_admin_not_internal,
+logic = MemberPermissionLogic(
+    member_is_admin_not_internal,
     ['delete_member', ],
     'organization',
 )
 add_permission_logic(Member, logic)
 
 # Organização -> Admin -> eventos
-logic = CustomPermissionLogic(
-    is_admin,
+logic = MemberPermissionLogic(
+    member_is_admin,
     ['delete_event'],
     'organization',
 )
 add_permission_logic(Event, logic)
 
-logic = CustomPermissionLogic(
-    is_member,
+logic = MemberPermissionLogic(
+    member_is_member,
     ['change_event'],
     'organization',
 )
