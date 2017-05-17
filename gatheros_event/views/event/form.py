@@ -48,9 +48,12 @@ class EventAddFormView(AccountMixin, generic.CreateView):
         return super(EventAddFormView, self).form_valid(form)
 
     def get_success_url(self):
-        kwargs = self.get_form_kwargs()
-        pk = kwargs.get('pk')
-        return reverse('gatheros_event:event-panel', kwargs={'pk': pk})
+        form = self.get_form()
+        event = form.instance
+        return reverse(
+            'gatheros_event:event-panel',
+            kwargs={'pk': event.pk}
+        )
 
     def cannot_add(self):
         can_add = self.request.user.has_perm(

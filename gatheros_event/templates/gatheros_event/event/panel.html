@@ -6,7 +6,6 @@
     <div style="padding:10px">
         <a href="{% url 'gatheros_event:event-list' %}">Voltar</a>
     </div>
-    '
     <hr/>
     <h1>Painel do Evento</h1>
     <h2>{{ object.name }}</h2>
@@ -216,7 +215,7 @@
                     {% endif %}
                 </form>
                 <pre>Alterar tipo de inscrição</pre>
-                <pre>Ver lotes</pre>
+                <pre>Gerenciar lotes</pre>
                 {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
                     {% event_payment_type object as payment_type %}
                     {% if payment_type == 'free' %}
@@ -269,7 +268,7 @@
                                 <tr>
                                     <th style="text-align: left;">Lote</th>
                                     <th># Insc.</th>
-                                    <th>%</th>
+                                    <th>Limite</th>
                                     <th style="text-align: left;">Status</th>
                                 </tr>
                                 </thead>
@@ -280,8 +279,8 @@
                                         <td width="25%"
                                             style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
                                             {{ lot.subscriptions.all|length }}
-                                                    {% if lot.limit %}/
-                                                        {{ lot.limit }}{% endif %}</td>
+                                            {% if lot.limit %}/
+                                                {{ lot.limit }}{% endif %}</td>
                                         <td width="15%"
                                             style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
                                             {% if lot.percent_completed %}
@@ -302,8 +301,9 @@
                         </div>
                         <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
                             <a href="#"
-                               onclick="document.change_status.submit()">Ver
-                                lotes</a>
+                               onclick="document.change_status.submit()">
+                               Gerenciar lotes
+                            </a>
                             <input type="hidden" name="published" value="1"/>
                         </div>
                     </div>

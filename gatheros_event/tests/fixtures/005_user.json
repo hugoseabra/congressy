@@ -22,7 +22,7 @@
     "pk": 3,
     "fields": {
       "password": "pbkdf2_sha256$36000$ZtBKp6S1U3IT$/PLo+i69WsaFgZ3LBQRKm4z2rrzyvjE5luvkV+L+0/s=",
-      "last_login": "2017-05-04T20:29:44.229",
+      "last_login": "2017-05-17T20:28:24.767",
       "is_superuser": false,
       "username": "diegotolentino@gmail.com",
       "first_name": "Diego",
@@ -40,7 +40,7 @@
     "pk": 4,
     "fields": {
       "password": "pbkdf2_sha256$36000$a00q3GKiWnvN$25kAJ4ghaSGyU9CcajY1i3gXbNLXGFne/vfZRy/0CYM=",
-      "last_login": "2017-05-04T21:23:38.984",
+      "last_login": "2017-05-17T20:25:21.115",
       "is_superuser": false,
       "username": "lucianasilva@gmail.com",
       "first_name": "Luciana",
@@ -57,7 +57,7 @@
     "model": "auth.user",
     "pk": 5,
     "fields": {
-      "password": "",
+      "password": "pbkdf2_sha256$36000$2DWUKGNIS7GX$kNdMKASrqf6p/R/yhGwh/oIRI29/EjqW7fgW1p3o/kc=",
       "last_login": null,
       "is_superuser": false,
       "username": "flavia@in2web.com.br",
