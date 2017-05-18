@@ -95,11 +95,11 @@ class PersonModelTest(GatherosTestCase):
         def create_person_with_active_user():
             no_user_person = self._get_person_with_no_user()
             no_user_person.has_user = True
-            no_user_person.email = str(person.pk) + '@gmail.com'
+            no_user_person.email = str(no_user_person.pk) + '@gmail.com'
             no_user_person.save()
 
             # Ativa usuário para teste
-            self.assertFalse(person.user.is_active)
+            self.assertFalse(no_user_person.user.is_active)
             no_user_person.user.is_active = True
             no_user_person.user.save()
 
