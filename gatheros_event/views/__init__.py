@@ -4,3 +4,4 @@ from .event.list import EventListView
 from .event.panel import EventPanelView
 from .organization.switch import OrganizationSwitch
 from .organization.panel import OrganizationPanelView
+from .organization.invite import InviteView
