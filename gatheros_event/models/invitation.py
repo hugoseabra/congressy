@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
@@ -21,6 +22,12 @@ class Invitation(models.Model):
         (INVITATION_TYPE_ADMIN, 'Administrador'),
     )
 
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        primary_key=True
+    )
     author = models.ForeignKey(
         Member,
         verbose_name='autor',

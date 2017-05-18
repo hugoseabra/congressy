@@ -66,7 +66,9 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
+                (
+                    'name',
+                    models.CharField(max_length=255, verbose_name='nome')),
                 ('subscription_type', models.CharField(
                     choices=[
                         ('disabled', 'Desativadas'),
@@ -166,13 +168,16 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Invitation',
             fields=[
-                ('id', models.AutoField(
-                    auto_created=True,
+                ('uuid', models.UUIDField(
+                    default=uuid.uuid4,
+                    editable=False,
                     primary_key=True,
                     serialize=False,
-                    verbose_name='ID'
+                    unique=True
                 )),
-                ('created', models.DateTimeField(verbose_name='criado em')),
+                ('created', models.DateTimeField(
+                    verbose_name='criado em'
+                )),
                 ('expired', models.DateTimeField(
                     blank=True,
                     null=True,
@@ -275,7 +280,9 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('name', models.CharField(max_length=100, verbose_name='nome')),
+                ('name', models.CharField(
+                    max_length=100,
+                    verbose_name='nome')),
                 ('description', models.TextField(
                     blank=True,
                     null=True,
@@ -346,8 +353,9 @@ class Migration(migrations.Migration):
                     max_length=128,
                     unique=True,
                     verbose_name='permalink',
-                    help_text='Link que aparecerá para exibir as informações da'
-                              ' organizações: https://gatheros.com/<permalink>'
+                    help_text='Link que aparecerá para exibir as informações '
+                              'da organizações: '
+                              'https://gatheros.com/<permalink>'
                 )),
             ],
             options={
@@ -371,7 +379,10 @@ class Migration(migrations.Migration):
                     serialize=False,
                     unique=True
                 )),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
+                ('name', models.CharField(
+                    max_length=255,
+                    verbose_name='nome'
+                )),
                 ('gender', models.CharField(
                     choices=[
                         ('M', 'Masculino'),
@@ -455,9 +466,17 @@ class Migration(migrations.Migration):
                     null=True,
                     verbose_name='orgão expedidor'
                 )),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('modified', models.DateTimeField(auto_now=True, null=True)),
-                ('synchronized', models.NullBooleanField(default=False)),
+                ('created', models.DateTimeField(
+                    auto_now_add=True,
+                    null=True
+                )),
+                ('modified', models.DateTimeField(
+                    auto_now=True,
+                    null=True
+                )),
+                ('synchronized', models.NullBooleanField(
+                    default=False
+                )),
                 ('term_version', models.IntegerField(
                     blank=True, null=True,
                     verbose_name='versão do termo de uso'
@@ -602,7 +621,8 @@ class Migration(migrations.Migration):
                     blank=True,
                     help_text='Informações do Google StreetView para exibir'
                               ' imagens do local no site.',
-                    null=True, verbose_name='Link do Google StreetView'
+                    null=True,
+                    verbose_name='Link do Google StreetView'
                 )),
                 ('city', models.ForeignKey(
                     on_delete=django.db.models.deletion.PROTECT,
@@ -631,7 +651,10 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
+                ('name', models.CharField(
+                    max_length=255,
+                    verbose_name='nome'
+                )),
                 ('active', models.BooleanField(
                     default=True,
                     verbose_name='ativo'
@@ -657,7 +680,10 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
+                ('name', models.CharField(
+                    max_length=255,
+                    verbose_name='nome'
+                )),
                 ('active', models.BooleanField(
                     default=True,
                     verbose_name='ativo'
@@ -677,7 +703,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Info',
             fields=[
-                ('text', models.TextField(verbose_name='texto')),
+                ('text', models.TextField(
+                    verbose_name='texto'
+                )),
                 ('event', models.OneToOneField(
                     on_delete=django.db.models.deletion.CASCADE,
                     primary_key=True,
