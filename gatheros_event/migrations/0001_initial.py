@@ -83,8 +83,8 @@ class Migration(migrations.Migration):
                 )),
                 ('subscription_offline', models.BooleanField(
                     default=False,
-                    help_text='Ativar a sincronização para usar off-line no dia'
-                              ' do evento.',
+                    help_text='Ativar a sincronização para usar off-line no'
+                              ' dia do evento.',
                     verbose_name='ativar inscrições off-line'
                 )),
                 ('date_start',
