@@ -41,8 +41,12 @@ class OrganizationAdminInternalPermissionsTest(TestCase):
 
     def test_admin_cannot_invite(self):
         self.assertTrue(self.organization.is_admin(self.user))
-        self.assertFalse(self.user.has_perm('gatheros_event.can_invite',
-                                            self.organization))
+        self.assertFalse(
+            self.user.has_perm(
+                'gatheros_event.can_invite',
+                self.organization
+            )
+        )
 
     def test_check_improperly_permission(self):
         with self.assertRaises(ImproperlyConfigured):
@@ -69,8 +73,12 @@ class OrganizationAdminNotInternalPermissionsTest(TestCase):
 
     def test_admin_can_invite(self):
         self.assertTrue(self.organization.is_admin(self.user))
-        self.assertTrue(self.user.has_perm('gatheros_event.can_invite',
-                                           self.organization))
+        self.assertTrue(
+            self.user.has_perm(
+                'gatheros_event.can_invite',
+                self.organization
+            )
+        )
 
 
 class OrganizationMembersPermissionsTest(TestCase):
@@ -88,8 +96,12 @@ class OrganizationMembersPermissionsTest(TestCase):
 
     def test_admin_cannot_invite(self):
         self.assertFalse(self.organization.is_admin(self.user))
-        self.assertFalse(self.user.has_perm('gatheros_event.can_invite',
-                                            self.organization))
+        self.assertFalse(
+            self.user.has_perm(
+                'gatheros_event.can_invite',
+                self.organization
+            )
+        )
 
 
 class OrganizationNotMembersPermissionsTest(TestCase):
@@ -107,5 +119,9 @@ class OrganizationNotMembersPermissionsTest(TestCase):
 
     def test_not_member_cannot_invite(self):
         self.assertFalse(self.organization.is_member(self.user))
-        self.assertFalse(self.user.has_perm('gatheros_event.can_invite',
-                                            self.organization))
+        self.assertFalse(
+            self.user.has_perm(
+                'gatheros_event.can_invite',
+                self.organization
+            )
+        )
