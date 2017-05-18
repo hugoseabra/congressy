@@ -25,4 +25,3 @@ def event_payment_type(event):
         return 'paied'
 
     return 'free'
-

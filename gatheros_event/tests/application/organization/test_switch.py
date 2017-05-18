@@ -57,7 +57,10 @@ class OrganizationSwitchTest(TestCase):
 
     def test_not_allowed_organization(self):
         org = self._get_organization_not_member()
-        result = self.client.post(self.url, {'organization-context-pk': org.pk})
+        result = self.client.post(
+            self.url,
+            {'organization-context-pk': org.pk}
+        )
         self.assertEqual(result.status_code, 403)
 
     def test_not_exist_organization(self):
@@ -80,7 +83,7 @@ class OrganizationSwitchTest(TestCase):
 
         # Second organization
         organization = self._get_organization_other(organization)
-        response= self.client.post(
+        response = self.client.post(
             self.url,
             {'organization-context-pk': organization.pk}
         )

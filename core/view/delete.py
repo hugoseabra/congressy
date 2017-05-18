@@ -1,3 +1,5 @@
+"""Gatheros view mixin for deletion of models"""
+
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
@@ -7,6 +9,8 @@ from gatheros_event.views.mixins import AccountMixin
 
 
 class DeleteViewMixin(AccountMixin, DeleteView):
+    """Mixin class for delete view"""
+
     protected = False
     message = 'Você está prestes a excluir este registro. Deseja realmente' \
               ' continuar?'
@@ -42,6 +46,8 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         return super(DeleteViewMixin, self).post(request, *args, **kwargs)
 
     def can_delete(self):
+        """Checks if user can delete model"""
+
         obj = self.get_object()
 
         app_label = obj._meta.app_label
@@ -50,4 +56,3 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         can_delete = self.request.user.has_perm(full_name, obj)
 
         return obj.is_deletable() and can_delete
-

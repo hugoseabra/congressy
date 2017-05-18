@@ -33,9 +33,11 @@ class EventDeleteTest(TestCase):
             kwargs={'pk': self.event_pk}
         )
 
+    # noinspection PyMethodMayBeStatic
     def _get_login_url(self):
         return reverse('gatheros_front:login')
 
+    # noinspection PyMethodMayBeStatic
     def _get_event_list_url(self):
         return reverse('gatheros_event:event-list')
 

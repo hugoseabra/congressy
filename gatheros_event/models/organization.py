@@ -77,7 +77,7 @@ class Organization(models.Model):
         self.slug = slugify(
             model_class=Organization,
             slugify_from=self.name,
-            pk=self.pk
+            primary_key=self.pk
         )
 
     def get_members(self, group=None, person=None):

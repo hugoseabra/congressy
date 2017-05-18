@@ -1,14 +1,18 @@
+"""Phone number validation"""
+
 import phonenumbers
 from django.core.exceptions import ValidationError
-from phonenumbers import NumberParseException
 
 
 def phone_validator(value):
+    """Phone number validator using phonenumbers third-party library"""
+
     def is_valid(data, country_code):
+        """Checks if phone numberis valid"""
         try:
             data = phonenumbers.parse(data, country_code)
             return phonenumbers.is_possible_number(data)
-        except NumberParseException:
+        except phonenumbers.NumberParseException:
             return False
 
     if not is_valid(value, 'BR'):

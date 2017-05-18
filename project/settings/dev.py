@@ -1,3 +1,4 @@
+# pylint: disable-all
 from .settings import *
 
 DEBUG = True

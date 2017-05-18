@@ -1,10 +1,9 @@
-import json
-
 from django.contrib import admin
 from django.db.models import Count, Q
 
 from gatheros_event.models import Event
-from .models import Answer, Field, FieldOption, Form, Lot, Subscription, DefaultField
+from .models import Answer, DefaultField, Field, FieldOption, Form, Lot, \
+    Subscription
 
 
 @admin.register(DefaultField)
@@ -63,7 +62,7 @@ class FieldOptionAdmin(admin.ModelAdmin):
     )
     ordering = ['field', 'name', 'value']
 
-    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "field":
             kwargs["queryset"] = Field.objects.filter(with_options=True).all()
 
@@ -73,13 +72,13 @@ class FieldOptionAdmin(admin.ModelAdmin):
             **kwargs
         )
 
-    def get_field_label( self, instance ):
+    def get_field_label(self, instance):
         return '{} [ {} ]'.format(
             instance.field.label,
             instance.field.get_type_display()
         )
 
-    def get_event_form( self, instance ):
+    def get_event_form(self, instance):
         return instance.field.form
 
     get_field_label.__name__ = 'campo'
@@ -122,7 +121,7 @@ class LotAdmin(admin.ModelAdmin):
         }),
     )
 
-    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "event":
             events = Event.objects.annotate(num_lots=Count('lots')).filter(
                 Q(
@@ -134,12 +133,19 @@ class LotAdmin(admin.ModelAdmin):
             )
 
             for event in events:
-                if event.subscription_type == Event.SUBSCRIPTION_SIMPLE and event.lots.count() > 0:
+                is_simple = \
+                    event.subscription_type == Event.SUBSCRIPTION_SIMPLE
+                has_lots = event.lots.count() > 0
+                if is_simple and has_lots:
                     continue
 
             kwargs["queryset"] = events
 
-        return super(LotAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super(LotAdmin, self).formfield_for_foreignkey(
+            db_field,
+            request,
+            **kwargs
+        )
 
 
 @admin.register(Subscription)
@@ -158,14 +164,16 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(Form)
 class FormAdmin(admin.ModelAdmin):
-    def get_form( self, request, obj=None, **kwargs ):
+    pk = None
+
+    def get_form(self, request, obj=None, **kwargs):
         self.pk = None
         if obj:
             self.pk = obj.id
 
         return super(FormAdmin, self).get_form(request, obj, **kwargs)
 
-    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
 
         if not self.pk and db_field.name == "event":
             kwargs["queryset"] = Event.objects.filter(form=None).exclude(
@@ -178,7 +186,7 @@ class FormAdmin(admin.ModelAdmin):
             **kwargs
         )
 
-    def has_additional_fields( self, instance ):
+    def has_additional_fields(self, instance):
         return instance.has_additional_fields
 
     has_additional_fields.__name__ = 'campos adicionais'
@@ -192,7 +200,7 @@ class AnswerAdmin(admin.ModelAdmin):
     list_display = ['get_event', 'get_subscription', 'get_field', 'get_value']
     ordering = ['field__form', 'subscription__person', 'field__order']
 
-    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "subscription":
             kwargs["queryset"] = Subscription.objects \
                 .annotate(num_answers=Count('answers')) \
@@ -211,18 +219,18 @@ class AnswerAdmin(admin.ModelAdmin):
             **kwargs
         )
 
-    def get_event( self, instance ):
+    def get_event(self, instance):
         return instance.field.form
 
-    def get_subscription( self, instance ):
+    def get_subscription(self, instance):
         return instance.subscription.person
 
-    def get_field( self, instance ):
+    def get_field(self, instance):
         field = instance.field.label
-        field += ' [ '+instance.field.get_type_display()+' ]'
+        field += ' [ ' + instance.field.get_type_display() + ' ]'
         return field
 
-    def get_value( self, instance ):
+    def get_value(self, instance):
         return instance.get_display_value()
 
     get_event.__name__ = 'event'

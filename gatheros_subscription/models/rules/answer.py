@@ -25,10 +25,11 @@ def rule_3_resposta_com_tipo_correto(answer):
         return
 
     field = answer.field
-    if field.type in [field.FIELD_CHECKBOX_GROUP] and type(value) is not list:
+    if field.type in [
+            field.FIELD_CHECKBOX_GROUP] and not isinstance(value, list):
         raise ValidationError({'value': [
-            'Tipo de valor incorreto: O campo \'{}\' exige um registro de valor'
-            ' do tipo \'list\''.format(field.label)
+            'Tipo de valor incorreto: O campo \'{}\' exige um registro de'
+            ' valor do tipo \'list\''.format(field.label)
         ]})
 
     if field.type in [
@@ -41,8 +42,8 @@ def rule_3_resposta_com_tipo_correto(answer):
         field.FIELD_SELECT,
         field.FIELD_BOOLEAN,
         field.FIELD_TEXTAREA,
-    ] and type(value) is not str:
+    ] and not isinstance(value, str):
         raise ValidationError({'value': [
-            'Tipo de valor incorreto: O campo \'{}\' exige um registro de valor'
-            ' do tipo \'string\''.format(field.label)
+            'Tipo de valor incorreto: O campo \'{}\' exige um registro de'
+            ' valor do tipo \'string\''.format(field.label)
         ]})

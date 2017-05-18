@@ -27,11 +27,15 @@ class EventModelTest(GatherosTestCase):
             "date_start": datetime.now(),
             "date_end": datetime.now() + timedelta(hours=8)
         }
-        return self._create_model(Model=Event, data=data, **kwargs)
+        return self._create_model(model_class=Event, data=data, **kwargs)
 
     def _create_organization(self, **kwargs):
         data = {"name": 'Org test'}
-        return self._create_model(Model=Organization, data=data, **kwargs)
+        return self._create_model(
+            model_class=Organization,
+            data=data,
+            **kwargs
+        )
 
     def _create_place(self, organization=None, **kwargs):
         if not organization:
@@ -50,7 +54,7 @@ class EventModelTest(GatherosTestCase):
             "village": "Setor Oeste",
             "reference": None
         }
-        return self._create_model(Model=Place, data=data, **kwargs)
+        return self._create_model(model_class=Place, data=data, **kwargs)
 
     def test_rule_1_data_inicial_antes_da_data_final(self):
         rule_callback = rule.rule_1_data_inicial_antes_da_data_final

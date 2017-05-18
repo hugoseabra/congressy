@@ -2,8 +2,9 @@ from datetime import datetime, timedelta
 
 import django
 
-django.setup()
 from gatheros_event.models import Event
+
+django.setup()
 
 """
 11 eventos com datas reajustadas com referência a data de hoje
@@ -81,8 +82,9 @@ for i, dict_dates in enumerate(lots_dates):
 
         ref = dict_dates[ii]
 
-        start = event.date_start - timedelta(days=ref.get('days_before_event')-1)
-        end = start + timedelta(days=ref.get('days')-1)
+        start = event.date_start - timedelta(
+            days=ref.get('days_before_event') - 1)
+        end = start + timedelta(days=ref.get('days') - 1)
 
         if end >= event.date_start:
             end = event.date_start - timedelta(seconds=1)

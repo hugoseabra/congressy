@@ -16,6 +16,7 @@ class FormModelTest(GatherosTestCase):
         '010_event'
     ]
 
+    # noinspection PyMethodMayBeStatic
     def _get_event(self, subscription_type=Event.SUBSCRIPTION_SIMPLE):
         event = Event.objects.filter(
             subscription_type=subscription_type
@@ -32,7 +33,7 @@ class FormModelTest(GatherosTestCase):
             event = self._get_event()
 
         data = {'event': event}
-        return self._create_model(Model=Form, data=data, persist=persist)
+        return self._create_model(model_class=Form, data=data, persist=persist)
 
     def test_rule_1_form_em_event_inscricao_desativada(self):
         rule_callback = rule.rule_1_form_em_event_inscricao_desativada

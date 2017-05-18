@@ -38,7 +38,11 @@ class LotModelTest(GatherosTestCase):
         }
 
     def _create_event(self, **kwargs):
-        return self._create_model(Model=Event, data=self.event_data, **kwargs)
+        return self._create_model(
+            model_class=Event,
+            data=self.event_data,
+            **kwargs
+        )
 
     def _create_lot(self, event=None, **kwargs):
         if not event:
@@ -49,7 +53,11 @@ class LotModelTest(GatherosTestCase):
             'date_start': event.date_start - timedelta(days=10),
         })
 
-        return self._create_model(Model=Lot, data=self.lot_data, **kwargs)
+        return self._create_model(
+            model_class=Lot,
+            data=self.lot_data,
+            **kwargs
+        )
 
     def test_rule_1_event_inscricao_desativada(self):
         rule_callback = rule.rule_1_event_inscricao_desativada

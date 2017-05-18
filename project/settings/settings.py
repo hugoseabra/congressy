@@ -1,3 +1,5 @@
+"""Django settings"""
+
 import os
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -51,6 +53,8 @@ AUTHENTICATION_BACKENDS = [
 
 
 class InvalidTemplateVariable(str):
+    """InvalidTemplateVariable when some template variable is not in context"""
+
     def __mod__(self, other):
         from django.template.base import TemplateSyntaxError
         raise TemplateSyntaxError("Invalid variable : '%s'" % other)

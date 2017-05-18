@@ -35,5 +35,3 @@ class InvitationFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn('organization', form.errors)
         self.assertIn('emails', form.errors)
-
-

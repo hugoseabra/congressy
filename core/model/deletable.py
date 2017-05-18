@@ -1,8 +1,14 @@
+"""
+Checks if model is deletable
+"""
+
 from django.db import IntegrityError, models, router
 from django.db.models.deletion import Collector
 
 
 class NotDeletableError(IntegrityError):
+    """Not deletable exception"""
+
     def __init__(self, *args, **kwargs):
         super(NotDeletableError, self).__init__(
             'Você não pode excluir este registro.',
@@ -12,6 +18,7 @@ class NotDeletableError(IntegrityError):
 
 
 class CheckerCollector(Collector):
+    """Collection checker for deletable model"""
     def __init__(self, *args, **kwargs):
         super(CheckerCollector, self).__init__(*args, **kwargs)
         self.protected = set()
@@ -19,8 +26,9 @@ class CheckerCollector(Collector):
     def collect(self, objs, **kwargs):
         try:
             return super(CheckerCollector, self).collect(objs, **kwargs)
-        except models.ProtectedError as e:
-            self.protected.update(e.protected_objects)
+
+        except models.ProtectedError as exc:
+            self.protected.update(exc.protected_objects)
 
     def can_fast_delete(self, objs, from_field=None):
         """
@@ -31,13 +39,18 @@ class CheckerCollector(Collector):
 
 
 class DeletableModel(object):
+    """Deletable model checker"""
     def __init__(self):
         self.checker = CheckerCollector(using=router.db_for_write(self))
 
     def is_deletable(self):
+        """Checks if model is deletable"""
+
         self.checker.collect(objs=[self])
         return len(self.checker.protected) == 0
 
     def check_deletable(self):
+        """Raises an exception if model is not deletable"""
+
         if self.is_deletable() is False:
             raise NotDeletableError()

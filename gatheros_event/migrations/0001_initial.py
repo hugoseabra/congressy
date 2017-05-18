@@ -66,7 +66,10 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
+                ('name', models.CharField(
+                    max_length=255,
+                    verbose_name='nome'
+                )),
                 ('subscription_type', models.CharField(
                     choices=[
                         ('disabled', 'Desativadas'),
@@ -81,8 +84,8 @@ class Migration(migrations.Migration):
                 )),
                 ('subscription_offline', models.BooleanField(
                     default=False,
-                    help_text='Ativar a sincronização para usar off-line no dia'
-                              ' do evento.',
+                    help_text='Ativar a sincronização para usar off-line no'
+                              ' dia do evento.',
                     verbose_name='ativar inscrições off-line'
                 )),
                 ('date_start',
@@ -275,7 +278,10 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('name', models.CharField(max_length=100, verbose_name='nome')),
+                ('name', models.CharField(
+                    max_length=100,
+                    verbose_name='nome'
+                )),
                 ('description', models.TextField(
                     blank=True,
                     null=True,
@@ -346,8 +352,9 @@ class Migration(migrations.Migration):
                     max_length=128,
                     unique=True,
                     verbose_name='permalink',
-                    help_text='Link que aparecerá para exibir as informações da'
-                              ' organizações: https://gatheros.com/<permalink>'
+                    help_text='Link que aparecerá para exibir as informações'
+                              ' da organizações:'
+                              ' https://gatheros.com/<permalink>'
                 )),
             ],
             options={
@@ -371,7 +378,10 @@ class Migration(migrations.Migration):
                     serialize=False,
                     unique=True
                 )),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
+                ('name', models.CharField(
+                    max_length=255,
+                    verbose_name='nome'
+                )),
                 ('gender', models.CharField(
                     choices=[
                         ('M', 'Masculino'),
@@ -455,7 +465,10 @@ class Migration(migrations.Migration):
                     null=True,
                     verbose_name='orgão expedidor'
                 )),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
+                ('created', models.DateTimeField(
+                    auto_now_add=True,
+                    null=True
+                )),
                 ('modified', models.DateTimeField(auto_now=True, null=True)),
                 ('synchronized', models.NullBooleanField(default=False)),
                 ('term_version', models.IntegerField(
@@ -631,7 +644,10 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
+                ('name', models.CharField(
+                    max_length=255,
+                    verbose_name='nome'
+                )),
                 ('active', models.BooleanField(
                     default=True,
                     verbose_name='ativo'
@@ -657,7 +673,10 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
+                ('name', models.CharField(
+                    max_length=255,
+                    verbose_name='nome'
+                )),
                 ('active', models.BooleanField(
                     default=True,
                     verbose_name='ativo'

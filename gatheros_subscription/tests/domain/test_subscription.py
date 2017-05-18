@@ -29,7 +29,7 @@ class SubscriptionModelTest(GatherosTestCase):
             'city': City.objects.get(pk=5413),
             'cpf': '82247263631'
         }
-        return self._create_model(Model=Person, data=data, **kwargs)
+        return self._create_model(model_class=Person, data=data, **kwargs)
 
     def _create_event(self, **kwargs):
         data = {
@@ -40,7 +40,7 @@ class SubscriptionModelTest(GatherosTestCase):
             "category": Category.objects.get(pk=4),
             "subscription_type": Event.SUBSCRIPTION_BY_LOTS
         }
-        return self._create_model(Model=Event, data=data, **kwargs)
+        return self._create_model(model_class=Event, data=data, **kwargs)
 
     def _create_lot(self, event=None, **kwargs):
         if not event:
@@ -56,7 +56,7 @@ class SubscriptionModelTest(GatherosTestCase):
             "internal": False
         }
 
-        return self._create_model(Model=Lot, data=data, **kwargs)
+        return self._create_model(model_class=Lot, data=data, **kwargs)
 
     def _create_subscription(self, lot=None, person=None, **kwargs):
         if not lot:
@@ -72,7 +72,11 @@ class SubscriptionModelTest(GatherosTestCase):
             'code': None,
             'created_by': 1
         }
-        return self._create_model(Model=Subscription, data=data, **kwargs)
+        return self._create_model(
+            model_class=Subscription,
+            data=data,
+            **kwargs
+        )
 
     def test_rule_1_limite_lote_excedido(self):
         rule_callback = rule.rule_1_limite_lote_excedido

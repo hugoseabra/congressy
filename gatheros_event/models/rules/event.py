@@ -29,10 +29,10 @@ def rule_3_evento_data_final_posterior_atual(event, adding=True):
 
 def rule_4_running_published_event_cannot_change_date_start(event):
     """
-    Se evento está publicado e em andamento, não é possível mudar a 
+    Se evento está publicado e em andamento, não é possível mudar a
     data inicial.
-    
-    :param event: Event model 
+
+    :param event: Event model
     :return: None
     """
     now = datetime.now()

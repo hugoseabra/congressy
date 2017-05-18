@@ -21,6 +21,7 @@ class EventModelTest(TestCase):
         '006_subscription',
     ]
 
+    # noinspection PyMethodMayBeStatic
     def _get_event(self, **kwargs):
         event = Event.objects.get(**kwargs)
         event.date_start = datetime.now() - timedelta(days=10)
@@ -45,7 +46,8 @@ class EventModelTest(TestCase):
 
         event.subscription_type = Event.SUBSCRIPTION_DISABLED
         event.save()
-        # When returning to disabled, internal lot previously created is deleted
+        # When returning to disabled, internal lot previously created is
+        # deleted
         self.assertEqual(event.lots.count(), 0)
 
         event.subscription_type = Event.SUBSCRIPTION_BY_LOTS

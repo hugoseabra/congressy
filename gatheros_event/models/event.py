@@ -150,7 +150,7 @@ class Event(models.Model, deletable.DeletableModel):
         self.slug = slugify(
             model_class=Event,
             slugify_from=self.name,
-            pk=self.pk
+            primary_key=self.pk
         )
 
     def get_period(self):

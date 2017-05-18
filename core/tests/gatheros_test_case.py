@@ -1,9 +1,13 @@
+"""Gatheros testcase mixin"""
+
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 
 
 class GatherosTestCase(TestCase):
+    """Mixing for Django testcase class"""
+
     def _trigger_validation_error(self, callback, params=None, field=None):
         self._trigger_error(
             error_class=ValidationError,
@@ -23,15 +27,15 @@ class GatherosTestCase(TestCase):
         if not params:
             params = []
 
-        with self.assertRaises(error_class) as e:
+        with self.assertRaises(error_class) as exc:
             callback(*params)
 
         if field:
-            self.assertIn(field, dict(e.exception))
+            self.assertIn(field, dict(exc.exception))
 
-    def _create_model(self, Model, data, persist=False, **kwargs):
+    def _create_model(self, model_class, data, persist=False, **kwargs):
         data.update(**kwargs)
-        entity = Model(**data)
+        entity = model_class(**data)
 
         if persist:
             entity.save()

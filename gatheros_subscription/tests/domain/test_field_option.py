@@ -14,6 +14,7 @@ class TestModelFieldOption(GatherosTestCase):
         '003_field',
     ]
 
+    # noinspection PyMethodMayBeStatic
     def _get_field(self):
         field = Field.objects.last()
         # Forcing to test
@@ -30,7 +31,7 @@ class TestModelFieldOption(GatherosTestCase):
             'name': 'Field test',
             'value': 'Field test'
         }
-        return self._create_model(Model=FieldOption, data=data, **kwargs)
+        return self._create_model(model_class=FieldOption, data=data, **kwargs)
 
     def test_rule_1_somente_campos_com_opcoes(self):
         rule_callback = rule.rule_1_somente_campos_com_opcoes

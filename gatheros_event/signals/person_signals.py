@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from gatheros_event.models import Person
 
 
-def split_name( name ):
+def split_name(name):
     names = name.split(' ')
     last_name = names[-1]
     names.pop()
@@ -15,9 +15,10 @@ def split_name( name ):
 
 
 @receiver(pre_save, sender=Person)
-def add_related_user_when_has_user( instance, raw, **_ ):
+def add_related_user_when_has_user(instance, raw, **_):
     """
-    Verifica se a instância de Person possui informações necessárias para vincular User
+    Verifica se a instância de Person possui informações necessárias para
+    vincular User
 
     :param sender:
     :param instance:
@@ -34,7 +35,10 @@ def add_related_user_when_has_user( instance, raw, **_ ):
             return
 
         if User.objects.filter(username=instance.email).count() > 0:
-            raise ValidationError({'email': ['Já existe um usuário ativo com o e-mail {}.'.format(instance.email)]})
+            raise ValidationError({'email': [
+                'Já existe um usuário ativo com o e-mail'
+                ' {}.'.format(instance.email)
+            ]})
 
         names = split_name(instance.name)
 
@@ -42,9 +46,10 @@ def add_related_user_when_has_user( instance, raw, **_ ):
             user = User.objects.get(email=instance.email)
 
             """
-            Um usuário poderá ter sido de outra pessoa. Se a pessoa possui
-            acesso ao mesmo e-mail, então iremos deixar o registro ser processado.
-            Porém, teremos de garantir que a pessoa possui acesso ao e-mail informado.
+            Um usuário poderá ter sido de outra pessoa. Se a pessoa
+            possui acesso ao mesmo e-mail, então iremos deixar o registro ser
+            processado. Porém, teremos de garantir que a pessoa possui acesso
+            ao e-mail informado.
             """
             user.is_active = False
 
@@ -73,13 +78,14 @@ def add_related_user_when_has_user( instance, raw, **_ ):
 
 
 @receiver(post_save, sender=Person)
-def update_user_related_name( instance, raw, **_ ):
+def update_user_related_name(instance, raw, **_):
     """
     Atualiza o nome de Usuário assim que o nome da pessoa é atualizado.
-    
     """
     # Disable when loaded by fixtures
-    if raw is True or not instance.user or instance.has_changed('name') is False:
+    if raw is True \
+            or not instance.user \
+            or instance.has_changed('name') is False:
         return
 
     names = split_name(instance.name)

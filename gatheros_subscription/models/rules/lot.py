@@ -23,7 +23,7 @@ def rule_2_mais_de_1_lote_evento_inscricao_simples(lot):
     else:
         # Caso não possua, se evento de inscrição simples já possui lote
         error = lot.event.subscription_type == Event.SUBSCRIPTION_SIMPLE \
-                and lot.event.lots.count() > 0
+            and lot.event.lots.count() > 0
 
     if error:
         raise IntegrityError(
@@ -35,19 +35,17 @@ def rule_2_mais_de_1_lote_evento_inscricao_simples(lot):
 def rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(lot):
     if lot.event.subscription_type == lot.event.SUBSCRIPTION_SIMPLE \
             and lot.internal is False:
-        raise ValidationError(
-            {'internal': [
-                'Lote não pode ser interno para evento com inscrições simples.']
-            }
-        )
+        raise ValidationError({'internal': [
+            'Lote não pode ser interno para evento com inscrições simples.'
+        ]})
 
 
 def rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(lot):
     if lot.event.subscription_type == lot.event.SUBSCRIPTION_BY_LOTS \
             and lot.internal is True:
         raise ValidationError({'internal': [
-            'O evento possui inscrições por lotes, portanto o lote não pode ser'
-            ' interno.'
+            'O evento possui inscrições por lotes, portanto o lote não pode'
+            ' ser interno.'
         ]})
 
 

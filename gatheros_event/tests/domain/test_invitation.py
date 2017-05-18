@@ -18,8 +18,13 @@ class InvitationModelTest(GatherosTestCase):
         '012_invitation',
     ]
 
-    def _create_invitation(self, author=None, to=None, persist=False, **kwargs):
-
+    def _create_invitation(
+        self,
+        author=None,
+        to=None,
+        persist=False,
+        **kwargs
+    ):
         while to is None:
             if not author:
                 author = Member.objects.filter(
@@ -45,7 +50,7 @@ class InvitationModelTest(GatherosTestCase):
             'type': Invitation.INVITATION_TYPE_ADMIN
         }
         return self._create_model(
-            Model=Invitation,
+            model_class=Invitation,
             data=data,
             persist=persist,
             **kwargs
@@ -100,7 +105,7 @@ class InvitationModelTest(GatherosTestCase):
             .filter(organization__internal=False).exclude(
                 pk=invitation.author.pk,
                 organization=invitation.author.organization
-        ).first().person.user
+            ).first().person.user
 
         """ RULE """
         self._trigger_validation_error(rule_callback, [invitation], field='to')

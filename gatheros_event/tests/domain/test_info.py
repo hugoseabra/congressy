@@ -24,7 +24,7 @@ class InfoModelTest(GatherosTestCase):
             "date_end": datetime.now() + timedelta(hours=8)
         }
         return self._create_model(
-            Model=Event,
+            model_class=Event,
             data=data,
             persist=persist,
             **kwargs
@@ -47,7 +47,7 @@ class InfoModelTest(GatherosTestCase):
         }
 
         return self._create_model(
-            Model=Info,
+            model_class=Info,
             data=data,
             persist=persist,
             **kwargs

@@ -32,8 +32,12 @@ class PersonModelTest(GatherosTestCase):
             'gender': 'M',
             'city': City.objects.get(pk=5413)
         }
-        return self._create_model(Model=Person, data=data, persist=persist,
-                                  **kwargs)
+        return self._create_model(
+            model_class=Person,
+            data=data,
+            persist=persist,
+            **kwargs
+        )
 
     def test_rule_1_has_user_deve_ter_email(self):
         rule_callback = rule.rule_1_has_user_deve_ter_email

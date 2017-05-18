@@ -1,3 +1,7 @@
+"""
+Gatheros custom fields
+"""
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -6,6 +10,8 @@ from .widgets import MultiEmailWidget
 
 
 class MultiEmailField(forms.Field):
+    """Field for multi-email"""
+
     message = "'%s' não é um email válido."
     code = 'invalid'
     widget = MultiEmailWidget

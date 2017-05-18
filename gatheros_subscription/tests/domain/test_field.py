@@ -16,6 +16,7 @@ class FieldModelTest(GatherosTestCase):
         '003_field'
     ]
 
+    # noinspection PyMethodMayBeStatic
     def _get_form(self):
         return Form.objects.first()
 
@@ -30,7 +31,7 @@ class FieldModelTest(GatherosTestCase):
             'name': 'new field tests'
         }
         return self._create_model(
-            Model=Field,
+            model_class=Field,
             data=data,
             persist=persist,
             **kwargs

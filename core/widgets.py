@@ -1,3 +1,5 @@
+"""Gatheros widgets"""
+
 import six
 from django.core import validators
 from django.core.exceptions import ValidationError
@@ -7,6 +9,8 @@ MULTI_EMAIL_FIELD_EMPTY_VALUES = validators.EMPTY_VALUES + ('[]',)
 
 
 class MultiEmailWidget(Textarea):
+    """Multi e-mail widget"""
+
     is_hidden = False
 
     def prep_value(self, value):

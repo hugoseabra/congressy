@@ -1,10 +1,10 @@
+from django import forms
 from django.contrib import messages
+from django.db.models.fields import BooleanField
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
-from django.views import generic
 from django.utils import six
-from django import forms
-from django.db.models.fields import BooleanField
+from django.views import generic
 
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
@@ -100,7 +100,7 @@ class EventEditFormView(AccountMixin, generic.UpdateView):
     def get_context_data(self, **kwargs):
         context = super(EventEditFormView, self).get_context_data(**kwargs)
         context['title'] = '{} ({})'.format(self.object.name, self.object.pk)
-        context['form_title'] = 'Editar evento #ID:'+str(self.object.pk)
+        context['form_title'] = 'Editar evento #ID:' + str(self.object.pk)
         context['next_path'] = self._get_referer_url()
 
         return context
@@ -123,7 +123,7 @@ class EventEditFormView(AccountMixin, generic.UpdateView):
         request = self.request
         previous_url = request.META.get('HTTP_REFERER')
         if previous_url:
-            host = request.scheme+'://'+request.META.get('HTTP_HOST', '')
+            host = request.scheme + '://' + request.META.get('HTTP_HOST', '')
             previous_url = previous_url.replace(host, '')
 
             if previous_url != request.path:
@@ -274,7 +274,8 @@ class EventEditDatesFormView(AccountMixin, generic.FormView):
         return super(EventEditDatesFormView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
-        context = super(EventEditDatesFormView, self).get_context_data(**kwargs)
+        context = super(EventEditDatesFormView, self).get_context_data(
+            **kwargs)
         context['title'] = '{} ({})'.format(self.object.name, self.object.pk)
         context['form_title'] = 'Alterar datas'
         context['next_path'] = self.get_success_url()

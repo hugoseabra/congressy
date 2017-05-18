@@ -51,7 +51,7 @@ class Answer(models.Model):
 
         value = self.get_value()
 
-        if type(value) is list:
+        if isinstance(value, list):
             result += ', '.join(value)
         else:
             result += str(value)

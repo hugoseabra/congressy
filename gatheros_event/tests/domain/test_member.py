@@ -25,7 +25,7 @@ class MemberModelTest(GatherosTestCase):
     def _create_organization(self, internal=True, persist=True):
         data = {'name': 'Org Test', 'internal': internal}
         return self._create_model(
-            Model=Organization,
+            model_class=Organization,
             data=data,
             persist=persist
         )
@@ -51,7 +51,11 @@ class MemberModelTest(GatherosTestCase):
             'invited_on': datetime.now()
         }
 
-        return self._create_model(Model=Member, data=data, persist=persist)
+        return self._create_model(
+            model_class=Member,
+            data=data,
+            persist=persist
+        )
 
     def test_rule_1_membros_deve_ter_usuarios(self):
         rule_callback = rule.rule_1_membros_deve_ter_usuarios

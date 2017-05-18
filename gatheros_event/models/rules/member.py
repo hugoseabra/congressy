@@ -27,14 +27,15 @@ def rule_3_organizacao_interna_unico_membro_admin(entity, adding=True):
     if adding is True and entity.organization.internal is True \
             and entity.group != entity.ADMIN:
         raise IntegrityError(
-            'Membro de organização interna deve ser \'{}\''.format(entity.ADMIN)
+            'Membro de organização interna deve ser \'{}\''.format(
+                entity.ADMIN)
         )
 
 
 def rule_4_nao_remover_member_organizacao_interna(entity):
     """
     Organizações internas, por ser de uma pessoa apenas, não pode fiar sem
-    membros. 
+    membros.
     """
     if entity.organization.internal is True:
         raise IntegrityError(

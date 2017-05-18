@@ -4,6 +4,7 @@ from . import AbstractField, Form
 
 
 class FieldManager(models.Manager):
+    # noinspection PyMethodMayBeStatic
     def append_field(self, field):
         last_field = Field.objects.filter(form=field.form) \
             .order_by('-order') \

@@ -14,7 +14,10 @@ class Info(models.Model):
     CONFIG_TYPE_VIDEO = 'video'
 
     CONFIG_TYPE_CHOICES = (
-        (CONFIG_TYPE_MAIN_IMAGE, 'Imagem única (Largura 360px, Altura: livre)'),
+        (
+            CONFIG_TYPE_MAIN_IMAGE,
+            'Imagem única (Largura 360px, Altura: livre)'
+        ),
         (CONFIG_TYPE_4_IMAGES, '4 imagens pequenas (Tamanho: 300px x 300px)'),
         (CONFIG_TYPE_VIDEO, 'Vídeo (Youtube)'),
     )

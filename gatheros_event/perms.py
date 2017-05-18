@@ -41,27 +41,27 @@ class MemberPermissionLogic(PermissionLogic):
                 'add_permission_logic')
 
         return self.handler(user_obj=user_obj, organization=obj) \
-               and perm.split('.')[1] in self.permissions
+            and perm.split('.')[1] in self.permissions
 
 
 # Handlers
 def member_is_admin(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
     return organization \
-           and organization.is_admin(person)
+        and organization.is_admin(person)
 
 
 def member_is_admin_not_internal(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
     return organization \
-           and organization.is_admin(person) \
-           and not organization.internal
+        and organization.is_admin(person) \
+        and not organization.internal
 
 
 def member_is_member(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
     return organization \
-           and organization.is_member(person)
+        and organization.is_member(person)
 
 
 # Lógicas de permissões

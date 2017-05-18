@@ -21,9 +21,11 @@ class AnswerModelTest(GatherosTestCase):
         '006_subscription',
     ]
 
+    # noinspection PyMethodMayBeStatic
     def _get_field(self):
         return Field.objects.filter(form_default_field=False).first()
 
+    # noinspection PyMethodMayBeStatic
     def _get_subscription(self, event):
         return Subscription.objects.filter(event=event).first()
 
@@ -39,7 +41,7 @@ class AnswerModelTest(GatherosTestCase):
             'subscription': subscription,
             'value': '{"display": "Teste", "value": "test"}'
         }
-        return self._create_model(Model=Answer, data=data, **kwargs)
+        return self._create_model(model_class=Answer, data=data, **kwargs)
 
     def test_rule_1_campo_inscricao_formulario_mesmo_evento(self):
         rule_callback = rule.rule_1_campo_inscricao_formulario_mesmo_evento
@@ -101,7 +103,10 @@ class AnswerModelTest(GatherosTestCase):
             ).first()
 
             subscription = Subscription.objects.filter(event=event).first()
-            answer = self._create_answer(field=field, subscription=subscription)
+            answer = self._create_answer(
+                field=field,
+                subscription=subscription
+            )
 
             """ RULE """
             self._trigger_validation_error(
@@ -126,7 +131,10 @@ class AnswerModelTest(GatherosTestCase):
             ).first()
 
             subscription = Subscription.objects.filter(event=event).first()
-            answer = self._create_answer(field=field, subscription=subscription)
+            answer = self._create_answer(
+                field=field,
+                subscription=subscription
+            )
             answer.value = '{"value": ["A", "B"]}'
 
             """ RULE """
