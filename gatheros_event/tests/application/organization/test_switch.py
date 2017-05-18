@@ -23,7 +23,7 @@ class OrganizationSwitchTest(TestCase):
     def setUp(self):
         # Usuário com várias organizações
         self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.client.login(testcase_user=self.user)
+        self.client.force_login(self.user)
         self.url = reverse('gatheros_event:organization-switch')
 
     def _get_organization(self, wsgi_request=None):

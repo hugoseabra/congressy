@@ -17,7 +17,7 @@ class OrganizationPanelTest(TestCase):
 
     def setUp(self):
         user = User.objects.get(username='lucianasilva@gmail.com')
-        self.client.login(testcase_user=user)
+        self.client.force_login(user)
 
         url = reverse('gatheros_event:organization-panel')
         self.result = self.client.get(url)

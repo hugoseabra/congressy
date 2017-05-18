@@ -40,7 +40,7 @@ class AddEventTest(TestCase):
         # Usuário com várias organizações
         self.user = User.objects.get(username="lucianasilva@gmail.com")
         self.url = reverse('gatheros_event:event-add')
-        self.client.login(testcase_user=self.user)
+        self.client.force_login(self.user)
 
     def test_status_is_200_ok(self):
         result = self.client.get(self.url)
@@ -63,7 +63,7 @@ class EditEventTest(TestCase):
     def setUp(self):
         # Usuário com várias organizações
         self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.client.login(testcase_user=self.user)
+        self.client.force_login(self.user)
 
     def _get_active_organization(self):
         request = MockRequest(self.user, self.client.session)
@@ -99,7 +99,7 @@ class EditEventTest(TestCase):
 
         # Usuário não está em nenhuma das organizações do usuário inicial
         self.user = User.objects.get(username="diegotolentino@gmail.com")
-        self.client.login(testcase_user=self.user)
+        self.client.force_login(self.user)
 
         # Tenta editar evento no qual não possui acesso
         result = self.client.get(self._get_url(pk=event.pk))

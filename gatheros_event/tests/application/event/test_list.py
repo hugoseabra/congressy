@@ -40,7 +40,7 @@ class EventListTest(TestCase):
         # Usuário com várias organizações
         self.user = User.objects.get(username="lucianasilva@gmail.com")
         self.url = reverse('gatheros_event:event-list')
-        self.client.login(testcase_user=self.user)
+        self.client.force_login(self.user)
 
     def _get_active_organization(self):
         request = MockRequest(self.user, self.client.session)

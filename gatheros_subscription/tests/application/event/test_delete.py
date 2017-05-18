@@ -65,13 +65,13 @@ class EventDeleteTest(TestCase):
     def _event_admin_login(self):
         user = self._get_user(Member.ADMIN)
         assert user is not None
-        assert self.client.login(testcase_user=user)
+        self.client.force_login(user)
         self._switch_context(group=Member.ADMIN)
 
     def _event_helper_login(self):
         user = self._get_user(group=Member.HELPER)
         assert user is not None
-        assert self.client.login(testcase_user=user)
+        self.client.force_login(user)
         self._switch_context(group=Member.HELPER)
 
     def _process_delete(self, remove=True):
