@@ -39,17 +39,26 @@
                                 {% endfor %}
                                 <input type="hidden" name="next" value="{{ request.path }}"/>
                             </select>
-                            |
+                            {% if not organization.internal %}
+                                &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp
+                                &nbsp
+                                <a href="{% url 'gatheros_event:organization-panel' %}">Gerenciar</a>
+                            {% endif %}
+
+                            &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
                             <a href="{% url 'gatheros_front:logout' %}">Sair</a>
+                            &nbsp &nbsp &nbsp &nbsp
                         </form>
                     {% elif organizations and organizations|length == 1 %}
                         <strong>{{ organization.name }}</strong>
-                        |
+                        &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
                         <a href="{% url 'gatheros_front:logout' %}">Sair</a>
+                        &nbsp &nbsp &nbsp &nbsp
                     {% else %}
                         <strong>{{ request.user.get_full_name }}</strong>
-                        |
+                        &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
                         <a href="{% url 'gatheros_front:logout' %}">Sair</a>
+                        &nbsp &nbsp &nbsp &nbsp
                     {% endif %}
                 </div>
             </div>

@@ -13,7 +13,7 @@ from .rules import event as rule
 # @TODO redimensionar banner destaque para altura e largura corretas - 1140 x 500
 # @TODO redimensionar banner de topo para altura e largura corretas - 1920 x 900
 
-@track_data('subscription_type')
+@track_data('subscription_type', 'date_start')
 class Event(models.Model, deletable.DeletableModel):
     RESOURCE_URI = '/api/core/events/'
 
@@ -118,6 +118,15 @@ class Event(models.Model, deletable.DeletableModel):
                   ' rascunhos.'
     )
 
+    @property
+    def limit(self):
+        limit = 0
+        for lot in self.lots.all():
+            if lot.limit:
+                limit += lot.limit
+
+        return limit
+
     class Meta:
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'
@@ -132,6 +141,7 @@ class Event(models.Model, deletable.DeletableModel):
         rule.rule_1_data_inicial_antes_da_data_final(self)
         rule.rule_2_local_deve_ser_da_mesma_organizacao_do_evento(self)
         rule.rule_3_evento_data_final_posterior_atual(self, self._state.adding)
+        rule.rule_4_running_published_event_cannot_change_date_start(self)
 
     def __str__(self):
         return str(self.name)
@@ -149,6 +159,7 @@ class Event(models.Model, deletable.DeletableModel):
         start_time = self.date_start.time()
         end_time = self.date_end.time()
 
+        period = ''
         if start_date < end_date:
             period = 'De ' + self.date_start.strftime('%d/%m/%Y %Hh%M')
             period += ' a ' + self.date_end.strftime('%d/%m/%Y %Hh%M')

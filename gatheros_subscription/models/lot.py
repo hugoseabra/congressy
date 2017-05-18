@@ -1,5 +1,6 @@
 import uuid
-from datetime import timedelta
+from datetime import datetime, timedelta
+from django.utils.encoding import force_text
 
 from django.db import models
 
@@ -23,6 +24,15 @@ class Lot(models.Model):
     DISCOUNT_TYPE = (
         ('percent', '%'),
         ('money', 'R$'),
+    )
+
+    LOT_STATUS_RUNNING = 'running'
+    LOT_STATUS_FINISHED = 'finished'
+
+    STATUSES = (
+        (None, 'não-iniciado'),
+        (LOT_STATUS_RUNNING, 'andamento'),
+        (LOT_STATUS_FINISHED, 'finalizado'),
     )
 
     name = models.CharField(
@@ -103,6 +113,31 @@ class Lot(models.Model):
         verbose_name_plural = 'lotes'
         ordering = ['pk', 'name', 'event']
         unique_together = (("name", "event"),)
+
+    @property
+    def percent_completed(self):
+        if not self.limit:
+            return None
+
+        completed = ((self.subscriptions.count() * 100) / self.limit)
+        return '{0:.2f}%'.format(round(completed, 2))
+
+    @property
+    def status(self):
+        now = datetime.now()
+        if now >= self.date_end:
+            return Lot.LOT_STATUS_FINISHED
+
+        if self.date_start <= now <= self.date_end:
+            return Lot.LOT_STATUS_RUNNING
+
+        return None
+
+    def get_status_display(self):
+        return force_text(
+            dict(Lot.STATUSES).get(self.status, None),
+            strings_only=True
+        )
 
     def save(self, **kwargs):
         self.full_clean()

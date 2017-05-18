@@ -19,7 +19,6 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
 
     # THIRD PARTY
-    'formtools',
     'permission',
 
     # KANU_APPS

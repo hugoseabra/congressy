@@ -1,12 +1,352 @@
 {% extends "gatheros_front/base.html" %}
 {% load i18n static %}
+{% load event_tags %}
 
 {% block content %}
     <div style="padding:10px">
         <a href="{% url 'gatheros_event:event-list' %}">Voltar</a>
     </div>
-    <hr />
+    <hr/>
     <h1>Painel do Evento</h1>
-    <h2>{{ event.name }}</h2>
+    <h2>{{ object.name }}</h2>
+    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
+        {% if can_change %}
+            <a href="{% url 'gatheros_event:event-edit' object.pk %}">Editar</a>
+        {% endif %}
+        {% if can_change and can_delete %}
+            &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
+        {% endif %}
+        {% if can_delete %}
+            <a href="{% url 'gatheros_event:event-delete' object.pk %}">Excluir</a>
+        {% endif %}
+    </div>
 
+    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <td width="15%" style="vertical-align: top">
+                {% if not organization.internal %}
+                    <div style="background-color: #DDDDDD;border: 1px solid #DDD">
+                        <div style="padding:0 5px">
+                            <p><strong>Realizador:</strong></p>
+                            <p>
+                                <a href="{% url 'gatheros_event:organization-panel' %}">{{ object.organization.name }}</a>
+                            </p>
+                        </div>
+                        <div style="padding:0 5px">
+                            <p><strong>Tipo de Acesso:</strong></p>
+                            <p>{{ member.get_group_display }}</p>
+                        </div>
+                        {% if user has 'gatheros_event.change_organization' of organization %}
+                            <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
+                                <a href="#">Mudar realizador</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <br/>
+                {% endif %}
+                <div style="background-color: whitesmoke;border: 1px solid #DDD;">
+                    <div style="padding:15px">&rightarrow; <a href="#">Página do
+                        evento</a></div>
+                    <div style="padding:15px">&rightarrow; <a href="#">Lotes</a>
+                    </div>
+                    <div style="padding:15px">&rightarrow; <a href="#">Inscrições</a>
+                    </div>
+                </div>
+            </td>
+            <td style="vertical-align: top;padding:0 10px">
+                <pre>Número de mulheres, homens, PNEs, cidades</pre>
+                <pre>Número e percentual de credenciados</pre>
+                <table width="100%" border="1" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td width="40%" style="vertical-align: top;">
+                            ssdf
+                        </td>
+                        <td style="vertical-align: top;padding: 0 15px">
+                            sdf
+                        </td>
+                    </tr>
+                </table>
+                <table width="100%" border="1" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td width="40%" style="vertical-align: top;">
+                            <pre>Ver exibição de imagem do evento</pre>
+                            <pre>Enviar banner pequeno por aqui</pre>
+                            <img src="/media/Evento_Banner_pequeno.png"
+                                 width="99%" style="border:1px solid #DDD"/>
+                        </td>
+                        <td style="vertical-align: top;padding: 0 15px">
+                            <h3>Congresso</h3>
+                            <hr/>
+                            <h2>{{ object.name }}</h2>
+
+                            <div>
+                                <strong>Período:</strong> {{ object.get_period }}
+                            </div>
+                            {% if object.place %}
+                                <div>
+                                    <p>
+                                        <strong>Local:</strong> {{ object.place.name }}
+                                    </p>
+                                    <p style="color:dimgray;text-indent: 20px;">{{ object.place.get_complete_address }}</p>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <p>
+                                    <strong>Descrição:</strong>
+                                </p>
+                                <p style="color:dimgray;text-indent: 20px;text-align: justify;line-height: 24px;">{{ object.description }}</p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+
+                <br/><br/><br/><br/><br/>
+                <hr/>
+                <pre>
+                    = Local
+                    = Transferência
+                    = Estatísticas (quantitativas) de incrição (se ativo). Se inativo, apresentar a mensagem (desativado). Infos:
+                      > Total de inscritos
+                      > Total de credenciados
+                      > Lotes limitados (se houver): preenchidos
+                      > PNEs
+                    = Vagas do evento (se inscrições ativadas). Se inativado, não exibir. Se ativado e for simples,
+                    apresentar um gráfico simples de vagas preenchidas. Se por lotes, apresentar o mesmo gráfico com o botão "Detalhar"
+                </pre>
+            </td>
+            <td width="20%" style="vertical-align: top">
+                <form name="change_status"
+                      action="{% url 'gatheros_event:event-patch' object.pk %}"
+                      method="post">{% csrf_token %}
+                    {% if status.published %}
+                        {% if status.status == 'future' %}
+                            <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                                <div style="text-align: left;">
+                                    <strong>Status:</strong></div>
+                                <div style="font-weight: bold;font-size: 20px;color: darkgreen;padding: 10px 0">
+                                    Publicado
+                                </div>
+                                <div style="color: dimgray;padding:10px">
+                                    Faltam
+                                    <strong>{{ status.remaining }}</strong>
+                                </div>
+                                {% if user has 'gatheros_event.change_event' of object %}
+                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                        <a href="#"
+                                           onclick="document.change_status.submit()">Despublicar</a>
+                                        <input type="hidden" name="published"
+                                               value="0"/>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% elif status.status == 'running' %}
+                            <div style="padding: 10px 0 30px;text-align: center;border-bottom: 1px solid #DDDDDD">
+                                <div style="text-align: left;">
+                                    <strong>Status:</strong></div>
+                                <div style="font-weight: bold;font-size: 20px;color: darkgreen;padding: 10px 0">
+                                    Em andamento
+                                </div>
+                            </div>
+                        {% elif status.status == 'finished' %}
+                            <div style="padding: 10px 0 30px;text-align: center;border-bottom: 1px solid #DDDDDD">
+                                <div style="text-align: left;">
+                                    <strong>Status:</strong></div>
+                                <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
+                                    Encerrado
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        {% if status.status == 'future' %}
+                            <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                                <div style="text-align: left;">
+                                    <strong>Status:</strong></div>
+                                <div style="font-weight: bold;font-size: 20px;color: darkred;padding: 10px 0">
+                                    Não publicado
+                                </div>
+                                <div style="color: dimgray;padding:10px">
+                                    Faltam
+                                    <strong>{{ status.remaining }}</strong>
+                                </div>
+                                {% if user has 'gatheros_event.change_event' of object %}
+                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                        <a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar
+                                            data</a>
+                                        &nbsp;&nbsp; | &nbsp;&nbsp;
+                                        <a href="#"
+                                           onclick="document.change_status.submit()">Publicar</a>
+                                        <input type="hidden" name="published"
+                                               value="1"/>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% elif status.status == 'expired' %}
+                            <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                                <div style="text-align: left;">
+                                    <strong>Status:</strong></div>
+                                <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
+                                    Expirado
+                                </div>
+                                {% if user has 'gatheros_event.change_event' of object %}
+                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                        <a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar
+                                            data</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% elif status.status == 'running' %}
+                            <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                                <div style="text-align: left;">
+                                    <strong>Status:</strong></div>
+                                <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
+                                    Em andamento
+                                </div>
+                                {% if user has 'gatheros_event.change_event' of object %}
+                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                        <a href="#"
+                                           onclick="document.change_status.submit()">Publicar</a>
+                                        <input type="hidden" name="published"
+                                               value="1"/>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </form>
+                <pre>Alterar tipo de inscrição</pre>
+                <pre>Gerenciar lotes</pre>
+                {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
+                    {% event_payment_type object as payment_type %}
+                    {% if payment_type == 'free' %}
+                        <div style="padding: 10px 0 0;text-align: center">
+                            <div style="text-align: left;"><strong>Tipo de
+                                inscrição:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                Gratuitas
+                            </div>
+                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                <a href="#">Alterar tipo</a>
+                            </div>
+                        </div>
+                    {% elif payment_type == 'mixed' %}
+                        <div style="padding: 10px 0 30px;text-align: center">
+                            <div style="text-align: left;"><strong>Tipo de
+                                inscrição:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                Mistas
+                            </div>
+                            <div style="color: dimgray;padding:10px">Gratuitas e
+                                pagas
+                            </div>
+                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                <a href="#">Alterar tipo</a>
+                            </div>
+                        </div>
+                    {% elif payment_type == 'paied' %}
+                        <div style="padding: 10px 0 0;text-align: center">
+                            <div style="text-align: left;"><strong>Tipo de
+                                inscrição:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                Pagas
+                            </div>
+                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                <a href="#">Alterar tipo</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                {% if object.subscription_type == object.SUBSCRIPTION_BY_LOTS %}
+                    <div style="padding: 10px 0 0;border-bottom: 1px solid #DDDDDD">
+                        <div style="text-align: left">
+                            <strong>Inscrições:</strong>
+                        </div>
+                        <div style="color: #333;margin: 5px 10px">
+                            <table border="0" width="100%" cellpadding="10"
+                                   cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: left;">Lote</th>
+                                    <th># Insc.</th>
+                                    <th>Limite</th>
+                                    <th style="text-align: left;">Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for lot in object.lots.all %}
+                                    <tr>
+                                        <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ lot.name }}</td>
+                                        <td width="25%"
+                                            style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
+                                            {{ lot.subscriptions.all|length }}
+                                            {% if lot.limit %}/
+                                                {{ lot.limit }}{% endif %}</td>
+                                        <td width="15%"
+                                            style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
+                                            {% if lot.percent_completed %}
+                                                {{ lot.percent_completed }}{% else %}
+                                                Livre{% endif %}</td>
+                                        <td width="20%"
+                                            style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:{% if lot.status == lot.LOT_STATUS_FINISHED %}darkred{% elif lot.status == lot.LOT_STATUS_RUNNING %}green{% else %}dimgray{% endif %}">
+                                            {% if lot.status %}
+                                                {{ lot.get_status_display|capfirst }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                            <a href="#"
+                               onclick="document.change_status.submit()">
+                               Gerenciar lotes
+                            </a>
+                            <input type="hidden" name="published" value="1"/>
+                        </div>
+                    </div>
+                {% elif object.subscription_type == object.SUBSCRIPTION_SIMPLE %}
+                    {% if object.limit %}
+                        <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                            <div style="text-align: left;">
+                                <strong>Inscrições:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                1000/1035
+                            </div>
+                            <div style="color: #333">(25%)</div>
+                            <div style="color: dimgray;padding:10px">Limitadas
+                            </div>
+                        </div>
+                    {% else %}
+                        <div style="padding: 10px 0 30px;text-align: center;border-bottom: 1px solid #DDDDDD">
+                            <div style="text-align: left;">
+                                <strong>Inscrições:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">{{ object.subscriptions.all|length }}</div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+
+
+                {#                <div style="background-color: whitesmoke;border: 1px solid #DDD;">#}
+                {#                    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">#}
+                {#                        <a href="#">Publicar evento</a>#}
+                {#                    </div>#}
+                {#                    <div style="padding:15px"><strong>Tipo de inscrição:</strong> gratuitas [<a href="#">Alterar</a>]</div>#}
+                {#                    <div style="padding:15px">#}
+                {#                        <strong>Website e Redes sociais:</strong>#}
+                {#                        <ul>#}
+                {#                            <li style="padding: 5px"><strong>Website:</strong> asdf</li>#}
+                {#                            <li style="padding: 5px"><strong>Facebook</strong> asdf</li>#}
+                {#                            <li style="padding: 5px"><strong>Twitter</strong> asf</li>#}
+                {#                            <li style="padding: 5px"><strong>Linkedin</strong> asdf</li>#}
+                {#                            <li style="padding: 5px"><strong>Skype</strong> asdf</li>#}
+                {#                        </ul>#}
+                {#                    </div>#}
+                {#                </div>#}
+            </td>
+        </tr>
+    </table>
 {% endblock %}

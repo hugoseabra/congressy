@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
+from django.contrib.sessions.backends.db import SessionStore
 from django.core.exceptions import SuspiciousOperation
+from django.http import HttpRequest
 from django.test import TestCase
 
 from gatheros_event.helpers import account
@@ -7,31 +9,19 @@ from gatheros_event.models import Member, Organization
 from gatheros_event.views.mixins import AccountMixin
 
 
-class MockSession(object):
-    modified = False
-    _iter = {}
-
-    def __iter__(self):
-        return iter(self._iter)
-
-    def __getitem__(self, item):
-        return self._iter.get(item)
-
-    def __setitem__(self, key, value):
-        self._iter[key] = value
-
-    def __delitem__(self, key):
-        del self._iter[key]
-
-    def get(self, item):
-        return self._iter.get(item)
+class MockSession(SessionStore):
+    def __init__(self):
+        super(MockSession, self).__init__()
 
 
-class MockRequest(object):
-    session = MockSession()
-
-    def __init__(self, user):
+class MockRequest(HttpRequest):
+    def __init__(self, user, session=None):
         self.user = user
+        if not session:
+            session = MockSession()
+
+        self.session = session
+        super(MockRequest, self).__init__()
 
 
 class AccountHelperTest(TestCase):
@@ -46,11 +36,16 @@ class AccountHelperTest(TestCase):
 
     def _set_user(self, username):
         self.user = User.objects.get(username=username)
-        self.request = MockRequest(self.user)
+        self.request = MockRequest(self.user, self.client.session)
         account.update_account(self.request)
 
     def _get_organization(self):
         return account.get_organization(self.request)
+
+    def _get_organizations(self):
+        return list(Organization.objects.filter(
+            members__person=self.user.person
+        ).order_by('-internal', 'name'))
 
     def setUp(self):
         self._set_user("lucianasilva@gmail.com")
@@ -90,9 +85,7 @@ class AccountHelperTest(TestCase):
 
     def test_return_organizations_of_user_logged(self):
         # Organizações do usuário 1
-        organizations1 = list(
-            Organization.objects.filter(members__person=self.user.person)
-        )
+        organizations1 = list(self._get_organizations())
 
         self.assertListEqual(
             account.get_organizations(self.request),
@@ -101,9 +94,7 @@ class AccountHelperTest(TestCase):
 
         # Organizações do usuário 2
         self._set_user("flavia@in2web.com.br")
-        organizations2 = list(
-            Organization.objects.filter(members__person=self.user.person)
-        )
+        organizations2 = list(self._get_organizations())
 
         self.assertListEqual(
             account.get_organizations(self.request),
@@ -129,9 +120,9 @@ class AccountHelperTest(TestCase):
         account.get_organizations(self.request)
 
         # Os caches estão estabelecidos na requisição
-        self.assertTrue(hasattr(self.request, '_cached_organization'))
-        self.assertTrue(hasattr(self.request, '_cached_member'))
-        self.assertTrue(hasattr(self.request, '_cached_organizations'))
+        self.assertTrue(hasattr(self.request, 'cached_organization'))
+        self.assertTrue(hasattr(self.request, 'cached_member'))
+        self.assertTrue(hasattr(self.request, 'cached_organizations'))
 
         # Executa o clean
         account.clean_account(self.request)
@@ -140,9 +131,9 @@ class AccountHelperTest(TestCase):
         self.assertNotIn('account', self.request.session)
 
         # Os caches apagados da requisição
-        self.assertFalse(hasattr(self.request, '_cached_organization'))
-        self.assertFalse(hasattr(self.request, '_cached_member'))
-        self.assertFalse(hasattr(self.request, '_cached_organizations'))
+        self.assertFalse(hasattr(self.request, 'cached_organization'))
+        self.assertFalse(hasattr(self.request, 'cached_member'))
+        self.assertFalse(hasattr(self.request, 'cached_organizations'))
 
     def test_user_without_person(self):
         with self.assertRaises(SuspiciousOperation):
@@ -161,25 +152,28 @@ class AccountHelperIsConfiguredTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.request = MockRequest(self.user)
+        self.request = MockRequest(self.user, self.client.session)
         account.clean_account(self.request)
 
     def test_configured_on_login(self):
-        self.assertFalse(account.is_configured())
+        self.assertFalse(account.is_configured(self.request))
         self.client.login(testcase_user=self.user)
-        self.assertTrue(account.is_configured())
+
+        # Login utiliza outro objeto de session. Recriando para resgatar dados.
+        self.request = MockRequest(self.user, self.client.session)
+        self.assertTrue(account.is_configured(self.request))
 
     def test_configured_on_update_account(self):
-        self.assertFalse(account.is_configured())
+        self.assertFalse(account.is_configured(self.request))
         account.update_account(self.request)
-        self.assertTrue(account.is_configured())
+        self.assertTrue(account.is_configured(self.request))
 
     def test_not_configured_after_clean_account(self):
-        self.assertFalse(account.is_configured())
+        self.assertFalse(account.is_configured(self.request))
         account.update_account(self.request)
-        self.assertTrue(account.is_configured())
+        self.assertTrue(account.is_configured(self.request))
         account.clean_account(self.request)
-        self.assertFalse(account.is_configured())
+        self.assertFalse(account.is_configured(self.request))
 
 
 class AccountMixinTest(TestCase):

@@ -6,21 +6,27 @@
     <h2>Excluir evento</h2>
 
     {% if protected %}
-        {% if delete_message %}
-            {{ delete_message }}
+        {% if not_allowed_message %}
+            {{ not_allowed_message }}
         {% endif %}
         <br />
         <br />
         <a href="{% url 'gatheros_event:event-list' %}" class="button cancel-link">Voltar</a>
     {% else %}
-        Você está prestes a excluir o {{ model_name }} '{{ object.name }}'. Deseja realmente continuar?
+        {% if delete_message %}
+            {{ delete_message }}
+        {% endif %}
         <br />
         <br />
         <form method="post">{% csrf_token %}
             <div>
                 <input type="hidden" name="post" value="yes"/>
                 <input type="submit" value="{% trans "Yes, I'm sure" %}"/>
-                <a href="{% url 'gatheros_event:event-list' %}" class="button cancel-link">{% trans "No, take me back" %}</a>
+                {% if next_path %}
+                    <a href="{{ next_path|urlencode }}">Não, leve-me de volta</a>
+                {% else %}
+                    <a href="{% url 'gatheros_event:event-list' %}">Não, leve-me de volta</a>
+                {% endif %}
             </div>
         </form>
 

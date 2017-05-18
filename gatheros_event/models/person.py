@@ -11,12 +11,6 @@ from . import Occupation
 from .rules import person as rule
 
 
-class TextFieldWithInputText(models.TextField):
-    def formfield(self, **kwargs):
-        kwargs.update({"widget": forms.TextInput})
-        return super(TextFieldWithInputText, self).formfield(**kwargs)
-
-
 @track_data('name', 'has_user', 'user', 'email')
 class Person(models.Model):
     RESOURCE_URI = '/api/core/people/'
@@ -58,7 +52,8 @@ class Person(models.Model):
         null=True,
         verbose_name='CEP'
     )
-    street = TextFieldWithInputText(
+    street = models.CharField(
+        max_length=255,
         blank=True,
         null=True,
         verbose_name='endereço'
@@ -70,12 +65,14 @@ class Person(models.Model):
         null=True,
         help_text="Caso não tenha, informar S/N."
     )
-    complement = TextFieldWithInputText(
+    complement = models.CharField(
+        max_length=255,
         blank=True,
         null=True,
         verbose_name='complemento'
     )
-    village = TextFieldWithInputText(
+    village = models.CharField(
+        max_length=255,
         blank=True,
         null=True,
         verbose_name='bairro'
@@ -105,11 +102,23 @@ class Person(models.Model):
         verbose_name='CPF',
         validators=[cpf_validator]
     )
-    birth_date = models.DateField(blank=True, null=True,
-                                  verbose_name='data nascimento')
-    rg = TextFieldWithInputText(blank=True, null=True, verbose_name='rg')
-    orgao_expedidor = TextFieldWithInputText(blank=True, null=True,
-                                             verbose_name='orgão expedidor')
+    birth_date = models.DateField(
+        blank=True,
+        null=True,
+        verbose_name='data nascimento'
+    )
+    rg = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='rg'
+    )
+    orgao_expedidor = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='orgão expedidor'
+    )
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     modified = models.DateTimeField(auto_now=True, blank=True, null=True)
 
@@ -130,6 +139,10 @@ class Person(models.Model):
         verbose_name='profissão',
         blank=True,
         null=True
+    )
+    pne = models.BooleanField(
+        verbose_name='portador de necessidades especiais',
+        default=False
     )
 
     website = models.CharField(max_length=255, null=True, blank=True)

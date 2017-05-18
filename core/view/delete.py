@@ -8,7 +8,8 @@ from gatheros_event.views.mixins import AccountMixin
 
 class DeleteViewMixin(AccountMixin, DeleteView):
     protected = False
-    message = None
+    message = 'Você está prestes a excluir este registro. Deseja realmente' \
+              ' continuar?'
     delete_message = 'Tem certeza que deseja excluir?'
     success_message = "Registro excluído com sucesso!"
     not_allowed_message = 'Você não tem permissão para excluir este registro.'
@@ -31,11 +32,6 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         context['delete_message'] = self.delete_message.format(**data)
         return context
 
-    def get_object(self, queryset=None):
-        obj = super(DeleteViewMixin, self).get_object(queryset=queryset)
-        obj.check_deletable()
-        return obj
-
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 
@@ -49,8 +45,9 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         obj = self.get_object()
 
         app_label = obj._meta.app_label
-        model_name = obj._meta.object_name.lower()
+        model_name = obj._meta.model_name
         full_name = "%s.%s_%s" % (app_label, 'delete', model_name)
+        can_delete = self.request.user.has_perm(full_name, obj)
 
-        return self.request.user.has_perm(full_name, self.get_object())
+        return obj.is_deletable() and can_delete
 

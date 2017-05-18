@@ -2,7 +2,27 @@ from django.conf.urls import include, url
 
 from . import views
 
-url_events = [
+url_event = [
+    url(
+        r'^(?P<pk>[\d]+)/edit/dates$',
+        views.EventEditDatesFormView.as_view(),
+        name='event-edit-dates'
+    ),
+    url(
+        r'^(?P<pk>[\d]+)/patch/$',
+        views.EventPatchFormView.as_view(),
+        name='event-patch'
+    ),
+    url(
+        r'^(?P<pk>[\d]+)/edit/$',
+        views.EventEditFormView.as_view(),
+        name='event-edit'
+    ),
+    url(
+        r'^(?P<pk>[\d]+)/delete/$',
+        views.EventDeleteView.as_view(),
+        name='event-delete'
+    ),
     url(
         r'^(?P<pk>[\d]+)/$',
         views.EventPanelView.as_view(),
@@ -10,21 +30,8 @@ url_events = [
     ),
     url(
         r'^add/$',
-        views.EventWizardView.as_view(
-            condition_dict={
-                'step2': views.add_new_place
-            }),
+        views.EventAddFormView.as_view(),
         name='event-add'
-    ),
-    url(
-        r'^(?P<pk>[\d]+)/edit/$',
-        views.EventEditView.as_view(),
-        name='event-edit'
-    ),
-    url(
-        r'^(?P<pk>[\d]+)/delete/$',
-        views.EventDeleteView.as_view(),
-        name='event-delete'
     ),
     url(
         r'^',
@@ -52,6 +59,6 @@ url_organization = [
 ]
 
 urlpatterns = [
-    url(r'^org/', include(url_organization)),
-    url(r'^events/', include(url_events)),
+    url(r'^events/', include(url_event)),
+    url(r'^organizations/', include(url_organization)),
 ]

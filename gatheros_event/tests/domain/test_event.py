@@ -107,6 +107,40 @@ class EventModelTest(GatherosTestCase):
             field='date_end'
         )
 
+    def test_rule_4_running_published_event_cannot_change_date_start(self):
+        rule_callback = \
+            rule.rule_4_running_published_event_cannot_change_date_start
+
+        self.event.date_start = datetime.now() - timedelta(hours=2)
+        self.event.date_end = datetime.now() + timedelta(hours=6)
+        self.event.published = True
+        self.event.save()
+
+        # Mudando data inicial com evento publicado
+        self.event.date_start = datetime.now() - timedelta(hours=8)
+
+        # RULE
+        self._trigger_validation_error(
+            callback=rule_callback,
+            params=[self.event],
+            field='date_start'
+        )
+
+        # MODEL
+        self._trigger_validation_error(
+            callback=self.event.save,
+            field='date_start'
+        )
+
+        self.event.published = False
+        self.event.date_start = datetime.now() - timedelta(hours=8)
+
+        # RULE
+        rule_callback(self.event)
+
+        # MODEL
+        self.event.save()
+
     def test_slug_gerado(self):
         event = self._create_event(persist=True)
         self.assertIsNotNone(event.slug)

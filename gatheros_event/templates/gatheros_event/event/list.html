@@ -1,5 +1,6 @@
 {% extends "gatheros_front/base.html" %}
 {% load i18n static %}
+{% load event_tags %}
 
 {% block title %}Gatheros - Eventos{% endblock %}
 
@@ -30,12 +31,29 @@
                                 <strong>Descrição:</strong>
                                 <span style="color: dimgray;text-align: justify">{{ event.description|truncatechars:150 }}</span>
                             </p>
-                            <p><strong>Quando:</strong> {{ event.get_period }}
-                            </p>
+                            <p><strong>Quando:</strong> {{ event.get_period }}</p>
                             {% if event.place %}
                                 <p>
                                     <strong>Local:</strong> {{ event.place.name }}
+                                </p>
                                 <p style="color:dimgray;text-indent: 20px;">{{ event.place.get_complete_address }}</p>
+                            {% endif %}
+                            <p>
+                                <strong>Tipo de inscrição:</strong>
+                                {{ event.get_subscription_type_display }}
+                                {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+                                    {% event_payment_type event as payment_type %}
+                                    (
+                                        {% if payment_type == 'free' %}Gratuitas{% endif %}
+                                        {% if payment_type == 'paied' %}Pagas{% endif %}
+                                        {% if payment_type == 'Mixed' %}Mistas - gratuitas e pagas{% endif %}
+                                    )
+                                {% endif %}
+                            </p>
+                            {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
+                                <p>
+                                    <strong>Inscrições:</strong>
+                                    {{ event.subscriptions.all|length }}{% if event.limit %} / {{ event.limit }}{% endif %}
                                 </p>
                             {% endif %}
                         </div>

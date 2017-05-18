@@ -31,6 +31,11 @@ for i, dict_day in enumerate(ref_days):
 
     event.date_start = start.replace(hour=8, minute=0, second=0)
     event.date_end = end.replace(hour=18, minute=0, second=0)
+    published = event.published
+    event.published = False
+    event.save()
+
+    event.published = published
     event.save()
 
 """
