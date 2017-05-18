@@ -1,14 +1,12 @@
 from django.views.generic import TemplateView
+from django.views.generic.edit import FormView
 
+from gatheros_event.forms import InvitationForm
 from gatheros_event.views.mixins import AccountMixin
 
 
 class OrganizationPanelView(AccountMixin, TemplateView):
     template_name = 'gatheros_event/organization/invite.html'
-
-
-from gatheros_event.forms import InvitationForm
-from django.views.generic.edit import FormView
 
 
 class InviteView(FormView):
@@ -35,4 +33,4 @@ class InviteView(FormView):
         # This method is called when valid form data has been POSTed.
         # It should return an HttpResponse.
         form.send_invite()
-        return super(ContactView, self).form_valid(form)
+        return super(InviteView, self).form_valid(form)

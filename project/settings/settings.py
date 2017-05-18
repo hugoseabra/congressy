@@ -117,6 +117,7 @@ USE_L10N = True
 USE_TZ = False
 
 STATIC_URL = '/static/'
+# noinspection PyUnresolvedReferences
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -174,7 +174,7 @@ class Migration(migrations.Migration):
                     editable=False,
                     primary_key=True,
                     serialize=False,
-                    verbose_name='ID'
+                    unique=True
                 )),
                 ('created', models.DateTimeField(
                     verbose_name='criado em'
@@ -355,8 +355,9 @@ class Migration(migrations.Migration):
                     max_length=128,
                     unique=True,
                     verbose_name='permalink',
-                    help_text='Link que aparecerá para exibir as informações da'
-                              ' organizações: https://gatheros.com/<permalink>'
+                    help_text='Link que aparecerá para exibir as informações'
+                              ' da organizações:'
+                              ' https://gatheros.com/<permalink>'
                 )),
             ],
             options={
@@ -646,7 +647,10 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('name', models.CharField(max_length=255, verbose_name='nome')),
+                ('name', models.CharField(
+                    max_length=255,
+                    verbose_name='nome'
+                )),
                 ('active', models.BooleanField(
                     default=True,
                     verbose_name='ativo'

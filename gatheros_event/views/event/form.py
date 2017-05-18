@@ -175,6 +175,7 @@ class EventPatchFormView(AccountMixin, generic.View):
                 if not hasattr(self.object, key):
                     continue
 
+                # noinspection PyProtectedMember
                 field = self.object._meta.get_field(key)
                 if isinstance(field, BooleanField):
                     value = value == 'true' or value == '1'

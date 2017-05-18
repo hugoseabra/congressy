@@ -95,6 +95,7 @@ class Place(models.Model):
     def __str__(self):
         return '{} ({})'.format(self.name, self.organization.name)
 
+    # noinspection PyMethodMayBeStatic
     def _add_prefix(self, *args, prefix=', '):
         for arg in args:
             if arg:

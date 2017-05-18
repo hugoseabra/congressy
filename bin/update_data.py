@@ -2,9 +2,11 @@ from datetime import datetime, timedelta
 
 import django
 
+django.setup()
+
+# noinspection PyPep8
 from gatheros_event.models import Event
 
-django.setup()
 
 """
 11 eventos com datas reajustadas com referência a data de hoje

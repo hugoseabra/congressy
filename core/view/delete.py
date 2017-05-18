@@ -11,6 +11,7 @@ from gatheros_event.views.mixins import AccountMixin
 class DeleteViewMixin(AccountMixin, DeleteView):
     """Mixin class for delete view"""
 
+    object = None
     protected = False
     message = 'Você está prestes a excluir este registro. Deseja realmente' \
               ' continuar?'
@@ -50,7 +51,9 @@ class DeleteViewMixin(AccountMixin, DeleteView):
 
         obj = self.get_object()
 
+        # noinspection PyProtectedMember
         app_label = obj._meta.app_label
+        # noinspection PyProtectedMember
         model_name = obj._meta.model_name
         full_name = "%s.%s_%s" % (app_label, 'delete', model_name)
         can_delete = self.request.user.has_perm(full_name, obj)

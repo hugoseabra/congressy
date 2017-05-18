@@ -33,6 +33,7 @@ class GatherosTestCase(TestCase):
         if field:
             self.assertIn(field, dict(exc.exception))
 
+    # noinspection PyMethodMayBeStatic
     def _create_model(self, model_class, data, persist=False, **kwargs):
         data.update(**kwargs)
         entity = model_class(**data)

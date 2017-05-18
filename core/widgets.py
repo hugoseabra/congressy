@@ -13,6 +13,7 @@ class MultiEmailWidget(Textarea):
 
     is_hidden = False
 
+    # noinspection PyMethodMayBeStatic
     def prep_value(self, value):
         """ Prepare value before effectively render widget """
         if value in MULTI_EMAIL_FIELD_EMPTY_VALUES:

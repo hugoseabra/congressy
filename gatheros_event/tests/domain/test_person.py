@@ -17,12 +17,15 @@ class PersonModelTest(GatherosTestCase):
         '008_member'
     ]
 
+    # noinspection PyMethodMayBeStatic
     def _get_person_with_no_user(self):
         return Person.objects.get(pk='e50e56e7-2686-497f-82b1-a2500243f12b')
 
+    # noinspection PyMethodMayBeStatic
     def _get_person_with_internal_organization(self):
         return Person.objects.get(pk='a7c5f518-7669-4b71-a83b-2a7107e9c313')
 
+    # noinspection PyMethodMayBeStatic
     def _get_person_with_external_organization(self):
         return Person.objects.get(pk='5c76d747-f22a-4d27-9211-3b9929fb908d')
 
@@ -90,17 +93,17 @@ class PersonModelTest(GatherosTestCase):
         rule_callback = rule.rule_4_desativa_usuario_ao_deletar_pessoa
 
         def create_person_with_active_user():
-            person = self._get_person_with_no_user()
-            person.has_user = True
-            person.email = str(person.pk) + '@gmail.com'
-            person.save()
+            no_user_person = self._get_person_with_no_user()
+            no_user_person.has_user = True
+            no_user_person.email = str(person.pk) + '@gmail.com'
+            no_user_person.save()
 
             # Ativa usuário para teste
             self.assertFalse(person.user.is_active)
-            person.user.is_active = True
-            person.user.save()
+            no_user_person.user.is_active = True
+            no_user_person.user.save()
 
-            return person
+            return no_user_person
 
         """ REGRA """
         person = create_person_with_active_user()

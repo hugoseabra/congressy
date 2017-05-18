@@ -61,6 +61,7 @@ def track_data(*fields):
         cls.whats_changed = whats_changed
 
         # Ensure we are updating local attributes on model init
+        # noinspection PyUnusedLocal
         def _post_init(instance, **kwargs):
             _store(instance)
 

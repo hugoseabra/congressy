@@ -53,6 +53,7 @@ class InfoModelTest(GatherosTestCase):
             **kwargs
         )
 
+    # noinspection PyMethodMayBeStatic
     def _populate_files(self, info):
         info.image_main = 'some_main_image.jpg'
         info.image1 = 'image1.jpg'

@@ -16,9 +16,11 @@ class MemberModelTest(GatherosTestCase):
         '008_member'
     ]
 
+    # noinspection PyMethodMayBeStatic
     def _get_organization(self, internal=False):
         return Organization.objects.filter(internal=internal).first()
 
+    # noinspection PyMethodMayBeStatic
     def _get_person(self, has_user=True):
         return Person.objects.filter(has_user=has_user).first()
 

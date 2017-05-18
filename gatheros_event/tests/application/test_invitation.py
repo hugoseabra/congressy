@@ -16,12 +16,14 @@ class InvitationFormTest(TestCase):
         '008_member',
     ]
 
+    # noinspection PyMethodMayBeStatic
     def _get_form(self, username="lucianasilva@gmail.com", data=None):
         user = User.objects.get(username=username)
         return InvitationForm(user, data)
 
     def test_init_without_user(self):
         with self.assertRaises(TypeError):
+            # noinspection PyArgumentList
             InvitationForm()
 
     def test_init_with_user_without_data(self):

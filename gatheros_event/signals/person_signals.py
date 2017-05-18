@@ -20,7 +20,6 @@ def add_related_user_when_has_user(instance, raw, **_):
     Verifica se a instância de Person possui informações necessárias para
     vincular User
 
-    :param sender:
     :param instance:
     :param raw:
     :param _:
