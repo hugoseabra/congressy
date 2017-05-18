@@ -5,3 +5,4 @@ from .event.form import EventAddFormView, EventEditFormView, \
 from .event.panel import EventPanelView
 from .organization.switch import OrganizationSwitch
 from .organization.panel import OrganizationPanelView
+from .organization.invite import InviteView

@@ -15,7 +15,7 @@ class StartTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username='lucianasilva@gmail.com')
-        self.client.login(testcase_user=self.user)
+        self.client.force_login(self.user)
         self.result = self.client.get(reverse('gatheros_front:start'))
 
     def test_status_is_200_ok(self):

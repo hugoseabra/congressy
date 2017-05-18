@@ -169,13 +169,16 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Invitation',
             fields=[
-                ('id', models.AutoField(
-                    auto_created=True,
+                ('uuid', models.UUIDField(
+                    default=uuid.uuid4,
+                    editable=False,
                     primary_key=True,
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('created', models.DateTimeField(verbose_name='criado em')),
+                ('created', models.DateTimeField(
+                    verbose_name='criado em'
+                )),
                 ('expired', models.DateTimeField(
                     blank=True,
                     null=True,
@@ -352,9 +355,8 @@ class Migration(migrations.Migration):
                     max_length=128,
                     unique=True,
                     verbose_name='permalink',
-                    help_text='Link que aparecerá para exibir as informações'
-                              ' da organizações:'
-                              ' https://gatheros.com/<permalink>'
+                    help_text='Link que aparecerá para exibir as informações da'
+                              ' organizações: https://gatheros.com/<permalink>'
                 )),
             ],
             options={
@@ -644,10 +646,7 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('name', models.CharField(
-                    max_length=255,
-                    verbose_name='nome'
-                )),
+                ('name', models.CharField(max_length=255, verbose_name='nome')),
                 ('active', models.BooleanField(
                     default=True,
                     verbose_name='ativo'
@@ -696,7 +695,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Info',
             fields=[
-                ('text', models.TextField(verbose_name='texto')),
+                ('text', models.TextField(
+                    verbose_name='texto'
+                )),
                 ('event', models.OneToOneField(
                     on_delete=django.db.models.deletion.CASCADE,
                     primary_key=True,

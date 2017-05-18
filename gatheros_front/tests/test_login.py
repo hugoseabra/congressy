@@ -21,7 +21,7 @@ class LoginTest(TestCase):
         self.assertEqual(self.result.status_code, 200)
 
     def test_if_login_ok_redirect(self):
-        self.client.login(testcase_user=self.user)
+        self.client.force_login(self.user)
         self.result = self.client.get(reverse('gatheros_front:login'))
         self.assertRedirects(self.result, reverse('gatheros_front:start'))
 

@@ -47,6 +47,11 @@ url_organization = [
         name='organization-switch'
     ),
     url(
+        r'^convite/',
+        views.InviteView.as_view(),
+        name='organization-invite'
+    ),
+    url(
         r'^',
         views.OrganizationPanelView.as_view(),
         name='organization-panel'

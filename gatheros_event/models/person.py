@@ -1,6 +1,5 @@
 import uuid
 
-from django import forms
 from django.contrib.auth.models import User
 from django.db import models
 from kanu_locations.models import City
@@ -32,14 +31,12 @@ class Person(models.Model):
         choices=GENDER_CHOICES,
         verbose_name='sexo'
     )
-
     email = models.EmailField(
         unique=True,
         blank=True,
         null=True,
         verbose_name='email'
     )
-
     city = models.ForeignKey(
         City,
         on_delete=models.PROTECT,

@@ -157,7 +157,7 @@ class AccountHelperIsConfiguredTest(TestCase):
 
     def test_configured_on_login(self):
         self.assertFalse(account.is_configured(self.request))
-        self.client.login(testcase_user=self.user)
+        self.client.force_login(self.user)
 
         # Login utiliza outro objeto de session. Recriando para resgatar dados.
         self.request = MockRequest(self.user, self.client.session)
@@ -188,7 +188,7 @@ class AccountMixinTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.client.login(testcase_user=self.user)
+        self.client.force_login(self.user)
         self.view = AccountMixin(request=self.client.request().wsgi_request)
 
     def test_organizations(self):

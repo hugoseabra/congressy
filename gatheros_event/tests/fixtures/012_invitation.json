@@ -1,7 +1,7 @@
 [
 {
     "model": "gatheros_event.invitation",
-    "pk": 1,
+    "pk": "5a9a6185-bd8b-4516-aeb0-499dbc81a361",
     "fields": {
         "author": 5,
         "to": 2,
@@ -12,7 +12,7 @@
 },
 {
     "model": "gatheros_event.invitation",
-    "pk": 2,
+    "pk": "67995893-1fdc-4571-83a6-26326cb6a2d8",
     "fields": {
         "author": 5,
         "to": 3,
@@ -23,7 +23,7 @@
 },
 {
     "model": "gatheros_event.invitation",
-    "pk": 3,
+    "pk": "9a2a3132-e529-499b-b2a1-d5af151ea487",
     "fields": {
         "author": 7,
         "to": 3,
@@ -34,7 +34,7 @@
 },
 {
     "model": "gatheros_event.invitation",
-    "pk": 4,
+    "pk": "6b13171f-73c8-444a-b3ca-c51490d1e965",
     "fields": {
         "author": 10,
         "to": 4,

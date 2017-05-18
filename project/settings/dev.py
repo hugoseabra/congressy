@@ -1,4 +1,5 @@
-# pylint: disable-all
+# pylint: skip-file
+
 from .settings import *
 
 DEBUG = True
@@ -13,3 +14,5 @@ DATABASES = {
         'HOST': 'localhost',
     },
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
