@@ -1,51 +1,114 @@
 from django import forms
 from django.contrib import messages
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models.fields import BooleanField
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import six
-from django.views import generic
+from django.utils.decorators import classonlymethod
+from django.views import View, generic
 
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 
 
-class EventAddFormView(AccountMixin, generic.CreateView):
-    model = Event
+# @TODO Levar forms para raiz forms.py
+
+
+class BaseEventView(AccountMixin, View):
+    success_message = ''
+    success_url = None
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.cannot_view():
+            return redirect(reverse_lazy('gatheros_event:event-list'))
+
+        return super(BaseEventView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        messages.success(self.request, self.success_message)
+        # noinspection PyUnresolvedReferences
+        return super(BaseEventView, self).form_valid(form)
+
+    def _get_referer_url(self):
+        request = self.request
+        previous_url = request.META.get('HTTP_REFERER')
+        if previous_url:
+            host = request.scheme + '://' + request.META.get('HTTP_HOST', '')
+            previous_url = previous_url.replace(host, '')
+
+            if previous_url != request.path:
+                return previous_url
+
+        return self.success_url
+
+    def cannot_view(self):
+        raise NotImplemented()
+
+
+class BaseEventPatchFormView(BaseEventView):
+    object = None
+
+    def dispatch(self, request, *args, **kwargs):
+        def error_redirect():
+            messages.warning(self.request, "Nenhum evento foi informado.")
+            return redirect(reverse_lazy('gatheros_event:event-list'))
+
+        pk = kwargs.get('pk')
+        if not pk:
+            return error_redirect()
+
+        try:
+            self.object = Event.objects.get(pk=pk)
+
+        except Event.DoesNotExist:
+            return error_redirect()
+
+        return super(BaseEventPatchFormView, self).dispatch(
+            request,
+            *args,
+            **kwargs
+        )
+
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = [
+            'organization',
+            'category',
+            'name',
+            'date_start',
+            'date_end',
+            'description',
+            'subscription_type',
+            'subscription_offline',
+            'published'
+        ]
+        widgets = {'organization': forms.HiddenInput()}
+
+
+class EventAddFormView(generic.CreateView, BaseEventView):
+    form_class = EventForm
     template_name = 'gatheros_event/event/form.html'
-    fields = [
-        'category',
-        'name',
-        'date_start',
-        'date_end',
-        'description',
-        'subscription_type',
-        'subscription_offline',
-        'published'
-    ]
+    success_message = 'Evento criado com sucesso.'
+
+    def get_initial(self):
+        initial = super(EventAddFormView, self).get_initial()
+        initial['organization'] = self.organization
+
+        return initial
 
     def get_context_data(self, **kwargs):
         context = super(EventAddFormView, self).get_context_data(**kwargs)
-        context['form_title'] = 'Adicionar evento'
+
+        form_title = "Novo evento"
+        if not self.organization.internal:
+            form_title += " para '" + self.organization.name + "'"
+
+        context['form_title'] = form_title
 
         return context
-
-    def get(self, request, *args, **kwargs):
-        if self.cannot_add():
-            return redirect(reverse_lazy('gatheros_event:event-list'))
-
-        return super(EventAddFormView, self).get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        if self.cannot_add():
-            return redirect(reverse_lazy('gatheros_event:event-list'))
-
-        return super(EventAddFormView, self).post(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        form.instance.organization = self.organization
-        messages.success(self.request, 'Evento criado com sucesso.')
-        return super(EventAddFormView, self).form_valid(form)
 
     def get_success_url(self):
         form = self.get_form()
@@ -55,7 +118,7 @@ class EventAddFormView(AccountMixin, generic.CreateView):
             kwargs={'pk': event.pk}
         )
 
-    def cannot_add(self):
+    def cannot_view(self):
         can_add = self.request.user.has_perm(
             'gatheros_event.can_add_event',
             self.organization
@@ -69,33 +132,16 @@ class EventAddFormView(AccountMixin, generic.CreateView):
         return can_add is False
 
 
-class EventEditFormView(AccountMixin, generic.UpdateView):
-    model = Event
+class EventEditFormView(generic.UpdateView, BaseEventView):
+    form_class = EventForm
+    model = EventForm.Meta.model
     template_name = 'gatheros_event/event/form.html'
     success_url = reverse_lazy('gatheros_event:event-list')
-    fields = [
-        'category',
-        'name',
-        'date_start',
-        'date_end',
-        'description',
-        'subscription_type',
-        'subscription_offline',
-        'published'
-    ]
+    success_message = 'Evento alterado com sucesso.'
 
-    def get(self, request, *args, **kwargs):
-        response = super(EventEditFormView, self).get(request, *args, **kwargs)
-        if self.cannot_edit():
-            return redirect(reverse_lazy('gatheros_event:event-list'))
-
-        return response
-
-    def post(self, request, *args, **kwargs):
-        if self.cannot_edit():
-            return redirect(reverse_lazy('gatheros_event:event-list'))
-
-        return super(EventEditFormView, self).post(request, *args, **kwargs)
+    def get_initial(self):
+        initial = super(EventEditFormView, self).get_initial()
+        initial['organization'] = self.organization
 
     def get_context_data(self, **kwargs):
         context = super(EventEditFormView, self).get_context_data(**kwargs)
@@ -104,11 +150,6 @@ class EventEditFormView(AccountMixin, generic.UpdateView):
         context['next_path'] = self._get_referer_url()
 
         return context
-
-    def form_valid(self, form):
-        form.instance.organization = self.organization
-        messages.success(self.request, 'Evento alterado com sucesso.')
-        return super(EventEditFormView, self).form_valid(form)
 
     def get_success_url(self):
         form_kwargs = self.get_form_kwargs()
@@ -131,7 +172,7 @@ class EventEditFormView(AccountMixin, generic.UpdateView):
 
         return self.success_url
 
-    def cannot_edit(self):
+    def cannot_view(self):
         event = self.get_object()
         can_edit = self.request.user.has_perm(
             'gatheros_event.change_event',
@@ -146,56 +187,86 @@ class EventEditFormView(AccountMixin, generic.UpdateView):
         return can_edit is False
 
 
-class EventPatchFormView(AccountMixin, generic.View):
+class EventPatchFormView(BaseEventPatchFormView):
     http_method_names = ['post']
     model = Event
-    object = None
 
+    # noinspection PyUnusedLocal
     def post(self, request, **kwargs):
-        def error_redirect():
-            messages.warning(self.request, "Nenhum evento foi informado.")
-            return redirect(reverse_lazy('gatheros_event:event-list'))
+        updated_field = []
+        for key, value in six.iteritems(self.request.POST):
+            if not hasattr(self.object, key):
+                continue
 
-        pk = kwargs.get('pk')
-        if not pk:
-            return error_redirect()
+            # noinspection PyProtectedMember
+            field = self.object._meta.get_field(key)
+            if isinstance(field, BooleanField):
+                value = value == 'true' or value == '1'
 
-        try:
-            self.object = Event.objects.get(pk=pk)
+            setattr(self.object, key, value)
+            updated_field.append(key)
 
-        except Event.DoesNotExist:
-            return error_redirect()
+        self.object.save(update_fields=updated_field)
 
-        else:
-            if self.cannot_edit(request):
-                return error_redirect()
+        return redirect(reverse(
+            'gatheros_event:event-panel',
+            kwargs={'pk': self.object.pk}
+        ))
 
-            updated_field = []
-            for key, value in six.iteritems(self.request.POST):
-                if not hasattr(self.object, key):
-                    continue
-
-                # noinspection PyProtectedMember
-                field = self.object._meta.get_field(key)
-                if isinstance(field, BooleanField):
-                    value = value == 'true' or value == '1'
-
-                setattr(self.object, key, value)
-                updated_field.append(key)
-
-            self.object.save(update_fields=updated_field)
-
-        path = reverse('gatheros_event:event-panel', kwargs={'pk': pk})
-        return redirect(path)
-
-    def cannot_edit(self, request):
-        can_edit = request.user.has_perm(
+    def cannot_view(self):
+        can_edit = self.request.user.has_perm(
             'gatheros_event.change_event',
             self.object
         )
         if not can_edit:
             messages.warning(
-                request,
+                self.request,
+                "Você não tem permissão para editar este evento"
+            )
+
+        return can_edit is False
+
+
+class BaseSimpleFormView(generic.FormView, BaseEventPatchFormView):
+    template_name = None
+    form_title = 'Alterar'
+    object = None
+    success_message = 'Evento alterado com sucesso.'
+
+    def get_initial(self):
+        initial = super(BaseSimpleFormView, self).get_initial()
+        initial['pk'] = self.object.pk
+
+        return initial
+
+    def form_valid(self, form):
+        form.instance = self.object
+        form.instance.organization = self.organization
+        form.save()
+
+        return super(BaseSimpleFormView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(BaseSimpleFormView, self).get_context_data(
+            **kwargs)
+        context['title'] = '{} ({})'.format(self.object.name, self.object.pk)
+        context['form_title'] = self.form_title
+        context['next_path'] = self.get_success_url()
+
+        return context
+
+    def get_success_url(self):
+        pk = self.object.pk
+        return reverse('gatheros_event:event-panel', kwargs={'pk': pk})
+
+    def cannot_view(self):
+        can_edit = self.request.user.has_perm(
+            'gatheros_event.change_event',
+            self.object
+        )
+        if not can_edit:
+            messages.warning(
+                self.request,
                 "Você não tem permissão para editar este evento"
             )
 
@@ -213,89 +284,87 @@ class EventEditDatesForm(forms.Form):
         self.instance.save()
 
 
-class EventEditDatesFormView(AccountMixin, generic.FormView):
+class EventEditDatesFormView(BaseSimpleFormView):
     form_class = EventEditDatesForm
     template_name = 'gatheros_event/event/form.html'
-    object = None
-
-    def error_redirect(self):
-        messages.warning(self.request, "Nenhum evento foi informado.")
-        return redirect(reverse_lazy('gatheros_event:event-list'))
+    form_title = 'Alterar datas'
 
     def get_initial(self):
         initial = super(EventEditDatesFormView, self).get_initial()
-        initial['pk'] = self.object.pk
         initial['date_start'] = self.object.date_start
         initial['date_end'] = self.object.date_end
 
         return initial
 
-    def get(self, request, **kwargs):
-        pk = kwargs.get('pk')
-        if not pk:
-            return self.error_redirect()
 
-        try:
-            self.object = Event.objects.get(pk=pk)
+class EventEditSubscriptionTypeForm(forms.Form):
+    subscription_type = forms.ChoiceField(
+        label='Inscrições',
+        widget=forms.Select
+    )
 
-        except Event.DoesNotExist:
-            return self.error_redirect()
+    subscription_offline = forms.BooleanField(
+        label='Inscrições offline',
+        required=False
+    )
+    instance = None
 
-        else:
-            if self.cannot_edit(request):
-                return self.error_redirect()
+    def __init__(self, *args, **kwargs):
+        super(EventEditSubscriptionTypeForm, self).__init__(*args, **kwargs)
+        self.fields['subscription_type'].choices = Event.SUBSCRIPTION_CHOICES
 
-        return super(EventEditDatesFormView, self).get(request, **kwargs)
+    def save(self):
+        self.instance.subscription_type = \
+            self.cleaned_data.get('subscription_type')
+        self.instance.subscription_offline = \
+            self.cleaned_data.get('subscription_offline')
+        self.instance.save()
 
-    def post(self, request, *args, **kwargs):
-        pk = kwargs.get('pk')
 
-        try:
-            self.object = Event.objects.get(pk=pk)
+class EventEditSubscriptionTypeFormView(BaseSimpleFormView):
+    form_class = EventEditSubscriptionTypeForm
+    template_name = 'gatheros_event/event/form.html'
+    form_title = 'Alterar tipo de inscrição'
 
-        except Event.DoesNotExist:
-            return self.error_redirect()
+    def get_initial(self):
+        initial = super(EventEditSubscriptionTypeFormView, self).get_initial()
+        initial['subscription_type'] = self.object.subscription_type
+        initial['subscription_offline'] = self.object.subscription_offline
 
-        else:
-            if self.cannot_edit(request):
-                return self.error_redirect()
+        return initial
 
-            return super(EventEditDatesFormView, self).post(
-                request,
-                *args,
-                **kwargs
-            )
 
-    def form_valid(self, form):
-        form.instance = self.object
-        form.instance.organization = self.organization
-        form.save()
+class EventSimpleEditView(View):
+    """View para formulários simples de event"""
 
-        messages.success(self.request, 'Evento alterado com sucesso.')
-        return super(EventEditDatesFormView, self).form_valid(form)
+    @classonlymethod
+    def as_view(cls, **kwargs):
+        """
+        Use this method within urls.py.
+        We need to override this method because we can render different
+        views from this to simplify urls setups.
+        """
+        return cls.get_view(**kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super(EventEditDatesFormView, self).get_context_data(
-            **kwargs)
-        context['title'] = '{} ({})'.format(self.object.name, self.object.pk)
-        context['form_title'] = 'Alterar datas'
-        context['next_path'] = self.get_success_url()
+    @classmethod
+    def get_view(cls, view_name=None, **kwargs):
+        view_name = view_name or kwargs.pop(
+            'view_name',
+            getattr(cls, 'view_name', None)
+        ) or None
 
-        return context
+        views = {
+            'dates': EventEditDatesFormView,
+            'subscription_type': EventEditSubscriptionTypeFormView
+        }
 
-    def get_success_url(self):
-        pk = self.object.pk
-        return reverse('gatheros_event:event-panel', kwargs={'pk': pk})
+        if view_name in views:
+            view = views[view_name]
+            return view.as_view(**kwargs)
 
-    def cannot_edit(self, request):
-        can_edit = request.user.has_perm(
-            'gatheros_event.change_event',
-            self.object
+        raise ImproperlyConfigured(
+            'EventSimpleEditView() não está configurado corretamente em'
+            ' urls.py. Configure utilizando'
+            ' `EventSimpleEditView.as_view(view_name=\'<nome_da_view>\')`.'
+            ' Os nomes de views possíveis são: ' + ', '.join(views.keys())
         )
-        if not can_edit:
-            messages.warning(
-                request,
-                "Você não tem permissão para editar este evento"
-            )
-
-        return can_edit is False

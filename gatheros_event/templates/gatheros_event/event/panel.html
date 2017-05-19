@@ -9,7 +9,7 @@
     <hr/>
     <h1>Painel do Evento</h1>
     <h2>{{ object.name }}</h2>
-    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
+    <div style="padding: 10px;background-color: #DDDDDD;text-align: center;">
         {% if can_change %}
             <a href="{% url 'gatheros_event:event-edit' object.pk %}">Editar</a>
         {% endif %}
@@ -20,6 +20,7 @@
             <a href="{% url 'gatheros_event:event-delete' object.pk %}">Excluir</a>
         {% endif %}
     </div>
+    <div style="margin-bottom:10px; width: 100%;height:3px;background-color: {% if object.published %}darkgreen{% else %}darkred{% endif %}"></div>
 
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
         <tr>
@@ -45,10 +46,10 @@
                     <br/>
                 {% endif %}
                 <div style="background-color: whitesmoke;border: 1px solid #DDD;">
-                    <div style="padding:15px">&rightarrow; <a href="#">Página do
-                        evento</a></div>
-                    <div style="padding:15px">&rightarrow; <a href="#">Lotes</a>
-                    </div>
+                    {% if object.subscription_type == object.SUBSCRIPTION_BY_LOTS %}
+                        <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:lot-list' object.pk %}">Lotes</a></div>
+                    {% endif %}
+                    <div style="padding:15px">&rightarrow; <a href="#">Página do evento</a></div>
                     <div style="padding:15px">&rightarrow; <a href="#">Inscrições</a>
                     </div>
                 </div>
@@ -71,6 +72,7 @@
                         <td width="40%" style="vertical-align: top;">
                             <pre>Ver exibição de imagem do evento</pre>
                             <pre>Enviar banner pequeno por aqui</pre>
+                            <!--suppress CheckImageSize -->
                             <img src="/media/Evento_Banner_pequeno.png"
                                  width="99%" style="border:1px solid #DDD"/>
                         </td>
@@ -214,8 +216,8 @@
                         {% endif %}
                     {% endif %}
                 </form>
-                <pre>Alterar tipo de inscrição</pre>
                 <pre>Gerenciar lotes</pre>
+                <pre>Editar quando inscrições simples: limite</pre>
                 {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
                     {% event_payment_type object as payment_type %}
                     {% if payment_type == 'free' %}
@@ -225,8 +227,13 @@
                             <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
                                 Gratuitas
                             </div>
+                            {% if object.subscription_offline %}
+                                <div style="color: dimgray;padding:10px">
+                                    <strong>Inscrições off-line ativas</strong>
+                                </div>
+                            {% endif %}
                             <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                <a href="#">Alterar tipo</a>
+                                <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
                             </div>
                         </div>
                     {% elif payment_type == 'mixed' %}
@@ -239,8 +246,13 @@
                             <div style="color: dimgray;padding:10px">Gratuitas e
                                 pagas
                             </div>
+                            {% if object.subscription_offline %}
+                                <div style="color: dimgray;padding:10px">
+                                    <strong>Inscrições off-line ativas</strong>
+                                </div>
+                            {% endif %}
                             <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                <a href="#">Alterar tipo</a>
+                                <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
                             </div>
                         </div>
                     {% elif payment_type == 'paied' %}
@@ -251,7 +263,7 @@
                                 Pagas
                             </div>
                             <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                <a href="#">Alterar tipo</a>
+                                <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
                             </div>
                         </div>
                     {% endif %}
@@ -278,9 +290,8 @@
                                         <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ lot.name }}</td>
                                         <td width="25%"
                                             style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
-                                            {{ lot.subscriptions.all|length }}
-                                            {% if lot.limit %}/
-                                                {{ lot.limit }}{% endif %}</td>
+                                            {{ lot.subscriptions.all|length }}{% if lot.limit %}/{{ lot.limit }}{% endif %}
+                                        </td>
                                         <td width="15%"
                                             style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
                                             {% if lot.percent_completed %}
@@ -300,7 +311,7 @@
                             </table>
                         </div>
                         <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                            <a href="#"
+                            <a href="{% url 'gatheros_subscription:lot-list' object.pk %}"
                                onclick="document.change_status.submit()">
                                Gerenciar lotes
                             </a>
@@ -313,7 +324,7 @@
                             <div style="text-align: left;">
                                 <strong>Inscrições:</strong></div>
                             <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                1000/1035
+                                {{ object.subscriptions.all|length }}{% if object.limit %}/{{ object.limit }}{% endif %}
                             </div>
                             <div style="color: #333">(25%)</div>
                             <div style="color: dimgray;padding:10px">Limitadas
@@ -326,14 +337,23 @@
                             <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">{{ object.subscriptions.all|length }}</div>
                         </div>
                     {% endif %}
+                {% else %}
+                    <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
+                        <div style="text-align: left;">
+                            <strong>Inscrições:</strong></div>
+                        <div style="font-weight: bold;font-size: 20px;color: darkred;padding: 10px 0">
+                            Desativadas
+                        </div>
+                        <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                            <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Ativar</a>
+                        </div>
+
+                    </div>
                 {% endif %}
 
 
 
                 {#                <div style="background-color: whitesmoke;border: 1px solid #DDD;">#}
-                {#                    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">#}
-                {#                        <a href="#">Publicar evento</a>#}
-                {#                    </div>#}
                 {#                    <div style="padding:15px"><strong>Tipo de inscrição:</strong> gratuitas [<a href="#">Alterar</a>]</div>#}
                 {#                    <div style="padding:15px">#}
                 {#                        <strong>Website e Redes sociais:</strong>#}

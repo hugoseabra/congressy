@@ -1,12 +1,18 @@
 from django.conf.urls import include, url
+from django.views.generic import RedirectView
 
 from . import views
 
 url_event = [
     url(
-        r'^(?P<pk>[\d]+)/edit/dates$',
-        views.EventEditDatesFormView.as_view(),
+        r'^(?P<pk>[\d]+)/edit/dates',
+        views.EventSimpleEditView.as_view(view_name='dates'),
         name='event-edit-dates'
+    ),
+    url(
+        r'^(?P<pk>[\d]+)/edit/subscription',
+        views.EventSimpleEditView.as_view(view_name='subscription_type'),
+        name='event-edit-subscription_type'
     ),
     url(
         r'^(?P<pk>[\d]+)/patch/$',
@@ -34,9 +40,16 @@ url_event = [
         name='event-add'
     ),
     url(
-        r'^',
+        r'^$',
         views.EventListView.as_view(),
         name='event-list'
+    ),
+    url(
+        r'^',
+        RedirectView.as_view(
+            pattern_name='gatheros_event:event-list',
+            permanent=False
+        )
     ),
 ]
 
