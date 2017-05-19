@@ -3,8 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
 
-# @TODO Colocar collection de Member na sessão do usuário para saber se ele é membro de alguma organização
-
 class Start(LoginRequiredMixin, TemplateView):
     template_name = 'gatheros_front/start.html'
 
