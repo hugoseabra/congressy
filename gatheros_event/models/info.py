@@ -4,7 +4,7 @@ from . import Event
 from .rules import info as rule
 
 
-# @TODO redimensionar banner de topo para altura e largura corretas - 1920 x 900
+# @TODO redimensionar banner de topo para alt. e lar. corretas - 1920 x 900
 
 class Info(models.Model):
     """ Informações de evento """

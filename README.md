@@ -85,7 +85,8 @@ cargo do desenvolvedor.
  
 As vezes o pylint não consegue encontrar @classonly objects.
   
-  
+
+Para ignorar, acrescente ```--disable=[CODE,]```
 ```bash
 pylint gatheros_event/ --disable=W0212,W0221,W0232,W0512,R0903,E1101
 ```

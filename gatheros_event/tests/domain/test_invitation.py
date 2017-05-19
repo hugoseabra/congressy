@@ -255,8 +255,8 @@ class InvitationModelTest(GatherosTestCase):
         def is_member():
             # Invited no member
             member_exists = False
-            for member in invited.person.members.all():
-                if member in organization.members.all():
+            for invited_member in invited.person.members.all():
+                if invited_member in organization.members.all():
                     member_exists = True
 
             return member_exists

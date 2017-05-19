@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django.db import models
+from django.utils.encoding import force_text
 
 from core.model import deletable, track_data
 from core.util import slugify
@@ -6,14 +9,14 @@ from . import Category, Organization, Place
 from .rules import event as rule
 
 
-# @TODO Cores: encontrar as 2 cores (primária e secundária) mais evidentes das imagens e persisti-las
+# @TODO Cores: encontrar 2 cores (primária e secundária) para hot site
 # @TODO gerenciar redirecionamento http em caso de mudança de slug
 
 # @TODO redimensionar banner pequeno para altura e largura corretas - 580 x 422
-# @TODO redimensionar banner destaque para altura e largura corretas - 1140 x 500
-# @TODO redimensionar banner de topo para altura e largura corretas - 1920 x 900
+# @TODO redimensionar banner destaque para alt. e lar. corretas - 1140 x 500
+# @TODO redimensionar banner de topo para alt. e larg. corretas - 1920 x 900
 
-@track_data('subscription_type', 'date_start')
+@track_data('subscription_type', 'date_start', 'date_end')
 class Event(models.Model, deletable.DeletableModel):
     RESOURCE_URI = '/api/core/events/'
 
@@ -25,6 +28,15 @@ class Event(models.Model, deletable.DeletableModel):
         (SUBSCRIPTION_DISABLED, 'Desativadas'),
         (SUBSCRIPTION_SIMPLE, 'Simples (gratuitas)'),
         (SUBSCRIPTION_BY_LOTS, 'Gerenciar por lotes'),
+    )
+
+    EVENT_STATUS_RUNNING = 'running'
+    EVENT_STATUS_FINISHED = 'finished'
+
+    STATUSES = (
+        (None, 'não-iniciado'),
+        (EVENT_STATUS_RUNNING, 'andamento'),
+        (EVENT_STATUS_FINISHED, 'finalizado'),
     )
 
     name = models.CharField(max_length=255, verbose_name='nome')
@@ -131,6 +143,23 @@ class Event(models.Model, deletable.DeletableModel):
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'
         ordering = ('name', 'pk', 'category__name')
+
+    @property
+    def status(self):
+        now = datetime.now()
+        if now >= self.date_end:
+            return Event.LOT_STATUS_FINISHED
+
+        if self.date_start <= now <= self.date_end:
+            return Event.LOT_STATUS_RUNNING
+
+        return None
+
+    def get_status_display(self):
+        return force_text(
+            dict(Event.STATUSES).get(self.status, None),
+            strings_only=True
+        )
 
     def save(self, *args, **kwargs):
         self._create_unique_slug()

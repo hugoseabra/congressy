@@ -34,6 +34,7 @@ def rule_4_running_published_event_cannot_change_date_start(event):
 
     :param event: Event model
     :return: None
+    :raise ValidationError
     """
     now = datetime.now()
     published = event.published

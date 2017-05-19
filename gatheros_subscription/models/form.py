@@ -4,7 +4,6 @@ from gatheros_event.models import Event
 from .rules import form as rule
 
 
-# @TODO Campos pre-definidos cadastrados a parte e inseridos na criação de novo form
 class Form(models.Model):
     event = models.OneToOneField(
         Event,

@@ -95,11 +95,11 @@ class AnswerModelTest(GatherosTestCase):
     def test_rule_3_resposta_com_tipo_correto(self):
         rule_callback = rule.rule_3_resposta_com_tipo_correto
 
-        def check_value_type_as_list(type):
+        def check_value_type_as_list(field_type):
             event = Event.objects.get(pk=1)
             field = event.form.fields.filter(
                 form_default_field=False,
-                type=type
+                type=field_type
             ).first()
 
             subscription = Subscription.objects.filter(event=event).first()
@@ -123,11 +123,11 @@ class AnswerModelTest(GatherosTestCase):
             field.save()
             answer.save()
 
-        def check_value_type_as_string(type):
+        def check_value_type_as_string(field_type):
             event = Event.objects.get(pk=2)
             field = event.form.fields.filter(
                 form_default_field=False,
-                type=type
+                type=field_type
             ).first()
 
             subscription = Subscription.objects.filter(event=event).first()

@@ -12,23 +12,25 @@ from gatheros_event.models import Event
 11 eventos com datas reajustadas com referência a data de hoje
 """
 ref_days = [
-    {'days_before_now': -10, 'days_of_event': 1},
-    {'days_before_now': -5, 'days_of_event': 1},
-    {'days_before_now': 0, 'days_of_event': 1},
-    {'days_before_now': 3, 'days_of_event': 1},
-    {'days_before_now': 5, 'days_of_event': 1},
-    {'days_before_now': 8, 'days_of_event': 1},
-    {'days_before_now': 10, 'days_of_event': 1},
-    {'days_before_now': 15, 'days_of_event': 1},
-    {'days_before_now': 25, 'days_of_event': 1},
-    {'days_before_now': 30, 'days_of_event': 1},
-    {'days_before_now': 35, 'days_of_event': 3},
+    {'days_before_today': -10, 'days_of_event': 1},
+    {'days_before_today': -5, 'days_of_event': 1},
+    {'days_before_today': 0, 'days_of_event': 1},
+    {'days_before_today': 3, 'days_of_event': 1},
+    {'days_before_today': 5, 'days_of_event': 1},
+    {'days_before_today': 8, 'days_of_event': 1},
+    {'days_before_today': 10, 'days_of_event': 1},
+    {'days_before_today': 15, 'days_of_event': 1},
+    {'days_before_today': 25, 'days_of_event': 1},
+    {'days_before_today': 30, 'days_of_event': 1},
+    {'days_before_today': 35, 'days_of_event': 3},
 ]
 
 events = Event.objects.all().order_by('pk')
 for i, dict_day in enumerate(ref_days):
     event = events[i]
-    start = datetime.today() + timedelta(days=dict_day.get('days_before_now'))
+    start = datetime.today() + timedelta(
+        days=dict_day.get('days_before_today')
+    )
 
     end = start + timedelta(days=dict_day.get('days_of_event') - 1)
 

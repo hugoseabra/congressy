@@ -224,3 +224,13 @@ class EventModelTest(TestCase):
         # lot MUST be external
         lot = event.lots.first()
         self.assertFalse(lot.internal)
+
+    def test_configure_lot_dates_when_simple_subscription(self):
+        # Fixture is SUBSCRIPTION_BY_LOTS
+        event = self._get_event(pk=11)
+
+        # Fixture is SUBSCRIPTION_SIMPLE
+        self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_BY_LOTS)
+
+        event.subscription_type = Event.SUBSCRIPTION_SIMPLE
+        event.save()

@@ -1,14 +1,20 @@
 import uuid
 from datetime import datetime, timedelta
-from django.utils.encoding import force_text
 
 from django.db import models
+from django.utils.encoding import force_text
 
 from gatheros_event.models import Event
 from .rules import lot as rule
 
 
 class LotManager(models.Manager):
+    def num_lots(self, lot):
+        return self.filter(event=lot.event_id).count()
+
+    def get_next_lot_number(self, event):
+        return self.filter(event=event).count() + 1
+
     def generate_promo_code(self):
         while True:
             code = str(uuid.uuid4()).split('-')[0].upper()
@@ -170,3 +176,49 @@ class Lot(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.event.name, self.name)
+
+    def adjust_unique_lot_date(self, force=False):
+        """
+        Ajusta data de lote quando o evento possui inscrições simples.
+        - Data inicial será:
+            * Se evento ainda não iniciou, será na data atual
+            * Se evento já inicou, 1 dia antes da data inicial do evento
+            * Hora sempre iniciando as 8h da manhã
+        - Data final será:*
+            * 1 minuto antes da data inicial do evento
+
+        :param force: Boolean - Força atualização de datas do lote
+        :return: None
+        """
+        not_simple = self.event.subscription_type != Event.SUBSCRIPTION_SIMPLE
+        if force is False and not_simple:
+            return
+
+        now = datetime.now()
+        if self.event.date_start > now:
+            self.date_start = now
+        else:
+            self.date_start = self.event.date_start - timedelta(days=1)
+
+        self.date_start = self.date_start.replace(hour=8, minute=0, second=0)
+        self.date_end = self.event.date_start - timedelta(minutes=1)
+
+    def get_period(self):
+        start_date = self.date_start.date()
+        end_date = self.date_end.date()
+        start_time = self.date_start.time()
+        end_time = self.date_end.time()
+
+        period = ''
+        if start_date < end_date:
+            period = 'De ' + self.date_start.strftime('%d/%m/%Y %Hh%M')
+            period += ' a ' + self.date_end.strftime('%d/%m/%Y %Hh%M')
+
+        if start_date == end_date:
+            period = self.date_start.strftime('%d/%m/%Y')
+            period += ' das '
+            period += start_time.strftime('%Hh%M')
+            period += ' às '
+            period += end_time.strftime('%Hh%M')
+
+        return period

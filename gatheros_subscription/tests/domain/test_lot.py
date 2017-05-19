@@ -332,3 +332,72 @@ class LotModelTest(GatherosTestCase):
         event.save()
 
         lot.save()
+
+    def test_adjust_unique_lot_date_event_not_started(self):
+        now = datetime.now()
+
+        event = Event.objects.get(pk=1)
+
+        # Simple subscription to get unique lot
+        self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_SIMPLE)
+
+        event.date_start = now + timedelta(weeks=2)
+        event.date_end = now + timedelta(weeks=2, hours=6)
+        event.published = False
+        event.save()
+
+        lot = event.lots.first()
+
+        def format_date(dt):
+            return dt.strftime('%d/%m/%Y %H:%m:%S')
+
+        # Rule
+        date_start = now.replace(hour=8, minute=0, second=0)
+        date_end = event.date_start - timedelta(minutes=1)
+
+        self.assertNotEqual(
+            format_date(lot.date_start),
+            format_date(date_start)
+        )
+        self.assertNotEqual(format_date(lot.date_end), format_date(date_end))
+
+        # Dates adjusted
+        lot.adjust_unique_lot_date()
+
+        self.assertEqual(format_date(lot.date_start), format_date(date_start))
+        self.assertEqual(format_date(lot.date_end), format_date(date_end))
+
+    def test_adjust_unique_lot_date_event_started(self):
+        now = datetime.now()
+
+        event = Event.objects.get(pk=1)
+
+        # Simple subscription to get unique lot
+        self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_SIMPLE)
+
+        event.date_start = now - timedelta(hours=2)
+        event.date_end = now + timedelta(hours=4)
+        event.published = False
+        event.save()
+
+        lot = event.lots.first()
+
+        def format_date(dt):
+            return dt.strftime('%d/%m/%Y %H:%m:%S')
+
+        # Rule
+        date_start = lot.event.date_start - timedelta(days=1)
+        date_start = date_start.replace(hour=8, minute=0, second=0)
+        date_end = event.date_start - timedelta(minutes=1)
+
+        self.assertNotEqual(
+            format_date(lot.date_start),
+            format_date(date_start)
+        )
+        self.assertNotEqual(format_date(lot.date_end), format_date(date_end))
+
+        # Dates adjusted
+        lot.adjust_unique_lot_date()
+
+        self.assertEqual(format_date(lot.date_start), format_date(date_start))
+        self.assertEqual(format_date(lot.date_end), format_date(date_end))
