@@ -8,6 +8,8 @@ from django.core.validators import validate_email
 
 from .widgets import MultiEmailWidget
 
+import re
+
 
 class MultiEmailField(forms.Field):
     """Field for multi-email"""
@@ -22,7 +24,7 @@ class MultiEmailField(forms.Field):
         if not value:
             return []
 
-        return [v.strip() for v in value.splitlines() if v != ""]
+        return [v.strip() for v in re.split(';|,|\n', value) if v != ""]
 
     def validate(self, value):
         super(MultiEmailField, self).validate(value)
