@@ -21,9 +21,9 @@ def rule_3_nao_pode_mudar_convidado(entity):
 
 
 def rule_4_administrador_nao_pode_se_convidar(entity):
-    author = entity.author.person
+    author = entity.author.person.user
 
-    if author == entity.to.person:
+    if author == entity.to:
         raise ValidationError(
             {'to': [
                 'Não é permitido um administrador se convidar para uma '
@@ -37,10 +37,10 @@ def rule_5_nao_deve_existir_2_convites_para_usuario_organizacao(entity,
     if adding is True and entity.has_previous() is True:
         raise ValidationError(
             {'to': [
-                'Já existe um convite para o usuário \'{}\' '
+                'Já existe um convite para \'{}\' '
                 'na organização \'{}\'.'.format(
+                    entity.to.email,
                     entity.author.organization.name,
-                    entity.to.person.name
                 )
             ]}
         )
@@ -57,14 +57,11 @@ def rule_6_autor_deve_ser_membro_admin(entity, adding=True):
 
 def rule_7_nao_deve_convidar_um_membro_da_organizacao(entity, adding=True):
     organization = entity.author.organization
-    person = entity.to.person
+    user = entity.to
 
-    if adding and organization.is_member(person):
+    if adding and organization.is_member(user):
         raise ValidationError(
             {'to': [
-                'Não é permitido convidar \'{}\' para a organização '
-                '\'{}\' pois ele já é membro.'.format(
-                    person.name,
-                    organization.name
-                )
+                'Um membro com o email "{}" já existe na '
+                'organização "{}".'.format(user.email, organization.name)
             ]})
