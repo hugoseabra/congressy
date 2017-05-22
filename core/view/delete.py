@@ -58,7 +58,7 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         # noinspection PyProtectedMember
         app_label = obj._meta.app_label
         # noinspection PyProtectedMember
-        model_name = self.organization._meta.model_name
+        model_name = obj._meta.model_name
         full_name = "%s.%s_%s" % (app_label, 'delete', model_name)
         can_delete = self.request.user.has_perm(full_name, obj)
 
