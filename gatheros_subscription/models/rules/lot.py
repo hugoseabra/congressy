@@ -18,12 +18,11 @@ def rule_2_mais_de_1_lote_evento_inscricao_simples(lot):
     Não permite mais de um lote em eventos de inscrições simples.
     """
     if lot.pk:
-        # Se edição, verificar se o evento possui o lote em questão
-        error = not lot.event.lots.filter(pk=lot.pk).exists()
-    else:
-        # Caso não possua, se evento de inscrição simples já possui lote
-        error = lot.event.subscription_type == Event.SUBSCRIPTION_SIMPLE \
-            and lot.event.lots.count() > 0
+        return
+
+    # Caso não possua, se evento de inscrição simples já possui lote
+    error = lot.event.subscription_type == Event.SUBSCRIPTION_SIMPLE \
+        and lot.event.lots.count() > 0
 
     if error:
         raise IntegrityError(

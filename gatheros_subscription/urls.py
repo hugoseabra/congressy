@@ -10,6 +10,16 @@ url_lot = [
         name='lot-list'
     ),
     url(
+        r'^(?P<lot_pk>[\d]+)/delete/$',
+        views.LotDeleteView.as_view(),
+        name='lot-delete'
+    ),
+    url(
+        r'^(?P<lot_pk>[\d]+)/$',
+        views.LotEditFormView.as_view(),
+        name='lot-edit'
+    ),
+    url(
         r'^add/$',
         views.LotAddFormView.as_view(),
         name='lot-add'

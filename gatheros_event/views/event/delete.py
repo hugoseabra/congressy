@@ -1,12 +1,13 @@
 from django.urls import reverse_lazy
+from django.utils.module_loading import import_string
 
-from core.view.delete import DeleteViewMixin
 from gatheros_event.models import Event
+
+DeleteViewMixin = import_string('core.view.delete.DeleteViewMixin')
 
 
 class EventDeleteView(DeleteViewMixin):
     model = Event
-    template_name = 'gatheros_event/event/delete.html'
     success_url = reverse_lazy('gatheros_event:event-list')
 
     delete_message = "Não é possível excluir o evento '{name}' possivelmente" \

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.utils.encoding import force_text
 
+from core.model import deletable
 from gatheros_event.models import Event
 from .rules import lot as rule
 
@@ -24,7 +25,7 @@ class LotManager(models.Manager):
                 return code
 
 
-class Lot(models.Model):
+class Lot(models.Model, deletable.DeletableModel):
     INTERNAL_DEFAULT_NAME = 'default'
 
     DISCOUNT_TYPE = (

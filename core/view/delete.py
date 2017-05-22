@@ -18,11 +18,13 @@ class DeleteViewMixin(AccountMixin, DeleteView):
     delete_message = 'Tem certeza que deseja excluir?'
     success_message = "Registro excluído com sucesso!"
     not_allowed_message = 'Você não tem permissão para excluir este registro.'
+    template_name = 'generic/delete.html'
 
     def render_to_response(self, context, **response_kwargs):
         if not self.can_delete():
             messages.warning(self.request, self.not_allowed_message)
-            return redirect(self.success_url.format(**self.object.__dict__))
+            url = self.get_success_url()
+            return redirect(url.format(**self.object.__dict__))
 
         return super(DeleteViewMixin, self).render_to_response(
             context=context,
@@ -31,6 +33,8 @@ class DeleteViewMixin(AccountMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(DeleteViewMixin, self).get_context_data(**kwargs)
+        # noinspection PyProtectedMember
+        context['title'] = 'Excluir '+self.object._meta.verbose_name
         context['protected'] = self.protected
 
         data = self.object.__dict__
@@ -54,7 +58,7 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         # noinspection PyProtectedMember
         app_label = obj._meta.app_label
         # noinspection PyProtectedMember
-        model_name = obj._meta.model_name
+        model_name = self.organization._meta.model_name
         full_name = "%s.%s_%s" % (app_label, 'delete', model_name)
         can_delete = self.request.user.has_perm(full_name, obj)
 
