@@ -45,9 +45,15 @@ ALGUMAS AÇÕES DENTRO DA PLATAFORMA SERÃO DE ACORDO COM A ORGANIZAÇÃO E GRUP
 
 # Verificação Pylint #
   
-Disabilitar as seguintes verificações:
+Esta seção é para documentar a configuração feita em ```.pylintrc```
 
-Códigos: http://pylint-messages.wikidot.com/all-codes
+-- ---
+
+Referência de códigos: http://pylint-messages.wikidot.com/all-codes
+
+-- ---
+
+Disabilitar as seguintes verificações:
  
 ### Warnings: ###
 
@@ -84,9 +90,3 @@ cargo do desenvolvedor.
 #### E1101 - Class Event has no objects member ####
  
 As vezes o pylint não consegue encontrar @classonly objects.
-  
-
-Para ignorar, acrescente ```--disable=[CODE,]```
-```bash
-pylint gatheros_event/ --disable=W0212,W0221,W0232,W0512,R0903,E1101
-```
