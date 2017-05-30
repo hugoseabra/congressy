@@ -1,0 +1,17 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:organization-panel' %}">Voltar</a>
+    </div>
+    <hr/>
+
+    <h1>Convite aceito</h1>
+
+    <b>
+        Seu convite para fazer parte da organização {{ organization.name }}
+        foi aceito com sucessocom sucesso.
+    </b>
+
+{% endblock %}

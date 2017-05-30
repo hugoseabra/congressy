@@ -72,9 +72,10 @@ class Invitation(models.Model):
         unique_together = (('author', 'to'),)
 
     def __str__(self):
-        return '{} ({}) - {}'.format(self.to.first_name,
-                                     self.author.organization.name,
-                                     self.created)
+        return '{} - {}'.format(
+            self.author.organization.name,
+            self.to.first_name if self.to.first_name else self.to.email
+        )
 
     def has_previous(self):
         return Invitation.objects.filter(

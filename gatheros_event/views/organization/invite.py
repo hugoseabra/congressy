@@ -1,38 +1,34 @@
-from django.views.generic import TemplateView
+from django.urls import reverse_lazy
+from django.views.generic import FormView, TemplateView
 
+from gatheros_event.forms import InvitationForm
 from gatheros_event.views.mixins import AccountMixin
 
 
-class OrganizationPanelView(AccountMixin, TemplateView):
+class InviteView(AccountMixin, FormView):
     template_name = 'gatheros_event/organization/invite.html'
-
-
-from gatheros_event.forms import InvitationForm
-from django.views.generic.edit import FormView
-
-
-class InviteView(FormView):
-    template_name = 'gatheros_event/organization/invite.html'
-
-    # form_class = InvitationForm
-    # success_url = '/thanks/'
+    success_url = reverse_lazy('gatheros_event:organization-invite-success')
 
     def get_form(self, form_class=None):
         """
         Retorna uma instancia de form para ser usada na view
         """
-        kwargs = self.get_form_kwargs()
-        kwargs.update({'user': self.request.user})
-        return InvitationForm(**kwargs)
+        return InvitationForm(user=self.request.user, **self.get_form_kwargs())
 
     def form_valid(self, form):
         """
         No post executa este método se o form for válido
 
         :param form:
-        :return:
+        :return: HttpResponseRedirect
         """
-        # This method is called when valid form data has been POSTed.
-        # It should return an HttpResponse.
         form.send_invite()
-        return super(ContactView, self).form_valid(form)
+        return super(InviteView, self).form_valid(form)
+
+
+class InviteSuccessView(AccountMixin, TemplateView):
+    template_name = 'gatheros_event/organization/invite-success.html'
+
+
+class InviteAcceptView(AccountMixin, FormView):
+    template_name = 'gatheros_event/organization/invite-accept.html'

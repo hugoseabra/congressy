@@ -34,7 +34,7 @@ url_event = [
         name='event-add'
     ),
     url(
-        r'^',
+        r'^$',
         views.EventListView.as_view(),
         name='event-list'
     ),
@@ -42,17 +42,27 @@ url_event = [
 
 url_organization = [
     url(
-        r'^switch/',
+        r'^switch/$',
         views.OrganizationSwitch.as_view(),
         name='organization-switch'
     ),
     url(
-        r'^convite/',
+        r'^aceitar-convite/(?P<pk>[0-9A-Fa-f-]+)/$',
+        views.InviteAcceptView.as_view(),
+        name='organization-invite-accept'
+    ),
+    url(
+        r'^convite-sucesso/$',
+        views.InviteSuccessView.as_view(),
+        name='organization-invite-success'
+    ),
+    url(
+        r'^convite/$',
         views.InviteView.as_view(),
         name='organization-invite'
     ),
     url(
-        r'^',
+        r'^$',
         views.OrganizationPanelView.as_view(),
         name='organization-panel'
     ),

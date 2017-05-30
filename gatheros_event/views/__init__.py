@@ -1,8 +1,9 @@
 from .event.delete import EventDeleteView
+from .event.form import EventAddFormView, EventEditDatesFormView, \
+    EventEditFormView, EventPatchFormView
 from .event.list import EventListView
-from .event.form import EventAddFormView, EventEditFormView, \
-    EventPatchFormView, EventEditDatesFormView
 from .event.panel import EventPanelView
-from .organization.switch import OrganizationSwitch
+from .organization.invite import InviteAcceptView, InviteSuccessView, \
+    InviteView
 from .organization.panel import OrganizationPanelView
-from .organization.invite import InviteView
+from .organization.switch import OrganizationSwitch
