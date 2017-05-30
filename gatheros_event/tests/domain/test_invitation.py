@@ -4,8 +4,7 @@ from django.db import IntegrityError
 from django.db.models import Count
 
 from core.tests import GatherosTestCase
-from gatheros_event.models import Invitation, Member, Organization
-from gatheros_event.models.rules import invitation as rule
+from gatheros_event.models import Invitation, Member, Organization, rules
 
 
 class InvitationModelTest(GatherosTestCase):
@@ -18,7 +17,8 @@ class InvitationModelTest(GatherosTestCase):
         '012_invitation',
     ]
 
-    def _create_invitation(self, author=None, to=None, persist=False, **kwargs):
+    def _create_invitation(self, author=None, to=None, persist=False,
+                           **kwargs):
 
         while to is None:
             if not author:
@@ -52,18 +52,19 @@ class InvitationModelTest(GatherosTestCase):
         )
 
     def test_rule_1_organizacao_internas_nao_pode_ter_convites(self):
-        rule_callback = rule.rule_1_organizacao_internas_nao_pode_ter_convites
+        rule = rules.invitation \
+            .rule_1_organizacao_internas_nao_pode_ter_convites
         organization = Organization.objects.filter(internal=True).first()
         member = organization.members.filter(group=Member.ADMIN).first()
         user = User.objects.exclude(pk=member.person.user.pk).first()
 
         invitation = self._create_invitation(author=member, to=user)
 
-        """ RULE """
-        self._trigger_integrity_error(rule_callback, [invitation])
+        with self.assertRaises(IntegrityError):
+            rule(invitation)
 
-        """ MODEL """
-        self._trigger_integrity_error(invitation.save)
+        with self.assertRaises(IntegrityError):
+            invitation.save()
 
         """ FUNCIONANDO """
         organization.internal = False
@@ -71,7 +72,7 @@ class InvitationModelTest(GatherosTestCase):
         invitation.save()
 
     def test_rule_2_nao_pode_mudar_autor(self):
-        rule_callback = rule.rule_2_nao_pode_mudar_autor
+        rule = rules.invitation.rule_2_nao_pode_mudar_autor
         invitation = Invitation.objects.filter(
             author__organization__internal=False
         ).first()
@@ -80,92 +81,82 @@ class InvitationModelTest(GatherosTestCase):
             organization__internal=False
         ).exclude(pk=invitation.author.pk).first()
 
-        """ RULE """
-        self._trigger_validation_error(
-            callback=rule_callback,
-            params=[invitation],
-            field='author'
-        )
+        with self.assertRaises(ValidationError):
+            rule(invitation)
 
-        """ MODEL """
-        self._trigger_validation_error(invitation.save, field='author')
+        with self.assertRaises(ValidationError):
+            invitation.save()
 
     def test_rule_3_nao_pode_mudar_convidado(self):
-        rule_callback = rule.rule_3_nao_pode_mudar_convidado
+        rule = rules.invitation.rule_3_nao_pode_mudar_convidado
         invitation = Invitation.objects.filter(
             author__organization__internal=False
         ).first()
 
         invitation.to = Member.objects \
             .filter(organization__internal=False).exclude(
-                pk=invitation.author.pk,
-                organization=invitation.author.organization
+            pk=invitation.author.pk,
+            organization=invitation.author.organization
         ).first().person.user
 
-        """ RULE """
-        self._trigger_validation_error(rule_callback, [invitation], field='to')
+        with self.assertRaises(ValidationError):
+            rule(invitation)
 
-        """ MODEL """
-        self._trigger_validation_error(invitation.save, field='to')
+        with self.assertRaises(ValidationError):
+            invitation.save()
 
     def test_rule_4_administrador_nao_pode_se_convidar(self):
-        rule_callback = rule.rule_4_administrador_nao_pode_se_convidar
+        rule = rules.invitation.\
+            rule_4_administrador_nao_pode_se_convidar
         invitation = self._create_invitation()
         invited_user = invitation.to
         invitation.to = invitation.author.person.user
 
-        """ RULE """
-        self._trigger_validation_error(rule_callback, [invitation], field='to')
+        with self.assertRaises(ValidationError):
+            rule(invitation)
 
-        """ MODEL """
-        self._trigger_validation_error(invitation.save, field='to')
+        with self.assertRaises(ValidationError):
+            invitation.save()
 
         """ FUNCIONANDO """
         invitation.to = invited_user
         invitation.save()
 
     def test_rule_5_nao_deve_existir_2_convites_para_usuario_organizacao(self):
-        rule_callback = \
-            rule.rule_5_nao_deve_existir_2_convites_para_usuario_organizacao
-        invitation = self._create_invitation(persist=True)
+        rule = rules.invitation \
+            .rule_5_nao_deve_existir_2_convites_para_mesmo_usuario
+        first_invitation = self._create_invitation(persist=True)
 
-        invitation2 = self._create_invitation(
-            author=invitation.author,
-            to=invitation.to
+        invitation = self._create_invitation(
+            author=first_invitation.author,
+            to=first_invitation.to
         )
 
-        """ RULE """
-        self._trigger_validation_error(
-            callback=rule_callback,
-            params=[invitation2, True],
-            field='to'
-        )
+        with self.assertRaises(ValidationError):
+            rule(invitation)
 
-        """ MODEL """
-        self._trigger_validation_error(invitation2.save, field='to')
+        with self.assertRaises(ValidationError):
+            invitation.save()
 
         """ FUNCIONANDO """
-        invitation.delete()
-        invitation2.save()
+        first_invitation.delete()
+        invitation.save()
 
     def test_rule_6_autor_deve_ser_membro_admin(self):
-        rule_callback = rule.rule_6_autor_deve_ser_membro_admin
+        rule = rules.invitation.rule_6_autor_deve_ser_membro_admin
 
         author = Member.objects.filter(group=Member.HELPER).first()
         invitation = self._create_invitation(author=author)
 
-        """ RULE """
-        self._trigger_validation_error(
-            callback=rule_callback,
-            params=[invitation, True],
-            field='author'
-        )
+        with self.assertRaises(ValidationError):
+            rule(invitation)
 
-        """ MODEL """
-        self._trigger_validation_error(invitation.save, field='author')
+        with self.assertRaises(ValidationError):
+            invitation.save()
 
     def test_rule_7_convidado_ja_membro_da_organizacao(self):
-        rule_callback = rule.rule_7_nao_deve_convidar_um_membro_da_organizacao
+        rule = rules.invitation.\
+            rule_7_nao_deve_convidar_um_membro_da_organizacao
 
         # Pegar alguma organização com mais de 1 membro
         organization = Organization.objects.annotate(
@@ -183,15 +174,11 @@ class InvitationModelTest(GatherosTestCase):
             to=invited.person.user
         )
 
-        """ RULE """
-        self._trigger_validation_error(
-            callback=rule_callback,
-            params=[invitation, True],
-            field='to'
-        )
+        with self.assertRaises(ValidationError):
+            rule(invitation)
 
-        """ MODEL """
-        self._trigger_validation_error(invitation.save, field='to')
+        with self.assertRaises(ValidationError):
+            invitation.save()
 
     def test_no_invitation_for_internal_organization(self):
         invitation = Invitation(

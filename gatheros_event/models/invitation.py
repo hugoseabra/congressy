@@ -7,7 +7,7 @@ from django.db import models
 from core.model import track_data
 from gatheros_event import settings
 from . import Member
-from .rules import invitation as rule
+from .rules import check_invite
 
 
 @track_data('author', 'to')
@@ -63,18 +63,7 @@ class Invitation(models.Model):
         super(Invitation, self).save(*args, **kwargs)
 
     def clean(self):
-        rule.rule_1_organizacao_internas_nao_pode_ter_convites(self)
-        rule.rule_2_nao_pode_mudar_autor(self)
-        rule.rule_3_nao_pode_mudar_convidado(self)
-        rule.rule_4_administrador_nao_pode_se_convidar(self)
-        rule.rule_5_nao_deve_existir_2_convites_para_usuario_organizacao(
-            self, self._state.adding
-        )
-        rule.rule_6_autor_deve_ser_membro_admin(self, self._state.adding)
-        rule.rule_7_nao_deve_convidar_um_membro_da_organizacao(
-            self,
-            self._state.adding
-        )
+        check_invite(self)
 
     class Meta:
         verbose_name = 'convite'
