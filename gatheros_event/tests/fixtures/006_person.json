@@ -28,8 +28,7 @@
       "facebook": null,
       "twitter": null,
       "linkedin": null,
-      "skype": null,
-      "has_user": true
+      "skype": null
     }
   },
   {
@@ -61,8 +60,7 @@
       "facebook": "https://facebook.com/hugoseabra19",
       "twitter": "https://twitter.com/hugoseabra19",
       "linkedin": "https://linkedin.com/hugoseabra19",
-      "skype": "hugoseabra19",
-      "has_user": true
+      "skype": "hugoseabra19"
     }
   },
   {
@@ -94,8 +92,7 @@
       "facebook": null,
       "twitter": null,
       "linkedin": null,
-      "skype": null,
-      "has_user": true
+      "skype": null
     }
   },
   {
@@ -127,8 +124,7 @@
       "facebook": null,
       "twitter": null,
       "linkedin": null,
-      "skype": null,
-      "has_user": false
+      "skype": null
     }
   },
   {
@@ -160,8 +156,7 @@
       "facebook": "https://facebook.com/luciana.silva",
       "twitter": null,
       "linkedin": null,
-      "skype": null,
-      "has_user": true
+      "skype": null
     }
   },
   {
@@ -193,8 +188,7 @@
       "facebook": null,
       "twitter": null,
       "linkedin": null,
-      "skype": null,
-      "has_user": false
+      "skype": null
     }
   },
   {
@@ -226,8 +220,7 @@
       "facebook": null,
       "twitter": null,
       "linkedin": null,
-      "skype": null,
-      "has_user": true
+      "skype": null
     }
   },
   {
@@ -259,8 +252,7 @@
       "facebook": "http://facebook.com/joaorabelo.advogado",
       "twitter": "http://twitter.com/joaorabelo.advogado",
       "linkedin": "http://linkedin.com/joaorabelo.advogado",
-      "skype": "joaorabelo.advogado",
-      "has_user": false
+      "skype": "joaorabelo.advogado"
     }
   },
   {
@@ -292,8 +284,7 @@
       "facebook": null,
       "twitter": null,
       "linkedin": null,
-      "skype": null,
-      "has_user": false
+      "skype": null
     }
   }
 ]

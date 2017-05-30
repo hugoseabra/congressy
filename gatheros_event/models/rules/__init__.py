@@ -1,9 +1,9 @@
-from . import event, info, invitation, member, person
+from . import event, info, invitation, member
 
 
 def check_invite(entity):
     """
-    Regras para conferencia de convites
+    Regras para validação de convites
 
     :param entity:
     """

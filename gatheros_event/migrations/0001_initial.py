@@ -515,10 +515,6 @@ class Migration(migrations.Migration):
                     max_length=255,
                     null=True
                 )),
-                ('has_user', models.BooleanField(
-                    default=False,
-                    verbose_name='vincular usuario?'
-                )),
                 ('city', models.ForeignKey(
                     null=True,
                     on_delete=django.db.models.deletion.PROTECT,
