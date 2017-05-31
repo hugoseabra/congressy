@@ -42,7 +42,7 @@ class InvitationModelTest(GatherosTestCase):
         data = {
             'author': author,
             'to': to,
-            'type': Invitation.INVITATION_TYPE_ADMIN
+            'group': Member.ADMIN
         }
         return self._create_model(
             Model=Invitation,
@@ -184,7 +184,7 @@ class InvitationModelTest(GatherosTestCase):
         invitation = Invitation(
             author=Member.objects.get(pk=1, group=Member.ADMIN),
             to=User.objects.get(pk=3),
-            type=Invitation.INVITATION_TYPE_ADMIN,
+            group=Member.ADMIN,
         )
 
         # Error when invitation from internal organization
@@ -199,7 +199,7 @@ class InvitationModelTest(GatherosTestCase):
         invitation = Invitation(
             author=member,  # Admin member
             to=invited,
-            type=Invitation.INVITATION_TYPE_ADMIN,
+            group=Member.ADMIN,
         )
         invitation.save()
 
@@ -220,7 +220,7 @@ class InvitationModelTest(GatherosTestCase):
         invitation = Invitation(
             author=helper,
             to=User.objects.get(pk=6),
-            type=Invitation.INVITATION_TYPE_ADMIN,
+            group=Member.ADMIN,
         )
 
         # Error when a HELPER member creates an invitation
@@ -248,8 +248,7 @@ class InvitationModelTest(GatherosTestCase):
         Member.objects.create(
             organization=organization,
             person=invited.person,
-            group=Member.HELPER,
-            created_by=1,
+            group=Member.HELPER
         )
         self.assertTrue(is_member())
 
@@ -257,7 +256,7 @@ class InvitationModelTest(GatherosTestCase):
         invitation = Invitation(
             author=member,  # Admin member
             to=invited,
-            type=Invitation.INVITATION_TYPE_ADMIN,
+            group=Member.ADMIN,
         )
 
         with self.assertRaises(ValidationError) as e:
@@ -271,7 +270,7 @@ class InvitationModelTest(GatherosTestCase):
         invitation = Invitation(
             author=member,
             to=member.person.user,
-            type=Invitation.INVITATION_TYPE_ADMIN,
+            group=Member.ADMIN,
         )
 
         with self.assertRaises(ValidationError) as e:

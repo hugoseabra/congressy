@@ -14,14 +14,6 @@ from .rules import check_invite
 class Invitation(models.Model):
     """ Convite para organização """
 
-    INVITATION_TYPE_HELPER = 'helper'
-    INVITATION_TYPE_ADMIN = 'admin'
-
-    INVITATION_TYPES = (
-        (INVITATION_TYPE_HELPER, 'Auxiliar'),
-        (INVITATION_TYPE_ADMIN, 'Administrador'),
-    )
-
     uuid = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
@@ -45,11 +37,11 @@ class Invitation(models.Model):
         blank=True,
         null=True
     )
-    type = models.CharField(
+    group = models.CharField(
         max_length=10,
-        choices=INVITATION_TYPES,
-        verbose_name='tipo',
-        default='helper'
+        choices=Member.GROUP_CHOICES,
+        verbose_name='grupo',
+        default=Member.HELPER
     )
 
     def save(self, *args, **kwargs):

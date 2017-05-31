@@ -1,15 +1,16 @@
-from django.shortcuts import reverse
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
+from django.shortcuts import reverse
 
 from core.fields import MultiEmailField
-from .models import Invitation, Organization
+from .models import Invitation, Member, Organization, Person
 from .models.rules import check_invite
 
 
-class InvitationForm(forms.Form):
+class InvitationCreateForm(forms.Form):
     organization = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         empty_label='-----',
@@ -20,7 +21,7 @@ class InvitationForm(forms.Form):
     _invites = None
 
     def __init__(self, user, data=None, *args, **kwargs):
-        super(InvitationForm, self).__init__(data=data, *args, **kwargs)
+        super(InvitationCreateForm, self).__init__(data=data, *args, **kwargs)
 
         organizations = Organization.objects.filter(
             members__person__user=user
@@ -51,7 +52,7 @@ class InvitationForm(forms.Form):
             invite = Invitation(
                 author=organization.get_members(person=self.user)[0],
                 to=invited_user,
-                type=Invitation.INVITATION_TYPE_HELPER
+                group=Member.HELPER
             )
 
             # Submete os convites as regras
@@ -63,7 +64,7 @@ class InvitationForm(forms.Form):
     def send_invite(self):
         for invite in self._invites:
             url = reverse(
-                'gatheros_event:organization-invite-accept',
+                'gatheros_event:invitation-decision',
                 kwargs={'pk': str(invite.pk)}
             )
             invite.to.save()
@@ -74,3 +75,52 @@ class InvitationForm(forms.Form):
                 settings.DEFAULT_FROM_EMAIL,
                 [invite.to.email]
             )
+
+
+class InvitationDecisionForm(forms.ModelForm):
+    """
+    Decide o resultado de um convite e suas implicações
+    """
+
+    def accept(self):
+        """
+        Aceita o convite e criar o membro
+
+        :return:
+        """
+        user = self.instance.to
+
+        # Se não tiver um perfil de pessoa vinculado não permite aceitar
+        if not hasattr(user, 'person'):
+            raise ValidationError('Usuário não tem perfil de pessoa')
+
+        # Cria membro
+        Member.objects.create(
+            organization=self.instance.author.organization,
+            person=user.person,
+            group=self.instance.group
+        )
+
+        # Remove o convite que não é mais necessário
+        self.instance.delete()
+
+    def decline(self):
+        """
+        Recusa o convite
+        :return:
+        """
+        self.instance.delete()
+
+    class Meta:
+        model = Invitation
+        exclude = []
+
+
+class ProfileForm(forms.ModelForm):
+    """
+    Pessoas que são usuários do sistema
+    """
+
+    class Meta:
+        model = Person
+        exclude = []

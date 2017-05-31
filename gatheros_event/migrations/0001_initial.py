@@ -183,14 +183,14 @@ class Migration(migrations.Migration):
                     null=True,
                     verbose_name='expira em'
                 )),
-                ('type', models.CharField(
+                ('group', models.CharField(
                     choices=[
-                        ('helper', 'Auxiliar'),
-                        ('admin', 'Administrador')
+                        ('admin', 'Administrador'),
+                        ('helper', 'Auxiliar')
                     ],
                     default='helper',
                     max_length=10,
-                    verbose_name='tipo'
+                    verbose_name='grupo'
                 )),
             ],
             options={

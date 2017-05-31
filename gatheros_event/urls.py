@@ -47,19 +47,24 @@ url_organization = [
         name='organization-switch'
     ),
     url(
-        r'^aceitar-convite/(?P<pk>[0-9A-Fa-f-]+)/$',
-        views.InviteAcceptView.as_view(),
-        name='organization-invite-accept'
+        r'^convite/(?P<pk>[0-9A-Fa-f-]+)/perfil/$',
+        views.InvitationProfileView.as_view(),
+        name='invitation-profile'
+    ),
+    url(
+        r'^convite/(?P<pk>[0-9A-Fa-f-]+)/$',
+        views.InvitationDecisionView.as_view(),
+        name='invitation-decision'
     ),
     url(
         r'^convite-sucesso/$',
-        views.InviteSuccessView.as_view(),
-        name='organization-invite-success'
+        views.InvitationCreateSuccessView.as_view(),
+        name='invitation-success'
     ),
     url(
         r'^convite/$',
-        views.InviteView.as_view(),
-        name='organization-invite'
+        views.InvitationCreateView.as_view(),
+        name='invitation'
     ),
     url(
         r'^$',
