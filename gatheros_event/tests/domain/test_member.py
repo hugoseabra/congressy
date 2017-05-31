@@ -46,9 +46,7 @@ class MemberModelTest(GatherosTestCase):
         data = {
             'organization': organization,
             'person': person,
-            'group': group,
-            'created_by': 1,
-            'invited_on': datetime.now()
+            'group': group
         }
 
         return self._create_model(Model=Member, data=data, persist=persist)

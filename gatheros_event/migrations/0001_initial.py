@@ -220,22 +220,6 @@ class Migration(migrations.Migration):
                     auto_now_add=True,
                     verbose_name='criado em'
                 )),
-                ('created_by', models.PositiveIntegerField(
-                    verbose_name='criado por'
-                )),
-                ('invited_on', models.DateTimeField(
-                    auto_now_add=True,
-                    verbose_name='convidado em'
-                )),
-                ('accepted', models.BooleanField(
-                    default=False,
-                    verbose_name='convite aceito'
-                )),
-                ('accepted_on', models.DateTimeField(
-                    blank=True,
-                    null=True,
-                    verbose_name='aceito em'
-                )),
                 ('active', models.BooleanField(
                     default=True,
                     verbose_name='ativo'
