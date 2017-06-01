@@ -29,6 +29,8 @@ class EventAdmin(admin.ModelAdmin):
         'category',
         'date_start',
         'date_end',
+        'get_percent_completed',
+        'get_percent_attended',
         'published',
         'pk'
     )
@@ -65,6 +67,25 @@ class EventAdmin(admin.ModelAdmin):
         }),
     )
 
+    def get_percent_completed(self, instance):
+        if not instance.limit:
+            return 'Livre'
+
+        remaining = instance.limit - instance.subscriptions.count()
+        percent = '{0:.2f}'.format(100 - instance.percent_completed)
+        return '{} ({}%)'.format(remaining, percent)
+
+    def get_percent_attended(self, instance):
+        queryset = instance.subscriptions
+        return '{}/{} ({}%)'.format(
+            queryset.filter(attended=True).count(),
+            queryset.count(),
+            '{0:.2f}'.format(instance.percent_attended)
+        )
+
+    get_percent_completed.__name__ = 'Vagas restantes'
+    get_percent_attended.__name__ = 'Credenciados'
+
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
@@ -74,7 +95,6 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'gender', 'user', 'created')
     ordering = ('created', 'name')
     readonly_fields = [
-        'user',
         'synchronized',
         'term_version',
         'politics_version'
@@ -85,12 +105,13 @@ class PersonAdmin(admin.ModelAdmin):
             'fields': (
                 'name',
                 'gender',
+                'pne',
                 'birth_date',
                 'cpf',
                 'rg',
                 'orgao_expedidor',
                 'avatar',
-                'has_user',
+                'user',
             ),
         }),
         ('Contato', {
@@ -209,7 +230,7 @@ class MemberAdmin(admin.ModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "person":
-            query_set = Person.objects.filter(has_user=True).order_by('name')
+            query_set = Person.objects.order_by('name')
             kwargs["queryset"] = query_set
 
         return super(MemberAdmin, self).formfield_for_foreignkey(
