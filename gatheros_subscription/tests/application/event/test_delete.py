@@ -80,15 +80,17 @@ class EventDeleteTest(TestCase):
         if remove:
             self._remove_subscriptions()
 
-        return self.client.post(self._get_delete_url())
+        return self.client.post(self._get_delete_url(), follow=True)
 
     def test_delete_requires_login(self):
-        url = self._get_delete_url()
         self.assertTrue(self._event_exists())
 
         # NOT Authenticated
         result = self._process_delete()
-        self.assertRedirects(result, self._get_login_url() + '?next=' + url)
+        self.assertContains(
+            result,
+            "Você não tem permissão para excluir este registro."
+        )
 
         # Authenticated
         self._event_admin_login()
@@ -104,7 +106,10 @@ class EventDeleteTest(TestCase):
         self.assertTrue(self._event_exists())
 
         result = self._process_delete(remove=False)
-        self.assertEqual(403, result.status_code)
+        self.assertContains(
+            result,
+            "Você não tem permissão para excluir este registro."
+        )
         self.assertTrue(self._event_exists())
 
         # Processando com remoção de inscrições
@@ -126,5 +131,8 @@ class EventDeleteTest(TestCase):
 
         self.assertTrue(self._event_exists())
         result = self._process_delete()
-        self.assertEqual(result.status_code, 403)
+        self.assertContains(
+            result,
+            "Você não tem permissão para excluir este registro."
+        )
         self.assertTrue(self._event_exists())

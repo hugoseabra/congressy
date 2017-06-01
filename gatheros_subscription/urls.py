@@ -5,11 +5,6 @@ from . import views
 
 url_lot = [
     url(
-        r'^$',
-        views.LotListView.as_view(),
-        name='lot-list'
-    ),
-    url(
         r'^(?P<lot_pk>[\d]+)/delete/$',
         views.LotDeleteView.as_view(),
         name='lot-delete'
@@ -25,6 +20,11 @@ url_lot = [
         name='lot-add'
     ),
     url(
+        r'^$',
+        views.LotListView.as_view(),
+        name='lot-list'
+    ),
+    url(
         r'^',
         RedirectView.as_view(
             pattern_name='gatheros_event:event-list',
@@ -34,5 +34,5 @@ url_lot = [
 ]
 
 urlpatterns = [
-    url(r'^events/(?P<pk>[\d]+)/lots/', include(url_lot)),
+    url(r'^events/(?P<event_pk>[\d]+)/lots/', include(url_lot)),
 ]

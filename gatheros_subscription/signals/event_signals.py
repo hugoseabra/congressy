@@ -117,14 +117,19 @@ def _merge_lots_and_subscriptions(event):
 
 
 def _merge_subscriptions(lot, subscriptions):
-    # normalize
+    """
+    Normaliza as inscrições no lote.
+    :param lot: Lote a receber inscrições
+    :param subscriptions: Collection de inscrições
+    :return: None
+    """
     has_subscriptions = lot.subscriptions.count() > 0
     subscription_counter = 0
     for sub in subscriptions:
         if subscription_counter == 0:
             if has_subscriptions:
                 count_max = lot.subscriptions.aggregate(Max('count'))
-                subscription_counter = count_max['count__max']
+                subscription_counter = count_max.get('count__max', 0)
             else:
                 subscription_counter = 0
 

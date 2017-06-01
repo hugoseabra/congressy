@@ -63,6 +63,7 @@ class EventModelTest(TestCase):
         self.assertEqual(event.lots.count(), 0)
 
     def test_disable_subscription_with_subscriptions(self):
+        # Passar de inscrição simples para desativada
         event = self._get_event(pk=1)
         # Fixture is SUBSCRIPTION_SIMPLE
         self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_SIMPLE)
@@ -70,6 +71,20 @@ class EventModelTest(TestCase):
 
         lot = event.lots.first()
         self.assertEqual(lot.subscriptions.count(), 4)
+
+        # Not allowed to disable subscription when there are subscriptions
+        with self.assertRaises(Exception):
+            event.subscription_type = Event.SUBSCRIPTION_DISABLED
+            event.save()
+
+        # Passar de inscrição por lotes para desativada
+        event = self._get_event(pk=10)
+        # Fixture is SUBSCRIPTION_BY_LOTS
+        self.assertEqual(event.subscription_type, Event.SUBSCRIPTION_BY_LOTS)
+        self.assertEqual(event.lots.count(), 1)
+
+        lot = event.lots.first()
+        self.assertEqual(lot.subscriptions.count(), 6)
 
         # Not allowed to disable subscription when there are subscriptions
         with self.assertRaises(Exception):

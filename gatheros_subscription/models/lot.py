@@ -28,9 +28,12 @@ class LotManager(models.Manager):
 class Lot(models.Model, deletable.DeletableModel):
     INTERNAL_DEFAULT_NAME = 'default'
 
+    DISCOUNT_TYPE_PERCENT = 'percent'
+    DISCOUNT_TYPE_MONEY = 'money'
+
     DISCOUNT_TYPE = (
-        ('percent', '%'),
-        ('money', 'R$'),
+        (DISCOUNT_TYPE_PERCENT, '%'),
+        (DISCOUNT_TYPE_MONEY, 'R$'),
     )
 
     LOT_STATUS_RUNNING = 'running'

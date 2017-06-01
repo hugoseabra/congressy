@@ -1,23 +1,21 @@
-from django import forms
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
-from django.utils.module_loading import import_string
 from django.views import View, generic
 
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
+from gatheros_subscription import forms
 from gatheros_subscription.models import Lot
 
-DeleteViewMixin = import_string('core.view.delete.DeleteViewMixin')
+# Manter abaixo dos outros imports
+from core.view.delete import DeleteViewMixin
 
-
-# @TODO Levar forms para raiz forms.py
 # @TODO Resolver inconsistências de Base
+
 
 class BaseLotView(AccountMixin, View):
     event = None
-    show_not_allowed_message = False
 
     def dispatch(self, request, *args, **kwargs):
         try:
@@ -30,7 +28,7 @@ class BaseLotView(AccountMixin, View):
             return redirect(reverse_lazy('gatheros_event:event-list'))
 
         else:
-            if self._cannot_view():
+            if not self.can_view():
                 return redirect(reverse(
                     'gatheros_event:event-panel',
                     kwargs={'pk': self.event.pk}
@@ -45,23 +43,27 @@ class BaseLotView(AccountMixin, View):
         return context
 
     def _set_event(self):
-        self.event = Event.objects.get(pk=self.kwargs.get('pk'))
+        self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
 
-    def _cannot_view(self):
+    def can_view(self, show_message=True):
         if not self.event:
-            return True
+            return False
 
         by_lots = self.event.subscription_type == Event.SUBSCRIPTION_BY_LOTS
         same_organization = self.event.organization == self.organization
-        can = by_lots and same_organization
+        can_manage = self.request.user.has_perm(
+            'gatheros_event.view_lots',
+            self.event
+        )
+        can = by_lots and same_organization and can_manage
 
-        if can is False and self.show_not_allowed_message:
+        if not can and show_message:
             messages.warning(
                 self.request,
-                "Você não pode inserir gerenciar lotes neste evento."
+                "Você não pode realizar esta ação de lote neste evento."
             )
 
-        return can is False
+        return can
 
 
 class BaseFormLotView(BaseLotView):
@@ -87,59 +89,19 @@ class LotListView(BaseLotView, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(LotListView, self).get_context_data(**kwargs)
         context['event'] = self.event
+        context['can_add'] = self._can_add
 
         return context
 
-
-class LotForm(forms.ModelForm):
-    event = None
-
-    class Meta:
-        model = Lot
-        fields = [
-            'event',
-            'name',
-            'date_start',
-            'date_end',
-            'limit',
-            'price',
-            'discount_type',
-            'discount',
-            'transfer_tax',
-            'private'
-        ]
-        widgets = {'event': forms.HiddenInput()}
-
-    def __init__(self, **kwargs):
-        super(LotForm, self).__init__(**kwargs)
-        self.event = kwargs.get('initial').get('event')
-        self._set_dates_help_texts()
-
-    def _set_dates_help_texts(self):
-        last_lot = self.event.lots.last()
-        if last_lot:
-            diff = self.event.date_start - last_lot.date_end
-
-            if diff.days <= 1:
-                date_start_help = 'O lote anterior ({}) pega todo o período' \
-                                  ' do evento.'.format(last_lot.name)
-            else:
-                lot_date_end = last_lot.date_end.strftime('%d/%m/%Y %Hh%M')
-                date_start_help = \
-                    'Existe um lote anterior ({}) que finaliza em {}. Tente' \
-                    ' não chocar as datas.'.format(last_lot.name, lot_date_end)
-
-            self.fields['date_start'].help_text = date_start_help
-
-        event_date_start = self.event.date_start.strftime('%d/%m/%Y %Hh%M')
-        self.fields['date_end'].help_text = \
-            'O evento inicia-se em {}. O final do lote deve ser anterior a' \
-            ' esta data.'.format(event_date_start)
+    def _can_add(self):
+        return self.request.user.has_perm(
+            'gatheros_event.add_lot',
+            self.event
+        )
 
 
 class LotAddFormView(BaseFormLotView, generic.CreateView):
-    show_not_allowed_message = True
-    form_class = LotForm
+    form_class = forms.LotForm
     template_name = 'gatheros_subscription/lot/form.html'
 
     def get_context_data(self, **kwargs):
@@ -154,14 +116,29 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
     def get_success_url(self):
         return reverse(
             'gatheros_subscription:lot-list',
-            kwargs={'pk': self.event.pk}
+            kwargs={'event_pk': self.event.pk}
         )
+
+    def can_view(self, show_message=True):
+        can_view = super(LotAddFormView, self).can_view(False)
+        can = can_view and self.request.user.has_perm(
+            'gatheros_event.add_lot',
+            self.event
+        )
+
+        if not can and show_message:
+            messages.warning(
+                self.request,
+                "Você não pode adicionar lote neste evento."
+            )
+
+        return can
 
 
 class LotEditFormView(BaseFormLotView, generic.UpdateView):
     show_not_allowed_message = True
-    form_class = LotForm
-    model = LotForm.Meta.model
+    form_class = forms.LotForm
+    model = forms.LotForm.Meta.model
     template_name = 'gatheros_subscription/lot/form.html'
     pk_url_kwarg = 'lot_pk'
 
@@ -171,28 +148,52 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         return context
 
     def form_valid(self, form):
-        messages.success(self.request, 'Lote editado com sucesso.')
+        messages.success(self.request, 'Lote alterado com sucesso.')
         return super(LotEditFormView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse(
             'gatheros_subscription:lot-list',
-            kwargs={'pk': self.event.pk}
+            kwargs={'event_pk': self.event.pk}
         )
 
+    def can_view(self, show_message=True):
+        can_view = super(LotEditFormView, self).can_view(False)
+        can = can_view and self.request.user.has_perm(
+            'gatheros_subscription.change_lot',
+            self.get_object()
+        )
 
-class LotDeleteView(DeleteViewMixin):
-    model = Event
+        if not can and show_message:
+            messages.warning(
+                self.request,
+                "Você não pode editar lote neste evento."
+            )
+
+        return can
+
+
+class LotDeleteView(BaseLotView, DeleteViewMixin):
+    model = Lot
     pk_url_kwarg = 'lot_pk'
-    delete_message = "Não é possível excluir o lote '{name}' possivelmente" \
-                     " porque inscrições. Exporte, gerencie e" \
-                     " exclua as inscrições existentes antes de excluir o" \
-                     " lote."
-
+    delete_message = "Tem certeza que deseja excluir o lote \"{name}\"?"
     success_message = "Lote excluído com sucesso!"
 
     def get_success_url(self):
         return reverse(
             'gatheros_subscription:lot-list',
-            kwargs={'pk': self.kwargs['pk']}
+            kwargs={'event_pk': self.kwargs['event_pk']}
         )
+
+    def can_view(self, show_message=True):
+        self.object = self.get_object()
+        can_view = super(LotDeleteView, self).can_view(False)
+        can = can_view and self.can_delete()
+
+        if not can and show_message:
+            messages.warning(
+                self.request,
+                "Você não pode excluir lote neste evento."
+            )
+
+        return can
