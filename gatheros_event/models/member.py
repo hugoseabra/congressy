@@ -1,3 +1,9 @@
+# pylint: disable=W5101
+"""
+Membro de organização, pertencente a um determinado grupo, responsável para
+gerir as informações relacionadas aos eventos da organização.
+"""
+
 from django.db import models
 
 from gatheros_event.models.rules import member as rule
@@ -5,6 +11,8 @@ from . import Person
 
 
 class Member(models.Model):
+    """Membro de organização."""
+
     ADMIN = 'admin'
     HELPER = 'helper'
 
@@ -53,6 +61,7 @@ class Member(models.Model):
         super(Member, self).delete(*args, **kwargs)
 
     def check_rules(self):
+        """Verifica regras de Membro"""
         rule.rule_1_membros_deve_ter_usuarios(self)
         rule.rule_2_organizacao_interna_apenas_1_membro(
             self,

@@ -110,7 +110,7 @@ class InvitationDecisionView(TemplateView):
                 # Se errado direciona para a criação do perfil
                 return redirect(
                     'gatheros_event:invitation-profile',
-                    pk= kwargs.get('pk')
+                    pk=kwargs.get('pk')
                 )
 
         else:

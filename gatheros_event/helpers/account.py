@@ -1,9 +1,14 @@
+"""
+Helper para configuração de contexto de usuário mediante sessão e organização
+ativa do usuário na sessão.
+"""
 from django.core.exceptions import SuspiciousOperation
 
 from gatheros_event.models import Organization, Person
 
 
 def is_configured(request):
+    """Verifica se contexto de sessão está configurada."""
     configured = 'account' in request.session
     if not configured:
         clean_account(request)
@@ -12,6 +17,7 @@ def is_configured(request):
 
 
 def get_organization(request):
+    """Retorna a organização ativa na sessão."""
     if not hasattr(request, 'cached_organization'):
         account = request.session.get('account')
         try:
@@ -26,10 +32,10 @@ def get_organization(request):
 
 def get_organizations(request):
     """
-    Retorna a organização ativa na sessão
+    Retorna as organizações do usuário autenticado.
 
-    :param request:
-    :return:
+    :param request: Instância de HttpRequest
+    :return: list
     """
     if not hasattr(request, 'cached_organizations'):
         account = request.session.get('account')
@@ -143,6 +149,7 @@ def clean_account(request):
 
 
 def clean_cache(request):
+    """Limpa cache de contexto de organização da sessão."""
     if hasattr(request, 'cached_organizations'):
         del request.cached_organizations
 

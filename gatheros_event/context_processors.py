@@ -1,3 +1,6 @@
+"""
+Gatheros Event template context processor
+"""
 from .helpers import account as _account_helper
 
 

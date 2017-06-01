@@ -104,4 +104,3 @@ class LotFormTest(TestCase):
         self.assertTrue(form.is_valid())
         form.save()
         test_instance_data(form, data)
-

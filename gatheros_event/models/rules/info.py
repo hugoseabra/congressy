@@ -1,11 +1,16 @@
+# pylint: disable=C0103,W0622
 """
-A exibição de informações do evento aceita apenas um tipo de configuração.
+Regras de negócio para informação de evento.
 """
 
 from django.core.exceptions import ValidationError
 
 
 def rule_1_imagem_unica_somente(info):
+    """
+    Se configuração é para imagem principal, imagem principal deve ser enviada
+    e não pode haver outras imagens e link do youtube.
+    """
     if info.config_type != info.CONFIG_TYPE_MAIN_IMAGE:
         return
 
@@ -25,6 +30,10 @@ def rule_1_imagem_unica_somente(info):
 
 
 def rule_2_4_imagens_somente(info):
+    """
+    Se configuração é para 4 imagens, imagens devem ser enviadas e não pode
+    haver imagem principal e link do youtube.
+    """
     if info.config_type != info.CONFIG_TYPE_4_IMAGES:
         return
 
@@ -46,6 +55,11 @@ def rule_2_4_imagens_somente(info):
 
 
 def rule_3_youtube_video_somente(info):
+    """
+    Se configuração é link do youtube, imagens devem ser enviadas e não pode
+    haver imagem principal e 4 imagens.
+    """
+
     if info.config_type != info.CONFIG_TYPE_VIDEO:
         return
 
@@ -63,5 +77,11 @@ def rule_3_youtube_video_somente(info):
 
 
 def _remove_file(file):
-    storage, path = file.storage, file.path
+    """
+    Remove arquivos do storage.
+    :param file: object - Instância de File
+    :return: None
+    """
+    storage = file.storage
+    path = file.path
     storage.delete(path)

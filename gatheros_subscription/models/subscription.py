@@ -1,3 +1,8 @@
+# pylint: disable=W5101
+"""
+Inscrições de pessoas em eventos.
+"""
+
 import uuid
 from datetime import datetime
 
@@ -10,6 +15,8 @@ from .rules import subscription as rule
 
 
 class SubscriptionManager(models.Manager):
+    """ Gerenciador de inscrição - Manager"""
+
     def next_count(self, lot):
         count_max = self.filter(lot=lot).aggregate(Max('count'))
         if count_max['count__max']:
@@ -30,6 +37,8 @@ class SubscriptionManager(models.Manager):
 # @TODO Acrescentar campo boolean "PNE"
 
 class Subscription(models.Model):
+    """ Modelo de inscrição """
+
     DEVICE_ORIGIN_WEB = 'web'
     DEVICE_ORIGIN_OFFLINE = 'offline'
 
@@ -125,6 +134,8 @@ class Subscription(models.Model):
         self.event = self.lot.event
 
     def check_rules(self):
+        """ Verifica regras de negócios de inscrição """
+
         rule.rule_1_limite_lote_excedido(self)
 
         # RULE 2 - rule.rule_2_codigo_inscricao_deve_ser_gerado
@@ -145,6 +156,8 @@ class Subscription(models.Model):
         rule.rule_6_inscricao_apos_data_final_evento(self, self._state.adding)
 
     def get_count_display(self):
+        """ Recupera display de formatação de número de inscrição. """
+
         if not self.count:
             return '--'
         return '{0:03d}'.format(self.count)

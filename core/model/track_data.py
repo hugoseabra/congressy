@@ -1,3 +1,4 @@
+# pylint: disable=W0613
 """Decorator @track_data - Tracks changes in models"""
 
 from django.db.models.signals import post_init

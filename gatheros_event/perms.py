@@ -1,3 +1,7 @@
+# pylint: disable=C0103, E0401
+"""
+Gatheros Event Permission
+"""
 from django.core.exceptions import ImproperlyConfigured
 from permission import add_permission_logic
 from permission.compat import is_authenticated
@@ -8,6 +12,9 @@ from .models import Event, Member, Organization, Person
 
 
 class MemberPermissionLogic(PermissionLogic):
+    """
+    Lógica de permissão baseada no relacionamento do usuário com organização.
+    """
     def __init__(self, handler, permissions=None, field_organization=None):
         """
         Construtor
@@ -28,6 +35,10 @@ class MemberPermissionLogic(PermissionLogic):
         self.field_organization = field_organization
 
     def has_perm(self, user_obj, perm, obj=None):
+        """
+        Verifica se existe permissão do usuário de acordo com a permissão e
+        handler de lógica de permissão.
+        """
         if not is_authenticated(user_obj):
             return False
 
@@ -48,11 +59,25 @@ class MemberPermissionLogic(PermissionLogic):
 
 # Handlers
 def member_is_admin(user_obj, organization=None):
+    """
+    Usuário é membro de organização e administrador.
+
+    :param user_obj: Instância de usuário
+    :param organization: Instância de organização
+    :return: bool
+    """
     person = Person.objects.get(user=user_obj)
     return organization and organization.is_admin(person)
 
 
 def member_is_admin_not_internal(user_obj, organization=None):
+    """
+    Usuário é membro de organização não interna e administrador.
+
+    :param user_obj: Instância de usuário
+    :param organization: Instância de organização
+    :return: bool
+    """
     if not organization or organization.internal:
         return False
 
@@ -61,6 +86,13 @@ def member_is_admin_not_internal(user_obj, organization=None):
 
 
 def member_is_member(user_obj, organization):
+    """
+    Usuário é membro da organização.
+
+    :param user_obj: Instância de usuário
+    :param organization: Instância de organização
+    :return: bool
+    """
     person = Person.objects.get(user=user_obj)
     return organization and organization.is_member(person)
 

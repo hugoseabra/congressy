@@ -1,3 +1,8 @@
+# pylint: disable=W5101
+"""
+Ocupação de pessoas.
+"""
+
 from django.db import models
 
 

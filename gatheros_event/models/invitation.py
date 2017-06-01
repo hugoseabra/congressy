@@ -1,3 +1,9 @@
+# pylint: disable=W5101,C0103
+"""
+Convite para que uma pessoa, cadastrada ou não, possa participar de uma
+organização.
+"""
+
 import uuid
 from datetime import datetime, timedelta
 
@@ -70,5 +76,9 @@ class Invitation(models.Model):
         )
 
     def has_previous(self):
+        """
+        Verifica se existe convite prévio.
+        :return: bool
+        """
         return Invitation.objects.filter(
             author__organization=self.author.organization, to=self.to).exists()

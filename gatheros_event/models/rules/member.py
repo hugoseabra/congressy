@@ -1,7 +1,15 @@
+# pylint: disable=C0103
+"""
+Regras de negócio de membro de organização.
+"""
+
 from django.db import IntegrityError
 
 
 def rule_1_membros_deve_ter_usuarios(entity):
+    """
+    Membro deve ter usuário vinculado.
+    """
     if entity.person.user is None:
         raise IntegrityError(
             'Pessoa sem usuário não pode participar de organizações'

@@ -1,3 +1,9 @@
+# pylint: disable=W5101,E0401,C0103
+"""
+Pessoa, nesta aplicação, é o principal objetivo de toda a plataforma, que
+serão os usuários e/ou participantes de eventos na plataforma.
+"""
+
 import uuid
 
 from django.contrib.auth.models import User
@@ -11,6 +17,8 @@ from . import Occupation
 
 @track_data('name', 'user', 'email')
 class Person(models.Model):
+    """Pessoa"""
+
     RESOURCE_URI = '/api/core/people/'
 
     GENDER_CHOICES = (
@@ -176,12 +184,21 @@ class Person(models.Model):
         super(Person, self).delete(*args, **kwargs)
 
     def get_cpf_display(self):
+        """
+        Recupera CPF formatado.
+
+        :return: string
+        """
         cpf = str(self.cpf)
         if not cpf:
             return ''
         return '{0}.{1}.{2}-{3}'.format(cpf[:3], cpf[3:6], cpf[6:9], cpf[9:11])
 
     def get_birth_date_display(self):
+        """
+        Recupera data de nascimento formatada.
+        :return: string
+        """
         if not self.birth_date:
             return '--'
         return self.birth_date.strftime('%d/%m/%Y')

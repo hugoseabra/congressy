@@ -1,3 +1,11 @@
+# pylint: disable=W5101
+"""
+Evento é o modelo chave de toda a aplicação: uma estrutura de realização
+feita por um organizador de evento, dono de uma organização, e que deseja
+apresentar informações ligadas a ela a pessoa que possam se interessar em
+participar do evento.
+"""
+
 from datetime import datetime
 
 from django.db import models
@@ -18,6 +26,8 @@ from .rules import event as rule
 
 @track_data('subscription_type', 'date_start', 'date_end')
 class Event(models.Model, deletable.DeletableModel):
+    """Modelo de Evento"""
+
     RESOURCE_URI = '/api/core/events/'
 
     SUBSCRIPTION_BY_LOTS = 'by_lots'
@@ -132,10 +142,12 @@ class Event(models.Model, deletable.DeletableModel):
 
     @property
     def limit(self):
+        """Limit do evento de acordo com os lotes existentes."""
         limit = 0
-        for lot in self.lots.all():
-            if lot.limit:
-                limit += lot.limit
+        if hasattr(self, 'lots'):
+            for lot in self.lots.all():
+                if lot.limit:
+                    limit += lot.limit
 
         return limit
 
@@ -151,6 +163,7 @@ class Event(models.Model, deletable.DeletableModel):
 
     @property
     def status(self):
+        """Status do evento de acordo com suas datas."""
         now = datetime.now()
         if now >= self.date_end:
             return Event.LOT_STATUS_FINISHED
@@ -161,6 +174,7 @@ class Event(models.Model, deletable.DeletableModel):
         return None
 
     def get_status_display(self):
+        """ Recupera o status do evento de acordo com a propriedade 'status'"""
         return force_text(
             dict(Event.STATUSES).get(self.status, None),
             strings_only=True
@@ -172,6 +186,7 @@ class Event(models.Model, deletable.DeletableModel):
         super(Event, self).save(*args, **kwargs)
 
     def check_rules(self):
+        """Verifica regras do evento"""
         rule.rule_1_data_inicial_antes_da_data_final(self)
         rule.rule_2_local_deve_ser_da_mesma_organizacao_do_evento(self)
         rule.rule_3_evento_data_final_posterior_atual(self, self._state.adding)
@@ -188,6 +203,7 @@ class Event(models.Model, deletable.DeletableModel):
         )
 
     def get_period(self):
+        """Recupera string de período de evento de acordo com as datas."""
         start_date = self.date_start.date()
         end_date = self.date_end.date()
         start_time = self.date_start.time()

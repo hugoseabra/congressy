@@ -1,8 +1,12 @@
+"""
+Formulários de Event
+"""
 from django import forms
 from gatheros_event.models import Event
 
 
 class EventForm(forms.ModelForm):
+    """Formulário principal de evento"""
     class Meta:
         model = Event
         fields = [
@@ -19,12 +23,8 @@ class EventForm(forms.ModelForm):
         widgets = {'organization': forms.HiddenInput()}
 
 
-class BaseEventPartialEdit(forms.ModelForm):
-    def __init__(self, data=None, *args, **kwargs):
-        super(BaseEventPartialEdit, self).__init__(data=data, *args, **kwargs)
-
-
-class EventEditDatesForm(BaseEventPartialEdit):
+class EventEditDatesForm(forms.ModelForm):
+    """Formulário de edição de datas de evento"""
     class Meta:
         model = Event
         fields = [
@@ -33,7 +33,8 @@ class EventEditDatesForm(BaseEventPartialEdit):
         ]
 
 
-class EventEditSubscriptionTypeForm(BaseEventPartialEdit):
+class EventEditSubscriptionTypeForm(forms.ModelForm):
+    """Formulário de edição de Tipo de Inscrição de evento"""
     class Meta:
         model = Event
         fields = [
@@ -42,7 +43,8 @@ class EventEditSubscriptionTypeForm(BaseEventPartialEdit):
         ]
 
 
-class EventPublicationForm(BaseEventPartialEdit):
+class EventPublicationForm(forms.ModelForm):
+    """Formulário de edição de publicação de evento"""
     class Meta:
         model = Event
         fields = [
@@ -50,8 +52,9 @@ class EventPublicationForm(BaseEventPartialEdit):
         ]
 
     def clean_published(self):
+        """Limpa campo 'published'"""
         published = self.data['published']
-        if type(published) == str:
+        if isinstance(published, str):
             published = published == '1'
 
         return published

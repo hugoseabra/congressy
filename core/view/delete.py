@@ -1,3 +1,4 @@
+# pylint: disable=R0901
 """Gatheros view mixin for deletion of models"""
 
 from django.contrib import messages

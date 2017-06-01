@@ -1,3 +1,8 @@
+# pylint: disable=C0103,E0611
+"""
+Formulário relacionados a Convites de Pessoas a serem membros de organizações
+"""
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -11,6 +16,7 @@ from gatheros_event.models.rules import check_invite
 
 
 class InvitationCreateForm(forms.Form):
+    """Formulário de criação de Convite"""
     organization = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
         empty_label='-----',
@@ -62,6 +68,7 @@ class InvitationCreateForm(forms.Form):
             self._invites.append(invite)
 
     def send_invite(self):
+        """Notifica pessoa convidada"""
         for invite in self._invites:
             url = reverse(
                 'gatheros_event:invitation-decision',

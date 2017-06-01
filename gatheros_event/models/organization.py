@@ -1,3 +1,10 @@
+# pylint: disable=W5101
+"""
+Organização é a estrutura máxima da aplicação, pois nela, define-se seus
+membros, com seus devidos grupos, e como eles poderão interagir nos eventos
+vinculadas a ela.
+"""
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -81,6 +88,13 @@ class Organization(models.Model):
         )
 
     def get_members(self, group=None, person=None):
+        """
+        Recupera litsa de membros.
+
+        :param group: string - Filtro de lista por grupo
+        :param person: object - filtro de lista por Instância de Person ou User
+        :return: list
+        """
         qs = self.members.all()
 
         if group:

@@ -1,3 +1,9 @@
+# pylint: disable=W5101
+"""
+Opção de campo de formulário para dar suporte a diversos valores possíveis
+para um campo.
+"""
+
 from django.db import models
 
 from . import Field
@@ -6,6 +12,8 @@ from .rules import field_option as rule
 
 # @TODO valores únicos para a pergunta
 class FieldOption(models.Model):
+    """ Modelo de opção de campo. """
+
     field = models.ForeignKey(
         Field,
         on_delete=models.CASCADE,
@@ -31,6 +39,8 @@ class FieldOption(models.Model):
         super(FieldOption, self).save(*args, **kwargs)
 
     def check_rules(self):
+        """ Verifica regras de negócio. """
+
         rule.rule_1_somente_campos_com_opcoes(self)
 
     def __str__(self):

@@ -1,3 +1,9 @@
+# pylint: disable=W5101,E0401
+"""
+Local onde o evento vai acontecer, para facilitar a orientação aos possíveis
+participantes e exibição de mapa.
+"""
+
 from django.db import models
 from kanu_locations.models import City
 
@@ -8,6 +14,8 @@ from . import Organization
 # @TODO Ver integração com Google Maps
 
 class Place(models.Model):
+    """Local de evento."""
+
     name = models.CharField(max_length=255, verbose_name='nome')
     organization = models.ForeignKey(
         Organization,
@@ -96,37 +104,60 @@ class Place(models.Model):
         return '{} ({})'.format(self.name, self.organization.name)
 
     # noinspection PyMethodMayBeStatic
-    def _add_prefix(self, *args, prefix=', '):
-        for arg in args:
-            if arg:
-                return prefix
+    def _add_prefix(self, *args, **kwargs):
+        if args:
+            return kwargs.get('prefix', '')
 
         return ''
 
     def get_formatted_zip_code(self):
-        zc = self.zip_code
-        return '{0}.{1}-{2}'.format(zc[:2], zc[2:5], zc[5:])
+        """
+        Recupera CEP formatado.
+        :return: string
+        """
+        return '{0}.{1}-{2}'.format(
+            self.zip_code[:2],
+            self.zip_code[2:5],
+            self.zip_code[5:]
+        )
 
     def get_complete_address(self):
+        """
+        Recupera endereço completo e formatado.
+        :return: string
+        """
         address = ''
         if self.street:
             address += self.street
 
         if self.number:
-            address += self._add_prefix(self.street) + 'Nº. ' + self.number
+            address += self._add_prefix(
+                self.street,
+                prefix=', '
+            ) + 'Nº. ' + self.number
 
         if self.complement:
-            address += self._add_prefix(self.street,
-                                        self.number) + self.complement
+            address += self._add_prefix(
+                self.street,
+                self.number,
+                prefix=', '
+            ) + self.complement
 
         if self.village:
-            address += self._add_prefix(self.street, self.number,
-                                        self.complement) + self.village
+            address += self._add_prefix(
+                self.street,
+                self.number,
+                self.complement,
+                prefix=', '
+            ) + self.village
 
         if self.zip_code:
             address += self._add_prefix(
-                self.street, self.number,
-                self.complement, self.village
+                self.street,
+                self.number,
+                self.complement,
+                self.village,
+                prefix=', '
             ) + 'CEP: ' + self.get_formatted_zip_code()
 
         address += self._add_prefix(

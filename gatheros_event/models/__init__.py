@@ -1,3 +1,6 @@
+"""
+Models para Gatheros Event
+"""
 # @TODO Remover rules dos models e levá-los para camadas de domínios
 # @TODO Manter arquivos de rules em models/rules
 # @TODO Testar rules separadamente na camada de domínio

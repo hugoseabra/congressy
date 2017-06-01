@@ -1,9 +1,17 @@
+# pylint: disable=W5101
+"""
+Campo de formulário, responsável pela versatilidade de buscar informações
+dos participantes de eventos através de suas inscrições.
+"""
+
 from django.db import models
 
 from . import AbstractField, Form
 
 
 class FieldManager(models.Manager):
+    """ Gerenciador de campo - manager """
+
     # noinspection PyMethodMayBeStatic
     def append_field(self, field):
         last_field = Field.objects.filter(form=field.form) \
@@ -16,6 +24,8 @@ class FieldManager(models.Manager):
 
 
 class Field(AbstractField):
+    """ Modelo de campo de formulário. """
+
     form = models.ForeignKey(
         Form,
         on_delete=models.CASCADE,
@@ -47,6 +57,7 @@ class Field(AbstractField):
         if self._state.adding and not self.order:
             self.order = Field.objects.append_field(self)
 
+        # Verifica se o tipo de campo é aceito.
         self._accepts_options()
 
         return super(Field, self).save(**kwargs)
@@ -63,6 +74,7 @@ class Field(AbstractField):
         )
 
     def _accepts_options(self):
+        """ Campos aceitos pelo formulário. """
         self.with_options = self.type in [
             self.FIELD_SELECT,
             self.FIELD_CHECKBOX_GROUP,

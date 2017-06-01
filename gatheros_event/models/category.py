@@ -1,3 +1,9 @@
+# pylint: disable=W5101
+"""
+Categoria de evento são importantes para agrupar os eventos em estruturas
+que se assemelham e ajudar a estruturar a apresentação do evento para
+pessoas que possam se interessar em participar do evento.
+"""
 from django.db import models
 
 

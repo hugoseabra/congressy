@@ -1,3 +1,8 @@
+# pylint: disable=C0103
+"""
+Regras de negócio para convite.
+"""
+
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 

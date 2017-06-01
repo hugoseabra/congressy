@@ -1,7 +1,14 @@
+# pylint: disable=W5101
+"""
+Classe abstrata para Campo de formulário
+"""
+
 from django.db import models
 
 
 class AbstractField(models.Model):
+    """ Campo de formulário. """
+
     FIELD_INPUT_TEXT = 'input-text'
     FIELD_INPUT_DATE = 'input-date'
     FIELD_INPUT_DATETIME = 'input-datetime-local'

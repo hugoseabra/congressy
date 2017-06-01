@@ -1,3 +1,7 @@
+# pylint: disable=W0222
+"""
+Django Admin para Gatheros Event
+"""
 from django.contrib import admin
 
 from .models import Category, Event, Info, Invitation, Member, Occupation, \
@@ -9,11 +13,15 @@ from .models import Category, Event, Info, Invitation, Member, Occupation, \
 @admin.register(Occupation)
 @admin.register(Category)
 class NameActivePKAdmin(admin.ModelAdmin):
+    """Base class para modelos que possuem campos 'active' e 'name'"""
     list_display = ('name', 'active', 'pk')
 
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
+    """
+    Admin para Event
+    """
     list_display = (
         'name',
         'organization',
@@ -60,6 +68,9 @@ class EventAdmin(admin.ModelAdmin):
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
+    """
+    Admin para Person
+    """
     list_display = ('name', 'gender', 'user', 'created')
     ordering = ('created', 'name')
     readonly_fields = [
@@ -118,6 +129,9 @@ class PersonAdmin(admin.ModelAdmin):
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
+    """
+    Admin para Organization
+    """
     list_display = ('name', 'active', 'internal')
     fieldsets = (
         (None, {
@@ -148,6 +162,9 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 @admin.register(Place)
 class PlaceAdmin(admin.ModelAdmin):
+    """
+    Admin para Place
+    """
     list_display = ('name', 'organization', 'pk')
     fieldsets = (
         (None, {
@@ -176,11 +193,17 @@ class PlaceAdmin(admin.ModelAdmin):
 
 @admin.register(Info)
 class EventInfoAdmin(admin.ModelAdmin):
+    """
+    Admin para Event Info
+    """
     list_display = ('event', 'pk')
 
 
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
+    """
+    Admin para Member
+    """
     list_display = ('organization', 'person', 'group', 'pk')
     ordering = ('organization', 'person')
 
@@ -198,6 +221,9 @@ class MemberAdmin(admin.ModelAdmin):
 
 @admin.register(Invitation)
 class InvitationAdmin(admin.ModelAdmin):
+    """
+    Admin para Invitation
+    """
     list_display = (
         'author', 'get_user', 'get_organization', 'created', 'expired')
     readonly_fields = ['created', 'expired']
@@ -216,9 +242,11 @@ class InvitationAdmin(admin.ModelAdmin):
         )
 
     def get_organization(self, instance):
+        """Valor para coluna 'Organização'"""
         return instance.author.organization
 
     def get_user(self, instance):
+        """Valor para coluna 'Usuário'"""
         return '{} {} ({})'.format(
             instance.to.first_name,
             instance.to.last_name,

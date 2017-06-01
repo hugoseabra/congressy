@@ -1,9 +1,15 @@
+# pylint: disable=C0103
+"""Regras de Negócios para Evento."""
+
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
 
 
 def rule_1_data_inicial_antes_da_data_final(event):
+    """
+    Data inicial deve ser antes da data final.
+    """
     if event.date_end < event.date_start:
         raise ValidationError({'date_start': [
             'Data inicial deve anterior a data final'
@@ -21,6 +27,9 @@ def rule_2_local_deve_ser_da_mesma_organizacao_do_evento(event):
 
 
 def rule_3_evento_data_final_posterior_atual(event, adding=True):
+    """
+    Data final deve ser posterior a data atual.
+    """
     if adding is True and event.date_end < datetime.now():
         raise ValidationError({'date_end': [
             'Não é possível cadastrar evento que já tenha se encerrado.'

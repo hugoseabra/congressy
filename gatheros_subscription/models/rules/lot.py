@@ -1,3 +1,6 @@
+# pylint: disable=C0103
+"""Regras de Negócios para lote."""
+
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
@@ -7,6 +10,10 @@ from gatheros_event.models import Event
 
 
 def rule_1_event_inscricao_desativada(lot):
+    """
+    Evento com inscrição desativada não possui lote.
+    """
+
     if lot.event.subscription_type == Event.SUBSCRIPTION_DISABLED:
         raise ValidationError(
             {'event': ['O evento selecionado possui inscrições desativadas']}
@@ -32,6 +39,10 @@ def rule_2_mais_de_1_lote_evento_inscricao_simples(lot):
 
 
 def rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(lot):
+    """
+    Evento com inscrição simples não pode ter lote externo.
+    """
+
     if lot.event.subscription_type == lot.event.SUBSCRIPTION_SIMPLE \
             and lot.internal is False:
         raise ValidationError({'internal': [
@@ -40,6 +51,10 @@ def rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(lot):
 
 
 def rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(lot):
+    """
+    Evento com inscrição por lotes não pode ter lote interno
+    """
+
     if lot.event.subscription_type == lot.event.SUBSCRIPTION_BY_LOTS \
             and lot.internal is True:
         raise ValidationError({'internal': [
@@ -49,6 +64,9 @@ def rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(lot):
 
 
 def rule_5_data_inicial_antes_data_final(lot):
+    """
+    Data inicial do lote deve ser anterior a data final
+    """
     if lot.date_start > lot.date_end:
         raise ValidationError({'date_start': [
             'A data inicial deve ser anterior a data final do lote.']})
@@ -62,6 +80,9 @@ def rule_6_data_inicial_antes_data_inicial_evento(lot):
 
 
 def rule_7_data_final_antes_data_inicial_evento(lot):
+    """
+    Data final do lote deve ser anterior a data inicial do evento.
+    """
     if lot.date_end and lot.date_end > lot.event.date_start:
         raise ValidationError({'date_end': [
             'A data final do lote deve ser anterior a data inicial do evento'
@@ -76,6 +97,9 @@ def rule_8_lot_interno_nao_pode_ter_preco(lot):
 
 
 def rule_9_lote_pago_deve_ter_limite(lot):
+    """
+    Lote pago deve ter um limite.
+    """
     if lot.price and not lot.limit:
         raise ValidationError({'limit': [
             'Lotes com inscrições pagas devem possuir um limite de público.'
@@ -90,6 +114,9 @@ def rule_10_lote_privado_deve_ter_codigo_promocional(lot):
 
 
 def rule_11_evento_encerrado_nao_pode_ter_novo(lot, adding=True):
+    """
+    Novo lote deve ter data final posterior a data atual.
+    """
     if adding is True and datetime.now() > lot.event.date_end:
         raise IntegrityError(
             'O evento \'{}\' já foi encerrado e não pode ter novo lote'.format(

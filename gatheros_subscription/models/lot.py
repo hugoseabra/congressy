@@ -1,3 +1,9 @@
+# pylint: disable=W5101
+"""
+Lotes são importantes para agrupar as inscrições de um evento, para separar
+os critérios de inscrições: se gratuitas, se limitadas, se privados, etc.
+"""
+
 import uuid
 from datetime import datetime, timedelta
 
@@ -10,6 +16,8 @@ from .rules import lot as rule
 
 
 class LotManager(models.Manager):
+    """ Manager - Gerenciador de lote. """
+
     def num_lots(self, lot):
         return self.filter(event=lot.event_id).count()
 
@@ -26,6 +34,8 @@ class LotManager(models.Manager):
 
 
 class Lot(models.Model, deletable.DeletableModel):
+    """ Modelo de Lote """
+
     INTERNAL_DEFAULT_NAME = 'default'
 
     DISCOUNT_TYPE_PERCENT = 'percent'
@@ -134,6 +144,11 @@ class Lot(models.Model, deletable.DeletableModel):
 
     @property
     def status(self):
+        """
+        Status do lote de acordo com suas datas.
+        :return: string
+        """
+
         now = datetime.now()
         if now >= self.date_end:
             return Lot.LOT_STATUS_FINISHED
@@ -144,6 +159,10 @@ class Lot(models.Model, deletable.DeletableModel):
         return None
 
     def get_status_display(self):
+        """
+        Recupera nome do status
+        :return: string
+        """
         return force_text(
             dict(Lot.STATUSES).get(self.status, None),
             strings_only=True
@@ -164,6 +183,8 @@ class Lot(models.Model, deletable.DeletableModel):
             self.promo_code = Lot.objects.generate_promo_code()
 
     def check_rules(self):
+        """ Verifica regras de negócio. """
+
         rule.rule_1_event_inscricao_desativada(self)
         rule.rule_2_mais_de_1_lote_evento_inscricao_simples(self)
         rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)
@@ -182,6 +203,8 @@ class Lot(models.Model, deletable.DeletableModel):
         return '{} - {}'.format(self.event.name, self.name)
 
     def adjust_unique_lot_date(self, force=False):
+        """ Ajusta datas de lote único do evento. """
+
         """
         Ajusta data de lote quando o evento possui inscrições simples.
         - Data inicial será:
@@ -208,6 +231,10 @@ class Lot(models.Model, deletable.DeletableModel):
         self.date_end = self.event.date_start - timedelta(minutes=1)
 
     def get_period(self):
+        """ Recupera string formatada de periodo do lote, de acordo com suas
+        datas, deivamente formatada.
+        """
+
         start_date = self.date_start.date()
         end_date = self.date_end.date()
         start_time = self.date_start.time()

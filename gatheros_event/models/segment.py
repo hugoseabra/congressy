@@ -1,3 +1,10 @@
+# pylint: disable=W5101
+"""
+Segmentos são importantes para cruzar os segmentos atendidos por um evento e,
+por sua vez, saber quais os segmentos de interesses das pessoas participantes
+de eventos.
+"""
+
 from django.db import models
 
 

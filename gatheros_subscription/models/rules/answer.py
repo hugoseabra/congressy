@@ -1,7 +1,14 @@
+# pylint: disable=C0103
+"""Regras de Negócios para Resposta de campo."""
+
 from django.core.exceptions import ValidationError
 
 
 def rule_1_campo_inscricao_formulario_mesmo_evento(answer):
+    """
+    Resposta de um campo de formulário de ser de uma inscrição do evento
+    correto.
+    """
     answer_event = answer.subscription.event
     field_event = answer.field.form.event
     if answer_event != field_event:
@@ -13,6 +20,9 @@ def rule_1_campo_inscricao_formulario_mesmo_evento(answer):
 
 
 def rule_2_resposta_apenas_se_campo_adicional(answer):
+    """
+    Resposta de campo deve apenas se campo é não-padrão, ou seja, (adicional).
+    """
     if answer.field.form_default_field is True:
         raise ValidationError({'field': [
             'Campo selecionado não é adicional ao formulário.'
@@ -20,6 +30,9 @@ def rule_2_resposta_apenas_se_campo_adicional(answer):
 
 
 def rule_3_resposta_com_tipo_correto(answer):
+    """
+    Resposta de campo com opções deve ser do tipo 'list'
+    """
     value = answer.get_value()
     if not value:
         return

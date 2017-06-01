@@ -1,3 +1,4 @@
+"""Gatheros event forms """
 from .invitation import (
     InvitationCreateForm,
     InvitationDecisionForm,

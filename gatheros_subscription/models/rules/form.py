@@ -1,3 +1,6 @@
+# pylint: disable=C0103
+"""Regras de Negócios para formulário de evento."""
+
 from django.db import IntegrityError
 
 from gatheros_event.models import Event
@@ -5,6 +8,9 @@ from .. import DefaultField
 
 
 def rule_1_form_em_event_inscricao_desativada(form):
+    """
+    Evento com inscrição desativada não possui formulário.
+    """
     event = form.event
     if event.subscription_type == Event.SUBSCRIPTION_DISABLED:
         raise IntegrityError(

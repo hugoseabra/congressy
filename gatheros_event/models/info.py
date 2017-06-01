@@ -1,3 +1,9 @@
+# pylint: disable=W5101
+"""
+Informação relacionada a um evento para estrutrar uma exibição mais elaborada
+das informações sobre o evento para os usuaŕios.
+"""
+
 from django.db import models
 
 from . import Event
@@ -87,6 +93,7 @@ class Info(models.Model):
         super(Info, self).save(*args, **kwargs)
 
     def check_rules(self):
+        """Verifica regras de informação de evento."""
         rule.rule_1_imagem_unica_somente(self)
         rule.rule_2_4_imagens_somente(self)
         rule.rule_3_youtube_video_somente(self)

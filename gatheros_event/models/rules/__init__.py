@@ -1,3 +1,7 @@
+"""
+Regras de negócio dos modelos.
+"""
+
 from . import event, info, invitation, member
 
 
