@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.forms import SetPasswordForm
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.urls import reverse_lazy
@@ -157,13 +156,12 @@ class InvitationProfileView(TemplateView):
 
         # Se não estiver logado e se o usuário convidado não tem perfil
         context.update({
-            'profile_form': ProfileForm(
+            'form': ProfileForm(
                 user=context['invite'].to,
                 initial={
                     'email': context['invite'].to.email
                 }
             ),
-            'password_form': SetPasswordForm(context['invite'].to),
         })
 
         return render_to_response(
@@ -179,22 +177,21 @@ class InvitationProfileView(TemplateView):
         invite = context.get('invite')
 
         # Cria os forms que fazem parte do post
-        profile_form = ProfileForm(user=invite.to, data=request.POST)
-        password_form = SetPasswordForm(invite.to, data=request.POST)
+        form = ProfileForm(user=invite.to, data=request.POST)
 
-        # Vericia erros nos forms
-        if not profile_form.is_valid() or not password_form.is_valid():
+        # Verifica erros no form
+        if not form.is_valid():
             context.update({
                 'messages': messages.get_messages(self.request),
+                'form': messages.get_messages(self.request),
             })
             return render_to_response(
                 'gatheros_event/organization/invitation-profile.html',
                 context
             )
 
-        # Salva os forms
-        profile_form.save()
-        password_form.save()
+        # Salva o form
+        form.save()
 
         # Aceitar o convite
         invite_form = InvitationDecisionForm(instance=invite)

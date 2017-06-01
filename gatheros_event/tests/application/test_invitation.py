@@ -377,8 +377,8 @@ class InvitationProfileViewTest(TestCase):
             "city": 5413,
 
             # Senha do novo usuário
-            'new_password1': '123',
-            'new_password2': '123',
+            'new_password1': '3510',
+            'new_password2': '3510',
         }
 
     def test_get(self):
@@ -433,3 +433,20 @@ class InvitationProfileViewTest(TestCase):
 
         with self.assertRaises(Invitation.DoesNotExist):
             Invitation.objects.get(pk=self.invite_pk)
+
+    def test_post_user_can_login(self):
+        """
+        Apos aceitar o convite e criar o perfil o usuário deve ser capaz
+        de acessar o sistema com a senha informada
+        """
+        self.client.post(
+            self.url,
+            self.data
+        )
+
+        self.assertTrue(
+            self.client.login(
+                username=self.data["email"],
+                password=self.data['new_password1'],
+            )
+        )

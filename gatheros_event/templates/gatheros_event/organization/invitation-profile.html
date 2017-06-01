@@ -10,14 +10,8 @@
     <h1>Convite > Criar perfil</h1>
 
     <form action="" method="post">{% csrf_token %}
-        <h2>Perfil</h2>
         <table>
-            {{ profile_form.as_table }}
-        </table>
-
-        <h2>Senha de acesso</h2>
-        <table>
-            {{ password_form.as_table }}
+            {{ form.as_table }}
         </table>
 
         <a href="/">Cancelar</a>
