@@ -14,7 +14,7 @@ class EventPanelView(AccountMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         event = self.get_object()
-        if self._cannot_view(event):
+        if not self._can_view(event):
             return redirect(reverse_lazy('gatheros_event:event-list'))
 
         return super(EventPanelView, self).get(request, **kwargs)
@@ -24,12 +24,12 @@ class EventPanelView(AccountMixin, DetailView):
         context['status'] = self._get_status()
         context['can_change'] = self._can_change
         context['can_delete'] = self._can_delete
+        context['can_view_lots'] = self._can_view_lots
 
         return context
 
-    def _cannot_view(self, event):
-        can = event.organization == self.organization
-        return can is False
+    def _can_view(self, event):
+        return event.organization == self.organization
 
     def _can_change(self):
         return self.request.user.has_perm(
@@ -38,11 +38,21 @@ class EventPanelView(AccountMixin, DetailView):
         )
 
     def _can_delete(self):
-        can = self.request.user.has_perm(
+        return self.request.user.has_perm(
             'gatheros_event.delete_event',
             self.object
         )
-        return can and self.object.is_deletable()
+
+    def _can_view_lots(self):
+        subscription_by_lots = \
+            self.object.subscription_type == Event.SUBSCRIPTION_BY_LOTS
+
+        can_manage = self.request.user.has_perm(
+            'gatheros_event.view_lots',
+            self.object
+        )
+
+        return subscription_by_lots and can_manage
 
     def _get_status(self):
         now = datetime.now()

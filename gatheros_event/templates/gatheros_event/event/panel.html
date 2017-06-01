@@ -46,7 +46,7 @@
                     <br/>
                 {% endif %}
                 <div style="background-color: whitesmoke;border: 1px solid #DDD;">
-                    {% if object.subscription_type == object.SUBSCRIPTION_BY_LOTS %}
+                    {% if can_view_lots %}
                         <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:lot-list' object.pk %}">Lotes</a></div>
                     {% endif %}
                     <div style="padding:15px">&rightarrow; <a href="#">Página do evento</a></div>
@@ -119,7 +119,7 @@
             </td>
             <td width="20%" style="vertical-align: top">
                 <form name="change_status"
-                      action="{% url 'gatheros_event:event-patch' object.pk %}"
+                      action="{% url 'gatheros_event:event-edit-publication' object.pk %}"
                       method="post">{% csrf_token %}
                     {% if status.published %}
                         {% if status.status == 'future' %}

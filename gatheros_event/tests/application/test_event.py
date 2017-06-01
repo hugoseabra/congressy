@@ -1,4 +1,5 @@
 # test_transferir_evento_para_outra_organizacao_do_administrador(self):
+from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
@@ -30,8 +31,8 @@ class EventEditDateViewTest(TestCase):
             kwargs={'pk': 4}
         )
         self.data = {
-            'date_start': '30/05/2017 08:00:00',
-            'date_end': '30/05/2017 18:00:00',
+            'date_start': datetime.now() + timedelta(days=5),
+            'date_end': datetime.now() + timedelta(days=5, hours=6),
         }
 
     def test_get_ok(self):
@@ -45,6 +46,7 @@ class EventEditDateViewTest(TestCase):
         """
         Data inicial inválida devem retornar erro
         """
+        # noinspection PyTypeChecker
         self.data.update({'date_start': 'foo/bar'})
         response = self.client.post(self.url, self.data)
         self.assertContains(
@@ -56,6 +58,7 @@ class EventEditDateViewTest(TestCase):
         """
         Data final inválida devem retornar erro
         """
+        # noinspection PyTypeChecker
         self.data.update({'date_end': 'foo/bar'})
         response = self.client.post(self.url, self.data)
         self.assertContains(

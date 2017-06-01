@@ -1,107 +1,176 @@
-from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
+from datetime import datetime, timedelta
+
 from django.test import TestCase
-from django.urls import reverse
+from django.utils import six
 
-from gatheros_event.helpers import account
-from gatheros_event.models import Event, Organization, Member
-
-
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
+from gatheros_event.forms import (
+    EventForm,
+    EventEditDatesForm,
+    EventEditSubscriptionTypeForm,
+    EventPublicationForm
+)
+from gatheros_event.models import Event
 
 
-class AddEventTest(TestCase):
+class BaseEventFormTest(TestCase):
     fixtures = [
-        'kanu_locations_city_test',
-        '005_user',
-        '003_occupation',
-        '004_category',
-        '006_person',
-        '007_organization',
-        '008_member',
-        '009_place',
-        '010_event',
+        '007_organization'
     ]
 
-    def setUp(self):
-        # Usuário com várias organizações
-        self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.url = reverse('gatheros_event:event-add')
-        self.client.force_login(self.user)
+    # noinspection PyMethodMayBeStatic
+    def _get_event(self, pk):
+        return Event.objects.get(pk=pk)
 
-    def test_status_is_200_ok(self):
-        result = self.client.get(self.url)
-        self.assertEqual(result.status_code, 200)
+    # noinspection PyMethodMayBeStatic
+    def _get_data(self):
+        date_start = datetime.now() + timedelta(days=5)
+        date_start = date_start.replace(
+            hour=8,
+            minute=0,
+            second=0,
+            microsecond=0
+        )
+
+        date_end = datetime.now() + timedelta(days=5, hours=8)
+        date_end = date_end.replace(
+            hour=12,
+            minute=0,
+            second=0,
+            microsecond=0
+        )
+
+        return {
+            "name": 'Event tests',
+            "organization": 1,
+            "category": 1,
+            "subscription_type": Event.SUBSCRIPTION_DISABLED,
+            "date_start": date_start,
+            "date_end": date_end,
+            "subscription_offline": False,
+            "published": False,
+        }
+
+    def get_main_form(self, instance=None, data=None):
+        if not data:
+            data = self._get_data()
+
+        return EventForm(instance=instance, data=data)
 
 
-class EditEventTest(TestCase):
-    fixtures = [
-        'kanu_locations_city_test',
-        '005_user',
-        '003_occupation',
-        '004_category',
-        '006_person',
-        '007_organization',
-        '008_member',
-        '009_place',
-        '010_event',
-    ]
+class EventFormTest(BaseEventFormTest):
+    def test_create_edit_event(self):
+        def test_instance_data(form_obj, model_data):
+            model = form_obj.instance
+            for key, value in six.iteritems(model_data):
+                model_v = getattr(model, key)
 
-    def setUp(self):
-        # Usuário com várias organizações
-        self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.client.force_login(self.user)
+                if hasattr(model_v, 'pk'):
+                    model_v = model_v.pk
 
-    def _get_active_organization(self):
-        request = MockRequest(self.user, self.client.session)
-        return account.get_organization(request)
+                self.assertEqual(model_v, value)
 
-    def _get_event(self):
-        organization = self._get_active_organization()
-        return Event.objects.filter(organization=organization).first()
+        data = self._get_data()
 
-    def _get_url(self, pk=None):
-        if not pk:
-            event = self._get_event()
-            pk = event.pk
+        form = self.get_main_form()
+        self.assertTrue(form.is_valid())
+        form.save()
+        test_instance_data(form, data)
 
-        return reverse('gatheros_event:event-edit', kwargs={'pk': pk})
+        data.update({
+            'name': 'Event - another name',
+            'category': 2
+        })
 
-    def _switch_context(self, group=Member.ADMIN):
-        organization = self._get_active_organization()
-        other = Organization.objects.exclude(pk=organization.pk).filter(
-            members__person=self.user.person,
-            members__group=group
-        ).first()
+        form = self.get_main_form(instance=form.instance, data=data)
+        self.assertTrue(form.is_valid())
+        form.save()
+        test_instance_data(form, data)
 
-        url = reverse('gatheros_event:organization-switch')
-        self.client.post(url, {'organization-context-pk': other.pk})
 
-    def test_user_can_edit(self):
-        result = self.client.get(self._get_url())
-        self.assertEqual(result.status_code, 200)
+class EventDatesFormTest(BaseEventFormTest):
+    def test_dates_edition_event(self):
+        def test_instance_data(form_obj, model_data):
+            model = form_obj.instance
+            for key, value in six.iteritems(model_data):
+                model_v = getattr(model, key)
 
-    def test_user_cannot_edit(self):
-        event = self._get_event()
+                if hasattr(model_v, 'pk'):
+                    model_v = model_v.pk
 
-        # Usuário não está em nenhuma das organizações do usuário inicial
-        self.user = User.objects.get(username="diegotolentino@gmail.com")
-        self.client.force_login(self.user)
+                self.assertEqual(model_v, value)
 
-        # Tenta editar evento no qual não possui acesso
-        result = self.client.get(self._get_url(pk=event.pk))
-        self.assertEqual(result.status_code, 302)
-        self.assertRedirects(result, reverse('gatheros_event:event-list'))
+        data = self._get_data()
+
+        form = self.get_main_form()
+        self.assertTrue(form.is_valid())
+        form.save()
+        test_instance_data(form, data)
+
+        data = {
+            'date_start': form.instance.date_start + timedelta(hours=4),
+            'date_end': form.instance.date_end + timedelta(hours=4)
+        }
+
+        form = EventEditDatesForm(instance=form.instance, data=data)
+        self.assertTrue(form.is_valid())
+        form.save()
+        test_instance_data(form, data)
+
+
+class EventSubscriptionTypeFormTest(BaseEventFormTest):
+    def test_subscription_type_edition_event(self):
+        def test_instance_data(form_obj, model_data):
+            model = form_obj.instance
+            for key, value in six.iteritems(model_data):
+                model_v = getattr(model, key)
+
+                if hasattr(model_v, 'pk'):
+                    model_v = model_v.pk
+
+                self.assertEqual(model_v, value)
+
+        data = self._get_data()
+
+        form = self.get_main_form()
+        self.assertTrue(form.is_valid())
+        form.save()
+        test_instance_data(form, data)
+
+        data = {
+            'subscription_type': Event.SUBSCRIPTION_SIMPLE,
+            'subscription_offline': True,
+        }
+
+        form = EventEditSubscriptionTypeForm(instance=form.instance, data=data)
+        self.assertTrue(form.is_valid())
+        form.save()
+        test_instance_data(form, data)
+
+
+class EventPublicationFormTest(BaseEventFormTest):
+    def test_publication_edition_event(self):
+        def test_instance_data(form_obj, model_data):
+            model = form_obj.instance
+            for key, value in six.iteritems(model_data):
+                model_v = getattr(model, key)
+
+                if hasattr(model_v, 'pk'):
+                    model_v = model_v.pk
+
+                self.assertEqual(model_v, value)
+
+        data = self._get_data()
+
+        form = self.get_main_form()
+        self.assertTrue(form.is_valid())
+        form.save()
+        test_instance_data(form, data)
+
+        data = {
+            'published': True,
+        }
+
+        form = EventPublicationForm(instance=form.instance, data=data)
+        self.assertTrue(form.is_valid())
+        form.save()
+        test_instance_data(form, data)
