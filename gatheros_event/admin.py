@@ -74,7 +74,6 @@ class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'gender', 'user', 'created')
     ordering = ('created', 'name')
     readonly_fields = [
-        'user',
         'synchronized',
         'term_version',
         'politics_version'
@@ -90,7 +89,7 @@ class PersonAdmin(admin.ModelAdmin):
                 'rg',
                 'orgao_expedidor',
                 'avatar',
-                'has_user',
+                'user',
             ),
         }),
         ('Contato', {
