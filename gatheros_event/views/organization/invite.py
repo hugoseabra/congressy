@@ -1,11 +1,13 @@
 from django.contrib import messages
+from django.contrib.auth.forms import SetPasswordForm
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.urls import reverse_lazy
 from django.views.decorators.csrf import get_token
-from django.views.generic import FormView, TemplateView, View
+from django.views.generic import FormView, TemplateView
 
-from gatheros_event.forms import InvitationCreateForm, InvitationDecisionForm
+from gatheros_event.forms import InvitationCreateForm, InvitationDecisionForm, \
+    ProfileForm
 from gatheros_event.models import Invitation
 from gatheros_event.views.mixins import AccountMixin
 
@@ -15,6 +17,15 @@ class InvitationCreateView(AccountMixin, FormView):
     success_url = reverse_lazy(
         'gatheros_event:invitation-success'
     )
+
+    def get_initial(self):
+        """
+        Valores iniciais para os campos do form
+        :return:
+        """
+        return {
+            'organization': self.request.GET.get('organization', None)
+        }
 
     def get_form(self, form_class=None):
         """
@@ -120,7 +131,81 @@ class InvitationDecisionView(TemplateView):
             )
 
 
-class InvitationProfileView(View):
+class InvitationProfileView(TemplateView):
+    def get_context_data(self, **kwargs):
+        context = super(InvitationProfileView, self).get_context_data(**kwargs)
+
+        invite = get_object_or_404(Invitation, pk=kwargs.get('pk'))
+
+        context.update({
+            'invite': invite,
+            'csrf_token': get_token(self.request),
+            'author': invite.author,
+            'organization': invite.author.organization,
+        })
+
+        return context
+
     def get(self, request, **kwargs):
-        from django.http.response import HttpResponse
-        return HttpResponse('Terminar perfil de usuário')
+        """
+        Exibe form de decisão
+        :param request:
+        :param kwargs:
+        :return:
+        """
+        context = self.get_context_data(**kwargs)
+
+        # Se não estiver logado e se o usuário convidado não tem perfil
+        context.update({
+            'profile_form': ProfileForm(
+                user=context['invite'].to,
+                initial={
+                    'email': context['invite'].to.email
+                }
+            ),
+            'password_form': SetPasswordForm(context['invite'].to),
+        })
+
+        return render_to_response(
+            'gatheros_event/organization/invitation-profile.html',
+            context
+        )
+
+    def post(self, request, **kwargs):
+        """
+        Cria o perfil e aceita o convite
+        """
+        context = self.get_context_data(**kwargs)
+        invite = context.get('invite')
+
+        # Cria os forms que fazem parte do post
+        profile_form = ProfileForm(user=invite.to, data=request.POST)
+        password_form = SetPasswordForm(invite.to, data=request.POST)
+
+        # Vericia erros nos forms
+        if not profile_form.is_valid() or not password_form.is_valid():
+            context.update({
+                'messages': messages.get_messages(self.request),
+            })
+            return render_to_response(
+                'gatheros_event/organization/invitation-profile.html',
+                context
+            )
+
+        # Salva os forms
+        profile_form.save()
+        password_form.save()
+
+        # Aceitar o convite
+        invite_form = InvitationDecisionForm(instance=invite)
+        invite_form.is_valid()
+
+        # Deve conseguir aceitar o convite corretamente
+        try:
+            invite_form.accept()
+            return redirect('gatheros_event:organization-panel')
+        except ValidationError:
+            raise ValidationError(
+                "Algo errado ocorreu e não foi possível aceitar o "
+                "convite, apos salvar o perfil. Contate o suporte técnico"
+            )
