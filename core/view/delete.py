@@ -1,7 +1,7 @@
 """Gatheros view mixin for deletion of models"""
 
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
+from django.forms.models import model_to_dict
 from django.shortcuts import redirect
 from django.views.generic import DeleteView
 
@@ -13,23 +13,19 @@ class DeleteViewMixin(AccountMixin, DeleteView):
 
     object = None
     protected = False
-    message = 'Você está prestes a excluir este registro. Deseja realmente' \
-              ' continuar?'
     delete_message = 'Tem certeza que deseja excluir?'
     success_message = "Registro excluído com sucesso!"
     not_allowed_message = 'Você não tem permissão para excluir este registro.'
     template_name = 'generic/delete.html'
 
-    def render_to_response(self, context, **response_kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if not self.can_delete():
             messages.warning(self.request, self.not_allowed_message)
+            self.object = self.get_object()
             url = self.get_success_url()
-            return redirect(url.format(**self.object.__dict__))
+            return redirect(url.format(**model_to_dict(self.object)))
 
-        return super(DeleteViewMixin, self).render_to_response(
-            context=context,
-            **response_kwargs
-        )
+        return super(DeleteViewMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(DeleteViewMixin, self).get_context_data(**kwargs)
@@ -37,15 +33,12 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         context['title'] = 'Excluir '+self.object._meta.verbose_name
         context['protected'] = self.protected
 
-        data = self.object.__dict__
+        data = model_to_dict(self.get_object())
         context['delete_message'] = self.delete_message.format(**data)
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-
-        if self.can_delete() is False:
-            raise PermissionDenied('Você não pode excluir este registro.')
 
         messages.success(request, self.success_message)
         return super(DeleteViewMixin, self).post(request, *args, **kwargs)

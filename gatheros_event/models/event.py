@@ -68,7 +68,7 @@ class Event(models.Model, deletable.DeletableModel):
         help_text='Ativar a sincronização para usar off-line no dia do evento.'
     )
 
-    slug = models.CharField(
+    slug = models.SlugField(
         max_length=128,
         unique=True,
         editable=False,
@@ -143,6 +143,11 @@ class Event(models.Model, deletable.DeletableModel):
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'
         ordering = ('name', 'pk', 'category__name')
+
+        permissions = (
+            ("view_lots", "Can view lots"),
+            ('add_lot', 'Can add lot'),
+        )
 
     @property
     def status(self):

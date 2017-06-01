@@ -1,7 +1,7 @@
 from django import forms
 
 from core.fields import MultiEmailField
-from .models import Organization
+from gatheros_event.models import Organization
 
 
 class InvitationForm(forms.Form):

@@ -153,7 +153,7 @@ class Migration(migrations.Migration):
                               ' considerados rascunhos.',
                     verbose_name='publicado'
                 )),
-                ('slug', models.CharField(
+                ('slug', models.SlugField(
                     editable=False,
                     max_length=128,
                     unique=True,
@@ -164,6 +164,10 @@ class Migration(migrations.Migration):
                 'verbose_name': 'evento',
                 'verbose_name_plural': 'eventos',
                 'ordering': ('name', 'pk', 'category__name'),
+                'permissions': (
+                    ('view_lots', 'Can view lots'),
+                    ('add_lot', 'Can add lot'),
+                ),
             },
         ),
         migrations.CreateModel(
@@ -351,7 +355,7 @@ class Migration(migrations.Migration):
                     default=True,
                     verbose_name='gerado internamente'
                 )),
-                ('slug', models.CharField(
+                ('slug', models.SlugField(
                     max_length=128,
                     unique=True,
                     verbose_name='permalink',

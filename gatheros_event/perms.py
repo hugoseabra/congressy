@@ -40,28 +40,29 @@ class MemberPermissionLogic(PermissionLogic):
                 'Verfique o parametro "field_organization" em '
                 'add_permission_logic')
 
-        return self.handler(user_obj=user_obj, organization=obj) \
-            and perm.split('.')[1] in self.permissions
+        has_perm = perm.split('.')[1] in self.permissions
+        perm_granted = self.handler(user_obj=user_obj, organization=obj)
+
+        return has_perm and perm_granted
 
 
 # Handlers
 def member_is_admin(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
-    return organization \
-        and organization.is_admin(person)
+    return organization and organization.is_admin(person)
 
 
 def member_is_admin_not_internal(user_obj, organization=None):
+    if organization and not organization.internal:
+        return False
+
     person = Person.objects.get(user=user_obj)
-    return organization \
-        and organization.is_admin(person) \
-        and not organization.internal
+    return organization.is_admin(person)
 
 
-def member_is_member(user_obj, organization=None):
+def member_is_member(user_obj, organization):
     person = Person.objects.get(user=user_obj)
-    return organization \
-        and organization.is_member(person)
+    return organization and organization.is_member(person)
 
 
 # Lógicas de permissões
@@ -104,7 +105,7 @@ add_permission_logic(Event, logic)
 
 logic = MemberPermissionLogic(
     member_is_member,
-    ['change_event'],
+    ['change_event', 'view_lots', 'add_lot'],
     'organization',
 )
 add_permission_logic(Event, logic)

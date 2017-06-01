@@ -14,7 +14,7 @@ class Organization(models.Model):
         blank=True,
         verbose_name='descrição'
     )
-    slug = models.CharField(
+    slug = models.SlugField(
         max_length=128,
         unique=True,
         verbose_name='permalink',

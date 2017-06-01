@@ -6,18 +6,18 @@ from . import views
 url_event = [
     url(
         r'^(?P<pk>[\d]+)/edit/dates',
-        views.EventSimpleEditView.as_view(view_name='dates'),
+        views.EventDatesFormView.as_view(),
         name='event-edit-dates'
     ),
     url(
         r'^(?P<pk>[\d]+)/edit/subscription',
-        views.EventSimpleEditView.as_view(view_name='subscription_type'),
+        views.EventSubscriptionTypeFormView.as_view(),
         name='event-edit-subscription_type'
     ),
     url(
-        r'^(?P<pk>[\d]+)/patch/$',
-        views.EventPatchFormView.as_view(),
-        name='event-patch'
+        r'^(?P<pk>[\d]+)/subscription_type/$',
+        views.EventPublicationFormView.as_view(),
+        name='event-edit-publication'
     ),
     url(
         r'^(?P<pk>[\d]+)/edit/$',
