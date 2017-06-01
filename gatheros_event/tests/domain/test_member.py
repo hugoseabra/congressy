@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from django.contrib.auth.models import User
 from core.tests import GatherosTestCase
 from gatheros_event.models import Member, Organization, Person
 from gatheros_event.models.rules import member as rule
@@ -22,7 +22,7 @@ class MemberModelTest(GatherosTestCase):
 
     # noinspection PyMethodMayBeStatic
     def _get_person(self, has_user=True):
-        return Person.objects.filter(has_user=has_user).first()
+        return Person.objects.filter(user__isnull=not has_user).first()
 
     def _create_organization(self, internal=True, persist=True):
         data = {'name': 'Org Test', 'internal': internal}
@@ -48,9 +48,7 @@ class MemberModelTest(GatherosTestCase):
         data = {
             'organization': organization,
             'person': person,
-            'group': group,
-            'created_by': 1,
-            'invited_on': datetime.now()
+            'group': group
         }
 
         return self._create_model(
@@ -62,8 +60,10 @@ class MemberModelTest(GatherosTestCase):
     def test_rule_1_membros_deve_ter_usuarios(self):
         rule_callback = rule.rule_1_membros_deve_ter_usuarios
 
-        member = self._create_member(person=self._get_person(has_user=False),
-                                     persist=False)
+        member = self._create_member(
+            person=self._get_person(has_user=False),
+            persist=False
+        )
 
         """ REGRA """
         self._trigger_integrity_error(rule_callback, [member])
@@ -72,7 +72,7 @@ class MemberModelTest(GatherosTestCase):
         self._trigger_integrity_error(member.save)
 
         # Insere usuário
-        member.person.has_user = True
+        member.person.user = User.objects.create_user(member.person.email)
         member.person.save()
 
         # Agora funciona

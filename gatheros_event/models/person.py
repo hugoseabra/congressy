@@ -7,10 +7,9 @@ from kanu_locations.models import City
 from core.model import track_data
 from core.model.validator import cpf_validator, phone_validator
 from . import Occupation
-from .rules import person as rule
 
 
-@track_data('name', 'has_user', 'user', 'email')
+@track_data('name', 'user', 'email')
 class Person(models.Model):
     RESOURCE_URI = '/api/core/people/'
 
@@ -147,10 +146,6 @@ class Person(models.Model):
     twitter = models.CharField(max_length=255, null=True, blank=True)
     linkedin = models.CharField(max_length=255, null=True, blank=True)
     skype = models.CharField(max_length=255, null=True, blank=True)
-    has_user = models.BooleanField(
-        verbose_name='vincular usuario?',
-        default=False
-    )
 
     class Meta:
         verbose_name = 'pessoa'
@@ -167,18 +162,18 @@ class Person(models.Model):
         if not self.cpf:
             self.cpf = None
 
-        self.check_rules()
         self.full_clean()
         super(Person, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        rule.rule_4_desativa_usuario_ao_deletar_pessoa(self)
-        super(Person, self).delete(*args, **kwargs)
+        """
+        Usuário permamancerá no sistema pois pode haver registros ligados
+        """
+        if self.user and self.user.is_active is True:
+            self.user.is_active = False
+            self.user.save()
 
-    def check_rules(self):
-        rule.rule_1_has_user_deve_ter_email(self)
-        rule.rule_2_ja_existe_outro_usuario_com_mesmo_email(self)
-        rule.rule_3_nao_remove_usuario_uma_vez_relacionado(self)
+        super(Person, self).delete(*args, **kwargs)
 
     def get_cpf_display(self):
         cpf = str(self.cpf)

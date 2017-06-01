@@ -88,10 +88,12 @@ class Organization(models.Model):
 
         if person:
             if isinstance(person, User):
-                person = Person.objects.get(user=person)
+                try:
+                    person = Person.objects.get(user=person)
+                except Person.DoesNotExist:
+                    return []
 
             qs = qs.filter(person=person)
-
         return qs
 
     def is_member(self, person):
@@ -101,10 +103,7 @@ class Organization(models.Model):
         :param person: Pessoa ou usuário que é membro
         :return:
         """
-        if isinstance(person, User):
-            person = Person.objects.get(user=person)
-
-        return self.get_members(person=person).exists()
+        return len(self.get_members(person=person)) > 0
 
     def is_admin(self, person):
         """
@@ -113,7 +112,4 @@ class Organization(models.Model):
         :param person: Pessoa ou usuário que é membro
         :return:
         """
-        if isinstance(person, User):
-            person = Person.objects.get(user=person)
-
-        return self.get_members(group=Member.ADMIN, person=person).exists()
+        return len(self.get_members(group=Member.ADMIN, person=person)) > 0

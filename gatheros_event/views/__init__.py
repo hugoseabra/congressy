@@ -8,6 +8,7 @@ from .event.form import (
     EventDatesFormView,
 )
 from .event.panel import EventPanelView
-from .organization.switch import OrganizationSwitch
+from .organization.invite import InvitationCreateSuccessView, \
+    InvitationCreateView, InvitationDecisionView, InvitationProfileView
 from .organization.panel import OrganizationPanelView
-from .organization.invite import InviteView
+from .organization.switch import OrganizationSwitch

@@ -188,14 +188,14 @@ class Migration(migrations.Migration):
                     null=True,
                     verbose_name='expira em'
                 )),
-                ('type', models.CharField(
+                ('group', models.CharField(
                     choices=[
-                        ('helper', 'Auxiliar'),
-                        ('admin', 'Administrador')
+                        ('admin', 'Administrador'),
+                        ('helper', 'Auxiliar')
                     ],
                     default='helper',
                     max_length=10,
-                    verbose_name='tipo'
+                    verbose_name='grupo'
                 )),
             ],
             options={
@@ -224,22 +224,6 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(
                     auto_now_add=True,
                     verbose_name='criado em'
-                )),
-                ('created_by', models.PositiveIntegerField(
-                    verbose_name='criado por'
-                )),
-                ('invited_on', models.DateTimeField(
-                    auto_now_add=True,
-                    verbose_name='convidado em'
-                )),
-                ('accepted', models.BooleanField(
-                    default=False,
-                    verbose_name='convite aceito'
-                )),
-                ('accepted_on', models.DateTimeField(
-                    blank=True,
-                    null=True,
-                    verbose_name='aceito em'
                 )),
                 ('active', models.BooleanField(
                     default=True,
@@ -515,10 +499,6 @@ class Migration(migrations.Migration):
                     blank=True,
                     max_length=255,
                     null=True
-                )),
-                ('has_user', models.BooleanField(
-                    default=False,
-                    verbose_name='vincular usuario?'
                 )),
                 ('city', models.ForeignKey(
                     null=True,

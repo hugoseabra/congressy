@@ -1,0 +1,23 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:organization-panel' %}">Voltar</a>
+    </div>
+    <hr/>
+
+    <h1>Convite</h1>
+
+    Usuário do convite é diferente do logado
+    <form action="" method="post">{% csrf_token %}
+        <p>
+            <strong>{{ author.person.name }}</strong> convidou você para fazer
+            parte da organização <strong>{{ organization.name }}</strong>.
+        </p>
+
+        <input type="submit" name="invitation_accept" value="Aceitar"/>
+        <input type="submit" name="invitation_decline" value="Recusar"/>
+    </form>
+
+{% endblock %}

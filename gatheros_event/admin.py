@@ -183,7 +183,6 @@ class EventInfoAdmin(admin.ModelAdmin):
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('organization', 'person', 'group', 'pk')
     ordering = ('organization', 'person')
-    readonly_fields = ['accepted_on']
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "person":

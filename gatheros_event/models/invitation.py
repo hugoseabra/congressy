@@ -7,20 +7,12 @@ from django.db import models
 from core.model import track_data
 from gatheros_event import settings
 from . import Member
-from .rules import invitation as rule
+from .rules import check_invite
 
 
 @track_data('author', 'to')
 class Invitation(models.Model):
     """ Convite para organização """
-
-    INVITATION_TYPE_HELPER = 'helper'
-    INVITATION_TYPE_ADMIN = 'admin'
-
-    INVITATION_TYPES = (
-        (INVITATION_TYPE_HELPER, 'Auxiliar'),
-        (INVITATION_TYPE_ADMIN, 'Administrador'),
-    )
 
     uuid = models.UUIDField(
         default=uuid.uuid4,
@@ -45,11 +37,11 @@ class Invitation(models.Model):
         blank=True,
         null=True
     )
-    type = models.CharField(
+    group = models.CharField(
         max_length=10,
-        choices=INVITATION_TYPES,
-        verbose_name='tipo',
-        default='helper'
+        choices=Member.GROUP_CHOICES,
+        verbose_name='grupo',
+        default=Member.HELPER
     )
 
     def save(self, *args, **kwargs):
@@ -63,18 +55,7 @@ class Invitation(models.Model):
         super(Invitation, self).save(*args, **kwargs)
 
     def clean(self):
-        rule.rule_1_organizacao_internas_nao_pode_ter_convites(self)
-        rule.rule_2_nao_pode_mudar_autor(self)
-        rule.rule_3_nao_pode_mudar_convidado(self)
-        rule.rule_4_administrador_nao_pode_se_convidar(self)
-        rule.rule_5_nao_deve_existir_2_convites_para_usuario_organizacao(
-            self, self._state.adding
-        )
-        rule.rule_6_autor_deve_ser_membro_admin(self, self._state.adding)
-        rule.rule_7_nao_deve_convidar_um_membro_da_organizacao(
-            self,
-            self._state.adding
-        )
+        check_invite(self)
 
     class Meta:
         verbose_name = 'convite'
@@ -83,9 +64,10 @@ class Invitation(models.Model):
         unique_together = (('author', 'to'),)
 
     def __str__(self):
-        return '{} ({}) - {}'.format(self.to.first_name,
-                                     self.author.organization.name,
-                                     self.created)
+        return '{} - {}'.format(
+            self.author.organization.name,
+            self.to.first_name if self.to.first_name else self.to.email
+        )
 
     def has_previous(self):
         return Invitation.objects.filter(
