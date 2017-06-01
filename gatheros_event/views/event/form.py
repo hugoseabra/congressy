@@ -23,6 +23,13 @@ class BaseEventView(AccountMixin, View):
         # noinspection PyUnresolvedReferences
         return super(BaseEventView, self).form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        # noinspection PyUnresolvedReferences
+        context = super(BaseEventView, self).get_context_data(**kwargs)
+        context['next_path'] = self._get_referer_url()
+
+        return context
+
     def _get_referer_url(self):
         request = self.request
         previous_url = request.META.get('HTTP_REFERER')
@@ -119,7 +126,6 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
         context = super(EventEditFormView, self).get_context_data(**kwargs)
         context['title'] = '{} ({})'.format(self.object.name, self.object.pk)
         context['form_title'] = 'Editar evento #ID:' + str(self.object.pk)
-        context['next_path'] = self._get_referer_url()
 
         return context
 
@@ -131,18 +137,6 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
             return next_path
 
         return super(EventEditFormView, self).get_success_url()
-
-    def _get_referer_url(self):
-        request = self.request
-        previous_url = request.META.get('HTTP_REFERER')
-        if previous_url:
-            host = request.scheme + '://' + request.META.get('HTTP_HOST', '')
-            previous_url = previous_url.replace(host, '')
-
-            if previous_url != request.path:
-                return previous_url
-
-        return self.success_url
 
 
 class EventPublicationFormView(BaseSimpleEditlView, generic.UpdateView):
