@@ -83,6 +83,7 @@ class InvitationDecisionView(TemplateView):
             context
         )
 
+    # noinspection PyMethodMayBeStatic
     def post(self, request, **kwargs):
         """
         Trata a ação de Aceitar ou Recusar o Convite
@@ -121,6 +122,7 @@ class InvitationDecisionView(TemplateView):
 
 
 class InvitationProfileView(View):
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def get(self, request, **kwargs):
         from django.http.response import HttpResponse
         return HttpResponse('Terminar perfil de usuário')

@@ -34,6 +34,7 @@
                             <form action="{% url 'gatheros_event:organization-switch' %}"
                                   method="post"
                                   id="organization-context-pk">{% csrf_token %}
+                                <!--suppress HtmlFormInputWithoutLabel -->
                                 <select name="organization-context-pk"
                                         id="organization-context-pk"
                                         onchange="submit()">

@@ -1,5 +1,5 @@
-from datetime import datetime
 from django.contrib.auth.models import User
+
 from core.tests import GatherosTestCase
 from gatheros_event.models import Member, Organization, Person
 from gatheros_event.models.rules import member as rule

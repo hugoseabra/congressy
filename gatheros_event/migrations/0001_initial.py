@@ -337,7 +337,7 @@ class Migration(migrations.Migration):
                 )),
                 ('internal', models.BooleanField(
                     default=True,
-                    verbose_name='gerado internamente'
+                    verbose_name='interno'
                 )),
                 ('slug', models.SlugField(
                     max_length=128,

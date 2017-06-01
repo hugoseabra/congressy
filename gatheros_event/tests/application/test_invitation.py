@@ -30,6 +30,7 @@ class InvitationCreateFormTest(TestCase):
         Form sem usuário deve emitir um exception
         """
         with self.assertRaises(TypeError):
+            # noinspection PyArgumentList
             InvitationCreateForm()
 
     def test_init_with_user_without_data(self):
