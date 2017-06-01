@@ -7,7 +7,7 @@ from django.shortcuts import reverse
 from django.test import TestCase
 
 from gatheros_event.forms import InvitationCreateForm
-from gatheros_event.models import Invitation, Organization
+from gatheros_event.models import Invitation, Member, Organization, Person
 
 
 class InvitationCreateFormTest(TestCase):
@@ -59,6 +59,7 @@ class InvitationCreateFormTest(TestCase):
         """
         form = self._get_form(data={
             'organization': 5,
+            'group': Member.HELPER,
             'to': 'joao@teste.com,'
                   'diegotolentino@gmail.com'
         })
@@ -86,6 +87,7 @@ class InvitationCreateViewTest(TestCase):
             .get(slug="in2-web-solucoes-e-servicos")
         self.data = {
             'organization': organization.pk,
+            'group': Member.HELPER,
             'to': 'joao@teste.com,'
                   'diegotolentino@gmail.com'
         }
@@ -332,4 +334,120 @@ class InvitationDecisionViewWithoutProfileTest(TestCase):
         self.assertEqual(
             Invitation.objects.get(pk=self.invite_pk).pk,
             self.invite_pk
+        )
+
+
+class InvitationProfileViewTest(TestCase):
+    fixtures = [
+        '001_user',
+        '003_occupation',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+        '012_invitation',
+    ]
+
+    def setUp(self):
+        self.to = User.objects.get(email="joao-das-couves@gmail.com")
+        self.wrong_to = User.objects.get(email="flavia@in2web.com.br")
+        invite = Invitation.objects.get(
+            author__person__email="flavia@in2web.com.br",
+            author__organization__slug="paroquias-unidas",
+            to=self.to
+        )
+
+        self.invite_pk = invite.pk
+        self.organization = invite.author.organization
+        self.url = reverse(
+            'gatheros_event:invitation-profile',
+            kwargs={
+                'pk': self.invite_pk
+            }
+        )
+
+        self.url_success = reverse(
+            'gatheros_event:organization-panel'
+        )
+
+        self.data = {
+            # Informações do perfil
+            "name": "João das Couves",
+            "gender": "M",
+            "email": "joao-das-couves@gmail.com",
+            "city": 5413,
+
+            # Senha do novo usuário
+            'new_password1': '3510',
+            'new_password2': '3510',
+        }
+
+    def test_get(self):
+        """
+        Retorna página com form para criação do perfil e senha
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_profile_created(self):
+        """
+        Post cria um perfil
+        """
+        response = self.client.post(
+            self.url,
+            self.data
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        self.assertNotIsInstance(
+            self.to,
+            Person,
+            'Perfil de usuário não foi criado'
+        )
+
+    def test_post_member_created(self):
+        """
+        Post cria um membro na organização
+        """
+        self.client.post(
+            self.url,
+            self.data
+        )
+
+        try:
+            Member.objects.get(
+                organization=self.organization,
+                person=self.to.person
+            )
+        except Member.DoesNotExist:
+            self.fail('Membro não foi criado')
+
+    def test_post_invitation_removed(self):
+        """
+        Post remove o convite
+        """
+        self.client.post(
+            self.url,
+            self.data
+        )
+
+        with self.assertRaises(Invitation.DoesNotExist):
+            Invitation.objects.get(pk=self.invite_pk)
+
+    def test_post_user_can_login(self):
+        """
+        Apos aceitar o convite e criar o perfil o usuário deve ser capaz
+        de acessar o sistema com a senha informada
+        """
+        self.client.post(
+            self.url,
+            self.data
+        )
+
+        self.assertTrue(
+            self.client.login(
+                username=self.data["email"],
+                password=self.data['new_password1'],
+            )
         )

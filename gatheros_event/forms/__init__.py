@@ -1,11 +1,16 @@
 """Gatheros event forms """
+from .event import (
+    EventEditDatesForm,
+    EventEditSubscriptionTypeForm,
+    EventForm,
+    EventPublicationForm
+)
+
 from .invitation import (
     InvitationCreateForm,
     InvitationDecisionForm,
 )
-from .event import (
-    EventForm,
-    EventEditDatesForm,
-    EventEditSubscriptionTypeForm,
-    EventPublicationForm
+
+from .profile import (
+    ProfileForm
 )

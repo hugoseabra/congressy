@@ -11,7 +11,7 @@ from django.core.mail import send_mail
 from django.shortcuts import reverse
 
 from core.fields import MultiEmailField
-from gatheros_event.models import Invitation, Member, Organization, Person
+from gatheros_event.models import Invitation, Member, Organization
 from gatheros_event.models.rules import check_invite
 
 
@@ -19,8 +19,12 @@ class InvitationCreateForm(forms.Form):
     """Formulário de criação de Convite"""
     organization = forms.ModelChoiceField(
         queryset=Organization.objects.all(),
-        empty_label='-----',
         label='Organização'
+    )
+    group = forms.ChoiceField(
+        choices=Member.GROUP_CHOICES,
+        initial=Member.HELPER,
+        label='Grupo'
     )
     to = MultiEmailField(label='Emails')
     user = None
@@ -58,7 +62,7 @@ class InvitationCreateForm(forms.Form):
             invite = Invitation(
                 author=organization.get_members(person=self.user)[0],
                 to=invited_user,
-                group=Member.HELPER
+                group=self.cleaned_data['group']
             )
 
             # Submete os convites as regras
@@ -120,14 +124,4 @@ class InvitationDecisionForm(forms.ModelForm):
 
     class Meta:
         model = Invitation
-        exclude = []
-
-
-class ProfileForm(forms.ModelForm):
-    """
-    Pessoas que são usuários do sistema
-    """
-
-    class Meta:
-        model = Person
         exclude = []

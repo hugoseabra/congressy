@@ -7,17 +7,15 @@
     </div>
     <hr/>
 
-    <h1>Convite</h1>
+    <h1>Convite > Criar perfil</h1>
 
-    Usuário do convite é diferente do logado
     <form action="" method="post">{% csrf_token %}
-        <p>
-            <strong>{{ author.person.name }}</strong> convidou você para fazer
-            parte da organização <strong>{{ organization.name }}</strong>.
-        </p>
+        <table>
+            {{ form.as_table }}
+        </table>
 
-        <input type="submit" name="invitation_accept" value="Aceitar"/>
-        <input type="submit" name="invitation_decline" value="Recusar"/>
+        <a href="/">Cancelar</a>
+        <input type="submit" value="Salvar"/>
     </form>
 
 {% endblock %}

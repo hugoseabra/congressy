@@ -13,7 +13,7 @@
     <h2>Usuário: {{ user.username }} </h2>
 
     {% if user has 'gatheros_event.can_invite' of organization %}
-        <a href="{% url 'gatheros_event:invitation' %}">Convidar membros</a>
+        <a href="{% url 'gatheros_event:invitation' %}?organization={{ organization.pk }}">Convidar membros</a>
     {% else %}
         <b>Não pode convidar membros</b>
     {% endif %}
