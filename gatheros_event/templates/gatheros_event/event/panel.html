@@ -46,75 +46,98 @@
                     <br/>
                 {% endif %}
                 <div style="background-color: whitesmoke;border: 1px solid #DDD;">
-                    {% if can_view_lots %}
-                        <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:lot-list' object.pk %}">Lotes</a></div>
-                    {% endif %}
-                    <div style="padding:15px">&rightarrow; <a href="#">Página do evento</a></div>
-                    <div style="padding:15px">&rightarrow; <a href="#">Inscrições</a>
+                    <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
+                        Página do evento
                     </div>
+                    <div style="padding:15px">&rightarrow; <a href="#">Detalhes do evento</a></div>
+                    <div style="padding:15px">&rightarrow; <a href="#">Informações</a></div>
+                    <div style="padding:15px">&rightarrow; <a href="#">Seções</a></div>
                 </div>
+
+                {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
+                    <div style="background-color: whitesmoke;border: 1px solid #DDD;">
+                        <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
+                            Inscrições
+                        </div>
+                        {% if can_view_lots %}
+                            <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:lot-list' object.pk %}">Lotes</a></div>
+                        {% endif %}
+                        <div style="padding:15px">&rightarrow; <a href="#">Formulário</a></div>
+                        <div style="padding:15px">&rightarrow; <a href="#">Lista de inscritos</a></div>
+                        <div style="padding:15px">&rightarrow; <a href="#">Credenciamento</a></div>
+                    </div>
+                {% endif %}
             </td>
-            <td style="vertical-align: top;padding:0 10px">
-                <pre>Número de mulheres, homens, PNEs, cidades</pre>
-                <pre>Número e percentual de credenciados</pre>
-                <table width="100%" border="1" cellspacing="0" cellpadding="0">
+            <td style="vertical-align: top;padding:0 20px">
+                <table width="100%" border="0" cellspacing="0" cellpadding="10" style="border-bottom: 1px solid #dddddd;margin-bottom: 10px">
                     <tr>
-                        <td width="40%" style="vertical-align: top;">
-                            ssdf
+                        <td width="25%" style="vertical-align: top;">
+                            <strong>Homens:</strong> {{ report.num_men }}
                         </td>
-                        <td style="vertical-align: top;padding: 0 15px">
-                            sdf
+                        <td width="25%">
+                            <strong>Mulheres:</strong> {{ report.num_women }}
+                        </td>
+                        <td width="25%">
+                            <strong>PNEs:</strong> {{ report.num_pnes }}
+                        </td>
+                        <td width="25%">
+                            <strong>Cidades:</strong> {{ report.num_cities }}
                         </td>
                     </tr>
                 </table>
-                <table width="100%" border="1" cellspacing="0" cellpadding="0">
+                <div style="border-bottom: 1px solid #dddddd;margin-bottom: 10px;padding: 10px">
+                    <div style="margin-bottom: 5px;font-weight: bold;">Credenciamentos:</div>
+                    <div style="border: 1px solid gray; background-color: #ddd">
+                        <div style="background-color: green;width:{{ percent_attended.number }}%">&nbsp;</div>
+                    </div>
+                    <div style="text-align: center;width:100%;margin-top: 5px">{{ percent_attended.label }}%</div>
+                </div>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tr>
                         <td width="40%" style="vertical-align: top;">
+                            {% if object.banner_small %}
+                                <!--suppress CheckImageSize -->
+                                <img src="{{ object.banner_small.url }}" width="99%" style="border:1px solid #DDD;margin:3px"/>
+                            {% else %}
+                                <!--suppress CheckImageSize -->
+                                <img src="/media/Evento_Banner_pequeno.png" width="99%" style="border:1px solid #DDD;margin:3px"/>
+                            {% endif %}
                             <pre>Ver exibição de imagem do evento</pre>
                             <pre>Enviar banner pequeno por aqui</pre>
-                            <!--suppress CheckImageSize -->
-                            <img src="/media/Evento_Banner_pequeno.png"
-                                 width="99%" style="border:1px solid #DDD"/>
                         </td>
                         <td style="vertical-align: top;padding: 0 15px">
-                            <h3>Congresso</h3>
-                            <hr/>
-                            <h2>{{ object.name }}</h2>
+                            <h2 style="margin:0">{{ object.name }}</h2>
+                            <h4 style="margin-top:5px;color: dimgray">Congresso</h4>
 
                             <div>
                                 <strong>Período:</strong> {{ object.get_period }}
                             </div>
                             {% if object.place %}
-                                <div>
+                                <div style="margin-top: 20px;border-top: 1px solid #DDD">
                                     <p>
                                         <strong>Local:</strong> {{ object.place.name }}
                                     </p>
                                     <p style="color:dimgray;text-indent: 20px;">{{ object.place.get_complete_address }}</p>
                                 </div>
                             {% endif %}
-                            <div>
-                                <p>
-                                    <strong>Descrição:</strong>
-                                </p>
-                                <p style="color:dimgray;text-indent: 20px;text-align: justify;line-height: 24px;">{{ object.description }}</p>
-                            </div>
+                            {% if object.description %}
+                                <div style="margin-top: 20px;border-top: 1px solid #DDD">
+                                    <p>
+                                        <strong>Descrição:</strong>
+                                    </p>
+                                    <p style="color:dimgray;text-indent: 20px;text-align: justify;line-height: 24px;">{{ object.description }}</p>
+                                </div>
+                            {% endif %}
                         </td>
                     </tr>
                 </table>
 
 
-                <br/><br/><br/><br/><br/>
+                <br/>
                 <hr/>
                 <pre>
                     = Local
                     = Transferência
-                    = Estatísticas (quantitativas) de incrição (se ativo). Se inativo, apresentar a mensagem (desativado). Infos:
-                      > Total de inscritos
-                      > Total de credenciados
-                      > Lotes limitados (se houver): preenchidos
-                      > PNEs
-                    = Vagas do evento (se inscrições ativadas). Se inativado, não exibir. Se ativado e for simples,
-                    apresentar um gráfico simples de vagas preenchidas. Se por lotes, apresentar o mesmo gráfico com o botão "Detalhar"
                 </pre>
             </td>
             <td width="20%" style="vertical-align: top">
@@ -178,8 +201,7 @@
                                         &nbsp;&nbsp; | &nbsp;&nbsp;
                                         <a href="#"
                                            onclick="document.change_status.submit()">Publicar</a>
-                                        <input type="hidden" name="published"
-                                               value="1"/>
+                                        <input type="hidden" name="published" value="1"/>
                                     </div>
                                 {% endif %}
                             </div>
@@ -216,8 +238,6 @@
                         {% endif %}
                     {% endif %}
                 </form>
-                <pre>Gerenciar lotes</pre>
-                <pre>Editar quando inscrições simples: limite</pre>
                 {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
                     {% event_payment_type object as payment_type %}
                     {% if payment_type == 'free' %}
@@ -278,35 +298,41 @@
                                    cellspacing="0">
                                 <thead>
                                 <tr>
+                                    <th width="2%">#</th>
                                     <th style="text-align: left;">Lote</th>
-                                    <th># Insc.</th>
-                                    <th>Limite</th>
-                                    <th style="text-align: left;">Status</th>
+                                    <th width="30%">Insc.</th>
+                                    <th width="15%">Limite</th>
+                                    <th width="20%" style="text-align: left;">Status</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for lot in object.lots.all %}
+                                    {% for lot in object.lots.all %}
+                                        <tr>
+                                            <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ forloop.counter }}</td>
+                                            <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ lot.name }}</td>
+                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
+                                                {{ lot.subscriptions.count }}{% if lot.limit %}/{{ lot.limit }}{% endif %}
+                                            </td>
+                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
+                                                {% if lot.percent_completed %}{{ lot.percent_completed }}%{% else %}Livre{% endif %}
+                                            </td>
+                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:{% if lot.status == lot.LOT_STATUS_FINISHED %}darkred{% elif lot.status == lot.LOT_STATUS_RUNNING %}green{% else %}dimgray{% endif %}">
+                                                {% if lot.status %}
+                                                    {{ lot.get_status_display|capfirst }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
                                     <tr>
-                                        <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ lot.name }}</td>
-                                        <td width="25%"
-                                            style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
-                                            {{ lot.subscriptions.all|length }}{% if lot.limit %}/{{ lot.limit }}{% endif %}
+                                        <td colspan="2" style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray"><strong>TOTAIS</strong></td>
+                                        <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
+                                            {{ object.subscriptions.count }}
                                         </td>
-                                        <td width="15%"
-                                            style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
-                                            {% if lot.percent_completed %}
-                                                {{ lot.percent_completed }}{% else %}
-                                                Livre{% endif %}</td>
-                                        <td width="20%"
-                                            style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:{% if lot.status == lot.LOT_STATUS_FINISHED %}darkred{% elif lot.status == lot.LOT_STATUS_RUNNING %}green{% else %}dimgray{% endif %}">
-                                            {% if lot.status %}
-                                                {{ lot.get_status_display|capfirst }}
-                                            {% else %}
-                                                -
-                                            {% endif %}
-                                        </td>
+                                        <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;">{{ object.percent_completed }}%</td>
+                                        <td style="text-align: center;border-bottom:1px solid lightgray;"></td>
                                     </tr>
-                                {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -324,7 +350,7 @@
                             <div style="text-align: left;">
                                 <strong>Inscrições:</strong></div>
                             <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                {{ object.subscriptions.all|length }}{% if object.limit %}/{{ object.limit }}{% endif %}
+                                {{ object.subscriptions.count }}{% if object.limit %}/{{ object.limit }}{% endif %}
                             </div>
                             <div style="color: #333">(25%)</div>
                             <div style="color: dimgray;padding:10px">Limitadas
@@ -334,7 +360,7 @@
                         <div style="padding: 10px 0 30px;text-align: center;border-bottom: 1px solid #DDDDDD">
                             <div style="text-align: left;">
                                 <strong>Inscrições:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">{{ object.subscriptions.all|length }}</div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">{{ object.subscriptions.count }}</div>
                         </div>
                     {% endif %}
                 {% else %}
