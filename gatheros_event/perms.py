@@ -53,7 +53,7 @@ def member_is_admin(user_obj, organization=None):
 
 
 def member_is_admin_not_internal(user_obj, organization=None):
-    if organization and not organization.internal:
+    if not organization or organization.internal:
         return False
 
     person = Person.objects.get(user=user_obj)
