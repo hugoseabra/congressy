@@ -49,7 +49,7 @@
                     <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
                         Página do evento
                     </div>
-                    <div style="padding:15px">&rightarrow; <a href="#">Detalhes do evento</a></div>
+                    <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_event:event-detail' object.pk %}">Detalhes do evento</a></div>
                     <div style="padding:15px">&rightarrow; <a href="#">Informações</a></div>
                     <div style="padding:15px">&rightarrow; <a href="#">Seções</a></div>
                 </div>
@@ -101,7 +101,7 @@
                                 <img src="{{ object.banner_small.url }}" width="99%" style="border:1px solid #DDD;margin:3px"/>
                             {% else %}
                                 <!--suppress CheckImageSize -->
-                                <img src="/media/Evento_Banner_pequeno.png" width="99%" style="border:1px solid #DDD;margin:3px"/>
+                                <img src="/media/test/Evento_Banner_pequeno.png" width="99%" style="border:1px solid #DDD;margin:3px"/>
                             {% endif %}
                             <pre>Enviar banner pequeno por aqui</pre>
                         </td>

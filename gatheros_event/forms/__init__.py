@@ -3,7 +3,8 @@ from .event import (
     EventEditDatesForm,
     EventEditSubscriptionTypeForm,
     EventForm,
-    EventPublicationForm
+    EventImageForm,
+    EventPublicationForm,
 )
 
 from .invitation import (

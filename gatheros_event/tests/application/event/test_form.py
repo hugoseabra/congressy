@@ -1,12 +1,18 @@
+import os
+import shutil
+import tempfile
 from datetime import datetime, timedelta
 
+from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import six
 
 from gatheros_event.forms import (
-    EventForm,
     EventEditDatesForm,
     EventEditSubscriptionTypeForm,
+    EventForm,
+    EventImageForm,
     EventPublicationForm
 )
 from gatheros_event.models import Event
@@ -14,7 +20,9 @@ from gatheros_event.models import Event
 
 class BaseEventFormTest(TestCase):
     fixtures = [
-        '007_organization'
+        '007_organization',
+        '009_place',
+        '010_event',
     ]
 
     # noinspection PyMethodMayBeStatic
@@ -174,3 +182,60 @@ class EventPublicationFormTest(BaseEventFormTest):
         self.assertTrue(form.is_valid())
         form.save()
         test_instance_data(form, data)
+
+
+class EventImagesFormTest(TestCase):
+    fixtures = [
+        '007_organization',
+        '009_place',
+        '010_event',
+    ]
+
+    def setUp(self):
+        project_media_dir = settings.MEDIA_ROOT
+        self.path = os.path.join(project_media_dir, 'test')
+        settings.MEDIA_ROOT = tempfile.mktemp()
+
+    def tearDown(self):
+        if os.path.isdir(settings.MEDIA_ROOT):
+            shutil.rmtree(settings.MEDIA_ROOT)
+
+    # noinspection PyMethodMayBeStatic
+    def _get_event(self):
+        return Event.objects.get(slug='streaming-de-sucesso')
+
+    def test_banner(self):
+        event = self._get_event()
+
+        file_names = {
+            'banner_top': 'Evento_Banner_topo.png',
+            'banner_slide': 'Evento_Banner_destaque.png',
+            'banner_small': 'Evento_Banner_pequeno.png',
+        }
+
+        file_dict = {}
+        for field_name, file_name in six.iteritems(file_names):
+            assert hasattr(event, field_name)
+            attr = getattr(event, field_name)
+
+            # Campo ImageFile deve estar vazio
+            self.assertEqual(attr.name, '')
+
+            file_path = os.path.join(self.path, file_name)
+
+            file = open(file_path, 'rb')
+            file_dict[field_name] = SimpleUploadedFile(file_name, file.read())
+
+        form = EventImageForm(instance=event, files=file_dict)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        event = self._get_event()
+        for field_name, file_name in six.iteritems(file_names):
+            assert hasattr(event, field_name)
+            attr = getattr(event, field_name)
+            file_path = os.path.join(self.path, file_name)
+
+            # Campo ImageFile deve ter o arquivo enviado.
+            self.assertEqual(attr.name, file_name)
+            self.assertTrue(os.path.isfile(file_path))
