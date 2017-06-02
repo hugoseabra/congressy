@@ -34,7 +34,7 @@
                             </p>
                         </div>
                         <div style="padding:0 5px">
-                            <p><strong>Tipo de Acesso:</strong></p>
+                            <p><strong>Acessando como:</strong></p>
                             <p>{{ member.get_group_display }}</p>
                         </div>
                         {% if user has 'gatheros_event.change_organization' of organization %}
@@ -65,6 +65,7 @@
                         <div style="padding:15px">&rightarrow; <a href="#">Formulário</a></div>
                         <div style="padding:15px">&rightarrow; <a href="#">Lista de inscritos</a></div>
                         <div style="padding:15px">&rightarrow; <a href="#">Credenciamento</a></div>
+                        <div style="padding:15px">&rightarrow; <a href="#">Exportação de dados</a></div>
                     </div>
                 {% endif %}
             </td>
@@ -102,7 +103,6 @@
                                 <!--suppress CheckImageSize -->
                                 <img src="/media/Evento_Banner_pequeno.png" width="99%" style="border:1px solid #DDD;margin:3px"/>
                             {% endif %}
-                            <pre>Ver exibição de imagem do evento</pre>
                             <pre>Enviar banner pequeno por aqui</pre>
                         </td>
                         <td style="vertical-align: top;padding: 0 15px">
@@ -111,23 +111,39 @@
 
                             <div>
                                 <strong>Período:</strong> {{ object.get_period }}
+                                [<a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar</a>]
                             </div>
-                            {% if object.place %}
-                                <div style="margin-top: 20px;border-top: 1px solid #DDD">
+                            <div style="margin-top: 20px;border-top: 1px solid #DDD">
+                                {% if object.place %}
                                     <p>
                                         <strong>Local:</strong> {{ object.place.name }}
+                                        [<a href="#">Alterar</a>]
                                     </p>
                                     <p style="color:dimgray;text-indent: 20px;">{{ object.place.get_complete_address }}</p>
-                                </div>
-                            {% endif %}
-                            {% if object.description %}
+                                {% else %}
+                                    <p><strong>Evento on-line</strong> [<a href="#">Alterar</a>]</p>
+                                {% endif %}
+                            </div>
                                 <div style="margin-top: 20px;border-top: 1px solid #DDD">
                                     <p>
                                         <strong>Descrição:</strong>
                                     </p>
-                                    <p style="color:dimgray;text-indent: 20px;text-align: justify;line-height: 24px;">{{ object.description }}</p>
+                                    {% if object.description %}
+                                        <p style="color:dimgray;text-indent: 20px;text-align: justify;line-height: 24px;">
+                                            {{ object.description }}
+                                        </p>
+                                    {% else %}
+                                        <p style="color:dimgray;text-align: justify;line-height: 24px;">
+                                            <span>Sem descrição.</span>
+                                            <br />
+                                            <br />
+                                           <span style="font-style: italic">
+                                               Insira uma descrição. Será muito bom para localizar o seu evento nos sites de busca.
+                                           </span>
+                                        </p>
+                                        <p style="text-align: center;">[<a href="#">Alterar</a>]</p>
+                                    {% endif %}
                                 </div>
-                            {% endif %}
                         </td>
                     </tr>
                 </table>
@@ -136,7 +152,6 @@
                 <br/>
                 <hr/>
                 <pre>
-                    = Local
                     = Transferência
                 </pre>
             </td>
@@ -196,8 +211,7 @@
                                 </div>
                                 {% if user has 'gatheros_event.change_event' of object %}
                                     <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                        <a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar
-                                            data</a>
+                                        <a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar data</a>
                                         &nbsp;&nbsp; | &nbsp;&nbsp;
                                         <a href="#"
                                            onclick="document.change_status.submit()">Publicar</a>
