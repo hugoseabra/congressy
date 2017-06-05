@@ -20,22 +20,25 @@ class ProfileForm(forms.ModelForm):
     new_password1 = forms.CharField(
         label="Senha",
         strip=False,
-        widget=forms.PasswordInput
+        widget=forms.PasswordInput,
+        required=False
     )
     new_password2 = forms.CharField(
         label="Confirmar Senha",
         strip=False,
-        widget=forms.PasswordInput
+        widget=forms.PasswordInput,
+        required=False
     )
 
-    def __init__(self, user, instance=None, data=None, *args, **kwargs):
-        super(ProfileForm, self).__init__(
-            instance=instance,
-            data=data,
-            *args,
-            **kwargs
-        )
+    def __init__(self, user, password_required=True, *args, **kwargs):
+        if hasattr(user, 'person'):
+            kwargs.update({'instance': user.person})
+
+        super(ProfileForm, self).__init__(*args, **kwargs)
         self.user = user
+
+        self.fields['new_password1'].required = password_required
+        self.fields['new_password2'].required = password_required
 
     def clean_new_password2(self):
         password1 = self.cleaned_data.get('new_password1')
@@ -52,9 +55,9 @@ class ProfileForm(forms.ModelForm):
     def save(self, **_):
         super(ProfileForm, self).save(commit=True)
 
-        password = self.cleaned_data["new_password1"]
         self.user.is_active = True
-        self.user.set_password(password)
+        if self.cleaned_data["new_password1"]:
+            self.user.set_password(self.cleaned_data["new_password1"])
         self.user.save()
 
         self.instance.user = self.user
@@ -64,4 +67,9 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Person
-        exclude = ['user']
+        exclude = [
+            'user',
+            'synchronized',
+            'term_version',
+            'politics_version',
+        ]

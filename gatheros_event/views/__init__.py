@@ -19,3 +19,4 @@ from .organization.invite import (
 )
 from .organization.panel import OrganizationPanelView
 from .organization.switch import OrganizationSwitch
+from .profile import ProfileView

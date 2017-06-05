@@ -32,7 +32,7 @@
                     {% if request.user.is_authenticated %}
                         {% if organizations and organizations|length > 1 %}
                             <form action="{% url 'gatheros_event:organization-switch' %}"
-                                  method="post"
+                                  method="post" style="display: inline-block;"
                                   id="organization-context-pk">{% csrf_token %}
                                 <!--suppress HtmlFormInputWithoutLabel -->
                                 <select name="organization-context-pk"
@@ -48,26 +48,19 @@
                                            value="{{ request.path }}"/>
                                 </select>
                                 {% if not organization.internal %}
-                                    &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp
-                                    &nbsp
                                     <a href="{% url 'gatheros_event:organization-panel' %}">Gerenciar</a>
                                 {% endif %}
-                                &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp
-                                &nbsp
-                                <a href="{% url 'gatheros_front:logout' %}">Sair</a>
-                                &nbsp &nbsp &nbsp &nbsp
                             </form>
                         {% elif organizations and organizations|length == 1 %}
                             <strong>{{ organization.name }}</strong>
-                            &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
-                            <a href="{% url 'gatheros_front:logout' %}">Sair</a>
-                            &nbsp &nbsp &nbsp &nbsp
                         {% else %}
                             <strong>{{ request.user.get_full_name }}</strong>
-                            &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
-                            <a href="{% url 'gatheros_front:logout' %}">Sair</a>
-                            &nbsp &nbsp &nbsp &nbsp
                         {% endif %}
+
+                        &nbsp; | &nbsp;
+                        <a href="{% url 'gatheros_event:profile' %}">Perfil</a>
+                        &nbsp; | &nbsp;
+                        <a href="{% url 'gatheros_front:logout' %}">Sair</a>
                     {% endif %}
                 </div>
             </div>

@@ -92,7 +92,16 @@ url_organization = [
     ),
 ]
 
+url_profile = [
+    url(
+        r'^me/$',
+        views.ProfileView.as_view(),
+        name='profile'
+    ),
+]
+
 urlpatterns = [
+    url(r'^/', include(url_profile)),
     url(r'^events/', include(url_event)),
     url(r'^organizations/', include(url_organization)),
 ]
