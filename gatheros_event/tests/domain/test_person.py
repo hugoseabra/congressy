@@ -28,6 +28,7 @@ class PersonModelTest(TestCase):
     def _get_person_with_external_organization(self):
         return Person.objects.get(pk='5c76d747-f22a-4d27-9211-3b9929fb908d')
 
+    # noinspection PyMethodMayBeStatic
     def _create_person(self, persist=True, **kwargs):
         data = {
             'name': 'Test',

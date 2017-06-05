@@ -5,7 +5,7 @@ feita por um organizador de evento, dono de uma organização, e que deseja
 apresentar informações ligadas a ela a pessoa que possam se interessar em
 participar do evento.
 """
-
+from collections import Counter
 from datetime import datetime
 
 from django.db import models
@@ -140,6 +140,16 @@ class Event(models.Model, deletable.DeletableModel):
                   ' rascunhos.'
     )
 
+    class Meta:
+        verbose_name = 'evento'
+        verbose_name_plural = 'eventos'
+        ordering = ('name', 'pk', 'category__name')
+
+        permissions = (
+            ("view_lots", "Can view lots"),
+            ('add_lot', 'Can add lot'),
+        )
+
     @property
     def limit(self):
         """Limit do evento de acordo com os lotes existentes."""
@@ -151,15 +161,30 @@ class Event(models.Model, deletable.DeletableModel):
 
         return limit
 
-    class Meta:
-        verbose_name = 'evento'
-        verbose_name_plural = 'eventos'
-        ordering = ('name', 'pk', 'category__name')
+    @property
+    def percent_completed(self):
+        completed = 0.0
 
-        permissions = (
-            ("view_lots", "Can view lots"),
-            ('add_lot', 'Can add lot'),
-        )
+        if hasattr(self, 'lots'):
+            for lot in self.lots.all():
+                completed += lot.percent_completed
+
+            completed = completed / self.lots.count()
+
+        return round(completed, 2)
+
+    @property
+    def percent_attended(self):
+        attended = 0.0
+        if hasattr(self, 'subscriptions'):
+            queryset = self.subscriptions
+            num = queryset.count()
+
+            if num > 0:
+                num_attended = queryset.filter(attended=True).count()
+                attended = (num_attended * 100) / num
+
+        return round(attended, 2)
 
     @property
     def status(self):
@@ -222,3 +247,50 @@ class Event(models.Model, deletable.DeletableModel):
             period += end_time.strftime('%Hh%M')
 
         return period
+
+    def get_report(self):
+        """
+        Recupera um dicinário com informaçõse que podem ser utilizadas como
+        relatório.
+        """
+        if not hasattr(self, 'subscriptions'):
+            return {}
+
+        def perc(num, num_total):
+            if num_total == 0:
+                return 0
+            return '{0:.2f}%'.format((num * 100) / num_total)
+
+        queryset = self.subscriptions
+        total = queryset.count()
+        subs = queryset.values(
+            'person__pne',
+            'person__gender',
+            'person__city'
+        ).annotate(
+            num_pnes=models.Count('person__pne'),
+            num_gender=models.Count('person__gender')
+        ).order_by()
+
+        men = [
+            sub['num_gender'] for sub in subs if sub['person__gender'] == 'M'
+        ]
+        num_men = sum(men)
+
+        women = [
+            sub['num_gender'] for sub in subs if sub['person__gender'] == 'F'
+        ]
+        num_women = sum(women)
+
+        pnes = [sub['num_pnes'] for sub in subs if sub['person__pne'] is True]
+        num_pnes = sum(pnes)
+
+        cities = [sub['person__city'] for sub in subs]
+        num_cities = len(Counter(cities))
+
+        return {
+            'num_men': '{} ({})'.format(num_men, perc(num_men, total)),
+            'num_women': '{} ({})'.format(num_women, perc(num_women, total)),
+            'num_pnes': '{} ({})'.format(num_pnes, perc(num_pnes, total)),
+            'num_cities': num_cities,
+        }

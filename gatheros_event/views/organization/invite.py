@@ -5,8 +5,11 @@ from django.urls import reverse_lazy
 from django.views.decorators.csrf import get_token
 from django.views.generic import FormView, TemplateView
 
-from gatheros_event.forms import InvitationCreateForm, InvitationDecisionForm, \
+from gatheros_event.forms import (
+    InvitationCreateForm,
+    InvitationDecisionForm,
     ProfileForm
+)
 from gatheros_event.models import Invitation
 from gatheros_event.views.mixins import AccountMixin
 
@@ -93,6 +96,7 @@ class InvitationDecisionView(TemplateView):
             context
         )
 
+    # noinspection PyMethodMayBeStatic
     def post(self, request, **kwargs):
         """
         Trata a ação de Aceitar ou Recusar o Convite

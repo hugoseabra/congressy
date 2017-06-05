@@ -3,10 +3,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
 
+# noinspection PyClassHasNoInit
 class Start(LoginRequiredMixin, TemplateView):
     template_name = 'gatheros_front/start.html'
 
 
+# noinspection PyClassHasNoInit
 class Login(auth_views.LoginView):
     template_name = 'gatheros_front/login.html'
     redirect_authenticated_user = True

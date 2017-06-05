@@ -59,6 +59,7 @@ def rule_5_nao_deve_existir_2_convites_para_mesmo_usuario(entity):
     organização
     :param entity:
     """
+    # noinspection PyProtectedMember
     if entity._state.adding is True and entity.has_previous() is True:
         raise ValidationError(
             {'to': [
@@ -79,6 +80,7 @@ def rule_6_autor_deve_ser_membro_admin(entity):
     organization = entity.author.organization
     person = entity.author.person
 
+    # noinspection PyProtectedMember
     if entity._state.adding and not organization.is_admin(person):
         raise ValidationError({'author': [
             'Somente administradores podem convidar novos membros.']})
@@ -92,6 +94,7 @@ def rule_7_nao_deve_convidar_um_membro_da_organizacao(entity):
     organization = entity.author.organization
     user = entity.to
 
+    # noinspection PyProtectedMember
     if entity._state.adding and organization.is_member(user):
         raise ValidationError(
             {'to': [

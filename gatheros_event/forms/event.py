@@ -58,3 +58,14 @@ class EventPublicationForm(forms.ModelForm):
             published = published == '1'
 
         return published
+
+
+class EventImageForm(forms.ModelForm):
+    """Formulário de upload de imagens de evento."""
+    class Meta:
+        model = Event
+        fields = [
+            'banner_small',
+            'banner_top',
+            'banner_slide',
+        ]

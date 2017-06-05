@@ -59,7 +59,7 @@ class Organization(models.Model):
     active = models.BooleanField(default=True, verbose_name='ativo')
     internal = models.BooleanField(
         default=True,
-        verbose_name='gerado internamente'
+        verbose_name='interno'
     )
 
     class Meta:

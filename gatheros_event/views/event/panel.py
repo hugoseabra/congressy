@@ -25,6 +25,11 @@ class EventPanelView(AccountMixin, DetailView):
         context['can_change'] = self._can_change
         context['can_delete'] = self._can_delete
         context['can_view_lots'] = self._can_view_lots
+        context['percent_attended'] = {
+            'label': round(self.object.percent_attended),
+            'number': str(self.object.percent_attended).replace(',', '.'),
+        }
+        context['report'] = self._get_report()
 
         return context
 
@@ -38,7 +43,7 @@ class EventPanelView(AccountMixin, DetailView):
         )
 
     def _can_delete(self):
-        return self.request.user.has_perm(
+        return self.object.is_deletable() and self.request.user.has_perm(
             'gatheros_event.delete_event',
             self.object
         )
@@ -106,3 +111,8 @@ class EventPanelView(AccountMixin, DetailView):
         remaining += str(60 - now.minute) + 'm'
 
         return remaining
+
+    def _get_report(self):
+        """ Recupera relatório do painel"""
+
+        return self.object.get_report()

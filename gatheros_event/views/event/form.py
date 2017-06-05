@@ -11,6 +11,7 @@ class BaseEventView(AccountMixin, View):
     template_name = 'gatheros_event/event/form.html'
     success_message = ''
     success_url = None
+    form_title = None
 
     def dispatch(self, request, *args, **kwargs):
         if not self.can_view():
@@ -23,6 +24,14 @@ class BaseEventView(AccountMixin, View):
         # noinspection PyUnresolvedReferences
         return super(BaseEventView, self).form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        # noinspection PyUnresolvedReferences
+        context = super(BaseEventView, self).get_context_data(**kwargs)
+        context['next_path'] = self._get_referer_url()
+        context['form_title'] = self.get_form_title()
+
+        return context
+
     def _get_referer_url(self):
         request = self.request
         previous_url = request.META.get('HTTP_REFERER')
@@ -34,6 +43,9 @@ class BaseEventView(AccountMixin, View):
                 return previous_url
 
         return self.success_url
+
+    def get_form_title(self):
+        return self.form_title
 
     def can_view(self):
         raise NotImplemented('Você deve implementar `can_view()`.')
@@ -70,16 +82,12 @@ class EventAddFormView(BaseEventView, generic.CreateView):
 
         return initial
 
-    def get_context_data(self, **kwargs):
-        context = super(EventAddFormView, self).get_context_data(**kwargs)
-
+    def get_form_title(self):
         form_title = "Novo evento"
         if not self.organization.internal:
-            form_title += " para '" + self.organization.name + "'"
+            form_title += " para '{}'".format(self.organization.name)
 
-        context['form_title'] = form_title
-
-        return context
+        return form_title
 
     def get_success_url(self):
         form = self.get_form()
@@ -117,10 +125,6 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(EventEditFormView, self).get_context_data(**kwargs)
-        context['title'] = '{} ({})'.format(self.object.name, self.object.pk)
-        context['form_title'] = 'Editar evento #ID:' + str(self.object.pk)
-        context['next_path'] = self._get_referer_url()
-
         return context
 
     def get_success_url(self):
@@ -131,18 +135,6 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
             return next_path
 
         return super(EventEditFormView, self).get_success_url()
-
-    def _get_referer_url(self):
-        request = self.request
-        previous_url = request.META.get('HTTP_REFERER')
-        if previous_url:
-            host = request.scheme + '://' + request.META.get('HTTP_HOST', '')
-            previous_url = previous_url.replace(host, '')
-
-            if previous_url != request.path:
-                return previous_url
-
-        return self.success_url
 
 
 class EventPublicationFormView(BaseSimpleEditlView, generic.UpdateView):
@@ -155,9 +147,11 @@ class EventSubscriptionTypeFormView(BaseSimpleEditlView, generic.UpdateView):
     form_class = forms.EventEditSubscriptionTypeForm
     model = forms.EventEditSubscriptionTypeForm.Meta.model
     success_message = 'Tipo de inscrição alterada com sucesso.'
+    form_title = 'Editar Tipo de Inscrição'
 
 
 class EventDatesFormView(BaseSimpleEditlView, generic.UpdateView):
     form_class = forms.EventEditDatesForm
     model = forms.EventEditDatesForm.Meta.model
     success_message = 'Datas alteradas com sucesso.'
+    form_title = 'Editar Datas do Evento'

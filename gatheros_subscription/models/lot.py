@@ -122,7 +122,7 @@ class Lot(models.Model, deletable.DeletableModel):
 
     internal = models.BooleanField(
         default=False,
-        verbose_name='gerado internamente'
+        verbose_name='interno'
     )
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
 
@@ -131,16 +131,26 @@ class Lot(models.Model, deletable.DeletableModel):
     class Meta:
         verbose_name = 'lote'
         verbose_name_plural = 'lotes'
-        ordering = ['pk', 'name', 'event']
+        ordering = ['date_start', 'date_end', 'pk', 'name']
         unique_together = (("name", "event"),)
 
     @property
     def percent_completed(self):
-        if not self.limit:
-            return None
+        completed = 0.00
+        if self.limit:
+            completed = ((self.subscriptions.count() * 100) / self.limit)
 
-        completed = ((self.subscriptions.count() * 100) / self.limit)
-        return '{0:.2f}%'.format(round(completed, 2))
+        return round(completed, 2)
+
+    @property
+    def percent_attended(self):
+        queryset = self.subscriptions
+        num_subs = queryset.count()
+        if num_subs == 0:
+            return 0
+
+        attended = queryset.filter(attended=True).count()
+        return round((attended * 100)/num_subs, 2)
 
     @property
     def status(self):

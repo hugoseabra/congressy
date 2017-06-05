@@ -1,0 +1,60 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:event-panel' object.pk %}">Voltar</a>
+    </div>
+    <hr/>
+    <h1>Configuração de Detalhes do Evento</h1>
+    <h2>{{ object.name }}</h2>
+    <div style="padding: 10px;background-color: #DDDDDD;text-align: center;"></div>
+    <div style="margin-bottom:10px; width: 100%;height:3px;background-color: {% if object.published %}darkgreen{% else %}darkred{% endif %}"></div>
+
+    <h3>Imagens:</h3>
+    <form>
+        <table cellpadding="0" cellspacing="0" border="0" width="60%">
+            <tbody>
+            <tr>
+                <th width="25%" style="border-bottom: 1px solid #DDD">
+                    <label for="id_banner_small">Banner pequeno:</label>
+                </th>
+                <td width="50%" style="border-bottom: 1px solid #DDD;">
+                    {% if object.banner_small %}
+                    <div style="margin-bottom: 20px">
+                        Atualmente:
+                        <span style="color: dimgray">banner_small_seo-resultados-event.jpg</span>
+                        &nbsp;&nbsp;&nbsp;
+                        <button type="button">Excluir</button>
+                    </div>
+                    <div>
+                        Modificar: <input type="file" name="banner_small" id="id_banner_small" />
+                    </div>
+                    {% else %}
+                    <input type="file" name="banner_small" id="id_banner_small">
+                    <br>
+                    {% endif %}
+                    <div class="help">
+                        Banner pequeno para apresentação geral (tamanho: 580px x 422px)
+                    </div>
+                </td>
+                <td width="25%" style="border: 1px solid #DDD">
+                    {% if object.banner_small %}
+                        <div style="font-weight: bold;padding:8px;background-color: #DDD;border-bottom:1px solid dimgray">Pré-visualização:</div>
+                        <img style="border: 1px solid dimgray" src="{{ object.banner_small.url }}" width="300px" />
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+
+
+    <hr/>
+    <h3>Local do evento:</h3>
+
+
+    <hr/>
+    <h3>Redes Sociais:</h3>
+
+{% endblock %}
