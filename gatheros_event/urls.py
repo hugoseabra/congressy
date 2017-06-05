@@ -101,7 +101,7 @@ url_profile = [
 ]
 
 urlpatterns = [
-    url(r'^/', include(url_profile)),
+    url(r'^', include(url_profile)),
     url(r'^events/', include(url_event)),
     url(r'^organizations/', include(url_organization)),
 ]
