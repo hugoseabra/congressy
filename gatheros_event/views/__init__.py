@@ -12,3 +12,4 @@ from .organization.invite import InvitationCreateSuccessView, \
     InvitationCreateView, InvitationDecisionView, InvitationProfileView
 from .organization.panel import OrganizationPanelView
 from .organization.switch import OrganizationSwitch
+from .profile import ProfileView
