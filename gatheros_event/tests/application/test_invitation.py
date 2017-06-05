@@ -414,13 +414,13 @@ class InvitationProfileViewTest(TestCase):
             self.data
         )
 
-        try:
+        self.assertIsInstance(
             Member.objects.get(
                 organization=self.organization,
                 person=self.to.person
-            )
-        except Member.DoesNotExist:
-            self.fail('Membro não foi criado')
+            ),
+            Member
+        )
 
     def test_post_invitation_removed(self):
         """
