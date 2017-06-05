@@ -1,4 +1,7 @@
 from .event.delete import EventDeleteView
+from .event.detail import (
+    EventDetailView,
+)
 from .event.form import (
     EventAddFormView,
     EventDatesFormView,
@@ -8,7 +11,6 @@ from .event.form import (
 )
 from .event.list import EventListView
 from .event.panel import EventPanelView
-from .event.detail import EventDetaillView
 from .organization.invite import (
     InvitationCreateSuccessView,
     InvitationCreateView,

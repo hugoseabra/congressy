@@ -1,6 +1,4 @@
 import os
-import shutil
-import tempfile
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -8,13 +6,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import six
 
-from gatheros_event.forms import (
-    EventEditDatesForm,
-    EventEditSubscriptionTypeForm,
-    EventForm,
-    EventImageForm,
-    EventPublicationForm
-)
+from gatheros_event.forms import EventBannerForm, EventEditDatesForm, \
+    EventEditSubscriptionTypeForm, EventForm, EventPublicationForm
 from gatheros_event.models import Event
 
 
@@ -192,13 +185,7 @@ class EventImagesFormTest(TestCase):
     ]
 
     def setUp(self):
-        project_media_dir = settings.MEDIA_ROOT
-        self.path = os.path.join(project_media_dir, 'test')
-        settings.MEDIA_ROOT = tempfile.mktemp()
-
-    def tearDown(self):
-        if os.path.isdir(settings.MEDIA_ROOT):
-            shutil.rmtree(settings.MEDIA_ROOT)
+        self.path = os.path.join(settings.MEDIA_ROOT, 'test')
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
@@ -224,9 +211,13 @@ class EventImagesFormTest(TestCase):
             file_path = os.path.join(self.path, file_name)
 
             file = open(file_path, 'rb')
-            file_dict[field_name] = SimpleUploadedFile(file_name, file.read())
+            file_dict[field_name] = SimpleUploadedFile(
+                file_name,
+                file.read(),
+                'image/png'
+            )
 
-        form = EventImageForm(instance=event, files=file_dict)
+        form = EventBannerForm(instance=event, files=file_dict)
         self.assertTrue(form.is_valid())
         form.save()
 
@@ -234,8 +225,31 @@ class EventImagesFormTest(TestCase):
         for field_name, file_name in six.iteritems(file_names):
             assert hasattr(event, field_name)
             attr = getattr(event, field_name)
-            file_path = os.path.join(self.path, file_name)
+            file_path = os.path.join(settings.MEDIA_ROOT, file_name)
 
             # Campo ImageFile deve ter o arquivo enviado.
             self.assertEqual(attr.name, file_name)
             self.assertTrue(os.path.isfile(file_path))
+
+        # Clear file deve limpar o campo no model e deletar os arquivos
+        dict_clear = {}
+        for field_name in six.iterkeys(file_names):
+            key = field_name+'-clear'
+            dict_clear[key] = 'on'
+
+        form = EventBannerForm(
+            instance=event,
+            data=dict_clear
+        )
+        form.save()
+
+        # Campos limpos e sem arquivos
+        event = self._get_event()
+        for field_name, file_name in six.iteritems(file_names):
+            assert hasattr(event, field_name)
+            attr = getattr(event, field_name)
+            file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+
+            # Campo ImageFile deve ter o arquivo enviado.
+            self.assertEqual(attr.name, '')
+            self.assertFalse(os.path.isfile(file_path))

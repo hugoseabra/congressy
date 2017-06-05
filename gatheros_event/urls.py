@@ -7,7 +7,7 @@ from . import views
 url_event = [
     url(
         r'^(?P<pk>[\d]+)/detail',
-        views.EventDetaillView.as_view(),
+        views.EventDetailView.as_view(),
         name='event-detail'
     ),
     url(

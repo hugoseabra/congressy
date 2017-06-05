@@ -2,6 +2,7 @@
 {% load i18n static %}
 
 {% block content %}
+    {% get_media_prefix as media_url %}
     <div style="padding:10px">
         <a href="{% url 'gatheros_event:event-panel' object.pk %}">Voltar</a>
     </div>
@@ -12,41 +13,42 @@
     <div style="margin-bottom:10px; width: 100%;height:3px;background-color: {% if object.published %}darkgreen{% else %}darkred{% endif %}"></div>
 
     <h3>Imagens:</h3>
-    <form>
+    <form name="event_detail_banner_upload" method="post" action="{% url 'gatheros_event:event-detail' object.pk %}" enctype="multipart/form-data">{% csrf_token %}
         <table cellpadding="0" cellspacing="0" border="0" width="60%">
             <tbody>
-            <tr>
-                <th width="25%" style="border-bottom: 1px solid #DDD">
-                    <label for="id_banner_small">Banner pequeno:</label>
-                </th>
-                <td width="50%" style="border-bottom: 1px solid #DDD;">
-                    {% if object.banner_small %}
-                    <div style="margin-bottom: 20px">
-                        Atualmente:
-                        <span style="color: dimgray">banner_small_seo-resultados-event.jpg</span>
-                        &nbsp;&nbsp;&nbsp;
-                        <button type="button">Excluir</button>
-                    </div>
-                    <div>
-                        Modificar: <input type="file" name="banner_small" id="id_banner_small" />
-                    </div>
-                    {% else %}
-                    <input type="file" name="banner_small" id="id_banner_small">
-                    <br>
-                    {% endif %}
-                    <div class="help">
-                        Banner pequeno para apresentação geral (tamanho: 580px x 422px)
-                    </div>
-                </td>
-                <td width="25%" style="border: 1px solid #DDD">
-                    {% if object.banner_small %}
+            {% for field in banner_form %}
+                <tr>
+                    <th width="25%" style="border-bottom: 1px solid #DDD">
+                        <label for="id_banner_small">{{ field.label_tag }}</label>
+                    </th>
+                    <td width="50%" style="border-bottom: 1px solid #DDD;">
+                        {{ field.errors }}
+                        {{ field }}
+                        <p>
+                            {{ field.help_text }}
+                        </p>
+                    </td>
+                    <td width="25%" style="border: 1px solid #DDD">
                         <div style="font-weight: bold;padding:8px;background-color: #DDD;border-bottom:1px solid dimgray">Pré-visualização:</div>
-                        <img style="border: 1px solid dimgray" src="{{ object.banner_small.url }}" width="300px" />
-                    {% endif %}
-                </td>
-            </tr>
+                        {% if field.value %}
+                            <img style="border: 1px solid dimgray" src="{{ field.value.url }}" width="300px" />
+                        {% else %}
+                            <div style="width:300px;height: 200px">&nbsp;</div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+                <tr>
+                    <td colspan="3" style="text-align: center;">
+                        <br />
+                        <input type="submit" value="Atualizar banners"/>
+                        <br />
+                        <br />
+                    </td>
+                </tr>
             </tbody>
         </table>
+        <input type="hidden" name="submit_type" value="update_banners" />
     </form>
 
 

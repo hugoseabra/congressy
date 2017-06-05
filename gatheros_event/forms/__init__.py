@@ -3,7 +3,7 @@ from .event import (
     EventEditDatesForm,
     EventEditSubscriptionTypeForm,
     EventForm,
-    EventImageForm,
+    EventBannerForm,
     EventPublicationForm,
 )
 
