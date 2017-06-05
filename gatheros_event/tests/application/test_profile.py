@@ -178,8 +178,5 @@ class ProfileViewTest(TestCase):
         """
         Atualiza o perfil
         """
-        response = self.client.post(
-            self.url,
-            self.data
-        )
+        response = self.client.post(self.url, self.data, follow=True)
         self.assertContains(response, 'Perfil atualizado com sucesso')
