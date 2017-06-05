@@ -10,8 +10,8 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.utils.encoding import force_text
 
-from core.model import deletable
 from gatheros_event.models import Event
+from gatheros_event.models.mixins import GatherosModelMixin
 from .rules import lot as rule
 
 
@@ -33,7 +33,7 @@ class LotManager(models.Manager):
                 return code
 
 
-class Lot(models.Model, deletable.DeletableModel):
+class Lot(models.Model, GatherosModelMixin):
     """ Modelo de Lote """
 
     INTERNAL_DEFAULT_NAME = 'default'

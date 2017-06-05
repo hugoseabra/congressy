@@ -11,10 +11,12 @@ from datetime import datetime
 from django.db import models
 from django.utils.encoding import force_text
 
-from core.model import deletable, track_data
+from core.model import track_data
 from core.util import slugify
 from . import Category, Organization, Place
 from .rules import event as rule
+
+from .mixins import GatherosModelMixin
 
 
 # @TODO Cores: encontrar 2 cores (primária e secundária) para hot site
@@ -24,8 +26,10 @@ from .rules import event as rule
 # @TODO redimensionar banner destaque para alt. e lar. corretas - 1140 x 500
 # @TODO redimensionar banner de topo para alt. e larg. corretas - 1920 x 900
 
+# @TODO Excluir imagens banners ao deletar evento.
+
 @track_data('subscription_type', 'date_start', 'date_end')
-class Event(models.Model, deletable.DeletableModel):
+class Event(models.Model, GatherosModelMixin):
     """Modelo de Evento"""
 
     RESOURCE_URI = '/api/core/events/'

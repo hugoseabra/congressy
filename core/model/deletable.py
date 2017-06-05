@@ -40,11 +40,12 @@ class CheckerCollector(Collector):
 
 class DeletableModel(object):
     """Deletable model checker"""
-    def __init__(self):
-        self.checker = CheckerCollector(using=router.db_for_write(self))
+    checker = None
 
     def is_deletable(self):
         """Checks if model is deletable"""
+        if not self.checker:
+            self.checker = CheckerCollector(using=router.db_for_write(self))
 
         self.checker.collect(objs=[self])
         return len(self.checker.protected) == 0
