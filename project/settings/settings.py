@@ -21,6 +21,7 @@ INSTALLED_APPS = [
 
     # THIRD PARTY
     'permission',
+    'stdimage',
 
     # KANU_APPS
     'kanu_locations',

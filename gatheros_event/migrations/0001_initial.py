@@ -5,11 +5,14 @@ from __future__ import unicode_literals
 import uuid
 
 import django.db.models.deletion
+import stdimage.models
+import stdimage.validators
 from django.conf import settings
 from django.core.management import call_command
 from django.db import migrations, models
 
 from core.model import validator
+from gatheros_event.models.event import get_image_path
 
 
 def load_initial_data(*_):
@@ -98,28 +101,39 @@ class Migration(migrations.Migration):
                     null=True,
                     verbose_name='descrição'
                 )),
-                ('banner_slide', models.ImageField(
+                ('banner_slide', stdimage.models.StdImageField(
                     blank=True,
-                    help_text='Banner pequeno para destaque'
-                              ' (tamanho: 1140px x 500px)',
+                    help_text='Banner de destaque (tamanho: 1140px x 500px)',
                     null=True,
-                    upload_to='',
+                    upload_to=get_image_path,
+                    validators=[
+                        stdimage.validators.MinSizeValidator(1140, 500),
+                        stdimage.validators.MaxSizeValidator(2048, 898)
+                    ],
                     verbose_name='banner destaque'
                 )),
-                ('banner_small', models.ImageField(
+                ('banner_small', stdimage.models.StdImageField(
                     blank=True,
                     help_text='Banner pequeno para apresentação geral'
                               ' (tamanho: 580px x 422px)',
                     null=True,
-                    upload_to='',
+                    upload_to=get_image_path,
+                    validators=[
+                        stdimage.validators.MinSizeValidator(580, 422),
+                        stdimage.validators.MaxSizeValidator(1024, 745)
+                    ],
                     verbose_name='banner pequeno'
                 )),
-                ('banner_top', models.ImageField(
+                ('banner_top', stdimage.models.StdImageField(
                     blank=True,
                     help_text='Banner para o topo do site do evento'
                               ' (tamanho: 1920px x 900px)',
                     null=True,
-                    upload_to='',
+                    upload_to=get_image_path,
+                    validators=[
+                        stdimage.validators.MinSizeValidator(1920, 900),
+                        stdimage.validators.MaxSizeValidator(4096, 1920)
+                    ],
                     verbose_name='banner topo do site'
                 )),
                 ('website', models.CharField(

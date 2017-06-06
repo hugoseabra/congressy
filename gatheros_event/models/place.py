@@ -105,8 +105,8 @@ class Place(models.Model):
 
     # noinspection PyMethodMayBeStatic
     def _add_prefix(self, *args, **kwargs):
-        if args:
-            return kwargs.get('prefix', '')
+        if [arg for arg in args if arg]:
+                return kwargs.get('prefix', '')
 
         return ''
 

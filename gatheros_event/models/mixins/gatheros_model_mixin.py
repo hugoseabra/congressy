@@ -1,7 +1,6 @@
 from core.model.deletable import DeletableModel
-from core.model.model_help_text import ModelHelperMixin
 
 
-class GatherosModelMixin(ModelHelperMixin, DeletableModel):
+class GatherosModelMixin(DeletableModel):
     """Gatheros Model Mixin"""
     pass

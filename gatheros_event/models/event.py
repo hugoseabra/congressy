@@ -5,18 +5,20 @@ feita por um organizador de evento, dono de uma organização, e que deseja
 apresentar informações ligadas a ela a pessoa que possam se interessar em
 participar do evento.
 """
+import os
 from collections import Counter
 from datetime import datetime
 
 from django.db import models
 from django.utils.encoding import force_text
+from stdimage import StdImageField
+from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
 from core.model import track_data
 from core.util import slugify
 from . import Category, Organization, Place
-from .rules import event as rule
-
 from .mixins import GatherosModelMixin
+from .rules import event as rule
 
 
 # @TODO Cores: encontrar 2 cores (primária e secundária) para hot site
@@ -27,6 +29,11 @@ from .mixins import GatherosModelMixin
 # @TODO redimensionar banner de topo para alt. e larg. corretas - 1920 x 900
 
 # @TODO Excluir imagens banners ao deletar evento.
+
+
+def get_image_path(instance, filename):
+    return os.path.join('event', str(instance.id), filename)
+
 
 @track_data('subscription_type', 'date_start', 'date_end')
 class Event(models.Model, GatherosModelMixin):
@@ -109,25 +116,34 @@ class Event(models.Model, GatherosModelMixin):
                   " sociais. Quanto mais detalhada, melhor!"
     )
 
-    banner_small = models.ImageField(
+    banner_small = StdImageField(
+        upload_to=get_image_path,
         blank=True,
         null=True,
         verbose_name='banner pequeno',
-        help_text="Banner pequeno para apresentação geral (tamanho: 580px"
-                  " x 422px)"
+        variations={'default': (580, 422), 'thumbnail': (200, 146, True)},
+        validators=[MinSizeValidator(580, 422), MaxSizeValidator(1024, 745)],
+        help_text="Banner pequeno para apresentação geral"
+                  " (tamanho: 580px x 422px)"
     )
 
-    banner_slide = models.ImageField(
+    banner_slide = StdImageField(
+        upload_to=get_image_path,
         blank=True,
         null=True,
         verbose_name='banner destaque',
-        help_text="Banner pequeno para destaque (tamanho: 1140px x 500px)"
+        variations={'default': (1140, 500), 'thumbnail': (200, 88, True)},
+        validators=[MinSizeValidator(1140, 500), MaxSizeValidator(2048, 898)],
+        help_text="Banner de destaque (tamanho: 1140px x 500px)"
     )
 
-    banner_top = models.ImageField(
+    banner_top = StdImageField(
+        upload_to=get_image_path,
         blank=True,
         null=True,
         verbose_name='banner topo do site',
+        variations={'default': (1920, 900), 'thumbnail': (200, 94, True)},
+        validators=[MinSizeValidator(1920, 900), MaxSizeValidator(4096, 1920)],
         help_text="Banner para o topo do site do evento"
                   " (tamanho: 1920px x 900px)"
     )
