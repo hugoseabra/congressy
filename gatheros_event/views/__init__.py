@@ -18,5 +18,6 @@ from .organization.invite import (
     InvitationProfileView
 )
 from .organization.panel import OrganizationPanelView
+from .organization.place import PlaceAddView
 from .organization.switch import OrganizationSwitch
 from .profile import ProfileView

@@ -36,6 +36,7 @@ class ProfileFormTest(TestCase):
         Form sem usuário deve emitir um exception
         """
         with self.assertRaises(TypeError):
+            # noinspection PyArgumentList
             InvitationCreateForm()
 
     @staticmethod

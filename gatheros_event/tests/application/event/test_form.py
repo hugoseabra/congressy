@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -6,9 +7,15 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import six
 
-from gatheros_event.forms import EventBannerForm, EventEditDatesForm, \
-    EventEditSubscriptionTypeForm, EventForm, EventPublicationForm
-from gatheros_event.models import Event
+from gatheros_event.forms import (
+    EventBannerForm,
+    EventEditDatesForm,
+    EventEditSubscriptionTypeForm,
+    EventForm,
+    EventPlaceForm,
+    EventPublicationForm,
+)
+from gatheros_event.models import Event, Organization
 
 
 class BaseEventFormTest(TestCase):
@@ -177,7 +184,7 @@ class EventPublicationFormTest(BaseEventFormTest):
         test_instance_data(form, data)
 
 
-class EventImagesFormTest(TestCase):
+class EventBannersFormTest(TestCase):
     fixtures = [
         '007_organization',
         '009_place',
@@ -185,11 +192,19 @@ class EventImagesFormTest(TestCase):
     ]
 
     def setUp(self):
-        self.path = os.path.join(settings.MEDIA_ROOT, 'test')
+        self.file_base_path = os.path.join(settings.MEDIA_ROOT, 'test')
+        self.event_path = os.path.join(settings.MEDIA_ROOT, 'event')
+        self.persisted_path = 'event'
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
         return Event.objects.get(slug='streaming-de-sucesso')
+
+    def tearDown(self):
+        event = self._get_event()
+        path = os.path.join(self.event_path, str(event.pk))
+        if os.path.isdir(path):
+            shutil.rmtree(path)
 
     def test_banner(self):
         event = self._get_event()
@@ -208,7 +223,7 @@ class EventImagesFormTest(TestCase):
             # Campo ImageFile deve estar vazio
             self.assertEqual(attr.name, '')
 
-            file_path = os.path.join(self.path, file_name)
+            file_path = os.path.join(self.file_base_path, file_name)
 
             file = open(file_path, 'rb')
             file_dict[field_name] = SimpleUploadedFile(
@@ -225,10 +240,15 @@ class EventImagesFormTest(TestCase):
         for field_name, file_name in six.iteritems(file_names):
             assert hasattr(event, field_name)
             attr = getattr(event, field_name)
-            file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+            file_dir = os.path.join(self.event_path, str(event.pk))
+            file_path = os.path.join(file_dir, file_name)
 
             # Campo ImageFile deve ter o arquivo enviado.
-            self.assertEqual(attr.name, file_name)
+            self.assertEqual(attr.name, '{}/{}/{}'.format(
+                self.persisted_path,
+                str(event.pk),
+                file_name
+            ))
             self.assertTrue(os.path.isfile(file_path))
 
         # Clear file deve limpar o campo no model e deletar os arquivos
@@ -248,8 +268,70 @@ class EventImagesFormTest(TestCase):
         for field_name, file_name in six.iteritems(file_names):
             assert hasattr(event, field_name)
             attr = getattr(event, field_name)
-            file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+            file_dir = os.path.join(self.event_path, str(event.pk))
+            file_path = os.path.join(file_dir, file_name)
 
             # Campo ImageFile deve ter o arquivo enviado.
             self.assertEqual(attr.name, '')
             self.assertFalse(os.path.isfile(file_path))
+
+
+class EventPlaceFormTest(TestCase):
+    fixtures = [
+        '007_organization',
+        '009_place',
+        '010_event',
+    ]
+
+    # noinspection PyMethodMayBeStatic
+    def _get_event(self):
+        return Event.objects.get(slug='encontro-de-lideres-2017')
+
+    def test_render_form(self):
+        """
+        Se na apresentação do formulário aparece apenas os locais da
+        organização do contexto.
+        """
+        event = self._get_event()
+        organization = event.organization
+        other_organization = Organization.objects.exclude(
+            pk=organization.pk
+        ).first()
+
+        form = EventPlaceForm(instance=event)
+        rendered = form.as_ul()
+
+        # Formulário DEVE conter locais da organização do evento
+        for place in organization.places.all():
+            option = 'value="{}"'.format(place.pk)
+            self.assertIn(option, rendered)
+
+        # Formulário NÃO DEVE conter locais de outra organização
+        for place in other_organization.places.all():
+            option = 'value="{}"'.format(place.pk)
+            self.assertNotIn(option, rendered)
+
+    def test_update_place(self):
+        """ Testa Form de atualização de local de evento. """
+
+        event = self._get_event()
+        current_place = event.place
+        organization = event.organization
+        place = organization.places.exclude(pk=event.place.pk).first()
+        assert place is not None
+
+        # Atualiza local
+        form = EventPlaceForm(instance=event, data={'place': place.pk})
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        event = self._get_event()
+        self.assertNotEqual(event.place.pk, current_place.pk)
+
+        # Limpa local
+        form = EventPlaceForm(instance=event, data={'place': None})
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        event = self._get_event()
+        self.assertIsNone(event.place)

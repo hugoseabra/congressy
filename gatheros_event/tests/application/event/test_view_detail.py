@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -27,7 +28,7 @@ class MockRequest(HttpRequest):
         super(MockRequest, self).__init__()
 
 
-class EventDetailUrl(TestCase):
+class EventDetailBannersUploadTest(TestCase):
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -39,54 +40,9 @@ class EventDetailUrl(TestCase):
     ]
 
     def setUp(self):
-        self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.event = Event.objects.get(slug='seo-e-resultados')
-        self.url = reverse('gatheros_event:event-detail', kwargs={
-            'pk': self.event.pk
-        })
-
-    def login(self):
-        self.client.force_login(self.user)
-        self._switch_context()
-
-    def _get_active_organization(self):
-        request = MockRequest(self.user, self.client.session)
-        return account.get_organization(request)
-
-    def _switch_context(self, group=Member.ADMIN):
-        organization = self._get_active_organization()
-        other = Organization.objects.exclude(pk=organization.pk).filter(
-            members__person=self.user.person,
-            members__group=group
-        ).first()
-        url = reverse('gatheros_event:organization-switch')
-        self.client.post(url, {'organization-context-pk': other.pk})
-
-    def test_status_is_302(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 302)
-        login = reverse('gatheros_front:login')+'?next='+self.url
-        self.assertRedirects(response, login)
-
-    def test_status_authenticated_200(self):
-        self.login()
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-
-
-class EventDetailUploadTest(TestCase):
-    fixtures = [
-        'kanu_locations_city_test',
-        '005_user',
-        '006_person',
-        '007_organization',
-        '008_member',
-        '009_place',
-        '010_event',
-    ]
-
-    def setUp(self):
-        self.path = os.path.join(settings.MEDIA_ROOT, 'test')
+        self.file_base_path = os.path.join(settings.MEDIA_ROOT, 'test')
+        self.event_path = os.path.join(settings.MEDIA_ROOT, 'event')
+        self.persisted_path = 'event'
 
         self.user = User.objects.get(username="lucianasilva@gmail.com")
         self.client.force_login(self.user)
@@ -118,6 +74,16 @@ class EventDetailUploadTest(TestCase):
     def _get_event(self):
         return Event.objects.get(slug='seo-e-resultados')
 
+    def tearDown(self):
+        event = self._get_event()
+        path = os.path.join(self.event_path, str(event.pk))
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+
+    def test_status_authenticated_200(self):
+        response = self.client.get(self._get_url())
+        self.assertEqual(response.status_code, 200)
+
     def test_upload(self):
         file_names = {
             'banner_top': 'Evento_Banner_topo.png',
@@ -127,7 +93,7 @@ class EventDetailUploadTest(TestCase):
 
         files_dict = {}
         for field_name, file_name in six.iteritems(file_names):
-            file_path = os.path.join(self.path, file_name)
+            file_path = os.path.join(self.file_base_path, file_name)
             file = open(file_path, 'rb')
             files_dict[field_name] = file
 
@@ -138,10 +104,15 @@ class EventDetailUploadTest(TestCase):
         event = self._get_event()
         for field_name, file_name in six.iteritems(file_names):
             file = getattr(event, field_name)
-            name = file.name
-            file_path = os.path.join(settings.MEDIA_ROOT, file_name)
 
-            self.assertEqual(name, file_name)
+            file_dir = os.path.join(self.event_path, str(event.pk))
+            file_path = os.path.join(file_dir, file_name)
+
+            self.assertEqual(file.name, '{}/{}/{}'.format(
+                self.persisted_path,
+                str(event.pk),
+                file_name
+            ))
             self.assertTrue(os.path.isfile(file_path))
 
         # Clear file deve limpar o campo no model e deletar os arquivos
@@ -160,8 +131,81 @@ class EventDetailUploadTest(TestCase):
         for field_name, file_name in six.iteritems(file_names):
             assert hasattr(event, field_name)
             attr = getattr(event, field_name)
-            file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+
+            file_dir = os.path.join(self.event_path, str(event.pk))
+            file_path = os.path.join(file_dir, file_name)
 
             # Campo ImageFile deve ter o arquivo enviado.
             self.assertEqual(attr.name, '')
             self.assertFalse(os.path.isfile(file_path))
+
+
+class EventDetailPlaceTest(TestCase):
+    fixtures = [
+        'kanu_locations_city_test',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+        '009_place',
+        '010_event',
+    ]
+
+    def setUp(self):
+        self.user = User.objects.get(username="flavia@in2web.com.br")
+        self.client.force_login(self.user)
+        self._switch_context()
+
+    def _get_active_organization(self):
+        request = MockRequest(self.user, self.client.session)
+        return account.get_organization(request)
+
+    def _switch_context(self, group=Member.ADMIN):
+        organization = self._get_active_organization()
+        other = Organization.objects.exclude(pk=organization.pk).filter(
+            members__person=self.user.person,
+            members__group=group
+        ).first()
+        url = reverse('gatheros_event:organization-switch')
+        self.client.post(url, {'organization-context-pk': other.pk})
+
+    def _get_url(self, pk=None):
+        if not pk:
+            event = self._get_event()
+            pk = event.pk
+
+        return reverse('gatheros_event:event-detail', kwargs={'pk': pk})
+
+    # noinspection PyMethodMayBeStatic
+    def _get_event(self):
+        return Event.objects.get(slug='encontro-de-lideres-2017')
+
+    def test_upload_place(self):
+        event = self._get_event()
+        place = event.place
+
+        organization = event.organization
+        other_place = organization.places.exclude(pk=place.pk).first()
+        assert other_place is not None
+
+        # Envia outro local para atualização
+        response = self.client.post(self._get_url(), data={
+            'submit_type': 'update_place',
+            'place': other_place.pk
+        }, follow=True)
+        self.assertContains(response, 'Local atualizado com sucesso.')
+
+        # Verifica update
+        event = self._get_event()
+        self.assertNotEqual(event.place.pk, place.pk)
+
+        # Envia nada para atualização de local
+        response = self.client.post(self._get_url(), data={
+            'submit_type': 'update_place',
+            'place': ''
+        }, follow=True)
+        self.assertContains(response, 'Local atualizado com sucesso.')
+
+        # Verifica update
+        event = self._get_event()
+        self.assertIsNone(event.place)
