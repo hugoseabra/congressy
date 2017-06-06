@@ -13,7 +13,12 @@
     <h2>Usuário: {{ user.username }} </h2>
 
     {% if user has 'gatheros_event.can_invite' of organization %}
-        <a href="{% url 'gatheros_event:invitation' %}?organization={{ organization.pk }}">Convidar membros</a>
+        <p>
+            <a href="{% url 'gatheros_event:invitation' %}?organization={{ organization.pk }}">Convidar membros</a>
+        </p>
+        <p>
+            <a href="{% url 'gatheros_event:organization-add-place' %}">Adicionar local</a>
+        </p>
     {% else %}
         <b>Não pode convidar membros</b>
     {% endif %}
@@ -33,6 +38,7 @@
         = Informações da organzação: avatar e nome
         = Informação de quantidade de eventos vinculados e um botão "visualizar"
         = Lista de membros (nome, tipo, data de entrada), com filtro (tipo) e possibilidade de "adicionar", "editar" e "excluir"
+        = Lista de locais e possibilidade de "adicionar", "editar" e "excluir"
         = Lista de convites pendentes (nome, e-mail, tipo, data de envio), com filtro (tipo) e possibilidade de "adicionar", "editar" e "excluir"
     </pre>
 

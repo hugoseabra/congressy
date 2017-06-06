@@ -61,11 +61,6 @@ url_event = [
 
 url_organization = [
     url(
-        r'^switch/$',
-        views.OrganizationSwitch.as_view(),
-        name='organization-switch'
-    ),
-    url(
         r'^convite/(?P<pk>[0-9A-Fa-f-]+)/perfil/$',
         views.InvitationProfileView.as_view(),
         name='invitation-profile'
@@ -84,6 +79,16 @@ url_organization = [
         r'^convite/$',
         views.InvitationCreateView.as_view(),
         name='invitation'
+    ),
+    url(
+        r'^add-place/$',
+        views.PlaceAddView.as_view(),
+        name='organization-add-place'
+    ),
+    url(
+        r'^switch/$',
+        views.OrganizationSwitch.as_view(),
+        name='organization-switch'
     ),
     url(
         r'^$',
