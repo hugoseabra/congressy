@@ -187,7 +187,7 @@ class InvitationProfileView(TemplateView):
         if not form.is_valid():
             context.update({
                 'messages': messages.get_messages(self.request),
-                'form': messages.get_messages(self.request),
+                'form': form,
             })
             return render_to_response(
                 'gatheros_event/organization/invitation-profile.html',
