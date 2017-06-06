@@ -451,3 +451,16 @@ class InvitationProfileViewTest(TestCase):
                 password=self.data['new_password1'],
             )
         )
+
+    def test_post_with_error(self):
+        """
+        Teste de post com informações de pessoas que já existem(duplicadas)
+        """
+        self.data.update({
+            "email": "diegotolentino@gmail.com",
+            "cpf": "00592728137",
+        })
+        response = self.client.post(self.url, self.data)
+
+        self.assertContains(response, 'Pessoa com este Email já existe')
+        self.assertContains(response, 'Pessoa com este CPF já existe')
