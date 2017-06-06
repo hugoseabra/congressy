@@ -7,6 +7,8 @@ from django import forms
 from gatheros_event.models import Event
 
 
+# @TODO Remover diretórios vazios de eventos que não possuem banners
+
 class EventForm(forms.ModelForm):
     """Formulário principal de evento"""
     class Meta:
@@ -73,26 +75,58 @@ class EventBannerForm(forms.ModelForm):
         ]
 
     def clean_banner_small(self):
-        if self.data.get('banner_small-clear'):
-            self._clear_file('banner_small')
-
+        self._clear_file('banner_small')
         return self.cleaned_data['banner_small']
 
     def clean_banner_top(self):
-        if self.data.get('banner_top-clear'):
-            self._clear_file('banner_top')
-
+        self._clear_file('banner_top')
         return self.cleaned_data['banner_top']
 
     def clean_banner_slide(self):
-        if self.data.get('banner_slide-clear'):
-            self._clear_file('banner_slide')
-
+        self._clear_file('banner_slide')
         return self.cleaned_data['banner_slide']
 
     def _clear_file(self, field_name):
         """Removes files from model"""
+
+        if field_name not in self.changed_data:
+            return
+
         file = getattr(self.instance, field_name)
+        if not file:
+            return
+
         storage = file.storage
         path = file.path
         storage.delete(path)
+
+        storage = file.default.storage
+        path = file.default.path
+        storage.delete(path)
+
+        storage = file.thumbnail.storage
+        path = file.thumbnail.path
+        storage.delete(path)
+
+
+class EventPlaceForm(forms.ModelForm):
+    """Formulário de edição de local de evento."""
+    class Meta:
+        model = Event
+        fields = [
+            'place',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(EventPlaceForm, self).__init__(*args, **kwargs)
+        self._filter_places()
+
+    def _filter_places(self):
+        organization = self.instance.organization
+        place_qs = organization.places
+
+        self.fields['place'].widget = forms.Select(
+            attrs={'onclick': 'submit()'},
+            choices=place_qs.all()
+        )
+        self.fields['place'].queryset = place_qs.all()
