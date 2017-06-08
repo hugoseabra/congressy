@@ -6,6 +6,12 @@ from .event import (
     EventForm,
     EventPlaceForm,
     EventPublicationForm,
+    EventSocialMediaForm,
+)
+from .info import (
+    Info4ImagesForm,
+    InfoMainImageForm,
+    InfoVideoForm,
 )
 from .invitation import (
     InvitationCreateForm,

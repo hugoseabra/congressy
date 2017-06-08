@@ -1,0 +1,137 @@
+import os
+import shutil
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.sessions.backends.db import SessionStore
+from django.http import HttpRequest
+from django.test import TestCase
+from django.urls import reverse
+from django.utils import six
+
+from gatheros_event.models import Event, Info
+
+
+class MockSession(SessionStore):
+    def __init__(self):
+        super(MockSession, self).__init__()
+
+
+class MockRequest(HttpRequest):
+    def __init__(self, user, session=None):
+        self.user = user
+        if not session:
+            session = MockSession()
+
+        self.session = session
+        super(MockRequest, self).__init__()
+
+
+class EventInfoTest(TestCase):
+    fixtures = [
+        'kanu_locations_city_test',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+        '009_place',
+        '010_event',
+        '011_info',
+    ]
+
+    def setUp(self):
+        self.file_base_path = os.path.join(
+            settings.BASE_DIR,
+            'gatheros_event',
+            'tests',
+            'fixtures',
+            'images',
+            'info'
+        )
+        self.user = User.objects.get(username="lucianasilva@gmail.com")
+        self.client.force_login(self.user)
+
+    def _get_url(self, pk=None):
+        if not pk:
+            event = self._get_event()
+            pk = event.pk
+
+        return reverse('gatheros_event:event-info', kwargs={
+            'pk': pk
+        })
+
+    # noinspection PyMethodMayBeStatic
+    def _get_event(self):
+        return Event.objects.get(slug='cafe-expresso-como-preparar')
+
+    def tearDown(self):
+        event = self._get_event()
+        path = os.path.join(
+            settings.MEDIA_ROOT,
+            'event',
+            str(event.pk)
+        )
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+
+    def test_4_images(self):
+        file_names = {
+            'image1': 'image1.jpg',
+            'image2': 'image2.jpg',
+            'image3': 'image3.jpg',
+            'image4': 'image4.jpg',
+        }
+
+        data = {}
+        for field_name, file_name in six.iteritems(file_names):
+            file_path = os.path.join(self.file_base_path, file_name)
+            file = open(file_path, 'rb')
+            data[field_name] = file
+
+        event = self._get_event()
+        data['event'] = event.pk
+        data['text'] = event.description
+        data['config_type'] = Info.CONFIG_TYPE_4_IMAGES
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(
+            response,
+            "Informações de capa atualizadas com sucesso."
+        )
+
+    def test_main_image(self):
+        file_names = {
+            'main_image': 'image_main.jpg',
+        }
+
+        data = {}
+        for field_name, file_name in six.iteritems(file_names):
+            file_path = os.path.join(self.file_base_path, file_name)
+            file = open(file_path, 'rb')
+            data[field_name] = file
+
+        event = self._get_event()
+        data['event'] = event.pk
+        data['text'] = event.description
+        data['config_type'] = Info.CONFIG_TYPE_MAIN_IMAGE
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(
+            response,
+            "Informações de capa atualizadas com sucesso."
+        )
+
+    def test_video(self):
+        event = self._get_event()
+        data = {
+            'event': event.pk,
+            'text': event.description,
+            'config_type': Info.CONFIG_TYPE_VIDEO,
+            'youtube_video_id': 'jbVpFUGCw1o'
+        }
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(
+            response,
+            "Informações de capa atualizadas com sucesso."
+        )

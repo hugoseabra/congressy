@@ -9,6 +9,7 @@ from .event.form import (
     EventPublicationFormView,
     EventSubscriptionTypeFormView
 )
+from .event.info import EventInfoView
 from .event.list import EventListView
 from .event.panel import EventPanelView
 from .organization.invite import (

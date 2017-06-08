@@ -6,6 +6,11 @@ from . import views
 
 url_event = [
     url(
+        r'^(?P<pk>[\d]+)/info',
+        views.EventInfoView.as_view(),
+        name='event-info'
+    ),
+    url(
         r'^(?P<pk>[\d]+)/detail',
         views.EventDetailView.as_view(),
         name='event-detail'

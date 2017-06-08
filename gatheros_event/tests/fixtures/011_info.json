@@ -4,12 +4,12 @@
     "pk": 4,
     "fields": {
       "text": "\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de \"Conte\u00fado aqui, conte\u00fado aqui\", fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).",
-      "config_type": null,
-      "image_main": null,
-      "image1": null,
-      "image2": null,
-      "image3": null,
-      "image4": null,
+      "config_type": "image_main",
+      "image_main": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
       "youtube_video_id": null
     }
   },
@@ -18,12 +18,12 @@
     "pk": 1,
     "fields": {
       "text": "\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de \"Conte\u00fado aqui, conte\u00fado aqui\", fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).",
-      "config_type": null,
-      "image_main": null,
-      "image1": null,
-      "image2": null,
-      "image3": null,
-      "image4": null,
+      "config_type": "4_images",
+      "image_main": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
       "youtube_video_id": null
     }
   },
@@ -31,14 +31,14 @@
     "model": "gatheros_event.info",
     "pk": 3,
     "fields": {
-      "text": "\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de \"Conte\u00fado aqui, conte\u00fado aqui\", fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).",
-      "config_type": null,
+      "text": "<p style=\"line-height: 25px;text-align: justify\">\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de <span style=\"color:red\">\"Conte\u00fado aqui, conte\u00fado aqui\"</span>, fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).</p>",
+      "config_type": "video",
       "image_main": null,
       "image1": null,
       "image2": null,
       "image3": null,
       "image4": null,
-      "youtube_video_id": null
+      "youtube_video_id": "jbVpFUGCw1o"
     }
   },
   {
@@ -46,12 +46,12 @@
     "pk": 2,
     "fields": {
       "text": "\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de \"Conte\u00fado aqui, conte\u00fado aqui\", fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).",
-      "config_type": null,
-      "image_main": null,
-      "image1": null,
-      "image2": null,
-      "image3": null,
-      "image4": null,
+      "config_type": "image_main",
+      "image_main": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
       "youtube_video_id": null
     }
   },
@@ -60,12 +60,12 @@
     "pk": 11,
     "fields": {
       "text": "\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de \"Conte\u00fado aqui, conte\u00fado aqui\", fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).",
-      "config_type": null,
-      "image_main": null,
-      "image1": null,
-      "image2": null,
-      "image3": null,
-      "image4": null,
+      "config_type": "4_images",
+      "image_main": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
       "youtube_video_id": null
     }
   },
@@ -74,12 +74,12 @@
     "pk": 10,
     "fields": {
       "text": "10/05/2017",
-      "config_type": null,
-      "image_main": null,
-      "image1": null,
-      "image2": null,
-      "image3": null,
-      "image4": null,
+      "config_type": "video",
+      "image_main": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
       "youtube_video_id": null
     }
   },
@@ -88,12 +88,12 @@
     "pk": 8,
     "fields": {
       "text": "\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de \"Conte\u00fado aqui, conte\u00fado aqui\", fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).",
-      "config_type": null,
-      "image_main": null,
-      "image1": null,
-      "image2": null,
-      "image3": null,
-      "image4": null,
+      "config_type": "image_main",
+      "image_main": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
       "youtube_video_id": null
     }
   },
@@ -102,12 +102,12 @@
     "pk": 9,
     "fields": {
       "text": "\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de \"Conte\u00fado aqui, conte\u00fado aqui\", fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).",
-      "config_type": null,
-      "image_main": null,
-      "image1": null,
-      "image2": null,
-      "image3": null,
-      "image4": null,
+      "config_type": "4_images",
+      "image_main": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
       "youtube_video_id": null
     }
   },
@@ -116,12 +116,12 @@
     "pk": 5,
     "fields": {
       "text": "\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de \"Conte\u00fado aqui, conte\u00fado aqui\", fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).",
-      "config_type": null,
-      "image_main": null,
-      "image1": null,
-      "image2": null,
-      "image3": null,
-      "image4": null,
+      "config_type": "video",
+      "image_main": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
       "youtube_video_id": null
     }
   },
@@ -130,12 +130,12 @@
     "pk": 6,
     "fields": {
       "text": "\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de \"Conte\u00fado aqui, conte\u00fado aqui\", fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).",
-      "config_type": null,
-      "image_main": null,
-      "image1": null,
-      "image2": null,
-      "image3": null,
-      "image4": null,
+      "config_type": "image_main",
+      "image_main": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
       "youtube_video_id": null
     }
   },
@@ -144,12 +144,12 @@
     "pk": 7,
     "fields": {
       "text": "\u00c9 um fato conhecido de todos que um leitor se distrair\u00e1 com o conte\u00fado de texto leg\u00edvel de uma p\u00e1gina quando estiver examinando sua diagrama\u00e7\u00e3o. A vantagem de usar Lorem Ipsum \u00e9 que ele tem uma distribui\u00e7\u00e3o normal de letras, ao contr\u00e1rio de \"Conte\u00fado aqui, conte\u00fado aqui\", fazendo com que ele tenha uma apar\u00eancia similar a de um texto leg\u00edvel. Muitos softwares de publica\u00e7\u00e3o e editores de p\u00e1ginas na internet agora usam Lorem Ipsum como texto-modelo padr\u00e3o, e uma r\u00e1pida busca por 'lorem ipsum' mostra v\u00e1rios websites ainda em sua fase de constru\u00e7\u00e3o. V\u00e1rias vers\u00f5es novas surgiram ao longo dos anos, eventualmente por acidente, e \u00e0s vezes de prop\u00f3sito (injetando humor, e coisas do g\u00eanero).",
-      "config_type": null,
-      "image_main": null,
-      "image1": null,
-      "image2": null,
-      "image3": null,
-      "image4": null,
+      "config_type": "4_images",
+      "image_main": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
       "youtube_video_id": null
     }
   }

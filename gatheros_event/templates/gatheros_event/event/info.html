@@ -1,0 +1,78 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+    {% get_media_prefix as media_url %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:event-panel' object.pk %}">Voltar</a>
+    </div>
+    <hr/>
+    <h1>Capa Principal do Evento</h1>
+    <h2>{{ object.name }}</h2>
+    <div style="padding: 10px;background-color: #DDDDDD;text-align: center;"></div>
+    <div style="margin-bottom:10px; width: 100%;height:3px;background-color: {% if object.published %}darkgreen{% else %}darkred{% endif %}"></div>
+
+    <table>
+        <tr>
+            <th><label for="config_type">Tipo de Capa:</label></th>
+            <td>
+                <select id="config_type" name="config_type" onchange="window.location.href=window.location.pathname+'?type='+this.value">
+                    {% for key, config_type in config_types %}
+                        <option {% if selected_config_type == key %}selected=""{% endif %} value="{{ key }}">{{ config_type }}</option>
+                    {% endfor %}
+                </select>
+                {% if show_reset_button %}
+                    <button type="button" onclick="window.location.href=window.location.pathname">Resetar</button>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    <hr />
+    <form method="post" action="{% url 'gatheros_event:event-info' object.pk %}" enctype="multipart/form-data">{% csrf_token %}
+        <table width="60%" border="0">
+            {{ form.as_table }}
+            <tr>
+                <td colspan="3" style="text-align: center;">
+                    <br />
+                    <input type="submit" value="Atualizar capa"/>
+                    <br />
+                    <br />
+                </td>
+            </tr>
+        </table>
+        <hr />
+        <table width="60%" border="0">
+            <tr>
+                <td style="vertical-align: top;">
+                    {% if object.info %}
+                        {{ object.info.text|safe }}
+                    {% endif %}
+                </td>
+                <td width="50%" style="padding:10px">
+                    {% if selected_config_type == object.info.CONFIG_TYPE_VIDEO %}
+                        <img width="480px" height="360px" src="https://img.youtube.com/vi/{{ object.info.youtube_video_id }}/0.jpg"/>
+                    {% elif selected_config_type == object.info.CONFIG_TYPE_MAIN_IMAGE and object.info.image_main %}
+                        <img src="{{ object.info.image_main.thumbnail.url }}"/>
+                    {% elif selected_config_type == object.info.CONFIG_TYPE_4_IMAGES %}
+                        <div style="width:415px">
+                            {% if object.info.image1 %}
+                                <img style="float:left;margin: 3px" src="{{ object.info.image1.thumbnail.url }}" />
+                            {% endif %}
+                            {% if object.info.image2 %}
+                                <img style="float:left;margin: 3px" src="{{ object.info.image2.thumbnail.url }}" />
+                            {% endif %}
+                            {% if object.info.image3 %}
+                                <img style="float:left;margin: 3px" src="{{ object.info.image3.thumbnail.url }}" />
+                            {% endif %}
+                            {% if object.info.image4 %}
+                                <img style="float:left;margin: 3px" src="{{ object.info.image4.thumbnail.url }}" />
+                            {% endif %}
+                            <div style="clear:both"></div>
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </form>
+
+{% endblock %}
