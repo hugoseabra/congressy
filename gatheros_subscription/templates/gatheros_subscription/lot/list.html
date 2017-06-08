@@ -34,7 +34,11 @@
                     {% endif %}
                     <td style="background: #FFF;padding:10px;margin-bottom: 3px">
                         <div>{{ forloop.counter }} -
-                            <a href="#">{{ lot.name }}</a>
+                            {% if user has 'gatheros_subscription.change_lot' of lot %}
+                                <a href="{% url 'gatheros_subscription:lot-edit' event.pk lot.pk %}">{{ lot.name }}</a>
+                            {% else %}
+                                {{ lot.name }}
+                            {% endif %}
                             - {% if lot.price and lot.price > 0 %}Pago{% else %}Gratuito{% endif %}
                         </div>
                         <hr/>

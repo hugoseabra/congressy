@@ -14,6 +14,7 @@ from gatheros_event.forms import (
     EventForm,
     EventPlaceForm,
     EventPublicationForm,
+    EventSocialMediaForm,
 )
 from gatheros_event.models import Event, Organization
 
@@ -192,7 +193,14 @@ class EventBannersFormTest(TestCase):
     ]
 
     def setUp(self):
-        self.file_base_path = os.path.join(settings.MEDIA_ROOT, 'test')
+        self.file_base_path = os.path.join(
+            settings.BASE_DIR,
+            'gatheros_event',
+            'tests',
+            'fixtures',
+            'images',
+            'event'
+        )
         self.event_path = os.path.join(settings.MEDIA_ROOT, 'event')
         self.persisted_path = 'event'
 
@@ -335,3 +343,37 @@ class EventPlaceFormTest(TestCase):
 
         event = self._get_event()
         self.assertIsNone(event.place)
+
+
+class EventSocialMediaFormTest(TestCase):
+    fixtures = [
+        '007_organization',
+        '009_place',
+        '010_event',
+    ]
+
+    # noinspection PyMethodMayBeStatic
+    def _get_event(self):
+        return Event.objects.get(slug='encontro-de-lideres-2017')
+
+    def test_social_media_edition_event(self):
+        data = {
+            'website': 'http://seoresultados.com',
+            'facebook': 'https://facebook.com/seo',
+            'twitter': 'https://twitter.com/seo',
+            'linkedin': 'https://linkedin.com/seo',
+            'skype': 'seoresultados',
+        }
+
+        form = EventSocialMediaForm(instance=self._get_event(), data=data)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        event = self._get_event()
+        for key, value in six.iteritems(data):
+            model_v = getattr(event, key)
+
+            if hasattr(model_v, 'pk'):
+                model_v = model_v.pk
+
+            self.assertEqual(model_v, value)

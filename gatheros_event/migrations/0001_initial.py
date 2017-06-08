@@ -13,6 +13,7 @@ from django.db import migrations, models
 
 from core.model import validator
 from gatheros_event.models.event import get_image_path
+from gatheros_event.models.info import get_image_path as get_info_image_path
 
 
 def load_initial_data(*_):
@@ -708,7 +709,6 @@ class Migration(migrations.Migration):
                     verbose_name='evento'
                 )),
                 ('config_type', models.CharField(
-                    blank=True,
                     choices=[
                         (
                             'image_main',
@@ -721,52 +721,72 @@ class Migration(migrations.Migration):
                         ('video', 'Vídeo (Youtube)')
                     ],
                     max_length=15,
-                    null=True,
                     verbose_name='Exibição'
                 )),
-                ('image_main', models.ImageField(
+                ('image_main', stdimage.models.StdImageField(
                     blank=True,
-                    help_text='Imagem única da descrição do evento'
-                              ' (Largura: 360px).',
+                    help_text='Imagem única da descrição do evento:'
+                              ' 750px x 874px',
                     null=True,
-                    upload_to='',
-                    verbose_name='imagem principal'
-                )),
-                ('image1', models.ImageField(
+                    upload_to=get_info_image_path,
+                    validators=[
+                        stdimage.validators.MinSizeValidator(750, 874),
+                        stdimage.validators.MaxSizeValidator(1400, 1400)
+                    ],
+                    verbose_name='imagem principal')
+                 ),
+                ('image1', stdimage.models.StdImageField(
                     blank=True,
-                    help_text='Tamanho: 300px x 300px',
+                    help_text='Tamanho: 350px x 350px',
                     null=True,
-                    upload_to='',
+                    upload_to=get_info_image_path,
+                    validators=[
+                        stdimage.validators.MinSizeValidator(350, 350),
+                        stdimage.validators.MaxSizeValidator(1400, 1400)
+                    ],
                     verbose_name='imagem pequena #1'
                 )),
-                ('image2', models.ImageField(
+                ('image2', stdimage.models.StdImageField(
                     blank=True,
-                    help_text='Tamanho: 300px x 300px',
+                    help_text='Tamanho: 350px x 350px',
                     null=True,
-                    upload_to='',
+                    upload_to=get_info_image_path,
+                    validators=[
+                        stdimage.validators.MinSizeValidator(350, 350),
+                        stdimage.validators.MaxSizeValidator(1400, 1400)
+                    ],
                     verbose_name='imagem pequena #2'
                 )),
-                ('image3', models.ImageField(
+                ('image3', stdimage.models.StdImageField(
                     blank=True,
-                    help_text='Tamanho: 300px x 300px',
+                    help_text='Tamanho: 350px x 350px',
                     null=True,
-                    upload_to='',
+                    upload_to=get_info_image_path,
+                    validators=[
+                        stdimage.validators.MinSizeValidator(350, 350),
+                        stdimage.validators.MaxSizeValidator(1400, 1400)
+                    ],
                     verbose_name='imagem pequena #3'
                 )),
-                ('image4', models.ImageField(
+                ('image4', stdimage.models.StdImageField(
                     blank=True,
-                    help_text='Tamanho: 300px x 300px',
+                    help_text='Tamanho: 350px x 350px',
                     null=True,
-                    upload_to='',
+                    upload_to=get_info_image_path,
+                    validators=[
+                        stdimage.validators.MinSizeValidator(350, 350),
+                        stdimage.validators.MaxSizeValidator(1400, 1400)
+                    ],
                     verbose_name='imagem pequena #4'
                 )),
-                ('youtube_video_id', models.TextField(
+                ('youtube_video_id', models.CharField(
                     blank=True,
-                    help_text='x: https://www.youtube.com/watch?v=xxxx',
+                    help_text='Exemplo: '
+                              'https://www.youtube.com/watch?v=id_do_video',
+                    max_length=12,
                     null=True,
                     verbose_name='ID do Youtube'
                 )),
-
             ],
             options={
                 'verbose_name': 'Informação de Evento',

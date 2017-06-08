@@ -3,14 +3,21 @@
 Informação relacionada a um evento para estrutrar uma exibição mais elaborada
 das informações sobre o evento para os usuaŕios.
 """
+import os
+from django.utils.html import strip_tags
 
 from django.db import models
+from stdimage import StdImageField
+from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
 from . import Event
-from .rules import info as rule
 
 
-# @TODO redimensionar banner de topo para alt. e lar. corretas - 1920 x 900
+# @TODO Excluir imagens banners ao deletar evento.
+
+def get_image_path(instance, filename):
+    return os.path.join('event', str(instance.event.id), filename)
+
 
 class Info(models.Model):
     """ Informações de evento """
@@ -38,46 +45,60 @@ class Info(models.Model):
 
     config_type = models.CharField(
         max_length=15,
-        null=True,
-        blank=True,
         verbose_name='Exibição',
         choices=CONFIG_TYPE_CHOICES
     )
-    image_main = models.ImageField(
+    image_main = StdImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
         verbose_name='imagem principal',
-        null=True,
-        blank=True,
-        help_text="Imagem única da descrição do evento (Largura: 360px)."
+        variations={'default': (750, 874), 'thumbnail': (200, 233, True)},
+        validators=[MinSizeValidator(750, 874), MaxSizeValidator(1400, 1400)],
+        help_text="Imagem única da descrição do evento: 750px x 874px"
     )
-    image1 = models.ImageField(
+    image1 = StdImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
         verbose_name='imagem pequena #1',
-        null=True,
-        blank=True,
-        help_text="Tamanho: 300px x 300px"
+        variations={'default': (350, 350), 'thumbnail': (200, 200, True)},
+        validators=[MinSizeValidator(350, 350), MaxSizeValidator(1400, 1400)],
+        help_text="Tamanho: 350px x 350px"
     )
-    image2 = models.ImageField(
+    image2 = StdImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
         verbose_name='imagem pequena #2',
-        null=True,
-        blank=True,
-        help_text="Tamanho: 300px x 300px"
+        variations={'default': (350, 350), 'thumbnail': (200, 200, True)},
+        validators=[MinSizeValidator(350, 350), MaxSizeValidator(1400, 1400)],
+        help_text="Tamanho: 350px x 350px"
     )
-    image3 = models.ImageField(
+    image3 = StdImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
         verbose_name='imagem pequena #3',
-        null=True,
-        blank=True,
-        help_text="Tamanho: 300px x 300px"
+        variations={'default': (350, 350), 'thumbnail': (200, 200, True)},
+        validators=[MinSizeValidator(350, 350), MaxSizeValidator(1400, 1400)],
+        help_text="Tamanho: 350px x 350px"
     )
-    image4 = models.ImageField(
+    image4 = StdImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
         verbose_name='imagem pequena #4',
-        null=True,
-        blank=True,
-        help_text="Tamanho: 300px x 300px"
+        variations={'default': (350, 350), 'thumbnail': (200, 200, True)},
+        validators=[MinSizeValidator(350, 350), MaxSizeValidator(1400, 1400)],
+        help_text="Tamanho: 350px x 350px"
     )
-    youtube_video_id = models.TextField(
+    youtube_video_id = models.CharField(
+        max_length=12,
         verbose_name='ID do Youtube',
         null=True,
         blank=True,
-        help_text="x: https://www.youtube.com/watch?v=xxxx"
+        help_text="Exemplo: https://www.youtube.com/watch?v=id_do_video"
     )
 
     class Meta:
@@ -89,11 +110,6 @@ class Info(models.Model):
         return self.event.name
 
     def save(self, *args, **kwargs):
-        self.check_rules()
+        self.event.description = strip_tags(self.text)
         super(Info, self).save(*args, **kwargs)
-
-    def check_rules(self):
-        """Verifica regras de informação de evento."""
-        rule.rule_1_imagem_unica_somente(self)
-        rule.rule_2_4_imagens_somente(self)
-        rule.rule_3_youtube_video_somente(self)
+        self.event.save()

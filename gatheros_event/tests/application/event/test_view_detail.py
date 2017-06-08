@@ -40,7 +40,14 @@ class EventDetailBannersUploadTest(TestCase):
     ]
 
     def setUp(self):
-        self.file_base_path = os.path.join(settings.MEDIA_ROOT, 'test')
+        self.file_base_path = os.path.join(
+            settings.BASE_DIR,
+            'gatheros_event',
+            'tests',
+            'fixtures',
+            'images',
+            'event'
+        )
         self.event_path = os.path.join(settings.MEDIA_ROOT, 'event')
         self.persisted_path = 'event'
 
@@ -79,10 +86,6 @@ class EventDetailBannersUploadTest(TestCase):
         path = os.path.join(self.event_path, str(event.pk))
         if os.path.isdir(path):
             shutil.rmtree(path)
-
-    def test_status_authenticated_200(self):
-        response = self.client.get(self._get_url())
-        self.assertEqual(response.status_code, 200)
 
     def test_upload(self):
         file_names = {
@@ -209,3 +212,52 @@ class EventDetailPlaceTest(TestCase):
         # Verifica update
         event = self._get_event()
         self.assertIsNone(event.place)
+
+
+class EventDetailSocialMediaTest(TestCase):
+    fixtures = [
+        'kanu_locations_city_test',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+        '009_place',
+        '010_event',
+    ]
+
+    def setUp(self):
+        self.user = User.objects.get(username="lucianasilva@gmail.com")
+        self.client.force_login(self.user)
+
+    def _get_url(self, pk=None):
+        if not pk:
+            event = self._get_event()
+            pk = event.pk
+
+        return reverse('gatheros_event:event-detail', kwargs={'pk': pk})
+
+    # noinspection PyMethodMayBeStatic
+    def _get_event(self):
+        return Event.objects.get(slug='a-arte-de-usar-linux')
+
+    def test_update_social_media(self):
+        event = self._get_event()
+        place = event.place
+
+        organization = event.organization
+        other_place = organization.places.exclude(pk=place.pk).first()
+        assert other_place is not None
+
+        # Envia outro local para atualização
+        response = self.client.post(self._get_url(), data={
+            'website': 'http://seoresultados.com',
+            'facebook': 'https://facebook.com/seoresultados',
+            'twitter': 'https://twitter.com/seoresultados',
+            'linkedin': 'https://linkedin.com/seoresultados',
+            'skype': 'seoresultados',
+            'submit_type': 'update_social_media',
+        }, follow=True)
+        self.assertContains(
+            response,
+            'Informações sociais atualizadas com sucesso.'
+        )

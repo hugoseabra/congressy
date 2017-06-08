@@ -217,7 +217,7 @@ class EventInfoAdmin(admin.ModelAdmin):
     """
     Admin para Event Info
     """
-    list_display = ('event', 'pk')
+    list_display = ('event', 'config_type', 'pk')
 
 
 @admin.register(Member)

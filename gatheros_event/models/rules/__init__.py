@@ -2,7 +2,7 @@
 Regras de negócio dos modelos.
 """
 
-from . import event, info, invitation, member
+from . import event, invitation, member
 
 
 def check_invite(entity):
