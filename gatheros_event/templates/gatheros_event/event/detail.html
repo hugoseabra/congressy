@@ -43,9 +43,9 @@
                     </td>
                     <td style="border: 1px solid #DDD;width:15%">
                         {% if field.value %}
-                            <img style="border: 1px solid dimgray" width="100%" src="{{ field.value.url }}" />
+                            <img style="border: 1px solid dimgray" width="100%" src="{{ field.value.thumbnail.url }}" />
                         {% else %}
-                            <div style="width:200px;height: 200px">&nbsp;</div>
+                            <div style="width:180px;height: 80px">&nbsp;</div>
                         {% endif %}
                     </td>
                 </tr>
@@ -66,7 +66,7 @@
 
     <hr/>
     <h3>Local do evento:</h3>
-    <form name="place_form" method="post" action="{% url 'gatheros_event:event-detail' object.pk %}">{% csrf_token %}
+    <form name="place_form" method="post" action="{% url 'gatheros_event:event-detail' object.pk %}" enctype="multipart/form-data">{% csrf_token %}
         {% if place_form.errors %}
             {% for field in place_form %}
                 {% for error in field.errors %}
@@ -75,7 +75,7 @@
                     </div>
                 {% endfor %}
             {% endfor %}
-            {% for error in banner_form.non_field_errors %}
+            {% for error in place_form.non_field_errors %}
                 <div class="alert alert-danger">
                     <strong>{{ error|escape }}</strong>
                 </div>
@@ -98,5 +98,33 @@
 
     <hr/>
     <h3>Redes Sociais:</h3>
+    <form name="socialmedia_form" method="post" action="{% url 'gatheros_event:event-detail' object.pk %}">{% csrf_token %}
+        {% if socialmedia_form.errors %}
+            {% for field in place_form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for error in socialmedia_form.non_field_errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <table cellpadding="0" cellspacing="0" border="0" width="60%">
+            {{ socialmedia_form }}
+            <tr>
+                <td colspan="3" style="text-align: center;">
+                    <br />
+                    <input type="submit" value="Atualizar informaões sociais"/>
+                    <br />
+                    <br />
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" name="submit_type" value="update_social_media" />
 
+    </form>
 {% endblock %}

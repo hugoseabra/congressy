@@ -130,3 +130,16 @@ class EventPlaceForm(forms.ModelForm):
             choices=place_qs.all()
         )
         self.fields['place'].queryset = place_qs.all()
+
+
+class EventSocialMediaForm(forms.ModelForm):
+    """Formulário de edição de local de evento."""
+    class Meta:
+        model = Event
+        fields = [
+            'website',
+            'facebook',
+            'linkedin',
+            'twitter',
+            'skype',
+        ]
