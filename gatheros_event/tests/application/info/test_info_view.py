@@ -74,6 +74,20 @@ class EventInfoTest(TestCase):
         if os.path.isdir(path):
             shutil.rmtree(path)
 
+    def test_text(self):
+        event = self._get_event()
+        data = {
+            'event': event.pk,
+            'text': event.description,
+            'config_type': Info.CONFIG_TYPE_TEXT_ONLY,
+        }
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(
+            response,
+            "Informações de capa atualizadas com sucesso."
+        )
+
     def test_4_images(self):
         file_names = {
             'image1': 'image1.jpg',

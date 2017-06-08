@@ -9,6 +9,7 @@ from django.utils import six
 from gatheros_event.forms import (
     Info4ImagesForm,
     InfoMainImageForm,
+    InfoTextForm,
     InfoVideoForm,
 )
 from gatheros_event.models import Event, Info
@@ -53,13 +54,52 @@ class BaseInfoFormTest(TestCase):
             shutil.rmtree(path)
 
 
+class InfoTextFormTest(BaseInfoFormTest):
+    def test_new_info(self):
+        info = self._get_info()
+        info.delete()
+
+        event = self._get_event()
+        data = {
+            'event': event.pk,
+            'text': info.event.description,
+            'config_type': Info.CONFIG_TYPE_TEXT_ONLY,
+        }
+
+        form = InfoTextForm(data=data)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        event = self._get_event()
+        info = event.info
+        self.assertIsInstance(info, Info)
+        self.assertEqual(info.config_type, Info.CONFIG_TYPE_TEXT_ONLY)
+
+    def test_video(self):
+        info = self._get_info()
+        assert info is not None
+
+        data = {
+            'event': info.event.pk,
+            'text': info.event.description,
+            'config_type': Info.CONFIG_TYPE_TEXT_ONLY,
+        }
+
+        form = InfoTextForm(instance=info, data=data)
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        info = self._get_info()
+        self.assertEqual(info.config_type, Info.CONFIG_TYPE_TEXT_ONLY)
+
+
 class Info4ImagesFormTest(BaseInfoFormTest):
     def test_new_info(self):
         info = self._get_info()
         data = {
             'event': info.event_id,
-            'text': info.event.description,
             'config_type': Info.CONFIG_TYPE_4_IMAGES,
+            'text': info.event.description,
         }
         info.delete()
 

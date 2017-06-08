@@ -33,6 +33,26 @@ class BaseModelFileForm(forms.ModelForm):
         storage.delete(path)
 
 
+class InfoTextForm(BaseModelFileForm):
+    """Formulário de edição text de informação de evento."""
+
+    class Meta:
+        model = Info
+        fields = [
+            'text',
+            'event',
+            'config_type',
+        ]
+        widgets = {
+            'event': forms.HiddenInput(),
+            'config_type': forms.HiddenInput(),
+        }
+
+    # noinspection PyMethodMayBeStatic
+    def clean_config_type(self):
+        return Info.CONFIG_TYPE_TEXT_ONLY
+
+
 class Info4ImagesForm(BaseModelFileForm):
     """Formulário de edição de 4 imagens pequenas"""
 

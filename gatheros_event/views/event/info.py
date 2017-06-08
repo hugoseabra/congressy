@@ -59,7 +59,9 @@ class EventInfoView(AccountMixin, DetailView):
         :return: Formulário
         """
 
-        if config_type == Info.CONFIG_TYPE_4_IMAGES:
+        if config_type == Info.CONFIG_TYPE_TEXT_ONLY:
+            form_class = forms.InfoTextForm
+        elif config_type == Info.CONFIG_TYPE_4_IMAGES:
             form_class = forms.Info4ImagesForm
         elif config_type == Info.CONFIG_TYPE_MAIN_IMAGE:
             form_class = forms.InfoMainImageForm

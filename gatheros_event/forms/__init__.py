@@ -11,6 +11,7 @@ from .event import (
 from .info import (
     Info4ImagesForm,
     InfoMainImageForm,
+    InfoTextForm,
     InfoVideoForm,
 )
 from .invitation import (

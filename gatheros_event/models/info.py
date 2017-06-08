@@ -22,11 +22,13 @@ def get_image_path(instance, filename):
 class Info(models.Model):
     """ Informações de evento """
 
+    CONFIG_TYPE_TEXT_ONLY = 'text_only'
     CONFIG_TYPE_MAIN_IMAGE = 'image_main'
     CONFIG_TYPE_4_IMAGES = '4_images'
     CONFIG_TYPE_VIDEO = 'video'
 
     CONFIG_TYPE_CHOICES = (
+        (CONFIG_TYPE_TEXT_ONLY, 'Somente texto'),
         (
             CONFIG_TYPE_MAIN_IMAGE,
             'Imagem única (Largura 360px, Altura: livre)'
@@ -46,6 +48,7 @@ class Info(models.Model):
     config_type = models.CharField(
         max_length=15,
         verbose_name='Exibição',
+        default=CONFIG_TYPE_TEXT_ONLY,
         choices=CONFIG_TYPE_CHOICES
     )
     image_main = StdImageField(
