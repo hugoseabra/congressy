@@ -67,7 +67,7 @@
                             <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:lot-list' object.pk %}">Lotes</a></div>
                         {% endif %}
                         <div style="padding:15px">&rightarrow; <a href="#">Formulário</a></div>
-                        <div style="padding:15px">&rightarrow; <a href="#">Lista de inscritos</a></div>
+                        <div style="padding:15px">&rightarrow; <a href="#">Pré-inscrições</a></div>
                         <div style="padding:15px">&rightarrow; <a href="#">Credenciamento</a></div>
                         <div style="padding:15px">&rightarrow; <a href="#">Exportação de dados</a></div>
                     </div>
@@ -121,7 +121,7 @@
                                 {% if object.place %}
                                     <p>
                                         <strong>Local:</strong> {{ object.place.name }}
-                                        [<a href="#">Alterar</a>]
+                                        [<a href="{% url 'gatheros_event:event-detail' object.pk %}">Alterar</a>]
                                     </p>
                                     <p style="color:dimgray;text-indent: 20px;">{{ object.place.get_complete_address }}</p>
                                 {% else %}
@@ -145,7 +145,7 @@
                                                Insira uma descrição. Será muito bom para localizar o seu evento nos sites de busca.
                                            </span>
                                         </p>
-                                        <p style="text-align: center;">[<a href="#">Alterar</a>]</p>
+                                        <p style="text-align: center;">[<a href="{% url 'gatheros_event:event-info' object.pk %}">Alterar</a>]</p>
                                     {% endif %}
                                 </div>
                         </td>
@@ -232,8 +232,7 @@
                                 </div>
                                 {% if user has 'gatheros_event.change_event' of object %}
                                     <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                        <a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar
-                                            data</a>
+                                        <a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar data</a>
                                     </div>
                                 {% endif %}
                             </div>

@@ -3,41 +3,79 @@
 
 {% block user %}{% endblock %}
 
+{% block extrastyle %}
+    <style type="text/css">
+        body {
+            background-color: #dddddd;
+        }
+
+        form {
+            background-color: #FFF;
+            width: 320px;
+            margin: 100px auto;
+            border: 5px solid #CCCCCC;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        form h1 {
+            text-align: center;
+        }
+
+        form div {
+            padding: 10px;
+        }
+
+        .submit-row {
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
+{% block extrascript %}
+    <script type="application/javascript">
+        window.setTimeout(function() {
+            document.getElementById("id_username").focus();
+        }, 500);
+    </script>
+{% endblock %}
+
 {% block content %}
-{% if form.errors and not form.non_field_errors %}
-<p class="errornote">
-Corrija os erros abaixo
-</p>
-{% endif %}
+    {% if form.errors and not form.non_field_errors %}
+        <p class="errornote">
+            Corrija os erros abaixo
+        </p>
+    {% endif %}
 
-{% if form.non_field_errors %}
-{% for error in form.non_field_errors %}
-<p class="errornote">
-    {{ error }}
-</p>
-{% endfor %}
-{% endif %}
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <p class="errornote">
+                {{ error }}
+            </p>
+        {% endfor %}
+    {% endif %}
 
-<form action="" method="post" id="login-form">{% csrf_token %}
-  <div class="form-row">
-    {{ form.username.errors }}
-    {{ form.username.label_tag }} {{ form.username }}
-  </div>
-  <div class="form-row">
-    {{ form.password.errors }}
-    {{ form.password.label_tag }} {{ form.password }}
-    <input type="hidden" name="next" value="{{ next }}" />
-  </div>
-  {% url 'admin_password_reset' as password_reset_url %}
-  {% if password_reset_url %}
-  <div class="password-reset-link">
-    <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
-  </div>
-  {% endif %}
-  <div class="submit-row">
-    <label>&nbsp;</label><input type="submit" value="{% trans 'Log in' %}" />
-  </div>
-</form>
+    <form action="" method="post" id="login-form">{% csrf_token %}
+        <h1>Login</h1>
+        <div class="form-row">
+            {{ form.username.errors }}
+            {{ form.username.label_tag }} {{ form.username }}
+        </div>
+        <div class="form-row">
+            {{ form.password.errors }}
+            {{ form.password.label_tag }} {{ form.password }}
+            <input type="hidden" name="next" value="{{ next }}"/>
+        </div>
+        {% url 'admin_password_reset' as password_reset_url %}
+        {% if password_reset_url %}
+            <div class="password-reset-link">
+                <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
+            </div>
+        {% endif %}
+        <div class="submit-row">
+            <input type="submit" value="{% trans 'Log in' %}"/>
+        </div>
+    </form>
 
 
 {% endblock %}
