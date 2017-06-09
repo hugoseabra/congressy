@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
@@ -18,10 +19,16 @@ class PlaceAddView(AccountMixin, CreateView):
         return initial
 
     def dispatch(self, request, *args, **kwargs):
-        # if not self._can_view():
-        #     return redirect(reverse_lazy('gatheros_event:event-list'))
+        dispatch = super(PlaceAddView, self).dispatch(request, *args, **kwargs)
 
-        return super(PlaceAddView, self).dispatch(request, *args, **kwargs)
+        if not self._can_view():
+            messages.warning(
+                request,
+                'Você não tem permissão para adicionar local.'
+            )
+            return redirect(reverse_lazy('gatheros_event:event-list'))
+
+        return dispatch
 
     def post(self, request, *args, **kwargs):
         next_path = request.POST.get('next')
@@ -59,6 +66,6 @@ class PlaceAddView(AccountMixin, CreateView):
 
     def _can_view(self):
         return self.request.user.has_perm(
-            'gatheros_event.add_place',
+            'gatheros_event.can_add_place',
             self.organization
         )

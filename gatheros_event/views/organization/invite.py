@@ -20,6 +20,24 @@ class InvitationCreateView(AccountMixin, FormView):
         'gatheros_event:invitation-success'
     )
 
+    def dispatch(self, request, *args, **kwargs):
+        dispatch = super(InvitationCreateView, self).dispatch(
+            request,
+            *args,
+            **kwargs
+        )
+        if not self._can_view():
+            if self.organization.internal:
+                messages.warning(request, 'Você não está em uma organização.')
+                return redirect(reverse_lazy('gatheros_front:start'))
+            else:
+                messages.warning(request, 'Você não pode realizar esta ação.')
+                return redirect(reverse_lazy(
+                    'gatheros_event:organization-panel'
+                ))
+
+        return dispatch
+
     def get_initial(self):
         """
         Valores iniciais para os campos do form
@@ -48,6 +66,14 @@ class InvitationCreateView(AccountMixin, FormView):
         form.send_invite()
 
         return super(InvitationCreateView, self).form_valid(form)
+
+    def _can_view(self):
+        not_internal = self.organization.internal is False
+        can_view = self.request.user.has_perm(
+            'gatheros_event.can_invite',
+            self.organization
+        )
+        return not_internal and can_view
 
 
 class InvitationCreateSuccessView(AccountMixin, TemplateView):

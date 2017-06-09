@@ -370,7 +370,8 @@ class Migration(migrations.Migration):
                 'permissions': (
                     ("can_invite", "Can invite members"),
                     ('can_view', 'Can view'),
-                    ('can_add_event', 'Can add event')
+                    ('can_add_event', 'Can add event'),
+                    ("can_add_place", "Can add place related to organization"),
                 ),
             },
         ),
@@ -710,16 +711,14 @@ class Migration(migrations.Migration):
                 )),
                 ('config_type', models.CharField(
                     choices=[
-                        (
-                            'image_main',
-                            'Imagem única (Largura 360px, Altura: livre)'
-                        ),
-                        (
-                            '4_images',
-                            '4 imagens pequenas (Tamanho: 300px x 300px)'
-                        ),
+                        ('text_only', 'Somente texto'),
+                        ('image_main', 'Imagem única'
+                                       ' (Largura 360px, Altura: livre)'),
+                        ('4_images', '4 imagens pequenas'
+                                     ' (Tamanho: 300px x 300px)'),
                         ('video', 'Vídeo (Youtube)')
                     ],
+                    default='text_only',
                     max_length=15,
                     verbose_name='Exibição'
                 )),

@@ -49,11 +49,11 @@
         <p>
             <a href="{% url 'gatheros_event:invitation' %}?organization={{ organization.pk }}">Convidar membros</a>
         </p>
+    {% endif %}
+    {% if user has 'gatheros_event.can_add_place' of organization %}
         <p>
             <a href="{% url 'gatheros_event:organization-add-place' %}">Adicionar local</a>
         </p>
-    {% else %}
-        <b>Não pode convidar membros</b>
     {% endif %}
 
     <br /><br /><br /><br /><br />
@@ -61,8 +61,6 @@
     <pre>
         Condição:
         ---------
-
-        = Somente organizações externas possuem painel
 
         Painel deve conter:
         -------------------
