@@ -37,11 +37,9 @@
                             <p><strong>Acessando como:</strong></p>
                             <p>{{ member.get_group_display }}</p>
                         </div>
-                        {% if user has 'gatheros_event.change_organization' of organization %}
-                            <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
-                                <a href="#">Mudar realizador</a>
-                            </div>
-                        {% endif %}
+                        <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
+                            <a href="#">Mudar realizador</a>
+                        </div>
                     </div>
                     <br/>
                 {% endif %}
