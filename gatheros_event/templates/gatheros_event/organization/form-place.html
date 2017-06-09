@@ -25,7 +25,7 @@
         <input type="submit" value="Salvar"/>
         {% if next_path %}
             <a href="{{ next_path|urlencode }}">Cancelar</a>
-            <input type="text" name="next" value="{{ next_path }}"/>
+            <input type="hidden" name="next" value="{{ next_path }}"/>
         {% else %}
             <a href="{% url 'gatheros_event:organization-panel' %}">Voltar</a>
         {% endif %}

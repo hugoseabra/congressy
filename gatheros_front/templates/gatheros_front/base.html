@@ -32,12 +32,22 @@
                     {% if request.user.is_authenticated %}
                         {% if organizations and organizations|length > 1 %}
                             <form action="{% url 'gatheros_event:organization-switch' %}"
-                                  method="post" style="display: inline-block;"
-                                  id="organization-context-pk">{% csrf_token %}
+                                  method="post" style="display: inline-block;">{% csrf_token %}
+                                {% if organization.internal %}
+                                    {% if request.user.person and request.user.person.avatar %}
+                                        <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ request.user.person.avatar.url }}" />
+                                    {% else %}
+                                        <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
+                                    {% endif %}
+                                {% else %}
+                                    {% if organization.avatar %}
+                                        <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ organization.avatar.url }}" />
+                                    {% endif %}
+                                {% endif %}
                                 <!--suppress HtmlFormInputWithoutLabel -->
                                 <select name="organization-context-pk"
                                         id="organization-context-pk"
-                                        onchange="submit()">
+                                        onchange="submit()" style="margin-top:3px">
                                     {% for org in organizations %}
                                         <option
                                                 {% if organization.pk == org.pk %}selected="selected"{% endif %}

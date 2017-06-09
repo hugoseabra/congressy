@@ -71,6 +71,7 @@ class Organization(models.Model):
             ("can_invite", "Can invite members"),
             ("can_view", "Can view"),
             ("can_add_event", "Can add event"),
+            ("can_add_place", "Can add place related to organization"),
         )
 
     def __str__(self):

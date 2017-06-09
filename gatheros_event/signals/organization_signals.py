@@ -17,6 +17,7 @@ def update_person_related_organization(instance, raw, **_):
 
     for member in instance.members.filter(organization__internal=True):
         organization = member.organization
+        organization.avatar = instance.avatar
         organization.name = instance.name
         organization.website = instance.website
         organization.facebook = instance.facebook
