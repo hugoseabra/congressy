@@ -108,14 +108,6 @@ class Event(models.Model, GatherosModelMixin):
         help_text="Deixar em branco se o evento é apenas on-line.",
     )
 
-    description = models.TextField(
-        null=True,
-        blank=True,
-        verbose_name='descrição',
-        help_text="Descrição que irá aparecer nos sites de busca e redes"
-                  " sociais. Quanto mais detalhada, melhor!"
-    )
-
     banner_small = StdImageField(
         upload_to=get_image_path,
         blank=True,

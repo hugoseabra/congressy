@@ -19,7 +19,6 @@ class EventForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
-            'description',
             'subscription_type',
             'subscription_offline',
             'published'

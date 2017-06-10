@@ -95,13 +95,6 @@ class Migration(migrations.Migration):
                 ('date_start',
                  models.DateTimeField(verbose_name='data inicial')),
                 ('date_end', models.DateTimeField(verbose_name='data final')),
-                ('description', models.TextField(
-                    blank=True,
-                    help_text='Descrição que irá aparecer nos sites de busca e'
-                              ' redes sociais. Quanto mais detalhada, melhor!',
-                    null=True,
-                    verbose_name='descrição'
-                )),
                 ('banner_slide', stdimage.models.StdImageField(
                     blank=True,
                     help_text='Banner de destaque (tamanho: 1140px x 500px)',
@@ -291,7 +284,12 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(
                     blank=True,
                     null=True,
-                    verbose_name='descrição'
+                    verbose_name='descrição (texto)'
+                )),
+                ('description_html', models.TextField(
+                    blank=True,
+                    null=True,
+                    verbose_name='descrição (HTML)'
                 )),
                 ('avatar_width', models.PositiveIntegerField(
                     blank=True,
@@ -699,8 +697,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Info',
             fields=[
-                ('text', models.TextField(
-                    verbose_name='texto'
+                ('description', models.TextField(
+                    verbose_name='descrição (texto)'
+                )),
+                ('description_html', models.TextField(
+                    verbose_name='descrição (HTML)'
                 )),
                 ('event', models.OneToOneField(
                     on_delete=django.db.models.deletion.CASCADE,

@@ -6,6 +6,7 @@ vinculadas a ela.
 """
 
 from django.contrib.auth.models import User
+from django.utils.html import strip_tags
 from django.db import models
 
 from core.util import slugify
@@ -19,7 +20,12 @@ class Organization(models.Model):
     description = models.TextField(
         null=True,
         blank=True,
-        verbose_name='descrição'
+        verbose_name='descrição (texto)'
+    )
+    description_html = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name='descrição (HTML)'
     )
     slug = models.SlugField(
         max_length=128,
@@ -79,6 +85,7 @@ class Organization(models.Model):
 
     def save(self, *args, **kwargs):
         self._create_unique_slug()
+        self.description = strip_tags(self.description_html)
         super(Organization, self).save(*args, **kwargs)
 
     def _create_unique_slug(self):

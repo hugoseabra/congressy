@@ -4,9 +4,9 @@ Informação relacionada a um evento para estrutrar uma exibição mais elaborad
 das informações sobre o evento para os usuaŕios.
 """
 import os
-from django.utils.html import strip_tags
 
 from django.db import models
+from django.utils.html import strip_tags
 from stdimage import StdImageField
 from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
@@ -37,7 +37,8 @@ class Info(models.Model):
         (CONFIG_TYPE_VIDEO, 'Vídeo (Youtube)'),
     )
 
-    text = models.TextField(verbose_name='texto')
+    description = models.TextField(verbose_name='descrição (texto)')
+    description_html = models.TextField(verbose_name='descrição (HTML)')
     event = models.OneToOneField(
         Event,
         on_delete=models.CASCADE,
@@ -113,6 +114,5 @@ class Info(models.Model):
         return self.event.name
 
     def save(self, *args, **kwargs):
-        self.event.description = strip_tags(self.text)
+        self.description = strip_tags(self.description_html)
         super(Info, self).save(*args, **kwargs)
-        self.event.save()

@@ -71,3 +71,7 @@ class Member(models.Model):
             self,
             self._state.adding
         )
+
+    def is_admin(self):
+        """ Verifica se membro é administrador """
+        return self.group == Member.ADMIN

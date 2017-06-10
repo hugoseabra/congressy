@@ -39,7 +39,7 @@ class InfoTextForm(BaseModelFileForm):
     class Meta:
         model = Info
         fields = [
-            'text',
+            'description_html',
             'event',
             'config_type',
         ]
@@ -63,7 +63,7 @@ class Info4ImagesForm(BaseModelFileForm):
             'image2',
             'image3',
             'image4',
-            'text',
+            'description_html',
             'event',
             'config_type',
         ]
@@ -100,7 +100,7 @@ class InfoMainImageForm(BaseModelFileForm):
         model = Info
         fields = [
             'image_main',
-            'text',
+            'description_html',
             'event',
             'config_type',
         ]
@@ -125,7 +125,7 @@ class InfoVideoForm(BaseModelFileForm):
         model = Info
         fields = [
             'youtube_video_id',
-            'text',
+            'description_html',
             'event',
             'config_type',
         ]
