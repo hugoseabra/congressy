@@ -12,71 +12,73 @@
         </div>
     {% endif %}
     <div style="background: #DDD">
-        <table width="100%">
-            {% for event in object_list %}
-                <tr>
-                    <td width="1%"
-                        style="background-color: {% if event.published %}green{% else %}gray{% endif %}"></td>
-                    <td style="background: #FFF;padding:10px;margin-bottom: 3px">
-                        <div>{{ forloop.counter }} -
-                            <a href="{% url 'gatheros_event:event-panel' event.pk %}">{{ event.name }}</a>
-                            {% if user.is_superuser %}
-                                <span style="font-size: medium;color:dimgray">({{ event.organization.name }})</span>
-                            {% endif %}
-                        </div>
-                        <hr/>
-                        <div style="text-indent: 10px;">
-                            <p><strong>{{ event.category.name }}</strong></p>
-                            {% if event.info %}
-                            <p>
-                                <strong>Descrição:</strong>
-                                <span style="color: dimgray;text-align: justify">{{ event.info.description|safe|truncatechars:150 }}</span>
-                            </p>
-                            {% endif %}
-                            <p><strong>Quando:</strong> {{ event.get_period }}</p>
-                            {% if event.place %}
-                                <p>
-                                    <strong>Local:</strong> {{ event.place.name }}
-                                </p>
-                                <p style="color:dimgray;text-indent: 20px;">{{ event.place.get_complete_address }}</p>
-                            {% endif %}
-                            <p>
-                                <strong>Tipo de inscrição:</strong>
-                                {{ event.get_subscription_type_display }}
-                                {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
-                                    {% event_payment_type event as payment_type %}
-                                    (
-                                        {% if payment_type == 'free' %}Gratuitas{% endif %}
-                                        {% if payment_type == 'paied' %}Pagas{% endif %}
-                                        {% if payment_type == 'mixed' %}Mistas: gratuitas e pagas{% endif %}
-                                    )
+        {% if object_list %}
+            <table width="100%">
+                {% for event in object_list %}
+                    <tr>
+                        <td width="1%"
+                            style="background-color: {% if event.published %}green{% else %}gray{% endif %}"></td>
+                        <td style="background: #FFF;padding:10px;margin-bottom: 3px">
+                            <div>{{ forloop.counter }} -
+                                <a href="{% url 'gatheros_event:event-panel' event.pk %}">{{ event.name }}</a>
+                                {% if user.is_superuser %}
+                                    <span style="font-size: medium;color:dimgray">({{ event.organization.name }})</span>
                                 {% endif %}
-                            </p>
-                            {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
+                            </div>
+                            <hr/>
+                            <div style="text-indent: 10px;">
+                                <p><strong>{{ event.category.name }}</strong></p>
+                                {% if event.info %}
                                 <p>
-                                    <strong>Inscrições:</strong>
-                                    {{ event.subscriptions.all|length }}{% if event.limit %} / {{ event.limit }}{% endif %}
+                                    <strong>Descrição:</strong>
+                                    <span style="color: dimgray;text-align: justify">{{ event.info.description|safe|truncatechars:150 }}</span>
                                 </p>
+                                {% endif %}
+                                <p><strong>Quando:</strong> {{ event.get_period }}</p>
+                                {% if event.place %}
+                                    <p>
+                                        <strong>Local:</strong> {{ event.place.name }}
+                                    </p>
+                                    <p style="color:dimgray;text-indent: 20px;">{{ event.place.get_complete_address }}</p>
+                                {% endif %}
+                                <p>
+                                    <strong>Tipo de inscrição:</strong>
+                                    {{ event.get_subscription_type_display }}
+                                    {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+                                        {% event_payment_type event as payment_type %}
+                                        (
+                                            {% if payment_type == 'free' %}Gratuitas{% endif %}
+                                            {% if payment_type == 'paied' %}Pagas{% endif %}
+                                            {% if payment_type == 'mixed' %}Mistas: gratuitas e pagas{% endif %}
+                                        )
+                                    {% endif %}
+                                </p>
+                                {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
+                                    <p>
+                                        <strong>Inscrições:</strong>
+                                        {{ event.subscriptions.all|length }}{% if event.limit %} / {{ event.limit }}{% endif %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td width="5%"
+                            style="background: #FFF;padding:10px;margin-bottom: 3px">
+                            {% if user has 'gatheros_event.change_event' of event %}
+                                <a href="{% url 'gatheros_event:event-edit' event.pk %}">Editar</a>
                             {% endif %}
-                        </div>
-                    </td>
-                    <td width="5%"
-                        style="background: #FFF;padding:10px;margin-bottom: 3px">
-                        {% if user has 'gatheros_event.change_event' of event %}
-                            <a href="{% url 'gatheros_event:event-edit' event.pk %}">Editar</a>
-                        {% endif %}
-                        {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
-                            <br/><br/>
-                            <a href="{% url 'gatheros_event:event-delete' event.pk %}">Excluir</a>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <div style="background: #FFF;padding:10px;margin-bottom: 3px">
-                    Nenhum evento
-                </div>
-            {% endfor %}
-        </table>
+                            {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
+                                <br/><br/>
+                                <a href="{% url 'gatheros_event:event-delete' event.pk %}">Excluir</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <div style="background: #FFF;padding:10px;margin-bottom: 3px">
+                Nenhum evento
+            </div>
+        {% endif %}
     </div>
 
 {% endblock %}

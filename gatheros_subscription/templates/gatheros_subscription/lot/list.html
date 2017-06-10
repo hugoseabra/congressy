@@ -19,62 +19,64 @@
     {% endif %}
 
     <div style="background: #DDD">
-        <table width="100%">
-            {% for lot in object_list %}
-                <tr>
-                    {% if lot.status == lot.LOT_STATUS_RUNNING %}
-                        <td width="1%"
-                            style="background-color: darkgreen"></td>
-                    {% elif lot.status == lot.LOT_STATUS_FINISHED %}
-                        <td width="1%"
-                            style="background-color: darkgoldenrod"></td>
-                    {% else %}
-                        <td width="1%"
-                            style="background-color: darkgrey"></td>
-                    {% endif %}
-                    <td style="background: #FFF;padding:10px;margin-bottom: 3px">
-                        <div>{{ forloop.counter }} -
-                            {% if user has 'gatheros_subscription.change_lot' of lot %}
-                                <a href="{% url 'gatheros_subscription:lot-edit' event.pk lot.pk %}">{{ lot.name }}</a>
-                            {% else %}
-                                {{ lot.name }}
-                            {% endif %}
-                            - {% if lot.price and lot.price > 0 %}Pago{% else %}Gratuito{% endif %}
-                        </div>
-                        <hr/>
-                        <div style="text-indent: 10px;">
-                            <p><strong>Período:</strong> {{ lot.get_period }}</p>
-                            <p><strong>Inscrições:</strong>
-                                {{ lot.subscriptions.all|length }}
-                                {% if lot.limit %}
-                                    / {{ lot.limit }}
-                                    vagas
-                                    <span style="color:dimgray">(limitadas)</span>
-                                {% else%}
-                                    vagas
-                                    <span style="color:dimgray">(aberto)</span>
+        {% if object_list %}
+            <table width="100%">
+                {% for lot in object_list %}
+                    <tr>
+                        {% if lot.status == lot.LOT_STATUS_RUNNING %}
+                            <td width="1%"
+                                style="background-color: darkgreen"></td>
+                        {% elif lot.status == lot.LOT_STATUS_FINISHED %}
+                            <td width="1%"
+                                style="background-color: darkgoldenrod"></td>
+                        {% else %}
+                            <td width="1%"
+                                style="background-color: darkgrey"></td>
+                        {% endif %}
+                        <td style="background: #FFF;padding:10px;margin-bottom: 3px">
+                            <div>{{ forloop.counter }} -
+                                {% if user has 'gatheros_subscription.change_lot' of lot %}
+                                    <a href="{% url 'gatheros_subscription:lot-edit' event.pk lot.pk %}">{{ lot.name }}</a>
+                                {% else %}
+                                    {{ lot.name }}
                                 {% endif %}
-                            </p>
-                            {% if lot.price and lot.price > 0 %}
-                                <p><strong>Preço:</strong> R$ {{ lot.price }}</p>
+                                - {% if lot.price and lot.price > 0 %}Pago{% else %}Gratuito{% endif %}
+                            </div>
+                            <hr/>
+                            <div style="text-indent: 10px;">
+                                <p><strong>Período:</strong> {{ lot.get_period }}</p>
+                                <p><strong>Inscrições:</strong>
+                                    {{ lot.subscriptions.all|length }}
+                                    {% if lot.limit %}
+                                        / {{ lot.limit }}
+                                        vagas
+                                        <span style="color:dimgray">(limitadas)</span>
+                                    {% else%}
+                                        vagas
+                                        <span style="color:dimgray">(aberto)</span>
+                                    {% endif %}
+                                </p>
+                                {% if lot.price and lot.price > 0 %}
+                                    <p><strong>Preço:</strong> R$ {{ lot.price }}</p>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td width="5%" style="background: #FFF;padding:10px;margin-bottom: 3px">
+                            {% if user has 'gatheros_subscription.change_lot' of lot %}
+                                <a href="{% url 'gatheros_subscription:lot-edit' event.pk lot.pk %}">Editar</a>
                             {% endif %}
-                        </div>
-                    </td>
-                    <td width="5%" style="background: #FFF;padding:10px;margin-bottom: 3px">
-                        {% if user has 'gatheros_subscription.change_lot' of lot %}
-                            <a href="{% url 'gatheros_subscription:lot-edit' event.pk lot.pk %}">Editar</a>
-                        {% endif %}
-                        {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
-                            <a href="{% url 'gatheros_subscription:lot-delete' event.pk lot.pk %}">Excluir</a>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% empty %}
-                <div style="background: #FFF;padding:10px;margin-bottom: 3px">
-                    Nenhum evento
-                </div>
-            {% endfor %}
-        </table>
+                            {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
+                                <a href="{% url 'gatheros_subscription:lot-delete' event.pk lot.pk %}">Excluir</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <div style="background: #FFF;padding:10px;margin-bottom: 3px">
+                Nenhum evento
+            </div>
+        {% endif %}
     </div>
 
 {% endblock %}

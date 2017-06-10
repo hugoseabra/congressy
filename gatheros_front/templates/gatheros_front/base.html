@@ -37,6 +37,7 @@
                                     {% if request.user.person and request.user.person.avatar %}
                                         <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ request.user.person.avatar.url }}" />
                                     {% else %}
+                                        <!--suppress CheckImageSize -->
                                         <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
                                     {% endif %}
                                 {% else %}
@@ -54,10 +55,9 @@
                                                 value="{{ org.pk }}">{{ org.name }}
                                         </option>
                                     {% endfor %}
-                                    <input type="hidden" name="next"
-                                           value="{{ request.path }}"/>
                                 </select>
-
+                                <input type="hidden" name="next"
+                                       value="{{ request.path }}"/>
                             </form>
                         {% elif organizations and organizations|length == 1 %}
                             <strong>{{ organization.name }}</strong>
@@ -82,8 +82,7 @@
     {% block messages %}
         {% if messages %}
             <ul class="messagelist">{% for message in messages %}
-                <li{% if message.tags %}
-                    class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+                <li {% if message.tags %}class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
             {% endfor %}</ul>
         {% endif %}
     {% endblock messages %}

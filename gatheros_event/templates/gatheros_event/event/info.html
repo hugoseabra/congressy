@@ -3,7 +3,8 @@
 
 {% block content %}
     {% get_media_prefix as media_url %}
-    <div style="padding:10px">
+    <!--suppress HtmlUnknownAttribute -->
+<div style="padding:10px">
         <a href="{% url 'gatheros_event:event-panel' object.pk %}">Voltar</a>
     </div>
     <hr/>
