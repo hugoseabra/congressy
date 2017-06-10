@@ -27,10 +27,12 @@
                         <hr/>
                         <div style="text-indent: 10px;">
                             <p><strong>{{ event.category.name }}</strong></p>
+                            {% if event.info %}
                             <p>
                                 <strong>Descrição:</strong>
-                                <span style="color: dimgray;text-align: justify">{{ event.description|truncatechars:150 }}</span>
+                                <span style="color: dimgray;text-align: justify">{{ event.info.description|safe|truncatechars:150 }}</span>
                             </p>
+                            {% endif %}
                             <p><strong>Quando:</strong> {{ event.get_period }}</p>
                             {% if event.place %}
                                 <p>

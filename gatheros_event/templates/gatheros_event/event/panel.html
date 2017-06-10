@@ -101,9 +101,6 @@
                             {% if object.banner_small %}
                                 <!--suppress CheckImageSize -->
                                 <img src="{{ object.banner_small.default.url }}" style="border:1px solid #DDD;margin:3px"/>
-                            {% else %}
-                                <!--suppress CheckImageSize -->
-                                <img src="/gatheros_event/tests/fixtures/images/event/Evento_Banner_pequeno.png" width="99%" style="border:1px solid #DDD;margin:3px"/>
                             {% endif %}
                             <pre>Enviar banner pequeno por aqui</pre>
                         </td>
@@ -126,30 +123,63 @@
                                     <p><strong>Evento on-line</strong> [<a href="#">Alterar</a>]</p>
                                 {% endif %}
                             </div>
-                                <div style="margin-top: 20px;border-top: 1px solid #DDD">
+                            <div style="margin-top: 20px;border-top: 1px solid #DDD">
+                                <p>
+                                    <strong>Descrição:</strong>
+                                </p>
+                                {% if object.info %}
                                     <p>
-                                        <strong>Descrição:</strong>
+                                        {{ object.info.description_html|safe }}
                                     </p>
-                                    {% if object.description %}
-                                        <p style="color:dimgray;text-indent: 20px;text-align: justify;line-height: 24px;">
-                                            {{ object.description }}
-                                        </p>
-                                    {% else %}
-                                        <p style="color:dimgray;text-align: justify;line-height: 24px;">
-                                            <span>Sem descrição.</span>
-                                            <br />
-                                            <br />
-                                           <span style="font-style: italic">
-                                               Insira uma descrição. Será muito bom para localizar o seu evento nos sites de busca.
-                                           </span>
-                                        </p>
-                                        <p style="text-align: center;">[<a href="{% url 'gatheros_event:event-info' object.pk %}">Alterar</a>]</p>
-                                    {% endif %}
-                                </div>
+                                {% else %}
+                                    <p style="color:dimgray;text-align: justify;line-height: 24px;">
+                                        <span>Sem descrição.</span>
+                                        <br />
+                                        <br />
+                                       <span style="font-style: italic">
+                                           Insira uma descrição. Será muito bom para localizar o seu evento nos sites de busca.
+                                       </span>
+                                    </p>
+                                    <p style="text-align: center;">[<a href="{% url 'gatheros_event:event-info' object.pk %}">Alterar</a>]</p>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                 </table>
-
+                {% if object.website or object.facebook or object.twitter or object.linkedin or object.skype %}
+                    <table width="100%" border="0" cellspacing="0" cellpadding="10" style="margin-top: 10px">
+                        <tr>
+                            <td colspan="5" style="background-color: #DDD"><h3 style="margin: 0">Informaçõse Sociais</h3></td>
+                        </tr>
+                        <tr>
+                            {% if object.website %}
+                            <td width="20%" style="vertical-align: top;">
+                                <strong>Website:</strong> <a target="_blank" href="{{ object.website }}">{{ object.website }}</a>
+                            </td>
+                            {% endif %}
+                            {% if object.facebook %}
+                            <td width="20%">
+                                <strong>Facebook:</strong> <a target="_blank" href="{{ object.facebook }}">{{ object.facebook }}</a>
+                            </td>
+                            {% endif %}
+                            {% if object.twitter %}
+                            <td width="20%">
+                                <strong>Twitter:</strong> <a target="_blank" href="{{ object.twitter }}">{{ object.twitter }}</a>
+                            </td>
+                            {% endif %}
+                            {% if object.linkedin %}
+                            <td width="20%">
+                                <strong>Linkedin:</strong> <a target="_blank" href="{{ object.linkedin }}">{{ object.linkedin }}</a>
+                            </td>
+                            {% endif %}
+                            {% if object.skype %}
+                            <td width="20%">
+                                <strong>Skype:</strong> {{ object.skype }}
+                            </td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                {% endif %}
 
                 <br/>
                 <hr/>
@@ -388,25 +418,8 @@
                         <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
                             <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Ativar</a>
                         </div>
-
                     </div>
                 {% endif %}
-
-
-
-                {#                <div style="background-color: whitesmoke;border: 1px solid #DDD;">#}
-                {#                    <div style="padding:15px"><strong>Tipo de inscrição:</strong> gratuitas [<a href="#">Alterar</a>]</div>#}
-                {#                    <div style="padding:15px">#}
-                {#                        <strong>Website e Redes sociais:</strong>#}
-                {#                        <ul>#}
-                {#                            <li style="padding: 5px"><strong>Website:</strong> asdf</li>#}
-                {#                            <li style="padding: 5px"><strong>Facebook</strong> asdf</li>#}
-                {#                            <li style="padding: 5px"><strong>Twitter</strong> asf</li>#}
-                {#                            <li style="padding: 5px"><strong>Linkedin</strong> asdf</li>#}
-                {#                            <li style="padding: 5px"><strong>Skype</strong> asdf</li>#}
-                {#                        </ul>#}
-                {#                    </div>#}
-                {#                </div>#}
             </td>
         </tr>
     </table>

@@ -16,14 +16,27 @@ class OrganizationPanelTest(TestCase):
     ]
 
     def setUp(self):
-        user = User.objects.get(username='lucianasilva@gmail.com')
-        self.client.force_login(user)
+        self.user = User.objects.get(username='lucianasilva@gmail.com')
+        self.client.force_login(self.user)
+        self.url = reverse('gatheros_event:organization-panel')
 
-        url = reverse('gatheros_event:organization-panel')
-        self.result = self.client.get(url)
+    def test_status_is_302(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
 
     def test_status_is_200_ok(self):
-        self.assertEqual(self.result.status_code, 200)
+        member = self.user.person.members.filter(
+            organization__internal=False
+        ).first()
+        assert member is not None
+        organization = member.organization
+        self.client.post(
+            reverse('gatheros_event:organization-switch'),
+            {'organization-context-pk': organization.pk}
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
 
 
 class OrganizationAdminInternalPermissionsTest(TestCase):

@@ -65,7 +65,6 @@ class AddEventTest(TestCase):
             'name': 'Event teste nah',
             'date_start': datetime.now() + timedelta(days=5),
             'date_end': datetime.now() + timedelta(days=5, hours=6),
-            'description': 'Some description',
             'subscription_type': Event.SUBSCRIPTION_DISABLED,
             'subscription_offline': False,
             'published': False
@@ -83,7 +82,6 @@ class AddEventTest(TestCase):
             'name': 'Event teste nah',
             'date_start': datetime.now() + timedelta(days=5),
             'date_end': datetime.now() + timedelta(days=5, hours=6),
-            'description': 'Some description',
             'subscription_type': Event.SUBSCRIPTION_DISABLED,
             'subscription_offline': False,
             'published': False
@@ -142,7 +140,6 @@ class EditEventTest(TestCase):
             'name',
             'date_start',
             'date_end',
-            'description',
             'subscription_type',
             'subscription_offline',
             'published'
@@ -151,13 +148,11 @@ class EditEventTest(TestCase):
         data.update({
             'category': 4,
             'name': 'Event edited',
-            'description': 'That is another description',
         })
 
         # Valores alterados não são iguais aos persistidos
         self.assertNotEqual(event.category_id, data['category'])
         self.assertNotEqual(event.name, data['name'])
-        self.assertNotEqual(event.description, data['description'])
 
         response = self.client.post(
             self._get_url(pk=event.pk),
@@ -174,7 +169,6 @@ class EditEventTest(TestCase):
         event = self._get_event(pk=event.pk)
         self.assertEqual(event.category_id, data['category'])
         self.assertEqual(event.name, data['name'])
-        self.assertEqual(event.description, data['description'])
 
     def test_cannot_edit_event(self):
         organization = self._get_active_organization()
@@ -187,7 +181,6 @@ class EditEventTest(TestCase):
             'name',
             'date_start',
             'date_end',
-            'description',
             'subscription_type',
             'subscription_offline',
             'published'

@@ -62,7 +62,7 @@ class InfoTextFormTest(BaseInfoFormTest):
         event = self._get_event()
         data = {
             'event': event.pk,
-            'text': info.event.description,
+            'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_TEXT_ONLY,
         }
 
@@ -81,7 +81,7 @@ class InfoTextFormTest(BaseInfoFormTest):
 
         data = {
             'event': info.event.pk,
-            'text': info.event.description,
+            'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_TEXT_ONLY,
         }
 
@@ -99,7 +99,7 @@ class Info4ImagesFormTest(BaseInfoFormTest):
         data = {
             'event': info.event_id,
             'config_type': Info.CONFIG_TYPE_4_IMAGES,
-            'text': info.event.description,
+            'description_html': '<p style="color:red>Some text</p>',
         }
         info.delete()
 
@@ -159,7 +159,7 @@ class Info4ImagesFormTest(BaseInfoFormTest):
 
         data = {
             'event': info.event_id,
-            'text': info.event.description,
+            'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_4_IMAGES,
         }
         form = Info4ImagesForm(instance=info, data=data, files=file_dict)
@@ -191,7 +191,7 @@ class InfoMainImageFormTest(BaseInfoFormTest):
         info = self._get_info()
         data = {
             'event': info.event_id,
-            'text': info.event.description,
+            'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_MAIN_IMAGE,
         }
         info.delete()
@@ -249,7 +249,7 @@ class InfoMainImageFormTest(BaseInfoFormTest):
 
         data = {
             'event': info.event_id,
-            'text': info.event.description,
+            'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_MAIN_IMAGE,
         }
         form = InfoMainImageForm(instance=info, data=data, files=file_dict)
@@ -284,7 +284,7 @@ class InfoVideoFormTest(BaseInfoFormTest):
         event = self._get_event()
         data = {
             'event': event.pk,
-            'text': info.event.description,
+            'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_VIDEO,
             'youtube_video_id': 'jbVpFUGCw1o',
         }
@@ -305,7 +305,7 @@ class InfoVideoFormTest(BaseInfoFormTest):
 
         data = {
             'event': info.event.pk,
-            'text': info.event.description,
+            'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_VIDEO,
             'youtube_video_id': 'jbVpFUGCw1o',
         }

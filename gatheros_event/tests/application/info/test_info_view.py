@@ -78,7 +78,7 @@ class EventInfoTest(TestCase):
         event = self._get_event()
         data = {
             'event': event.pk,
-            'text': event.description,
+            'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_TEXT_ONLY,
         }
 
@@ -104,7 +104,7 @@ class EventInfoTest(TestCase):
 
         event = self._get_event()
         data['event'] = event.pk
-        data['text'] = event.description
+        data['description_html'] = '<p style="color:red>Some text</p>'
         data['config_type'] = Info.CONFIG_TYPE_4_IMAGES
 
         response = self.client.post(self._get_url(), data=data, follow=True)
@@ -126,7 +126,7 @@ class EventInfoTest(TestCase):
 
         event = self._get_event()
         data['event'] = event.pk
-        data['text'] = event.description
+        data['description_html'] = '<p style="color:red>Some text</p>'
         data['config_type'] = Info.CONFIG_TYPE_MAIN_IMAGE
 
         response = self.client.post(self._get_url(), data=data, follow=True)
@@ -139,7 +139,7 @@ class EventInfoTest(TestCase):
         event = self._get_event()
         data = {
             'event': event.pk,
-            'text': event.description,
+            'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_VIDEO,
             'youtube_video_id': 'jbVpFUGCw1o'
         }

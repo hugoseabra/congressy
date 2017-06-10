@@ -83,8 +83,14 @@ class InvitationCreateViewTest(TestCase):
         self.client.force_login(self.user)
         self.url = reverse('gatheros_event:invitation')
         self.url_success = reverse('gatheros_event:invitation-success')
-        organization = Organization.objects \
-            .get(slug="in2-web-solucoes-e-servicos")
+        organization = Organization.objects.get(
+            slug="in2-web-solucoes-e-servicos"
+        )
+        self.client.post(
+            reverse('gatheros_event:organization-switch'),
+            {'organization-context-pk': organization.pk}
+        )
+
         self.data = {
             'organization': organization.pk,
             'group': Member.HELPER,

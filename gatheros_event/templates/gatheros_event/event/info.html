@@ -46,7 +46,7 @@
             <tr>
                 <td style="vertical-align: top;">
                     {% if object.info %}
-                        {{ object.info.text|safe }}
+                        {{ object.info.description_html|safe }}
                     {% endif %}
                 </td>
                 <td width="50%" style="padding:10px">

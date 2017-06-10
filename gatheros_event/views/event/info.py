@@ -84,20 +84,12 @@ class EventInfoView(AccountMixin, DetailView):
 
             return form_klass(**form_kwargs)
 
-        event_desc = self.object.description
-
         try:
             info = self.object.info
-            if not info.text:
-                info.text = event_desc
-
             form = new_form_instance(form_class, instance=info)
 
         except Info.DoesNotExist:
             form = new_form_instance(form_class)
-            form.initial.update({
-                'text': event_desc,
-            })
 
         form.initial.update({
             'config_type': config_type,
