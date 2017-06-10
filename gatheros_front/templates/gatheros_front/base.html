@@ -57,18 +57,19 @@
                                     <input type="hidden" name="next"
                                            value="{{ request.path }}"/>
                                 </select>
-                                {% if not organization.internal %}
-                                    <a href="{% url 'gatheros_event:organization-panel' %}">Gerenciar</a>
-                                {% endif %}
+
                             </form>
                         {% elif organizations and organizations|length == 1 %}
                             <strong>{{ organization.name }}</strong>
                         {% else %}
                             <strong>{{ request.user.get_full_name }}</strong>
                         {% endif %}
-
+                        {% if not organization.internal %}
+                            &nbsp; | &nbsp;
+                            <a href="{% url 'gatheros_event:organization-panel' %}">Minha organização</a>
+                        {% endif %}
                         &nbsp; | &nbsp;
-                        <a href="{% url 'gatheros_event:profile' %}">Perfil</a>
+                        <a href="{% url 'gatheros_event:profile' %}">Meus dados</a>
                         &nbsp; | &nbsp;
                         <a href="{% url 'gatheros_front:logout' %}">Sair</a>
                     {% endif %}

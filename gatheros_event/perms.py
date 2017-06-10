@@ -101,7 +101,13 @@ def member_is_member(user_obj, organization):
 # Organização -> Admin
 logic = MemberPermissionLogic(
     member_is_admin,
-    ['can_view', 'can_add_place', 'can_add_event'],
+    [
+        'change_organization',
+        'delete_organization',
+        'can_view',
+        'can_add_place',
+        'can_add_event'
+    ],
 )
 add_permission_logic(Organization, logic)
 

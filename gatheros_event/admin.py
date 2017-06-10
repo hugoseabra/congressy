@@ -45,7 +45,6 @@ class EventAdmin(admin.ModelAdmin):
                 'category',
                 'date_start',
                 'date_end',
-                'description',
                 'published',
                 'slug',
             ),
@@ -159,7 +158,7 @@ class OrganizationAdmin(admin.ModelAdmin):
             'fields': (
                 'name',
                 'slug',
-                'description',
+                'description_html',
                 'active',
             ),
         }),
@@ -218,6 +217,7 @@ class EventInfoAdmin(admin.ModelAdmin):
     Admin para Event Info
     """
     list_display = ('event', 'config_type', 'pk')
+    exclude = ('description',)
 
 
 @admin.register(Member)
