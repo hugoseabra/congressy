@@ -16,6 +16,12 @@ from . import Member
 from .rules import check_invite
 
 
+class InvitationManager(models.Manager):
+    """ Manager - Gerenciador de Convites. """
+    def get_invitations(self, organization):
+        return self.filter(organization=organization).all
+
+
 @track_data('author', 'to')
 class Invitation(models.Model):
     """ Convite para organização """
@@ -29,7 +35,8 @@ class Invitation(models.Model):
     author = models.ForeignKey(
         Member,
         verbose_name='autor',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='invitations'
     )
     to = models.ForeignKey(
         User,
@@ -49,6 +56,8 @@ class Invitation(models.Model):
         verbose_name='grupo',
         default=Member.HELPER
     )
+
+    objects = InvitationManager()
 
     def save(self, *args, **kwargs):
         if self._state.adding:
@@ -82,3 +91,7 @@ class Invitation(models.Model):
         """
         return Invitation.objects.filter(
             author__organization=self.author.organization, to=self.to).exists()
+
+    def is_expired(self):
+        """ Verifica se convite já está expirado. """
+        return self.expired < datetime.now()

@@ -20,7 +20,11 @@ def account(request):
     if not configured and authenticated:
         _account_helper.update_account(request)
 
+    if _account_helper.is_participant(request):
+        return {'context_type': 'participant'}
+
     return {
+        'context_type': 'member',
         'organizations': _account_helper.get_organizations(request),
         'organization': _account_helper.get_organization(request),
         'member': _account_helper.get_member(request),
