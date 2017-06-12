@@ -106,5 +106,23 @@
       "groups": [],
       "user_permissions": []
     }
+  },
+  {
+    "model": "auth.user",
+    "pk": 8,
+    "fields": {
+      "password": "pbkdf2_sha256$36000$2DWUKGNIS7GX$kNdMKASrqf6p/R/yhGwh/oIRI29/EjqW7fgW1p3o/kc=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "marcela@gmail.com",
+      "first_name": "Marcela",
+      "last_name": "Pires Neves",
+      "email": "marcela@gmail.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2017-04-20T18:00:26.864",
+      "groups": [],
+      "user_permissions": []
+    }
   }
 ]
