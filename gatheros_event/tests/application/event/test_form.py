@@ -203,16 +203,21 @@ class EventBannersFormTest(TestCase):
         )
         self.event_path = os.path.join(settings.MEDIA_ROOT, 'event')
         self.persisted_path = 'event'
+        self._clear_uploaded_directory()
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
         return Event.objects.get(slug='streaming-de-sucesso')
 
-    def tearDown(self):
+    # noinspection PyMethodMayBeStatic
+    def _clear_uploaded_directory(self):
         event = self._get_event()
         path = os.path.join(self.event_path, str(event.pk))
         if os.path.isdir(path):
             shutil.rmtree(path)
+
+    def tearDown(self):
+        self._clear_uploaded_directory()
 
     def test_banner(self):
         event = self._get_event()
