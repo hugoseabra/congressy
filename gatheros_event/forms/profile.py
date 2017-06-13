@@ -20,15 +20,31 @@ class ProfileCreateForm(forms.ModelForm):
     def save(self, domain_override=None, request=None,
              subject_template='registration/account_confirmation_subject.txt',
              email_template='registration/account_confirmation_email.html'):
+        """
+        Cria uma conta no sistema
 
-        self.user = User.objects.create_user(
+        :param domain_override:
+        :param request:
+        :param subject_template:
+        :param email_template:
+        :return:
+        """
+        # Criando perfil
+        super(ProfileCreateForm, self).save(commit=True)
+
+        # Criando usuário
+        user = User.objects.create_user(
             username=self.cleaned_data["email"],
             email=self.cleaned_data["email"],
             password=str(uuid4())
         )
-        self.user.save()
-        super(ProfileCreateForm, self).save(commit=True)
+        user.save()
 
+        # Vinculando usuário ao perfil
+        self.instance.user = user
+        self.instance.save()
+
+        # Criando o email de confirmação e definição de senha
         reset_form = PasswordResetForm(
             data={
                 'email': self.cleaned_data["email"]

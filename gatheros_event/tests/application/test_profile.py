@@ -221,33 +221,27 @@ class ProfileCreateFormTest(TestCase):
             sorted(list(['name', 'email', 'gender', 'city']))
         )
 
-    def test_save_create_person(self):
+    def test_account_success(self):
         """
-        Save cria uma pessoa
+        Save cria uma pessoa(perfil) e esta tem usuário vinculado
         """
-        count_before = Person.objects.count()
+        person_count = Person.objects.count()
+        user_count = User.objects.count()
         form = self.get_form(data=self.data)
         form.is_valid()
         form.save(domain_override='127.0.0.1')
-        self.assertEqual(Person.objects.count(), count_before + 1)
 
-    def test_save_create_user(self):
-        """
-        Save cria um usuário
-        """
-        count_before = User.objects.count()
-        form = self.get_form(data=self.data)
-        form.is_valid()
-        form.save(domain_override='127.0.0.1')
-        self.assertEqual(User.objects.count(), count_before + 1)
+        # Verifica se criou uma pessoa
+        self.assertEqual(Person.objects.count(), person_count + 1)
 
-    def test_save_send_email(self):
-        """
-        Save envia um email
-        """
-        form = self.get_form(data=self.data)
-        form.is_valid()
-        form.save(domain_override='127.0.0.1')
+        # Verifica se criou um usuário
+        self.assertEqual(User.objects.count(), user_count + 1)
+
+        # Verifica se o usuário tem uma pessoa vinculada
+        user = User.objects.get(email=self.data['email'])
+        self.assertIsInstance(user.person, Person)
+
+        # Verifica se enviou um email
         self.assertEqual(len(mail.outbox), 1)
 
 
