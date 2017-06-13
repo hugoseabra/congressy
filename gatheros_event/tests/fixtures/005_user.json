@@ -93,7 +93,7 @@
     "model": "auth.user",
     "pk": 7,
     "fields": {
-      "password": "",
+      "password": "pbkdf2_sha256$36000$2DWUKGNIS7GX$kNdMKASrqf6p/R/yhGwh/oIRI29/EjqW7fgW1p3o/kc=",
       "last_login": null,
       "is_superuser": false,
       "username": "joao-das-couves@gmail.com",
@@ -101,7 +101,7 @@
       "last_name": "",
       "email": "joao-das-couves@gmail.com",
       "is_staff": false,
-      "is_active": false,
+      "is_active": true,
       "date_joined": "2017-04-20T18:00:26.864",
       "groups": [],
       "user_permissions": []

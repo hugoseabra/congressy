@@ -61,7 +61,10 @@ class InvalidTemplateVariable(str):
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'gatheros_event/templates/'),
+            os.path.join(BASE_DIR, 'templates/'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'string_if_invalid': InvalidTemplateVariable("%s"),

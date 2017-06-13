@@ -1,10 +1,12 @@
 import uuid
 
 from django.contrib.auth.models import User
+from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
 
-from gatheros_event.forms import InvitationCreateForm, ProfileForm
+from gatheros_event.forms import InvitationCreateForm, ProfileCreateForm, \
+    ProfileForm
 from gatheros_event.models import Person
 
 
@@ -56,7 +58,7 @@ class ProfileFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertListEqual(
             sorted(list(form.errors.keys())),
-            sorted(list(['name', 'gender', 'city']))
+            sorted(list(['name', 'email', 'gender', 'city']))
         )
 
     def test_save_sucess(self):
@@ -181,3 +183,195 @@ class ProfileViewTest(TestCase):
         """
         response = self.client.post(self.url, self.data, follow=True)
         self.assertContains(response, 'Perfil atualizado com sucesso')
+
+
+class ProfileCreateFormTest(TestCase):
+    def setUp(self):
+        self.data = {
+            # Informações do perfil
+            "name": "João Das Couves",
+            "gender": "M",
+            "email": "joao-das-couves@gmail.com",
+            "city": 5413,
+        }
+
+    def get_form(self, **kwargs):
+        """
+        Cria um form
+        :param kwargs:
+        :return:  ProfileCreateForm
+        """
+        return ProfileCreateForm(**kwargs)
+
+    def test_form_is_valid(self):
+        """
+        Formulário é válido
+        """
+        form = self.get_form(data=self.data)
+        self.assertTrue(form.is_valid())
+
+    def test_init_with_user_without_data(self):
+        """
+        Checa campos obrigatórios
+        """
+        form = self.get_form(data={})
+        self.assertFalse(form.is_valid())
+        self.assertListEqual(
+            sorted(list(form.errors.keys())),
+            sorted(list(['name', 'email', 'gender', 'city']))
+        )
+
+    def test_save_create_person(self):
+        """
+        Save cria uma pessoa
+        """
+        count_before = Person.objects.count()
+        form = self.get_form(data=self.data)
+        form.is_valid()
+        form.save(domain_override='127.0.0.1')
+        self.assertEqual(Person.objects.count(), count_before + 1)
+
+    def test_save_create_user(self):
+        """
+        Save cria um usuário
+        """
+        count_before = User.objects.count()
+        form = self.get_form(data=self.data)
+        form.is_valid()
+        form.save(domain_override='127.0.0.1')
+        self.assertEqual(User.objects.count(), count_before + 1)
+
+    def test_save_send_email(self):
+        """
+        Save envia um email
+        """
+        form = self.get_form(data=self.data)
+        form.is_valid()
+        form.save(domain_override='127.0.0.1')
+        self.assertEqual(len(mail.outbox), 1)
+
+
+class ProfileCreateViewTest(TestCase):
+    def setUp(self):
+        self.data = {
+            "name": "João Das Couves",
+            "gender": "M",
+            "email": "joao-das-couves@gmail.com",
+            "city": 5413,
+        }
+
+        self.url = reverse('gatheros_event:profile_create')
+
+    def test_get(self):
+        """
+        Retorna página com form
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_success(self):
+        """
+        Cria o perfil
+        """
+        response = self.client.post(self.url, self.data, follow=True)
+        self.assertContains(response, 'Informações registradas com sucesso')
+
+    def test_post_error(self):
+        """
+        Verifica se post sem dados mostra campos obrigatórios
+        """
+        response = self.client.post(self.url, data={})
+        self.assertContains(response, 'Este campo é obrigatório', 4)
+
+    def test_follow_mail_link(self):
+        """
+        Verificando o link do email enviado
+        """
+        self.client.post(self.url, self.data)
+        self.assertEqual(len(mail.outbox), 1)
+
+        message = mail.outbox[0]
+        url = message.body.split('http://testserver')[1].split('\n', 1)[0]
+
+        # Get
+        response = self.client.get(url, follow=True)
+        last_url, status_code = response.redirect_chain[-1]
+        self.assertContains(response, 'Nova senha')
+
+        # Post
+        data = {
+            'new_password1': 'foo',
+            'new_password2': 'foo'
+        }
+        response = self.client.post(last_url, data, follow=True)
+        self.assertContains(response, "Sua senha foi definida")
+
+        # Check passord
+        user = User.objects.get(email=self.data['email'])
+        self.assertTrue(user.check_password('foo'))
+
+
+class ProfileResetPasswordViewTest(TestCase):
+    fixtures = [
+        '001_user',
+        '003_occupation',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+    ]
+
+    def setUp(self):
+        self.data = {
+            'email': "joao-das-couves@gmail.com"
+        }
+        self.url = reverse('password_reset')
+        self.url_success = reverse('password_reset_done')
+
+    def test_get(self):
+        """
+        Retorna página com form
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_success(self):
+        """
+        Cria o perfil
+        """
+        response = self.client.post(self.url, self.data, follow=True)
+        self.assertContains(response, 'Redefinição de senha enviada')
+
+    def test_post_error(self):
+        """
+        Verifica se post sem dados mostra campos obrigatórios
+        """
+        response = self.client.post(self.url, data={})
+        self.assertContains(response, 'Este campo é obrigatório', 1)
+
+    def test_follow_mail_link(self):
+        """
+        Verificando o link do email enviado
+        """
+        self.client.post(self.url, self.data, follow=True)
+        self.assertEqual(len(mail.outbox), 1)
+
+        message = mail.outbox[0]
+        url = message.body.split('http://testserver')[1].split('\n', 1)[0]
+
+        # Get
+        response = self.client.get(url, follow=True)
+        last_url, status_code = response.redirect_chain[-1]
+        self.assertContains(response, 'Nova senha')
+
+        # Post
+        data = {
+            'new_password1': 'foo',
+            'new_password2': 'foo'
+        }
+        response = self.client.post(last_url, data, follow=True)
+        self.assertContains(response, "Sua senha foi definida")
+
+        # Check passord
+        user = User.objects.get(email=self.data['email'])
+        self.assertTrue(user.check_password('foo'))

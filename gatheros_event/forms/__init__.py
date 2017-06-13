@@ -19,6 +19,4 @@ from .invitation import (
     InvitationDecisionForm,
 )
 from .place import PlaceForm
-from .profile import (
-    ProfileForm
-)
+from .profile import ProfileCreateForm, ProfileForm

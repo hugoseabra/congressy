@@ -21,4 +21,4 @@ from .organization.invite import (
 from .organization.panel import OrganizationPanelView
 from .organization.place import PlaceAddView
 from .organization.switch import OrganizationSwitch
-from .profile import ProfileView
+from .profile import ProfileCreateView, ProfileView
