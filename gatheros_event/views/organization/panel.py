@@ -62,4 +62,7 @@ class OrganizationPanelView(AccountMixin, TemplateView):
         )
 
     def _can_view(self):
+        if self.is_participant:
+            return False
+
         return self.organization.internal is False

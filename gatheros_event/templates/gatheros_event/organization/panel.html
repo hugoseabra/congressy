@@ -64,89 +64,237 @@
             <td style="vertical-align: top;padding:0 10px">
                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tr>
-                        <td>
-                            <table width="100%" border="0" cellspacing="0" cellpadding="10" style="border-bottom: 1px solid #dddddd;margin-bottom: 10px">
+                        <td colspan="2">
+                            <table width="99.5%" border="0" cellspacing="0" cellpadding="10" style="border-bottom: 1px solid #dddddd;margin-bottom: 5px">
                                 <tr>
                                     <td width="16%" style="vertical-align: top;">
-                                        <strong>Eventos:</strong> as
+                                        <strong>Eventos:</strong> 100
                                     </td>
                                     <td width="16%" style="vertical-align: top;">
-                                        <strong>Cadastros:</strong> as
+                                        <strong>Cadastros:</strong> 1.870
                                     </td>
                                     <td width="16%" style="vertical-align: top;">
-                                        <strong>Homens:</strong> as
+                                        <strong>Homens:</strong> 644 (23.33%)
                                     </td>
                                     <td width="16%">
-                                        <strong>Mulheres:</strong> asdf
+                                        <strong>Mulheres:</strong> 548 (23.33%)
                                     </td>
                                     <td width="16%">
-                                        <strong>PNEs:</strong> sdf
+                                        <strong>PNEs:</strong> 22 (23.33%)
                                     </td>
                                     <td width="16%">
-                                        <strong>Cidades:</strong> asd
+                                        <strong>Cidades:</strong> 12
                                     </td>
                                 </tr>
                             </table>
                         </td>
-                        <td width="25%" rowspan="2" style="vertical-align: top">
+                    </tr>
+                    <tr>
+                        <td width="80%" style="vertical-align: top">
+                            {% if can_manage %}
+                            <div style="border: 1px solid #ddd;width:99%;margin: 0 auto">
+                                <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
+                                    Convites pendentes
+                                </div>
+                                <div style="padding: 4px">
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="6" style="color:#333">
+                                        <tr>
+                                            <th width="4%">#</th>
+                                            <th style="text-align: left">Convidado</th>
+                                            <th style="text-align: left">Convidado em</th>
+                                            <th style="text-align: left">Expira em</th>
+                                            <th width="15%">&nbsp;</th>
+                                        </tr>
+                                        {% for invitation in organization.get_invitations|slice:":5" %}
+                                        <tr>
+                                            <td style="text-align: center;border-bottom:1px solid #DDD">{{ forloop.counter }}</td>
+                                            <td style="border-bottom:1px solid #DDD;font-weight: bold;{% if invitation.is_expired %}color:darkgrey;font-style:italic{% endif %}">
+                                                {{ invitation.to.get_full_name }}
+                                                <span style="font-weight: normal;color: gray">({{ invitation.to.email }})</span>
+                                            </td>
+                                            <td style="border-bottom:1px solid #DDD;{% if invitation.is_expired %}color:darkgrey;font-style:italic{% endif %}">
+                                                {{ invitation.created }}
+                                            </td>
+                                            <td style="border-bottom:1px solid #DDD;{% if invitation.is_expired %}color:darkgrey;font-style:italic{% endif %}">
+                                                {{ invitation.expired }}
+                                            </td>
+                                            <td style="text-align: center;border-bottom:1px solid #DDD">
+                                                <button type="button">Reenviar</button>
+                                                <button type="button">Excluir</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </table>
+                                    <div style="margin-top:10px; padding: 10px;background-color: whitesmoke;text-align: center;border-bottom:1px solid dimgray">
+                                        <a href="#">Ver convites</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div style="border: 1px solid #ddd;width:99%;margin: 5px auto">
+                                <h4 style="padding:5px;margin-top:8px">Eventos populares</h4>
+                                <div style="padding: 4px">
+                                    {% for event in organization.events.all|slice:":6" %}
+                                    <div style="border: 1px solid #dddddd;float:left;width: 400px;margin-bottom: 8px;margin-left:4px">
+                                        <div style="padding:5px">
+                                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                <tr>
+                                                    <td width="25%">
+                                                        {% if event.banner_small %}
+                                                            <!--suppress CheckImageSize -->
+                                                            <img style="border-radius: 10px" src="{{ event.banner_small.thumbnail.url }}" width="100%" />
+                                                        {% else %}
+                                                            <!--suppress CheckImageSize -->
+                                                            <img style="border-radius: 10px" src="/media/default_avatar.png" width="73%" />
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <div style="margin-left: 4px;margin-top:4px;padding:10px 0">
+                                                            <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">
+                                                                <a href="{% url 'gatheros_event:event-panel' event.pk %}">
+                                                                    {{ event.name }}
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+                                    <div style="clear:both"></div>
+                                </div>
+                                <div style="margin-top:10px; padding: 10px;background-color: whitesmoke;text-align: center;border-bottom:1px solid dimgray">
+                                    <a href="#">Ver eventos</a>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="vertical-align: top">
                             <div style="border: 1px solid #dddddd;">
                                 <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
                                     Últimas atividades
                                 </div>
-                                <div style="padding:10px">
-                                    asdfasdf
+                                <div style="padding:10px;height: 521px">
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr><tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr><tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr><tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr><tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr><tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr><tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr><tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr><tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr><tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr><tr>
+                                            <td width="12%">
+                                                <img src="/media/default_avatar.png" width="100%" />
+                                            </td>
+                                            <td>
+                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
+                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
+                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
-                                <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
+                                <div style="margin-top:10px; padding: 10px;background-color: whitesmoke;text-align: center;border-bottom:1px solid dimgray">
                                     <a href="#">Ver todas as atividades</a>
                                 </div>
                             </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <table width="100%" border="0" cellspacing="0" cellpadding="4" style="border-bottom: 1px solid #dddddd;margin-bottom: 10px">
-                                <tr>
-                                    <td width="20%" style="vertical-align: top;">
-                                        <div style="border: 1px solid #dddddd;">
-                                            <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
-                                                Últimas atividades
-                                            </div>
-                                            <div style="padding:10px">
-                                                asdfasdf
-                                            </div>
-                                            <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
-                                                <a href="#">Ver todas as atividades</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td style="vertical-align: top;">
-                                        <div style="border: 1px solid #dddddd;">
-                                            <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
-                                                Últimas atividades
-                                            </div>
-                                            <div style="padding:10px">
-                                                asdfasdf
-                                            </div>
-                                            <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
-                                                <a href="#">Ver todas as atividades</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td style="vertical-align: top;">
-                                        <div style="border: 1px solid #dddddd;">
-                                            <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
-                                                Últimas atividades
-                                            </div>
-                                            <div style="padding:10px">
-                                                asdfasdf
-                                            </div>
-                                            <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
-                                                <a href="#">Ver todas as atividades</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
                         </td>
                     </tr>
                 </table>

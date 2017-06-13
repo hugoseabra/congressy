@@ -54,6 +54,7 @@ class EventDetailBannersUploadTest(TestCase):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
         self.client.force_login(self.user)
         self._switch_context()
+        self._clear_uploaded_directory()
 
     def _get_active_organization(self):
         request = MockRequest(self.user, self.client.session)
@@ -81,11 +82,15 @@ class EventDetailBannersUploadTest(TestCase):
     def _get_event(self):
         return Event.objects.get(slug='seo-e-resultados')
 
-    def tearDown(self):
+    # noinspection PyMethodMayBeStatic
+    def _clear_uploaded_directory(self):
         event = self._get_event()
         path = os.path.join(self.event_path, str(event.pk))
         if os.path.isdir(path):
             shutil.rmtree(path)
+
+    def tearDown(self):
+        self._clear_uploaded_directory()
 
     def test_upload(self):
         file_names = {

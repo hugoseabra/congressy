@@ -33,6 +33,7 @@ class BaseInfoFormTest(TestCase):
             'info'
         )
         self.persisted_path = 'event'
+        self._clear_uploaded_dir()
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
@@ -43,7 +44,8 @@ class BaseInfoFormTest(TestCase):
         event = self._get_event()
         return event.info
 
-    def tearDown(self):
+    # noinspection PyMethodMayBeStatic
+    def _clear_uploaded_dir(self):
         info = self._get_info()
         path = os.path.join(
             settings.MEDIA_ROOT,
@@ -52,6 +54,9 @@ class BaseInfoFormTest(TestCase):
         )
         if os.path.isdir(path):
             shutil.rmtree(path)
+
+    def tearDown(self):
+        self._clear_uploaded_dir()
 
 
 class InfoTextFormTest(BaseInfoFormTest):

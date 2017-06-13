@@ -9,11 +9,24 @@ from gatheros_event.models import Organization, Person
 
 def is_configured(request):
     """Verifica se contexto de sessão está configurada."""
-    configured = 'account' in request.session
-    if not configured:
-        clean_account(request)
 
-    return configured
+    if hasattr(request, 'cached_context_participant') \
+            and request.cached_context_participant is True:
+        return True
+
+    has_account = 'account' in request.session
+    if has_account:
+        return bool(request.session['account']) is True
+
+    clean_account(request)
+    return False
+
+
+def is_participant(request):
+    if hasattr(request, 'cached_context_participant'):
+        return getattr(request, 'cached_context_participant', False)
+
+    return False
 
 
 def get_organization(request):
@@ -95,6 +108,9 @@ def update_account(request, organization=None):
     Pk da organização ativa da sessão
     :return:
     """
+    if is_participant(request):
+        return
+
     if not is_configured(request):
         request.session['account'] = {}
 
@@ -108,15 +124,19 @@ def update_account(request, organization=None):
             raise SuspiciousOperation(
                 'Usuário %s não está vinculado a uma pessoa.' % request.user
             )
-            # @todo regra para usuários sem pessoa vinculada
 
         member = person.members \
             .filter(organization__active=True) \
             .order_by('-organization__internal', 'organization__name') \
             .first()
 
-        # @todo verificar regra se algum momento pode usuário sem organização
-        organization = member.organization
+        if not member:
+            request.cached_context_participant = True
+        else:
+            organization = member.organization
+
+    if is_participant(request):
+        return
 
     set_organization(request, organization)
 
@@ -150,6 +170,9 @@ def clean_account(request):
 
 def clean_cache(request):
     """Limpa cache de contexto de organização da sessão."""
+    if hasattr(request, 'cached_context_type'):
+        del request.cached_context_participant
+
     if hasattr(request, 'cached_organizations'):
         del request.cached_organizations
 

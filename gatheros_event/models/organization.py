@@ -6,8 +6,8 @@ vinculadas a ela.
 """
 
 from django.contrib.auth.models import User
-from django.utils.html import strip_tags
 from django.db import models
+from django.utils.html import strip_tags
 
 from core.util import slugify
 from .member import Member
@@ -135,3 +135,14 @@ class Organization(models.Model):
         :return:
         """
         return len(self.get_members(group=Member.ADMIN, person=person)) > 0
+
+    def get_invitations(self):
+        """
+        Recupera convites da organização feita por membros administradores
+        """
+        invitations = []
+        for member in self.members.all():
+            if not invitations:
+                invitations += list(member.invitations.all())
+
+        return invitations

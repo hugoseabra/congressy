@@ -7,7 +7,7 @@ gerir as informações relacionadas aos eventos da organização.
 from django.db import models
 
 from gatheros_event.models.rules import member as rule
-from . import Person
+from gatheros_event.models import Person
 
 
 class Member(models.Model):
