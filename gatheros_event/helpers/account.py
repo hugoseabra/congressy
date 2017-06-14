@@ -34,7 +34,10 @@ def get_organization(request):
     if not hasattr(request, 'cached_organization'):
         account = request.session.get('account')
         try:
-            org = Organization.objects.get(pk=account.get('organization'))
+            org = Organization.objects.get(
+                pk=account.get('organization'),
+                active=True
+            )
             request.cached_organization = org
 
         except Organization.DoesNotExist:
@@ -54,7 +57,8 @@ def get_organizations(request):
         account = request.session.get('account')
         request.cached_organizations = list(
             Organization.objects.filter(
-                pk__in=account.get('organizations')
+                pk__in=account.get('organizations'),
+                active=True
             ).order_by('-internal', 'name')
         )
 
@@ -98,7 +102,7 @@ def set_organization(request, organization):
     request.session.modified = True
 
 
-def update_account(request, organization=None):
+def update_account(request, organization=None, force=False):
     """
     Atualiza as informações das organizações e marca a organização principal
     como ativa na sessao
@@ -106,6 +110,7 @@ def update_account(request, organization=None):
     :param request:
     :param organization: int
     Pk da organização ativa da sessão
+    :param force: Força a atualização de organizações
     :return:
     """
     if is_participant(request):
@@ -126,7 +131,7 @@ def update_account(request, organization=None):
             )
 
         member = person.members \
-            .filter(organization__active=True) \
+            .filter(organization__active=True, active=True) \
             .order_by('-organization__internal', 'organization__name') \
             .first()
 
@@ -140,12 +145,14 @@ def update_account(request, organization=None):
 
     set_organization(request, organization)
 
-    if request.session['account'].get('organizations') is None:
+    if force or request.session['account'].get('organizations') is None:
         clean_cache(request)
 
         # Definindo todas organizações na sessão
         organizations = Organization.objects.filter(
-            members__person=request.user.person
+            members__person=request.user.person,
+            members__active=True,
+            active=True
         )
 
         request.session['account'].update({
