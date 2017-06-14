@@ -4,7 +4,7 @@ from gatheros_event.views.invite import (
     InvitationListView,
     InvitationCreateView,
     InvitationDecisionView,
-    # InvitationProfileView,
+    InvitationProfileView,
 )
 
 # EVENT
