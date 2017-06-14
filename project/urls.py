@@ -11,7 +11,7 @@ url_manager = [
         'gatheros_subscription.urls',
         'gatheros_subscription'
     )),
-    url(r'^manager/', include(
+    url(r'^', include(
         'gatheros_event.urls',
         'gatheros_event'
     )),

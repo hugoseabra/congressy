@@ -2,11 +2,6 @@
 {% load i18n static %}
 
 {% block content %}
-    <div style="padding:10px">
-        <a href="{% url 'gatheros_event:organization-panel' %}">Voltar</a>
-    </div>
-    <hr/>
-
     <pre>
         Criar um painel para o usuário? Isso poderia permitir a visualização
         de membros de uma organização por outros membros.
@@ -18,8 +13,8 @@
             {{ form.as_table }}
         </table>
 
-        <a href="/">Cancelar</a>
         <input type="submit" value="Salvar"/>
+        <a href="{% url 'gatheros_front:start' %}">Cancelar</a>
     </form>
 
 {% endblock %}

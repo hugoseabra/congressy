@@ -66,29 +66,24 @@ url_event = [
 
 url_organization = [
     url(
-        r'^convite/(?P<pk>[0-9A-Fa-f-]+)/perfil/$',
-        views.InvitationProfileView.as_view(),
-        name='invitation-profile'
+        r'^(?P<pk>[\d]+)/delete/$',
+        views.OrganizationDeleteView.as_view(),
+        name='organization-delete'
     ),
     url(
-        r'^convite/(?P<pk>[0-9A-Fa-f-]+)/$',
-        views.InvitationDecisionView.as_view(),
-        name='invitation-decision'
+        r'^(?P<pk>[\d]+)/edit/$',
+        views.OrganizationEditFormView.as_view(),
+        name='organization-edit'
     ),
     url(
-        r'^convite-sucesso/$',
-        views.InvitationCreateSuccessView.as_view(),
-        name='invitation-success'
+        r'^add/$',
+        views.OrganizationAddFormView.as_view(),
+        name='organization-add'
     ),
     url(
-        r'^convite/$',
-        views.InvitationCreateView.as_view(),
-        name='invitation'
-    ),
-    url(
-        r'^add-place/$',
-        views.PlaceAddView.as_view(),
-        name='organization-add-place'
+        r'^(?P<pk>[\d]+)/$',
+        views.OrganizationPanelView.as_view(),
+        name='organization-panel'
     ),
     url(
         r'^switch/$',
@@ -97,8 +92,57 @@ url_organization = [
     ),
     url(
         r'^$',
-        views.OrganizationPanelView.as_view(),
-        name='organization-panel'
+        views.OrganizationListView.as_view(),
+        name='organization-list'
+    ),
+]
+
+url_place = [
+    url(
+        r'^(?P<pk>[\d]+)/delete/$',
+        views.PlaceDeleteView.as_view(),
+        name='place-delete'
+    ),
+    url(
+        r'^(?P<pk>[\d]+)/$',
+        views.PlaceEditFormView.as_view(),
+        name='place-edit'
+    ),
+    url(
+        r'^add/$',
+        views.PlaceAddFormView.as_view(),
+        name='place-add'
+    ),
+    url(
+        r'^$',
+        views.PlaceListView.as_view(),
+        name='place-list'
+    ),
+]
+
+url_manager_invitation = [
+    url(
+        r'^add/$',
+        views.InvitationCreateView.as_view(),
+        name='invitation-add'
+    ),
+    url(
+        r'^$',
+        views.InvitationListView.as_view(),
+        name='invitation-list'
+    ),
+]
+
+url_invitation = [
+    url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/profile/$',
+        views.InvitationProfileView.as_view(),
+        name='invitation-profile'
+    ),
+    url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/$',
+        views.InvitationDecisionView.as_view(),
+        name='invitation-decision'
     ),
 ]
 
@@ -111,7 +155,16 @@ url_profile = [
 ]
 
 urlpatterns = [
-    url(r'^', include(url_profile)),
-    url(r'^events/', include(url_event)),
-    url(r'^organizations/', include(url_organization)),
+    url(r'^manager/', include(url_profile)),
+    url(r'^invitations/', include(url_invitation)),
+    url(r'^manager/events/', include(url_event)),
+    url(r'^manager/organizations/', include(url_organization)),
+    url(
+        r'^manager/organizations/(?P<organization_pk>[\d]+)/places/',
+        include(url_place)
+    ),
+    url(
+        r'^manager/organizations/(?P<organization_pk>[\d]+)/invitations/',
+        include(url_manager_invitation)
+    ),
 ]
