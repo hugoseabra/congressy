@@ -13,10 +13,11 @@ from kanu_locations.models import City
 from core.model import track_data
 from core.model.validator import cpf_validator, phone_validator
 from . import Occupation
+from .mixins import GatherosModelMixin
 
 
 @track_data('name', 'user', 'email')
-class Person(models.Model):
+class Person(models.Model, GatherosModelMixin):
     """Pessoa"""
 
     RESOURCE_URI = '/api/core/people/'

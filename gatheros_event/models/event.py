@@ -91,6 +91,8 @@ class Event(models.Model, GatherosModelMixin):
 
     slug = models.SlugField(
         max_length=128,
+        null=True,
+        blank=True,
         unique=True,
         editable=False,
         verbose_name='permalink'
@@ -101,8 +103,9 @@ class Event(models.Model, GatherosModelMixin):
 
     place = models.ForeignKey(
         Place,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         verbose_name='local',
+        related_name='events',
         blank=True,
         null=True,
         help_text="Deixar em branco se o evento é apenas on-line.",

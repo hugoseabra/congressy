@@ -3,32 +3,21 @@
 
 
 {% block content %}
-    {% if protected %}
-        {% if not_allowed_message %}
-            {{ not_allowed_message }}
-        {% endif %}
-        <!--suppress HtmlUnknownAttribute, HtmlUnknownAttribute, HtmlUnknownTarget -->
-        <br />
-        <br />
-        <a href="{% url 'gatheros_event:event-list' %}" class="button cancel-link">Voltar</a>
-    {% else %}
-        {% if delete_message %}
-            {{ delete_message }}
-        {% endif %}
-        <br />
-        <br />
-        <form method="post">{% csrf_token %}
-            <div>
-                <input type="hidden" name="post" value="yes"/>
-                <!--suppress HtmlUnknownAttribute -->
-                <input type="submit" value="{% trans "Yes, I'm sure" %}"/>
-                {% if next_path %}
-                    <a href="{{ next_path|urlencode }}">Não, leve-me de volta</a>
-                {% else %}
-                    <a href="{% url 'gatheros_event:event-list' %}">Não, leve-me de volta</a>
-                {% endif %}
-            </div>
-        </form>
-
+    {% if delete_message %}
+        {{ delete_message }}
     {% endif %}
+    <br />
+    <br />
+    <form method="post">{% csrf_token %}
+        <div>
+            <input type="hidden" name="post" value="yes"/>
+            <!--suppress HtmlUnknownAttribute -->
+            <input type="submit" value="{% trans "Yes, I'm sure" %}"/>
+            {% if next_path %}
+                <a href="{{ next_path|urlencode }}">Não, leve-me de volta</a>
+            {% else %}
+                <a href="{{ go_back_path }}">Não, leve-me de volta</a>
+            {% endif %}
+        </div>
+    </form>
 {% endblock %}

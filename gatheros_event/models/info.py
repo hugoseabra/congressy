@@ -11,6 +11,7 @@ from stdimage import StdImageField
 from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
 from . import Event
+from .mixins import GatherosModelMixin
 
 
 # @TODO Excluir imagens banners ao deletar evento.
@@ -19,7 +20,7 @@ def get_image_path(instance, filename):
     return os.path.join('event', str(instance.event.id), filename)
 
 
-class Info(models.Model):
+class Info(models.Model, GatherosModelMixin):
     """ Informações de evento """
 
     CONFIG_TYPE_TEXT_ONLY = 'text_only'

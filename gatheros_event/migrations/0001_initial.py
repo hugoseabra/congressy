@@ -164,6 +164,8 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(
                     editable=False,
                     max_length=128,
+                    null=True,
+                    blank=True,
                     unique=True,
                     verbose_name='permalink'
                 )),
@@ -354,6 +356,8 @@ class Migration(migrations.Migration):
                 )),
                 ('slug', models.SlugField(
                     max_length=128,
+                    blank=True,
+                    null=True,
                     unique=True,
                     verbose_name='permalink',
                     help_text='Link que aparecerá para exibir as informações'
@@ -369,7 +373,8 @@ class Migration(migrations.Migration):
                     ("can_invite", "Can invite members"),
                     ('can_view', 'Can view'),
                     ('can_add_event', 'Can add event'),
-                    ("can_add_place", "Can add place related to organization"),
+                    ("can_manage_members", "Can manage members"),
+                    ("can_manage_places", "Can manage places"),
                 ),
             },
         ),
@@ -631,7 +636,7 @@ class Migration(migrations.Migration):
                 )),
             ],
             options={
-                'verbose_name': 'local de Evento',
+                'verbose_name': 'local de evento',
                 'verbose_name_plural': 'locais de Evento',
                 'ordering': ['name'],
             },
@@ -819,6 +824,7 @@ class Migration(migrations.Migration):
             name='author',
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
+                related_name='invitations',
                 to='gatheros_event.Member',
                 verbose_name='autor'
             ),
@@ -858,11 +864,16 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 blank=True,
                 help_text='Deixar em branco se o evento é apenas on-line.',
+                related_name='events',
                 null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
+                on_delete=django.db.models.deletion.PROTECT,
                 to='gatheros_event.Place',
                 verbose_name='local'
             ),
+        ),
+        migrations.AlterUniqueTogether(
+            name='member',
+            unique_together=[('person', 'organization')],
         ),
         migrations.AlterUniqueTogether(
             name='invitation',

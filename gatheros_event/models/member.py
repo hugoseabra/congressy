@@ -6,11 +6,12 @@ gerir as informações relacionadas aos eventos da organização.
 
 from django.db import models
 
-from gatheros_event.models.rules import member as rule
 from gatheros_event.models import Person
+from gatheros_event.models.rules import member as rule
+from .mixins import GatherosModelMixin
 
 
-class Member(models.Model):
+class Member(models.Model, GatherosModelMixin):
     """Membro de organização."""
 
     ADMIN = 'admin'
@@ -51,6 +52,7 @@ class Member(models.Model):
         verbose_name = 'membro'
         verbose_name_plural = 'membros'
         ordering = ['person', 'organization']
+        unique_together = (('person', 'organization',),)
 
     def save(self, *args, **kwargs):
         self.check_rules()

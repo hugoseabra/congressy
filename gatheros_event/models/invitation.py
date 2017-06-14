@@ -13,10 +13,11 @@ from django.db import models
 from core.model import track_data
 from gatheros_event import settings
 from . import Member
+from .mixins import GatherosModelMixin
 from .rules import check_invite
 
 
-class InvitationManager(models.Manager):
+class InvitationManager(models.Manager, GatherosModelMixin):
     """ Manager - Gerenciador de Convites. """
     def get_invitations(self, organization):
         return self.filter(organization=organization).all

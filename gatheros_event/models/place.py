@@ -8,12 +8,13 @@ from django.db import models
 from kanu_locations.models import City
 
 from . import Organization
+from .mixins import GatherosModelMixin
 
 
 # @TODO Usar GeoDjango para coodenadas
 # @TODO Ver integração com Google Maps
 
-class Place(models.Model):
+class Place(models.Model, GatherosModelMixin):
     """Local de evento."""
 
     name = models.CharField(max_length=255, verbose_name='nome')
@@ -96,7 +97,7 @@ class Place(models.Model):
     )
 
     class Meta:
-        verbose_name = 'local de Evento'
+        verbose_name = 'local de evento'
         verbose_name_plural = 'locais de Evento'
         ordering = ['name']
 

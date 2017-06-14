@@ -11,10 +11,11 @@ from django.utils.html import strip_tags
 
 from core.util import slugify
 from .member import Member
+from .mixins import GatherosModelMixin
 from .person import Person
 
 
-class Organization(models.Model):
+class Organization(models.Model, GatherosModelMixin):
     """ Organização """
     name = models.CharField(max_length=100, verbose_name='nome')
     description = models.TextField(
@@ -29,6 +30,8 @@ class Organization(models.Model):
     )
     slug = models.SlugField(
         max_length=128,
+        blank=True,
+        null=True,
         unique=True,
         verbose_name='permalink',
         help_text="Link que aparecerá para exibir as informações da"
@@ -77,7 +80,8 @@ class Organization(models.Model):
             ("can_invite", "Can invite members"),
             ("can_view", "Can view"),
             ("can_add_event", "Can add event"),
-            ("can_add_place", "Can add place related to organization"),
+            ("can_manage_members", "Can manage members"),
+            ("can_manage_places", "Can manage places"),
         )
 
     def __str__(self):
@@ -101,7 +105,7 @@ class Organization(models.Model):
 
         :param group: string - Filtro de lista por grupo
         :param person: object - filtro de lista por Instância de Person ou User
-        :return: list
+        :return: QuerySet
         """
         qs = self.members.all()
 
@@ -117,6 +121,14 @@ class Organization(models.Model):
 
             qs = qs.filter(person=person)
         return qs
+
+    def get_member(self, person):
+        """ Recupera Member de organização. """
+        members_qs = self.get_members(person=person)
+        if members_qs.count() == 0:
+            return None
+
+        return members_qs.first()
 
     def is_member(self, person):
         """

@@ -8,7 +8,7 @@ from permission.compat import is_authenticated
 from permission.logics.base import PermissionLogic
 from permission.utils.field_lookup import field_lookup
 
-from .models import Event, Member, Organization, Person
+from .models import Event, Member, Organization, Person, Place
 
 
 class MemberPermissionLogic(PermissionLogic):
@@ -49,7 +49,11 @@ class MemberPermissionLogic(PermissionLogic):
             raise ImproperlyConfigured(
                 'Configuração errada, "obj" não é do tipo "Organization". '
                 'Verfique o parametro "field_organization" em '
-                'add_permission_logic')
+                'add_permission_logic. Lógica inserida: '
+                + str(self.handler.__name__) + ', permissões configuradas ('
+                + ', '.join(self.permissions) + ') e permissão solicitada: '
+                + str(perm)
+            )
 
         has_perm = perm.split('.')[1] in self.permissions
         perm_granted = self.handler(user_obj=user_obj, organization=obj)
@@ -105,7 +109,8 @@ logic = MemberPermissionLogic(
         'change_organization',
         'delete_organization',
         'can_view',
-        'can_add_place',
+        'can_manage_members',
+        'can_manage_places',
         'can_add_event'
     ],
 )
@@ -147,3 +152,12 @@ logic = MemberPermissionLogic(
     'organization',
 )
 add_permission_logic(Event, logic)
+
+
+# Organização -> Admin -> Locais de evento
+logic = MemberPermissionLogic(
+    member_is_admin,
+    ['delete_place'],
+    'organization',
+)
+add_permission_logic(Place, logic)

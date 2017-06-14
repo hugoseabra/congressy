@@ -159,6 +159,7 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'name',
                 'slug',
                 'description_html',
+                'avatar',
                 'active',
             ),
         }),
