@@ -92,8 +92,8 @@
     "pk": 5,
     "fields": {
         "name": "In2 Web Solu\u00e7\u00f5es e Servi\u00e7os",
-        "description": null,
-        "description_html": null,
+        "description": "Empresa privada de tecnologia",
+        "description_html": "Empresa privada de tecnologia",
         "avatar_width": null,
         "avatar_height": null,
         "avatar": "in2web.png",
@@ -114,8 +114,8 @@
     "pk": 6,
     "fields": {
         "name": "/MNT",
-        "description": null,
-        "description_html": null,
+        "description": "Comuniadade Mulheres na Tecnologia",
+        "description_html": "Comuniadade Mulheres na Tecnologia",
         "avatar_width": null,
         "avatar_height": null,
         "avatar": "mnt.jpeg",
@@ -136,8 +136,8 @@
     "pk": 7,
     "fields": {
         "name": "Paroquias Unidas",
-        "description": null,
-        "description_html": null,
+        "description": "União das Paróquias",
+        "description_html": "União das Paróquias",
         "avatar_width": null,
         "avatar_height": null,
         "avatar": null,

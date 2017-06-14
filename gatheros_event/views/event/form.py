@@ -123,10 +123,6 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
 
         return initial
 
-    def get_context_data(self, **kwargs):
-        context = super(EventEditFormView, self).get_context_data(**kwargs)
-        return context
-
     def get_success_url(self):
         form_kwargs = self.get_form_kwargs()
         data = form_kwargs.get('data', {})
