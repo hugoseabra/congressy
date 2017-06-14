@@ -1,20 +1,21 @@
 {% extends "gatheros_front/base.html" %}
 {% load i18n static %}
+{% load organization_tags %}
 
 {% block content %}
     <h1>Painel do Organização</h1>
     <div>
-        {% if organization.avatar %}
+        {% if object.avatar %}
         <div style="float:left;margin-right: 5px">
-            <img src="{{ organization.avatar.url }}" width="100px" height="100px" style="border:1px solid #DDD;margin:3px"/>
+            <img src="{{ object.avatar.url }}" width="100px" height="100px" style="border:1px solid #DDD;margin:3px"/>
         </div>
         {% endif %}
         <div style="float:left">
-            <h2 style="font-size: 36px">{{ organization.name }}</h2>
+            <h2 style="font-size: 36px">{{ object.name }}</h2>
         </div>
         <div style="clear:both"></div>
     </div>
-    <div style="padding: 10px;background-color: #DDDDDD;text-align: center;">
+    <div style="margin-bottom:20px;padding: 10px;background-color: #DDDDDD;text-align: center;">
         {% if can_change %}
             <a href="#">Editar</a>
         {% endif %}
@@ -24,8 +25,8 @@
         {% if can_delete %}
             <a href="#">Excluir</a>
         {% endif %}
+        <a href="#">Desativar</a>
     </div>
-    <div style="margin-bottom:10px; width: 100%;height:3px;background-color: green"></div>
 
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
         <tr>
@@ -33,33 +34,34 @@
                 <div style="background-color: #DDDDDD;border: 1px solid #DDD">
                     <div style="padding:0 5px">
                         <p><strong>Realizador:</strong></p>
-                        <p>{{ organization.name }}</p>
+                        <p>{{ object.name }}</p>
                     </div>
                     <div style="padding:0 5px">
                         <p><strong>Acessando como:</strong></p>
-                        <p>{{ member.get_group_display }}</p>
+                        <p>{% get_member_group_name object user %}</p>
                     </div>
                 </div>
                 <br/>
-                {% if can_manage %}
                 <div style="background-color: whitesmoke;border: 1px solid #dddddd;">
-                    {% if member.is_admin %}
                     <div style="padding:15px">
-                        &rightarrow; <a href="#">Membros</a>
+                        &rightarrow; <a href="{% url 'gatheros_event:organization-list' %}">Minhas organizações</a>
                     </div>
+                    {% if can_manage_invitations %}
+                        <div style="padding:15px">
+                            &rightarrow; <a href="{% url 'gatheros_event:invitation-list' object.pk %}">Convites</a>
+                        </div>
+                    {% endif %}
+                    {% if can_manage_members %}
+                        <div style="padding:15px">
+                            &rightarrow; <a href="#">Membros</a>
+                        </div>
                     {% endif %}
                     {% if can_manage_places %}
                         <div style="padding:15px">
-                            &rightarrow; <a href="#">Locais de eventos</a>
-                        </div>
-                    {% endif %}
-                    {% if can_manage_invitations %}
-                        <div style="padding:15px">
-                            &rightarrow; <a href="#">Convidados</a>
+                            &rightarrow; <a href="{% url 'gatheros_event:place-list' object.pk %}">Locais de eventos</a>
                         </div>
                     {% endif %}
                 </div>
-                {% endif %}
             </td>
             <td style="vertical-align: top;padding:0 10px">
                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -105,7 +107,7 @@
                                             <th style="text-align: left">Expira em</th>
                                             <th width="15%">&nbsp;</th>
                                         </tr>
-                                        {% for invitation in organization.get_invitations|slice:":5" %}
+                                        {% for invitation in object.get_invitations|slice:":5" %}
                                         <tr>
                                             <td style="text-align: center;border-bottom:1px solid #DDD">{{ forloop.counter }}</td>
                                             <td style="border-bottom:1px solid #DDD;font-weight: bold;{% if invitation.is_expired %}color:darkgrey;font-style:italic{% endif %}">
@@ -135,7 +137,7 @@
                             <div style="border: 1px solid #ddd;width:99%;margin: 5px auto">
                                 <h4 style="padding:5px;margin-top:8px">Eventos populares</h4>
                                 <div style="padding: 4px">
-                                    {% for event in organization.events.all|slice:":6" %}
+                                    {% for event in object.events.all|slice:":6" %}
                                     <div style="border: 1px solid #dddddd;float:left;width: 400px;margin-bottom: 8px;margin-left:4px">
                                         <div style="padding:5px">
                                             <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -302,17 +304,6 @@
         </tr>
     </table>
 
-    {% if user has 'gatheros_event.can_invite' of organization %}
-        <p>
-            <a href="{% url 'gatheros_event:invitation' %}?organization={{ organization.pk }}">Convidar membros</a>
-        </p>
-    {% endif %}
-    {% if user has 'gatheros_event.can_add_place' of organization %}
-        <p>
-            <a href="{% url 'gatheros_event:organization-add-place' %}">Adicionar local</a>
-        </p>
-    {% endif %}
-
     <br />
     <hr />
     <pre>
@@ -323,6 +314,8 @@
         = Lista de membros (nome, tipo, data de entrada), com filtro (tipo) e possibilidade de "adicionar", "editar" e "excluir"
         = Lista de locais e possibilidade de "adicionar", "editar" e "excluir"
         = Lista de convites pendentes (nome, e-mail, tipo, data de envio), com filtro (tipo) e possibilidade de "adicionar", "editar" e "excluir"
+        = Para ver organização, membro também deve estar ativo
+        = Admin pode desativar e ativar membro
     </pre>
 
 {% endblock %}

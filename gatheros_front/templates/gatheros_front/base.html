@@ -65,7 +65,7 @@
                         {% endif %}
                         {% if context_type == 'member' and not organization.internal %}
                             &nbsp; | &nbsp;
-                            <a href="{% url 'gatheros_event:organization-panel' %}">Minha organização</a>
+                            <a href="{% url 'gatheros_event:organization-panel' organization.pk %}">Gerenciar</a>
                         {% endif %}
                         &nbsp; | &nbsp;
                         <a href="{% url 'gatheros_event:profile' %}">Meus dados</a>

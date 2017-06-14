@@ -1,0 +1,52 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+{% load organization_tags %}
+
+{% block title %}Gatheros - Eventos{% endblock %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:organization-panel' place_organization.pk %}">Voltar</a>
+    </div>
+    <hr/>
+    <h1>Locais de evento</h1>
+    <h2>{{ place_organization.name }}</h2>
+    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
+        <a href="{% url 'gatheros_event:place-add' place_organization.pk %}">Adicionar</a>
+    </div>
+
+    <div style="background: #DDD">
+        {% if object_list %}
+            <table width="100%">
+                <tr>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome do Local</td>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
+                </tr>
+                {% for item in object_list %}
+                    <tr>
+                        <td style="background: #FFF;padding:10px;margin-bottom: 3px">
+                            <div>
+                                {{ forloop.counter }} -
+                                <a href="{% url 'gatheros_event:place-edit' place_organization.pk item.pk %}">{{ item.name }}</a>
+                            </div>
+                            <hr/>
+                            <div style="text-indent: 10px;">
+                                {{ item.get_complete_address }}
+                            </div>
+                        </td>
+                        <td width="8%" style="background: #FFF;padding:10px;margin-bottom: 3px">
+                            <a href="{% url 'gatheros_event:place-edit' place_organization.pk item.pk %}">Editar</a>
+                            &nbsp; &nbsp; &nbsp;
+                            <a href="{% url 'gatheros_event:place-delete' place_organization.pk item.pk %}">Excluir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <div style="background: #FFF;padding:10px;margin-bottom: 3px">
+                Nenhum local
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+    <div style="padding:10px">
+        {% if object %}
+            <a href="{% url 'gatheros_event:event-panel' object.pk %}">Voltar</a>
+        {% else %}
+            <a href="{% url 'gatheros_event:event-list' %}">Voltar</a>
+        {% endif %}
+    </div>
+    <hr/>
+    {% if object %}
+        <h2>{{ object.name }}</h2>
+        <div style="margin-bottom:10px;padding: 10px;background-color: #DDDDDD;text-align: center;"></div>
+    {% endif %}
+
+
+    {% if form_title %}
+        <h2>{{ form_title }}</h2>
+    {% endif %}
+    <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <br />
+        <hr />
+        <input type="submit" value="Salvar"/>
+        {% if next_path %}
+            <a href="{{ next_path|urlencode }}">Cancelar</a>
+            <input type="hidden" name="next" value="{{ next_path }}"/>
+        {% else %}
+            <a href="{% url 'gatheros_event:event-list' %}">Cancelar</a>
+        {% endif %}
+    </form>
+{% endblock %}
