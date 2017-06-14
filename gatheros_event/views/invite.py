@@ -1,51 +1,111 @@
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render_to_response
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import get_token
 from django.views.generic import FormView, TemplateView
+
+from django.views.generic import ListView
 
 from gatheros_event.forms import (
     InvitationCreateForm,
     InvitationDecisionForm,
     ProfileForm
 )
-from gatheros_event.models import Invitation
+from gatheros_event.models import Invitation, Organization
 from gatheros_event.views.mixins import AccountMixin
 
 
-class InvitationCreateView(AccountMixin, FormView):
-    template_name = 'gatheros_event/organization/invitation-create.html'
-    success_url = reverse_lazy(
-        'gatheros_event:invitation-success'
-    )
+class InvitationListView(AccountMixin, ListView):
+    model = Invitation
+    template_name = 'gatheros_event/invitation/list.html'
+    invitation_organization = None
+
+    def get_context_data(self, **kwargs):
+        context = super(InvitationListView, self).get_context_data(**kwargs)
+        context['invitation_organization'] = self.get_invitation_organization()
+
+        return context
 
     def dispatch(self, request, *args, **kwargs):
-        dispatch = super(InvitationCreateView, self).dispatch(
+        if not self._can_view():
+            if self.organization.internal:
+                messages.warning(request, 'Você não pode realizar esta ação.')
+                return redirect(reverse_lazy('gatheros_front:start'))
+            else:
+                org = self.get_invitation_organization()
+                messages.warning(request, 'Você não pode acessar esta área.')
+                return redirect(reverse(
+                    'gatheros_front:organization-panel',
+                    kwargs={'pk': org.pk}
+                ))
+
+        return super(InvitationListView, self).dispatch(
             request,
             *args,
             **kwargs
         )
-        if not self._can_view():
-            if self.organization.internal:
-                messages.warning(request, 'Você não está em uma organização.')
-                return redirect(reverse_lazy('gatheros_front:start'))
-            else:
-                messages.warning(request, 'Você não pode realizar esta ação.')
-                return redirect(reverse_lazy(
-                    'gatheros_event:organization-panel'
-                ))
 
-        return dispatch
+    def get_queryset(self):
+        query_set = super(InvitationListView, self).get_queryset()
+        organization = self.get_invitation_organization()
+
+        return query_set.filter(author__organization=organization).distinct()
+
+    def get_invitation_organization(self):
+        if self.invitation_organization:
+            return self.invitation_organization
+
+        self.invitation_organization = get_object_or_404(
+            Organization,
+            pk=self.kwargs.get('organization_pk')
+        )
+        return self.invitation_organization
+
+    def _can_view(self):
+        not_participant = not self.is_participant
+        can_manage = self.request.user.has_perm(
+            'gatheros_event.can_invite',
+            self.get_invitation_organization()
+        )
+        return not_participant and can_manage
+
+
+class InvitationCreateView(AccountMixin, FormView):
+    template_name = 'gatheros_event/invitation/invitation-create.html'
+    invitation_organization = None
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self._can_view():
+            messages.warning(request, 'Você não pode realizar esta ação.')
+            org = self.get_invitation_organization()
+            return redirect(reverse(
+                'gatheros_event:organization-panel',
+                kwargs={'pk': org.pk}
+            ))
+
+        return super(InvitationCreateView, self).dispatch(
+            request,
+            *args,
+            **kwargs
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super(InvitationCreateView, self).get_context_data(**kwargs)
+        context['invitation_organization'] = self.get_invitation_organization()
+
+        return context
 
     def get_initial(self):
         """
         Valores iniciais para os campos do form
         :return:
         """
-        return {
-            'organization': self.request.GET.get('organization', None)
-        }
+        initial = super(InvitationCreateView, self).get_initial()
+        initial.update({
+            'organization': self.get_invitation_organization()
+        })
+        return initial
 
     def get_form(self, form_class=None):
         """
@@ -64,21 +124,29 @@ class InvitationCreateView(AccountMixin, FormView):
         :return: HttpResponseRedirect
         """
         form.send_invite()
-
+        messages.success(self.request, 'Convite(s) enviado(s) com sucesso.')
         return super(InvitationCreateView, self).form_valid(form)
 
-    def _can_view(self):
-        not_internal = self.organization.internal is False
-        can_view = self.request.user.has_perm(
-            'gatheros_event.can_invite',
-            self.organization
+    def get_invitation_organization(self):
+        if self.invitation_organization:
+            return self.invitation_organization
+
+        self.invitation_organization = get_object_or_404(
+            Organization,
+            pk=self.kwargs.get('organization_pk')
         )
-        return not_internal and can_view
+        return self.invitation_organization
 
+    def get_success_url(self):
+        return reverse('gatheros_event:invitation-list', kwargs={
+            'organization_pk': self.get_invitation_organization().pk
+        })
 
-class InvitationCreateSuccessView(AccountMixin, TemplateView):
-    template_name = 'gatheros_event/organization/' \
-                    'invitation-create-success.html'
+    def _can_view(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_invite',
+            self.get_invitation_organization()
+        )
 
 
 class InvitationDecisionView(TemplateView):
@@ -105,7 +173,7 @@ class InvitationDecisionView(TemplateView):
                 'messages': messages.get_messages(request)
             })
             return render_to_response(
-                'gatheros_event/organization/invitation-decision.html',
+                'gatheros_event/invitation/invitation-decision.html',
                 context
             )
 
@@ -118,7 +186,7 @@ class InvitationDecisionView(TemplateView):
         })
 
         return render_to_response(
-            'gatheros_event/organization/invitation-decision.html',
+            'gatheros_event/invitation/invitation-decision.html',
             context
         )
 
@@ -131,21 +199,21 @@ class InvitationDecisionView(TemplateView):
         :return:
         """
         invite = get_object_or_404(Invitation, pk=kwargs.get('pk'))
+        org_id = invite.author.organization_id
         form = InvitationDecisionForm(instance=invite)
         form.is_valid()
 
         if 'invitation_decline' in request.POST:
             form.decline()
             return render_to_response(
-                'gatheros_event/organization/invitation-decline.html',
-                # context
+                'gatheros_event/invitation/invitation-decline.html'
             )
 
         elif 'invitation_accept' in request.POST:
             try:
                 # Se der tudo certo no aceite, redireciona para painel
                 form.accept()
-                return redirect('gatheros_event:organization-panel')
+                return redirect('gatheros_event:organization-panel', pk=org_id)
             except ValidationError:
                 # Se errado direciona para a criação do perfil
                 return redirect(
@@ -195,7 +263,7 @@ class InvitationProfileView(TemplateView):
         })
 
         return render_to_response(
-            'gatheros_event/organization/invitation-profile.html',
+            'gatheros_event/invitation/invitation-profile.html',
             context
         )
 
@@ -216,7 +284,7 @@ class InvitationProfileView(TemplateView):
                 'form': form,
             })
             return render_to_response(
-                'gatheros_event/organization/invitation-profile.html',
+                'gatheros_event/invitation/invitation-profile.html',
                 context
             )
 
@@ -230,7 +298,10 @@ class InvitationProfileView(TemplateView):
         # Deve conseguir aceitar o convite corretamente
         try:
             invite_form.accept()
-            return redirect('gatheros_event:organization-panel')
+            return redirect(reverse(
+                'gatheros_event:organization-panel',
+                kwargs={'pk': invite.author.organization_id}
+            ))
         except ValidationError:
             raise ValidationError(
                 "Algo errado ocorreu e não foi possível aceitar o "

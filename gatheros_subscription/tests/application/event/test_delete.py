@@ -89,7 +89,7 @@ class EventDeleteTest(TestCase):
         result = self._process_delete()
         self.assertContains(
             result,
-            "Você não tem permissão para excluir este registro."
+            "Você não pode excluir este registro."
         )
 
         # Authenticated
@@ -108,7 +108,7 @@ class EventDeleteTest(TestCase):
         result = self._process_delete(remove=False)
         self.assertContains(
             result,
-            "Você não tem permissão para excluir este registro."
+            "Você não pode excluir este registro."
         )
         self.assertTrue(self._event_exists())
 
@@ -133,6 +133,6 @@ class EventDeleteTest(TestCase):
         result = self._process_delete()
         self.assertContains(
             result,
-            "Você não tem permissão para excluir este registro."
+            "Você não pode excluir este registro."
         )
         self.assertTrue(self._event_exists())

@@ -1,14 +1,16 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import DetailView
 
+from gatheros_event.models import Organization
 from gatheros_event.views.mixins import AccountMixin
 
 
 # @TODO Restringir visualização
 
-class OrganizationPanelView(AccountMixin, TemplateView):
+class OrganizationPanelView(AccountMixin, DetailView):
+    model = Organization
     template_name = 'gatheros_event/organization/panel.html'
 
     def dispatch(self, request, *args, **kwargs):
@@ -25,10 +27,13 @@ class OrganizationPanelView(AccountMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(OrganizationPanelView, self).get_context_data(**kwargs)
+
+        # Força valor de contexto
+        context['organization'] = self.organization
         context.update({
-            'can_manage': self._can_manage,
             'can_manage_places': self._can_manage_places,
             'can_manage_invitations': self._can_manage_invitations,
+            'can_manage_members': self._can_manage_members,
             'can_change': self._can_change,
             'can_delete': self._can_delete,
         })
@@ -36,33 +41,38 @@ class OrganizationPanelView(AccountMixin, TemplateView):
 
     def _can_manage_places(self):
         return self.request.user.has_perm(
-            'gatheros_event.can_add_place',
-            self.organization
+            'gatheros_event.can_manage_places',
+            self.object
         )
 
     def _can_manage_invitations(self):
         return self.request.user.has_perm(
             'gatheros_event.can_invite',
-            self.organization
+            self.object
         )
 
-    def _can_manage(self):
-        return self._can_manage_invitations() or self._can_manage_places()
+    def _can_manage_members(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_manage_members',
+            self.object
+        )
 
     def _can_change(self):
         return self.request.user.has_perm(
             'gatheros_event.change_organization',
-            self.organization
+            self.object
         )
 
     def _can_delete(self):
         return self.request.user.has_perm(
             'gatheros_event.delete_organization',
-            self.organization
+            self.object
         )
 
     def _can_view(self):
         if self.is_participant:
             return False
 
-        return self.organization.internal is False
+        org = self.get_object()
+        user = self.request.user
+        return org.internal is False and org.is_member(user)

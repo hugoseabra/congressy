@@ -18,6 +18,7 @@ from .invitation import (
     InvitationCreateForm,
     InvitationDecisionForm,
 )
+from .organization import OrganizationForm
 from .place import PlaceForm
 from .profile import (
     ProfileForm

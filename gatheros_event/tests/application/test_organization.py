@@ -18,11 +18,18 @@ class OrganizationPanelTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(username='lucianasilva@gmail.com')
         self.client.force_login(self.user)
-        self.url = reverse('gatheros_event:organization-panel')
 
-    def test_status_is_302(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 302)
+    def _get_url(self):
+        member = self.user.person.members.filter(
+            organization__internal=False
+        ).first()
+        assert member is not None
+        organization = member.organization
+
+        return reverse(
+            'gatheros_event:organization-panel',
+            kwargs={'pk': organization.pk}
+        )
 
     def test_status_is_200_ok(self):
         member = self.user.person.members.filter(
@@ -35,7 +42,7 @@ class OrganizationPanelTest(TestCase):
             {'organization-context-pk': organization.pk}
         )
 
-        response = self.client.get(self.url)
+        response = self.client.get(self._get_url())
         self.assertEqual(response.status_code, 200)
 
 

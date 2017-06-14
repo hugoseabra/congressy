@@ -1,0 +1,66 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+{% load organization_tags %}
+
+{% block title %}Gatheros - Eventos{% endblock %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:organization-panel' invitation_organization.pk %}">Voltar</a>
+    </div>
+    <hr/>
+
+    <h1>Convites</h1>
+    <h2>{{ invitation_organization.name }}</h2>
+    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
+        <a href="{% url 'gatheros_event:invitation-add' invitation_organization.pk %}">Enviar convites</a>
+    </div>
+
+    <div style="background: #DDD">
+        {% if object_list %}
+            <table width="100%">
+                <tr>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome (e-mail)</td>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Autor</td>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Criado em</td>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Expira em</td>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
+                </tr>
+                {% for item in object_list %}
+                    <tr>
+                        <td style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                            <div>
+                                {{ forloop.counter }} -
+                                {{ item.to.email }}
+                            </div>
+                        </td>
+                        <td width="25%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                            {% if item.author.person.avatar %}
+                                <img  style="float:left;padding-right:4px" width="25px" src="{{ item.author.person.avatar.url }}" />
+                            {% endif %}
+                            <div style="margin-top: 3px">
+                                {{ item.author.person.name }}
+                            </div>
+                        </td>
+                        <td width="12%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                            {{ item.created }}
+                        </td>
+                        <td width="12%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                            {{ item.expired }}
+                        </td>
+                        <td width="10%" style="text-align:center;background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
+                            <a href="#">Reenviar</a>
+                            &nbsp; &nbsp; &nbsp;
+                            <a href="#">Excluir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <div style="background: #FFF;padding:10px;margin-bottom: 3px">
+                Nenhum local
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

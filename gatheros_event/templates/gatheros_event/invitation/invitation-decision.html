@@ -1,12 +1,8 @@
 {% extends "gatheros_front/base.html" %}
 {% load i18n static %}
 
+{% block user %}{% endblock %}
 {% block content %}
-    <div style="padding:10px">
-        <a href="{% url 'gatheros_event:organization-panel' %}">Voltar</a>
-    </div>
-    <hr/>
-
     <h1>Convite</h1>
 
     {% if not messages %}

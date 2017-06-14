@@ -15,7 +15,7 @@ class PlaceFormTest(TestCase):
     def _get_organization(self):
         return Organization.objects.get(slug='mnt')
 
-    def test_add_local(self):
+    def test_add(self):
         organization = self._get_organization()
         num_places = organization.places.count()
         assert num_places > 0
@@ -36,3 +36,27 @@ class PlaceFormTest(TestCase):
 
         place = Place.objects.get(name=name, city=city)
         self.assertIsInstance(place, Place)
+
+    def test_edit(self):
+        organization = self._get_organization()
+        place = Place.objects.filter(organization=organization).first()
+        num_places = organization.places.count()
+        assert num_places > 0
+
+        name = place.name + ' edited'
+        city = 5319
+
+        form = PlaceForm(instance=place, data={
+            'name': name,
+            'city': city,
+            'organization': organization.pk
+        })
+        if not form.is_valid():
+            print(form.errors)
+
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        place = Place.objects.get(pk=place.pk)
+        self.assertEqual(place.name, name)
+        self.assertEqual(place.city.pk, city)

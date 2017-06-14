@@ -17,33 +17,15 @@ from gatheros_event.models.rules import check_invite
 
 class InvitationCreateForm(forms.Form):
     """Formulário de criação de Convite"""
-    organization = forms.ModelChoiceField(
-        queryset=Organization.objects.all(),
-        label='Organização'
-    )
-    group = forms.ChoiceField(
-        choices=Member.GROUP_CHOICES,
-        initial=Member.HELPER,
-        label='Grupo'
-    )
     to = MultiEmailField(label='Emails')
+    organization = forms.HiddenInput()
+
     user = None
     _invites = None
 
-    def __init__(self, user, data=None, *args, **kwargs):
+    def __init__(self,  user, data=None, *args, **kwargs):
         super(InvitationCreateForm, self).__init__(data=data, *args, **kwargs)
 
-        organizations = Organization.objects.filter(
-            members__person__user=user
-        )
-
-        orgs_can_invite = organizations
-
-        for org in organizations:
-            if not user.has_perm('gatheros_event.can_invite', org):
-                orgs_can_invite = orgs_can_invite.exclude(pk=org.pk)
-
-        self.fields['organization'].queryset = orgs_can_invite
         self.user = user
         self._invites = []
 
@@ -51,7 +33,7 @@ class InvitationCreateForm(forms.Form):
         if self.errors:
             return []
 
-        organization = self.cleaned_data['organization']
+        organization = self.initial.get('organization')
 
         # Cria os convites
         for email in self.cleaned_data['to']:
@@ -60,9 +42,9 @@ class InvitationCreateForm(forms.Form):
                 defaults={'email': email}
             )
             invite = Invitation(
-                author=organization.get_members(person=self.user)[0],
+                author=organization.get_member(person=self.user),
                 to=invited_user,
-                group=self.cleaned_data['group']
+                group=Member.HELPER
             )
 
             # Submete os convites as regras
@@ -78,6 +60,9 @@ class InvitationCreateForm(forms.Form):
                 'gatheros_event:invitation-decision',
                 kwargs={'pk': str(invite.pk)}
             )
+
+            # Convite para um tipo inicialmente.
+            invite.group = Member.HELPER
             invite.to.save()
             invite.save()
             send_mail(

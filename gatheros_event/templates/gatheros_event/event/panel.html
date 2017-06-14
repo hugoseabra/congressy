@@ -30,7 +30,7 @@
                         <div style="padding:0 5px">
                             <p><strong>Realizador:</strong></p>
                             <p>
-                                <a href="{% url 'gatheros_event:organization-panel' %}">{{ object.organization.name }}</a>
+                                <a href="{% url 'gatheros_event:organization-panel' object.organization.pk %}">{{ object.organization.name }}</a>
                             </p>
                         </div>
                         <div style="padding:0 5px">

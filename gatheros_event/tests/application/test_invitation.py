@@ -21,9 +21,18 @@ class InvitationCreateFormTest(TestCase):
     ]
 
     # noinspection PyMethodMayBeStatic
-    def _get_form(self, username="lucianasilva@gmail.com", data=None):
+    def _get_form(
+            self,
+            initial=None,
+            username="lucianasilva@gmail.com",
+            data=None
+    ):
         user = User.objects.get(username=username)
-        return InvitationCreateForm(user, data)
+        return InvitationCreateForm(user=user, initial=initial, data=data)
+
+    # noinspection PyMethodMayBeStatic
+    def _get_organization(self):
+        return Organization.objects.get(slug='in2-web-solucoes-e-servicos')
 
     def test_init_without_user(self):
         """
@@ -39,31 +48,20 @@ class InvitationCreateFormTest(TestCase):
         """
         form = self._get_form(data={})
         self.assertFalse(form.is_valid())
-        self.assertIn('organization', form.errors)
         self.assertIn('to', form.errors)
-
-    def test_render_form(self):
-        """
-        Se na apresentação do formulário aparece as organizações que é
-        permitido convidar, e não aparece as que não é
-        """
-        form = self._get_form()
-        rendered = form.as_ul()
-        self.assertIn("In2 Web Soluções e Serviços", rendered)
-        self.assertNotIn("/MNT", rendered)
-        self.assertNotIn("Luciana Silva", rendered)
 
     def test_send_invite(self):
         """
         Se o convite foi enviado por email
         """
-        form = self._get_form(data={
-            'organization': 5,
-            'group': Member.HELPER,
-            'to': 'joao@teste.com,'
-                  'diegotolentino@gmail.com'
-        })
-        form.is_valid()
+        form = self._get_form(
+            initial={'organization': self._get_organization()},
+            data={'to': 'joao@teste.com, diegotolentino@gmail.com'}
+        )
+        self.assertTrue(form.is_valid())
+        if form.errors:
+            print(form.errors)
+
         form.send_invite()
         self.assertEqual(len(mail.outbox), 2)
 
@@ -81,28 +79,19 @@ class InvitationCreateViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
         self.client.force_login(self.user)
-        self.url = reverse('gatheros_event:invitation')
-        self.url_success = reverse('gatheros_event:invitation-success')
-        organization = Organization.objects.get(
+        self.organization = Organization.objects.get(
             slug="in2-web-solucoes-e-servicos"
         )
-        self.client.post(
-            reverse('gatheros_event:organization-switch'),
-            {'organization-context-pk': organization.pk}
-        )
-
-        self.data = {
-            'organization': organization.pk,
-            'group': Member.HELPER,
-            'to': 'joao@teste.com,'
-                  'diegotolentino@gmail.com'
-        }
+        self.url = reverse('gatheros_event:invitation-add', kwargs={
+            'organization_pk': self.organization.pk
+        })
+        self.data = {'to': 'joao@teste.com, diegotolentino@gmail.com'}
 
     def test_get_ok(self):
         """
         Retornar a página com o formulário deve ser ok
         """
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_invalid_emails_post(self):
@@ -110,34 +99,19 @@ class InvitationCreateViewTest(TestCase):
         Email inválido
         """
         self.data.update({'to': '123'})
-        response = self.client.post(self.url, self.data)
+        response = self.client.post(self.url, self.data, follow=True)
         self.assertNotContains(response, "Este campo é obrigatório")
         self.assertContains(response, "não é um email válido.")
-
-    def test_invalid_organization_post(self):
-        """
-        Sem organização
-        """
-        self.data.pop('organization')
-        response = self.client.post(self.url, self.data)
-        self.assertContains(response, "Este campo é obrigatório")
-        self.assertNotContains(response, "não é um email válido")
-
-    def test_invite_to_foreign_organization(self):
-        """
-        Organização que o usuário não é membro
-        """
-        self.data.update({'organization': 7})
-        response = self.client.post(self.url, self.data)
-        self.assertContains(response, "Sua escolha não é uma das disponíveis.")
 
     def test_not_allowed_to_invite_organization(self):
         """
         Organização que o usuário é membro mas não é admin
         """
-        self.data.update({'organization': 2})
-        response = self.client.post(self.url, self.data)
-        self.assertContains(response, "Sua escolha não é uma das disponíveis.")
+        url = reverse('gatheros_event:invitation-add', kwargs={
+            'organization_pk': 6
+        })
+        response = self.client.post(url, self.data, follow=True)
+        self.assertContains(response, "Você não pode realizar esta ação.")
 
     def test_invite_already_organization_member(self):
         """
@@ -148,7 +122,7 @@ class InvitationCreateViewTest(TestCase):
                 'to': 'flavia@in2web.com.br'
             }
         )
-        response = self.client.post(self.url, self.data)
+        response = self.client.post(self.url, self.data, follow=True)
         self.assertRegex(
             response.content.decode("utf-8"),
             r'Um membro com o email .* já existe na organização .*.'
@@ -160,9 +134,7 @@ class InvitationCreateViewTest(TestCase):
         pagina de sucesso
         """
         self.assertEqual(Invitation.objects.count(), 0)
-        response = self.client.post(self.url, self.data)
-        self.assertRedirects(response, self.url_success)
-        response = self.client.get(self.url_success)
+        response = self.client.post(self.url, self.data, follow=True)
         self.assertContains(response, "Convite(s) enviado(s) com sucesso.")
 
     def test_invite_sent_success_has_outbox_email(self):
@@ -373,7 +345,10 @@ class InvitationProfileViewTest(TestCase):
         )
 
         self.url_success = reverse(
-            'gatheros_event:organization-panel'
+            'gatheros_event:invitation-list',
+            kwargs={
+                'organization_pk': self.organization.pk
+            }
         )
 
         self.data = {

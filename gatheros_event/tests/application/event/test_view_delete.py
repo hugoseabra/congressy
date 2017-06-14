@@ -90,5 +90,5 @@ class EventDeleteTest(TestCase):
         response = self.client.post(url, follow=True)
         self.assertContains(
             response,
-            "Você não tem permissão para excluir este registro."
+            "Você não pode excluir este registro."
         )
