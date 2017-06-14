@@ -152,6 +152,11 @@ url_profile = [
         views.ProfileView.as_view(),
         name='profile'
     ),
+    url(
+        r'^criar-conta/$',
+        views.ProfileCreateView.as_view(),
+        name='profile_create'
+    ),
 ]
 
 urlpatterns = [

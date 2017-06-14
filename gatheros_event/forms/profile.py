@@ -2,18 +2,79 @@
 """
 Formulário relacionados a Convites de Pessoas a serem membros de organizações
 """
+from uuid import uuid4
+
 from django import forms
 from django.contrib.auth import (
     password_validation,
 )
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.models import User
 
 from gatheros_event.models import Person
+
+
+class ProfileCreateForm(forms.ModelForm):
+    email = forms.EmailField(label='E-Mail')
+
+    def save(self, domain_override=None, request=None,
+             subject_template='registration/account_confirmation_subject.txt',
+             email_template='registration/account_confirmation_email.html'):
+        """
+        Cria uma conta no sistema
+
+        :param domain_override:
+        :param request:
+        :param subject_template:
+        :param email_template:
+        :return:
+        """
+        # Criando perfil
+        super(ProfileCreateForm, self).save(commit=True)
+
+        # Criando usuário
+        user = User.objects.create_user(
+            username=self.cleaned_data["email"],
+            email=self.cleaned_data["email"],
+            password=str(uuid4())
+        )
+        user.save()
+
+        # Vinculando usuário ao perfil
+        self.instance.user = user
+        self.instance.save()
+
+        # Criando o email de confirmação e definição de senha
+        reset_form = PasswordResetForm(
+            data={
+                'email': self.cleaned_data["email"]
+            }
+        )
+        reset_form.is_valid()
+        reset_form.save(
+            domain_override=domain_override,
+            subject_template_name=subject_template,
+            email_template_name=email_template,
+            request=request,
+        )
+        return self.instance
+
+    class Meta:
+        model = Person
+        exclude = [
+            'user',
+            'synchronized',
+            'term_version',
+            'politics_version',
+        ]
 
 
 class ProfileForm(forms.ModelForm):
     """
     Pessoas que são usuários do sistema
     """
+    email = forms.EmailField(label='E-Mail')
+
     error_messages = {
         'password_mismatch': "Os dois passwords não combinam",
     }

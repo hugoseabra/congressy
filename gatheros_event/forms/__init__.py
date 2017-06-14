@@ -20,6 +20,4 @@ from .invitation import (
 )
 from .organization import OrganizationForm
 from .place import PlaceForm
-from .profile import (
-    ProfileForm
-)
+from .profile import ProfileCreateForm, ProfileForm

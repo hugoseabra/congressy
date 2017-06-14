@@ -17,7 +17,7 @@
             border-radius: 5px;
             padding: 10px;
         }
-        
+
         form h1 {
             text-align: center;
         }
@@ -34,7 +34,7 @@
 
 {% block extrascript %}
     <script type="application/javascript">
-        window.setTimeout(function() {
+        window.setTimeout(function () {
             document.getElementById("id_username").focus();
         }, 500);
     </script>
@@ -74,6 +74,21 @@
         {% endif %}
         <div class="submit-row">
             <input type="submit" value="{% trans 'Log in' %}"/>
+        </div>
+
+        <div>
+            <p>
+                Esqueceu sua senha?
+                <a href="{% url 'password_reset' %}">
+                    Clique aqui
+                </a>
+            </p>
+            <p>
+                Não possui uma conta?
+                <a href="{% url 'gatheros_event:profile_create' %}">
+                    Clique aqui
+                </a>
+            </p>
         </div>
     </form>
 
