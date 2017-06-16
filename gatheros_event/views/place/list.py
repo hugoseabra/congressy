@@ -20,16 +20,15 @@ class PlaceListView(AccountMixin, ListView):
 
     def dispatch(self, request, *args, **kwargs):
         if not self._can_view():
-            if self.organization.internal:
-                messages.warning(request, 'Você não está em uma organização.')
-                return redirect(reverse_lazy('gatheros_front:start'))
-            else:
-                org = self.get_place_organization()
-                messages.warning(request, 'Você não pode acessar esta área.')
-                return redirect(reverse(
-                    'gatheros_front:organization-panel',
-                    kwargs={'pk': org.pk}
-                ))
+            org = self.get_place_organization()
+            messages.warning(
+                request,
+                'Você não tem permissão de realizar esta ação.'
+            )
+            return redirect(reverse(
+                'gatheros_event:organization-panel',
+                kwargs={'pk': org.pk}
+            ))
 
         return super(PlaceListView, self).dispatch(
             request,
@@ -44,6 +43,8 @@ class PlaceListView(AccountMixin, ListView):
         return query_set.filter(organization=organization)
 
     def get_place_organization(self):
+        """ Resgata organização do contexto da view. """
+
         if self.place_organization:
             return self.place_organization
 

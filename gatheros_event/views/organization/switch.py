@@ -11,15 +11,39 @@ from gatheros_event.models import Organization
 class OrganizationSwitch(RedirectView):
     def post(self, request, *args, **kwargs):
 
+        if not request.user.is_authenticated():
+            return super(OrganizationSwitch, self).post(
+                request,
+                *args,
+                **kwargs
+            )
+
         pk = request.POST.get('organization-context-pk', None)
 
         if not pk:
             messages.info(request, 'Nenhuma organização foi informada.')
             return self.get(request, *args, **kwargs)
 
-        organization = get_object_or_404(Organization, pk=pk)
+        organization = get_object_or_404(Organization, pk=pk, active=True)
         if not organization.is_member(request.user):
-            raise PermissionDenied('Você não é membro desta organização.')
+            messages.error(request, 'Você não é membro desta organização.')
+            return super(OrganizationSwitch, self).post(
+                request,
+                *args,
+                **kwargs
+            )
+
+        members = organization.members.filter(
+            person__user=self.request.user,
+            active=True
+        )
+        if not members:
+            messages.error(request, 'Você não é membro desta organização.')
+            return super(OrganizationSwitch, self).post(
+                request,
+                *args,
+                **kwargs
+            )
 
         account.update_account(request, organization)
 

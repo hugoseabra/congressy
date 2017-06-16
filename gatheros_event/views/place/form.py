@@ -17,8 +17,17 @@ class BaseFormView(AccountMixin, View):
     place_organization = None
 
     def dispatch(self, request, *args, **kwargs):
-        if not self._can_view():
-            return redirect(reverse_lazy('gatheros_event:organization-list'))
+
+        if self.organization and not self._can_view():
+            org = self.get_place_organization()
+            messages.warning(
+                request,
+                'Você não tem permissão de realizar esta ação.'
+            )
+            return redirect(reverse(
+                'gatheros_event:organization-panel',
+                kwargs={'pk': org.pk}
+            ))
 
         return super(BaseFormView, self).dispatch(request, *args, **kwargs)
 

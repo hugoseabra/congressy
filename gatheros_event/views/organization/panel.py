@@ -18,8 +18,11 @@ class OrganizationPanelView(AccountMixin, DetailView):
             *args,
             **kwargs
         )
-        if not self._can_view():
-            messages.warning(request, 'Você não está em uma organização.')
+        if self.organization and not self._can_view():
+            messages.warning(
+                request,
+                'Você não tem permissão de realizar esta ação.'
+            )
             return redirect(reverse_lazy('gatheros_front:start'))
 
         return dispatch
@@ -78,4 +81,6 @@ class OrganizationPanelView(AccountMixin, DetailView):
 
         org = self.get_object()
         user = self.request.user
-        return org.internal is False and org.is_member(user)
+        member = org.get_member(user)
+
+        return org.internal is False and member and member.active

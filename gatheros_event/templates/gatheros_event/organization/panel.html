@@ -53,7 +53,7 @@
                     {% endif %}
                     {% if can_manage_members %}
                         <div style="padding:15px">
-                            &rightarrow; <a href="#">Membros</a>
+                            &rightarrow; <a href="{% url 'gatheros_event:member-list' object.pk %}">Membros</a>
                         </div>
                     {% endif %}
                     {% if can_manage_places %}
@@ -172,31 +172,9 @@
                                 <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
                                     Últimas atividades
                                 </div>
-                                <div style="padding:10px;height: 521px">
+                                <div style="padding:10px;height: 421px">
                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                         <tr>
-                                            <td width="12%">
-                                                <!--suppress CheckImageSize -->
-                                                <img src="/media/default_avatar.png" width="100%" />
-                                            </td>
-                                            <td>
-                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
-                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
-                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
-                                                </div>
-                                            </td>
-                                        </tr><tr>
-                                            <td width="12%">
-                                                <!--suppress CheckImageSize -->
-                                                <img src="/media/default_avatar.png" width="100%" />
-                                            </td>
-                                            <td>
-                                                <div style="margin-left: 4px;margin-top:4px;padding:5px 0">
-                                                    <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">Hugo Seabras</div>
-                                                    <div style="color:dimgray;font-size: 12px">Cadastrou um participante</div>
-                                                </div>
-                                            </td>
-                                        </tr><tr>
                                             <td width="12%">
                                                 <!--suppress CheckImageSize -->
                                                 <img src="/media/default_avatar.png" width="100%" />
@@ -315,10 +293,7 @@
         Painel deve conter:
         -------------------
         = Suporte a Transferência de evento entre organizações
-        = Informação de quantidade de eventos vinculados e um botão "visualizar"
         = Lista de membros (nome, tipo, data de entrada), com filtro (tipo) e possibilidade de "adicionar", "editar" e "excluir"
-        = Lista de locais e possibilidade de "adicionar", "editar" e "excluir"
-        = Lista de convites pendentes (nome, e-mail, tipo, data de envio), com filtro (tipo) e possibilidade de "adicionar", "editar" e "excluir"
         = Para ver organização, membro também deve estar ativo
         = Admin pode desativar e ativar membro
     </pre>

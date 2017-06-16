@@ -80,7 +80,13 @@
                         <td style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                             <div>
                                 {{ forloop.counter }} -
-                                {{ item.to.email }}
+
+                                {% if item.to.get_full_name %}
+                                    {{ item.to.get_full_name }}
+                                    <span style="font-weight: normal;color: gray">({{ item.to.email }})</span>
+                                {% else %}
+                                    {{ item.to.email }}
+                                {% endif %}
                             </div>
                         </td>
                         <td width="25%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
@@ -97,7 +103,7 @@
                         <td width="12%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                             {{ item.expired }}
                         </td>
-                        <td width="10%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
+                        <td width="12%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
                             <div style="float:left">
                                 <form action="{% url 'gatheros_event:invitation-resend' invitation_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja renovar este convite?')">{% csrf_token %}
                                     <button type="submit">Reenviar</button>

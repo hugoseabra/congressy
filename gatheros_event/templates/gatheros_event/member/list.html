@@ -1,0 +1,125 @@
+{% extends "gatheros_front/base.html" %}
+
+{% block title %}Gatheros - Eventos{% endblock %}
+
+{% block content %}
+
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:organization-panel' member_organization.pk %}">Voltar</a>
+    </div>
+    <hr/>
+
+    <h1>Membros</h1>
+    <h2>{{ member_organization.name }}</h2>
+    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;"></div>
+
+
+    {% if member_active_list %}
+        <div style="border: 1px solid #DDD;padding: 10px">
+            <h3>Membros ativos</h3>
+
+            {% for group_name, members in member_active_list.items %}
+                <h4>{{ group_name }}</h4>
+
+                {% if members %}
+                    <div style="background: #DDD">
+                        <table width="100%">
+                            <tr>
+                                <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome (e-mail)</td>
+                                <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Membro desde</td>
+                                <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
+                            </tr>
+                            {% for item in members %}
+                                <tr>
+                                    <td style="color: #333;background-color: #FFF;padding:10px;margin-bottom: 3px">
+                                        <div>
+                                            {% if item.person.avatar %}
+                                                <img  style="float:left;padding-right:4px" width="25px" src="{{ item.person.avatar.url }}" />
+                                            {% endif %}
+                                            {{ item.person.name }}
+                                            <span style="font-weight: normal;color: gray">({{ item.person.email }})</span>
+                                        </div>
+                                    </td>
+                                    <td width="15%" style="color: #333;background-color: #FFF;padding:10px;margin-bottom: 3px">
+                                        {{ item.created }}
+                                    </td>
+                                    <td width="20%" style="color: #333;background-color: #FFF; padding:10px;margin-bottom: 3px">
+                                        <div style="float:left">
+                                            <form action="{% url 'gatheros_event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
+                                                <button type="submit">Tornar {% if item.group == item.HELPER %}Administrador{% else %}Auxiliar{% endif %}</button>
+                                                <input type="hidden" name="action" value="change_group" />
+                                                <input type="hidden" name="group" value="{% if item.group == item.HELPER %}{{ item.ADMIN }}{% else %}{{ item.HELPER }}{% endif %}" />
+                                            </form>
+                                        </div>
+                                        <div style="float:left;margin-left: 4px">
+                                            <form action="{% url 'gatheros_event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
+                                                <button type="submit">Desativar</button>
+                                                <input type="hidden" name="action" value="deactivate" />
+                                            </form>
+                                        </div>
+                                        <div style="float:left;margin-left: 4px">
+                                            <form action="{% url 'gatheros_event:member-delete' member_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja realmente excluir?')">{% csrf_token %}
+                                                <button type="submit">Excluir</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+    {% endif %}
+    <br /><br />
+    {% if member_inactive_list %}
+        <div style="border: 1px solid #DDD;padding: 10px">
+            <h3>Membros Inativos</h3>
+            <div style="background: #DDD">
+                <table width="100%">
+                    <tr>
+                        <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome (e-mail)</td>
+                        <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Membro desde</td>
+                        <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Tipo</td>
+                        <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
+                    </tr>
+                    {% for item in member_inactive_list %}
+                        <tr>
+                            <td style="color: #333;background-color: #FFF;padding:10px;margin-bottom: 3px">
+                                <div>
+                                    {% if item.person.avatar %}
+                                        <img  style="float:left;padding-right:4px" width="25px" src="{{ item.person.avatar.url }}" />
+                                    {% endif %}
+                                    {{ item.person.name }}
+                                    <span style="font-weight: normal;color: gray">({{ item.person.email }})</span>
+                                </div>
+                            </td>
+                            <td width="15%" style="color: #333;background-color: #FFF;padding:10px;margin-bottom: 3px">
+                                {{ item.created }}
+                            </td>
+                            <td width="15%" style="color: #333;background-color: #FFF;padding:10px;margin-bottom: 3px">
+                                {{ item.get_group_display }}
+                            </td>
+                            <td width="10%" style="text-align: center;color: #333;background-color: #FFF; padding:10px;margin-bottom: 3px">
+                                <div style="float:left;margin-left: 4px">
+                                    <form action="{% url 'gatheros_event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
+                                        <button type="submit">Ativar</button>
+                                        <input type="hidden" name="action" value="activate" />
+                                    </form>
+                                </div>
+                                <div style="float:left;margin-left: 4px">
+                                    <form action="{% url 'gatheros_event:member-delete' member_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja realmente excluir?')">{% csrf_token %}
+                                        <button type="submit">Excluir</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

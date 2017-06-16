@@ -16,14 +16,19 @@ class BaseOrganizationView(AccountMixin, View):
     form_title = None
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.can_view():
-            return redirect(reverse_lazy('gatheros_event:organization-list'))
-
-        return super(BaseOrganizationView, self).dispatch(
+        dispatch = super(BaseOrganizationView, self).dispatch(
             request,
             *args,
             **kwargs
         )
+        if self.organization and not self.can_view():
+            messages.warning(
+                request,
+                'Você não tem permissão de realizar esta ação.'
+            )
+            return redirect(reverse_lazy('gatheros_event:organization-list'))
+
+        return dispatch
 
     def get_form(self, form_class=None):
         """

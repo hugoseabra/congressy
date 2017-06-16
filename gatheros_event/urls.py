@@ -97,6 +97,24 @@ url_organization = [
     ),
 ]
 
+url_member = [
+    url(
+        r'^(?P<pk>[\d]+)/manage/$',
+        views.MemberManageView.as_view(),
+        name='member-manage'
+    ),
+    url(
+        r'^(?P<pk>[\d]+)/delete/$',
+        views.MemberDeleteView.as_view(),
+        name='member-delete'
+    ),
+    url(
+        r'^$',
+        views.MemberListView.as_view(),
+        name='member-list'
+    ),
+]
+
 url_place = [
     url(
         r'^(?P<pk>[\d]+)/delete/$',
@@ -181,5 +199,9 @@ urlpatterns = [
     url(
         r'^manager/organizations/(?P<organization_pk>[\d]+)/invitations/',
         include(url_manager_invitation)
+    ),
+    url(
+        r'^manager/organizations/(?P<organization_pk>[\d]+)/members/',
+        include(url_member)
     ),
 ]

@@ -1,13 +1,4 @@
-
-# INVITATION
-from gatheros_event.views.invite import (
-    InvitationCreateView,
-    InvitationDecisionView,
-    InvitationDeleteView,
-    InvitationListView,
-    InvitationProfileView,
-    InvitationResendView,
-)
+""" Views """
 
 # EVENT
 from .event.delete import EventDeleteView
@@ -24,7 +15,17 @@ from .event.form import (
 from .event.info import EventInfoView
 from .event.list import EventListView
 from .event.panel import EventPanelView
-
+# INVITATION
+from .invite import (
+    InvitationCreateView,
+    InvitationDecisionView,
+    InvitationDeleteView,
+    InvitationListView,
+    InvitationProfileView,
+    InvitationResendView,
+)
+# MEMBER
+from .member import MemberDeleteView, MemberListView, MemberManageView
 # ORGANIZATION
 from .organization.delete import OrganizationDeleteView
 from .organization.form import (
@@ -34,7 +35,6 @@ from .organization.form import (
 from .organization.list import OrganizationListView
 from .organization.panel import OrganizationPanelView
 from .organization.switch import OrganizationSwitch
-
 # PLACE
 from .place.delete import PlaceDeleteView
 from .place.form import (
@@ -42,6 +42,5 @@ from .place.form import (
     PlaceEditFormView,
 )
 from .place.list import PlaceListView
-
 # PROFILE
 from .profile import ProfileCreateView, ProfileView

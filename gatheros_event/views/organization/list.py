@@ -13,15 +13,18 @@ class OrganizationListView(AccountMixin, ListView):
     ordering = ['name']
 
     def dispatch(self, request, *args, **kwargs):
-        if not self._can_view():
-            messages.warning(request, 'Você não pode acessar esta área.')
-            return redirect(reverse_lazy('gatheros_front:start'))
-
         dispatch = super(OrganizationListView, self).dispatch(
             request,
             *args,
             **kwargs
         )
+
+        if self.organization and not self._can_view():
+            messages.warning(
+                request,
+                'Você não tem permissão de realizar esta ação.'
+            )
+            return redirect(reverse_lazy('gatheros_front:start'))
 
         return dispatch
 
@@ -30,7 +33,9 @@ class OrganizationListView(AccountMixin, ListView):
         person = self.member.person
         return query_set.filter(
             internal=False,
-            members__person=person
+            members__person=person,
+            members__active=True,
+            active=True
         ).distinct()
 
     def _can_view(self):

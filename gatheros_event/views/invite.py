@@ -43,7 +43,7 @@ class InvitationListView(AccountMixin, ListView):
                 org = self.get_invitation_organization()
                 messages.warning(request, 'Você não pode realizar esta ação.')
                 return redirect(reverse(
-                    'gatheros_front:organization-panel',
+                    'gatheros_event:organization-panel',
                     kwargs={'pk': org.pk}
                 ))
 

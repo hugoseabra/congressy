@@ -20,7 +20,7 @@ class OrganizationDeleteView(DeleteViewMixin):
             **kwargs
         )
 
-        if not can_delete:
+        if self.organization and not can_delete:
             event_list = self._get_related_events()
             if event_list:
                 msg = 'Os seguintes eventos estão relacionados a este local: '
