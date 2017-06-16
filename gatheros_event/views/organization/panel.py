@@ -3,11 +3,10 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import DetailView
 
+from gatheros_event.helpers import account
 from gatheros_event.models import Organization
 from gatheros_event.views.mixins import AccountMixin
 
-
-# @TODO Restringir visualização
 
 class OrganizationPanelView(AccountMixin, DetailView):
     model = Organization
@@ -31,6 +30,7 @@ class OrganizationPanelView(AccountMixin, DetailView):
         # Força valor de contexto
         context['organization'] = self.organization
         context.update({
+            'get_invitations': self._get_invitations(),
             'can_manage_places': self._can_manage_places,
             'can_manage_invitations': self._can_manage_invitations,
             'can_manage_members': self._can_manage_members,
@@ -38,6 +38,9 @@ class OrganizationPanelView(AccountMixin, DetailView):
             'can_delete': self._can_delete,
         })
         return context
+
+    def _get_invitations(self):
+        return self.object.get_invitations(include_expired=False)
 
     def _can_manage_places(self):
         return self.request.user.has_perm(

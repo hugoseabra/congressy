@@ -148,13 +148,18 @@ class Organization(models.Model, GatherosModelMixin):
         """
         return len(self.get_members(group=Member.ADMIN, person=person)) > 0
 
-    def get_invitations(self):
+    def get_invitations(self, include_expired=True):
         """
         Recupera convites da organização feita por membros administradores
         """
         invitations = []
         for member in self.members.all():
             if not invitations:
-                invitations += list(member.invitations.all())
+                all_invitations = member.invitations.all()
+                if include_expired:
+                    invitations += list(all_invitations)
+                else:
+                    invitations += [inv for inv in all_invitations if
+                                    not inv.is_expired]
 
         return invitations
