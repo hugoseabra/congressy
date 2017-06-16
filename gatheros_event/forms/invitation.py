@@ -11,8 +11,22 @@ from django.core.mail import send_mail
 from django.shortcuts import reverse
 
 from core.fields import MultiEmailField
-from gatheros_event.models import Invitation, Member, Organization
+from gatheros_event.models import Invitation, Member
 from gatheros_event.models.rules import check_invite
+
+
+def send_invitation(invitation):
+    url = reverse(
+        'gatheros_event:invitation-decision',
+        kwargs={'pk': str(invitation.pk)}
+    )
+
+    send_mail(
+        'Novo convite para organização',
+        'Para aceitar clique no link: {0}'.format(url),
+        settings.DEFAULT_FROM_EMAIL,
+        [invitation.to.email]
+    )
 
 
 class InvitationCreateForm(forms.Form):
@@ -56,21 +70,12 @@ class InvitationCreateForm(forms.Form):
     def send_invite(self):
         """Notifica pessoa convidada"""
         for invite in self._invites:
-            url = reverse(
-                'gatheros_event:invitation-decision',
-                kwargs={'pk': str(invite.pk)}
-            )
-
             # Convite para um tipo inicialmente.
             invite.group = Member.HELPER
             invite.to.save()
             invite.save()
-            send_mail(
-                'Novo convite para organização',
-                'Para aceitar clique no link: {0}'.format(url),
-                settings.DEFAULT_FROM_EMAIL,
-                [invite.to.email]
-            )
+
+            send_invitation(invite)
 
 
 class InvitationDecisionForm(forms.ModelForm):

@@ -1,11 +1,15 @@
 # test_resend_invitation_differente_type(self):
 # test_expiration_days_as_configured(self):
+
+from datetime import datetime, timedelta
+
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.shortcuts import reverse
 from django.test import TestCase
 
+from gatheros_event import settings
 from gatheros_event.forms import InvitationCreateForm
 from gatheros_event.models import Invitation, Member, Organization, Person
 
@@ -445,3 +449,98 @@ class InvitationProfileViewTest(TestCase):
 
         self.assertContains(response, 'Pessoa com este Email já existe')
         self.assertContains(response, 'Pessoa com este CPF já existe')
+
+
+class InvitationDeleteViewTest(TestCase):
+    fixtures = [
+        '001_user',
+        '003_occupation',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+        '012_invitation',
+    ]
+
+    def setUp(self):
+        self.user = User.objects.get(username="lucianasilva@gmail.com")
+        self.client.force_login(self.user)
+
+    def test_delete(self):
+        member = self.user.person.members.first()
+        invitation = Invitation.objects.filter(author=member).first()
+
+        url = reverse('gatheros_event:invitation-delete', kwargs={
+            'organization_pk': invitation.author.organization.pk,
+            'pk': invitation.pk
+        })
+        response = self.client.post(url, {'pk': invitation.pk}, follow=True)
+        self.assertContains(response, 'Convite excluído com sucesso.')
+
+
+class InvitationRenewViewTest(TestCase):
+    fixtures = [
+        '001_user',
+        '003_occupation',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+        '012_invitation',
+    ]
+
+    def setUp(self):
+        self.user = User.objects.get(username="lucianasilva@gmail.com")
+        self.client.force_login(self.user)
+
+    def test_renew(self):
+        now = datetime.now()
+        created_date = now - timedelta(days=30)
+
+        days = settings.INVITATION_ACCEPT_DAYS
+        expire_date = created_date + timedelta(days=days)
+
+        # Altera convite como antigo
+        member = self.user.person.members.first()
+        invitation = Invitation.objects.filter(author=member).first()
+        invitation.created = created_date
+        invitation.expired = expire_date
+        invitation.save()
+
+        self.assertTrue(invitation.is_expired)
+
+        url = reverse('gatheros_event:invitation-resend', kwargs={
+            'organization_pk': invitation.author.organization.pk,
+            'pk': invitation.pk
+        })
+        response = self.client.post(url, {'pk': invitation.pk}, follow=True)
+        self.assertContains(response, 'Convite renovado com sucesso.')
+
+        invitation = Invitation.objects.get(pk=invitation.pk)
+        self.assertFalse(invitation.is_expired)
+
+    def test_renew_not_expired(self):
+        created_date = datetime.now()
+
+        days = settings.INVITATION_ACCEPT_DAYS
+        expire_date = created_date + timedelta(days=days)
+
+        # Altera convite como antigo
+        member = self.user.person.members.first()
+        invitation = Invitation.objects.filter(author=member).first()
+
+        invitation.created = created_date
+        invitation.expired = expire_date
+        invitation.save()
+
+        self.assertFalse(invitation.is_expired)
+
+        url = reverse('gatheros_event:invitation-resend', kwargs={
+            'organization_pk': invitation.author.organization.pk,
+            'pk': invitation.pk
+        })
+        response = self.client.post(url, {'pk': invitation.pk}, follow=True)
+        self.assertContains(
+            response,
+            'O convite não está expirado e não precisa ser renovado.'
+        )

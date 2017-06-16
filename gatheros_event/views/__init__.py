@@ -1,10 +1,12 @@
 
 # INVITATION
 from gatheros_event.views.invite import (
-    InvitationListView,
     InvitationCreateView,
     InvitationDecisionView,
+    InvitationDeleteView,
+    InvitationListView,
     InvitationProfileView,
+    InvitationResendView,
 )
 
 # EVENT

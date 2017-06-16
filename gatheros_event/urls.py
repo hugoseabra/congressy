@@ -122,6 +122,16 @@ url_place = [
 
 url_manager_invitation = [
     url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/resend/$',
+        views.InvitationResendView.as_view(),
+        name='invitation-resend'
+    ),
+    url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/delete/$',
+        views.InvitationDeleteView.as_view(),
+        name='invitation-delete'
+    ),
+    url(
         r'^add/$',
         views.InvitationCreateView.as_view(),
         name='invitation-add'

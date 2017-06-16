@@ -16,8 +16,15 @@
         <a href="{% url 'gatheros_event:invitation-add' invitation_organization.pk %}">Enviar convites</a>
     </div>
 
-    <div style="background: #DDD">
-        {% if object_list %}
+    {% if not open_invitations and not expired_invitations %}
+        <div style="padding: 10px;border:1px solid #DDD;text-align: center;margin-top: 20px">
+            Nenhum convite
+        </div>
+    {% endif %}
+
+    {% if open_invitations %}
+        <h3>Aguardando resposta</h3>
+        <div style="background: #DDD">
             <table width="100%">
                 <tr>
                     <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome (e-mail)</td>
@@ -26,7 +33,7 @@
                     <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Expira em</td>
                     <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
                 </tr>
-                {% for item in object_list %}
+                {% for item in open_invitations %}
                     <tr>
                         <td style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                             <div>
@@ -48,19 +55,64 @@
                         <td width="12%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                             {{ item.expired }}
                         </td>
-                        <td width="10%" style="text-align:center;background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
-                            <a href="#">Reenviar</a>
-                            &nbsp; &nbsp; &nbsp;
-                            <a href="#">Excluir</a>
+                        <td width="10%" style="text-align:center; background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
+                            <a href="{% url 'gatheros_event:invitation-delete' invitation_organization.pk item.pk %}">Excluir</a>
                         </td>
                     </tr>
                 {% endfor %}
             </table>
-        {% else %}
-            <div style="background: #FFF;padding:10px;margin-bottom: 3px">
-                Nenhum local
-            </div>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
+
+    {% if expired_invitations %}
+        <h3>Convites expirados</h3>
+        <div style="background: #DDD">
+            <table width="100%">
+                <tr>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome (e-mail)</td>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Autor</td>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Criado em</td>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Expirado em</td>
+                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
+                </tr>
+                {% for item in expired_invitations %}
+                    <tr>
+                        <td style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                            <div>
+                                {{ forloop.counter }} -
+                                {{ item.to.email }}
+                            </div>
+                        </td>
+                        <td width="25%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                            {% if item.author.person.avatar %}
+                                <img  style="float:left;padding-right:4px" width="25px" src="{{ item.author.person.avatar.url }}" />
+                            {% endif %}
+                            <div style="margin-top: 3px">
+                                {{ item.author.person.name }}
+                            </div>
+                        </td>
+                        <td width="12%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                            {{ item.created }}
+                        </td>
+                        <td width="12%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                            {{ item.expired }}
+                        </td>
+                        <td width="10%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
+                            <div style="float:left">
+                                <form action="{% url 'gatheros_event:invitation-resend' invitation_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja renovar este convite?')">{% csrf_token %}
+                                    <button type="submit">Reenviar</button>
+                                </form>
+                            </div>
+                            &nbsp; &nbsp; &nbsp;
+                            <div style="float:left; margin-left: 10px">
+                                <a href="{% url 'gatheros_event:invitation-delete' invitation_organization.pk item.pk %}">Excluir</a>
+                            </div>
+                            <div style="clear:both"></div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
 
 {% endblock %}
