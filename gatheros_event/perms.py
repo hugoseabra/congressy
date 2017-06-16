@@ -8,7 +8,7 @@ from permission.compat import is_authenticated
 from permission.logics.base import PermissionLogic
 from permission.utils.field_lookup import field_lookup
 
-from .models import Event, Member, Organization, Person, Place
+from .models import Event, Invitation, Member, Organization, Person, Place
 
 
 class MemberPermissionLogic(PermissionLogic):
@@ -161,3 +161,11 @@ logic = MemberPermissionLogic(
     'organization',
 )
 add_permission_logic(Place, logic)
+
+# Organização -> Admin -> Invitation
+logic = MemberPermissionLogic(
+    member_is_admin_not_internal,
+    ['delete_invitation'],
+    'author__organization',
+)
+add_permission_logic(Invitation, logic)

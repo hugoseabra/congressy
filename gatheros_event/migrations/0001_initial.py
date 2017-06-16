@@ -211,7 +211,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'convite',
                 'verbose_name_plural': 'convites',
-                'ordering': ('created', 'author'),
+                'ordering': ('-created', '-expired', 'author'),
             },
         ),
         migrations.CreateModel(

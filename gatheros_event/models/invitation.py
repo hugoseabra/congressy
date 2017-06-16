@@ -17,14 +17,14 @@ from .mixins import GatherosModelMixin
 from .rules import check_invite
 
 
-class InvitationManager(models.Manager, GatherosModelMixin):
+class InvitationManager(models.Manager):
     """ Manager - Gerenciador de Convites. """
     def get_invitations(self, organization):
         return self.filter(organization=organization).all
 
 
 @track_data('author', 'to')
-class Invitation(models.Model):
+class Invitation(models.Model, GatherosModelMixin):
     """ Convite para organização """
 
     uuid = models.UUIDField(
@@ -60,12 +60,14 @@ class Invitation(models.Model):
 
     objects = InvitationManager()
 
+    @property
+    def is_expired(self):
+        """ Verifica se convite já está expirado. """
+        return self.expired < datetime.now()
+
     def save(self, *args, **kwargs):
         if self._state.adding:
-            self.created = datetime.now()
-            self.expired = self.created + timedelta(
-                days=settings.INVITATION_ACCEPT_DAYS
-            )
+            self._set_dates()
 
         self.full_clean()
         super(Invitation, self).save(*args, **kwargs)
@@ -76,13 +78,19 @@ class Invitation(models.Model):
     class Meta:
         verbose_name = 'convite'
         verbose_name_plural = 'convites'
-        ordering = ('created', 'author',)
+        ordering = ('-created', '-expired', 'author',)
         unique_together = (('author', 'to'),)
 
     def __str__(self):
         return '{} - {}'.format(
             self.author.organization.name,
             self.to.first_name if self.to.first_name else self.to.email
+        )
+
+    def _set_dates(self):
+        self.created = datetime.now()
+        self.expired = self.created + timedelta(
+            days=settings.INVITATION_ACCEPT_DAYS
         )
 
     def has_previous(self):
@@ -93,6 +101,10 @@ class Invitation(models.Model):
         return Invitation.objects.filter(
             author__organization=self.author.organization, to=self.to).exists()
 
-    def is_expired(self):
-        """ Verifica se convite já está expirado. """
-        return self.expired < datetime.now()
+    def renew(self, save=False):
+        """ Renova convite. """
+
+        self._set_dates()
+
+        if save:
+            self.save()
