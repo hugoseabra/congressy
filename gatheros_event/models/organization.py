@@ -148,6 +148,10 @@ class Organization(models.Model, GatherosModelMixin):
         """
         return len(self.get_members(group=Member.ADMIN, person=person)) > 0
 
+    def is_member_active(self, person):
+        member = self.get_member(person)
+        return member.active if member else False
+
     def get_invitations(self, include_expired=True):
         """
         Recupera convites da organização feita por membros administradores

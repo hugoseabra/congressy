@@ -67,19 +67,24 @@ class MemberPermissionLogic(PermissionLogic):
 # Handlers
 def member_is_admin(user_obj, organization=None):
     """
-    Usuário é membro de organização e administrador.
+    Usuário é membro ativo de organização e administrador.
 
     :param user_obj: Instância de usuário
     :param organization: Instância de organização
     :return: bool
     """
     person = Person.objects.get(user=user_obj)
-    return organization and organization.is_admin(person)
+    is_auth = user_obj.is_authenticated()
+    is_admin = organization and organization.is_admin(person)
+    is_active = organization and organization.active
+    is_member_active = organization and organization.is_member_active(person)
+
+    return is_auth and is_admin and is_active and is_member_active
 
 
 def member_is_admin_not_internal(user_obj, organization=None):
     """
-    Usuário é membro de organização não interna e administrador.
+    Usuário é membro ativo de organização não interna e administrador.
 
     :param user_obj: Instância de usuário
     :param organization: Instância de organização
@@ -89,40 +94,51 @@ def member_is_admin_not_internal(user_obj, organization=None):
         return False
 
     person = Person.objects.get(user=user_obj)
-    return organization.is_admin(person)
+    is_auth = user_obj.is_authenticated()
+    is_admin = organization and organization.is_admin(person)
+    is_active = organization and organization.active
+    is_member_active = organization and organization.is_member_active(person)
+
+    return is_auth and is_admin and is_active and is_member_active
 
 
 def member_is_member(user_obj, organization):
     """
-    Usuário é membro da organização.
+    Usuário é membro ativo da organização.
 
     :param user_obj: Instância de usuário
     :param organization: Instância de organização
     :return: bool
     """
+
     person = Person.objects.get(user=user_obj)
-    return organization and organization.is_member(person)
+    is_auth = user_obj.is_authenticated()
+    is_member = organization and organization.is_member(person)
+    is_active = organization and organization.active
+    is_member_active = organization and organization.is_member_active(person)
+
+    return is_auth and is_member and is_active and is_member_active
 
 
 # Lógicas de permissões
 # Organização -> Admin
 logic = MemberPermissionLogic(
     member_is_admin,
-    [
-        'change_organization',
-        'delete_organization',
-        'can_view',
-        'can_manage_members',
-        'can_manage_places',
-        'can_add_event'
-    ],
+    ['can_add_event'],
 )
 add_permission_logic(Organization, logic)
 
 # Organização -> Admin -> Não Interno
 logic = MemberPermissionLogic(
     member_is_admin_not_internal,
-    ['can_invite'],
+    [
+        'can_view',
+        'can_invite',
+        'change_organization',
+        'delete_organization',
+        'can_manage_members',
+        'can_manage_places',
+    ],
 )
 add_permission_logic(Organization, logic)
 
@@ -136,7 +152,10 @@ add_permission_logic(Organization, logic)
 # Organização -> Admin -> membros
 logic = MemberPermissionLogic(
     member_is_admin_not_internal,
-    ['delete_member', ],
+    [
+        'change_member',
+        'delete_member',
+    ],
     'organization',
 )
 add_permission_logic(Member, logic)

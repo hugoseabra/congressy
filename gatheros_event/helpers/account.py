@@ -31,6 +31,10 @@ def is_participant(request):
 
 def get_organization(request):
     """Retorna a organização ativa na sessão."""
+
+    if not request.user.is_authenticated():
+        return
+
     if not hasattr(request, 'cached_organization'):
         account = request.session.get('account')
         try:
@@ -53,6 +57,10 @@ def get_organizations(request):
     :param request: Instância de HttpRequest
     :return: list
     """
+
+    if not request.user.is_authenticated():
+        return
+
     if not hasattr(request, 'cached_organizations'):
         account = request.session.get('account')
         request.cached_organizations = list(
@@ -72,6 +80,10 @@ def get_member(request):
     :param request:
     :return:
     """
+
+    if not request.user.is_authenticated():
+        return
+
     if not hasattr(request, 'cached_member'):
         try:
             request.cached_member = get_organization(request).members.get(
@@ -93,6 +105,10 @@ def set_organization(request, organization):
     Pk da organização ativa da sessão
     :return:
     """
+
+    if not request.user.is_authenticated():
+        return
+
     clean_cache(request)
 
     if isinstance(organization, Organization):
@@ -113,6 +129,10 @@ def update_account(request, organization=None, force=False):
     :param force: Força a atualização de organizações
     :return:
     """
+
+    if not request.user.is_authenticated():
+        return
+
     if is_participant(request):
         return
 
@@ -150,8 +170,8 @@ def update_account(request, organization=None, force=False):
 
         # Definindo todas organizações na sessão
         organizations = Organization.objects.filter(
-            members__person=request.user.person,
             members__active=True,
+            members__person=request.user.person,
             active=True
         )
 

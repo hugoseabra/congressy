@@ -23,6 +23,7 @@ class DeleteViewMixin(AccountMixin, DeleteView):
     template_name = 'generic/delete.html'
 
     def dispatch(self, request, *args, **kwargs):
+
         self.object = self.get_object()
 
         if not isinstance(self.object, DeletableModel):
@@ -39,7 +40,11 @@ class DeleteViewMixin(AccountMixin, DeleteView):
             url = self.get_success_url()
             return redirect(url.format(**model_to_dict(self.object)))
 
-        return super(DeleteViewMixin, self).dispatch(request, *args, **kwargs)
+        return super(DeleteViewMixin, self).dispatch(
+            request,
+            *args,
+            **kwargs
+        )
 
     def get_context_data(self, **kwargs):
         context = super(DeleteViewMixin, self).get_context_data(**kwargs)
