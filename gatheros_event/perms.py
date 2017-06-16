@@ -49,10 +49,13 @@ class MemberPermissionLogic(PermissionLogic):
             raise ImproperlyConfigured(
                 'Configuração errada, "obj" não é do tipo "Organization". '
                 'Verfique o parametro "field_organization" em '
-                'add_permission_logic. Lógica inserida: '
-                + str(self.handler.__name__) + ', permissões configuradas ('
-                + ', '.join(self.permissions) + ') e permissão solicitada: '
-                + str(perm)
+                'add_permission_logic. Lógica inserida: {handler_name},'
+                ' permissões configuradas ({permissions}) e'
+                ' permissão solicitada: {required_permission}'.format(
+                    handler_name=self.handler.__name__,
+                    permissions=', '.join(self.permissions),
+                    required_permission=perm
+                )
             )
 
         has_perm = perm.split('.')[1] in self.permissions

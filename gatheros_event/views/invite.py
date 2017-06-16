@@ -4,7 +4,6 @@ from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import get_token
 from django.views.generic import FormView, ListView, TemplateView, UpdateView
-from django.db.models import F
 
 from core.view.delete import DeleteViewMixin
 from gatheros_event.forms import (
@@ -13,7 +12,6 @@ from gatheros_event.forms import (
     ProfileForm
 )
 from gatheros_event.forms.invitation import send_invitation
-
 from gatheros_event.models import Invitation, Organization
 from gatheros_event.views.mixins import AccountMixin
 

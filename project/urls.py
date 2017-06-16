@@ -9,23 +9,22 @@ url_admin = [url(r'^admin/', admin.site.urls)]
 
 url_manager = [
     url(
-                r'^lembrar-senha/$',
-                views.PasswordResetView.as_view(),
-                name='password_reset'
-            ),
-            url(
-                r'^lembrar-senha/completo/$',
-                views.PasswordResetDoneView.as_view(),
-                name='password_reset_done'
-            ),
-            url(
-                r'^redefinir/'
-                '(?P<uidb64>[0-9A-Za-z_\-]+)/'
-                '(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-                views.PasswordResetConfirmView.as_view(),
-                name='password_reset_confirm'
-            ),
-
+        r'^lembrar-senha/$',
+        views.PasswordResetView.as_view(),
+        name='password_reset'
+    ),
+    url(
+        r'^lembrar-senha/completo/$',
+        views.PasswordResetDoneView.as_view(),
+        name='password_reset_done'
+    ),
+    url(
+        r'^redefinir/'
+        '(?P<uidb64>[0-9A-Za-z_\-]+)/'
+        '(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        views.PasswordResetConfirmView.as_view(),
+        name='password_reset_confirm'
+    ),
     url(
         r'^redefinir/completo/$',
         views.PasswordResetCompleteView.as_view(),

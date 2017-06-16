@@ -24,7 +24,7 @@ class MultiEmailField(forms.Field):
         if not value:
             return []
 
-        return [v.strip() for v in re.split(';|,|\n', value) if v != ""]
+        return [v.strip() for v in re.split('[;,\n]', value) if v != ""]
 
     def validate(self, value):
         super(MultiEmailField, self).validate(value)

@@ -19,7 +19,11 @@ class BaseOrganizationView(AccountMixin, View):
         if not self.can_view():
             return redirect(reverse_lazy('gatheros_event:organization-list'))
 
-        return super(BaseOrganizationView, self).dispatch(request, *args, **kwargs)
+        return super(BaseOrganizationView, self).dispatch(
+            request,
+            *args,
+            **kwargs
+        )
 
     def get_form(self, form_class=None):
         """

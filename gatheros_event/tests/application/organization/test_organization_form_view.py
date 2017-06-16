@@ -91,4 +91,3 @@ class OrganizationFormAddTest(TestCase):
 
         with self.assertRaises(Organization.DoesNotExist):
             Organization.objects.get(pk=org.pk)
-

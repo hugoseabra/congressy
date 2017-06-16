@@ -125,7 +125,7 @@ class Organization(models.Model, GatherosModelMixin):
     def get_member(self, person):
         """ Recupera Member de organização. """
         members_qs = self.get_members(person=person)
-        if members_qs.count() == 0:
+        if len(members_qs) == 0:
             return None
 
         return members_qs.first()

@@ -195,6 +195,7 @@ class ProfileCreateFormTest(TestCase):
             "city": 5413,
         }
 
+    # noinspection PyMethodMayBeStatic
     def get_form(self, **kwargs):
         """
         Cria um form

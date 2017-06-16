@@ -48,6 +48,7 @@ class OrganizationForm(forms.ModelForm):
         super(OrganizationForm, self).__init__(data=data, *args, **kwargs)
 
     def save(self, commit=True):
+        # noinspection PyProtectedMember
         is_new = self.instance._state.adding
         self.instance.internal = False
         self.instance.active = True
