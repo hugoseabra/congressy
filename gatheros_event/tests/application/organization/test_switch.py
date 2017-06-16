@@ -62,15 +62,19 @@ class OrganizationSwitchTest(TestCase):
 
     def test_not_allowed_organization_403(self):
         org = self._get_organization_not_member()
-        result = self.client.post(
+        response = self.client.post(
             self.url,
-            {'organization-context-pk': org.pk}
+            {'organization-context-pk': org.pk},
+            follow=True
         )
-        self.assertEqual(result.status_code, 403)
+        self.assertContains(response, 'Você não é membro desta organização.')
 
     def test_not_exist_organization_404(self):
-        result = self.client.post(self.url, {'organization-context-pk': 9999})
-        self.assertEqual(result.status_code, 404)
+        response = self.client.post(
+            self.url, {'organization-context-pk': 9999},
+            follow=True
+        )
+        self.assertEqual(response.status_code, 404)
 
     def test_presentation(self):
         # First organization

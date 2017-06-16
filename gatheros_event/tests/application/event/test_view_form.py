@@ -49,14 +49,15 @@ class AddEventTest(TestCase):
         organization = self._get_active_organization()
         other = Organization.objects.exclude(pk=organization.pk).filter(
             members__person=self.user.person,
+            internal=False,
             members__group=group
         ).first()
         url = reverse('gatheros_event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def test_status_is_200_ok(self):
-        result = self.client.get(self.url)
-        self.assertEqual(result.status_code, 200)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
 
     def test_add_event(self):
         data = {
