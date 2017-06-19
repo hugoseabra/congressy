@@ -35,7 +35,6 @@ class OrganizationListView(AccountMixin, ListView):
             internal=False,
             members__person=person,
             members__active=True,
-            active=True
         ).distinct()
 
     def _can_view(self):

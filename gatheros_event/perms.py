@@ -76,10 +76,9 @@ def member_is_admin(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
     is_auth = user_obj.is_authenticated()
     is_admin = organization and organization.is_admin(person)
-    is_active = organization and organization.active
     is_member_active = organization and organization.is_member_active(person)
 
-    return is_auth and is_admin and is_active and is_member_active
+    return is_auth and is_admin and is_member_active
 
 
 def member_is_admin_not_internal(user_obj, organization=None):
@@ -96,10 +95,9 @@ def member_is_admin_not_internal(user_obj, organization=None):
     person = Person.objects.get(user=user_obj)
     is_auth = user_obj.is_authenticated()
     is_admin = organization and organization.is_admin(person)
-    is_active = organization and organization.active
     is_member_active = organization and organization.is_member_active(person)
 
-    return is_auth and is_admin and is_active and is_member_active
+    return is_auth and is_admin and is_member_active
 
 
 def member_is_member(user_obj, organization):
@@ -114,10 +112,9 @@ def member_is_member(user_obj, organization):
     person = Person.objects.get(user=user_obj)
     is_auth = user_obj.is_authenticated()
     is_member = organization and organization.is_member(person)
-    is_active = organization and organization.active
     is_member_active = organization and organization.is_member_active(person)
 
-    return is_auth and is_member and is_active and is_member_active
+    return is_auth and is_member and is_member_active
 
 
 # Lógicas de permissões

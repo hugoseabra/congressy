@@ -70,7 +70,7 @@ class OrganizationPanelView(AccountMixin, DetailView):
         )
 
     def _can_delete(self):
-        return self.request.user.has_perm(
+        return self.object.is_deletable() and self.request.user.has_perm(
             'gatheros_event.delete_organization',
             self.object
         )

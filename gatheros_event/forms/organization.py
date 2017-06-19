@@ -19,6 +19,7 @@ class OrganizationForm(forms.ModelForm):
         fields = (
             'name',
             'description_html',
+            'active',
             'avatar',
             'website',
             'facebook',
@@ -51,7 +52,9 @@ class OrganizationForm(forms.ModelForm):
         # noinspection PyProtectedMember
         is_new = self.instance._state.adding
         self.instance.internal = False
-        self.instance.active = True
+
+        if is_new:
+            self.instance.active = True
 
         result = super(OrganizationForm, self).save(commit=commit)
         if is_new:

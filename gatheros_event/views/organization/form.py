@@ -44,7 +44,15 @@ class BaseOrganizationView(AccountMixin, View):
     def form_valid(self, form):
         messages.success(self.request, self.success_message)
         # noinspection PyUnresolvedReferences
-        return super(BaseOrganizationView, self).form_valid(form)
+        result = super(BaseOrganizationView, self).form_valid(form)
+
+        update_account(
+            request=self.request,
+            organization=self.organization,
+            force=True
+        )
+
+        return result
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
@@ -78,15 +86,6 @@ class OrganizationAddFormView(BaseOrganizationView, generic.CreateView):
     form_class = forms.OrganizationForm
     success_message = 'Organização criada com sucesso.'
     form_title = 'Nova organização'
-
-    def form_valid(self, form):
-        result = super(OrganizationAddFormView, self).form_valid(form=form)
-        update_account(
-            request=self.request,
-            organization=self.organization,
-            force=True
-        )
-        return result
 
     def get_success_url(self):
         return reverse(

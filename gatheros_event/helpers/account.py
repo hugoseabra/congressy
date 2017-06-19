@@ -86,9 +86,13 @@ def get_member(request):
 
     if not hasattr(request, 'cached_member'):
         try:
-            request.cached_member = get_organization(request).members.get(
-                person=request.user.person
-            )
+            organization = get_organization(request)
+            if organization:
+                request.cached_member = get_organization(request).members.get(
+                    person=request.user.person
+                )
+            else:
+                return None
 
         except Organization.DoesNotExist:
             return None
@@ -163,8 +167,6 @@ def update_account(request, organization=None, force=False):
     if is_participant(request):
         return
 
-    set_organization(request, organization)
-
     if force or request.session['account'].get('organizations') is None:
         clean_cache(request)
 
@@ -180,6 +182,13 @@ def update_account(request, organization=None, force=False):
         })
         request.session.modified = True
         clean_cache(request)
+
+    # Se a organização do contexto não foi carregada, carrega a primeira
+    organizations = get_organizations(request)
+    if organization not in organizations:
+        organization = organizations[0]
+
+    set_organization(request, organization)
 
 
 def clean_account(request):
