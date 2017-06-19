@@ -72,7 +72,6 @@ class OrganizationFormTest(TestCase):
         self.assertTrue(form.is_valid())
         saved_org = form.save()
         self.assertFalse(saved_org.internal)
-        self.assertTrue(saved_org.active)
 
         organization = Organization.objects.get(pk=saved_org.pk)
 

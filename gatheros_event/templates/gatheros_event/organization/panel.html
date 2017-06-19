@@ -15,18 +15,27 @@
         </div>
         <div style="clear:both"></div>
     </div>
-    <div style="margin-bottom:20px;padding: 10px;background-color: #DDDDDD;text-align: center;">
-        {% if can_change %}
-            <a href="#">Editar</a>
-        {% endif %}
-        {% if can_change and can_delete %}
-            &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
-        {% endif %}
-        {% if can_delete %}
-            <a href="#">Excluir</a>
-        {% endif %}
-        <a href="#">Desativar</a>
+    <div style="padding: 10px;background-color: #DDDDDD;">
+        <div style="width:300px;margin:0 auto">
+            {% if can_change %}
+                <div style="float:left">
+                    <a href="{% url 'gatheros_event:organization-edit' object.pk %}">Editar</a>
+                </div>
+            {% endif %}
+            {% if can_change and can_delete %}
+                <div style="float:left">
+                    &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
+                </div>
+            {% endif %}
+            {% if can_delete %}
+                <div style="float:left">
+                    <a href="{% url 'gatheros_event:organization-delete' object.pk %}">Excluir</a>
+                </div>
+            {% endif %}
+            <div style="clear:both"></div>
+        </div>
     </div>
+    <div style="margin-bottom:10px; width: 100%;height:3px;background-color: {% if object.active %}darkgreen{% else %}darkred{% endif %}"></div>
 
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
         <tr>
@@ -286,16 +295,5 @@
             </td>
         </tr>
     </table>
-
-    <br />
-    <hr />
-    <pre>
-        Painel deve conter:
-        -------------------
-        = Suporte a Transferência de evento entre organizações
-        = Lista de membros (nome, tipo, data de entrada), com filtro (tipo) e possibilidade de "adicionar", "editar" e "excluir"
-        = Para ver organização, membro também deve estar ativo
-        = Admin pode desativar e ativar membro
-    </pre>
 
 {% endblock %}

@@ -3,8 +3,9 @@ Formulários de Event
 """
 
 from django import forms
+from django.shortcuts import get_object_or_404
 
-from gatheros_event.models import Event
+from gatheros_event.models import Event, Organization, Member
 
 
 # @TODO Remover diretórios vazios de eventos que não possuem banners
@@ -142,3 +143,54 @@ class EventSocialMediaForm(forms.ModelForm):
             'twitter',
             'skype',
         ]
+
+
+class EventTransferForm(forms.Form):
+    """
+    Formulário de Transferência de propriedade de evento entre organizações.
+    """
+    instance = None
+    user = None
+
+    organization_to = forms.ChoiceField(label='Para')
+
+    def __init__(self, user, instance, *args, **kwargs):
+        self.user = user
+        self.instance = instance
+        super(EventTransferForm, self).__init__(*args, **kwargs)
+        self._populate()
+
+    def _populate(self):
+
+        current_org = self.instance.organization
+        members = self.user.person.members.filter(group=Member.ADMIN).order_by(
+            '-organization__internal',
+            'organization__name'
+        )
+
+        organizations = [
+            (member.organization.pk, member.organization.name)
+            for member in members if member.organization.pk != current_org.pk
+        ]
+        self.fields['organization_to'].choices = organizations
+
+    def clean(self):
+        organization = get_object_or_404(
+            Organization,
+            pk=self.data['organization_to']
+        )
+
+        if organization.is_admin(self.user) is False:
+            raise forms.ValidationError({
+                'organization_to': 'Você não pode transferir um evento para'
+                                   ' uma organização na qual você não é'
+                                   ' administador.'
+            })
+
+        self.cleaned_data['organization_to'] = organization
+        return self.cleaned_data
+
+    def save(self):
+        self.instance.organization = self.cleaned_data['organization_to']
+        self.instance.place = None
+        self.instance.save()

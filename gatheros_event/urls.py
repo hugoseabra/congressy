@@ -6,22 +6,27 @@ from . import views
 
 url_event = [
     url(
-        r'^(?P<pk>[\d]+)/info',
+        r'^(?P<pk>[\d]+)/transfer/',
+        views.EventTransferView.as_view(),
+        name='event-transfer'
+    ),
+    url(
+        r'^(?P<pk>[\d]+)/info/',
         views.EventInfoView.as_view(),
         name='event-info'
     ),
     url(
-        r'^(?P<pk>[\d]+)/detail',
+        r'^(?P<pk>[\d]+)/detail/',
         views.EventDetailView.as_view(),
         name='event-detail'
     ),
     url(
-        r'^(?P<pk>[\d]+)/edit/dates',
+        r'^(?P<pk>[\d]+)/edit/dates/',
         views.EventDatesFormView.as_view(),
         name='event-edit-dates'
     ),
     url(
-        r'^(?P<pk>[\d]+)/edit/subscription',
+        r'^(?P<pk>[\d]+)/edit/subscription/',
         views.EventSubscriptionTypeFormView.as_view(),
         name='event-edit-subscription_type'
     ),

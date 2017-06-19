@@ -14,13 +14,15 @@
         {% if object_list %}
             <table width="100%">
                 <tr>
-                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome</td>
+                    <td colspan="2" style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome</td>
                     <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Grupo</td>
                     <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
                 </tr>
                 {% for item in object_list %}
                     {% get_member_group item user as member_group %}
                     <tr>
+                        <td width="1%"
+                            style="background-color: {% if item.active %}green{% else %}gray{% endif %}"></td>
                         <td style="background: #FFF;padding:10px;margin-bottom: 3px">
                             <div>
                                 {{ forloop.counter }} -

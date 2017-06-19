@@ -15,6 +15,7 @@ from .event.form import (
 from .event.info import EventInfoView
 from .event.list import EventListView
 from .event.panel import EventPanelView
+from .event.transfer import EventTransferView
 # INVITATION
 from .invite import (
     InvitationCreateView,

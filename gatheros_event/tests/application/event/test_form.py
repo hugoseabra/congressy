@@ -15,8 +15,9 @@ from gatheros_event.forms import (
     EventPlaceForm,
     EventPublicationForm,
     EventSocialMediaForm,
+    EventTransferForm,
 )
-from gatheros_event.models import Event, Organization
+from gatheros_event.models import Event, Member, Organization
 
 
 class BaseEventFormTest(TestCase):
@@ -267,7 +268,7 @@ class EventBannersFormTest(TestCase):
         # Clear file deve limpar o campo no model e deletar os arquivos
         dict_clear = {}
         for field_name in six.iterkeys(file_names):
-            key = field_name+'-clear'
+            key = field_name + '-clear'
             dict_clear[key] = 'on'
 
         form = EventBannerForm(
@@ -382,3 +383,109 @@ class EventSocialMediaFormTest(TestCase):
                 model_v = model_v.pk
 
             self.assertEqual(model_v, value)
+
+
+class EventTransferFormTest(TestCase):
+    fixtures = [
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+        '009_place',
+        '010_event',
+    ]
+
+    def setUp(self):
+        self.organization = Organization.objects.get(slug='luciana-silva')
+        self.member = self.organization.members.first()
+        self.events = self._get_events()
+
+    # noinspection PyMethodMayBeStatic
+    def _get_events(self):
+        member = self.organization.members.first()
+        person = member.person
+
+        members = person.members.filter(group=Member.ADMIN)
+        orgs = [member.organization for member in members]
+        events = []
+        for org in orgs:
+            events += list(org.events.all())
+
+        return events
+
+    # noinspection PyMethodMayBeStatic
+    def _get_org_not_member(self):
+        members = self.member.person.members.all()
+        pks = [member.organization.pk for member in members]
+        return Organization.objects.exclude(pk__in=pks).first()
+
+    def _get_form(self, data=None):
+        event = self.events[0]
+
+        return EventTransferForm(
+            user=self.member.person.user,
+            instance=event,
+            data=data
+        )
+
+    def test_render_correct_orgs(self):
+        members = self.member.person.members.filter(group=Member.ADMIN)
+        pks_admin = [member.organization.pk for member in members if
+                     member.organization.pk != self.organization.pk]
+
+        members = self.member.person.members.exclude(group=Member.ADMIN)
+        pks_not_admin = [member.organization.pk for member in members if
+                         member.organization.pk != self.organization.pk]
+
+        form = self._get_form(data={
+            'organization_to': self.organization.pk
+        })
+        rendered = form.as_ul()
+
+        for pk in pks_admin:
+            # Ignore a organização do evento
+            if pk == form.instance.organization.pk:
+                continue
+
+            self.assertIn(str(pk), rendered)
+
+        for pk in pks_not_admin:
+            self.assertNotIn(str(pk), rendered)
+
+    def test_transfer_not_member(self):
+        org = self._get_org_not_member()
+        form = self._get_form(data={
+            'organization_to': org.pk
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('organization_to', form.errors)
+
+    def test_transfer_org_not_admin(self):
+        person = self.member.person
+        member = person.members.exclude(group=Member.ADMIN).first()
+
+        form = self._get_form(data={
+            'organization_to': member.organization.pk
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('organization_to', form.errors)
+
+    def test_transfer(self):
+        form = self._get_form()
+        member = self.member.person.members.filter(
+            group=Member.ADMIN
+        ).exclude(organization__pk=form.instance.organization.pk).first()
+        org = member.organization
+
+        form = self._get_form(data={
+            'organization_to': org.pk
+        })
+        if not form.is_valid():
+            print(form.as_ul())
+            print(form.errors)
+
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        event = Event.objects.get(pk=form.instance.pk)
+        self.assertEqual(event.organization.pk, org.pk)

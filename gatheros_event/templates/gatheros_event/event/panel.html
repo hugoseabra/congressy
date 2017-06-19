@@ -37,12 +37,12 @@
                             <p><strong>Acessando como:</strong></p>
                             <p>{{ member.get_group_display }}</p>
                         </div>
-                        <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
-                            <a href="#">Mudar realizador</a>
-                        </div>
                     </div>
-                    <br/>
                 {% endif %}
+                <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
+                    <a href="{% url 'gatheros_event:event-transfer' object.pk %}">Mudar realizador</a>
+                </div>
+                <br/>
                 {% if can_change %}
                 <div style="background-color: whitesmoke;border: 1px solid #DDD;">
                     <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">

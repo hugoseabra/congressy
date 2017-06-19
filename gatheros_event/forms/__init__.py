@@ -7,6 +7,7 @@ from .event import (
     EventPlaceForm,
     EventPublicationForm,
     EventSocialMediaForm,
+    EventTransferForm,
 )
 from .info import (
     Info4ImagesForm,
