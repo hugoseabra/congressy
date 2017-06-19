@@ -8,11 +8,11 @@ from .models import Answer, DefaultField, Field, FieldOption, Form, Lot, \
 
 @admin.register(DefaultField)
 class DefaultFieldAdmin(admin.ModelAdmin):
-    list_display = ('label', 'type', 'required', 'pk')
+    list_display = ('label', 'field_type', 'required', 'pk')
     fields = [
         'name',
         'label',
-        'type',
+        'field_type',
         'order',
         'required',
         'instruction',
@@ -28,7 +28,7 @@ class FieldAdmin(admin.ModelAdmin):
         'form',
         'order',
         'label',
-        'type',
+        'field_type',
         'required',
         'form_default_field',
         'with_options',
@@ -39,7 +39,7 @@ class FieldAdmin(admin.ModelAdmin):
         'form',
         'name',
         'label',
-        'type',
+        'field_type',
         'order',
         'required',
         'instruction',
@@ -75,7 +75,7 @@ class FieldOptionAdmin(admin.ModelAdmin):
     def get_field_label(self, instance):
         return '{} [ {} ]'.format(
             instance.field.label,
-            instance.field.get_type_display()
+            instance.field.get_field_type_display()
         )
 
     def get_event_form(self, instance):
@@ -248,7 +248,7 @@ class AnswerAdmin(admin.ModelAdmin):
 
     def get_field(self, instance):
         field = instance.field.label
-        field += ' [ ' + instance.field.get_type_display() + ' ]'
+        field += ' [ ' + instance.field.get_field_type_display() + ' ]'
         return field
 
     def get_value(self, instance):

@@ -54,9 +54,10 @@ class Migration(migrations.Migration):
                     max_length=255,
                     verbose_name='rótulo'
                 )),
-                ('type', models.CharField(
+                ('field_type', models.CharField(
                     choices=[
                         ('input-text', 'Texto (255 caracteres)'),
+                        ('input-number', 'Número'),
                         ('input-date', 'Data'),
                         ('input-datetime-local', 'Data e hora'),
                         ('input-email', 'E-mail'),
@@ -124,9 +125,10 @@ class Migration(migrations.Migration):
                     max_length=255,
                     verbose_name='rótulo'
                 )),
-                ('type', models.CharField(
+                ('field_type', models.CharField(
                     choices=[
                         ('input-text', 'Texto (255 caracteres)'),
+                        ('input-number', 'Número'),
                         ('input-date', 'Data'),
                         ('input-datetime-local', 'Data e hora'),
                         ('input-email', 'E-mail'),

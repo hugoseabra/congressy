@@ -5,7 +5,7 @@
     "fields": {
         "name": "name",
         "label": "Nome Completo",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 1,
         "required": true,
         "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
@@ -23,7 +23,7 @@
     "fields": {
         "name": "email",
         "label": "E-mail",
-        "type": "input-email",
+        "field_type": "input-email",
         "order": 2,
         "required": false,
         "instruction": "",
@@ -41,7 +41,7 @@
     "fields": {
         "name": "phone",
         "label": "Celular",
-        "type": "input-phone",
+        "field_type": "input-phone",
         "order": 3,
         "required": true,
         "instruction": "",
@@ -59,7 +59,7 @@
     "fields": {
         "name": "city",
         "label": "Cidade",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 4,
         "required": true,
         "instruction": "",
@@ -77,7 +77,7 @@
     "fields": {
         "name": "name",
         "label": "Nome Completo",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 1,
         "required": true,
         "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
@@ -95,7 +95,7 @@
     "fields": {
         "name": "email",
         "label": "E-mail",
-        "type": "input-email",
+        "field_type": "input-email",
         "order": 2,
         "required": false,
         "instruction": "",
@@ -113,7 +113,7 @@
     "fields": {
         "name": "phone",
         "label": "Celular",
-        "type": "input-phone",
+        "field_type": "input-phone",
         "order": 3,
         "required": true,
         "instruction": "",
@@ -131,7 +131,7 @@
     "fields": {
         "name": "city",
         "label": "Cidade",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 4,
         "required": true,
         "instruction": "",
@@ -149,7 +149,7 @@
     "fields": {
         "name": "name",
         "label": "Nome Completo",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 1,
         "required": true,
         "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
@@ -167,7 +167,7 @@
     "fields": {
         "name": "email",
         "label": "E-mail",
-        "type": "input-email",
+        "field_type": "input-email",
         "order": 2,
         "required": false,
         "instruction": "",
@@ -185,7 +185,7 @@
     "fields": {
         "name": "phone",
         "label": "Celular",
-        "type": "input-phone",
+        "field_type": "input-phone",
         "order": 3,
         "required": true,
         "instruction": "",
@@ -203,7 +203,7 @@
     "fields": {
         "name": "city",
         "label": "Cidade",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 4,
         "required": true,
         "instruction": "",
@@ -221,7 +221,7 @@
     "fields": {
         "name": "name",
         "label": "Nome Completo",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 1,
         "required": true,
         "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
@@ -239,7 +239,7 @@
     "fields": {
         "name": "email",
         "label": "E-mail",
-        "type": "input-email",
+        "field_type": "input-email",
         "order": 2,
         "required": false,
         "instruction": "",
@@ -257,7 +257,7 @@
     "fields": {
         "name": "phone",
         "label": "Celular",
-        "type": "input-phone",
+        "field_type": "input-phone",
         "order": 3,
         "required": true,
         "instruction": "",
@@ -275,7 +275,7 @@
     "fields": {
         "name": "city",
         "label": "Cidade",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 4,
         "required": true,
         "instruction": "",
@@ -293,7 +293,7 @@
     "fields": {
         "name": "name",
         "label": "Nome Completo",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 1,
         "required": true,
         "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
@@ -311,7 +311,7 @@
     "fields": {
         "name": "email",
         "label": "E-mail",
-        "type": "input-email",
+        "field_type": "input-email",
         "order": 2,
         "required": false,
         "instruction": "",
@@ -329,7 +329,7 @@
     "fields": {
         "name": "phone",
         "label": "Celular",
-        "type": "input-phone",
+        "field_type": "input-phone",
         "order": 3,
         "required": true,
         "instruction": "",
@@ -347,7 +347,7 @@
     "fields": {
         "name": "city",
         "label": "Cidade",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 4,
         "required": true,
         "instruction": "",
@@ -365,7 +365,7 @@
     "fields": {
         "name": "name",
         "label": "Nome Completo",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 1,
         "required": true,
         "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
@@ -383,7 +383,7 @@
     "fields": {
         "name": "email",
         "label": "E-mail",
-        "type": "input-email",
+        "field_type": "input-email",
         "order": 2,
         "required": false,
         "instruction": "",
@@ -401,7 +401,7 @@
     "fields": {
         "name": "phone",
         "label": "Celular",
-        "type": "input-phone",
+        "field_type": "input-phone",
         "order": 3,
         "required": true,
         "instruction": "",
@@ -419,7 +419,7 @@
     "fields": {
         "name": "city",
         "label": "Cidade",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 4,
         "required": true,
         "instruction": "",
@@ -437,7 +437,7 @@
     "fields": {
         "name": "name",
         "label": "Nome Completo",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 1,
         "required": true,
         "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
@@ -455,7 +455,7 @@
     "fields": {
         "name": "email",
         "label": "E-mail",
-        "type": "input-email",
+        "field_type": "input-email",
         "order": 2,
         "required": false,
         "instruction": "",
@@ -473,7 +473,7 @@
     "fields": {
         "name": "phone",
         "label": "Celular",
-        "type": "input-phone",
+        "field_type": "input-phone",
         "order": 3,
         "required": true,
         "instruction": "",
@@ -491,7 +491,7 @@
     "fields": {
         "name": "city",
         "label": "Cidade",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 4,
         "required": true,
         "instruction": "",
@@ -509,7 +509,7 @@
     "fields": {
         "name": "name",
         "label": "Nome Completo",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 1,
         "required": true,
         "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
@@ -527,7 +527,7 @@
     "fields": {
         "name": "email",
         "label": "E-mail",
-        "type": "input-email",
+        "field_type": "input-email",
         "order": 2,
         "required": false,
         "instruction": "",
@@ -545,7 +545,7 @@
     "fields": {
         "name": "phone",
         "label": "Celular",
-        "type": "input-phone",
+        "field_type": "input-phone",
         "order": 3,
         "required": true,
         "instruction": "",
@@ -563,7 +563,7 @@
     "fields": {
         "name": "city",
         "label": "Cidade",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 4,
         "required": true,
         "instruction": "",
@@ -581,7 +581,7 @@
     "fields": {
         "name": "Possui horta em casa?",
         "label": "Possui horta em casa?",
-        "type": "boolean",
+        "field_type": "boolean",
         "order": 5,
         "required": true,
         "instruction": "",
@@ -599,7 +599,7 @@
     "fields": {
         "name": "O que mais gosta de cultivar?",
         "label": "O que mais gosta de cultivar?",
-        "type": "radio-group",
+        "field_type": "radio-group",
         "order": 6,
         "required": true,
         "instruction": "",
@@ -617,7 +617,7 @@
     "fields": {
         "name": "O que gostaria de aprender?",
         "label": "O que gostaria de aprender?",
-        "type": "checkbox-group",
+        "field_type": "checkbox-group",
         "order": 7,
         "required": false,
         "instruction": "",
@@ -635,7 +635,7 @@
     "fields": {
         "name": "Tem conhecimento de l\u00f3gica de programa\u00e7\u00e3o?",
         "label": "Tem conhecimento de l\u00f3gica de programa\u00e7\u00e3o?",
-        "type": "boolean",
+        "field_type": "boolean",
         "order": 5,
         "required": true,
         "instruction": "",
@@ -653,7 +653,7 @@
     "fields": {
         "name": "Se tem curso superior, qual?",
         "label": "Se tem curso superior, qual?",
-        "type": "input-text",
+        "field_type": "input-text",
         "order": 6,
         "required": false,
         "instruction": "",
@@ -671,7 +671,7 @@
     "fields": {
         "name": "Data de in\u00edcio da horta",
         "label": "Data de in\u00edcio da horta",
-        "type": "input-date",
+        "field_type": "input-date",
         "order": 8,
         "required": false,
         "instruction": "",
@@ -689,7 +689,7 @@
     "fields": {
         "name": "Qual o melhor hor\u00e1rio para fazer o curso?",
         "label": "Qual o melhor hor\u00e1rio para fazer o curso?",
-        "type": "input-datetime-local",
+        "field_type": "input-datetime-local",
         "order": 9,
         "required": false,
         "instruction": "",
@@ -707,7 +707,7 @@
     "fields": {
         "name": "Possui e-mail profissional? Se sim, qual?",
         "label": "Possui e-mail profissional? Se sim, qual?",
-        "type": "input-email",
+        "field_type": "input-email",
         "order": 7,
         "required": false,
         "instruction": "",
@@ -725,7 +725,7 @@
     "fields": {
         "name": "Possui outro telefone celular?",
         "label": "Possui outro telefone celular?",
-        "type": "input-phone",
+        "field_type": "input-phone",
         "order": 8,
         "required": false,
         "instruction": "",
@@ -743,7 +743,7 @@
     "fields": {
         "name": "O que pode contar da sua hist\u00f3ria?",
         "label": "O que pode contar da sua hist\u00f3ria?",
-        "type": "textarea",
+        "field_type": "textarea",
         "order": 9,
         "required": true,
         "instruction": "",
@@ -761,7 +761,7 @@
     "fields": {
         "name": "Qual destas linguagens voc\u00ea mais ouve falar?",
         "label": "Qual destas linguagens voc\u00ea mais ouve falar?",
-        "type": "select",
+        "field_type": "select",
         "order": 10,
         "required": false,
         "instruction": "",
@@ -779,7 +779,7 @@
     "fields": {
         "name": "Quais destas linguagens voc\u00ea conhece?",
         "label": "Quais destas linguagens voc\u00ea conhece?",
-        "type": "checkbox-group",
+        "field_type": "checkbox-group",
         "order": 11,
         "required": false,
         "instruction": "",
@@ -797,7 +797,7 @@
     "fields": {
         "name": "O que gostaria de aprender no curso?",
         "label": "O que gostaria de aprender no curso?",
-        "type": "radio-group",
+        "field_type": "radio-group",
         "order": 12,
         "required": false,
         "instruction": "",
@@ -815,7 +815,7 @@
     "fields": {
         "name": "Escolaridade",
         "label": "Escolaridade",
-        "type": "select",
+        "field_type": "select",
         "order": 5,
         "required": true,
         "instruction": "",

@@ -10,6 +10,7 @@ class AbstractField(models.Model):
     """ Campo de formulário. """
 
     FIELD_INPUT_TEXT = 'input-text'
+    FIELD_INPUT_NUMBER = 'input-number'
     FIELD_INPUT_DATE = 'input-date'
     FIELD_INPUT_DATETIME = 'input-datetime-local'
     FIELD_INPUT_EMAIL = 'input-email'
@@ -22,6 +23,7 @@ class AbstractField(models.Model):
 
     TYPES = (
         (FIELD_INPUT_TEXT, 'Texto (255 caracteres)'),
+        (FIELD_INPUT_NUMBER, 'Número'),
         (FIELD_INPUT_DATE, 'Data'),
         (FIELD_INPUT_DATETIME, 'Data e hora'),
         (FIELD_INPUT_EMAIL, 'E-mail'),
@@ -41,7 +43,7 @@ class AbstractField(models.Model):
         max_length=255,
         verbose_name='rótulo'
     )
-    type = models.CharField(
+    field_type = models.CharField(
         max_length=20,
         choices=TYPES,
         default='input-text',

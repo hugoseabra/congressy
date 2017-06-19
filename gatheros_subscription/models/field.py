@@ -69,13 +69,13 @@ class Field(AbstractField):
 
         return required + '{} - {} ({})'.format(
             self.label,
-            self.get_type_display(),
+            self.get_field_type_display(),
             self.form
         )
 
     def _accepts_options(self):
         """ Campos aceitos pelo formulário. """
-        self.with_options = self.type in [
+        self.with_options = self.field_type in [
             self.FIELD_SELECT,
             self.FIELD_CHECKBOX_GROUP,
             self.FIELD_RADIO_GROUP,

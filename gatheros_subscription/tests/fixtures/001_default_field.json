@@ -5,7 +5,7 @@
     "fields": {
       "name": "name",
       "label": "Nome Completo",
-      "type": "input-text",
+      "field_type": "input-text",
       "order": 1,
       "required": true,
       "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
@@ -19,7 +19,7 @@
     "fields": {
       "name": "email",
       "label": "E-mail",
-      "type": "input-email",
+      "field_type": "input-email",
       "order": 2,
       "required": false,
       "instruction": "",
@@ -33,7 +33,7 @@
     "fields": {
       "name": "phone",
       "label": "Celular",
-      "type": "input-phone",
+      "field_type": "input-phone",
       "order": 3,
       "required": true,
       "instruction": "",
@@ -47,7 +47,7 @@
     "fields": {
       "name": "city",
       "label": "Cidade",
-      "type": "input-text",
+      "field_type": "input-text",
       "order": 4,
       "required": true,
       "instruction": "",
