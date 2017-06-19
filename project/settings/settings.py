@@ -25,6 +25,7 @@ INSTALLED_APPS = [
 
     # KANU_APPS
     'kanu_locations',
+    'kanu_form',
 
     # GATHEROS_APPS
     'core',
