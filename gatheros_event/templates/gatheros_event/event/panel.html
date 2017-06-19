@@ -39,11 +39,11 @@
                         </div>
                     </div>
                 {% endif %}
+                {% if can_change %}
                 <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
                     <a href="{% url 'gatheros_event:event-transfer' object.pk %}">Mudar realizador</a>
                 </div>
                 <br/>
-                {% if can_change %}
                 <div style="background-color: whitesmoke;border: 1px solid #DDD;">
                     <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
                         Página do evento
@@ -57,6 +57,7 @@
                 {% endif %}
 
                 {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
+                    <br/>
                     <div style="background-color: whitesmoke;border: 1px solid #DDD;">
                         <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
                             Inscrições
@@ -64,7 +65,7 @@
                         {% if can_view_lots %}
                             <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:lot-list' object.pk %}">Lotes</a></div>
                         {% endif %}
-                        <div style="padding:15px">&rightarrow; <a href="#">Formulário</a></div>
+                        <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:form-config' object.pk %}">Configuração de Formulário</a></div>
                         <div style="padding:15px">&rightarrow; <a href="#">Pré-inscrições</a></div>
                         <div style="padding:15px">&rightarrow; <a href="#">Credenciamento</a></div>
                         <div style="padding:15px">&rightarrow; <a href="#">Exportação de dados</a></div>

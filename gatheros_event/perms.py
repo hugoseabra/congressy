@@ -160,14 +160,14 @@ add_permission_logic(Member, logic)
 # Organização -> Admin -> eventos
 logic = MemberPermissionLogic(
     member_is_admin,
-    ['delete_event'],
+    ['change_event', 'delete_event'],
     'organization',
 )
 add_permission_logic(Event, logic)
 
 logic = MemberPermissionLogic(
     member_is_member,
-    ['change_event', 'view_lots', 'add_lot'],
+    ['view_lots', 'add_lot'],
     'organization',
 )
 add_permission_logic(Event, logic)

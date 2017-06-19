@@ -41,6 +41,7 @@ class BaseFormView(AccountMixin, View):
         context = super(BaseFormView, self).get_context_data(**kwargs)
         context['next_path'] = self._get_referer_url()
         context['form_title'] = self.get_form_title()
+        context['place_organization'] = self.get_place_organization()
 
         return context
 

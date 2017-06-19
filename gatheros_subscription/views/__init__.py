@@ -1,1 +1,2 @@
-from .lot import LotListView, LotAddFormView, LotEditFormView, LotDeleteView
+from .event_form import EventFormView
+from .lot import LotAddFormView, LotDeleteView, LotEditFormView, LotListView

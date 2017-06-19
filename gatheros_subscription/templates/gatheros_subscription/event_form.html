@@ -1,0 +1,53 @@
+{% extends "gatheros_front/base.html" %}
+{% load event_form_tags %}
+
+{% block content %}
+    <div style="padding:10px">
+        {% if next_path %}
+            <a href="{{ next_path|urlencode }}">Voltar</a>
+        {% else %}
+            <a href="{% url 'gatheros_event:organization-panel' event.pk %}">Voltar</a>
+        {% endif %}
+    </div>
+    <hr/>
+    <h1>{{ event.name }}</h1>
+    <div style="margin-bottom:10px;padding: 10px;background-color: #DDDDDD;text-align: center;">
+        <a href="#">Adicionar</a>
+    </div>
+
+    {% if form_title %}
+        <h2>{{ form_title }}</h2>
+    {% endif %}
+
+    <form method="post">{% csrf_token %}
+        <table border="0" width="50%" cellspacing="10">
+            {% for field in form %}
+            <tr>
+                <th width="25%" style="text-align: right">
+                    <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
+                </th>
+                <td>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <p class="help">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                    {{ field.errors }}
+                </td>
+                <td width="5%" style="text-align: center">
+                    {% form_is_default form field.name as is_default %}
+                    {% if not is_default %}
+                    {% endif %}
+                    <a href="#">&uparrow;</a>
+                    &nbsp; &nbsp;
+                    <a href="#">&downarrow;</a>
+                </td>
+                <td width="15%">
+                    <a href="#">Editar</a>
+                    &nbsp; &nbsp; &nbsp;
+                    <a href="#">Excluir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </form>
+{% endblock %}
