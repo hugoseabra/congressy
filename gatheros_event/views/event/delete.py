@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 
-from core.view.delete import DeleteViewMixin
 from gatheros_event.models import Event
+from gatheros_event.views.mixins import DeleteViewMixin
 
 
 class EventDeleteView(DeleteViewMixin):

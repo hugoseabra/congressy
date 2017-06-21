@@ -162,7 +162,7 @@ class Event(models.Model, GatherosModelMixin):
 
         permissions = (
             ("view_lots", "Can view lots"),
-            ('add_lot', 'Can add lot'),
+            ('can_add_lot', 'Can add lot'),
         )
 
     @property

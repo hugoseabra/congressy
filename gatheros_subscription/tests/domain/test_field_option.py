@@ -37,7 +37,7 @@ class TestModelFieldOption(GatherosTestCase):
         rule_callback = rule.rule_1_somente_campos_com_opcoes
 
         field_option = self._create_field_option()
-        field_option.field.type = Field.FIELD_INPUT_TEXT
+        field_option.field.field_type = Field.FIELD_INPUT_TEXT
         field_option.field.save()
 
         """ RULE """
@@ -54,6 +54,6 @@ class TestModelFieldOption(GatherosTestCase):
         )
 
         """ FUNCIONANDO """
-        field_option.field.type = Field.FIELD_RADIO_GROUP
+        field_option.field.field_type = Field.FIELD_RADIO_GROUP
         field_option.field.save()
         field_option.save()

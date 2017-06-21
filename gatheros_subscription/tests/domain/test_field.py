@@ -26,7 +26,7 @@ class FieldModelTest(GatherosTestCase):
 
         data = {
             'form': form,
-            'type': Field.FIELD_INPUT_TEXT,
+            'field_type': Field.FIELD_INPUT_TEXT,
             'label': 'New one',
             'name': 'new field tests'
         }

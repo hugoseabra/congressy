@@ -26,6 +26,10 @@ class Form(models.Model):
         verbose_name_plural = 'formulários de eventos'
         ordering = ['event']
 
+        permissions = (
+            ("can_add_field", "Can add field"),
+        )
+
     def save(self, *args, **kwargs):
         self.check_rules()
         super(Form, self).save(*args, **kwargs)

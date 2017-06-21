@@ -99,7 +99,7 @@ class AnswerModelTest(GatherosTestCase):
             event = Event.objects.get(pk=1)
             field = event.form.fields.filter(
                 form_default_field=False,
-                type=field_type
+                field_type=field_type
             ).first()
 
             subscription = Subscription.objects.filter(event=event).first()
@@ -119,7 +119,7 @@ class AnswerModelTest(GatherosTestCase):
             self._trigger_validation_error(callback=answer.save, field='value')
 
             """ FUNCIONANDO """
-            field.type = Field.FIELD_RADIO_GROUP
+            field.field_type = Field.FIELD_RADIO_GROUP
             field.save()
             answer.save()
 
@@ -127,7 +127,7 @@ class AnswerModelTest(GatherosTestCase):
             event = Event.objects.get(pk=2)
             field = event.form.fields.filter(
                 form_default_field=False,
-                type=field_type
+                field_type=field_type
             ).first()
 
             subscription = Subscription.objects.filter(event=event).first()
@@ -148,7 +148,7 @@ class AnswerModelTest(GatherosTestCase):
             self._trigger_validation_error(callback=answer.save, field='value')
 
             """ FUNCIONANDO """
-            field.type = Field.FIELD_CHECKBOX_GROUP
+            field.field_type = Field.FIELD_CHECKBOX_GROUP
             field.save()
             answer.save()
 

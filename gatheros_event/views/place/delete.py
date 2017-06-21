@@ -2,8 +2,8 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
-from core.view.delete import DeleteViewMixin
 from gatheros_event.models import Organization, Place
+from gatheros_event.views.mixins import DeleteViewMixin
 
 
 class PlaceDeleteView(DeleteViewMixin):

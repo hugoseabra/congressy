@@ -3,7 +3,6 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import DetailView
 
-from gatheros_event.helpers import account
 from gatheros_event.models import Organization
 from gatheros_event.views.mixins import AccountMixin
 

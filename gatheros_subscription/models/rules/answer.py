@@ -38,14 +38,14 @@ def rule_3_resposta_com_tipo_correto(answer):
         return
 
     field = answer.field
-    if field.type in [
+    if field.field_type in [
             field.FIELD_CHECKBOX_GROUP] and not isinstance(value, list):
         raise ValidationError({'value': [
             'Tipo de valor incorreto: O campo \'{}\' exige um registro de'
             ' valor do tipo \'list\''.format(field.label)
         ]})
 
-    if field.type in [
+    if field.field_type in [
         field.FIELD_INPUT_TEXT,
         field.FIELD_INPUT_PHONE,
         field.FIELD_INPUT_EMAIL,

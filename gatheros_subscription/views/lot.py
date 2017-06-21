@@ -4,12 +4,10 @@ from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot
 
-# Manter abaixo dos outros imports
-from core.view.delete import DeleteViewMixin
 
 # @TODO Resolver inconsistências de Base
 
@@ -122,7 +120,7 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
     def can_view(self, show_message=True):
         can_view = super(LotAddFormView, self).can_view(False)
         can = can_view and self.request.user.has_perm(
-            'gatheros_event.add_lot',
+            'gatheros_event.can_add_lot',
             self.event
         )
 

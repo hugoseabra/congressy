@@ -243,6 +243,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'formulário de evento',
                 'ordering': ['event'],
                 'verbose_name_plural': 'formulários de eventos',
+                'permissions': (('can_add_field', 'Can add field'),)
             },
         ),
         migrations.CreateModel(

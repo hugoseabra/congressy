@@ -1,11 +1,11 @@
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.views.generic import ListView, View
 
-from core.view.delete import DeleteViewMixin
 from gatheros_event.models import Member, Organization
+from gatheros_event.views.mixins import DeleteViewMixin
 from .mixins import AccountMixin
 
 
@@ -101,6 +101,7 @@ class MemberListView(BaseOrganizationMixin, ListView):
 class MemberManageView(BaseOrganizationMixin):
     http_method_names = ['post']
 
+    # noinspection PyUnusedLocal
     def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
 

@@ -176,7 +176,7 @@ class Migration(migrations.Migration):
                 'ordering': ('name', 'pk', 'category__name'),
                 'permissions': (
                     ('view_lots', 'Can view lots'),
-                    ('add_lot', 'Can add lot'),
+                    ('can_add_lot', 'Can add lot'),
                 ),
             },
         ),

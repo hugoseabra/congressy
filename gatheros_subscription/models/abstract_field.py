@@ -4,9 +4,10 @@ Classe abstrata para Campo de formulário
 """
 
 from django.db import models
+from gatheros_event.models.mixins import GatherosModelMixin
 
 
-class AbstractField(models.Model):
+class AbstractField(models.Model, GatherosModelMixin):
     """ Campo de formulário. """
 
     FIELD_INPUT_TEXT = 'input-text'

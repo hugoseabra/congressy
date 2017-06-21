@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView

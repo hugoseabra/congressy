@@ -25,7 +25,7 @@ class EventTransferView(AccountMixin, FormView):
 
     def get_form(self, form_class=None):
         self.object = get_object_or_404(Event, pk=self.kwargs.get('pk'))
-        
+
         return EventTransferForm(
             user=self.request.user,
             instance=self.object,

@@ -5,7 +5,6 @@ from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import get_token
 from django.views.generic import FormView, ListView, TemplateView, UpdateView
 
-from core.view.delete import DeleteViewMixin
 from gatheros_event.forms import (
     InvitationCreateForm,
     InvitationDecisionForm,
@@ -13,7 +12,7 @@ from gatheros_event.forms import (
 )
 from gatheros_event.forms.invitation import send_invitation
 from gatheros_event.models import Invitation, Organization
-from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 
 
 class InvitationListView(AccountMixin, ListView):
