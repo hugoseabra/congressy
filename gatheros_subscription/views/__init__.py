@@ -3,5 +3,12 @@ from .event_form import (
     EventFormDeleteView,
     EventFormFieldAddView,
     EventFormFieldEditView,
+    EventFormReorderView,
+)
+from .field_option import (
+    FieldOptionAddView,
+    FieldOptionDeleteView,
+    FieldOptionEditView,
+    FieldOptionsView,
 )
 from .lot import LotAddFormView, LotDeleteView, LotEditFormView, LotListView

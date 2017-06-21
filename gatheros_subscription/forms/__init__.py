@@ -1,6 +1,7 @@
 from .event_form import (
     EventConfigForm,
     EventFormFieldForm,
+    EventFormFieldOptionForm,
     EventFormFieldOrderForm,
 )
 from .lot import LotForm

@@ -179,3 +179,55 @@ class EventFormFieldDeleteViewTest(BaseEventFormTest):
         self._login()
         response = self.client.post(self._get_url(), follow=True)
         self.assertContains(response, 'Campo excluído com sucesso')
+
+
+class EventFormFieldReorderViewTest(BaseEventFormTest):
+    def _get_url(self, event=None, field=None):
+        if not event:
+            event = self.event
+
+        if not field:
+            field = event.form.fields.filter(form_default_field=False).first()
+
+        return reverse('gatheros_subscription:field-order', kwargs={
+            'event_pk': event.pk,
+            'field_pk': field.pk
+        })
+
+    def test_reorder_not_allowed(self):
+        """ Testa exclusão de campo fixo pela view. """
+        self._login()
+        field = self.event.form.fields.filter(form_default_field=True).first()
+
+        response = self.client.post(self._get_url(field=field), follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
+
+    def test_200_logged(self):
+        """ 200 quando logado. """
+        self._login()
+        response = self.client.get(self._get_url())
+        self.assertEqual(response.status_code, 405)
+
+    def test_order_up(self):
+        """ Testa exclusão de campo pela view. """
+
+        field = self.event.form.fields.filter(form_default_field=False).first()
+        first_order = field.order
+
+        self._login()
+        self.client.post(self._get_url(field=field), data={'up': ''})
+
+        field = Field.objects.get(pk=field.pk)
+        self.assertEqual(field.order, first_order+1)
+
+    def test_order_down(self):
+        """ Testa exclusão de campo pela view. """
+
+        field = self.event.form.fields.filter(form_default_field=False).first()
+        first_order = field.order
+
+        self._login()
+        self.client.post(self._get_url(field=field), data={'down': ''})
+
+        field = Field.objects.get(pk=field.pk)
+        self.assertEqual(field.order, first_order-1)

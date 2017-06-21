@@ -6,12 +6,13 @@ para um campo.
 
 from django.db import models
 
+from gatheros_event.models.mixins import GatherosModelMixin
 from . import Field
 from .rules import field_option as rule
 
 
 # @TODO valores únicos para a pergunta
-class FieldOption(models.Model):
+class FieldOption(models.Model, GatherosModelMixin):
     """ Modelo de opção de campo. """
 
     field = models.ForeignKey(

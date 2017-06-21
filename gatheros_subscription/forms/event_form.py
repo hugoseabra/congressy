@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import model_to_dict
 
-from gatheros_subscription.models import Field
+from gatheros_subscription.models import Field, FieldOption
 from kanu_form.field_manager import FieldManager
 from kanu_form.forms import KanuForm
 
@@ -35,14 +35,17 @@ class EventConfigForm(KanuForm):
         for field in fields:
             field_dict = model_to_dict(field, exclude=[
                 'active',
-                'id',
-                'instruction',
+                'default_value',
                 'form_default_field',
                 'form',
-                'with_options',
+                'id',
+                'instruction',
                 'order',
+                'with_options',
             ])
             field_dict['help_text'] = field.instruction
+            if field.default_value:
+                field_dict['initial'] = field.default_value
 
             if field.with_options:
                 field_dict['options'] = [(option.value, option.name) for option
@@ -159,3 +162,27 @@ class EventFormFieldOrderForm(forms.Form):
 
         except Field.DoesNotExist:
             return None
+
+
+class EventFormFieldOptionForm(forms.ModelForm):
+    """ Formulário de opção de campo de formulário. """
+
+    class Meta:
+        model = FieldOption
+        fields = ['name', 'value']
+
+    def __init__(self, field, *args, **kwargs):
+        self.field = field
+        super(EventFormFieldOptionForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        if self.instance.pk and self.instance.field.pk != self.field.pk:
+            raise forms.ValidationError('Você não pode editar esta opção.')
+
+        return super(EventFormFieldOptionForm, self).clean()
+
+    def save(self, commit=True):
+        self.full_clean()
+
+        self.instance.field = self.field
+        return super(EventFormFieldOptionForm, self).save(commit=commit)

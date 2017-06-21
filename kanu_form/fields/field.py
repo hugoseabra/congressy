@@ -67,6 +67,7 @@ class Field(object):
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
+                widget=self._get_widget(fields.TextInput)
             )
 
         if self.type == self.FIELD_INPUT_NUMBER:
@@ -125,6 +126,7 @@ class Field(object):
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
+                widget=self._get_widget(fields.CheckboxInput)
             )
 
         if self.type == self.FIELD_SELECT:
@@ -174,9 +176,15 @@ class Field(object):
         return field
 
     def _get_widget(self, widget_class, **kwargs):
-        self.attrs.update({
-            'required': self.required
-        })
+        if self.required:
+            self.attrs.update({
+                'required': self.required
+            })
+
+        if self.placeholder:
+            self.attrs.update({
+                'placeholder': self.placeholder
+            })
 
         if self.attrs:
             kwargs.update({'attrs': self.attrs})
