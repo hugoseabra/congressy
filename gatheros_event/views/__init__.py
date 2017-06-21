@@ -1,10 +1,8 @@
 """ Views """
 
 # EVENT
-from .event.delete import EventDeleteView
-from .event.detail import (
-    EventDetailView,
-)
+from gatheros_event.views.event.delete import EventDeleteView
+from .event.detail import EventDetailView
 from .event.form import (
     EventAddFormView,
     EventDatesFormView,

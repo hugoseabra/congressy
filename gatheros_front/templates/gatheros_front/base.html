@@ -64,8 +64,20 @@
                                        value="{{ request.path }}"/>
                             </form>
                         {% elif organizations and organizations|length == 1 %}
+                            {% if request.user.person and request.user.person.avatar %}
+                                <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ request.user.person.avatar.url }}" />
+                            {% else %}
+                                <!--suppress CheckImageSize -->
+                                <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
+                            {% endif %}
                             <strong>{{ organization.name }}</strong>
                         {% else %}
+                            {% if request.user.person and request.user.person.avatar %}
+                                <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ request.user.person.avatar.url }}" />
+                            {% else %}
+                                <!--suppress CheckImageSize -->
+                                <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
+                            {% endif %}
                             <strong>{{ request.user.get_full_name }}</strong>
                         {% endif %}
                         {% if context_type == 'member' and organization and not organization.internal %}
