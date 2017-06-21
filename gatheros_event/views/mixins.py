@@ -119,8 +119,11 @@ class DeleteViewMixin(AccountMixin, DeleteView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 
+        self.pre_delete()
         messages.success(request, self.success_message)
-        return super(DeleteViewMixin, self).post(request, *args, **kwargs)
+        response = super(DeleteViewMixin, self).post(request, *args, **kwargs)
+        self.post_delete()
+        return response
 
     def can_delete(self):
         """Checks if user can delete model"""
@@ -138,3 +141,12 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         can_delete = self.request.user.has_perm(full_name, obj)
 
         return obj.is_deletable() and can_delete
+
+    # noinspection PyMethodMayBeStatic
+    def pre_delete(self):
+        """ Processo a ser executado antes de deletar. """
+        pass
+
+    def post_delete(self):
+        """ Processo a ser executado depois de deletar. """
+        pass
