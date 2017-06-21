@@ -1,0 +1,25 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_subscription:fields-config' event.pk %}">Voltar</a>
+    </div>
+    <hr/>
+    <h1>{{ event.name }}</h1>
+    <div style="margin-bottom:10px;padding: 10px;background-color: #DDDDDD;text-align: center;"></div>
+
+    {% if form_title %}
+        <h2>{{ form_title }}</h2>
+    {% endif %}
+    <br />
+    <form action="" method="post">{% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <br />
+        <hr />
+        <input type="submit" value="Salvar"/>
+        <a href="{% url 'gatheros_subscription:fields-config' event.pk %}">Cancelar</a>
+    </form>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "gatheros_front/base.html" %}
+{% load event_form_tags %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:event-panel' event.pk %}">Voltar</a>
+    </div>
+    <hr/>
+    <h1>{{ event.name }}</h1>
+    <div style="margin-bottom:10px;padding: 10px;background-color: #DDDDDD;text-align: center;">
+        <a href="{% url 'gatheros_subscription:field-add' event.pk %}">Adicionar</a>
+    </div>
+
+    {% if form_title %}
+        <h2>{{ form_title }}</h2>
+    {% endif %}
+
+    <form method="post">{% csrf_token %}
+        <table border="0" width="60%" cellpadding="10" cellspacing="1" style="background-color:#DDD">
+            {% for field in form %}
+                {% get_field_by_name form field.name as field_obj %}
+                {% form_is_default form field.name as is_default %}
+                {% user_can_delete user form field.name as can_delete %}
+                {% user_can_edit user form field.name as can_edit %}
+                <tr>
+                    <td width="1%" style="text-align:center;background-color:#F6F6F6">
+                        {{ field_obj.order }}
+                    </td>
+                    <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not field_obj.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
+                    </th>
+                    <td style="vertical-align: top;background-color:{% if not field_obj.active %}#F6F6F6{% else %}#FFF{% endif %}" {% if not field_obj.with_options %}colspan="2"{% endif %}>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <br />
+                            <strong>Instrução:</strong> {{ field.help_text|safe }}
+                        {% endif %}
+                        {{ field.errors }}
+                    </td>
+                    {% if field_obj.with_options %}
+                    <td width="13%" style="text-align: center;background-color:{% if not field_obj.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                        <a style="text-decoration: none" href="#">Gerenciar opções</a>
+                    </td>
+                    {% endif %}
+                    <td width="1%" style="text-align: center;background-color:{% if not field_obj.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                        {% if not is_default %}
+                        {% endif %}
+                        {% if not forloop.first %}
+                            <a href="#" style="text-decoration: none">&uparrow;</a>
+                        {% endif %}
+                        {% if not forloop.last %}
+                            <a href="#" style="text-decoration: none">&downarrow;</a>
+                        {% endif %}
+                    </td>
+                    <td width="11%" style=";background-color:{% if not field_obj.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                        {% if can_edit %}
+                            <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-edit' event.pk field_obj.pk %}">Editar</a>
+                        {% endif %}
+                        &nbsp;
+                        {% if can_delete %}
+                            <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-delete' event.pk field_obj.pk %}">Excluir</a>
+                        {% endif %}
+
+                        {% if not field_obj.active %}
+                            <div style="text-align: center;font-style: italic;padding: 4px">Desativado</div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </form>
+{% endblock %}

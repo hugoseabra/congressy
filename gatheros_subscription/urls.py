@@ -1,13 +1,28 @@
 from django.conf.urls import include, url
 from django.views.generic import RedirectView
 
-from . import views
+from gatheros_subscription import views
 
 url_form = [
     url(
+        r'^(?P<field_pk>[\d]+)/delete/$',
+        views.EventFormDeleteView.as_view(),
+        name='field-delete'
+    ),
+    url(
+        r'^(?P<field_pk>[\d]+)/$',
+        views.EventFormFieldEditView.as_view(),
+        name='field-edit'
+    ),
+    url(
+        r'^add',
+        views.EventFormFieldAddView.as_view(),
+        name='field-add'
+    ),
+    url(
         r'^config',
-        views.EventFormView.as_view(),
-        name='form-config'
+        views.EventConfigFormView.as_view(),
+        name='fields-config'
     ),
 ]
 
@@ -42,6 +57,6 @@ url_lot = [
 ]
 
 urlpatterns = [
-    url(r'^events/(?P<event_pk>[\d]+)/form/', include(url_form)),
+    url(r'^events/(?P<event_pk>[\d]+)/fields/', include(url_form)),
     url(r'^events/(?P<event_pk>[\d]+)/lots/', include(url_lot)),
 ]
