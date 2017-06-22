@@ -26,9 +26,15 @@
             <div style="float:left">
                 <a href="{% url 'gatheros_front:start' %}">Início</a>
                 &nbsp; &nbsp; &nbsp; &nbsp;
-                <a href="{% url 'gatheros_event:organization-list' %}">Organizações</a>
+                <a href="#">Minhas Inscrições</a>
                 &nbsp; &nbsp; &nbsp; &nbsp;
-                <a href="{% url 'gatheros_event:event-list' %}">Eventos</a>
+                <a href="#">Meus Convites</a>
+                {% if context_type == 'member' %}
+                    &nbsp; &nbsp; &nbsp; &nbsp;
+                    <a href="{% url 'gatheros_event:organization-list' %}">Organizações</a>
+                    &nbsp; &nbsp; &nbsp; &nbsp;
+                    <a href="{% url 'gatheros_event:event-list' %}">Eventos</a>
+                {% endif %}
             </div>
             <div style="float:right">
                 <div>
