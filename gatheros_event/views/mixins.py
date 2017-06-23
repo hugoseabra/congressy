@@ -37,6 +37,17 @@ class AccountMixin(LoginRequiredMixin, View):
     def organizations(self):
         return SimpleLazyObject(lambda: get_organizations(self.request))
 
+    @property
+    def has_internal_organization(self):
+        orgs = [org for org in self.organizations if org.internal]
+        return len(orgs) == 1
+
+    @property
+    def has_organization(self):
+        user = self.request.user
+        orgs = [org for org in self.organizations if org.is_admin(user)]
+        return len(orgs) == 1
+
     # noinspection PyMethodMayBeStatic
     def can_access(self):
         """ Verifica se usuário pode acessar o conteúdo da view. """
