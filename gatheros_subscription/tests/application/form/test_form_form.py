@@ -164,7 +164,9 @@ class EventFormFieldOrderFormTest(TestCase):
 
     def test_get_next_field(self):
         """ Testa captura de próximo campo. """
-        first_field = self.event.form.fields.first()
+        first_field = self.event.form.fields.filter(
+            form_default_field=False
+        ).first()
 
         form = EventFormFieldOrderForm(instance=first_field)
         next_field = form.get_next_field(first_field.order)
@@ -210,7 +212,9 @@ class EventFormFieldOrderFormTest(TestCase):
     def test_order_up(self):
         """ Testa reordenação de campo para baixo. """
 
-        first_field = self.event.form.fields.first()
+        first_field = self.event.form.fields.filter(
+            form_default_field=False
+        ).first()
         first_field_order = first_field.order
 
         form = EventFormFieldOrderForm(instance=first_field)

@@ -249,3 +249,13 @@ class EventModelTest(TestCase):
 
         event.subscription_type = Event.SUBSCRIPTION_SIMPLE
         event.save()
+
+    def test_event_must_have_form(self):
+        """ Testa se evento com inscrições ativadas possui form. """
+
+        event = self._get_event(pk=5)
+        event.subscription_type = Event.SUBSCRIPTION_SIMPLE
+        event.save()
+
+        self.assertTrue(hasattr(event, 'form'))
+        self.assertIsNotNone(event.form)

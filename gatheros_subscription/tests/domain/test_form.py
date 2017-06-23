@@ -26,6 +26,7 @@ class FormModelTest(GatherosTestCase):
         event.date_end = datetime.now() + timedelta(days=1)
         event.published = False
         event.save()
+
         return event
 
     def _create_form(self, event=None, persist=False):
@@ -55,15 +56,14 @@ class FormModelTest(GatherosTestCase):
     def test_rule_2_form_possui_todos_campos_padrao(self):
         rule_callback = rule.rule_2_form_possui_todos_campos_padrao
 
-        form = self._create_form()
-        form.save()
+        event = self._get_event()
 
         # Error
         # Remover 1 dos campos padrão.
-        field = form.fields.first()
+        field = event.form.fields.first()
         field.delete()
-        self._trigger_integrity_error(rule_callback, [form])
+        self._trigger_integrity_error(rule_callback, [event.form])
 
         # Garante todos os campos novamente
-        form.save()
-        rule_callback(form)
+        event.form.save()
+        rule_callback(event.form)

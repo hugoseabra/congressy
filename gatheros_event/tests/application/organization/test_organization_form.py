@@ -42,6 +42,17 @@ class OrganizationFormTest(TestCase):
         member = members.first()
         self.assertEqual(member.group, Member.ADMIN)
 
+    def test_add_internal(self):
+        """ Testa adição de nova organização interna. """
+
+        person = self.user.person
+        data = person.get_profile_data()
+        form = OrganizationForm(user=self.user, internal=True, data=data)
+        self.assertTrue(form.is_valid())
+        saved_organization = form.save()
+
+        self.assertTrue(saved_organization.internal)
+
     def test_error_user_not_member(self):
         organization = Organization.objects.get(slug='paroquias-unidas')
 

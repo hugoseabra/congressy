@@ -3,6 +3,7 @@ import shutil
 from datetime import datetime, timedelta
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import six
@@ -20,12 +21,18 @@ from gatheros_event.forms import (
 from gatheros_event.models import Event, Member, Organization
 
 
-class BaseEventFormTest(TestCase):
+class BaseEventForm(TestCase):
     fixtures = [
+        '005_user',
+        '006_person',
         '007_organization',
         '009_place',
         '010_event',
     ]
+
+    # noinspection PyMethodMayBeStatic
+    def _get_user(self):
+        return User.objects.get(email='lucianasilva@gmail.com')
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self, pk):
@@ -60,14 +67,31 @@ class BaseEventFormTest(TestCase):
             "published": False,
         }
 
-    def get_main_form(self, instance=None, data=None):
+    def get_main_form(self, user=None, instance=None, data=None):
+        if not user:
+            user = self._get_user()
+
         if not data:
             data = self._get_data()
 
-        return EventForm(instance=instance, data=data)
+        return EventForm(user=user, instance=instance, data=data)
 
 
-class EventFormTest(BaseEventFormTest):
+class EventFormTest(BaseEventForm):
+    def test_render(self):
+        """ Testa se organização """
+        user = self._get_user()
+        form = self.get_main_form(user=user)
+        content = form.as_ul()
+
+        for member in user.person.members.all():
+            org = member.organization
+            can_add = user.has_perm('gatheros_event.can_add_event', org)
+            if can_add:
+                self.assertIn(content, org.name)
+            else:
+                self.assertNotIn(content, org.name)
+
     def test_create_edit_event(self):
         def test_instance_data(form_obj, model_data):
             model = form_obj.instance
@@ -97,7 +121,7 @@ class EventFormTest(BaseEventFormTest):
         test_instance_data(form, data)
 
 
-class EventDatesFormTest(BaseEventFormTest):
+class EventDatesFormTest(BaseEventForm):
     def test_dates_edition_event(self):
         def test_instance_data(form_obj, model_data):
             model = form_obj.instance
@@ -127,7 +151,7 @@ class EventDatesFormTest(BaseEventFormTest):
         test_instance_data(form, data)
 
 
-class EventSubscriptionTypeFormTest(BaseEventFormTest):
+class EventSubscriptionTypeFormTest(BaseEventForm):
     def test_subscription_type_edition_event(self):
         def test_instance_data(form_obj, model_data):
             model = form_obj.instance
@@ -157,7 +181,7 @@ class EventSubscriptionTypeFormTest(BaseEventFormTest):
         test_instance_data(form, data)
 
 
-class EventPublicationFormTest(BaseEventFormTest):
+class EventPublicationFormTest(BaseEventForm):
     def test_publication_edition_event(self):
         def test_instance_data(form_obj, model_data):
             model = form_obj.instance

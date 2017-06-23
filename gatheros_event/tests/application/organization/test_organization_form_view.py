@@ -37,6 +37,7 @@ class OrganizationFormAddTest(TestCase):
         self.client.force_login(self.user)
 
     def test_add(self):
+        """ Testa criação de organização pela view. """
         data = {
             'name': 'Added organization',
             'description_html': '<p style="color:red>Some text</p>',
@@ -52,7 +53,25 @@ class OrganizationFormAddTest(TestCase):
             "Organização criada com sucesso."
         )
 
+    def test_add_internal(self):
+        """ Testa criação de organização interna pela view. """
+
+        # Usuário que não possui organização interna
+        user = User.objects.get(username="hugoseabra19@gmail.com")
+        self.client.force_login(user)
+
+        response = self.client.post(
+            path=reverse_lazy('gatheros_event:organization-add-internal'),
+            follow=True
+        )
+        self.assertContains(
+            response,
+            "Organização criada com sucesso"
+        )
+
     def test_edit(self):
+        """ Testa edição de organização pela view. """
+
         org = Organization.objects.get(slug='in2-web-solucoes-e-servicos')
         data = {
             'name': org.name + ' edited',
@@ -76,6 +95,8 @@ class OrganizationFormAddTest(TestCase):
         self.assertEqual(org.description_html, data['description_html'])
 
     def test_delete(self):
+        """ Testa exclusão de organização pela view. """
+
         org = Organization.objects.get(slug='in2-web-solucoes-e-servicos')
 
         response = self.client.post(

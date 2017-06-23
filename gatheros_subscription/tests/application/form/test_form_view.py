@@ -223,7 +223,7 @@ class EventFormFieldReorderViewTest(BaseEventFormTest):
     def test_order_down(self):
         """ Testa exclusão de campo pela view. """
 
-        field = self.event.form.fields.filter(form_default_field=False).first()
+        field = self.event.form.fields.filter(form_default_field=False)[1]
         first_order = field.order
 
         self._login()

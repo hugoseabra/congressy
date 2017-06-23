@@ -25,7 +25,9 @@ class MockRequest(HttpRequest):
         super(MockRequest, self).__init__()
 
 
-class AddEventTest(TestCase):
+class EventAddViewTest(TestCase):
+    """ Testa view de adicionar evento. """
+
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -42,6 +44,7 @@ class AddEventTest(TestCase):
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
+        """ Resgata organização ativa. """
         request = MockRequest(self.user, self.client.session)
         return account.get_organization(request)
 
@@ -60,8 +63,9 @@ class AddEventTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_add_event(self):
+        org = self._get_active_organization()
         data = {
-            'organization': 1,
+            'organization': org.pk,
             'category': 1,
             'name': 'Event teste nah',
             'date_start': datetime.now() + timedelta(days=5),
@@ -76,9 +80,10 @@ class AddEventTest(TestCase):
 
     def test_cannot_add_event(self):
         self._switch_context(group=Member.HELPER)
+        org = self._get_active_organization()
 
         data = {
-            'organization': 1,
+            'organization': org.pk,
             'category': 1,
             'name': 'Event teste nah',
             'date_start': datetime.now() + timedelta(days=5),
@@ -91,11 +96,11 @@ class AddEventTest(TestCase):
         response = self.client.post(self.url, data, follow=True)
         self.assertContains(
             response,
-            'Você não tem permissão para adicionar evento.'
+            'Você não pode inserir um evento nesta organização'
         )
 
 
-class EditEventTest(TestCase):
+class EventEditViewTest(TestCase):
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -193,11 +198,11 @@ class EditEventTest(TestCase):
         )
         self.assertContains(
             response,
-            'Você não tem permissão para editar este evento.'
+            'Você não tem permissão para editar este evento'
         )
 
 
-class EventDatesEditTest(TestCase):
+class EventDatesEditViewTest(TestCase):
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -311,11 +316,11 @@ class EventDatesEditTest(TestCase):
 
         self.assertContains(
             response,
-            'Você não tem permissão para editar este evento.'
+            'Você não tem permissão para editar este evento'
         )
 
 
-class EventSubscriptionTypeEditTest(TestCase):
+class EventSubscriptionTypeEditViewTest(TestCase):
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -433,11 +438,11 @@ class EventSubscriptionTypeEditTest(TestCase):
 
         self.assertContains(
             response,
-            'Você não tem permissão para editar este evento.'
+            'Você não tem permissão para editar este evento'
         )
 
 
-class EventPublicationEditTest(TestCase):
+class EventPublicationEditViewTest(TestCase):
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -512,5 +517,5 @@ class EventPublicationEditTest(TestCase):
 
         self.assertContains(
             response,
-            'Você não tem permissão para editar este evento.'
+            'Você não tem permissão para editar este evento'
         )
