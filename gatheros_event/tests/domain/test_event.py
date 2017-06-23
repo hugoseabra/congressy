@@ -148,4 +148,3 @@ class EventModelTest(GatherosTestCase):
     def test_slug_gerado(self):
         event = self._create_event(persist=True)
         self.assertIsNotNone(event.slug)
-

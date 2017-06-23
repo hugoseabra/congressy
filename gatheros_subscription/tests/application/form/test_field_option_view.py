@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
-from django.core.exceptions import ValidationError
 
 from gatheros_event.models import Event
 from gatheros_subscription.models import Field, FieldOption
@@ -78,6 +77,7 @@ class FieldOptionAddViewTest(TestCase):
         self.user = User.objects.get(email='diegotolentino@gmail.com')
         self.event = Event.objects.get(slug='arte-e-agricultura-urbana')
 
+    # noinspection PyMethodMayBeStatic
     def _get_url(self):
         return reverse('gatheros_subscription:field-option-add')
 
