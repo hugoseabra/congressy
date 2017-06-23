@@ -15,34 +15,65 @@
         <h2>{{ form_title }}</h2>
     {% endif %}
     <table border="0" width="60%" cellpadding="10" cellspacing="1" style="background-color:#DDD">
-        {% for field in form %}
-            {% get_field_by_name form field.name as field_obj %}
-            {% form_is_default form field.name as is_default %}
-            {% user_can_delete user form field.name as can_delete %}
-            {% user_can_edit user form field.name as can_edit %}
+        <tr>
+            <td colspan="6" style="font-weight: bold">Campos principais</td>
+        </tr>
+        {% for item in default_fields %}
+            {% user_can_delete user item.field as can_delete %}
+            {% user_can_edit user item.field as can_edit %}
             <tr>
                 <td width="1%" style="text-align:center;background-color:#F6F6F6">
-                    {{ field_obj.order }}
+                    {{ item.field.order }}
                 </td>
-                <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not field_obj.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                    <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
+                <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                    <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
                 </th>
-                <td style="vertical-align: top;background-color:{% if not field_obj.active %}#F6F6F6{% else %}#FFF{% endif %}" {% if not field_obj.with_options %}colspan="2"{% endif %}>
-                    {{ field }}
-                    {% if field.help_text %}
+                <td style="vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}" {% if item.field.with_options %}colspan="3"{% else %}colspan="4"{% endif %}>
+                    {{ item.form_field }}
+                    {% if item.form_field.help_text %}
                         <br />
-                        <strong>Instrução:</strong> {{ field.help_text|safe }}
+                        <strong>Instrução:</strong> {{ item.form_field.help_text|safe }}
                     {% endif %}
-                    {{ field.errors }}
+                    {{ item.form_field.errors }}
                 </td>
-                {% if field_obj.with_options %}
-                <td width="13%" style="text-align: center;background-color:{% if not field_obj.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                    <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-options' event.pk field_obj.pk %}">Gerenciar opções</a>
+                {% if item.field.with_options %}
+                <td width="13%" style="text-align: center;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                    <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-options' event.pk item.field.pk %}">Gerenciar opções</a>
                 </td>
                 {% endif %}
-                <td width="2%" style="text-align: center;background-color:{% if not field_obj.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                    <form method="post" action="{% url 'gatheros_subscription:field-order' event.pk field_obj.pk %}">{% csrf_token %}
-                        {% if not is_default %}
+            </tr>
+        {% endfor %}
+        {% if additional_fields %}
+            <tr>
+                <td colspan="6" style="font-weight: bold">Campos adicionais</td>
+            </tr>
+        {% endif %}
+        {% for item in additional_fields %}
+            {% user_can_delete user item.field as can_delete %}
+            {% user_can_edit user item.field as can_edit %}
+            <tr>
+                <td width="1%" style="text-align:center;background-color:#F6F6F6">
+                    {{ item.field.order }}
+                </td>
+                <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                    <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
+                </th>
+                <td style="vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}" {% if not item.field.with_options %}colspan="2"{% endif %}>
+                    {{ item.form_field }}
+                    {% if item.form_field.help_text %}
+                        <br />
+                        <strong>Instrução:</strong> {{ item.form_field.help_text|safe }}
+                    {% endif %}
+                    {{ item.form_field.errors }}
+                </td>
+                {% if item.field.with_options %}
+                <td width="13%" style="text-align: center;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                    <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-options' event.pk item.field.pk %}">Gerenciar opções</a>
+                </td>
+                {% endif %}
+                <td width="2%" style="text-align: center;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                    <form method="post" action="{% url 'gatheros_subscription:field-order' event.pk item.field.pk %}">{% csrf_token %}
+                        {% if not item.field.form_default_field %}
                             {% if not forloop.first %}
                                 <button name="down">&uparrow;</button>
                             {% endif %}
@@ -55,16 +86,16 @@
                         {% endif %}
                     </form>
                 </td>
-                <td width="11%" style=";background-color:{% if not field_obj.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                <td width="11%" style=";background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
                     {% if can_edit %}
-                        <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-edit' event.pk field_obj.pk %}">Editar</a>
+                        <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-edit' event.pk item.field.pk %}">Editar</a>
                     {% endif %}
                     &nbsp;
                     {% if can_delete %}
-                        <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-delete' event.pk field_obj.pk %}">Excluir</a>
+                        <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-delete' event.pk item.field.pk %}">Excluir</a>
                     {% endif %}
 
-                    {% if not field_obj.active %}
+                    {% if not item.field.active %}
                         <div style="text-align: center;font-style: italic;padding: 4px">Desativado</div>
                     {% endif %}
                 </td>

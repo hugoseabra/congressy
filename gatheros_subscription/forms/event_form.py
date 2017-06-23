@@ -8,6 +8,7 @@ from kanu_form.forms import KanuForm
 
 class EventConfigForm(KanuForm):
     default_fields = set()
+    gatheros_fields = {}
 
     def __init__(self, form, *args, **kwargs):
         self.form = form
@@ -30,9 +31,9 @@ class EventConfigForm(KanuForm):
     def _configure_fields(self):
         """ Configura campos do formulário dinamicamente. """
 
-        fields = self.form.fields.filter()
+        for field in self.form.fields.all():
+            self.gatheros_fields[field.name] = field
 
-        for field in fields:
             field_dict = model_to_dict(field, exclude=[
                 'active',
                 'default_value',
@@ -147,6 +148,7 @@ class EventFormFieldOrderForm(forms.Form):
         """ Resgata o campo anterior mais próximo. """
         try:
             return self.fields_qs.filter(
+                form_default_field=False,
                 order__lt=current_order
             ).order_by('-order').first()
 
@@ -157,6 +159,7 @@ class EventFormFieldOrderForm(forms.Form):
         """ Resgata o campo posterior mais próximo. """
         try:
             return self.fields_qs.filter(
+                form_default_field=False,
                 order__gt=current_order
             ).order_by('order').first()
 

@@ -84,6 +84,32 @@ class EventConfigFormView(BaseEventForm, generic.FormView):
     template_name = 'gatheros_subscription/event_form/config.html'
     form_title = 'Configuração de Formulário'
 
+    def get_context_data(self, **kwargs):
+        cxt = super(EventConfigFormView, self).get_context_data(**kwargs)
+        form = cxt['form']
+        fields_dict = form.gatheros_fields
+
+        default_fields = []
+        additional_fields = []
+        for form_field in cxt['form']:
+            field = fields_dict.get(form_field.name)
+            if field.form_default_field:
+                default_fields.append({
+                    'form_field': form_field,
+                    'field': field
+                })
+            else:
+                additional_fields.append({
+                    'form_field': form_field,
+                    'field': field
+                })
+
+        cxt.update({
+            'default_fields': default_fields,
+            'additional_fields': additional_fields,
+        })
+        return cxt
+
     def get_form(self, form_class=None):
         if not form_class:
             form_class = self.form_class
