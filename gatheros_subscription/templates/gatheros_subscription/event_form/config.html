@@ -102,4 +102,8 @@
             </tr>
         {% endfor %}
     </table>
+    <hr />
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_event:event-panel' event.pk %}">Voltar</a>
+    </div>
 {% endblock %}

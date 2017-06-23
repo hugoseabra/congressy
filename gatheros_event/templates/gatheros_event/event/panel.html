@@ -40,20 +40,20 @@
                     </div>
                 {% endif %}
                 {% if can_change %}
-                <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
-                    <a href="{% url 'gatheros_event:event-transfer' object.pk %}">Mudar realizador</a>
-                </div>
-                <br/>
-                <div style="background-color: whitesmoke;border: 1px solid #DDD;">
-                    <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
-                        Página do evento
+                    <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
+                        <a href="{% url 'gatheros_event:event-transfer' object.pk %}">Mudar realizador</a>
                     </div>
-                    <div style="padding:15px">
-                        &rightarrow; <a href="{% url 'gatheros_event:event-detail' object.pk %}">Configurar detalhes do evento</a>
+                    <br/>
+                    <div style="background-color: whitesmoke;border: 1px solid #DDD;">
+                        <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
+                            Página do evento
+                        </div>
+                        <div style="padding:15px">
+                            &rightarrow; <a href="{% url 'gatheros_event:event-detail' object.pk %}">Configurar detalhes do evento</a>
+                        </div>
+                        <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_event:event-info' object.pk %}">Configurar capa</a></div>
+                        {# <div style="padding:15px">&rightarrow; <a href="#">Seções</a></div>#}
                     </div>
-                    <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_event:event-info' object.pk %}">Configurar capa</a></div>
-                    {# <div style="padding:15px">&rightarrow; <a href="#">Seções</a></div>#}
-                </div>
                 {% endif %}
 
                 {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
@@ -204,14 +204,14 @@
                                     Faltam
                                     <strong>{{ status.remaining }}</strong>
                                 </div>
-                                {% if user has 'gatheros_event.change_event' of object %}
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                    {% if can_change %}
                                         <a href="#"
                                            onclick="document.change_status.submit()">Despublicar</a>
                                         <input type="hidden" name="published"
                                                value="0"/>
-                                    </div>
-                                {% endif %}
+                                    {% endif %}
+                                </div>
                             </div>
                         {% elif status.status == 'running' %}
                             <div style="padding: 10px 0 30px;text-align: center;border-bottom: 1px solid #DDDDDD">
@@ -242,15 +242,15 @@
                                     Faltam
                                     <strong>{{ status.remaining }}</strong>
                                 </div>
-                                {% if user has 'gatheros_event.change_event' of object %}
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                    {% if can_change %}
                                         <a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar data</a>
                                         &nbsp;&nbsp; | &nbsp;&nbsp;
                                         <a href="#"
                                            onclick="document.change_status.submit()">Publicar</a>
                                         <input type="hidden" name="published" value="1"/>
-                                    </div>
-                                {% endif %}
+                                    {% endif %}
+                                </div>
                             </div>
                         {% elif status.status == 'expired' %}
                             <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
@@ -259,11 +259,11 @@
                                 <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
                                     Expirado
                                 </div>
-                                {% if user has 'gatheros_event.change_event' of object %}
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                    {% if can_change %}
                                         <a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar data</a>
-                                    </div>
-                                {% endif %}
+                                    {% endif %}
+                                </div>
                             </div>
                         {% elif status.status == 'running' %}
                             <div style="padding: 10px 0 0;text-align: center;border-bottom: 1px solid #DDDDDD">
@@ -272,14 +272,14 @@
                                 <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
                                     Em andamento
                                 </div>
-                                {% if user has 'gatheros_event.change_event' of object %}
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                    {% if can_change %}
                                         <a href="#"
                                            onclick="document.change_status.submit()">Publicar</a>
                                         <input type="hidden" name="published"
                                                value="1"/>
-                                    </div>
-                                {% endif %}
+                                    {% endif %}
+                                </div>
                             </div>
                         {% endif %}
                     {% endif %}
@@ -299,7 +299,9 @@
                                 </div>
                             {% endif %}
                             <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                                {% if can_change %}
+                                    <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                                {% endif %}
                             </div>
                         </div>
                     {% elif payment_type == 'mixed' %}
@@ -318,7 +320,9 @@
                                 </div>
                             {% endif %}
                             <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                                {% if can_change %}
+                                    <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                                {% endif %}
                             </div>
                         </div>
                     {% elif payment_type == 'paied' %}
@@ -329,7 +333,9 @@
                                 Pagas
                             </div>
                             <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                                {% if can_change %}
+                                    <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                                {% endif %}
                             </div>
                         </div>
                     {% endif %}
@@ -383,11 +389,13 @@
                             </table>
                         </div>
                         <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                            <a href="{% url 'gatheros_subscription:lot-list' object.pk %}"
-                               onclick="document.change_status.submit()">
-                               Gerenciar lotes
-                            </a>
-                            <input type="hidden" name="published" value="1"/>
+                            {% if can_view_lots %}
+                                <a href="{% url 'gatheros_subscription:lot-list' object.pk %}"
+                                   onclick="document.change_status.submit()">
+                                   Gerenciar lotes
+                                </a>
+                                <input type="hidden" name="published" value="1"/>
+                            {% endif %}
                         </div>
                     </div>
                 {% elif object.subscription_type == object.SUBSCRIPTION_SIMPLE %}
@@ -417,7 +425,9 @@
                             Desativadas
                         </div>
                         <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                            <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Ativar</a>
+                            {% if can_change %}
+                                <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Ativar</a>
+                            {% endif %}
                         </div>
                     </div>
                 {% endif %}

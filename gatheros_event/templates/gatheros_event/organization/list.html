@@ -13,42 +13,54 @@
     <div style="background: #DDD">
         {% if object_list %}
             <table width="100%">
-                <tr>
-                    <td colspan="2" style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome</td>
-                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Grupo</td>
-                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
-                </tr>
-                {% for item in object_list %}
-                    {% get_member_group item user as member_group %}
+                <thead>
                     <tr>
-                        <td width="1%"
-                            style="background-color: {% if item.active %}green{% else %}gray{% endif %}"></td>
-                        <td style="background: #FFF;padding:10px;margin-bottom: 3px">
-                            <div>
-                                {{ forloop.counter }} -
-                                <a href="{% url 'gatheros_event:organization-panel' item.pk %}">{{ item.name }}</a>
-                            </div>
-                            {% if item.description_html %}
-                            <hr/>
-                            <div style="text-indent: 10px;">
-                                {{ item.description_html|safe }}
-                            </div>
-                            {% endif %}
-                        </td>
-                        <td style="background: #FFF;padding:10px;margin-bottom: 3px">
-                            {% get_member_group_name item user %}
-                        </td>
-                        <td width="8%" style="background: #FFF;padding:10px;margin-bottom: 3px">
-                            {% if member_group == member.ADMIN %}
-                            <a href="{% url 'gatheros_event:organization-edit' item.pk %}">Editar</a>
-                            &nbsp; &nbsp; &nbsp;
-                                {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
-                                    <a href="{% url 'gatheros_event:organization-delete' item.pk %}">Excluir</a>
-                                {% endif %}
-                            {% endif %}
-                        </td>
+                        <th colspan="2" style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome</th>
+                        <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Grupo</th>
+                        <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px"></th>
                     </tr>
-                {% endfor %}
+                </thead>
+                <tbody>
+                    {% for item in object_list %}
+                        {% get_member_group item user as member_group %}
+                        <tr>
+                            <td width="1%"
+                                style="background-color: {% if item.active %}green{% else %}gray{% endif %}"></td>
+                            <td style="background: #FFF;padding:10px;margin-bottom: 3px">
+                                {% if item.avatar %}
+                                    <div style="float:left;width: 100px">
+                                        <img src="{{ item.avatar.url }}" width="100px" />
+                                    </div>
+                                {% endif %}
+                                <div style="float:left;width: {% if item.avatar %}92%{% else %}99%{% endif %}">
+                                    <div>
+                                        {{ forloop.counter }} -
+                                        <a href="{% url 'gatheros_event:organization-panel' item.pk %}">{{ item.name }}</a>
+                                    </div>
+                                    {% if item.description_html %}
+                                    <hr/>
+                                    <div style="text-indent: 10px;">
+                                        {{ item.description_html|safe }}
+                                    </div>
+                                </div>
+                                <div style="clear:both"></div>
+                                {% endif %}
+                            </td>
+                            <td style="background: #FFF;padding:10px;margin-bottom: 3px" {% if not member_group == member.ADMIN %}colspan="2"{% endif %}>
+                                {% get_member_group_name item user %}
+                            </td>
+                            {% if member_group == member.ADMIN %}
+                            <td width="8%" style="background: #FFF;padding:10px;margin-bottom: 3px">
+                                <a href="{% url 'gatheros_event:organization-edit' item.pk %}">Editar</a>
+                                &nbsp; &nbsp; &nbsp;
+                                    {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
+                                        <a href="{% url 'gatheros_event:organization-delete' item.pk %}">Excluir</a>
+                                    {% endif %}
+                            </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         {% else %}
             <div style="background: #FFF;padding:10px;margin-bottom: 3px">

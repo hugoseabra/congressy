@@ -69,9 +69,9 @@
                                 <input type="hidden" name="next"
                                        value="{{ request.path }}"/>
                             </form>
-                        {% elif organizations and organizations|length == 1 %}
-                            {% if request.user.person and request.user.person.avatar %}
-                                <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ request.user.person.avatar.url }}" />
+                        {% elif organizations and organizations|length == 1 and organization %}
+                            {% if organization and organization.avatar %}
+                                <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ organization.url }}" />
                             {% else %}
                                 <!--suppress CheckImageSize -->
                                 <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />

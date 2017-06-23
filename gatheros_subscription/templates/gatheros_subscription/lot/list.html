@@ -21,6 +21,12 @@
     <div style="background: #DDD">
         {% if object_list %}
             <table width="100%">
+                <tr>
+                    <th style="text-align: left;border:1px solid #fff;padding:10px" colspan="2">
+                        # - Nome - Tipo
+                    </th>
+                    <th style="border:1px solid #fff;padding:10px"></th>
+                </tr>
                 {% for lot in object_list %}
                     <tr>
                         {% if lot.status == lot.LOT_STATUS_RUNNING %}

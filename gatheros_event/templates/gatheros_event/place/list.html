@@ -19,8 +19,9 @@
         {% if object_list %}
             <table width="100%">
                 <tr>
-                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome do Local</td>
-                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
+                    <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome do Local</th>
+                    <th style="border:1px solid #fff;padding:10px;margin-bottom: 3px"># Eventos</th>
+                    <th style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></th>
                 </tr>
                 {% for item in object_list %}
                     <tr>
@@ -33,6 +34,9 @@
                             <div style="text-indent: 10px;">
                                 {{ item.get_complete_address }}
                             </div>
+                        </td>
+                        <td width="5%" style="text-align:center;background: #FFF;padding:10px;margin-bottom: 3px">
+                            {{ item.events.count }}
                         </td>
                         <td width="8%" style="background: #FFF;padding:10px;margin-bottom: 3px">
                             <a href="{% url 'gatheros_event:place-edit' place_organization.pk item.pk %}">Editar</a>
