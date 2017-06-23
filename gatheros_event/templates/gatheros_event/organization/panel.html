@@ -102,79 +102,82 @@
                     </tr>
                     <tr>
                         <td width="80%" style="vertical-align: top">
-                            {% if can_manage_invitations %}
-                            <div style="border: 1px solid #ddd;width:99%;margin: 0 auto">
-                                <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
-                                    Convites pendentes
-                                </div>
-                                <div style="padding: 4px">
-                                    <table width="100%" border="0" cellspacing="0" cellpadding="6" style="color:#333">
-                                        <tr>
-                                            <th width="4%">#</th>
-                                            <th style="text-align: left">Convidado</th>
-                                            <th style="text-align: left">Convidado em</th>
-                                            <th style="text-align: left">Expira em</th>
-                                        </tr>
-                                        {% for invitation in get_invitations|slice:":5" %}
-                                        <tr>
-                                            <td style="text-align: center;border-bottom:1px solid #DDD">{{ forloop.counter }}</td>
-                                            <td style="border-bottom:1px solid #DDD;font-weight: bold;{% if invitation.is_expired %}color:darkgrey;font-style:italic{% endif %}">
-                                                {% if invitation.to.get_full_name %}
-                                                    {{ invitation.to.get_full_name }}
-                                                    <span style="font-weight: normal;color: gray">({{ invitation.to.email }})</span>
-                                                {% else %}
-                                                    {{ invitation.to.email }}
-                                                {% endif %}
-                                            </td>
-                                            <td style="border-bottom:1px solid #DDD;{% if invitation.is_expired %}color:darkgrey;font-style:italic{% endif %}">
-                                                {{ invitation.created }}
-                                            </td>
-                                            <td style="border-bottom:1px solid #DDD;{% if invitation.is_expired %}color:darkgrey;font-style:italic{% endif %}">
-                                                {{ invitation.expired }}
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </table>
-                                    <div style="margin-top:10px; padding: 10px;background-color: whitesmoke;text-align: center;border-bottom:1px solid dimgray">
-                                        <a href="{% url 'gatheros_event:invitation-list' object.pk %}">Ver todos os convites</a>
+                            {% if can_manage_invitations and invitations %}
+                                <div style="border: 1px solid #ddd;width:99%;margin: 0 auto">
+                                    <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
+                                        Convites pendentes
                                     </div>
-                                </div>
-                            </div>
-                            {% endif %}
-
-                            <div style="border: 1px solid #ddd;width:99%;margin: 5px auto">
-                                <h4 style="padding:5px;margin-top:8px">Eventos populares</h4>
-                                <div style="padding: 4px">
-                                    {% for event in object.events.all|slice:":6" %}
-                                    <div style="border: 1px solid #dddddd;float:left;width: 400px;margin-bottom: 8px;margin-left:4px">
-                                        <div style="padding:5px">
-                                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                <tr>
-                                                    <td width="25%">
-                                                        {% if event.banner_small %}
-                                                            <!--suppress CheckImageSize -->
-                                                            <img style="border-radius: 10px" src="{{ event.banner_small.thumbnail.url }}" width="100%" />
-                                                        {% else %}
-                                                            <!--suppress CheckImageSize -->
-                                                            <img style="border-radius: 10px" src="/media/default_avatar.png" width="73%" />
-                                                        {% endif %}
-                                                    </td>
-                                                    <td>
-                                                        <div style="margin-left: 4px;margin-top:4px;padding:10px 0">
-                                                            <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">
-                                                                {{ event.name }}
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </table>
+                                    <div style="padding: 4px">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="6" style="color:#333">
+                                            <tr>
+                                                <th style="text-align: left">Convidado</th>
+                                                <th style="text-align: left">Convidado em</th>
+                                                <th style="text-align: left">Expira em</th>
+                                            </tr>
+                                            {% for invitation in invitations %}
+                                            <tr>
+                                                <td style="border-bottom:1px solid #DDD;font-weight: bold;{% if invitation.is_expired %}color:darkgrey;font-style:italic{% endif %}">
+                                                    {% if invitation.to.person and invitation.to.person.avatar %}
+                                                        <img  style="float:left;padding-right:4px;margin-top: -3px" width="25px" src="{{ invitation.to.person.avatar.url }}" />
+                                                    {% endif %}
+                                                    {% if invitation.to.get_full_name %}
+                                                        {{ invitation.to.get_full_name }}
+                                                        <span style="font-weight: normal;color: gray">({{ invitation.to.email }})</span>
+                                                    {% else %}
+                                                        {{ invitation.to.email }}
+                                                    {% endif %}
+                                                </td>
+                                                <td style="border-bottom:1px solid #DDD;{% if invitation.is_expired %}color:darkgrey;font-style:italic{% endif %}">
+                                                    {{ invitation.created }}
+                                                </td>
+                                                <td style="border-bottom:1px solid #DDD;{% if invitation.is_expired %}color:darkgrey;font-style:italic{% endif %}">
+                                                    {{ invitation.expired }}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </table>
+                                        <div style="margin-top:10px; padding: 10px;background-color: whitesmoke;text-align: center;border-bottom:1px solid dimgray">
+                                            <a href="{% url 'gatheros_event:invitation-list' object.pk %}">Ver todos os convites</a>
                                         </div>
                                     </div>
-                                    {% endfor %}
-
-                                    <div style="clear:both"></div>
                                 </div>
-                            </div>
+                            {% endif %}
+
+                            {% if events %}
+                                <div style="border: 1px solid #ddd;width:99%;margin: 5px auto">
+                                    <h4 style="padding:5px;margin-top:8px">Eventos populares</h4>
+                                    <div style="padding: 4px">
+                                        {% for event in events %}
+                                        <div style="border: 1px solid #dddddd;float:left;width: 400px;margin-bottom: 8px;margin-left:4px">
+                                            <div style="padding:5px">
+                                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                    <tr>
+                                                        <td width="25%">
+                                                            {% if event.banner_small %}
+                                                                <!--suppress CheckImageSize -->
+                                                                <img style="border-radius: 10px" src="{{ event.banner_small.thumbnail.url }}" width="100%" />
+                                                            {% else %}
+                                                                <!--suppress CheckImageSize -->
+                                                                <img style="border-radius: 10px" src="/media/default_avatar.png" width="73%" />
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            <div style="margin-left: 4px;margin-top:4px;padding:10px 0">
+                                                                <div style="color:#333;font-size: 14px;margin-bottom:3px;font-weight: bold">
+                                                                    {{ event.name }}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+
+                                        <div style="clear:both"></div>
+                                    </div>
+                                </div>
+                            {% endif %}
                         </td>
                         <td style="vertical-align: top">
                             <div style="border: 1px solid #dddddd;">

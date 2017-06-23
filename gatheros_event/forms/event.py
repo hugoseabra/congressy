@@ -5,13 +5,14 @@ Formulários de Event
 from django import forms
 from django.shortcuts import get_object_or_404
 
-from gatheros_event.models import Event, Organization, Member
+from gatheros_event.models import Event, Member, Organization
 
 
 # @TODO Remover diretórios vazios de eventos que não possuem banners
 
 class EventForm(forms.ModelForm):
     """Formulário principal de evento"""
+
     class Meta:
         model = Event
         fields = [
@@ -24,11 +25,38 @@ class EventForm(forms.ModelForm):
             'subscription_offline',
             'published'
         ]
-        widgets = {'organization': forms.HiddenInput()}
+        widgets = {'organization': forms.HiddenInput}
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+
+        super(EventForm, self).__init__(*args, **kwargs)
+
+        instance = kwargs.get('instance')
+        if instance is None:
+            self._configure_organization_field()
+
+    def _configure_organization_field(self):
+        orgs = []
+        for member in self.user.person.members.filter():
+            organization = member.organization
+
+            can_add = self.user.has_perm(
+                'gatheros_event.can_add_event',
+                organization
+            )
+            if not can_add:
+                continue
+
+            orgs.append((organization.pk, organization.name,))
+
+        self.fields['organization'].widget = forms.Select()
+        self.fields['organization'].choices = orgs
 
 
 class EventEditDatesForm(forms.ModelForm):
     """Formulário de edição de datas de evento"""
+
     class Meta:
         model = Event
         fields = [
@@ -39,6 +67,7 @@ class EventEditDatesForm(forms.ModelForm):
 
 class EventEditSubscriptionTypeForm(forms.ModelForm):
     """Formulário de edição de Tipo de Inscrição de evento"""
+
     class Meta:
         model = Event
         fields = [
@@ -49,6 +78,7 @@ class EventEditSubscriptionTypeForm(forms.ModelForm):
 
 class EventPublicationForm(forms.ModelForm):
     """Formulário de edição de publicação de evento"""
+
     class Meta:
         model = Event
         fields = [
@@ -66,6 +96,7 @@ class EventPublicationForm(forms.ModelForm):
 
 class EventBannerForm(forms.ModelForm):
     """Formulário de upload de imagens de evento."""
+
     class Meta:
         model = Event
         fields = [
@@ -111,6 +142,7 @@ class EventBannerForm(forms.ModelForm):
 
 class EventPlaceForm(forms.ModelForm):
     """Formulário de edição de local de evento."""
+
     class Meta:
         model = Event
         fields = [
@@ -134,6 +166,7 @@ class EventPlaceForm(forms.ModelForm):
 
 class EventSocialMediaForm(forms.ModelForm):
     """Formulário de edição de local de evento."""
+
     class Meta:
         model = Event
         fields = [
@@ -161,7 +194,6 @@ class EventTransferForm(forms.Form):
         self._populate()
 
     def _populate(self):
-
         current_org = self.instance.organization
         members = self.user.person.members.filter(group=Member.ADMIN).order_by(
             '-organization__internal',

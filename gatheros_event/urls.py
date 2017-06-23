@@ -86,6 +86,11 @@ url_organization = [
         name='organization-add'
     ),
     url(
+        r'^add-internal/$',
+        views.OrganizationAddInternalFormView.as_view(),
+        name='organization-add-internal'
+    ),
+    url(
         r'^(?P<pk>[\d]+)/$',
         views.OrganizationPanelView.as_view(),
         name='organization-panel'

@@ -1,5 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import six
 
 from gatheros_event.models import Person
 
@@ -16,13 +17,10 @@ def update_person_related_organization(instance, raw, **_):
         return
 
     for member in instance.members.filter(organization__internal=True):
+
         organization = member.organization
-        organization.avatar = instance.avatar
-        organization.name = instance.name
-        organization.website = instance.website
-        organization.facebook = instance.facebook
-        organization.twitter = instance.twitter
-        organization.linkedin = instance.linkedin
-        organization.skype = instance.skype
+
+        for attr, value in six.iteritems(instance.get_profile_data()):
+            setattr(organization, attr, value)
 
         organization.save()

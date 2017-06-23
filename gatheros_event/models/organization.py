@@ -4,6 +4,7 @@ Organização é a estrutura máxima da aplicação, pois nela, define-se seus
 membros, com seus devidos grupos, e como eles poderão interagir nos eventos
 vinculadas a ela.
 """
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -152,18 +153,20 @@ class Organization(models.Model, GatherosModelMixin):
         member = self.get_member(person)
         return member.active if member else False
 
-    def get_invitations(self, include_expired=True):
+    def get_invitations(self, include_expired=True, limit=None):
         """
         Recupera convites da organização feita por membros administradores
         """
         invitations = []
         for member in self.members.all():
-            if not invitations:
-                all_invitations = member.invitations.all()
-                if include_expired:
-                    invitations += list(all_invitations)
-                else:
-                    invitations += [inv for inv in all_invitations if
-                                    not inv.is_expired]
+            invitation_qs = member.invitations
+            if not include_expired:
+                now = datetime.now()
+                invitation_qs = invitation_qs.filter(expired__gte=now)
+
+            if limit:
+                invitations += list(invitation_qs.all()[0:int(limit)])
+            else:
+                invitations += list(invitation_qs.all())
 
         return invitations

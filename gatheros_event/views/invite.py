@@ -11,6 +11,7 @@ from gatheros_event.forms import (
     ProfileForm
 )
 from gatheros_event.forms.invitation import send_invitation
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Invitation, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 
@@ -233,14 +234,14 @@ class InvitationDecisionView(TemplateView):
         invite = get_object_or_404(Invitation, pk=kwargs.get('pk'))
         context = self.get_context_data(**kwargs)
 
+        authenticated = request.user.is_authenticated()
+
         # Se tem perfil, precisa do login login
-        if not request.user.is_authenticated() \
-                and hasattr(invite.to, 'person'):
+        if not authenticated and hasattr(invite.to, 'person'):
             return redirect('gatheros_front:login')
 
         # Se o usuário autenticado for diferente do usuário do convite
-        if request.user.is_authenticated() \
-                and not request.user == invite.to:
+        if authenticated and not request.user == invite.to:
             messages.error(request, "Usuário do convite é diferente do logado")
             context.update({
                 'messages': messages.get_messages(request)
@@ -286,6 +287,10 @@ class InvitationDecisionView(TemplateView):
             try:
                 # Se der tudo certo no aceite, redireciona para painel
                 form.accept()
+
+                # Atualização contexto de organizações
+                update_account(request=self.request, force=True)
+
                 return redirect('gatheros_event:organization-panel', pk=org_id)
             except ValidationError:
                 # Se errado direciona para a criação do perfil
@@ -371,6 +376,10 @@ class InvitationProfileView(TemplateView):
         # Deve conseguir aceitar o convite corretamente
         try:
             invite_form.accept()
+
+            # Atualização contexto de organizações
+            update_account(request=self.request, force=True)
+
             return redirect(reverse(
                 'gatheros_event:organization-panel',
                 kwargs={'pk': invite.author.organization_id}

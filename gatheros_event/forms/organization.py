@@ -13,6 +13,7 @@ class OrganizationForm(forms.ModelForm):
     """Formulário principal de evento"""
 
     user = None
+    internal = False
 
     class Meta:
         model = Organization
@@ -28,8 +29,9 @@ class OrganizationForm(forms.ModelForm):
             'skype',
         )
 
-    def __init__(self, user, data=None, *args, **kwargs):
+    def __init__(self, user, internal=False, data=None, *args, **kwargs):
         self.user = user
+        self.internal = internal
 
         try:
             self.user.person
@@ -51,7 +53,7 @@ class OrganizationForm(forms.ModelForm):
     def save(self, commit=True):
         # noinspection PyProtectedMember
         is_new = self.instance._state.adding
-        self.instance.internal = False
+        self.instance.internal = self.internal
 
         if is_new:
             self.instance.active = True

@@ -32,7 +32,8 @@ class OrganizationPanelView(AccountMixin, DetailView):
         # Força valor de contexto
         context['organization'] = self.organization
         context.update({
-            'get_invitations': self._get_invitations(),
+            'invitations': self._get_invitations(),
+            'events': self.object.events.all()[0:6],
             'can_manage_places': self._can_manage_places,
             'can_manage_invitations': self._can_manage_invitations,
             'can_manage_members': self._can_manage_members,
@@ -42,7 +43,7 @@ class OrganizationPanelView(AccountMixin, DetailView):
         return context
 
     def _get_invitations(self):
-        return self.object.get_invitations(include_expired=False)
+        return self.object.get_invitations(include_expired=False, limit=5)
 
     def _can_manage_places(self):
         return self.request.user.has_perm(

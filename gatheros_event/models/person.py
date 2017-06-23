@@ -203,3 +203,15 @@ class Person(models.Model, GatherosModelMixin):
         if not self.birth_date:
             return '--'
         return self.birth_date.strftime('%d/%m/%Y')
+
+    def get_profile_data(self):
+        """ Resgata dados a serem utilizados publicamente no perfil. """
+        return {
+            'avatar': self.avatar,
+            'name': self.name,
+            'website': self.website,
+            'facebook': self.facebook,
+            'twitter': self.twitter,
+            'linkedin': self.linkedin,
+            'skype': self.skype,
+        }

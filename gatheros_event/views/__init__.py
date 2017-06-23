@@ -29,6 +29,7 @@ from .member import MemberDeleteView, MemberListView, MemberManageView
 from .organization.delete import OrganizationDeleteView
 from .organization.form import (
     OrganizationAddFormView,
+    OrganizationAddInternalFormView,
     OrganizationEditFormView,
 )
 from .organization.list import OrganizationListView

@@ -2,8 +2,10 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
+from django.core.exceptions import PermissionDenied
 
 from gatheros_event import forms
+from gatheros_event.models import Organization
 from gatheros_event.views.mixins import AccountMixin
 
 
@@ -29,6 +31,8 @@ class BaseEventView(AccountMixin, View):
         context = super(BaseEventView, self).get_context_data(**kwargs)
         context['next_path'] = self._get_referer_url()
         context['form_title'] = self.get_form_title()
+        context['is_manager'] = self.has_internal_organization
+        context['has_organization'] = self.has_organization
 
         return context
 
@@ -75,19 +79,37 @@ class BaseSimpleEditlView(BaseEventView):
 class EventAddFormView(BaseEventView, generic.CreateView):
     form_class = forms.EventForm
     success_message = 'Evento criado com sucesso.'
+    form_title = 'Novo evento'
+
+    def get_permission_denied_url(self):
+        return reverse_lazy('gatheros_event:event-list')
+
+    def get_form(self, form_class=None):
+        if not form_class:
+            form_class = self.form_class
+
+        return form_class(user=self.request.user, **self.get_form_kwargs())
+
+    def post(self, request, *args, **kwargs):
+        org_pk = request.POST.get('organization')
+        try:
+            org = Organization.objects.get(pk=org_pk)
+
+            if not request.user.has_perm('gatheros_event.can_add_event', org):
+                raise PermissionDenied()
+
+        except (Organization.DoesNotExist, PermissionDenied):
+            raise PermissionDenied(
+                'Você não pode inserir um evento nesta organização.'
+            )
+        else:
+            return super(EventAddFormView, self).post(request, *args, **kwargs)
 
     def get_initial(self):
         initial = super(EventAddFormView, self).get_initial()
         initial['organization'] = self.organization
 
         return initial
-
-    def get_form_title(self):
-        form_title = "Novo evento"
-        if not self.organization.internal:
-            form_title += " para '{}'".format(self.organization.name)
-
-        return form_title
 
     def get_success_url(self):
         form = self.get_form()
@@ -98,17 +120,7 @@ class EventAddFormView(BaseEventView, generic.CreateView):
         )
 
     def can_view(self):
-        can_add = self.request.user.has_perm(
-            'gatheros_event.can_add_event',
-            self.organization
-        )
-        if not can_add:
-            messages.warning(
-                self.request,
-                "Você não tem permissão para adicionar evento."
-            )
-
-        return can_add
+        return True
 
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
@@ -116,6 +128,12 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
     model = forms.EventForm.Meta.model
     success_url = reverse_lazy('gatheros_event:event-list')
     success_message = 'Evento alterado com sucesso.'
+
+    def get_form(self, form_class=None):
+        if not form_class:
+            form_class = self.form_class
+
+        return form_class(user=self.request.user, **self.get_form_kwargs())
 
     def get_initial(self):
         initial = super(EventEditFormView, self).get_initial()

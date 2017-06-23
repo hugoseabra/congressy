@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 
@@ -15,20 +15,8 @@ class BaseOrganizationView(AccountMixin, View):
     success_url = None
     form_title = None
 
-    def dispatch(self, request, *args, **kwargs):
-        dispatch = super(BaseOrganizationView, self).dispatch(
-            request,
-            *args,
-            **kwargs
-        )
-        if self.organization and not self.can_view():
-            messages.warning(
-                request,
-                'Você não tem permissão de realizar esta ação.'
-            )
-            return redirect(reverse_lazy('gatheros_event:organization-list'))
-
-        return dispatch
+    def get_permission_denied_url(self):
+        return reverse_lazy('gatheros_event:organization-list')
 
     def get_form(self, form_class=None):
         """
@@ -39,7 +27,11 @@ class BaseOrganizationView(AccountMixin, View):
             form_class = self.get_form_class()
 
         # noinspection PyUnresolvedReferences
-        return form_class(user=self.request.user, **self.get_form_kwargs())
+        kwargs = self.get_form_kwargs()
+        data = kwargs.get('data')
+        internal = data.get('internal', False) if data else False
+
+        return form_class(user=self.request.user, internal=internal, **kwargs)
 
     def form_valid(self, form):
         messages.success(self.request, self.success_message)
@@ -78,8 +70,8 @@ class BaseOrganizationView(AccountMixin, View):
     def get_form_title(self):
         return self.form_title
 
-    def can_view(self):
-        raise NotImplemented('Você deve implementar `can_view()`.')
+    def can_access(self):
+        raise NotImplemented('Você deve implementar `can_access()`.')
 
 
 class OrganizationAddFormView(BaseOrganizationView, generic.CreateView):
@@ -93,8 +85,39 @@ class OrganizationAddFormView(BaseOrganizationView, generic.CreateView):
             kwargs={'pk': self.object.pk}
         )
 
-    def can_view(self):
+    def can_access(self):
         return True
+
+
+class OrganizationAddInternalFormView(
+    BaseOrganizationView,
+    generic.CreateView
+):
+    form_class = forms.OrganizationForm
+    success_message = 'Organização criada com sucesso.'
+    form_title = 'Nova organização'
+
+    def post(self, request, *args, **kwargs):
+        try:
+            person = request.user.person
+
+            data = {'internal': True}
+            data.update(person.get_profile_data())
+            request.POST = data
+
+            return super(OrganizationAddInternalFormView, self).post(
+                request,
+                *args,
+                **kwargs
+            )
+        except ObjectDoesNotExist as e:
+            raise PermissionDenied('Um error ocorreu: ' + str(e))
+
+    def get_success_url(self):
+        return reverse_lazy('gatheros_event:event-add')
+
+    def can_access(self):
+        return not self.has_internal_organization
 
 
 class OrganizationEditFormView(BaseOrganizationView, generic.UpdateView):
@@ -103,7 +126,7 @@ class OrganizationEditFormView(BaseOrganizationView, generic.UpdateView):
     success_url = reverse_lazy('gatheros_event:organization-list')
     success_message = 'Organização alterada com sucesso.'
 
-    def can_view(self):
+    def can_access(self):
         can_edit = self.request.user.has_perm(
             'gatheros_event.change_organization',
             self.get_object()

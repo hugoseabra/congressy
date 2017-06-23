@@ -6,17 +6,15 @@
 
 {% block content %}
     <h1>Lista de Eventos</h1>
-    {% if user has 'gatheros_event.can_add_event' of organization %}
-        <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
-            <a href="{% url 'gatheros_event:event-add' %}">Adicionar</a>
-        </div>
-    {% endif %}
+    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
+        <a href="{% url 'gatheros_event:event-add' %}">Adicionar</a>
+    </div>
     <div style="background: #DDD">
         {% if object_list %}
             <table width="100%">
                 <tr>
                     <td colspan="2" style="border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome</td>
-                    <td style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
+                    <td width="8%" style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></td>
                 </tr>
                 {% for event in object_list %}
                     <tr>
@@ -66,12 +64,12 @@
                             </div>
                         </td>
                         <td width="5%"
-                            style="background: #FFF;padding:10px;margin-bottom: 3px">
+                            style="text-align:center;background: #FFF;padding:10px;margin-bottom: 3px">
                             {% if user has 'gatheros_event.change_event' of event %}
                                 <a href="{% url 'gatheros_event:event-edit' event.pk %}">Editar</a>
                             {% endif %}
+                            &nbsp; &nbsp;
                             {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
-                                <br/><br/>
                                 <a href="{% url 'gatheros_event:event-delete' event.pk %}">Excluir</a>
                             {% endif %}
                         </td>
