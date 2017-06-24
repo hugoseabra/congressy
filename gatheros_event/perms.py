@@ -167,7 +167,7 @@ add_permission_logic(Event, logic)
 
 logic = MemberPermissionLogic(
     member_is_member,
-    ['view_lots', 'view_form', 'can_add_lot'],
+    ['view_lots', 'view_form', 'can_add_lot', 'can_manage_subscriptions'],
     'organization',
 )
 add_permission_logic(Event, logic)
