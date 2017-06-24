@@ -14,9 +14,10 @@
     {% if form_title %}
         <h2>{{ form_title }}</h2>
     {% endif %}
-    <table border="0" width="60%" cellpadding="10" cellspacing="1" style="background-color:#DDD">
+    <table border="0" width="65%" cellpadding="10" cellspacing="1" style="background-color:#DDD">
         <tr>
             <td colspan="6" style="font-weight: bold">Campos principais</td>
+            <td style="text-align:center;font-weight: bold"># Inscrições</td>
         </tr>
         {% for item in default_fields %}
             {% user_can_delete user item.field as can_delete %}
@@ -28,7 +29,7 @@
                 <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
                     <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
                 </th>
-                <td style="vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}" {% if item.field.with_options %}colspan="3"{% else %}colspan="4"{% endif %}>
+                <td colspan="4" style="vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
                     {{ item.form_field }}
                     {% if item.form_field.help_text %}
                         <br />
@@ -36,9 +37,9 @@
                     {% endif %}
                     {{ item.form_field.errors }}
                 </td>
-                {% if item.field.with_options %}
-                <td width="13%" style="text-align: center;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                    <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-options' event.pk item.field.pk %}">Gerenciar opções</a>
+                {% if forloop.first %}
+                <td rowspan="{{ default_fields|length }}" width="10%" style="text-align: center;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                    {{ event.subscriptions.count }}
                 </td>
                 {% endif %}
             </tr>
@@ -98,6 +99,9 @@
                     {% if not item.field.active %}
                         <div style="text-align: center;font-style: italic;padding: 4px">Desativado</div>
                     {% endif %}
+                </td>
+                <td width="10%" style="text-align: center;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                    {{ item.field.answers.count }}
                 </td>
             </tr>
         {% endfor %}

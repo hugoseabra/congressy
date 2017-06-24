@@ -25,6 +25,7 @@ class EventPanelView(AccountMixin, DetailView):
         context['can_change'] = self._can_change
         context['can_delete'] = self._can_delete
         context['can_view_lots'] = self._can_view_lots
+        context['can_manage_subscriptions'] = self.can_manage_subscriptions
         context['percent_attended'] = {
             'label': round(self.object.percent_attended),
             'number': str(self.object.percent_attended).replace(',', '.'),
@@ -58,6 +59,12 @@ class EventPanelView(AccountMixin, DetailView):
         )
 
         return subscription_by_lots and can_manage
+
+    def can_manage_subscriptions(self):
+        return self.request.user.has_perm(
+            'gatheros_subscription.can_manage_subscriptions',
+            self.object
+        )
 
     def _get_status(self):
         now = datetime.now()

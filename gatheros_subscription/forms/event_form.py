@@ -8,12 +8,27 @@ from kanu_form.forms import KanuForm
 
 class EventConfigForm(KanuForm):
     default_fields = set()
+    additional_fields = set()
     gatheros_fields = {}
+    fields_configured = False
+    include_inactive = False
 
-    def __init__(self, form, *args, **kwargs):
+    def __init__(
+            self,
+            form,
+            field_manager=None,
+            include_inactive=False,
+            *args,
+            **kwargs):
+
         self.form = form
-        self.field_manager = FieldManager()
-        self._configure_fields()
+
+        if not field_manager:
+            self.field_manager = FieldManager()
+
+        self.include_inactive = include_inactive
+
+        self.configure_fields()
         super(EventConfigForm, self).__init__(
             self.field_manager,
             *args,
@@ -24,17 +39,37 @@ class EventConfigForm(KanuForm):
         """ Verifica se o campo é padrão. """
         return field_name in self.default_fields
 
-    def get_field_by_name(self, field_name):
-        """ Recupera PK do field pelo seu nome único. """
-        return self.form.fields.get(name=field_name)
+    def get_gatheros_field_by_name(self, field_name):
+        """ Resgata gatheros field pelo nome único. """
+        try:
+            return self.form.fields.get(name=field_name)
+        except Field.DoesNotExist:
+            return None
 
-    def _configure_fields(self):
+    def get_form_field_by_name(self, field_name):
+        """ Resgata form field pelo nome único. """
+        return self.fields[field_name] if field_name in self.fields else None
+
+    def configure_fields(self):
         """ Configura campos do formulário dinamicamente. """
 
-        for field in self.form.fields.all():
-            self.gatheros_fields[field.name] = field
+        if self.fields_configured:
+            return
 
-            field_dict = model_to_dict(field, exclude=[
+        fields_qs = self.form.fields
+
+        if not self.include_inactive:
+            fields_qs = fields_qs.filter(active=True)
+
+        for f in fields_qs.all():
+            self.gatheros_fields[f.name] = f
+
+            if f.form_default_field:
+                self.default_fields.add(f.name)
+            else:
+                self.additional_fields.add(f.name)
+
+            field_dict = model_to_dict(f, exclude=[
                 'active',
                 'default_value',
                 'form_default_field',
@@ -44,18 +79,20 @@ class EventConfigForm(KanuForm):
                 'order',
                 'with_options',
             ])
-            field_dict['help_text'] = field.instruction
-            if field.default_value:
-                field_dict['initial'] = field.default_value
 
-            if field.with_options:
-                field_dict['options'] = [(option.value, option.name) for option
-                                         in field.options.all()]
+            field_dict['help_text'] = f.instruction
 
-            if field.form_default_field:
-                self.default_fields.add(field.name)
+            if f.default_value:
+                field_dict['initial'] = f.default_value
+
+            if f.with_options:
+                field_dict['options'] = [
+                    (opt.value, opt.name) for opt in f.options.all()
+                ]
 
             self.field_manager.create(**field_dict)
+
+        self.fields_configured = True
 
 
 class EventFormFieldForm(forms.ModelForm):

@@ -34,6 +34,8 @@
                     <a href="{% url 'gatheros_event:organization-list' %}">Organizações</a>
                     &nbsp; &nbsp; &nbsp; &nbsp;
                     <a href="{% url 'gatheros_event:event-list' %}">Eventos</a>
+                    &nbsp; &nbsp; &nbsp; &nbsp;
+                    <a href="#">Pessoas</a>
                 {% endif %}
             </div>
             <div style="float:right">
@@ -71,7 +73,7 @@
                             </form>
                         {% elif organizations and organizations|length == 1 and organization %}
                             {% if organization and organization.avatar %}
-                                <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ organization.url }}" />
+                                <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ organization.avatar.url }}" />
                             {% else %}
                                 <!--suppress CheckImageSize -->
                                 <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />

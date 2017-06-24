@@ -1,0 +1,153 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'gatheros_subscription:subscription-list' event.pk %}">Voltar</a>
+    </div>
+    <hr/>
+    <h1>{{ event.name }}</h1>
+    <div style="margin-bottom:10px;padding: 10px;background-color: #DDDDDD;text-align: center;"></div>
+
+    {% if form_title %}
+        <h2>{{ form_title }}</h2>
+    {% endif %}
+    <br />
+    {% if object %}
+        <table border="0" width="50%" cellpadding="10" cellspacing="1">
+            <tr>
+                {% if object.person.avatar %}
+                    <td width="1%" style="font-weight: bold">
+                        <img src="{{ object.person.avatar.url }}" width="180px" />
+                    </td>
+                {% endif %}
+                <td style="padding: 0">
+                    <table border="0" width="100%" cellpadding="10" cellspacing="0">
+                        <tr>
+                            <th width="26%" style="text-align: right;vertical-align: top">
+                                UUID
+                            </th>
+                            <td style="vertical-align: top">
+                                {{ object.pk }}
+                            </td>
+                        </tr>
+                        {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+                            <tr>
+                                <th width="26%" style="text-align: right;vertical-align: top">
+                                    Lote
+                                </th>
+                                <td style="vertical-align: top">
+                                    {{ object.lot.name }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <th width="26%" style="text-align: right;vertical-align: top">
+                                Código de Inscrição
+                            </th>
+                            <td style="vertical-align: top">
+                                {{ object.code }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th width="20%" style="text-align: right;vertical-align: top">
+                                Número de Inscrição
+                            </th>
+                            <td style="vertical-align: top">
+                                {{ object.count }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th width="20%" style="text-align: right;vertical-align: top">
+                                Cadastrado em
+                            </th>
+                            <td style="vertical-align: top">
+                                {{ object.created }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th width="20%" style="text-align: right;vertical-align: top">
+                                Cadastrado por
+                            </th>
+                            <td style="vertical-align: top">
+                                {{ object.created_by }}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    {% endif %}
+    <form action="" method="post">{% csrf_token %}
+        {% for field in hidden_fields %}
+            {{ field }}
+        {% endfor %}
+
+        <table border="0" width="50%" cellpadding="10" cellspacing="1">
+            {% if internal_form_fields %}
+                <tr>
+                    <td colspan="2" style="font-weight: bold;background-color: #DDD">Campos internos</td>
+                </tr>
+                {% for form_field in internal_form_fields %}
+                    <tr>
+                        <th width="20%" style="text-align: right;vertical-align: top">
+                            <label for="{{ form_field.id_for_label }}">{{ form_field.label_tag }}</label>
+                        </th>
+                        <td style="vertical-align: top">
+                            {{ form_field }}
+                            {% if form_field.help_text %}
+                                <br />
+                                <strong>Instrução:</strong> {{ form_field.help_text|safe }}
+                            {% endif %}
+                            {{ form_field.errors }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            <tr>
+                <td colspan="2" style="font-weight: bold;background-color: #DDD">Campos principais</td>
+            </tr>
+            {% for item in default_fields %}
+                <tr>
+                    <th width="20%" style="text-align: right;vertical-align: top">
+                        <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
+                    </th>
+                    <td style="vertical-align: top">
+                        {{ item.form_field }}
+                        {% if item.form_field.help_text %}
+                            <br />
+                            <strong>Instrução:</strong> {{ item.form_field.help_text|safe }}
+                        {% endif %}
+                        {{ item.form_field.errors }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% if additional_fields %}
+            <table border="0" width="50%" cellpadding="10" cellspacing="1">
+                <tr>
+                    <td colspan="2" style="font-weight: bold;background-color: #DDD">Campos adicionais</td>
+                </tr>
+                {% for item in additional_fields %}
+                    <tr>
+                        <th width="25%" style="text-align: right;vertical-align: top;">
+                            <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
+                        </th>
+                        <td style="vertical-align: top;">
+                            {{ item.form_field }}
+                            {% if item.form_field.help_text %}
+                                <br />
+                                <strong>Instrução:</strong> {{ item.form_field.help_text|safe }}
+                            {% endif %}
+                            {{ item.form_field.errors }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+        <br />
+        <hr />
+        <input type="submit" value="Salvar"/>
+        <a href="{% url 'gatheros_subscription:subscription-list' event.pk %}">Cancelar</a>
+    </form>
+{% endblock %}

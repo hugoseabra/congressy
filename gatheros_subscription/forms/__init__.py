@@ -5,3 +5,4 @@ from .event_form import (
     EventFormFieldOrderForm,
 )
 from .lot import LotForm
+from .subscription import SubscriptionForm

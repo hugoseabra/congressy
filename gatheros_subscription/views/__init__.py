@@ -12,3 +12,8 @@ from .field_option import (
     FieldOptionsView,
 )
 from .lot import LotAddFormView, LotDeleteView, LotEditFormView, LotListView
+from .subscription import (
+    SubscriptionAddFormView,
+    SubscriptionEditFormView,
+    SubscriptionListView,
+)

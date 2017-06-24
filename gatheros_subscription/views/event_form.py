@@ -115,7 +115,11 @@ class EventConfigFormView(BaseEventForm, generic.FormView):
             form_class = self.form_class
 
         event = self._get_event()
-        return form_class(form=event.form, **self.get_form_kwargs())
+        return form_class(
+            form=event.form,
+            include_inactive=True,
+            **self.get_form_kwargs()
+        )
 
 
 class EventFormFieldAddView(BaseEventFormFieldForm, generic.CreateView):

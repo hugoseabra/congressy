@@ -3,6 +3,24 @@ from django.views.generic import RedirectView
 
 from gatheros_subscription import views
 
+url_subscription = [
+    url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/edit/$',
+        views.SubscriptionEditFormView.as_view(),
+        name='subscription-edit'
+    ),
+    url(
+        r'^add/$',
+        views.SubscriptionAddFormView.as_view(),
+        name='subscription-add'
+    ),
+    url(
+        r'^$',
+        views.SubscriptionListView.as_view(),
+        name='subscription-list'
+    ),
+]
+
 url_field_option = [
     url(
         r'^(?P<pk>[\d]+)/delete/$',
@@ -48,7 +66,7 @@ url_field = [
         name='field-add'
     ),
     url(
-        r'^config',
+        r'^',
         views.EventConfigFormView.as_view(),
         name='fields-config'
     ),
@@ -88,4 +106,8 @@ urlpatterns = [
     url(r'^fieldoptions/', include(url_field_option)),
     url(r'^events/(?P<event_pk>[\d]+)/fields/', include(url_field)),
     url(r'^events/(?P<event_pk>[\d]+)/lots/', include(url_lot)),
+    url(
+        r'^events/(?P<event_pk>[\d]+)/subscriptions/',
+        include(url_subscription)
+    ),
 ]

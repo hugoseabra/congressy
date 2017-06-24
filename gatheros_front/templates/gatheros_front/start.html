@@ -45,13 +45,16 @@
         <tr>
             <td width="12%" style="vertical-align: top">
                 {% if context_type == 'member' %}
-                    <div style="background-color: whitesmoke;border: 1px solid #dddddd;height: 150px">
+                    <div style="background-color: whitesmoke;border: 1px solid #dddddd">
                         <div style="padding: 10px;font-weight: bold">Como organizador</div>
                         <div style="padding:15px">
                             &rightarrow; <a href="{% url 'gatheros_event:organization-list' %}">Organizações</a>
                         </div>
                         <div style="padding:15px">
                             &rightarrow; <a href="{% url 'gatheros_event:event-list' %}">Eventos</a>
+                        </div>
+                        <div style="padding:15px">
+                            &rightarrow; <a href="#">Pessoas</a>
                         </div>
                     </div>
                 {% endif %}
