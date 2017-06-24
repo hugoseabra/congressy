@@ -5,6 +5,7 @@ dos participantes de eventos através de suas inscrições.
 """
 
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 
 from . import AbstractField, Form
 
@@ -36,14 +37,6 @@ class Field(AbstractField):
         default=False,
         verbose_name='campo fixo'
     )
-    active = models.BooleanField(
-        default=True,
-        verbose_name='ativo'
-    )
-    with_options = models.BooleanField(
-        default=False,
-        verbose_name='possui opções'
-    )
 
     objects = FieldManager()
 
@@ -57,10 +50,18 @@ class Field(AbstractField):
         if self._state.adding and not self.order:
             self.order = Field.objects.append_field(self)
 
-        # Verifica se o tipo de campo é aceito.
-        self._accepts_options()
-
         return super(Field, self).save(**kwargs)
+
+    def answer(self, subscription):
+        """ Recupera resposta de uma pergunta de acordo com inscrição. """
+
+        if self.form_default_field:
+            return getattr(subscription.person, self.name)
+
+        try:
+            return self.answers.get(subscription=subscription)
+        except ObjectDoesNotExist:
+            return None
 
     def __str__(self):
         required = ''
@@ -72,11 +73,3 @@ class Field(AbstractField):
             self.get_field_type_display(),
             self.form
         )
-
-    def _accepts_options(self):
-        """ Campos aceitos pelo formulário. """
-        self.with_options = self.field_type in [
-            self.FIELD_SELECT,
-            self.FIELD_CHECKBOX_GROUP,
-            self.FIELD_RADIO_GROUP,
-        ]

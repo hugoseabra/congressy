@@ -115,7 +115,7 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = 'Inscrição'
         verbose_name_plural = 'Inscrições'
-        ordering = ['person', 'event']
+        ordering = ['person', 'created', 'event']
         unique_together = (
             ("person", "event"),
             ("lot", "count"),
@@ -124,6 +124,19 @@ class Subscription(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.person.name, self.event.name)
+
+    @property
+    def form_data(self):
+        """ Resgata dados vinculados ao formulário de inscrição. """
+        form = self.event.form
+        answers = {}
+
+        for field in form.fields.all():
+            answer = field.answer(subscription=self)
+            if answer:
+                answers[field.name] = answer
+
+        return answers
 
     def save(self, *args, **kwargs):
         self.full_clean()

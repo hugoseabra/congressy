@@ -257,7 +257,7 @@
     "fields": {
       "subscription": "7fead9ea-fb4b-4e29-8f7c-c6145ba5b699",
       "field": 43,
-      "value": "{\"value\": [\"Java\",\"Javascript\",\"C\",\"PHP\",\"Python\"]}"
+      "value": "{\"value\": \"Java\"}"
     }
   },
   {

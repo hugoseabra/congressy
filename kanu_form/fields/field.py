@@ -54,6 +54,7 @@ class Field(object):
         self.placeholder = kwargs.get('placeholder', '')
         self.help_text = kwargs.get('help_text', '')
         self.max_length = kwargs.get('max_length', 255)
+        self.select_intro = kwargs.get('select_intro', False)
         self.attrs = kwargs.get('attrs', {})
         self.options = kwargs.get('options', [])
 
@@ -137,6 +138,10 @@ class Field(object):
                 help_text=self.help_text,
                 widget=self._get_widget(widgets.Select)
             )
+
+            if self.select_intro:
+                intro_option = [('', '- Selecione -',)]
+                self.options = intro_option + self.options
 
         if self.type == self.FIELD_RADIO_GROUP:
             field = fields.ChoiceField(

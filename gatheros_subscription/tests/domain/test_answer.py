@@ -7,18 +7,16 @@ from gatheros_subscription.models.rules import answer as rule
 class AnswerModelTest(GatherosTestCase):
     fixtures = [
         'kanu_locations_city_test',
-        '003_occupation',
-        '004_category',
         '005_user',
         '006_person',
         '007_organization',
         '009_place',
         '010_event',
-        '002_form',
-        '003_field',
-        '004_field_option',
-        '005_lot',
-        '006_subscription',
+        '003_form',
+        '004_field',
+        '005_field_option',
+        '006_lot',
+        '007_subscription',
     ]
 
     # noinspection PyMethodMayBeStatic

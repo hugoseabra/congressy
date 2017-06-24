@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from gatheros_subscription.models import DefaultField, Field, Form
+from gatheros_subscription.models import DefaultField, Field, FieldOption, Form
 
 
 @receiver(post_save, sender=Form)
@@ -15,10 +15,16 @@ def mange_form_fields(instance, raw, **_):
     if not default_fields:
         return
 
+    def create_options(field, default_options):
+        for option in default_options:
+            data = {'field': field}
+            data.update(**clean_dict(option))
+            FieldOption.objects.create(**data)
+
     def create_field(form, **kwargs):
         data = {'form': form, 'form_default_field': True}
         data.update(**kwargs)
-        Field.objects.create(**data)
+        return Field.objects.create(**data)
 
     def clean_dict(saved_field):
         field_dict = saved_field.__dict__
@@ -27,17 +33,14 @@ def mange_form_fields(instance, raw, **_):
 
         return field_dict
 
-    if instance.fields.count() > 0:
-        existing_field_names = []
-        for f in instance.fields.all().order_by('order'):
-            existing_field_names.append(f.name)
+    form_fields = instance.fields.all().order_by('order')
+    existing_fields = [f.name for f in form_fields]
 
-        for field in default_fields:
-            if field.name in existing_field_names:
-                continue
+    for default_field in default_fields:
+        if default_field.name in existing_fields:
+            continue
 
-            create_field(form=instance, **clean_dict(field))
-
-    else:
-        for field in default_fields:
-            create_field(form=instance, **clean_dict(field))
+        saved = create_field(form=instance, **clean_dict(default_field))
+        if default_field.with_options:
+            options = list(default_field.options.all())
+            create_options(saved, options)

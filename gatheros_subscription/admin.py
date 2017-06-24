@@ -2,19 +2,36 @@ from django.contrib import admin
 from django.db.models import Count, Q
 
 from gatheros_event.models import Event
-from .models import Answer, DefaultField, Field, FieldOption, Form, Lot, \
-    Subscription
+from .models import (
+    Answer,
+    DefaultField,
+    DefaultFieldOption,
+    Field,
+    FieldOption,
+    Form,
+    Lot,
+    Subscription,
+)
 
 
 @admin.register(DefaultField)
 class DefaultFieldAdmin(admin.ModelAdmin):
-    list_display = ('label', 'field_type', 'required', 'pk')
+    list_display = (
+        'label',
+        'field_type',
+        'order',
+        'required',
+        'with_options',
+        'pk'
+    )
+
     fields = [
         'name',
         'label',
         'field_type',
         'order',
         'required',
+        'select_intro',
         'instruction',
         'placeholder',
         'default_value',
@@ -22,8 +39,67 @@ class DefaultFieldAdmin(admin.ModelAdmin):
     ]
 
 
+class DefaultFieldWithOptionFilter(admin.SimpleListFilter):
+    title = 'Campo com opções'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'field__label'
+
+    def lookups(self, request, model_admin):
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+        fields = DefaultField.objects.filter(with_options=True)
+
+        return [(field.pk, field.label) for field in fields]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value:
+            queryset = queryset.filter(field__pk=self.value())
+
+        return queryset
+
+
+@admin.register(DefaultFieldOption)
+class DefaultFieldOptionAdmin(admin.ModelAdmin):
+    list_filter = (DefaultFieldWithOptionFilter,)
+    list_display = (
+        'name',
+        'value',
+        'get_field_label',
+        'pk'
+    )
+    ordering = ['field', 'name', 'value']
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "field":
+            kwargs["queryset"] = DefaultField.objects.filter(
+                with_options=True
+            ).all()
+
+        return super(DefaultFieldOptionAdmin, self).formfield_for_foreignkey(
+            db_field,
+            request,
+            **kwargs
+        )
+
+    def get_field_label(self, instance):
+        return '{} [ {} ]'.format(
+            instance.field.label,
+            instance.field.get_field_type_display()
+        )
+
+    get_field_label.__name__ = 'campo'
+
+
 @admin.register(Field)
 class FieldAdmin(admin.ModelAdmin):
+    search_fields = ('form__event__name',)
     list_display = (
         'form',
         'order',
@@ -42,6 +118,7 @@ class FieldAdmin(admin.ModelAdmin):
         'field_type',
         'order',
         'required',
+        'select_intro',
         'instruction',
         'placeholder',
         'default_value',
@@ -53,6 +130,13 @@ class FieldAdmin(admin.ModelAdmin):
 
 @admin.register(FieldOption)
 class FieldOptionAdmin(admin.ModelAdmin):
+    search_fields = (
+        'name',
+        'value',
+        'field__label',
+        'field__name',
+        'field__form__event__name',
+    )
     list_display = (
         'name',
         'value',
@@ -218,8 +302,13 @@ class FormAdmin(admin.ModelAdmin):
 
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ['get_event', 'get_subscription', 'get_field', 'get_value']
+    list_display = ['get_subscription', 'get_field', 'get_value']
     ordering = ['field__form', 'subscription__person', 'field__order']
+    list_filter = ('field__form__event',)
+    search_fields = (
+        'subscription__person__name',
+        'field__name',
+    )
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "subscription":
@@ -240,9 +329,6 @@ class AnswerAdmin(admin.ModelAdmin):
             **kwargs
         )
 
-    def get_event(self, instance):
-        return instance.field.form
-
     def get_subscription(self, instance):
         return instance.subscription.person
 
@@ -254,7 +340,6 @@ class AnswerAdmin(admin.ModelAdmin):
     def get_value(self, instance):
         return instance.get_display_value()
 
-    get_event.__name__ = 'event'
     get_subscription.__name__ = 'inscrição'
     get_field.__name__ = 'campo'
     get_value.__name__ = 'valor'

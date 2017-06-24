@@ -1,0 +1,20 @@
+[
+    {
+        "model": "gatheros_subscription.defaultfieldoption",
+        "pk": 1,
+        "fields": {
+            "field": 2,
+            "name": "M",
+            "value": "M"
+        }
+    },
+    {
+        "model": "gatheros_subscription.defaultfieldoption",
+        "pk": 2,
+        "fields": {
+            "field": 2,
+            "name": "F",
+            "value": "F"
+        }
+    }
+]

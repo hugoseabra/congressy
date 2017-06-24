@@ -6,12 +6,11 @@ from gatheros_subscription.models.rules import field_option as rule
 class TestModelFieldOption(GatherosTestCase):
     fixtures = [
         'kanu_locations_city_test',
-        '004_category',
         '007_organization',
         '009_place',
         '010_event',
-        '002_form',
-        '003_field',
+        '003_form',
+        '004_field',
     ]
 
     # noinspection PyMethodMayBeStatic

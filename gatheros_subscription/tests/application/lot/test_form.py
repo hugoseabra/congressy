@@ -9,7 +9,6 @@ from gatheros_subscription.forms import LotForm
 
 class LotFormTest(TestCase):
     fixtures = [
-        '004_category',
         '007_organization',
         '009_place',
         '010_event',

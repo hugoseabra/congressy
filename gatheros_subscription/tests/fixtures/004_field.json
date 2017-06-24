@@ -1,0 +1,984 @@
+[
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 1,
+    "fields": {
+      "name": "name",
+      "label": "Nome Completo",
+      "field_type": "input-text",
+      "order": 1,
+      "required": true,
+      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+      "placeholder": "Nome completo",
+      "default_value": "",
+      "form": 1,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 2,
+    "fields": {
+      "name": "email",
+      "label": "E-mail",
+      "field_type": "input-email",
+      "order": 3,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 1,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 3,
+    "fields": {
+      "name": "phone",
+      "label": "Celular",
+      "field_type": "input-phone",
+      "order": 4,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 1,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 4,
+    "fields": {
+      "name": "city",
+      "label": "Cidade",
+      "field_type": "input-text",
+      "order": 5,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 1,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 5,
+    "fields": {
+      "name": "name",
+      "label": "Nome Completo",
+      "field_type": "input-text",
+      "order": 1,
+      "required": true,
+      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+      "placeholder": "Nome completo",
+      "default_value": "",
+      "form": 2,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 6,
+    "fields": {
+      "name": "email",
+      "label": "E-mail",
+      "field_type": "input-email",
+      "order": 3,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 7,
+    "fields": {
+      "name": "phone",
+      "label": "Celular",
+      "field_type": "input-phone",
+      "order": 4,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 8,
+    "fields": {
+      "name": "city",
+      "label": "Cidade",
+      "field_type": "input-text",
+      "order": 5,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 9,
+    "fields": {
+      "name": "name",
+      "label": "Nome Completo",
+      "field_type": "input-text",
+      "order": 1,
+      "required": true,
+      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+      "placeholder": "Nome completo",
+      "default_value": "",
+      "form": 3,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 10,
+    "fields": {
+      "name": "email",
+      "label": "E-mail",
+      "field_type": "input-email",
+      "order": 3,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 3,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 11,
+    "fields": {
+      "name": "phone",
+      "label": "Celular",
+      "field_type": "input-phone",
+      "order": 4,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 3,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 12,
+    "fields": {
+      "name": "city",
+      "label": "Cidade",
+      "field_type": "input-text",
+      "order": 5,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 3,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 13,
+    "fields": {
+      "name": "name",
+      "label": "Nome Completo",
+      "field_type": "input-text",
+      "order": 1,
+      "required": true,
+      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+      "placeholder": "Nome completo",
+      "default_value": "",
+      "form": 4,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 14,
+    "fields": {
+      "name": "email",
+      "label": "E-mail",
+      "field_type": "input-email",
+      "order": 3,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 4,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 15,
+    "fields": {
+      "name": "phone",
+      "label": "Celular",
+      "field_type": "input-phone",
+      "order": 4,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 4,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 16,
+    "fields": {
+      "name": "city",
+      "label": "Cidade",
+      "field_type": "input-text",
+      "order": 5,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 4,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 17,
+    "fields": {
+      "name": "name",
+      "label": "Nome Completo",
+      "field_type": "input-text",
+      "order": 1,
+      "required": true,
+      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+      "placeholder": "Nome completo",
+      "default_value": "",
+      "form": 5,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 18,
+    "fields": {
+      "name": "email",
+      "label": "E-mail",
+      "field_type": "input-email",
+      "order": 3,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 5,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 19,
+    "fields": {
+      "name": "phone",
+      "label": "Celular",
+      "field_type": "input-phone",
+      "order": 4,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 5,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 20,
+    "fields": {
+      "name": "city",
+      "label": "Cidade",
+      "field_type": "input-text",
+      "order": 5,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 5,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 21,
+    "fields": {
+      "name": "name",
+      "label": "Nome Completo",
+      "field_type": "input-text",
+      "order": 1,
+      "required": true,
+      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+      "placeholder": "Nome completo",
+      "default_value": "",
+      "form": 6,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 22,
+    "fields": {
+      "name": "email",
+      "label": "E-mail",
+      "field_type": "input-email",
+      "order": 3,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 6,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 23,
+    "fields": {
+      "name": "phone",
+      "label": "Celular",
+      "field_type": "input-phone",
+      "order": 4,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 6,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 24,
+    "fields": {
+      "name": "city",
+      "label": "Cidade",
+      "field_type": "input-text",
+      "order": 5,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 6,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 25,
+    "fields": {
+      "name": "name",
+      "label": "Nome Completo",
+      "field_type": "input-text",
+      "order": 1,
+      "required": true,
+      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+      "placeholder": "Nome completo",
+      "default_value": "",
+      "form": 7,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 26,
+    "fields": {
+      "name": "email",
+      "label": "E-mail",
+      "field_type": "input-email",
+      "order": 3,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 7,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 27,
+    "fields": {
+      "name": "phone",
+      "label": "Celular",
+      "field_type": "input-phone",
+      "order": 4,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 7,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 28,
+    "fields": {
+      "name": "city",
+      "label": "Cidade",
+      "field_type": "input-text",
+      "order": 5,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 7,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 29,
+    "fields": {
+      "name": "name",
+      "label": "Nome Completo",
+      "field_type": "input-text",
+      "order": 1,
+      "required": true,
+      "instruction": "Nome completo, sem abrevia\u00e7\u00f5es",
+      "placeholder": "Nome completo",
+      "default_value": "",
+      "form": 8,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 30,
+    "fields": {
+      "name": "email",
+      "label": "E-mail",
+      "field_type": "input-email",
+      "order": 3,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 8,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 31,
+    "fields": {
+      "name": "phone",
+      "label": "Celular",
+      "field_type": "input-phone",
+      "order": 4,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 8,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 32,
+    "fields": {
+      "name": "city",
+      "label": "Cidade",
+      "field_type": "input-text",
+      "order": 5,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 8,
+      "form_default_field": true,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 33,
+    "fields": {
+      "name": "Possui horta em casa?",
+      "label": "Possui horta em casa?",
+      "field_type": "boolean",
+      "order": 6,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 1,
+      "form_default_field": false,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 34,
+    "fields": {
+      "name": "O que mais gosta de cultivar?",
+      "label": "O que mais gosta de cultivar?",
+      "field_type": "radio-group",
+      "order": 7,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 1,
+      "form_default_field": false,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 35,
+    "fields": {
+      "name": "O que gostaria de aprender?",
+      "label": "O que gostaria de aprender?",
+      "field_type": "checkbox-group",
+      "order": 8,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 1,
+      "form_default_field": false,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 36,
+    "fields": {
+      "name": "Tem conhecimento de l\u00f3gica de programa\u00e7\u00e3o?",
+      "label": "Tem conhecimento de l\u00f3gica de programa\u00e7\u00e3o?",
+      "field_type": "boolean",
+      "order": 6,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": false,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 37,
+    "fields": {
+      "name": "Se tem curso superior, qual?",
+      "label": "Se tem curso superior, qual?",
+      "field_type": "input-text",
+      "order": 7,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": false,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 38,
+    "fields": {
+      "name": "Data de in\u00edcio da horta",
+      "label": "Data de in\u00edcio da horta",
+      "field_type": "input-date",
+      "order": 9,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 1,
+      "form_default_field": false,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 39,
+    "fields": {
+      "name": "Qual o melhor hor\u00e1rio para fazer o curso?",
+      "label": "Qual o melhor hor\u00e1rio para fazer o curso?",
+      "field_type": "input-datetime-local",
+      "order": 10,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 1,
+      "form_default_field": false,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 40,
+    "fields": {
+      "name": "Possui e-mail profissional? Se sim, qual?",
+      "label": "Possui e-mail profissional? Se sim, qual?",
+      "field_type": "input-email",
+      "order": 8,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": false,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 41,
+    "fields": {
+      "name": "Possui outro telefone celular?",
+      "label": "Possui outro telefone celular?",
+      "field_type": "input-phone",
+      "order": 9,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": false,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 42,
+    "fields": {
+      "name": "O que pode contar da sua hist\u00f3ria?",
+      "label": "O que pode contar da sua hist\u00f3ria?",
+      "field_type": "textarea",
+      "order": 10,
+      "required": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": false,
+      "active": true,
+      "with_options": false
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 43,
+    "fields": {
+      "name": "Qual destas linguagens voc\u00ea mais ouve falar?",
+      "label": "Qual destas linguagens voc\u00ea mais ouve falar?",
+      "field_type": "select",
+      "order": 11,
+      "required": false,
+      "select_intro": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": false,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 44,
+    "fields": {
+      "name": "Quais destas linguagens voc\u00ea conhece?",
+      "label": "Quais destas linguagens voc\u00ea conhece?",
+      "field_type": "checkbox-group",
+      "order": 12,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": false,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 45,
+    "fields": {
+      "name": "O que gostaria de aprender no curso?",
+      "label": "O que gostaria de aprender no curso?",
+      "field_type": "radio-group",
+      "order": 13,
+      "required": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": false,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 46,
+    "fields": {
+      "name": "Escolaridade",
+      "label": "Escolaridade",
+      "field_type": "select",
+      "order": 6,
+      "required": true,
+      "select_intro": true,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 3,
+      "form_default_field": false,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 47,
+    "fields": {
+      "name": "gender",
+      "label": "Sexo",
+      "field_type": "select",
+      "order": 2,
+      "required": true,
+      "select_intro": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 1,
+      "form_default_field": true,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 48,
+    "fields": {
+      "name": "gender",
+      "label": "Sexo",
+      "field_type": "select",
+      "order": 2,
+      "required": true,
+      "select_intro": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 2,
+      "form_default_field": true,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 49,
+    "fields": {
+      "name": "gender",
+      "label": "Sexo",
+      "field_type": "select",
+      "order": 2,
+      "required": true,
+      "select_intro": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 3,
+      "form_default_field": true,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 50,
+    "fields": {
+      "name": "gender",
+      "label": "Sexo",
+      "field_type": "select",
+      "order": 2,
+      "required": true,
+      "select_intro": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 4,
+      "form_default_field": true,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 51,
+    "fields": {
+      "name": "gender",
+      "label": "Sexo",
+      "field_type": "select",
+      "order": 2,
+      "required": true,
+      "select_intro": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 5,
+      "form_default_field": true,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 52,
+    "fields": {
+      "name": "gender",
+      "label": "Sexo",
+      "field_type": "select",
+      "order": 2,
+      "required": true,
+      "select_intro": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 6,
+      "form_default_field": true,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 53,
+    "fields": {
+      "name": "gender",
+      "label": "Sexo",
+      "field_type": "select",
+      "order": 2,
+      "required": true,
+      "select_intro": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 7,
+      "form_default_field": true,
+      "active": true,
+      "with_options": true
+    }
+  },
+  {
+    "model": "gatheros_subscription.field",
+    "pk": 54,
+    "fields": {
+      "name": "gender",
+      "label": "Sexo",
+      "field_type": "select",
+      "order": 2,
+      "required": true,
+      "select_intro": false,
+      "instruction": "",
+      "placeholder": null,
+      "default_value": "",
+      "form": 8,
+      "form_default_field": true,
+      "active": true,
+      "with_options": true
+    }
+  }
+]

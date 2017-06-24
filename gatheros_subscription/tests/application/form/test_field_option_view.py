@@ -14,9 +14,9 @@ class FieldOptionViewTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
-        '002_form',
-        '003_field',
-        '004_field_option',
+        '003_form',
+        '004_field',
+        '005_field_option',
     ]
 
     def setUp(self):
@@ -68,9 +68,9 @@ class FieldOptionAddViewTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
-        '002_form',
-        '003_field',
-        '004_field_option',
+        '003_form',
+        '004_field',
+        '005_field_option',
     ]
 
     def setUp(self):
@@ -125,9 +125,9 @@ class FieldOptionEditViewTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
-        '002_form',
-        '003_field',
-        '004_field_option',
+        '003_form',
+        '004_field',
+        '005_field_option',
     ]
 
     def setUp(self):
@@ -187,9 +187,9 @@ class FieldOptionDeleteViewTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
-        '002_form',
-        '003_field',
-        '004_field_option',
+        '003_form',
+        '004_field',
+        '005_field_option',
     ]
 
     def setUp(self):

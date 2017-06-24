@@ -10,7 +10,6 @@ class FormModelTest(GatherosTestCase):
     fixtures = [
         'kanu_locations_city_test',
         '001_default_field',
-        '004_category',
         '007_organization',
         '009_place',
         '010_event'

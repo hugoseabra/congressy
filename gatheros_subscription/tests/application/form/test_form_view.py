@@ -14,9 +14,9 @@ class BaseEventFormTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
-        '002_form',
-        '003_field',
-        '004_field_option',
+        '003_form',
+        '004_field',
+        '005_field_option',
     ]
 
     def setUp(self):

@@ -32,7 +32,7 @@ class LotDeleteTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
-        '005_lot',
+        '006_lot',
     ]
 
     def setUp(self):

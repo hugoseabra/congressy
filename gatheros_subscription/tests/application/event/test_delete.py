@@ -8,15 +8,13 @@ class EventDeleteTest(TestCase):
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
-        '003_occupation',
-        '004_category',
         '006_person',
         '007_organization',
         '008_member',
         '009_place',
         '010_event',
-        '005_lot',
-        '006_subscription',
+        '006_lot',
+        '007_subscription',
     ]
 
     def setUp(self):

@@ -60,6 +60,14 @@ class AbstractField(models.Model, GatherosModelMixin):
         default=False,
         verbose_name='obrigatório'
     )
+
+    select_intro = models.BooleanField(
+        default=False,
+        verbose_name='Mostrar primeiro em branco',
+        help_text="Acrescenta `- Selecione -` na primeira opção da lista"
+                  " simples"
+    )
+
     instruction = models.TextField(
         verbose_name='instrução',
         null=True,
@@ -76,7 +84,25 @@ class AbstractField(models.Model, GatherosModelMixin):
         null=True,
         blank=True
     )
+
+    with_options = models.BooleanField(
+        default=False,
+        verbose_name='possui opções'
+    )
+
     active = models.BooleanField(default=True, verbose_name='ativo')
 
     class Meta:
         abstract = True
+
+    def save(self, **kwargs):
+        self._accepts_options()
+        return super(AbstractField, self).save(**kwargs)
+
+    def _accepts_options(self):
+        """ Campos aceitos pelo formulário. """
+        self.with_options = self.field_type in [
+            self.FIELD_SELECT,
+            self.FIELD_CHECKBOX_GROUP,
+            self.FIELD_RADIO_GROUP,
+        ]

@@ -14,6 +14,7 @@ from django.db import migrations, models
 from core.model import validator
 from gatheros_event.models.event import get_image_path
 from gatheros_event.models.info import get_image_path as get_info_image_path
+from gatheros_event.models.mixins import GatherosModelMixin
 
 
 def load_initial_data(*_):
@@ -177,8 +178,10 @@ class Migration(migrations.Migration):
                 'permissions': (
                     ('view_lots', 'Can view lots'),
                     ('can_add_lot', 'Can add lot'),
+                    ('can_manage_subscriptions', 'Can manage subscriptions'),
                 ),
             },
+            bases=(models.Model, GatherosModelMixin),
         ),
         migrations.CreateModel(
             name='Invitation',
@@ -213,6 +216,7 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'convites',
                 'ordering': ('-created', '-expired', 'author'),
             },
+            bases=(models.Model, GatherosModelMixin),
         ),
         migrations.CreateModel(
             name='Member',
@@ -245,6 +249,7 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'membros',
                 'ordering': ['person', 'organization'],
             },
+            bases=(models.Model, GatherosModelMixin),
         ),
         migrations.CreateModel(
             name='Occupation',
@@ -377,6 +382,7 @@ class Migration(migrations.Migration):
                     ("can_manage_places", "Can manage places"),
                 ),
             },
+            bases=(models.Model, GatherosModelMixin),
         ),
         migrations.CreateModel(
             name='Person',
@@ -546,6 +552,7 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'pessoas',
                 'ordering': ['name'],
             },
+            bases=(models.Model, GatherosModelMixin),
         ),
         migrations.CreateModel(
             name='Place',
@@ -640,6 +647,7 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'locais de Evento',
                 'ordering': ['name'],
             },
+            bases=(models.Model, GatherosModelMixin),
         ),
         migrations.CreateModel(
             name='Segment',
@@ -798,6 +806,7 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'Infomações de Eventos',
                 'ordering': ['event'],
             },
+            bases=(models.Model, GatherosModelMixin),
         ),
         migrations.AddField(
             model_name='member',
