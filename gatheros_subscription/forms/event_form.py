@@ -16,19 +16,17 @@ class EventConfigForm(KanuForm):
     def __init__(
             self,
             form,
-            field_manager=None,
             include_inactive=False,
             *args,
             **kwargs):
 
         self.form = form
-
-        if not field_manager:
-            self.field_manager = FieldManager()
-
         self.include_inactive = include_inactive
 
+        # Prepare fields to render
+        self.field_manager = FieldManager()
         self.configure_fields()
+
         super(EventConfigForm, self).__init__(
             self.field_manager,
             *args,
@@ -102,7 +100,6 @@ class EventFormFieldForm(forms.ModelForm):
         model = Field
         fields = [
             'field_type',
-            'name',
             'label',
             'placeholder',
             'required',

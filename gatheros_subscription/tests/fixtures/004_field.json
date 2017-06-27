@@ -579,7 +579,7 @@
     "model": "gatheros_subscription.field",
     "pk": 33,
     "fields": {
-      "name": "Possui horta em casa?",
+      "name": "possui-horta-em-casa",
       "label": "Possui horta em casa?",
       "field_type": "boolean",
       "order": 6,
@@ -597,7 +597,7 @@
     "model": "gatheros_subscription.field",
     "pk": 34,
     "fields": {
-      "name": "O que mais gosta de cultivar?",
+      "name": "o-que-mais-gosta-de-cultivar",
       "label": "O que mais gosta de cultivar?",
       "field_type": "radio-group",
       "order": 7,
@@ -615,7 +615,7 @@
     "model": "gatheros_subscription.field",
     "pk": 35,
     "fields": {
-      "name": "O que gostaria de aprender?",
+      "name": "o-que-mais-gosta-de-aprender",
       "label": "O que gostaria de aprender?",
       "field_type": "checkbox-group",
       "order": 8,
@@ -633,7 +633,7 @@
     "model": "gatheros_subscription.field",
     "pk": 36,
     "fields": {
-      "name": "Tem conhecimento de l\u00f3gica de programa\u00e7\u00e3o?",
+      "name": "tem-conhecimento-de-logica-de-programacao",
       "label": "Tem conhecimento de l\u00f3gica de programa\u00e7\u00e3o?",
       "field_type": "boolean",
       "order": 6,
@@ -651,7 +651,7 @@
     "model": "gatheros_subscription.field",
     "pk": 37,
     "fields": {
-      "name": "Se tem curso superior, qual?",
+      "name": "se-tem-curso-superior-qual",
       "label": "Se tem curso superior, qual?",
       "field_type": "input-text",
       "order": 7,
@@ -669,7 +669,7 @@
     "model": "gatheros_subscription.field",
     "pk": 38,
     "fields": {
-      "name": "Data de in\u00edcio da horta",
+      "name": "data-de-inicio-da-horta",
       "label": "Data de in\u00edcio da horta",
       "field_type": "input-date",
       "order": 9,
@@ -687,7 +687,7 @@
     "model": "gatheros_subscription.field",
     "pk": 39,
     "fields": {
-      "name": "Qual o melhor hor\u00e1rio para fazer o curso?",
+      "name": "qual-o-melhor-horario-para-fazer-o-curso",
       "label": "Qual o melhor hor\u00e1rio para fazer o curso?",
       "field_type": "input-datetime-local",
       "order": 10,
@@ -705,7 +705,7 @@
     "model": "gatheros_subscription.field",
     "pk": 40,
     "fields": {
-      "name": "Possui e-mail profissional? Se sim, qual?",
+      "name": "possui-e-mail-profissional-se-sim-qual",
       "label": "Possui e-mail profissional? Se sim, qual?",
       "field_type": "input-email",
       "order": 8,
@@ -723,7 +723,7 @@
     "model": "gatheros_subscription.field",
     "pk": 41,
     "fields": {
-      "name": "Possui outro telefone celular?",
+      "name": "possui-outro-telefone-celular",
       "label": "Possui outro telefone celular?",
       "field_type": "input-phone",
       "order": 9,
@@ -741,7 +741,7 @@
     "model": "gatheros_subscription.field",
     "pk": 42,
     "fields": {
-      "name": "O que pode contar da sua hist\u00f3ria?",
+      "name": "o-que-pode-contar-da-sua-historia",
       "label": "O que pode contar da sua hist\u00f3ria?",
       "field_type": "textarea",
       "order": 10,
@@ -759,7 +759,7 @@
     "model": "gatheros_subscription.field",
     "pk": 43,
     "fields": {
-      "name": "Qual destas linguagens voc\u00ea mais ouve falar?",
+      "name": "qual-destas-linguagens-voce-mais-ouve-falar",
       "label": "Qual destas linguagens voc\u00ea mais ouve falar?",
       "field_type": "select",
       "order": 11,
@@ -778,7 +778,7 @@
     "model": "gatheros_subscription.field",
     "pk": 44,
     "fields": {
-      "name": "Quais destas linguagens voc\u00ea conhece?",
+      "name": "quais-destas-linguagens-voce-conhece",
       "label": "Quais destas linguagens voc\u00ea conhece?",
       "field_type": "checkbox-group",
       "order": 12,
@@ -796,7 +796,7 @@
     "model": "gatheros_subscription.field",
     "pk": 45,
     "fields": {
-      "name": "O que gostaria de aprender no curso?",
+      "name": "o-que-gostaria-de-aprender-no-curso",
       "label": "O que gostaria de aprender no curso?",
       "field_type": "radio-group",
       "order": 13,
@@ -814,7 +814,7 @@
     "model": "gatheros_subscription.field",
     "pk": 46,
     "fields": {
-      "name": "Escolaridade",
+      "name": "escolaridade",
       "label": "Escolaridade",
       "field_type": "select",
       "order": 6,

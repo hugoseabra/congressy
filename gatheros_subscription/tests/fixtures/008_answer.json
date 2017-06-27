@@ -5,7 +5,7 @@
     "fields": {
       "subscription": "953ddca3-e8a7-4107-8da3-2d7ef48882f0",
       "field": 33,
-      "value": "{\"value\": \"Sim\"}"
+      "value": "{\"output\": \"Sim\", \"value\": true}"
     }
   },
   {
@@ -14,7 +14,7 @@
     "fields": {
       "subscription": "953ddca3-e8a7-4107-8da3-2d7ef48882f0",
       "field": 34,
-      "value": "{\"value\": \"Frutas\"}"
+      "value": "{\"output\": \"Frutas\", \"value\": \"frutas\"}"
     }
   },
   {
@@ -23,7 +23,7 @@
     "fields": {
       "subscription": "953ddca3-e8a7-4107-8da3-2d7ef48882f0",
       "field": 35,
-      "value": "{\"value\": [\"Insumos\",\"Equipamentos\",\"Irriga\u00e7\u00e3o\"]}"
+      "value": "{\"output\": [\"Insumos\",\"Equipamentos\",\"Irriga\u00e7\u00e3o\"], \"value\": [\"insumos\",\"equipamentos\",\"irrigacao\"]}"
     }
   },
   {
@@ -32,7 +32,7 @@
     "fields": {
       "subscription": "953ddca3-e8a7-4107-8da3-2d7ef48882f0",
       "field": 38,
-      "value": "{\"value\": \"2017-02-01\"}"
+      "value": "{\"output\": \"01/02/2017\", \"value\": \"2017-02-01\"}"
     }
   },
   {
@@ -41,7 +41,7 @@
     "fields": {
       "subscription": "953ddca3-e8a7-4107-8da3-2d7ef48882f0",
       "field": 39,
-      "value": "{\"value\": \"2017-06-25T08:00:00 \"}"
+      "value": "{\"output\": \"25/06/2017 08:00\", \"value\": \"2017-06-25T08:00:00\"}"
     }
   },
   {
@@ -50,7 +50,7 @@
     "fields": {
       "subscription": "436fcf1e-3a58-455c-9d0f-d0632b690a77",
       "field": 33,
-      "value": "{\"value\": \"N\u00e3o\"}"
+      "value": "{\"output\": \"N\u00e3o\", \"value\": false}"
     }
   },
   {
@@ -59,7 +59,7 @@
     "fields": {
       "subscription": "436fcf1e-3a58-455c-9d0f-d0632b690a77",
       "field": 34,
-      "value": "{\"value\": \"Tomate\"}"
+      "value": "{\"output\": \"Tomate\", \"value\": \"tomate\"}"
     }
   },
   {
@@ -68,7 +68,7 @@
     "fields": {
       "subscription": "436fcf1e-3a58-455c-9d0f-d0632b690a77",
       "field": 35,
-      "value": "{\"value\": [\"Insumos\",\"Ferramentas\"]}"
+      "value": "{\"output\": [\"Insumos\",\"Ferramentas\"], \"value\": [\"insumos\",\"ferramentas\"]}"
     }
   },
   {
@@ -77,7 +77,7 @@
     "fields": {
       "subscription": "436fcf1e-3a58-455c-9d0f-d0632b690a77",
       "field": 39,
-      "value": "{\"value\": \"2017-08-02T14:00:00 \"}"
+      "value": "{\"output\": \"02/08/2017 14:00\", \"value\": \"2017-08-02T14:00:00\"}"
     }
   },
   {
@@ -86,7 +86,7 @@
     "fields": {
       "subscription": "04c188f9-7547-461f-ac88-83db23987ba8",
       "field": 33,
-      "value": "{\"value\": \"Sim\"}"
+      "value": "{\"output\": \"Sim\", \"value\": true}"
     }
   },
   {
@@ -95,7 +95,7 @@
     "fields": {
       "subscription": "04c188f9-7547-461f-ac88-83db23987ba8",
       "field": 34,
-      "value": "{\"value\": \"Arroz\"}"
+      "value": "{\"output\": \"Arroz\", \"value\": \"arroz\"}"
     }
   },
   {
@@ -104,7 +104,7 @@
     "fields": {
       "subscription": "04c188f9-7547-461f-ac88-83db23987ba8",
       "field": 35,
-      "value": "{\"value\": [\"Insumos\"]}"
+      "value": "{\"output\": [\"Insumos\"], \"value\": [\"insumos\"]}"
     }
   },
   {
@@ -113,7 +113,7 @@
     "fields": {
       "subscription": "04c188f9-7547-461f-ac88-83db23987ba8",
       "field": 38,
-      "value": "{\"value\": \"2016-08-01\"}"
+      "value": "{\"output\": \"01/08/2017\", \"value\": \"2016-08-01\"}"
     }
   },
   {
@@ -122,7 +122,7 @@
     "fields": {
       "subscription": "04c188f9-7547-461f-ac88-83db23987ba8",
       "field": 39,
-      "value": "{\"value\": \"2017-06-10T18:00:00 \"}"
+      "value": "{\"output\": \"10/09/2017 18:00\", \"value\": \"2017-06-10T18:00:00\"}"
     }
   },
   {
@@ -131,7 +131,7 @@
     "fields": {
       "subscription": "ed6f3d53-5070-4362-95ab-dd863d1587bf",
       "field": 33,
-      "value": "{\"value\": \"Sim\"}"
+      "value": "{\"output\": \"Sim\", \"value\": true}"
     }
   },
   {
@@ -140,7 +140,7 @@
     "fields": {
       "subscription": "ed6f3d53-5070-4362-95ab-dd863d1587bf",
       "field": 34,
-      "value": "{\"value\": \"Alface\"}"
+      "value": "{\"output\": \"Alface\", \"value\": \"alface\"}"
     }
   },
   {
@@ -149,7 +149,7 @@
     "fields": {
       "subscription": "ed6f3d53-5070-4362-95ab-dd863d1587bf",
       "field": 35,
-      "value": "{\"value\": [\"Insumos\",\"Adubo\",\"Solo\"]}"
+      "value": "{\"output\": [\"Insumos\",\"Adubo\",\"Solo\"], \"value\": [\"insumos\",\"adubo\",\"solo\"]}"
     }
   },
   {
@@ -158,7 +158,7 @@
     "fields": {
       "subscription": "ed6f3d53-5070-4362-95ab-dd863d1587bf",
       "field": 38,
-      "value": "{\"value\": \"2016-09-20\"}"
+      "value": "{\"output\": \"20/09/2016\", \"value\": \"2016-09-20\"}"
     }
   },
   {
@@ -167,7 +167,7 @@
     "fields": {
       "subscription": "ed6f3d53-5070-4362-95ab-dd863d1587bf",
       "field": 39,
-      "value": "{\"value\": \"2017-06-10T14:00:00 \"}"
+      "value": "{\"output\": \"10/06/2016 14:00\", \"value\": \"2017-06-10T14:00:00\"}"
     }
   },
   {
@@ -176,7 +176,7 @@
     "fields": {
       "subscription": "bb233b5a-2edc-4f1b-bce4-13ea85830887",
       "field": 46,
-      "value": "{\"value\": \"Ensino Superior\"}"
+      "value": "{\"output\": \"Ensino Superior\", \"value\": \"ensino-superior\"}"
     }
   },
   {
@@ -185,7 +185,7 @@
     "fields": {
       "subscription": "953ca975-ce70-4677-8865-639e3a8d7b3d",
       "field": 46,
-      "value": "{\"value\": \"Ensino M\u00e9dio\"}"
+      "value": "{\"output\": \"Ensino M\u00e9dio\", \"value\": \"ensino-medio\"}"
     }
   },
   {
@@ -194,7 +194,7 @@
     "fields": {
       "subscription": "f5a9eecf-21b2-4b8f-a624-0a92bca5f3c3",
       "field": 46,
-      "value": "{\"value\": \"Mestrado\"}"
+      "value": "{\"output\": \"Mestrado\", \"value\": \"mestrado\"}"
     }
   },
   {
@@ -203,7 +203,7 @@
     "fields": {
       "subscription": "47ce11bd-145c-4139-9b14-dbb29b6c64a9",
       "field": 46,
-      "value": "{\"value\":\"Doutorado\"}"
+      "value": "{\"output\":\"Doutorado\", \"value\":\"doutorado\"}"
     }
   },
   {
@@ -212,7 +212,7 @@
     "fields": {
       "subscription": "7fead9ea-fb4b-4e29-8f7c-c6145ba5b699",
       "field": 36,
-      "value": "{\"value\": \"Sim\"}"
+      "value": "{\"output\": \"Sim\", \"value\": true}"
     }
   },
   {
@@ -239,7 +239,7 @@
     "fields": {
       "subscription": "7fead9ea-fb4b-4e29-8f7c-c6145ba5b699",
       "field": 41,
-      "value": "{\"value\": \"62998558545\"}"
+      "value": "{\"output\": \"(62) 9 9855-8545\", \"value\": \"62998558545\"}"
     }
   },
   {
@@ -257,7 +257,7 @@
     "fields": {
       "subscription": "7fead9ea-fb4b-4e29-8f7c-c6145ba5b699",
       "field": 43,
-      "value": "{\"value\": \"Java\"}"
+      "value": "{\"output\": \"Java\", \"value\": \"java\"}"
     }
   },
   {
@@ -266,7 +266,7 @@
     "fields": {
       "subscription": "0b9c07c0-7f7b-4a81-95c1-64c8a264e420",
       "field": 36,
-      "value": "{\"value\": \"N\u00e3o\"}"
+      "value": "{\"output\": \"N\u00e3o\", \"value\": false}"
     }
   },
   {
@@ -293,7 +293,7 @@
     "fields": {
       "subscription": "0b9c07c0-7f7b-4a81-95c1-64c8a264e420",
       "field": 43,
-      "value": "{\"value\": \"C\"}"
+      "value": "{\"output\": \"C\", \"value\": \"c\"}"
     }
   },
   {
@@ -302,7 +302,7 @@
     "fields": {
       "subscription": "0b9c07c0-7f7b-4a81-95c1-64c8a264e420",
       "field": 45,
-      "value": "{\"value\": \"L\u00f3gica\"}"
+      "value": "{\"output\": \"L\u00f3gica\", \"value\": \"logica\"}"
     }
   },
   {
@@ -311,7 +311,7 @@
     "fields": {
       "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
       "field": 36,
-      "value": "{\"value\": \"Sim\"}"
+      "value": "{\"output\": \"Sim\", \"value\": true}"
     }
   },
   {
@@ -329,7 +329,7 @@
     "fields": {
       "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
       "field": 45,
-      "value": "{\"value\": \"Python\"}"
+      "value": "{\"output\": \"Python\", \"value\": \"python\"}"
     }
   },
   {
@@ -338,7 +338,7 @@
     "fields": {
       "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
       "field": 44,
-      "value": "{\"value\": [\"PHP\", \"Python\", \"Javascript\"]}"
+      "value": "{\"output\": [\"PHP\", \"Python\", \"Javascript\"], \"value\": [\"php\", \"python\", \"javascript\"]}"
     }
   },
   {
@@ -347,7 +347,7 @@
     "fields": {
       "subscription": "376ddf8a-22fb-4ef5-b5ef-acb0ae6ce07c",
       "field": 43,
-      "value": "{\"value\": \"PHP\"}"
+      "value": "{\"output\": \"PHP\", \"value\": \"php\"}"
     }
   },
   {
@@ -374,7 +374,7 @@
     "fields": {
       "subscription": "ed372352-d869-4c3b-a878-208894500bad",
       "field": 36,
-      "value": "{\"value\": \"Sim\"}"
+      "value": "{\"output\": \"Sim\", \"value\": true}"
     }
   },
   {
@@ -392,7 +392,7 @@
     "fields": {
       "subscription": "ed372352-d869-4c3b-a878-208894500bad",
       "field": 45,
-      "value": "{\"value\": \"L\u00f3gica\"}"
+      "value": "{\"output\": \"L\u00f3gica\", \"value\": \"logica\"}"
     }
   },
   {
@@ -401,7 +401,7 @@
     "fields": {
       "subscription": "ed372352-d869-4c3b-a878-208894500bad",
       "field": 44,
-      "value": "{\"value\": [\"PHP\", \"Javascript\", \"Ruby\"]}"
+      "value": "{\"ou\": [\"PHP\", \"Javascript\", \"Ruby\"], \"value\": [\"php\", \"javascript\", \"ruby\"]}"
     }
   },
   {

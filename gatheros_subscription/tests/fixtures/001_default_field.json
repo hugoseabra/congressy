@@ -20,6 +20,7 @@
       "name": "gender",
       "label": "Sexo",
       "field_type": "select",
+      "with_options": true,
       "order": 2,
       "required": false,
       "select_intro": false,
