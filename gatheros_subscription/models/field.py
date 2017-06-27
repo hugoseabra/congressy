@@ -4,9 +4,10 @@ Campo de formulário, responsável pela versatilidade de buscar informações
 dos participantes de eventos através de suas inscrições.
 """
 
-from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 
+from core.util import model_field_slugify
 from . import AbstractField, Form
 
 
@@ -44,11 +45,24 @@ class Field(AbstractField):
         verbose_name = 'Campo de Formulário'
         verbose_name_plural = 'Campos de Formulário'
         ordering = ['form__id', 'order', 'name']
-        unique_together = (('form', 'name'), ('form', 'label'),)
+        unique_together = (('form', 'name'),)
 
     def save(self, **kwargs):
         if self._state.adding and not self.order:
             self.order = Field.objects.append_field(self)
+
+        if self.form_default_field:
+            to_slug = self.label if not self.name else self.name
+        else:
+            to_slug = self.label
+
+        self.name = model_field_slugify(
+            model_class=self.__class__,
+            instance=self,
+            string=to_slug,
+            filter_keys={'form': self.form},
+            slug_field='name'
+        )
 
         return super(Field, self).save(**kwargs)
 

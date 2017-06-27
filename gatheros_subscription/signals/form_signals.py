@@ -1,4 +1,5 @@
 from django.db.models.signals import post_save
+from django.forms import model_to_dict
 from django.dispatch import receiver
 
 from gatheros_subscription.models import DefaultField, Field, FieldOption, Form
@@ -27,9 +28,10 @@ def mange_form_fields(instance, raw, **_):
         return Field.objects.create(**data)
 
     def clean_dict(saved_field):
-        field_dict = saved_field.__dict__
-        del field_dict['id']
-        del field_dict['_state']
+        field_dict = model_to_dict(saved_field, exclude=(
+            'id',
+            '_state',
+        ))
 
         return field_dict
 

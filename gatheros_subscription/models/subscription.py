@@ -75,7 +75,7 @@ class Subscription(models.Model):
     origin = models.CharField(
         max_length=15,
         choices=DEVICE_ORIGINS,
-        default='web',
+        default=DEVICE_ORIGIN_WEB,
         verbose_name='origem'
     )
     created_by = models.PositiveIntegerField(verbose_name='criado por')

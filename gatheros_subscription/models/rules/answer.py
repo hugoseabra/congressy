@@ -53,10 +53,17 @@ def rule_3_resposta_com_tipo_correto(answer):
         field.FIELD_INPUT_DATETIME,
         field.FIELD_RADIO_GROUP,
         field.FIELD_SELECT,
-        field.FIELD_BOOLEAN,
         field.FIELD_TEXTAREA,
     ] and not isinstance(value, str):
         raise ValidationError({'value': [
             'Tipo de valor incorreto: O campo \'{}\' exige um registro de'
             ' valor do tipo \'string\''.format(field.label)
+        ]})
+
+    if field.field_type in [
+        field.FIELD_BOOLEAN,
+    ] and not isinstance(value, bool):
+        raise ValidationError({'value': [
+            'Tipo de valor incorreto: O campo \'{}\' exige um registro de'
+            ' valor do tipo \'boolean\''.format(field.label)
         ]})

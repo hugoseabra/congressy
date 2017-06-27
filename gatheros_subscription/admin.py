@@ -26,8 +26,8 @@ class DefaultFieldAdmin(admin.ModelAdmin):
     )
 
     fields = [
-        'name',
         'label',
+        'name',
         'field_type',
         'order',
         'required',
@@ -70,7 +70,6 @@ class DefaultFieldOptionAdmin(admin.ModelAdmin):
     list_filter = (DefaultFieldWithOptionFilter,)
     list_display = (
         'name',
-        'value',
         'get_field_label',
         'pk'
     )
@@ -104,17 +103,17 @@ class FieldAdmin(admin.ModelAdmin):
         'form',
         'order',
         'label',
+        'name',
         'field_type',
         'required',
         'form_default_field',
         'with_options',
         'pk'
     )
-    readonly_fields = ['form_default_field', 'with_options']
     fields = [
         'form',
-        'name',
         'label',
+        'name',
         'field_type',
         'order',
         'required',
@@ -126,13 +125,13 @@ class FieldAdmin(admin.ModelAdmin):
         'with_options',
         'form_default_field',
     ]
+    readonly_fields = ['name', 'form_default_field', 'with_options']
 
 
 @admin.register(FieldOption)
 class FieldOptionAdmin(admin.ModelAdmin):
     search_fields = (
         'name',
-        'value',
         'field__label',
         'field__name',
         'field__form__event__name',

@@ -4,6 +4,7 @@ Classe abstrata para Campo de formulário
 """
 
 from django.db import models
+
 from gatheros_event.models.mixins import GatherosModelMixin
 
 
@@ -38,7 +39,8 @@ class AbstractField(models.Model, GatherosModelMixin):
 
     name = models.CharField(
         max_length=255,
-        verbose_name='nome'
+        verbose_name='nome',
+        blank=True
     )
     label = models.CharField(
         max_length=255,

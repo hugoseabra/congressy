@@ -6,6 +6,7 @@ para um campo.
 
 from django.db import models
 
+from core.util import model_field_slugify
 from . import AbstractDefaultFieldOption, Field
 from .rules import field_option as rule
 
@@ -28,6 +29,22 @@ class FieldOption(AbstractDefaultFieldOption):
         unique_together = (('field', 'value'),)
 
     def save(self, *args, **kwargs):
+
+        to_slug = None
+        if self.field.form_default_field and not self.value:
+            to_slug = self.name
+        elif not self.field.form_default_field:
+            to_slug = self.value
+
+        if to_slug:
+            self.value = model_field_slugify(
+                model_class=self.__class__,
+                instance=self,
+                string=to_slug,
+                filter_keys={'field': self.field},
+                slug_field='value'
+            )
+
         self.check_rules()
         super(FieldOption, self).save(*args, **kwargs)
 

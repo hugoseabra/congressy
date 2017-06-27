@@ -6,6 +6,7 @@ Resposta de campos adicionais de formulário de evento.
 import json
 
 from django.db import models
+from django.utils import six
 
 from gatheros_subscription.models.rules import answer as rule
 from . import Field, Subscription
@@ -46,7 +47,7 @@ class Answer(models.Model):
         unique_together = (('subscription', 'field'),)
 
     def __str__(self):
-        return '{} - {}'.format(self.field, self.value)
+        return str(self.field)
 
     def get_display_value(self):
         """ Display para valor do campo. """
@@ -54,20 +55,34 @@ class Answer(models.Model):
         if not self.value:
             return None
 
-        data = json.loads(self.value)
+        try:
+            data = json.loads(self.value)
+        except TypeError:
+            return None
 
-        result = ''
-        if 'display' in data:
-            result += data.get('display') + ': '
+        if 'output' in data:
+            output = data['output']
 
-        value = self.get_value()
-
-        if isinstance(value, list):
-            result += ', '.join(value)
+        elif 'value' in data:
+            output = data['value']
         else:
-            result += str(value)
+            return None
 
-        return result
+        if isinstance(output, list):
+            output = ', '.join(output)
+
+        elif isinstance(output, dict):
+            formatted = []
+            for key, value in six.iteritems(output):
+                dict_value = str(key) + ': ' + str(value)
+                formatted.append(dict_value)
+
+            output = ', '.join(formatted)
+
+        else:
+            output = str(output)
+
+        return output
 
     def get_value(self):
         """ Recupera valor de campo. """
@@ -75,7 +90,11 @@ class Answer(models.Model):
         if not self.value:
             return None
 
-        data = json.loads(self.value)
+        try:
+            data = json.loads(self.value)
+        except TypeError:
+            return None
+
         if 'value' in data:
             return data.get('value')
 

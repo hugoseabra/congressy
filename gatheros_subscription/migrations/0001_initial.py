@@ -50,6 +50,7 @@ class Migration(migrations.Migration):
                     verbose_name='ID'
                 )),
                 ('name', models.CharField(
+                    blank=True,
                     max_length=255,
                     verbose_name='nome'
                 )),
@@ -165,6 +166,7 @@ class Migration(migrations.Migration):
                     verbose_name='ID'
                 )),
                 ('name', models.CharField(
+                    blank=True,
                     max_length=255,
                     verbose_name='nome'
                 )),
@@ -521,7 +523,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='field',
-            unique_together=[('form', 'label'), ('form', 'name')],
+            unique_together=[('form', 'name')],
         ),
         migrations.AlterUniqueTogether(
             name='defaultfieldoption',
