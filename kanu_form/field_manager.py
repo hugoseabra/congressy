@@ -1,12 +1,13 @@
-from kanu_form.fields.field import Field
-
 from collections import OrderedDict
+
+from kanu_form.fields.field import Field
 
 
 class FieldManager(object):
     def __init__(self):
         super(FieldManager, self).__init__()
         self.fields = OrderedDict()
+        self.kanu_fields = OrderedDict()
 
     def create(self, name, field_type, initial=None, required=True,
                label=None, **kwargs):
@@ -18,4 +19,15 @@ class FieldManager(object):
             **kwargs
         )
         self.fields.update({name: field.get_django_field()})
+        self.kanu_fields.update({name: field})
+
         return field
+
+    def validate(self, key, value):
+        kanu_field = self.kanu_fields.get(key)
+        if not kanu_field:
+            raise Exception(
+                'Não existe o campo `{}` no formulário.'.format(key)
+            )
+
+        return kanu_field.validate(value)

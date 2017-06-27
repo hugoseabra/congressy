@@ -1,11 +1,11 @@
 from django.core.exceptions import FieldError
-from django.forms import fields
-from django.forms import widgets
+from django.forms import fields, widgets
 
 from .widgets import DateInput, DateTimeInput, EmailInput, TelInput
 
 
 class Field(object):
+    django_field = None
     placeholder = None
     help_text = None
     value = None
@@ -59,84 +59,81 @@ class Field(object):
         self.options = kwargs.get('options', [])
 
     def get_django_field(self):
-        field = None
+        """ Recupera campo do Django Forms correto de acordo com o tipo. """
 
         if self.type == self.FIELD_INPUT_TEXT:
-            field = fields.CharField(
+            self.django_field = fields.CharField(
                 max_length=self.max_length,
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(fields.TextInput)
+                widget=self._get_widget()
             )
 
         if self.type == self.FIELD_INPUT_NUMBER:
-            field = fields.CharField(
+            self.django_field = fields.CharField(
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(fields.NumberInput)
+                widget=self._get_widget()
             )
 
         if self.type == self.FIELD_INPUT_DATE:
-            field = fields.DateField(
+            self.django_field = fields.DateField(
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(DateInput, format='%d/%m/%Y')
+                widget=self._get_widget()
             )
 
         if self.type == self.FIELD_INPUT_DATETIME:
-            field = fields.CharField(
+            self.django_field = fields.CharField(
                 max_length=18,
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(
-                    DateTimeInput,
-                    format='%d/%m/%Y %H:%M:%S'
-                )
+                widget=self._get_widget()
             )
 
         if self.type == self.FIELD_INPUT_EMAIL:
-            field = fields.EmailField(
+            self.django_field = fields.EmailField(
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(EmailInput)
+                widget=self._get_widget()
             )
 
         if self.type == self.FIELD_INPUT_PHONE:
-            field = fields.CharField(
+            self.django_field = fields.CharField(
                 max_length=18,
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(TelInput)
+                widget=self._get_widget()
             )
 
         if self.type == self.FIELD_BOOLEAN:
-            field = fields.BooleanField(
+            self.django_field = fields.BooleanField(
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(fields.CheckboxInput)
+                widget=self._get_widget()
             )
 
         if self.type == self.FIELD_SELECT:
-            field = fields.ChoiceField(
+            self.django_field = fields.ChoiceField(
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(widgets.Select)
+                widget=self._get_widget()
             )
 
             if self.select_intro:
@@ -144,43 +141,90 @@ class Field(object):
                 self.options = intro_option + self.options
 
         if self.type == self.FIELD_RADIO_GROUP:
-            field = fields.ChoiceField(
+            self.django_field = fields.ChoiceField(
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(widgets.RadioSelect)
+                widget=self._get_widget()
             )
 
         if self.type == self.FIELD_CHECKBOX_GROUP:
-            field = fields.MultipleChoiceField(
+            self.django_field = fields.MultipleChoiceField(
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(widgets.CheckboxSelectMultiple)
+                widget=self._get_widget()
             )
 
         if self.type == self.FIELD_TEXTAREA:
-            field = fields.ChoiceField(
+            self.django_field = fields.CharField(
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget(widgets.Textarea)
+                widget=self._get_widget()
             )
 
-        if not field:
+        if not self.django_field:
             raise FieldError('`{}` não encontrado: '.format(self.type))
 
         if self.options:
-            field.choices = self.options
+            self.django_field.choices = self.options
 
-        field.test = 1
+        return self.django_field
 
-        return field
+    def _get_widget(self):
+        """ Recupera o Widget correto de acordo com o tipo de campo. """
 
-    def _get_widget(self, widget_class, **kwargs):
+        widget = None
+
+        if self.type == self.FIELD_INPUT_TEXT:
+            widget = self._configure_widget(widgets.TextInput)
+
+        if self.type == self.FIELD_INPUT_NUMBER:
+            widget = self._configure_widget(widgets.NumberInput)
+
+        if self.type == self.FIELD_INPUT_DATE:
+            widget = self._configure_widget(DateInput, format='%d/%m/%Y')
+
+        if self.type == self.FIELD_INPUT_DATETIME:
+            widget = self._configure_widget(
+                DateTimeInput,
+                format='%d/%m/%Y %H:%M:%S'
+            )
+
+        if self.type == self.FIELD_INPUT_EMAIL:
+            widget = self._configure_widget(EmailInput)
+
+        if self.type == self.FIELD_INPUT_PHONE:
+            widget = self._configure_widget(TelInput)
+
+        if self.type == self.FIELD_BOOLEAN:
+            widget = self._configure_widget(widgets.CheckboxInput)
+
+        if self.type == self.FIELD_SELECT:
+            widget = self._configure_widget(widgets.Select)
+
+            if self.select_intro:
+                intro_option = [('', '- Selecione -',)]
+                self.options = intro_option + self.options
+
+        if self.type == self.FIELD_RADIO_GROUP:
+            widget = self._configure_widget(widgets.RadioSelect)
+
+        if self.type == self.FIELD_CHECKBOX_GROUP:
+            widget = self._configure_widget(widgets.CheckboxSelectMultiple)
+
+        if self.type == self.FIELD_TEXTAREA:
+            widget = self._configure_widget(widgets.Textarea)
+
+        return widget
+
+    def _configure_widget(self, widget_class, **kwargs):
+        """ Configura widget inserindo parâmetros necessários. """
+
         if self.required:
             self.attrs.update({
                 'required': self.required

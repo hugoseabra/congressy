@@ -14,6 +14,6 @@ class KanuForm(forms.Form):
 
     def _add_fields(self):
         self.fields.keyOrder = []
-        for name, field in six.iteritems(self.field_manager.fields):
-            self.fields[name] = field
+        for name, django_field in six.iteritems(self.field_manager.fields):
+            self.fields[name] = django_field
             self.fields.keyOrder.append(name)
