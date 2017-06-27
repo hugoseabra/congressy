@@ -21,7 +21,10 @@ class AnswerModelTest(GatherosTestCase):
 
     # noinspection PyMethodMayBeStatic
     def _get_field(self):
-        return Field.objects.filter(form_default_field=False).first()
+        return Field.objects.filter(
+            form_default_field=False,
+            field_type=Field.FIELD_INPUT_TEXT
+        ).first()
 
     # noinspection PyMethodMayBeStatic
     def _get_subscription(self, event):
@@ -37,20 +40,26 @@ class AnswerModelTest(GatherosTestCase):
         data = {
             'field': field,
             'subscription': subscription,
-            'value': '{"display": "Teste", "value": "test"}'
+            'value': '{"output": "Teste", "value": "test"}'
         }
         return self._create_model(model_class=Answer, data=data, **kwargs)
 
     def test_rule_1_campo_inscricao_formulario_mesmo_evento(self):
         rule_callback = rule.rule_1_campo_inscricao_formulario_mesmo_evento
 
-        event1 = Event.objects.get(pk=1)
-        field = event1.form.fields.filter(form_default_field=False).first()
+        event1 = Event.objects.get(slug='django-muito-alem-do-python')
+        field = event1.form.fields.filter(
+            form_default_field=False,
+            field_type=Field.FIELD_SELECT,
+        ).first()
 
-        event2 = Event.objects.get(pk=2)
+        event2 = Event.objects.get(slug='arte-e-agricultura-urbana')
         subscription = Subscription.objects.filter(event=event2).first()
 
-        answer = self._create_answer(field=field, subscription=subscription)
+        answer = self._create_answer(
+            field=field,
+            subscription=subscription,
+        )
 
         """ RULE """
         self._trigger_validation_error(

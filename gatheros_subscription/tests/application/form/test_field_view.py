@@ -6,7 +6,7 @@ from gatheros_event.models import Event
 from gatheros_subscription.models import Field
 
 
-class BaseEventFormTest(TestCase):
+class BaseEventFieldTest(TestCase):
     fixtures = [
         '005_user',
         '006_person',
@@ -65,11 +65,11 @@ class BaseEventFormTest(TestCase):
         )
 
 
-class EventConfigFormViewTest(BaseEventFormTest):
+class EventConfigFieldViewTest(BaseEventFieldTest):
     pass
 
 
-class EventFormFieldAddViewTest(BaseEventFormTest):
+class EventFormFieldAddViewTest(BaseEventFieldTest):
     def _get_url(self, event=None):
         if not event:
             event = self.event
@@ -93,7 +93,7 @@ class EventFormFieldAddViewTest(BaseEventFormTest):
         self.assertContains(response, 'Campo criado com sucesso')
 
 
-class EventFormFieldEditViewTest(BaseEventFormTest):
+class EventFormFieldEditViewTest(BaseEventFieldTest):
     def _get_url(self, event=None, field=None):
         if not event:
             event = self.event
@@ -133,7 +133,6 @@ class EventFormFieldEditViewTest(BaseEventFormTest):
 
         data = {
             'field_type': Field.FIELD_INPUT_TEXT,
-            'name': field.name + ' edited',
             'label': field.name + ' edited',
             'active': False,
         }
@@ -147,12 +146,11 @@ class EventFormFieldEditViewTest(BaseEventFormTest):
 
         field = Field.objects.get(pk=field.pk)
         self.assertEqual(field.field_type, data['field_type'])
-        self.assertEqual(field.name, data['name'])
         self.assertEqual(field.label, data['label'])
         self.assertEqual(field.active, data['active'])
 
 
-class EventFormFieldDeleteViewTest(BaseEventFormTest):
+class EventFormFieldDeleteViewTest(BaseEventFieldTest):
     def _get_url(self, event=None, field=None):
         if not event:
             event = self.event
@@ -181,7 +179,7 @@ class EventFormFieldDeleteViewTest(BaseEventFormTest):
         self.assertContains(response, 'Campo excluído com sucesso')
 
 
-class EventFormFieldReorderViewTest(BaseEventFormTest):
+class EventFormFieldReorderViewTest(BaseEventFieldTest):
     def _get_url(self, event=None, field=None):
         if not event:
             event = self.event

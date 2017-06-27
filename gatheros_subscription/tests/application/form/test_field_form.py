@@ -36,7 +36,7 @@ class EventConfigFormTest(TestCase):
             self.assertIn(field.label.title(), content)
 
 
-class EventFormTest(TestCase):
+class EventFieldTest(TestCase):
     fixtures = [
         '007_organization',
         '009_place',
@@ -139,7 +139,7 @@ class EventFormTest(TestCase):
         self.assertFalse(field.active)
 
 
-class EventFormFieldOrderFormTest(TestCase):
+class EventFieldFieldOrderFormTest(TestCase):
     fixtures = [
         '007_organization',
         '009_place',
