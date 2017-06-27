@@ -91,7 +91,6 @@ class Field(object):
 
         if self.type == self.FIELD_INPUT_DATETIME:
             self.django_field = fields.CharField(
-                max_length=18,
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
@@ -121,7 +120,7 @@ class Field(object):
         if self.type == self.FIELD_BOOLEAN:
             self.django_field = fields.BooleanField(
                 label=self.label.title(),
-                required=self.required,
+                required=False,
                 initial=self.initial,
                 help_text=self.help_text,
                 widget=self._get_widget()
@@ -202,7 +201,10 @@ class Field(object):
             widget = self._configure_widget(TelInput)
 
         if self.type == self.FIELD_BOOLEAN:
-            widget = self._configure_widget(widgets.CheckboxInput)
+            widget = self._configure_widget(
+                widgets.CheckboxInput,
+                as_required=False
+            )
 
         if self.type == self.FIELD_SELECT:
             widget = self._configure_widget(widgets.Select)
@@ -222,10 +224,10 @@ class Field(object):
 
         return widget
 
-    def _configure_widget(self, widget_class, **kwargs):
+    def _configure_widget(self, widget_class, as_required=True, **kwargs):
         """ Configura widget inserindo parâmetros necessários. """
 
-        if self.required:
+        if as_required and self.required:
             self.attrs.update({
                 'required': self.required
             })

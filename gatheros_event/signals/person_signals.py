@@ -12,8 +12,14 @@ def update_user_related_name(instance, raw, **_):
     if raw is True or not instance.user:
         return
 
-    first = instance.name.split(' ')[0]
-    last = instance.name.split(' ')[-1]
+    split_name = instance.name.strip().split(' ')
+    first = split_name[0]
+
+    last = ' '
+    for surename in split_name[1:]:
+        last += surename + ' '
+
+    last = last.strip()
 
     instance.user.first_name = first
     instance.user.last_name = last if not last == first else None

@@ -69,7 +69,7 @@ class AccountMixin(LoginRequiredMixin, View):
             )
 
         except PermissionDenied as e:
-            messages.warning(request, e)
+            messages.warning(request, str(e))
             return redirect(self.get_permission_denied_url())
 
 

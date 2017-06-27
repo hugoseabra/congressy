@@ -175,7 +175,6 @@ class FormRenderTest(TestCase):
         expected_content = [
             'input',
             'type="checkbox"',
-            'required',
             'id="id_boolean-field"',
         ]
 

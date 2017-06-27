@@ -17,12 +17,30 @@
         <table border="0" width="50%" cellpadding="10" cellspacing="1">
             <tr>
                 {% if object.person.avatar %}
-                    <td width="1%" style="font-weight: bold">
-                        <img src="{{ object.person.avatar.url }}" width="180px" />
+                    <td width="1%" style="vertical-align:top;font-weight: bold">
+                        <img src="{{ object.person.avatar.url }}" width="240px" />
                     </td>
                 {% endif %}
                 <td style="padding: 0">
                     <table border="0" width="100%" cellpadding="10" cellspacing="0">
+                        <tr>
+                            <th width="26%" style="text-align: right;vertical-align: top">
+                                Pessoa
+                            </th>
+                            <td style="vertical-align: top">
+                                {{ object.person.pk }}
+                            </td>
+                        </tr>
+                        {% if object.person.user_id %}
+                            <tr>
+                                <th width="26%" style="text-align: right;vertical-align: top">
+                                    Perfil
+                                </th>
+                                <td style="vertical-align: top">
+                                    &#10004;
+                                </td>
+                            </tr>
+                        {% endif %}
                         <tr>
                             <th width="26%" style="text-align: right;vertical-align: top">
                                 UUID

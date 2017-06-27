@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import Max
 
 from gatheros_event.models import Event, Person
+from gatheros_event.models.mixins import GatherosModelMixin
 from . import Lot
 from .rules import subscription as rule
 
@@ -36,7 +37,7 @@ class SubscriptionManager(models.Manager):
 # @TODO - verificar se evento irá emitir certificado. Se sim, exigir CPF
 # @TODO Acrescentar campo boolean "PNE"
 
-class Subscription(models.Model):
+class Subscription(models.Model, GatherosModelMixin):
     """ Modelo de inscrição """
 
     DEVICE_ORIGIN_WEB = 'web'
