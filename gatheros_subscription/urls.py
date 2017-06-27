@@ -5,6 +5,11 @@ from gatheros_subscription import views
 
 url_subscription = [
     url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/delete/$',
+        views.SubscriptionDeleteView.as_view(),
+        name='subscription-delete'
+    ),
+    url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/edit/$',
         views.SubscriptionEditFormView.as_view(),
         name='subscription-edit'

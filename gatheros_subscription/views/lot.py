@@ -146,8 +146,16 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         return context
 
     def form_valid(self, form):
-        messages.success(self.request, 'Lote alterado com sucesso.')
-        return super(LotEditFormView, self).form_valid(form)
+        try:
+            response = super(LotEditFormView, self).form_valid(form)
+
+        except Exception as e:
+            messages.error(self.request, str(e))
+            return self.form_invalid(form)
+
+        else:
+            messages.success(self.request, 'Lote alterado com sucesso.')
+            return response
 
     def get_success_url(self):
         return reverse(

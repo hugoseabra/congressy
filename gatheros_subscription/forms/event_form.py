@@ -7,18 +7,17 @@ from kanu_form.forms import KanuForm
 
 
 class EventConfigForm(KanuForm):
-    default_fields = set()
-    additional_fields = set()
-    gatheros_fields = {}
-    fields_configured = False
-    include_inactive = False
-
     def __init__(
             self,
             form,
             include_inactive=False,
             *args,
             **kwargs):
+
+        self.default_fields = {}
+        self.additional_fields = {}
+        self.gatheros_fields = {}
+        self.fields_configured = False
 
         self.form = form
         self.include_inactive = include_inactive
@@ -63,9 +62,9 @@ class EventConfigForm(KanuForm):
             self.gatheros_fields[f.name] = f
 
             if f.form_default_field:
-                self.default_fields.add(f.name)
+                self.default_fields[f.name] = f
             else:
-                self.additional_fields.add(f.name)
+                self.additional_fields[f.name] = f
 
             field_dict = model_to_dict(f, exclude=[
                 'active',

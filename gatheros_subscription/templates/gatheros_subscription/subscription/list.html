@@ -12,7 +12,11 @@
     <h2>{{ event.name }} {% if not event.published %}<i style="color: darkgrey">- não publicado</i>{% endif %}</h2>
 
     <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
-        <a href="{% url 'gatheros_subscription:subscription-add' event.pk %}">Adicionar</a>
+        {% if can_add_subscription %}
+            <a href="{% url 'gatheros_subscription:subscription-add' event.pk %}">Adicionar</a>
+        {% else %}
+            <span style="font-weight: bold">Lotes não disponíveis.</span>
+        {% endif %}
     </div>
 
     <div>
@@ -54,6 +58,7 @@
                         <th width="13%" style="text-align: left;border:1px solid #fff;padding:10px">
                             Data Inscrição
                         </th>
+                        <th width="2%" style="border:1px solid #fff;padding:10px">Perfil</th>
                         <th width="8%" style="border:1px solid #fff;padding:10px"></th>
                     </tr>
                     {% for item in object_list %}
@@ -73,9 +78,14 @@
                                 {{ item.created }}
                             </td>
                             <td style="text-align:center;background: #FFF;padding:10px;margin-bottom: 3px">
+                                {% if item.person.user_id %}
+                                    &#10004;
+                                {% endif %}
+                            </td>
+                            <td style="text-align:center;background: #FFF;padding:10px;margin-bottom: 3px">
                                 <a href="{% url 'gatheros_subscription:subscription-edit' event.pk item.pk %}">Editar</a>
                                 &nbsp;
-                                <a href="#">Excluir</a>
+                                <a href="{% url 'gatheros_subscription:subscription-delete' event.pk item.pk %}">Excluir</a>
                             </td>
                         </tr>
                     {% endfor %}

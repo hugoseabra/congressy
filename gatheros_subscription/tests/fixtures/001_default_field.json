@@ -23,7 +23,7 @@
       "with_options": true,
       "order": 2,
       "required": false,
-      "select_intro": false,
+      "select_intro": true,
       "instruction": "",
       "placeholder": null,
       "default_value": ""
