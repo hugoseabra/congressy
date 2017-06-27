@@ -22,12 +22,3 @@ class FieldManager(object):
         self.kanu_fields.update({name: field})
 
         return field
-
-    def validate(self, key, value):
-        kanu_field = self.kanu_fields.get(key)
-        if not kanu_field:
-            raise Exception(
-                'Não existe o campo `{}` no formulário.'.format(key)
-            )
-
-        return kanu_field.validate(value)
