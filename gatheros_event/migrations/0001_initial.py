@@ -410,7 +410,6 @@ class Migration(migrations.Migration):
                     blank=True,
                     max_length=254,
                     null=True,
-                    unique=True,
                     verbose_name='email'
                 )),
                 ('zip_code', models.CharField(
@@ -461,7 +460,6 @@ class Migration(migrations.Migration):
                     blank=True,
                     max_length=11,
                     null=True,
-                    unique=True,
                     validators=[validator.cpf_validator],
                     verbose_name='CPF')),
                 ('birth_date', models.DateField(

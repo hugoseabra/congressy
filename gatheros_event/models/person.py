@@ -40,7 +40,6 @@ class Person(models.Model, GatherosModelMixin):
         verbose_name='sexo'
     )
     email = models.EmailField(
-        unique=True,
         blank=True,
         null=True,
         verbose_name='email'
@@ -103,7 +102,6 @@ class Person(models.Model, GatherosModelMixin):
         max_length=11,
         blank=True,
         null=True,
-        unique=True,
         verbose_name='CPF',
         validators=[cpf_validator]
     )
