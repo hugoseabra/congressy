@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.html import strip_tags
 
-from core.util import slugify
+from core.util import model_field_slugify
 from .member import Member
 from .mixins import GatherosModelMixin
 from .person import Person
@@ -94,10 +94,10 @@ class Organization(models.Model, GatherosModelMixin):
         super(Organization, self).save(*args, **kwargs)
 
     def _create_unique_slug(self):
-        self.slug = slugify(
-            model_class=Organization,
-            slugify_from=self.name,
-            primary_key=self.pk
+        self.slug = model_field_slugify(
+            model_class=self.__class__,
+            instance=self,
+            string=self.name
         )
 
     def get_members(self, group=None, person=None):

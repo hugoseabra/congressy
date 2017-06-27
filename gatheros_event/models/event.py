@@ -15,7 +15,7 @@ from stdimage import StdImageField
 from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
 from core.model import track_data
-from core.util import slugify
+from core.util import model_field_slugify
 from . import Category, Organization, Place
 from .mixins import GatherosModelMixin
 from .rules import event as rule
@@ -237,10 +237,10 @@ class Event(models.Model, GatherosModelMixin):
         return str(self.name)
 
     def _create_unique_slug(self):
-        self.slug = slugify(
-            model_class=Event,
-            slugify_from=self.name,
-            primary_key=self.pk
+        self.slug = model_field_slugify(
+            model_class=self.__class__,
+            instance=self,
+            string=self.name
         )
 
     def get_period(self):
