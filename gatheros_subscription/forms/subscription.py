@@ -2,8 +2,8 @@ import json
 from datetime import datetime
 
 from django import forms
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import safestring, six
 from kanu_locations.models import City
 
@@ -25,25 +25,53 @@ class SubscriptionForm(EventConfigForm):
 
     def clean_lot(self):
         """ Resgata objeto de lote. """
-        return Lot.objects.get(pk=self.cleaned_data['lot'])
+        lot_pk = self.cleaned_data.get('lot')
+        if not lot_pk:
+            self.add_error('lot', 'Nenhum lote foi informado.')
+
+        return Lot.objects.get(pk=lot_pk)
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        name = name.strip()
+        split = name.split(' ')
+        if len(split) < 2:
+            self.add_error('name', 'Informe nome e sobrenome.')
+
+        return name
 
     def clean(self):
 
-        for field_name, gatheros_field in six.iteritems(self.gatheros_fields):
-            value = self.cleaned_data.get(field_name)
+        force_string = [
+            Field.FIELD_INPUT_DATETIME,
+            Field.FIELD_INPUT_DATE,
+        ]
 
-            if value == '':
-                value = None
+        for f_name, gatheros_field in six.iteritems(self.gatheros_fields):
+            value = self.cleaned_data.get(f_name)
+
+            if gatheros_field.field_type == Field.FIELD_BOOLEAN:
+                required = False
+
+            else:
+                required = gatheros_field.required
+
+            if gatheros_field.field_type in force_string:
+                value = str(value)
 
             if isinstance(value, str):
                 value = safestring.mark_safe(value.strip())
 
-            if not value and gatheros_field.required:
-                raise forms.ValidationError({
-                    field_name: 'Você deve informar deste campo'
-                })
+            if value == '':
+                value = None
 
-        return self.cleaned_data
+            if not value and required:
+                self.add_error(f_name, 'Você deve preencher este campo')
+
+            if value:
+                self.cleaned_data[f_name] = value
+
+        return super(SubscriptionForm, self).clean()
 
     def save(self):
         """ Salva dados. """
@@ -66,7 +94,7 @@ class SubscriptionForm(EventConfigForm):
 
         try:
             self.initial.update({'user': self.instance.person.user.pk})
-        except User.DoesNotExist:
+        except (ObjectDoesNotExist, AttributeError):
             pass
 
         for field_name, gatheros_field in six.iteritems(self.gatheros_fields):
@@ -131,17 +159,14 @@ class SubscriptionForm(EventConfigForm):
         except ObjectDoesNotExist:
             person = Person()
 
-        for field_name, gatheros_field in six.iteritems(self.gatheros_fields):
-            if not gatheros_field or not gatheros_field.form_default_field:
-                continue
+        for f_name, gatheros_field in six.iteritems(self.default_fields):
+            value = self.cleaned_data.get(f_name)
 
-            value = self.cleaned_data.get(field_name)
-
-            if hasattr(person, field_name):
-                if field_name == 'city':
+            if hasattr(person, f_name):
+                if f_name == 'city':
                     value = City.objects.get(pk=value)
 
-                setattr(person, field_name, value)
+                setattr(person, f_name, value)
 
         person.save()
 
@@ -150,11 +175,8 @@ class SubscriptionForm(EventConfigForm):
     def _save_or_create_answers(self):
         """ Salva respostas. """
 
-        for field_name, gatheros_field in six.iteritems(self.gatheros_fields):
-            if not gatheros_field or gatheros_field.form_default_field:
-                continue
-
-            value = self.cleaned_data.get(field_name)
+        for f_name, gatheros_field in six.iteritems(self.additional_fields):
+            value = self.cleaned_data.get(f_name)
 
             if gatheros_field.field_type == Field.FIELD_BOOLEAN:
                 output = 'Sim' if value is True else 'Não'
@@ -180,12 +202,10 @@ class SubscriptionForm(EventConfigForm):
                 value = json.dumps(value)
 
             elif gatheros_field.field_type == Field.FIELD_BOOLEAN:
-                value = json.dumps({'value': value, output: "Não"})
+                value = json.dumps({'value': value, 'output': "Não"})
 
             # Resposta já persistida
-            gatheros_answer = gatheros_field.answer(
-                subscription=self.instance
-            )
+            gatheros_answer = gatheros_field.answer(subscription=self.instance)
 
             if not value:
                 if gatheros_answer:
