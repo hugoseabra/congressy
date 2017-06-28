@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
 from gatheros_event.models import Event
@@ -64,7 +64,7 @@ class EventFieldTest(TestCase):
         event = Event.objects.get(slug='django-muito-alem-do-python')
         field = self.event.form.fields.filter(form_default_field=False).first()
 
-        with self.assertRaises(ValidationError) as e:
+        with self.assertRaises(PermissionDenied) as e:
             EventFormFieldForm(
                 form=event.form,
                 instance=field,
@@ -105,7 +105,7 @@ class EventFieldTest(TestCase):
         }
         field = self.event.form.fields.filter(form_default_field=True).first()
 
-        with self.assertRaises(ValidationError) as e:
+        with self.assertRaises(PermissionDenied) as e:
             self._get_form(instance=field, data=data)
 
         self.assertIn('Este campo não pode ser editado', str(e.exception))

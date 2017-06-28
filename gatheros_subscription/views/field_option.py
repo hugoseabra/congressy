@@ -5,7 +5,7 @@ from django.views import generic
 
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription.models import Field, FieldOption
-from .event_form import BaseEventForm
+from .event_form import BaseFormFieldView
 
 
 class FieldOptionAddView(AccountMixin, generic.View):
@@ -92,7 +92,7 @@ class FieldOptionDeleteView(DeleteViewMixin):
         return can_access and can_change
 
 
-class FieldOptionsView(BaseEventForm):
+class FieldOptionsView(BaseFormFieldView):
     template_name = 'gatheros_subscription/event_form/field_options.html'
     form_title = 'Opções de Campo'
 

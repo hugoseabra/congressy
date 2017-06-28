@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import model_to_dict
+from django.core.exceptions import PermissionDenied
 
 from gatheros_subscription.models import Field, FieldOption
 from kanu_form.field_manager import FieldManager
@@ -114,10 +115,10 @@ class EventFormFieldForm(forms.ModelForm):
         instance = kwargs.get('instance')
         if instance:
             if instance.form_default_field is True:
-                raise forms.ValidationError('Este campo não pode ser editado')
+                raise PermissionDenied('Este campo não pode ser editado')
 
             if instance.form.event.pk != form.event.pk:
-                raise forms.ValidationError(
+                raise PermissionDenied(
                     'Este campo não pertence ao formulário `{}`'.format(form)
                 )
 

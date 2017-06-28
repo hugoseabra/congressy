@@ -119,7 +119,7 @@ class EventFormFieldEditViewTest(BaseEventFieldTest):
             data=data,
             follow=True
         )
-        self.assertContains(response, 'Você não pode realizar esta ação')
+        self.assertContains(response, 'Este campo não pode ser editado')
 
     def test_edit(self):
         """ Testa edição pela view. """

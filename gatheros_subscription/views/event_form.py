@@ -13,7 +13,7 @@ from gatheros_subscription.forms import (
 from gatheros_subscription.models import Field
 
 
-class BaseEventForm(AccountMixin, generic.TemplateView):
+class BaseFormFieldView(AccountMixin, generic.TemplateView):
     form_title = 'Formulário'
     event = None
 
@@ -23,7 +23,7 @@ class BaseEventForm(AccountMixin, generic.TemplateView):
         })
 
     def get_context_data(self, **kwargs):
-        context = super(BaseEventForm, self).get_context_data(**kwargs)
+        context = super(BaseFormFieldView, self).get_context_data(**kwargs)
         context.update({
             'event': self._get_event(),
             'form_title': self.get_form_title(),
@@ -42,16 +42,18 @@ class BaseEventForm(AccountMixin, generic.TemplateView):
 
     def can_access(self):
         event = self._get_event()
+        org = self.organization
+        same_org = org and event.organization.pk == org.pk
         enabled = event.subscription_type != event.SUBSCRIPTION_DISABLED
         can_view = self.request.user.has_perm(
             'gatheros_subscription.change_form',
             event.form
         ) if enabled else False
 
-        return enabled and can_view
+        return same_org and enabled and can_view
 
 
-class BaseEventFormFieldForm(BaseEventForm):
+class BaseEventFormFieldForm(BaseFormFieldView):
     form_class = EventFormFieldForm
     model = form_class.Meta.model
     template_name = 'gatheros_subscription/event_form/form.html'
@@ -79,13 +81,13 @@ class BaseEventFormFieldForm(BaseEventForm):
         )
 
 
-class EventConfigFormView(BaseEventForm, generic.FormView):
+class EventConfigFormFieldView(BaseFormFieldView, generic.FormView):
     form_class = EventConfigForm
     template_name = 'gatheros_subscription/event_form/config.html'
     form_title = 'Configuração de Formulário'
 
     def get_context_data(self, **kwargs):
-        cxt = super(EventConfigFormView, self).get_context_data(**kwargs)
+        cxt = super(EventConfigFormFieldView, self).get_context_data(**kwargs)
         form = cxt['form']
         fields_dict = form.gatheros_fields
 
@@ -133,14 +135,13 @@ class EventFormFieldAddView(BaseEventFormFieldForm, generic.CreateView):
         )
 
     def can_access(self):
-        event = self._get_event()
         can_access = super(EventFormFieldAddView, self).can_access()
-        can_change = self.request.user.has_perm(
+        event = self._get_event()
+        can_add = self.request.user.has_perm(
             'gatheros_subscription.can_add_field',
             event.form
-        ) if can_access else False
-
-        return can_access and can_change
+        )
+        return can_access and can_add
 
 
 class EventFormFieldEditView(BaseEventFormFieldForm, generic.UpdateView):
@@ -157,22 +158,30 @@ class EventFormFieldEditView(BaseEventFormFieldForm, generic.UpdateView):
         )
 
     def can_access(self):
-        can_access = super(BaseEventFormFieldForm, self).can_access()
-        event_pk = int(self.kwargs.get('event_pk'))
-        same_event = self.object.form.event.pk == event_pk
-        not_default = self.object.form_default_field is False
+        can_access = super(EventFormFieldEditView, self).can_access()
+        event = self._get_event()
+        form = event.form
+        field = self.get_object()
+        same_form = field.form.pk == form.pk
         can_change = self.request.user.has_perm(
             'gatheros_subscription.change_field',
-            self.object
+            field
         )
 
-        return can_access and same_event and not_default and can_change
+        return can_access and same_form and can_change
 
 
-class EventFormDeleteView(DeleteViewMixin, BaseEventFormFieldForm):
+class EventFormFieldDeleteView(DeleteViewMixin, BaseFormFieldView):
     model = Field
-    delete_message = "Tem certeza que deseja excluir o campo \"{name}\"?"
+    delete_message = "Tem certeza que deseja excluir o campo \"{label}\"?"
     success_message = "Campo excluído com sucesso!"
+    pk_url_kwarg = 'field_pk'
+
+    def get_success_url(self):
+        return reverse(
+            'gatheros_subscription:fields-config',
+            kwargs={'event_pk': self.kwargs['event_pk']}
+        )
 
     def post_delete(self):
         event = self._get_event()
@@ -186,19 +195,12 @@ class EventFormDeleteView(DeleteViewMixin, BaseEventFormFieldForm):
             counter += 1
 
     def can_delete(self):
-        can_access = self.can_access()
-        event_pk = int(self.kwargs.get('event_pk'))
-        same_event = self.object.form.event.pk == event_pk
+        can_delete = super(EventFormFieldDeleteView, self).can_delete()
         not_default = self.object.form_default_field is False
-        can_delete = self.request.user.has_perm(
-            'gatheros_subscription.delete_field',
-            self.object
-        )
-
-        return can_access and same_event and not_default and can_delete
+        return can_delete and not_default
 
 
-class EventFormReorderView(BaseEventForm):
+class EventFormFieldReorderView(BaseFormFieldView):
     http_method_names = ['post']
     object = None
 
@@ -206,7 +208,7 @@ class EventFormReorderView(BaseEventForm):
         pk = self.kwargs.get('field_pk')
         self.object = get_object_or_404(Field, pk=pk)
 
-        return super(EventFormReorderView, self).dispatch(
+        return super(EventFormFieldReorderView, self).dispatch(
             request,
             *args,
             **kwargs
@@ -240,13 +242,14 @@ class EventFormReorderView(BaseEventForm):
             ))
 
     def can_access(self):
-        can_access = super(EventFormReorderView, self).can_access()
-        event_pk = int(self.kwargs.get('event_pk'))
-        same_event = self.object.form.event.pk == event_pk
+        can_access = super(EventFormFieldReorderView, self).can_access()
+        event = self._get_event()
+        same_org = event.organization.pk == self.organization.pk
+        same_event = self.object.form.event.pk == event.pk
         not_default = self.object.form_default_field is False
         can_change = self.request.user.has_perm(
             'gatheros_subscription.change_field',
             self.object
-        )
+        ) if not_default else False
 
-        return can_access and same_event and not_default and can_change
+        return same_org and can_access and same_event and can_change

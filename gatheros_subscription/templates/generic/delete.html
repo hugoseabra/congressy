@@ -1,7 +1,6 @@
 {% extends "gatheros_front/base.html" %}
 {% load i18n static %}
 
-
 {% block content %}
     {% if delete_message %}
         {{ delete_message }}
@@ -10,7 +9,6 @@
     <br />
     <form method="post">{% csrf_token %}
         <div>
-            <input type="hidden" name="post" value="yes"/>
             <!--suppress HtmlUnknownAttribute -->
             <input type="submit" value="{% trans "Yes, I'm sure" %}"/>
             {% if next_path %}
