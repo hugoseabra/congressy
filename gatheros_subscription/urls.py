@@ -5,6 +5,11 @@ from gatheros_subscription import views
 
 url_subscription = [
     url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/attendnace/$',
+        views.SubscriptionAttendanceView.as_view(),
+        name='subscription-attendance'
+    ),
+    url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/delete/$',
         views.SubscriptionDeleteView.as_view(),
         name='subscription-delete'
@@ -18,6 +23,11 @@ url_subscription = [
         r'^add/$',
         views.SubscriptionAddFormView.as_view(),
         name='subscription-add'
+    ),
+    url(
+        r'^attendance/search/$',
+        views.SubscriptionAttendanceSearchView.as_view(),
+        name='subscription-attendance-search'
     ),
     url(
         r'^$',
@@ -52,12 +62,12 @@ url_field = [
     ),
     url(
         r'^(?P<field_pk>[\d]+)/order/$',
-        views.EventFormReorderView.as_view(),
+        views.EventFormFieldReorderView.as_view(),
         name='field-order'
     ),
     url(
         r'^(?P<field_pk>[\d]+)/delete/$',
-        views.EventFormDeleteView.as_view(),
+        views.EventFormFieldDeleteView.as_view(),
         name='field-delete'
     ),
     url(
@@ -72,7 +82,7 @@ url_field = [
     ),
     url(
         r'^',
-        views.EventConfigFormView.as_view(),
+        views.EventConfigFormFieldView.as_view(),
         name='fields-config'
     ),
 ]

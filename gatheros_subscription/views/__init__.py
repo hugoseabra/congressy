@@ -1,9 +1,9 @@
 from .event_form import (
-    EventConfigFormView,
-    EventFormDeleteView,
+    EventConfigFormFieldView,
     EventFormFieldAddView,
+    EventFormFieldDeleteView,
     EventFormFieldEditView,
-    EventFormReorderView,
+    EventFormFieldReorderView,
 )
 from .field_option import (
     FieldOptionAddView,
@@ -14,6 +14,8 @@ from .field_option import (
 from .lot import LotAddFormView, LotDeleteView, LotEditFormView, LotListView
 from .subscription import (
     SubscriptionAddFormView,
+    SubscriptionAttendanceSearchView,
+    SubscriptionAttendanceView,
     SubscriptionDeleteView,
     SubscriptionEditFormView,
     SubscriptionListView,

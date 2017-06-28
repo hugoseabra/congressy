@@ -69,7 +69,7 @@
                         {% if can_manage_subscriptions %}
                             <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:subscription-list' object.pk %}">Pré-inscrições</a></div>
                         {% endif %}
-                        <div style="padding:15px">&rightarrow; <a href="#">Credenciamento</a></div>
+                        <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>
                         <div style="padding:15px">&rightarrow; <a href="#">Exportação de dados</a></div>
                     </div>
                 {% endif %}
@@ -183,12 +183,6 @@
                         </tr>
                     </table>
                 {% endif %}
-
-                <br/>
-                <hr/>
-                <pre>
-                    = Transferência
-                </pre>
             </td>
             <td width="20%" style="vertical-align: top">
                 <form name="change_status"
