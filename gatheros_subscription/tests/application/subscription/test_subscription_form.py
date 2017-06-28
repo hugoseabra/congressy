@@ -5,7 +5,10 @@ from django.test import TestCase
 from django.utils import six
 
 from gatheros_event.models import Event
-from gatheros_subscription.forms import SubscriptionForm
+from gatheros_subscription.forms import (
+    SubscriptionAttendanceForm,
+    SubscriptionForm,
+)
 from gatheros_subscription.models import Answer, Subscription
 
 
@@ -76,7 +79,7 @@ class SubscriptionFormTest(TestCase):
 
         self.assertIn('<select name="lot" ', content)
 
-    def test_add_new(self):
+    def test_add_new_person(self):
         """ Testa adição de nova inscrição. """
 
         gatheros_form = self.event.form
@@ -175,6 +178,7 @@ class SubscriptionFormTest(TestCase):
                 self.assertEqual(value, data_value)
 
     def test_edit(self):
+        """ Testa edição de inscriçõa. """
         sub = self.event.subscriptions.first()
 
         person = sub.person
@@ -229,3 +233,47 @@ class SubscriptionFormTest(TestCase):
                     continue
 
                 self.assertEqual(value, data_value)
+
+
+class SubscriptionAttendanceFormTest(TestCase):
+    """ Testa formulário de credenciamento. """
+
+    fixtures = [
+        '005_user',
+        '006_person',
+        '007_organization',
+        '009_place',
+        '010_event',
+        '003_form',
+        '006_lot',
+        '007_subscription',
+    ]
+
+    def setUp(self):
+        self.subscription = Subscription.objects.first()
+
+    def test_register_attendance(self):
+        """ Testa registro de credenciamento de inscrição. """
+        self.subscription.attended = False
+        self.subscription.attended_on = None
+
+        form = SubscriptionAttendanceForm(instance=self.subscription)
+        form.attended(True)
+
+        sub = Subscription.objects.get(pk=self.subscription.pk)
+
+        self.assertTrue(sub.attended)
+        self.assertIsNotNone(sub.attended_on)
+
+    def test_unregister_attendance(self):
+        """ Testa cancalmento de credenciamento de inscrição. """
+        self.subscription.attended = True
+        self.subscription.attended_on = datetime.now()
+
+        form = SubscriptionAttendanceForm(instance=self.subscription)
+        form.attended(False)
+
+        sub = Subscription.objects.get(pk=self.subscription.pk)
+
+        self.assertFalse(sub.attended)
+        self.assertIsNone(sub.attended_on)

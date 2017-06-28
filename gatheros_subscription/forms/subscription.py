@@ -13,6 +13,7 @@ from .event_form import EventConfigForm
 
 
 class SubscriptionForm(EventConfigForm):
+    """ Formulário de pré-inscrição. """
     def __init__(self, instance=None, hide_lot=True, *args, **kwargs):
         self.instance = instance
 
@@ -24,7 +25,7 @@ class SubscriptionForm(EventConfigForm):
         self._add_lot_field(hide_lot)
 
     def clean_lot(self):
-        """ Resgata objeto de lote. """
+        """ Limpa campo 'lot' """
         lot_pk = self.cleaned_data.get('lot')
         if not lot_pk:
             self.add_error('lot', 'Nenhum lote foi informado.')
@@ -32,6 +33,7 @@ class SubscriptionForm(EventConfigForm):
         return Lot.objects.get(pk=lot_pk)
 
     def clean_name(self):
+        """ Limpa campo 'name' """
         name = self.cleaned_data.get('name')
         name = name.strip()
         split = name.split(' ')
@@ -302,3 +304,15 @@ class SubscriptionForm(EventConfigForm):
             lot.widget = forms.HiddenInput()
 
         self.fields['lot'] = lot
+
+
+class SubscriptionAttendanceForm(forms.Form):
+    """ Formulário de credenciamento de Inscrições. """
+    def __init__(self, instance=None, *args, **kwargs):
+        self.instance = instance
+        super(SubscriptionAttendanceForm, self).__init__(*args, **kwargs)
+
+    def attended(self, attended):
+        self.instance.attended_on = datetime.now() if attended else None
+        self.instance.attended = attended
+        self.instance.save()

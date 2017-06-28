@@ -218,7 +218,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
         if num_lots == 0:
             self.permission_denied_message = \
-                'Lotes não disponíveis.'
+                'Lote(s) não disponível(is).'
 
             self.permission_denied_url = reverse(
                 'gatheros_subscription:subscription-list',
@@ -342,3 +342,72 @@ class SubscriptionDeleteView(EventViewMixin, DeleteViewMixin):
             'gatheros_event.can_manage_subscriptions',
             self.get_event()
         )
+
+
+class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
+    template_name = 'gatheros_subscription/subscription/attendance.html'
+    search_by = 'name'
+
+    def get_permission_denied_url(self):
+        return reverse(
+            'gatheros_event:event-panel',
+            kwargs={'pk': self.kwargs.get('event_pk')},
+        )
+
+    def get(self, request, *args, **kwargs):
+        self.search_by = request.GET.get('search_by', 'name')
+        return super(SubscriptionAttendanceSearchView, self).get(
+            request,
+            *args,
+            **kwargs
+        )
+
+    def post(self, request, *args, **kwargs):
+        search_by = request.GET.get('search_by', 'name')
+        value = request.POST.get('value')
+
+        if value:
+            kwargs.update({
+                'result_by': search_by,
+                'result': self.search_subscription(search_by, value),
+            })
+
+        return self.get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        cxt = super(SubscriptionAttendanceSearchView, self).get_context_data(
+            **kwargs
+        )
+        cxt.update({
+            'search_by': self.search_by,
+        })
+        return cxt
+
+    def search_subscription(self, search_by, value):
+        """ Busca inscrições de acordo com o valor passado. """
+
+        if search_by == 'name':
+            return self.search_by_name(value)
+
+        if search_by == 'code':
+            return self.search_by_code(value)
+
+    # noinspection PyMethodMayBeStatic
+    def search_by_name(self, name):
+        """ Busca inscrições por nome. """
+        try:
+            return Subscription.objects.filter(person__name__startswith=name)
+        except Subscription.DoesNotExist:
+            return None
+
+    # noinspection PyMethodMayBeStatic
+    def search_by_code(self, code):
+        """ Busca inscrições por código. """
+        try:
+            return Subscription.objects.get(code=code)
+        except Subscription.DoesNotExist:
+            return None
+
+
+class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
+    http_method_names = ['post']
