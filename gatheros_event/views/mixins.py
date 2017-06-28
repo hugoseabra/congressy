@@ -7,7 +7,7 @@ from django.utils.functional import SimpleLazyObject
 from django.views.generic import DeleteView
 from django.views.generic.base import View
 
-from core.model.deletable import DeletableModel
+from core.model.deletable import DeletableModelMixin
 from gatheros_event.helpers.account import (
     get_member,
     get_organization,
@@ -22,28 +22,42 @@ class AccountMixin(LoginRequiredMixin, View):
     permission_denied_message = 'Você não pode realizar esta ação.'
 
     @property
+    def is_authenticated(self):
+        """ Verifica se há autenticação de usuário. """
+        user = self.request.user if hasattr(self.request, 'user') else None
+        return user.is_authenticated() if user else False
+
+    @property
     def is_participant(self):
+        """ Verifica se usuário é participante apenas. """
         return is_participant(self.request)
 
     @property
     def organization(self):
+        """ Resgata objeto Organization do contexto do usuário. """
         return SimpleLazyObject(lambda: get_organization(self.request))
 
     @property
     def member(self):
+        """ Resgata objeto Member do usuário logado. """
         return SimpleLazyObject(lambda: get_member(self.request))
 
     @property
     def organizations(self):
+        """
+        Resgata um objeto contendo uma lista de Organization do usuário.
+        """
         return SimpleLazyObject(lambda: get_organizations(self.request))
 
     @property
     def has_internal_organization(self):
+        """ Verifica se usuário possui organização interna. """
         orgs = [org for org in self.organizations if org.internal]
         return len(orgs) == 1
 
     @property
     def has_organization(self):
+        """ Verifica se o usuário logado está em alguma organização. """
         user = self.request.user
         orgs = [org for org in self.organizations if org.is_admin(user)]
         return len(orgs) == 1
@@ -58,11 +72,15 @@ class AccountMixin(LoginRequiredMixin, View):
         return self.permission_denied_url
 
     def dispatch(self, request, *args, **kwargs):
+        """ Dispatch padrão da view. """
         try:
+            if not self.is_authenticated:
+                raise PermissionDenied(self.get_permission_denied_message())
+
             if not self.can_access():
                 raise PermissionDenied(self.get_permission_denied_message())
 
-            return super(AccountMixin, self).dispatch(
+            dispatch = super(AccountMixin, self).dispatch(
                 request,
                 *args,
                 **kwargs
@@ -71,6 +89,9 @@ class AccountMixin(LoginRequiredMixin, View):
         except PermissionDenied as e:
             messages.warning(request, str(e))
             return redirect(self.get_permission_denied_url())
+
+        else:
+            return dispatch
 
 
 class DeleteViewMixin(AccountMixin, DeleteView):
@@ -88,19 +109,21 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         try:
             self.object = self.get_object()
 
-            if not isinstance(self.object, DeletableModel):
+            if not isinstance(self.object, DeletableModelMixin):
                 # noinspection PyProtectedMember
+                model_name = self.object._meta.model_name
+                module_path = DeletableModelMixin.__module__
                 raise ImproperlyConfigured(
-                    'O model "{}" não é instância de'' "{}"'.format(
-                        self.object._meta.model_name,
-                        'DeletableModel'
+                    'O model "{}" não é instância de "{}"'.format(
+                        model_name,
+                        module_path+'.DeletableModelMixin'
                     )
                 )
 
             if not self.can_delete():
                 raise PermissionDenied(self.not_allowed_message)
 
-            return super(DeleteViewMixin, self).dispatch(
+            dispatch = super(DeleteViewMixin, self).dispatch(
                 request,
                 *args,
                 **kwargs
@@ -109,6 +132,9 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         except PermissionDenied as e:
             messages.warning(request, e)
             return redirect(self.get_permission_denied_url())
+
+        else:
+            return dispatch
 
     def get_permission_denied_url(self):
         url = self.get_success_url()
@@ -120,21 +146,31 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         context['go_back_path'] = self.get_success_url()
 
         # noinspection PyProtectedMember
-        context['title'] = 'Excluir ' + self.object._meta.verbose_name
+        verbose_name = self.object._meta.verbose_name
+        context['title'] = 'Excluir {}'.format(verbose_name)
 
         data = model_to_dict(self.get_object())
-        context['model_protected_message'] = self.model_protected_message
         context['delete_message'] = self.delete_message.format(**data)
         return context
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
+        try:
+            self.pre_delete()
 
-        self.pre_delete()
-        messages.success(request, self.success_message)
-        response = super(DeleteViewMixin, self).post(request, *args, **kwargs)
-        self.post_delete()
-        return response
+            response = super(DeleteViewMixin, self).post(
+                request,
+                *args,
+                **kwargs
+            )
+
+        except Exception as e:
+            messages.error(request, str(e))
+            return redirect(self.get_success_url())
+
+        else:
+            messages.success(request, self.success_message)
+            self.post_delete()
+            return response
 
     def can_delete(self):
         """Checks if user can delete model"""

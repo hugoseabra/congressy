@@ -1,5 +1,5 @@
 """
-Checks if model is deletable
+Deletable model mixin
 """
 
 from django.db import IntegrityError, models, router
@@ -38,7 +38,7 @@ class CheckerCollector(Collector):
         return False
 
 
-class DeletableModel(object):
+class DeletableModelMixin(object):
     """Deletable model checker"""
     checker = None
 
