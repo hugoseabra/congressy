@@ -23,9 +23,6 @@
                         <td style="background: #FFF;padding:10px;margin-bottom: 3px">
                             <div>{{ forloop.counter }} -
                                 <a href="{% url 'gatheros_event:event-panel' event.pk %}">{{ event.name }}</a>
-                                {% if user.is_superuser %}
-                                    <span style="font-size: medium;color:dimgray">({{ event.organization.name }})</span>
-                                {% endif %}
                             </div>
                             <hr/>
                             <div style="text-indent: 10px;">

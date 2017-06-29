@@ -8,7 +8,7 @@ from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.views import generic
 
-from gatheros_event.models import Event
+from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription.forms import (
     SubscriptionAttendanceForm,
@@ -515,3 +515,44 @@ class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
         event = self.get_event()
         sub = self.get_object()
         return sub.event.pk == event.pk
+
+
+class MySubscriptionsListView(AccountMixin, generic.ListView):
+    """ Lista de inscrições """
+
+    model = Subscription
+    template_name = 'gatheros_subscription/subscription/my_subscriptions.html'
+    ordering = ('event__name', 'event__date_start', 'event__date_end',)
+
+    def get_permission_denied_url(self):
+        return reverse('gatheros_front:start')
+
+    def get_queryset(self):
+        person = self.request.user.person
+        query_set = super(MySubscriptionsListView, self).get_queryset()
+        return query_set.filter(
+            person=person,
+            event__published=True,
+            attended=True,
+        )
+
+    def get_context_data(self, **kwargs):
+        cxt = super(MySubscriptionsListView, self).get_context_data(**kwargs)
+        cxt.update({'filter_categories': self.get_categories()})
+        return cxt
+
+    def get_categories(self):
+        """ Resgata categorias das inscrições existentes. """
+        queryset = self.get_queryset()
+        return queryset.values(
+            'event__category__name',
+            'event__category__id'
+        ).distinct().order_by('event__category__name')
+
+    def can_access(self):
+        try:
+            self.request.user.person
+        except Person.DoesNotExist:
+            return False
+        else:
+            return True

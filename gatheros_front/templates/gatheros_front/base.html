@@ -26,7 +26,7 @@
             <div style="float:left">
                 <a href="{% url 'gatheros_front:start' %}">Início</a>
                 &nbsp; &nbsp; &nbsp; &nbsp;
-                <a href="#">Minhas Inscrições</a>
+                <a href="{% url 'gatheros_subscription:my-subscriptions' %}">Minhas Inscrições</a>
                 &nbsp; &nbsp; &nbsp; &nbsp;
                 <a href="#">Meus Convites</a>
                 {% if context_type == 'member' %}
