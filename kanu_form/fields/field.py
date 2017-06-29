@@ -135,10 +135,6 @@ class Field(object):
                 widget=self._get_widget()
             )
 
-            if self.select_intro:
-                intro_option = [('', '- Selecione -',)]
-                self.options = intro_option + self.options
-
         if self.type == self.FIELD_RADIO_GROUP:
             self.django_field = fields.ChoiceField(
                 label=self.label.title(),

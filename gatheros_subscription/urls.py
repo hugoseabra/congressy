@@ -5,7 +5,7 @@ from gatheros_subscription import views
 
 url_subscription = [
     url(
-        r'^(?P<pk>[0-9A-Fa-f-]+)/attendnace/$',
+        r'^(?P<pk>[0-9A-Fa-f-]+)/attendance/$',
         views.SubscriptionAttendanceView.as_view(),
         name='subscription-attendance'
     ),

@@ -256,6 +256,7 @@ class SubscriptionAttendanceFormTest(TestCase):
         """ Testa registro de credenciamento de inscrição. """
         self.subscription.attended = False
         self.subscription.attended_on = None
+        self.subscription.save()
 
         form = SubscriptionAttendanceForm(instance=self.subscription)
         form.attended(True)
@@ -269,6 +270,7 @@ class SubscriptionAttendanceFormTest(TestCase):
         """ Testa cancalmento de credenciamento de inscrição. """
         self.subscription.attended = True
         self.subscription.attended_on = datetime.now()
+        self.subscription.save()
 
         form = SubscriptionAttendanceForm(instance=self.subscription)
         form.attended(False)
