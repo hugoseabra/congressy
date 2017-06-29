@@ -22,6 +22,7 @@ from .invite import (
     InvitationListView,
     InvitationProfileView,
     InvitationResendView,
+    MyInvitationsListView,
 )
 # MEMBER
 from .member import MemberDeleteView, MemberListView, MemberManageView

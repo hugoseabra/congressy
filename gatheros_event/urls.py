@@ -195,6 +195,11 @@ url_profile = [
         views.ProfileCreateView.as_view(),
         name='profile_create'
     ),
+    url(
+        r'^me/invitations$',
+        views.MyInvitationsListView.as_view(),
+        name='my-invitations'
+    ),
 ]
 
 urlpatterns = [

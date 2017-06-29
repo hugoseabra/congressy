@@ -28,7 +28,7 @@
                 &nbsp; &nbsp; &nbsp; &nbsp;
                 <a href="{% url 'gatheros_subscription:my-subscriptions' %}">Minhas Inscrições</a>
                 &nbsp; &nbsp; &nbsp; &nbsp;
-                <a href="#">Meus Convites</a>
+                <a href="{% url 'gatheros_event:my-invitations' %}">Meus Convites</a>
                 {% if context_type == 'member' %}
                     &nbsp; &nbsp; &nbsp; &nbsp;
                     <a href="{% url 'gatheros_event:organization-list' %}">Organizações</a>

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render_to_response
@@ -411,3 +413,25 @@ class InvitationDeleteView(DeleteViewMixin):
         return reverse('gatheros_event:invitation-list', kwargs={
             'organization_pk': org.pk
         })
+
+
+class MyInvitationsListView(AccountMixin, ListView):
+    """ Lista de inscrições """
+
+    model = Invitation
+    template_name = 'gatheros_event/invitation/my_invitations.html'
+    ordering = ('created', 'author__person__name', '-expired',)
+
+    def get_permission_denied_url(self):
+        return reverse('gatheros_front:start')
+
+    def get_queryset(self):
+        query_set = super(MyInvitationsListView, self).get_queryset()
+        return query_set.filter(
+            to=self.request.user,
+            expired__gt=datetime.now(),
+        )
+
+    def get_context_data(self, **kwargs):
+        cxt = super(MyInvitationsListView, self).get_context_data(**kwargs)
+        return cxt
