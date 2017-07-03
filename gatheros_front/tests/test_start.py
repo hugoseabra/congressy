@@ -21,9 +21,6 @@ class StartTest(TestCase):
     def test_status_is_200_ok(self):
         self.assertEqual(self.result.status_code, 200)
 
-    def test_html_contains_email(self):
-        self.assertContains(self.result, self.user.email)
-
 
 class StartWithoutLoginTest(TestCase):
     def setUp(self):

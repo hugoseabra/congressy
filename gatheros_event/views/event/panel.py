@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from django.shortcuts import redirect
-from django.urls import reverse_lazy
 from django.views.generic import DetailView
 
 from gatheros_event.models import Event
@@ -12,16 +10,10 @@ class EventPanelView(AccountMixin, DetailView):
     model = Event
     template_name = 'gatheros_event/event/panel.html'
 
-    def get(self, request, *args, **kwargs):
-        event = self.get_object()
-        if not self._can_view(event):
-            return redirect(reverse_lazy('gatheros_event:event-list'))
-
-        return super(EventPanelView, self).get(request, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super(EventPanelView, self).get_context_data(**kwargs)
         context['status'] = self._get_status()
+        context['can_transfer'] = self._can_transfer
         context['can_change'] = self._can_change
         context['can_delete'] = self._can_delete
         context['can_view_lots'] = self._can_view_lots
@@ -34,22 +26,30 @@ class EventPanelView(AccountMixin, DetailView):
 
         return context
 
-    def _can_view(self, event):
+    def can_access(self):
+        event = self.get_object()
         return event.organization == self.organization
 
+    def _can_transfer(self):
+        """ Verifica se usuário pode transferir este evento. """
+        return self.is_organization_admin
+
     def _can_change(self):
+        """ Verifica se usuário pode alterar o evento. """
         return self.request.user.has_perm(
             'gatheros_event.change_event',
             self.object
         )
 
     def _can_delete(self):
+        """ Verifica se usuário pode excluir o evento. """
         return self.object.is_deletable() and self.request.user.has_perm(
             'gatheros_event.delete_event',
             self.object
         )
 
     def _can_view_lots(self):
+        """ Verifica se usuário pode visualizar lotes. """
         subscription_by_lots = \
             self.object.subscription_type == Event.SUBSCRIPTION_BY_LOTS
 
@@ -61,12 +61,14 @@ class EventPanelView(AccountMixin, DetailView):
         return subscription_by_lots and can_manage
 
     def can_manage_subscriptions(self):
+        """ Verifica se usuário pode gerenciar inscrições. """
         return self.request.user.has_perm(
             'gatheros_subscription.can_manage_subscriptions',
             self.object
         )
 
     def _get_status(self):
+        """ Resgata o status. """
         now = datetime.now()
         event = self.object
         remaining = self._get_remaining_datetime()
@@ -99,10 +101,12 @@ class EventPanelView(AccountMixin, DetailView):
         return result
 
     def _get_remaining_datetime(self):
+        """ Resgata diferença de tempo que falta para o evento finalizar. """
         now = datetime.now()
         return self.object.date_start - now
 
     def _get_remaining_days(self, date=None):
+        """ Resgata tempo que falta para o evento finalizar em dias. """
         now = datetime.now()
 
         if not date:
@@ -120,6 +124,5 @@ class EventPanelView(AccountMixin, DetailView):
         return remaining
 
     def _get_report(self):
-        """ Recupera relatório do painel"""
-
+        """ Resgata informações gerais do evento. """
         return self.object.get_report()

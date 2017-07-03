@@ -140,7 +140,7 @@ class FieldAdmin(admin.ModelAdmin):
             '<div style="padding:3px 0">- ' + form.event.name + '</div>'
             for form in instance.forms.all()
         ]
-        
+
         return "".join(events)
 
     def num_forms(self, instance):

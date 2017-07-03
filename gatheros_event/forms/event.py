@@ -52,6 +52,7 @@ class EventForm(forms.ModelForm):
 
         self.fields['organization'].widget = forms.Select()
         self.fields['organization'].choices = orgs
+        self.fields['organization'].label = 'Realizador'
 
 
 class EventEditDatesForm(forms.ModelForm):

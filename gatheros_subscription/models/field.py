@@ -52,7 +52,7 @@ class Field(AbstractField):
             to_slug = self.label if not self.name else self.name
         else:
             to_slug = self.label
-        
+
         self.name = model_field_slugify(
             model_class=self.__class__,
             instance=self,
@@ -66,11 +66,13 @@ class Field(AbstractField):
     def answer(self, subscription):
         """ Recupera resposta de uma pergunta de acordo com inscrição. """
 
-        if self.form_default_field:
-            return getattr(subscription.person, self.name)
+        person = subscription.person
+        if self.form_default_field and hasattr(person, self.name):
+            return getattr(person, self.name)
 
         try:
             return self.answers.get(subscription=subscription)
+
         except ObjectDoesNotExist:
             return None
 

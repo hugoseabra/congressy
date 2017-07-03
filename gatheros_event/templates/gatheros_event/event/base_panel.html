@@ -1,0 +1,44 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+{% load event_tags %}
+
+
+{% block sidebar %}
+    {% if can_change %}
+        {% if can_transfer %}
+            <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
+                <a href="{% url 'gatheros_event:event-transfer' object.pk %}">Mudar realizador</a>
+            </div>
+            <br/>
+        {% endif %}
+        <div style="background-color: whitesmoke;border: 1px solid #DDD;">
+            <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
+                Página do evento
+            </div>
+            <div style="padding:15px">
+                &rightarrow; <a href="{% url 'gatheros_event:event-detail' object.pk %}">Configurar detalhes do evento</a>
+            </div>
+            <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_event:event-info' object.pk %}">Configurar capa</a></div>
+            {# <div style="padding:15px">&rightarrow; <a href="#">Seções</a></div>#}
+        </div>
+    {% endif %}
+    {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
+        <br/>
+        <div style="background-color: whitesmoke;border: 1px solid #DDD;">
+            <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
+                Inscrições
+            </div>
+            {% if can_view_lots %}
+                <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:lot-list' object.pk %}">Lotes</a></div>
+            {% endif %}
+            <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:fields-config' object.pk %}">Configuração de Formulário</a></div>
+            {% if can_manage_subscriptions %}
+                <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:subscription-list' object.pk %}">Pré-inscrições</a></div>
+            {% endif %}
+            <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>
+            <div style="padding:15px">&rightarrow; <a href="#">Exportação de dados</a></div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}{% endblock %}

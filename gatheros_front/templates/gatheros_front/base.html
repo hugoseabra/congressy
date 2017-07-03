@@ -2,131 +2,154 @@
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
-
     <title>{% block title %}Gatheros{% endblock %}</title>
-
     {% block extrastyle %}{% endblock %}
-
     {% block extrahead %}{% endblock %}
-
     {% block blockbots %}
-        <meta name="robots" content="NONE,NOARCHIVE"/>{% endblock %}
-
+        <meta name="robots" content="NONE,NOARCHIVE"/>
+    {% endblock %}
 </head>
-{% load i18n %}
-
-<body class="{% block bodyclass %}{% endblock %}"
-      data-admin-utc-offset="{% now "Z" %}">
+<body style="padding: 0;margin: 0">
 
 <!-- Container -->
 <div id="container">
-
-    {% block user %}
-        <div style="background-color: #DDD;padding:10px">
+    {% block topnav %}
+        <div style="background-color: #DDD;padding:10px;border-bottom:1px solid dimgray">
             <div style="float:left">
-                <a href="{% url 'gatheros_front:start' %}">Início</a>
-                &nbsp; &nbsp; &nbsp; &nbsp;
-                <a href="{% url 'gatheros_subscription:my-subscriptions' %}">Minhas Inscrições</a>
-                &nbsp; &nbsp; &nbsp; &nbsp;
-                <a href="{% url 'gatheros_event:my-invitations' %}">Meus Convites</a>
-                {% if context_type == 'member' %}
-                    &nbsp; &nbsp; &nbsp; &nbsp;
-                    <a href="{% url 'gatheros_event:organization-list' %}">Organizações</a>
-                    &nbsp; &nbsp; &nbsp; &nbsp;
-                    <a href="{% url 'gatheros_event:event-list' %}">Eventos</a>
-                    &nbsp; &nbsp; &nbsp; &nbsp;
-                    <a href="#">Pessoas</a>
-                {% endif %}
+                <h1 style="margin: 0">
+                    <a href="{% url 'gatheros_front:start' %}" style="text-decoration: none;color: #333;font-size: 26px">GATHEROS</a>
+                </h1>
             </div>
-            <div style="float:right">
-                <div>
-                    {% if request.user.is_authenticated %}
-                        {% if organizations and organizations|length > 1 %}
-                            <form action="{% url 'gatheros_event:organization-switch' %}"
-                                  method="post" style="display: inline-block;">{% csrf_token %}
-                                {% if organization and organization.internal %}
-                                    {% if request.user.person and request.user.person.avatar %}
-                                        <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ request.user.person.avatar.url }}" />
-                                    {% else %}
-                                        <!--suppress CheckImageSize -->
-                                        <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
-                                    {% endif %}
-                                {% elif organization and organization.avatar %}
-                                    <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ organization.avatar.url }}" />
-                                {% else %}
-                                    <!--suppress CheckImageSize -->
-                                    <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
-                                {% endif %}
-                                <!--suppress HtmlFormInputWithoutLabel -->
-                                <select name="organization-context-pk"
-                                        id="organization-context-pk"
-                                        onchange="submit()" style="margin-top:3px">
-                                    {% for org in organizations %}
-                                        <option
-                                                {% if organization.pk == org.pk %}selected="selected"{% endif %}
-                                                value="{{ org.pk }}">{{ org.name }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                                <input type="hidden" name="next"
-                                       value="{{ request.path }}"/>
-                            </form>
-                        {% elif organizations and organizations|length == 1 and organization %}
-                            {% if organization and organization.avatar %}
-                                <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ organization.avatar.url }}" />
-                            {% else %}
-                                <!--suppress CheckImageSize -->
-                                <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
-                            {% endif %}
-                            <strong>{{ organization.name }}</strong>
-                        {% else %}
-                            {% if request.user.person and request.user.person.avatar %}
-                                <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ request.user.person.avatar.url }}" />
-                            {% else %}
-                                <!--suppress CheckImageSize -->
-                                <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
-                            {% endif %}
-                            <strong>{{ request.user.get_full_name }}</strong>
-                        {% endif %}
-                        {% if context_type == 'member' and organization and not organization.internal %}
-                            &nbsp; | &nbsp;
-                            <a href="{% url 'gatheros_event:organization-panel' organization.pk %}">Gerenciar</a>
-                        {% endif %}
-                        &nbsp; | &nbsp;
-                        <a href="{% url 'gatheros_event:profile' %}">Meus dados</a>
+            <div style="float:right;margin-top: 6px">
+                {% if user.is_authenticated %}
+                    <div style="float:right;margin-top: 3px">
                         &nbsp; | &nbsp;
                         <a href="{% url 'gatheros_front:logout' %}">Sair</a>
-                    {% endif %}
-                </div>
+                    </div>
+                    <div style="float:right;margin-top: 3px">
+                        &nbsp; | &nbsp;
+                        <a href="{% url 'gatheros_event:profile' %}">Meus dados</a>
+                    </div>
+                    <div style="float:right;margin-top: 3px">
+                        <strong>{{ request.user.get_full_name }}</strong>
+                    </div>
+                    <div style="float:right">
+                        {% if request.user.person and request.user.person.avatar %}
+                            <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ request.user.person.avatar.url }}" />
+                        {% else %}
+                            <!--suppress CheckImageSize -->
+                            <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <div style="clear:both"></div>
             </div>
             <div style="clear:both"></div>
         </div>
     {% endblock %}
-
+    {% load gatheros_base_tags %}
     {% block messages %}
         {% if messages %}
-            <ul class="messagelist">{% for message in messages %}
-                <li {% if message.tags %}class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
-            {% endfor %}</ul>
+            <div style="width:100%;margin-top:3px">
+                <ul class="messagelist" style="list-style: none;margin: 0; padding: 0">
+                    {% for message in messages %}
+                        {% get_message_background_color message as bgcolor %}
+                        <li style="background-color: {{ bgcolor }};padding: 10px">
+                            {{ message|capfirst }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% endif %}
     {% endblock messages %}
+    <div>
+        <div style="float: left;width: 260px;margin-top: 30px">
+            {% block sidebar_organization %}
+                {% if organization and not organization.internal %}
+                    <div style="text-align: center;padding: 10px">
+                        {% if organization.avatar %}
+                            <!--suppress CheckImageSize -->
+                            <img style="border-radius: 50px" src="{{ organization.avatar.url }}" width="100px"/>
+                        {% else %}
+                            <!--suppress CheckImageSize -->
+                            <img style="border-radius: 50px" src="/media/default_avatar_organization.jpg" width="100px"/>
+                        {% endif %}
+                    </div>
+                    <div style="text-align: center;padding-bottom: 20px;font-weight: bold">
+                        <div>{{ organization.name }}</div>
+                        <div style="margin-top:5px;font-size: 14px">{{ member.get_group_display }}</div>
+                        <div style="margin-top:5px;font-size: 14px">
+                            <a href="{% url 'gatheros_event:organization-panel' organization.pk %}">Gerenciar</a>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if organizations %}
+                    <div style="padding:5px;overflow: hidden">
+                        <label style="font-weight: bold" for="organization-context-pk">Mudar para:</label>
+                        <form action="{% url 'gatheros_event:organization-switch' %}"
+                                  method="post" style="display: inline-block;">{% csrf_token %}
+                            <select name="organization-context-pk"
+                                    id="organization-context-pk"
+                                    onchange="submit()" style="margin-top:3px">
+                                {% for org in organizations %}
+                                    <option {% if organization.pk == org.pk %}selected="selected"{% endif %} value="{{ org.pk }}">
+                                        {{ org.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <input type="hidden" name="next" value="{{ request.path }}"/>
+                        </form>
+                    </div>
+                {% endif %}
+            {% endblock %}
 
-    <!-- Content -->
-    <div id="content" class="{% block coltype %}colM{% endblock %}">
-        {% block pretitle %}{% endblock %}
-        {% block content_title %}
-            {% if title %}
-                <h1>{{ title }}</h1>
-            {% endif %}
-        {% endblock %}
-        {% block content %}
-            {% block object-tools %}{% endblock %}
-            {{ content }}
-        {% endblock %}
-        {% block sidebar %}{% endblock %}
-        <br class="clear"/>
+            {% block sidebar %}
+                <table width="100%" border="0" cellpadding="0" cellspacing="5">
+                    {% if not organization or organization and organization.internal %}
+                        <tr>
+                            <td width="12%" style="vertical-align: top">
+                                <div style="background-color: whitesmoke;border: 1px solid #dddddd;">
+                                    <div style="padding: 10px;font-weight: bold">Como participante</div>
+                                    <div style="padding:15px">
+                                        &rightarrow; <a href="{% url 'gatheros_subscription:my-subscriptions' %}">Minhas inscrições</a>
+                                    </div>
+                                    <div style="padding:15px">
+                                        &rightarrow; <a href="{% url 'gatheros_event:my-invitations' %}">Meus convites</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% if organization and not organization.internal %}
+                        <tr>
+                            <td width="12%" style="vertical-align: top">
+                                {% if context_type == 'member' %}
+                                    <div style="background-color: whitesmoke;border: 1px solid #dddddd">
+                                        <div style="padding: 10px;font-weight: bold">Como organizador</div>
+                                        <div style="padding:15px">
+                                            &rightarrow; <a href="{% url 'gatheros_event:organization-list' %}">Organizações</a>
+                                        </div>
+                                        <div style="padding:15px">
+                                            &rightarrow; <a href="{% url 'gatheros_event:event-list' %}">Eventos</a>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                </table>
+            {% endblock %}
+        </div>
+        <div style="float: right;width:{% block content_width %}85%{% endblock %};padding: 5px">
+            <!-- Content -->
+            <div id="content">
+                {% block content %}{% endblock %}
+                <br class="clear"/>
+            </div>
+            <!-- END Content -->
+        </div>
+        <div style="clear: both"></div>
     </div>
-    <!-- END Content -->
 
     {% block footer %}
         <div id="footer"></div>

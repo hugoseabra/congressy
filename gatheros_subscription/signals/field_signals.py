@@ -54,4 +54,3 @@ def restrict_form_for_field(**kwargs):
     elif isinstance(instance, Field):
         for form in Form.objects.filter(pk__in=kwargs.get('pk_set')):
             check_organization(form, instance)
-

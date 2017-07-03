@@ -32,7 +32,6 @@ class BaseEventView(AccountMixin, View):
         context['next_path'] = self._get_referer_url()
         context['form_title'] = self.get_form_title()
         context['is_manager'] = self.has_internal_organization
-        context['has_organization'] = self.has_organization
 
         return context
 

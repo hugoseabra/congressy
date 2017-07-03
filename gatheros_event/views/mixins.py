@@ -56,11 +56,11 @@ class AccountMixin(LoginRequiredMixin, View):
         return len(orgs) == 1
 
     @property
-    def has_organization(self):
-        """ Verifica se o usuário logado está em alguma organização. """
+    def is_organization_admin(self):
+        """ Verifica se usuário é ADMIN de alguma organização. """
         user = self.request.user
         orgs = [org for org in self.organizations if org.is_admin(user)]
-        return len(orgs) == 1
+        return len(orgs) > 0
 
     # noinspection PyMethodMayBeStatic
     def can_access(self):

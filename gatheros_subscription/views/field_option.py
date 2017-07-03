@@ -66,7 +66,7 @@ class FieldOptionEditView(BaseFieldViewMixin):
     def pre_dispatch(self, request):
         if request.method == 'POST':
             self.set_event(request.POST.get('event_pk'))
-            
+
             pk = self.kwargs.get('pk')
             self.field_option = get_object_or_404(FieldOption, pk=pk)
             self.field = self.field_option.field

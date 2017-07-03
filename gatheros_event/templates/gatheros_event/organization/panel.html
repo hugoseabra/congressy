@@ -2,6 +2,10 @@
 {% load i18n static %}
 {% load organization_tags %}
 
+{% block sidebar_organization %}{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content_width %}99%{% endblock %}
+
 {% block content %}
     <h1>Painel do Organização</h1>
     <div>
@@ -70,6 +74,12 @@
                             &rightarrow; <a href="{% url 'gatheros_event:place-list' object.pk %}">Locais de eventos</a>
                         </div>
                     {% endif %}
+                    <div style="padding:15px">
+                        &rightarrow; <a href="#">Campos de Formulário</a>
+                    </div>
+                    <div style="padding:15px">
+                        &rightarrow; <a href="#">Pessoas</a>
+                    </div>
                 </div>
             </td>
             <td style="vertical-align: top;padding:0 10px">

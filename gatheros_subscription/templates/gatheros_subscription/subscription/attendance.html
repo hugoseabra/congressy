@@ -1,4 +1,4 @@
-{% extends "gatheros_front/base.html" %}
+{% extends "gatheros_event/event/base_panel.html" %}
 {% load i18n static %}
 {% load subscription_tags %}
 
@@ -22,7 +22,7 @@
             }
 
             input.setAttribute('size', size);
-            input.focus()
+            input.focus();
             {% if search_by == 'code' and result %}
                 document.getElementById('registration_button').focus();
             {% else %}
