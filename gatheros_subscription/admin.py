@@ -98,9 +98,15 @@ class DefaultFieldOptionAdmin(admin.ModelAdmin):
 
 @admin.register(Field)
 class FieldAdmin(admin.ModelAdmin):
-    search_fields = ('form__event__name',)
+    search_fields = (
+        'label',
+        'name',
+        'forms__event__name',
+        'organization__name',
+    )
     list_display = (
-        'form',
+        'organization',
+        'get_events',
         'order',
         'label',
         'name',
@@ -108,10 +114,12 @@ class FieldAdmin(admin.ModelAdmin):
         'required',
         'form_default_field',
         'with_options',
+        'num_forms',
         'pk'
     )
     fields = [
-        'form',
+        'organization',
+        'forms',
         'label',
         'name',
         'field_type',
@@ -127,6 +135,21 @@ class FieldAdmin(admin.ModelAdmin):
     ]
     readonly_fields = ['name', 'form_default_field', 'with_options']
 
+    def get_events(self, instance):
+        events = [
+            '<div style="padding:3px 0">- ' + form.event.name + '</div>'
+            for form in instance.forms.all()
+        ]
+        
+        return "".join(events)
+
+    def num_forms(self, instance):
+        return instance.forms.count()
+
+    num_forms.__name__ = '# Forms'
+    get_events.__name__ = 'Eventos'
+    get_events.allow_tags = True
+
 
 @admin.register(FieldOption)
 class FieldOptionAdmin(admin.ModelAdmin):
@@ -134,7 +157,7 @@ class FieldOptionAdmin(admin.ModelAdmin):
         'name',
         'field__label',
         'field__name',
-        'field__form__event__name',
+        'field__forms__event__name',
     )
     list_display = (
         'name',
@@ -166,6 +189,47 @@ class FieldOptionAdmin(admin.ModelAdmin):
 
     get_field_label.__name__ = 'campo'
     get_event_form.__name__ = 'formulário'
+
+
+class FieldInline(admin.StackedInline):
+    verbose_name = 'Campo'
+    verbose_name_plural = 'Campos'
+    model = Field.forms.through
+    extra = 0
+
+
+@admin.register(Form)
+class FormAdmin(admin.ModelAdmin):
+    pk = None
+    inlines = (FieldInline,)
+
+    def get_form(self, request, obj=None, **kwargs):
+        self.pk = None
+        if obj:
+            self.pk = obj.id
+
+        return super(FormAdmin, self).get_form(request, obj, **kwargs)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+
+        if not self.pk and db_field.name == "event":
+            kwargs["queryset"] = Event.objects.filter(form=None).exclude(
+                subscription_type=Event.SUBSCRIPTION_DISABLED
+            )
+
+        return super(FormAdmin, self).formfield_for_foreignkey(
+            db_field,
+            request,
+            **kwargs
+        )
+
+    def has_additional_fields(self, instance):
+        return instance.has_additional_fields
+
+    has_additional_fields.__name__ = 'campos adicionais'
+    has_additional_fields.boolean = True
+
+    list_display = ('event', 'has_additional_fields',)
 
 
 @admin.register(Lot)
@@ -266,46 +330,14 @@ class SubscriptionAdmin(admin.ModelAdmin):
     ordering = ('lot', 'count', 'person',)
 
 
-@admin.register(Form)
-class FormAdmin(admin.ModelAdmin):
-    pk = None
-
-    def get_form(self, request, obj=None, **kwargs):
-        self.pk = None
-        if obj:
-            self.pk = obj.id
-
-        return super(FormAdmin, self).get_form(request, obj, **kwargs)
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-
-        if not self.pk and db_field.name == "event":
-            kwargs["queryset"] = Event.objects.filter(form=None).exclude(
-                subscription_type=Event.SUBSCRIPTION_DISABLED
-            )
-
-        return super(FormAdmin, self).formfield_for_foreignkey(
-            db_field,
-            request,
-            **kwargs
-        )
-
-    def has_additional_fields(self, instance):
-        return instance.has_additional_fields
-
-    has_additional_fields.__name__ = 'campos adicionais'
-    has_additional_fields.boolean = True
-
-    list_display = ('event', 'has_additional_fields',)
-
-
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ['get_subscription', 'get_field', 'get_value']
-    ordering = ['field__form', 'subscription__person', 'field__order']
-    list_filter = ('field__form__event',)
+    list_display = ['subscription', 'get_field', 'get_value']
+    ordering = ['field__label', 'subscription__person', 'field__order']
+    list_filter = ('field__forms__event',)
     search_fields = (
         'subscription__person__name',
+        'subscription__event__name',
         'field__name',
     )
 
@@ -320,16 +352,13 @@ class AnswerAdmin(admin.ModelAdmin):
         if db_field.name == "field":
             kwargs["queryset"] = Field.objects.filter(
                 form_default_field=False
-            ).order_by('form__event', '-required')
+            ).order_by('-required')
 
         return super(AnswerAdmin, self).formfield_for_foreignkey(
             db_field,
             request,
             **kwargs
         )
-
-    def get_subscription(self, instance):
-        return instance.subscription.person
 
     def get_field(self, instance):
         field = instance.field.label
@@ -339,6 +368,5 @@ class AnswerAdmin(admin.ModelAdmin):
     def get_value(self, instance):
         return instance.get_display_value()
 
-    get_subscription.__name__ = 'inscrição'
     get_field.__name__ = 'campo'
     get_value.__name__ = 'valor'

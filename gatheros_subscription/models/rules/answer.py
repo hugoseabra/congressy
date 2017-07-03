@@ -4,18 +4,15 @@
 from django.core.exceptions import ValidationError
 
 
-def rule_1_campo_inscricao_formulario_mesmo_evento(answer):
+def rule_1_mesma_organizacao(answer):
     """
-    Resposta de um campo de formulário de ser de uma inscrição do evento
-    correto.
+    Resposta deve ser de um campo da mesma organização do evento da inscrição.
     """
-    answer_event = answer.subscription.event
-    field_event = answer.field.form.event
-    if answer_event != field_event:
+    answer_org = answer.subscription.event.organization.pk
+    field_org = answer.field.organization.pk
+    if answer_org != field_org:
         raise ValidationError(
-            {'field': ['Campo não pertence ao evento \'{}\'.'.format(
-                field_event.name
-            )]}
+            {'field': ['Campo não pertence à organização da inscrição.']}
         )
 
 

@@ -36,7 +36,7 @@ class Answer(models.Model):
     def check_rules(self):
         """ Verifica regras de negócio. """
 
-        rule.rule_1_campo_inscricao_formulario_mesmo_evento(self)
+        rule.rule_1_mesma_organizacao(self)
         rule.rule_2_resposta_apenas_se_campo_adicional(self)
         rule.rule_3_resposta_com_tipo_correto(self)
 

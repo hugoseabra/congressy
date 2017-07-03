@@ -3,24 +3,13 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from gatheros_event.models import Event
-from gatheros_subscription.models import Lot, Form
-
-
-@receiver(post_save, sender=Event)
-def create_form(instance, raw, **_):
-    # Disable when loaded by fixtures
-    if raw is True:
-        return
-
-    if instance.subscription_type != Event.SUBSCRIPTION_DISABLED:
-        try:
-            instance.form
-        except Form.DoesNotExist:
-            Form.objects.create(event=instance)
+from gatheros_subscription.models import Lot
 
 
 @receiver(pre_save, sender=Event)
 def clean_related_lots_when_subscription_disabled(instance, raw, **_):
+    """ Limpa lotes existente quando inscrição passa a ser desativada. """
+
     # Disable when loaded by fixtures
     if raw is True:
         return
@@ -32,6 +21,7 @@ def clean_related_lots_when_subscription_disabled(instance, raw, **_):
 
 @receiver(post_save, sender=Event)
 def manage_related_lot_when_subscription_enabled(instance, created, raw, **_):
+    """ Gerencia lotes relacionados quando inscrições são ativadas. """
     # Disable when loaded by fixtures
     if raw is True:
         return
@@ -42,33 +32,47 @@ def manage_related_lot_when_subscription_enabled(instance, created, raw, **_):
 
     num_lots = Lot.objects.filter(event=instance).count()
 
+    # Em inscrições simple
     if instance.subscription_type == Event.SUBSCRIPTION_SIMPLE:
+        # Se lotes, uni-los.
         if num_lots > 0:
             _merge_lots_and_subscriptions(event=instance)
             return
 
+        # Cria lote interno.
         _create_internal_lot(event=instance)
 
+    # Inscrições gerenciados por lote
     elif instance.subscription_type == Event.SUBSCRIPTION_BY_LOTS:
+        # Se lotes, convertê-los para externos
         if num_lots > 0:
             _convert_internal_lot_to_external(event=instance)
             return
 
+        # Cria lote externo
         _create_external_lot(event=instance)
 
 
 def _remove_lots(event):
+    """ Remove lotes sem inscrições do evento. """
+    lots_with_subs = []
+
     for lot in event.lots.all():
         if lot.subscriptions.count() > 0:
-            raise Exception(
-                'Lote já possui inscrições. Não é possível desativar as'
-                ' inscrições.'
-            )
+            lots_with_subs.append('{} (#{})'.format(lot.name, lot.pk))
+            continue
 
-    event.lots.all().delete()
+        lot.delete()
+
+    if lots_with_subs:
+        raise Exception(
+            'Há lotes que ainda possuem inscrições: {}. Não é possível'
+            ' desativar as inscrições.'.format(', '.join(lots_with_subs))
+        )
 
 
 def _create_internal_lot(event):
+    """ Cria lote interno para evento. """
     lot = Lot(
         name=Lot.INTERNAL_DEFAULT_NAME,
         event=event,
@@ -79,6 +83,7 @@ def _create_internal_lot(event):
 
 
 def _create_external_lot(event):
+    """ Cria lote externo para evento. """
     lot = Lot(
         name='Lote 1',
         event=event,
@@ -90,11 +95,15 @@ def _create_external_lot(event):
 
 def _merge_lots_and_subscriptions(event):
     """
-    1. check if lot(s) has(have) subscription(s)
-    2. find the most recent lot
-    3. transfer subscription(s) to most recent lot
-    4. convert most recent lot to internal
-    5. remove other lots
+    Junta lotes existentes cumprindo os seguintes passos:
+        1. verifica se lote(s) possui(em) inscrições(s)
+        2. encontra o lote mais recente
+        3. transfere inscrição(ões) para o lote mais recente
+        4. converte lote mais recente para interno
+        5. remove outros lots
+
+    :param event: Evento
+    :return: None
     """
     lots = event.lots.all().order_by('-pk')
 
@@ -102,7 +111,6 @@ def _merge_lots_and_subscriptions(event):
         return
 
     most_recent_lot = lots[0]
-    most_recent_lot.limit = 0
 
     subscriptions = []
     for lot in lots[1:]:
@@ -121,19 +129,28 @@ def _merge_lots_and_subscriptions(event):
     for lot in lots[1:]:
         lot.delete()
 
+    # Nome padrão
     most_recent_lot.name = Lot.INTERNAL_DEFAULT_NAME
-    most_recent_lot.internal = True
+
+    # Torna-o ilimitado.
+    most_recent_lot.limit = 0
+
+    # Torna-lo gratuito
     most_recent_lot.price = None
 
+    most_recent_lot.internal = True
+
+    # Ajusta data dentro dos limites do evento.
     most_recent_lot.adjust_unique_lot_date()
     most_recent_lot.save()
 
 
 def _merge_subscriptions(lot, subscriptions):
     """
-    Normaliza as inscrições no lote.
+    Uni inscrições de diversos lotes em um só.
+
     :param lot: Lote a receber inscrições
-    :param subscriptions: Collection de inscrições
+    :param subscriptions: Lista de inscrições
     :return: None
     """
     has_subscriptions = lot.subscriptions.count() > 0
@@ -155,6 +172,7 @@ def _merge_subscriptions(lot, subscriptions):
 
 
 def _convert_internal_lot_to_external(event):
+    """ Converte lotes internos para externos. """
     lots = event.lots.all().order_by('pk')
 
     if lots.count() == 0:

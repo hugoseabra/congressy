@@ -36,11 +36,13 @@
                         <div style="float:left">
                             <form method="post" action="{% url 'gatheros_subscription:field-option-edit' option.pk %}">{% csrf_token %}
                                 <button>Salvar</button>
+                                <input type="hidden" name="event_pk" value="{{ event.pk }}" />
                                 <input type="hidden" name="name" id="field_option_{{ option.pk }}" value="{{ option.name }}" />
                             </form>
                         </div>
                         <div style="float:left;margin-left: 5px">
                             <form onsubmit="return confirm('Tem certeza que deseja excluir a opção?')" method="post" action="{% url 'gatheros_subscription:field-option-delete' option.pk %}">{% csrf_token %}
+                                <input type="hidden" name="event_pk" value="{{ event.pk }}" />
                                 <button>X</button>
                             </form>
                         </div>
@@ -55,6 +57,7 @@
                 <form method="post" action="{% url 'gatheros_subscription:field-option-add' %}">{% csrf_token %}
                     <input type="text" name="name" value="" />
                     <button>Adicionar</button>
+                    <input type="hidden" name="event_pk" value="{{ event.pk }}" />
                     <input type="hidden" name="field_pk" value="{{ field.pk }}" />
                 </form>
             </td>

@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from core.tests import GatherosTestCase
 from gatheros_event.models import Event
-from gatheros_subscription.models import Form
+from gatheros_subscription.models import Form, DefaultField
 from gatheros_subscription.models.rules import form as rule
 
 
@@ -10,6 +10,7 @@ class FormModelTest(GatherosTestCase):
     fixtures = [
         'kanu_locations_city_test',
         '001_default_field',
+        '002_default_field_option',
         '007_organization',
         '009_place',
         '010_event'
@@ -36,6 +37,10 @@ class FormModelTest(GatherosTestCase):
         return self._create_model(model_class=Form, data=data, persist=persist)
 
     def test_rule_1_form_em_event_inscricao_desativada(self):
+        """
+        Testa erro ao tentar criar formulário em lote com inscrições
+        desativadas.
+        """
         rule_callback = rule.rule_1_form_em_event_inscricao_desativada
 
         event = self._get_event(subscription_type=Event.SUBSCRIPTION_DISABLED)
@@ -56,13 +61,24 @@ class FormModelTest(GatherosTestCase):
         rule_callback = rule.rule_2_form_possui_todos_campos_padrao
 
         event = self._get_event()
+        form = self._create_form(event=event, persist=True)
 
-        # Error
+        # No assertion
+        rule_callback(form)
+
+        default_fields = [field.name for field in DefaultField.objects.all()]
+        for field in form.fields.filter(form_default_field=True):
+            self.assertIn(field.name, default_fields)
+
         # Remover 1 dos campos padrão.
-        field = event.form.fields.first()
+        field = form.fields.first()
         field.delete()
-        self._trigger_integrity_error(rule_callback, [event.form])
+
+        # Assertion
+        self._trigger_integrity_error(rule_callback, [form])
 
         # Garante todos os campos novamente
-        event.form.save()
-        rule_callback(event.form)
+        form.save()
+
+        # No assertion
+        rule_callback(form)

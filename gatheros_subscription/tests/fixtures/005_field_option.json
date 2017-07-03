@@ -3,7 +3,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 1,
     "fields": {
-      "field": 34,
+      "field": 22,
       "name": "Arroz",
       "value": "arroz"
     }
@@ -12,7 +12,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 2,
     "fields": {
-      "field": 34,
+      "field": 22,
       "name": "Feij\u00e3o",
       "value": "feijao"
     }
@@ -21,7 +21,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 3,
     "fields": {
-      "field": 34,
+      "field": 22,
       "name": "Tomate",
       "value": "tomate"
     }
@@ -30,7 +30,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 4,
     "fields": {
-      "field": 34,
+      "field": 22,
       "name": "Alface",
       "value": "alface"
     }
@@ -39,7 +39,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 5,
     "fields": {
-      "field": 34,
+      "field": 22,
       "name": "Frutas",
       "value": "frutas"
     }
@@ -48,7 +48,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 6,
     "fields": {
-      "field": 35,
+      "field": 23,
       "name": "Adubo",
       "value": "adubo"
     }
@@ -57,7 +57,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 7,
     "fields": {
-      "field": 35,
+      "field": 23,
       "name": "Irriga\u00e7\u00e3o",
       "value": "irrigacao"
     }
@@ -66,7 +66,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 8,
     "fields": {
-      "field": 35,
+      "field": 23,
       "name": "Esta\u00e7\u00f5es",
       "value": "estacoes"
     }
@@ -75,7 +75,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 9,
     "fields": {
-      "field": 35,
+      "field": 23,
       "name": "Solo",
       "value": "solo"
     }
@@ -84,7 +84,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 10,
     "fields": {
-      "field": 35,
+      "field": 23,
       "name": "Equipamentos",
       "value": "equipamentos"
     }
@@ -93,7 +93,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 11,
     "fields": {
-      "field": 35,
+      "field": 23,
       "name": "Ferramentas",
       "value": "ferramentas"
     }
@@ -102,7 +102,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 12,
     "fields": {
-      "field": 35,
+      "field": 23,
       "name": "Insumos",
       "value": "insumos"
     }
@@ -111,7 +111,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 13,
     "fields": {
-      "field": 43,
+      "field": 31,
       "name": "Python",
       "value": "python"
     }
@@ -120,7 +120,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 14,
     "fields": {
-      "field": 43,
+      "field": 31,
       "name": "PHP",
       "value": "php"
     }
@@ -129,7 +129,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 15,
     "fields": {
-      "field": 43,
+      "field": 31,
       "name": "Erlan",
       "value": "erlan"
     }
@@ -138,7 +138,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 16,
     "fields": {
-      "field": 43,
+      "field": 31,
       "name": "Javascript",
       "value": "javascript"
     }
@@ -147,7 +147,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 17,
     "fields": {
-      "field": 43,
+      "field": 31,
       "name": "Java",
       "value": "java"
     }
@@ -156,7 +156,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 18,
     "fields": {
-      "field": 43,
+      "field": 31,
       "name": "Ruby",
       "value": "ruby"
     }
@@ -165,7 +165,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 19,
     "fields": {
-      "field": 43,
+      "field": 31,
       "name": "Fortran",
       "value": "fortran"
     }
@@ -174,7 +174,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 20,
     "fields": {
-      "field": 43,
+      "field": 31,
       "name": "C",
       "value": "c"
     }
@@ -183,7 +183,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 21,
     "fields": {
-      "field": 44,
+      "field": 32,
       "name": "Java",
       "value": "java"
     }
@@ -192,7 +192,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 22,
     "fields": {
-      "field": 44,
+      "field": 32,
       "name": "Javascript",
       "value": "javascript"
     }
@@ -201,7 +201,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 23,
     "fields": {
-      "field": 44,
+      "field": 32,
       "name": "Python",
       "value": "python"
     }
@@ -210,7 +210,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 24,
     "fields": {
-      "field": 44,
+      "field": 32,
       "name": "PHP",
       "value": "php"
     }
@@ -219,7 +219,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 25,
     "fields": {
-      "field": 44,
+      "field": 32,
       "name": "Ruby",
       "value": "ruby"
     }
@@ -228,7 +228,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 26,
     "fields": {
-      "field": 44,
+      "field": 32,
       "name": "Visual .Net",
       "value": "visual-net"
     }
@@ -237,7 +237,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 27,
     "fields": {
-      "field": 45,
+      "field": 33,
       "name": "L\u00f3gica",
       "value": "logica"
     }
@@ -246,7 +246,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 28,
     "fields": {
-      "field": 45,
+      "field": 33,
       "name": "Arquitetura",
       "value": "arquitetura"
     }
@@ -255,7 +255,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 29,
     "fields": {
-      "field": 45,
+      "field": 33,
       "name": "Boas pr\u00e1ticas",
       "value": "boas-praticas"
     }
@@ -264,7 +264,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 30,
     "fields": {
-      "field": 45,
+      "field": 33,
       "name": "Orienta\u00e7\u00e3o a Objeto",
       "value": "orientacao-a-objeto"
     }
@@ -273,7 +273,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 31,
     "fields": {
-      "field": 45,
+      "field": 33,
       "name": "Orienta\u00e7\u00e3o a Testes",
       "value": "orientacao-a-testes"
     }
@@ -282,7 +282,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 32,
     "fields": {
-      "field": 45,
+      "field": 33,
       "name": "Princ\u00edpios",
       "value": "principios"
     }
@@ -291,7 +291,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 33,
     "fields": {
-      "field": 45,
+      "field": 33,
       "name": "Experi\u00eancias de profissionais mais antigos",
       "value": "experiencias-de-profissionais-mais-antigos"
     }
@@ -300,7 +300,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 34,
     "fields": {
-      "field": 46,
+      "field": 34,
       "name": "Ensino Fundamental",
       "value": "ensino-fundamental"
     }
@@ -309,7 +309,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 35,
     "fields": {
-      "field": 46,
+      "field": 34,
       "name": "Ensino M\u00e9dio",
       "value": "ensino-medio"
     }
@@ -318,7 +318,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 36,
     "fields": {
-      "field": 46,
+      "field": 34,
       "name": "Ensino Superior",
       "value": "ensino-superior"
     }
@@ -327,7 +327,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 37,
     "fields": {
-      "field": 46,
+      "field": 34,
       "name": "Mestrado",
       "value": "mestrado"
     }
@@ -336,17 +336,16 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 38,
     "fields": {
-      "field": 46,
+      "field": 34,
       "name": "Doutorado",
       "value": "doutorado"
     }
   },
-
   {
     "model": "gatheros_subscription.fieldoption",
     "pk": 39,
     "fields": {
-      "field": 47,
+      "field": 5,
       "name": "M",
       "value": "M"
     }
@@ -355,7 +354,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 40,
     "fields": {
-      "field": 47,
+      "field": 5,
       "name": "F",
       "value": "F"
     }
@@ -364,7 +363,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 41,
     "fields": {
-      "field": 48,
+      "field": 10,
       "name": "M",
       "value": "M"
     }
@@ -373,7 +372,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 42,
     "fields": {
-      "field": 48,
+      "field": 10,
       "name": "F",
       "value": "F"
     }
@@ -382,7 +381,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 43,
     "fields": {
-      "field": 49,
+      "field": 15,
       "name": "M",
       "value": "M"
     }
@@ -391,7 +390,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 44,
     "fields": {
-      "field": 49,
+      "field": 15,
       "name": "F",
       "value": "F"
     }
@@ -400,7 +399,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 45,
     "fields": {
-      "field": 50,
+      "field": 20,
       "name": "M",
       "value": "M"
     }
@@ -409,79 +408,7 @@
     "model": "gatheros_subscription.fieldoption",
     "pk": 46,
     "fields": {
-      "field": 50,
-      "name": "F",
-      "value": "F"
-    }
-  },
-  {
-    "model": "gatheros_subscription.fieldoption",
-    "pk": 47,
-    "fields": {
-      "field": 51,
-      "name": "M",
-      "value": "M"
-    }
-  },
-  {
-    "model": "gatheros_subscription.fieldoption",
-    "pk": 48,
-    "fields": {
-      "field": 51,
-      "name": "F",
-      "value": "f"
-    }
-  },
-  {
-    "model": "gatheros_subscription.fieldoption",
-    "pk": 49,
-    "fields": {
-      "field": 52,
-      "name": "M",
-      "value": "M"
-    }
-  },
-  {
-    "model": "gatheros_subscription.fieldoption",
-    "pk": 50,
-    "fields": {
-      "field": 52,
-      "name": "F",
-      "value": "f"
-    }
-  },
-  {
-    "model": "gatheros_subscription.fieldoption",
-    "pk": 51,
-    "fields": {
-      "field": 53,
-      "name": "M",
-      "value": "M"
-    }
-  },
-  {
-    "model": "gatheros_subscription.fieldoption",
-    "pk": 52,
-    "fields": {
-      "field": 53,
-      "name": "F",
-      "value": "f"
-    }
-  },
-  {
-    "model": "gatheros_subscription.fieldoption",
-    "pk": 53,
-    "fields": {
-      "field": 54,
-      "name": "M",
-      "value": "M"
-    }
-  },
-  {
-    "model": "gatheros_subscription.fieldoption",
-    "pk": 54,
-    "fields": {
-      "field": 54,
+      "field": 20,
       "name": "F",
       "value": "F"
     }

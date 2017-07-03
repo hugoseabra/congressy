@@ -95,6 +95,7 @@ class EventConfigForm(KanuForm):
 
 class EventFormFieldForm(forms.ModelForm):
     form = None
+    organization = None
 
     class Meta:
         model = Field
@@ -110,34 +111,43 @@ class EventFormFieldForm(forms.ModelForm):
 
     def __init__(self, form, *args, **kwargs):
         self.form = form
+        self.organization = form.event.organization
+
         super(EventFormFieldForm, self).__init__(*args, **kwargs)
 
         instance = kwargs.get('instance')
         if instance:
             if instance.form_default_field is True:
-                raise PermissionDenied('Este campo não pode ser editado')
+                raise PermissionDenied('Este campo não pode ser editado.')
 
-            if instance.form.event.pk != form.event.pk:
+            if instance.organization.pk != self.organization.pk:
                 raise PermissionDenied(
-                    'Este campo não pertence ao formulário `{}`'.format(form)
+                    'Este campo não pertence a organização do evento.'
                 )
 
     def save(self, commit=True):
-        self.instance.form = self.form
+        self.instance.organization = self.organization
         self.instance.form_default_field = False
 
-        return super(EventFormFieldForm, self).save(commit=commit)
+        self.instance = super(EventFormFieldForm, self).save(commit=commit)
+        self.instance.forms.add(self.form)
+
+        return self.instance
 
 
 class EventFormFieldOrderForm(forms.Form):
     instance = None
     fields_qs = None
 
-    def __init__(self, instance, *args, **kwargs):
+    def __init__(self, form, instance, *args, **kwargs):
         self.instance = instance
-        self.fields_qs = self.instance.form.fields
+        self.fields_qs = form.fields
 
-        self.current_order = self.instance.order
+        if form.event.organization.pk != instance.organization.pk:
+            raise PermissionDenied(
+                'Este campo não pertence a organização do evento.'
+            )
+
         super(EventFormFieldOrderForm, self).__init__(*args, **kwargs)
 
     def order_down(self):

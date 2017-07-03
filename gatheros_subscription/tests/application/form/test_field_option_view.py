@@ -95,7 +95,9 @@ class FieldOptionAddViewTest(TestCase):
     def test_get_405(self):
         """ 405 quando acessado por GET. """
         self._login()
-        response = self.client.get(self._get_url())
+        response = self.client.get(
+            self._get_url()
+        )
         self.assertEqual(response.status_code, 405)
 
     def test_add(self):
@@ -105,6 +107,7 @@ class FieldOptionAddViewTest(TestCase):
         num = field.options.count()
 
         data = {
+            'event_pk': self.event.pk,
             'field_pk': field.pk,
             'name': 'New option 555'
         }
@@ -167,7 +170,10 @@ class FieldOptionEditViewTest(TestCase):
         field = self.event.form.fields.filter(with_options=True).first()
         field_option = field.options.first()
 
-        data = {'name': field.name + ' edited'}
+        data = {
+            'event_pk': self.event.pk,
+            'name': field_option.name + ' edited'
+        }
 
         self.client.post(
             self._get_url(field_option=field_option),
@@ -230,6 +236,7 @@ class FieldOptionDeleteViewTest(TestCase):
 
         self.client.post(
             self._get_url(field_option=field_option),
+            data={'event_pk': self.event.pk},
             follow=True
         )
 

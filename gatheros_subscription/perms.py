@@ -24,6 +24,6 @@ add_permission_logic(Form, logic)
 logic = MemberPermissionLogic(
     member_is_member,
     ['change_field', 'delete_field'],
-    'form__event__organization'
+    'organization'
 )
 add_permission_logic(Field, logic)

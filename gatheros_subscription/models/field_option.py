@@ -25,7 +25,7 @@ class FieldOption(AbstractDefaultFieldOption):
     class Meta:
         verbose_name = 'Opção de Campo'
         verbose_name_plural = 'Opções de Campo'
-        ordering = ['field__form__id', 'field__id', 'name']
+        ordering = ['field__id', 'name']
         unique_together = (('field', 'value'),)
 
     def save(self, *args, **kwargs):
@@ -54,9 +54,8 @@ class FieldOption(AbstractDefaultFieldOption):
         rule.rule_1_somente_campos_com_opcoes(self)
 
     def __str__(self):
-        return '{} [{}] - {} ({})'.format(
+        return '{} [{}] - {}'.format(
             self.name,
             self.value,
-            self.field.label,
-            self.field.form.event.name
+            self.field.label
         )

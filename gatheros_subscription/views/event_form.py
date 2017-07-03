@@ -61,13 +61,15 @@ class BaseEventFormFieldForm(BaseFormFieldView):
     pk_url_kwarg = 'field_pk'
     object = None
 
-    def get_form(self, form_class=None):
-        if not form_class:
-            form_class = self.form_class
-
+    # noinspection PyUnresolvedReferences
+    def get_form_kwargs(self):
         event = self._get_event()
-        # noinspection PyUnresolvedReferences
-        return form_class(form=event.form, **self.get_form_kwargs())
+        kwargs = super(BaseEventFormFieldForm, self).get_form_kwargs()
+        kwargs.update({
+            'form': event.form,
+        })
+
+        return kwargs
 
     def form_valid(self, form):
         messages.success(self.request, self.success_message)
@@ -112,16 +114,15 @@ class EventConfigFormFieldView(BaseFormFieldView, generic.FormView):
         })
         return cxt
 
-    def get_form(self, form_class=None):
-        if not form_class:
-            form_class = self.form_class
-
+    # noinspection PyUnresolvedReferences
+    def get_form_kwargs(self):
         event = self._get_event()
-        return form_class(
-            form=event.form,
-            include_inactive=True,
-            **self.get_form_kwargs()
-        )
+        kwargs = super(EventConfigFormFieldView, self).get_form_kwargs()
+        kwargs.update({
+            'form': event.form,
+            'include_inactive': True
+        })
+        return kwargs
 
 
 class EventFormFieldAddView(BaseEventFormFieldForm, generic.CreateView):
@@ -159,16 +160,12 @@ class EventFormFieldEditView(BaseEventFormFieldForm, generic.UpdateView):
 
     def can_access(self):
         can_access = super(EventFormFieldEditView, self).can_access()
-        event = self._get_event()
-        form = event.form
-        field = self.get_object()
-        same_form = field.form.pk == form.pk
         can_change = self.request.user.has_perm(
             'gatheros_subscription.change_field',
-            field
+            self.get_object()
         )
 
-        return can_access and same_form and can_change
+        return can_access and can_change
 
 
 class EventFormFieldDeleteView(DeleteViewMixin, BaseFormFieldView):
@@ -217,7 +214,11 @@ class EventFormFieldReorderView(BaseFormFieldView):
     # noinspection PyUnusedLocal
     def post(self, request, *args, **kwargs):
         try:
-            form = EventFormFieldOrderForm(instance=self.object)
+            event = self._get_event()
+            form = EventFormFieldOrderForm(
+                form=event.form,
+                instance=self.object
+            )
 
             success = False
 
@@ -245,11 +246,10 @@ class EventFormFieldReorderView(BaseFormFieldView):
         can_access = super(EventFormFieldReorderView, self).can_access()
         event = self._get_event()
         same_org = event.organization.pk == self.organization.pk
-        same_event = self.object.form.event.pk == event.pk
         not_default = self.object.form_default_field is False
         can_change = self.request.user.has_perm(
             'gatheros_subscription.change_field',
             self.object
         ) if not_default else False
 
-        return same_org and can_access and same_event and can_change
+        return same_org and can_access and can_change

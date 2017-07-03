@@ -87,7 +87,7 @@ class EventDeleteTest(TestCase):
         result = self._process_delete()
         self.assertContains(
             result,
-            "Você não pode excluir este registro."
+            "Você não pode realizar esta ação."
         )
 
         # Authenticated

@@ -237,7 +237,7 @@ class Migration(migrations.Migration):
                 )),
             ],
             options={
-                'ordering': ['form__id', 'order', 'name'],
+                'ordering': ['organization__id', 'order', 'name'],
                 'verbose_name': 'Campo de Formulário',
                 'verbose_name_plural': 'Campos de Formulário',
             },
@@ -477,12 +477,21 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='field',
-            name='form',
+            name='organization',
             field=models.ForeignKey(
+                to='gatheros_event.Organization',
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name='fields',
+                verbose_name='organização',
+                related_name='fields'
+            ),
+        ),
+        migrations.AddField(
+            model_name='field',
+            name='forms',
+            field=models.ManyToManyField(
                 to='gatheros_subscription.Form',
-                verbose_name='formulário'
+                verbose_name='formulário',
+                related_name='fields'
             ),
         ),
         migrations.AddField(
@@ -523,7 +532,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='field',
-            unique_together=[('form', 'name')],
+            unique_together=[('organization', 'name')],
         ),
         migrations.AlterUniqueTogether(
             name='defaultfieldoption',

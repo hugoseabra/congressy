@@ -34,11 +34,3 @@ class FieldModelTest(GatherosTestCase):
             persist=persist,
             **kwargs
         )
-
-    def test_new_field_always_last_one(self):
-        form = Form.objects.first()
-        last_order = form.fields.order_by('-order').first().order
-
-        field = self._create_field(form=form, persist=True)
-
-        self.assertEqual(field.order, last_order + 1)

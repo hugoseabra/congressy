@@ -10,6 +10,9 @@ class EventDeleteView(DeleteViewMixin):
     delete_message = "Tem certeza que deseja excluir o evento \"{name}\"?"
     success_message = "Evento excluído com sucesso."
 
+    def get_permission_denied_url(self):
+        return self.success_url
+
     def get_context_data(self, **kwargs):
         context = super(EventDeleteView, self).get_context_data(**kwargs)
         context['next_path'] = self._get_referer_url()

@@ -207,7 +207,7 @@ class EventFormFieldReorderViewTest(BaseEventFieldTest):
         self.assertEqual(response.status_code, 405)
 
     def test_order_up(self):
-        """ Testa exclusão de campo pela view. """
+        """ Testa reordenação crescente de campo pela view. """
 
         field = self.event.form.fields.filter(form_default_field=False).first()
         first_order = field.order
@@ -219,7 +219,7 @@ class EventFormFieldReorderViewTest(BaseEventFieldTest):
         self.assertEqual(field.order, first_order+1)
 
     def test_order_down(self):
-        """ Testa exclusão de campo pela view. """
+        """ Testa reordenação decrescente de campo pela view. """
 
         field = self.event.form.fields.filter(form_default_field=False)[1]
         first_order = field.order

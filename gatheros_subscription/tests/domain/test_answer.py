@@ -44,8 +44,8 @@ class AnswerModelTest(GatherosTestCase):
         }
         return self._create_model(model_class=Answer, data=data, **kwargs)
 
-    def test_rule_1_campo_inscricao_formulario_mesmo_evento(self):
-        rule_callback = rule.rule_1_campo_inscricao_formulario_mesmo_evento
+    def test_rule_1_mesma_organizacao(self):
+        rule_callback = rule.rule_1_mesma_organizacao
 
         event1 = Event.objects.get(slug='django-muito-alem-do-python')
         field = event1.form.fields.filter(
@@ -53,7 +53,8 @@ class AnswerModelTest(GatherosTestCase):
             field_type=Field.FIELD_SELECT,
         ).first()
 
-        event2 = Event.objects.get(slug='arte-e-agricultura-urbana')
+        # Evento diferente que não é da mesma organização do evento anterior
+        event2 = Event.objects.get(slug='seo-e-resultados')
         subscription = Subscription.objects.filter(event=event2).first()
 
         answer = self._create_answer(
