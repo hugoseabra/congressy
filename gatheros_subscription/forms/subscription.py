@@ -96,13 +96,11 @@ class SubscriptionForm(EventConfigForm):
 
         try:
             self.initial.update({'user': self.instance.person.user.pk})
+
         except (ObjectDoesNotExist, AttributeError):
             pass
 
         for field_name, gatheros_field in six.iteritems(self.gatheros_fields):
-            if not gatheros_field:
-                continue
-
             answer = gatheros_field.answer(subscription=self.instance)
             if not answer:
                 continue
@@ -110,9 +108,10 @@ class SubscriptionForm(EventConfigForm):
             if isinstance(answer, City):
                 answer = answer.pk
 
-            elif not gatheros_field.form_default_field:
+            else:
                 try:
                     answer = json.loads(answer.value)
+
                 except ValueError:
                     continue
 
@@ -129,21 +128,21 @@ class SubscriptionForm(EventConfigForm):
 
         if self.instance:
             instance = self.instance
+            instance.modified = datetime.now()
 
         else:
+            # @TODO Registrar autor da inscrição.
             instance = Subscription(
                 origin=Subscription.DEVICE_ORIGIN_WEB,
                 created_by=1,
             )
 
-        instance.person = self._save_or_create_person()
-        instance.lot = lot
-        instance.modified = datetime.now()
-        instance.save()
-
         self.instance = instance
+        self.instance.person = self._save_or_create_person()
+        self.instance.lot = lot
+        self.instance.save()
 
-        return instance
+        return self.instance
 
     def _save_or_create_person(self):
         """ Salva uma pessoa existente ou cria uma nova caso não exista. """
@@ -159,16 +158,20 @@ class SubscriptionForm(EventConfigForm):
                 person = self.instance.person
 
         except ObjectDoesNotExist:
+            # Para esta condição, os campos obrigatórios já deve estar contidos
+            # nos campos padrão da plataforma.
             person = Person()
 
-        for f_name, gatheros_field in six.iteritems(self.default_fields):
+        for f_name, gatheros_field in six.iteritems(self.gatheros_fields):
             value = self.cleaned_data.get(f_name)
 
-            if hasattr(person, f_name):
-                if f_name == 'city':
-                    value = City.objects.get(pk=value)
+            if not hasattr(person, f_name):
+                continue
 
-                setattr(person, f_name, value)
+            if f_name == 'city':
+                value = City.objects.get(pk=value)
+
+            setattr(person, f_name, value)
 
         person.save()
 
@@ -177,7 +180,18 @@ class SubscriptionForm(EventConfigForm):
     def _save_or_create_answers(self):
         """ Salva respostas. """
 
-        for f_name, gatheros_field in six.iteritems(self.additional_fields):
+        if not self.instance:
+            raise Exception('A instância de inscrição deve estar setada.')
+
+        # Campos
+        for f_name, gatheros_field in six.iteritems(self.gatheros_fields):
+            # Resgata responsta preexistente
+            gatheros_answer = gatheros_field.answer(subscription=self.instance)
+
+            # Se a resposta vir de Person ou outro objeto, ignorar
+            if not isinstance(gatheros_answer, Answer):
+                continue
+
             value = self.cleaned_data.get(f_name)
 
             if gatheros_field.field_type == Field.FIELD_BOOLEAN:
@@ -206,26 +220,20 @@ class SubscriptionForm(EventConfigForm):
             elif gatheros_field.field_type == Field.FIELD_BOOLEAN:
                 value = json.dumps({'value': value, 'output': "Não"})
 
-            # Resposta já persistida
-            gatheros_answer = gatheros_field.answer(subscription=self.instance)
-
-            if not value:
-                if gatheros_answer:
-                    # Se há resposta anterior e não há valor, exclui
-                    gatheros_answer.delete()
-
+            # Se há resposta anterior e não há valor, exclui
+            if gatheros_answer and not value:
+                gatheros_answer.delete()
                 continue
 
-            else:
-                # Se há valor e não há resposta anterior, criar
-                if not gatheros_answer:
-                    gatheros_answer = Answer(
-                        subscription=self.instance,
-                        field=gatheros_field,
-                    )
+            # Se há valor e não há resposta anterior, criar
+            if value and not gatheros_answer:
+                gatheros_answer = Answer(
+                    subscription=self.instance,
+                    field=gatheros_field,
+                )
 
-                gatheros_answer.value = value
-                gatheros_answer.save()
+            gatheros_answer.value = value
+            gatheros_answer.save()
 
     # noinspection PyMethodMayBeStatic
     def _process_option_answers(
@@ -283,7 +291,7 @@ class SubscriptionForm(EventConfigForm):
 
     def _add_lot_field(self, hide_lot=True):
         """
-        Adiciona o campo `lot` no formulário, sendo ele uma lista ou hidden.
+        Adiciona o campo `lot` no formulário.
         """
 
         choices = [('', '- Selecione -')]
@@ -313,6 +321,7 @@ class SubscriptionAttendanceForm(forms.Form):
         super(SubscriptionAttendanceForm, self).__init__(*args, **kwargs)
 
     def attended(self, attended):
+        """ Persiste atendimento de acordo com parâmetro. """
         self.instance.attended_on = datetime.now() if attended else None
         self.instance.attended = attended
         self.instance.save()
