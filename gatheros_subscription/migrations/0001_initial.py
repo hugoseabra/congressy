@@ -270,7 +270,7 @@ class Migration(migrations.Migration):
                 )),
             ],
             options={
-                'ordering': ['field__form__id', 'field__id', 'name'],
+                'ordering': ['field__id', 'name'],
                 'verbose_name': 'Opção de Campo',
                 'verbose_name_plural': 'Opções de Campo',
             },
