@@ -171,7 +171,7 @@ def setup_server(target='prod', document_root='/var/www/'):
     except Exception as e:
         abort(
             """
-    %s. 
+    %s.
     Para limpar antes execute:
         fab -H %s setup_server:target='%s',document_root='%s'
             """ % (

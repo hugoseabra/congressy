@@ -59,7 +59,7 @@ class SubscriptionFormViewTest(TestCase):
 
     def _login(self):
         self.client.force_login(self.user)
-        
+
     def test_add_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         url = reverse('gatheros_subscription:subscription-add', kwargs={
@@ -70,7 +70,7 @@ class SubscriptionFormViewTest(TestCase):
         redirect_url = reverse('gatheros_front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
-        
+
     def test_edit_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         sub = Subscription.objects.filter(event=self.event).first()
@@ -83,7 +83,7 @@ class SubscriptionFormViewTest(TestCase):
         redirect_url = reverse('gatheros_front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
-    
+
     def test_delete_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         sub = Subscription.objects.filter(event=self.event).first()
@@ -136,7 +136,7 @@ class SubscriptionFormViewTest(TestCase):
         url = reverse('gatheros_subscription:subscription-add', kwargs={
             'event_pk': self.event.pk,
         })
-        
+
         self._login()
         response = self.client.post(url, self.data, follow=True)
         self.assertContains(response, 'Pré-inscrição criada com sucesso')
