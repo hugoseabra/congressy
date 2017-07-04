@@ -91,10 +91,6 @@ def deploy(target='prod', document_root='/var/www/'):
         migrate()
         config_supervisor()
         config_nginx()
-        run('supervisorctl reread')
-        run('supervisorctl start %s' % ' '.join(services))
-        run('/etc/init.d/nginx configtest')
-        run('/etc/init.d/nginx reload')
 
 
 @task
