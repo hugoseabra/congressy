@@ -14,13 +14,13 @@ Fabric==1.13.2
 """
 import ConfigParser
 import os
-import string
 from StringIO import StringIO
 from datetime import datetime
 
 from django.utils.crypto import get_random_string
 from fabric.api import *
 from fabric.contrib import files
+from jinja2 import Template
 
 ##############################################################################
 # Configurações do projeto
@@ -39,25 +39,17 @@ SETTINGS_CONF = """
 \"\"\"
 from .settings import *
 
-SECRET_KEY = '${secret_key}'
+SECRET_KEY = '{{secret_key}}'
 DATABASES = {
     'default': {
         'ENGINE':'django.db.backends.postgresql_psycopg2',
-        'NAME': '${db_name}',
-        'USER': '${db_user}',
-        'PASSWORD': '${db_password}',
+        'NAME': '{{dbname}}',
+        'USER': '{{dbuser}}',
+        'PASSWORD': '{{dbpass}}',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
 }
-"""
-
-PIP_CONF = """
-[global]
-extra-index-url = http://kanu:kanu@pypi.kanusoftware.com/simple/
-
-[install]
-trusted-host=pypi.kanusoftware.com
 """
 
 
@@ -77,20 +69,68 @@ def deploy(target='prod', document_root='/var/www/'):
     """
     defaults(target=target, document_root=document_root)
 
-    # Extraindo os serviços supervisord relacionados
-    services = []
-    for line in run('supervisorctl status').strip().split("\n"):
-        service_name = line.split(' ')[0]
-        if env.full_name in service_name:
-            services.append(service_name)
-
     with cd(env.deploy_dir), prefix('source venv/bin/activate'):
         run('git pull origin master')
         install_requirements()
-        run('supervisorctl stop %s' % ' '.join(services))
+        run('supervisorctl stop %s' % ' '.join(get_supervisor_services()))
         migrate()
         config_supervisor()
         config_nginx()
+
+
+@task
+def reinstalldb(target='prod', document_root='/var/www/', fixtures=None):
+    """
+    Reinstala o banco de dados e executa os fixtures, para evistar problemas
+    um backup é gerado antes de qualquer alteração ser executada
+
+    :param target:
+        prefixo a ser colocado no nome do projeto para indicar sua
+        finalidade 'prod': produção, 'test': teste etc
+    :param document_root:
+        Diretório onde será colocado o projeto
+    :param fixtures: lista separada por virgula
+    :return:
+    """
+    defaults(target=target, document_root=document_root)
+
+    # Se o banco existe, precisa fazer um backup antes de excluir
+    if check_dbname(raise_error=False):
+        # Verifica se existe o diretório para salvar o backup
+        if not files.exists('/backup/'):
+            abort('Não foi possível criar um backup do banco, '
+                  'o diretório "/backup/" não existe.')
+
+        # Executa o backup
+        bkp_name = '/backup/reinstalldb_{0}_{1}.sql'.format(
+            datetime.now().strftime('%Y%m%d%H%M'),
+            env.dbname
+        )
+        command = 'pg_dump --format=c --file="{0}" {1}'.format(
+            bkp_name, env.dbname)
+        sudo(command, user='postgres')
+
+        # Informa o usuário
+        warn('Um backup foi criado em: {0}'.format(bkp_name))
+
+        # Para os serviços do supervisor
+        run('supervisorctl stop %s' % ' '.join(get_supervisor_services()))
+
+        # Removendo o banco antigo
+        sudo('psql -c "DROP DATABASE %s;"' % env.dbname, user='postgres')
+
+    # Criando banco novo
+    create_dbinstance()
+
+    # Migrando banco
+    migrate()
+
+    # Instalando fixtures informados
+    for item in fixtures.split(';'):
+        management_cmd("loaddata %s" % item)
+
+    # Iniciando os serviços do supervisor
+    run('supervisorctl start %s' % ' '.join(get_supervisor_services()))
 
 
 @task
@@ -108,26 +148,22 @@ def disable(target='prod', document_root='/var/www/'):
         Diretório onde será colocado o projeto
     """
     defaults(target=target, document_root=document_root)
-    pre_name = 'disabled_%s' % datetime.now().strftime('%Y%m%d%H%M')
+    pre = 'disabled_%s' % datetime.now().strftime('%Y%m%d%H%M')
 
     # Renomeia o banco
     if check_dbname(False):
-        sql = 'ALTER DATABASE %s RENAME TO %s_%s;' % (env.normalized_name,
-                                                      pre_name,
-                                                      env.normalized_name)
+        sql = 'ALTER DATABASE {0} RENAME TO {1}_{0};'.format(env.dbname, pre)
         sudo('psql -c "%s"' % sql, user='postgres')
 
     # Renomeia o usuário do banco
     if check_dbuser(False):
-        sql = 'ALTER USER %s RENAME TO %s_%s;' % (env.normalized_name,
-                                                  pre_name,
-                                                  env.normalized_name)
+        sql = 'ALTER USER {0} RENAME TO {1}_{0};'.format(env.dbname, pre)
         sudo('psql -c "%s"' % sql, user='postgres')
 
     # Renomeia o diretório de deploy
     if files.exists(env.deploy_dir):
         parent_dir = os.path.abspath(os.path.join(env.deploy_dir, '..'))
-        new_dir = os.path.join(parent_dir, '%s_%s' % (pre_name, env.full_name))
+        new_dir = os.path.join(parent_dir, '%s_%s' % (pre, env.full_name))
         run('mv %s %s' % (env.deploy_dir, new_dir))
 
     # Apagando conf do nginx
@@ -192,33 +228,36 @@ def setup_server(target='prod', document_root='/var/www/'):
 
     # Configuração do servidor pypi privado
     mkdir('~/.pip/')
-    put(local_path=StringIO(PIP_CONF), remote_path='~/.pip/pip.conf')
+    content = StringIO("""
+[global]
+extra-index-url = http://kanu:kanu@pypi.kanusoftware.com/simple/
+
+[install]
+trusted-host=pypi.kanusoftware.com
+    """)
+    put(local_path=content, remote_path='~/.pip/pip.conf')
 
     # Instalando dependências
     install_requirements()
 
+    # Criando usuário do banco
+    create_dbuser()
+
+    # Criando banco novo
+    create_dbinstance()
+
     # Criando senha do banco e secret key para o settings
-    db_password = generate_password()
-    db_user = env.normalized_name
-    db_name = env.normalized_name
-    secret_key = generate_password()
+    require('dbpass')
     kwargs = {
-        'db_password': db_password,
-        'db_user': db_user,
-        'db_name': db_name,
-        'secret_key': secret_key,
+        'dbpass': env.dbpass,
+        'dbuser': env.dbuser,
+        'dbname': env.dbname,
+        'secret_key': generate_password(),
         'target': env.target
     }
-    content = SETTINGS_CONF.decode('utf8')
-    content = string.Template(content).substitute(**kwargs)
-    content = content.encode('utf8')
+    template = Template(SETTINGS_CONF.decode('utf-8'))
+    content = template.render(kwargs).encode('utf-8')
     put(local_path=StringIO(content), remote_path=env.settings_file)
-
-    # Criando usuário e banco
-    run('echo "CREATE DATABASE {0}; '
-        '      CREATE USER {1} WITH password \'{2}\'; '
-        '      GRANT ALL PRIVILEGES ON DATABASE {0} to {1};" '
-        '| su -c psql postgres'.format(db_name, db_user, db_password))
 
     # Criando diretório paga guardar os uploads
     mkdir(get_settings_value('MEDIA_ROOT'))
@@ -307,7 +346,9 @@ def defaults(target='prod', document_root='/var/www/'):
     env.use_ssh_config = True
     env.target = target
     env.full_name = '%s.%s' % (target, env.base_name)
-    env.normalized_name = env.full_name.replace('.', '_')
+    normalized_name = env.full_name.replace('.', '_')
+    env.dbname = normalized_name
+    env.dbuser = normalized_name
     env.deploy_dir = os.path.join(document_root, env.full_name)
     env.local_dir = os.path.dirname(__file__)
     env.conf_root = os.path.join(env.local_dir, 'conf')
@@ -444,16 +485,14 @@ def check_dbname(raise_error=True):
 
     :return: bool
     """
-    require('normalized_name')
+    require('dbname')
     with cd('/'):
-        sql = "SELECT 1 FROM pg_database WHERE datname='%s'" % \
-              env.normalized_name
+        sql = "SELECT 1 FROM pg_database WHERE datname='%s'" % env.dbname
 
         if sudo('psql -tAc "%s"' % sql, user='postgres') == '1':
             if raise_error:
-                raise Exception('O banco de dados "%s" existe'
-                                % env.normalized_name)
-        return True
+                raise Exception('O banco de dados "%s" existe' % env.dbname)
+            return True
     return False
 
 
@@ -463,15 +502,13 @@ def check_dbuser(raise_error=True):
 
     :return: bool
     """
-    require('normalized_name')
+    require('dbuser')
     with cd('/'):
-        sql = "SELECT 1 FROM pg_roles WHERE rolname='%s'" % \
-              env.normalized_name
+        sql = "SELECT 1 FROM pg_roles WHERE rolname='%s'" % env.dbuser
 
         if sudo('psql -tAc "%s"' % sql, user='postgres') == '1':
             if raise_error:
-                raise Exception('O usuário de banco de dados "%s" existe'
-                                % env.normalized_name)
+                raise Exception('O usuário de banco "%s" existe' % env.dbuser)
             return True
         return False
 
@@ -496,10 +533,59 @@ def check_project(raise_error=True):
 
     # Diretório do projeto
     if files.exists(env.deploy_dir):
-        all_exceptions.append('O diretório "%s" já existe' %
-                              env.supervisor_file)
+        all_exceptions.append('O diretório "%s" já existe' % env.deploy_dir)
 
     if all_exceptions and raise_error:
         raise Exception('. '.join(all_exceptions))
 
     return len(all_exceptions) > 0
+
+
+def get_supervisor_services():
+    """
+    Extraindo os nomes dos serviços supervisord relacionados
+
+    :return: list[str]
+    """
+    require('full_name')
+
+    services = []
+    for line in run('supervisorctl status').strip().split("\n"):
+        service_name = line.split(' ')[0]
+        if env.full_name in service_name:
+            services.append(service_name)
+
+    return services
+
+
+def create_dbuser():
+    """
+    Criar usuário do banco
+    """
+    require('dbuser')
+    require('dbname')
+
+    # Criando usuário do banco
+    env.dbpass = generate_password()
+    sql = "CREATE USER {0} WITH password '{1}';".format(
+        env.dbuser, env.dbpass)
+    sudo('psql -c "%s"' % sql, user='postgres')
+
+
+def create_dbinstance():
+    """
+    Criar banco
+    """
+    require('dbuser')
+    require('dbname')
+
+    sql = """
+    CREATE DATABASE {0}
+      WITH OWNER = {1}
+        ENCODING = 'UTF8'
+        TABLESPACE = pg_default
+        LC_COLLATE = 'pt_BR.UTF-8'
+        LC_CTYPE = 'pt_BR.UTF-8'
+        CONNECTION LIMIT = -1;
+    """.format(env.dbname, env.dbuser)
+    sudo('psql -c "%s"' % sql, user='postgres')
