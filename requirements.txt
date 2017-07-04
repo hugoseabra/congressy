@@ -7,7 +7,7 @@ django-localflavor==1.4.1
 django-permission==1.0.4
 django-stdimage==2.4.1
 djangorestframework==3.4.7
-kanu-datatable==1.0.7
+gunicorn==19.7.1
 kanu-locations==1.0.1
 olefile==0.44
 packaging==16.8
