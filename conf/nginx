@@ -1,5 +1,5 @@
 server {
-    listen 80;
+    listen 79.143.184.103:80;
     server_name {{full_name}};
 
     location /media  {
