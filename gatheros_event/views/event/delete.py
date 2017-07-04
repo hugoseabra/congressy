@@ -5,6 +5,7 @@ from gatheros_event.views.mixins import DeleteViewMixin
 
 
 class EventDeleteView(DeleteViewMixin):
+    """ View de exclusão de Event. """
     model = Event
     success_url = reverse_lazy('gatheros_event:event-list')
     delete_message = "Tem certeza que deseja excluir o evento \"{name}\"?"
@@ -20,13 +21,15 @@ class EventDeleteView(DeleteViewMixin):
         return context
 
     def _get_referer_url(self):
+        """ Recupera url anterior para redirecionamento. """
         request = self.request
         previous_url = request.META.get('HTTP_REFERER')
-        if previous_url:
-            host = request.scheme + '://' + request.META.get('HTTP_HOST', '')
-            previous_url = previous_url.replace(host, '')
 
-            if previous_url != request.path:
-                return previous_url
+        if not previous_url:
+            return self.success_url
 
-        return self.success_url
+        host = request.scheme + '://' + request.META.get('HTTP_HOST', '')
+        previous_url = previous_url.replace(host, '')
+
+        if previous_url != request.path:
+            return previous_url

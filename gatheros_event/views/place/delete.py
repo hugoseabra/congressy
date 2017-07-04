@@ -12,6 +12,9 @@ class PlaceDeleteView(DeleteViewMixin):
     success_message = 'Local excluído com sucesso.'
     place_organization = None
 
+    def get_permission_denied_url(self):
+        return self.get_success_url()
+
     def dispatch(self, request, *args, **kwargs):
         can_delete = self.can_delete()
 

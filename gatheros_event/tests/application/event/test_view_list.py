@@ -40,6 +40,9 @@ class EventListTest(TestCase):
         # Usuário com várias organizações
         self.user = User.objects.get(username="lucianasilva@gmail.com")
         self.url = reverse('gatheros_event:event-list')
+
+    def _login(self):
+        """ Realiza login. """
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
@@ -66,11 +69,24 @@ class EventListTest(TestCase):
         event_list = response.context['object_list']
         return list(event_list)
 
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self.url, follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
     def test_status_is_200_ok(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
         result = self.client.get(self.url)
         self.assertEqual(result.status_code, 200)
 
     def test_list_of_user_organization(self):
+        """ Testa lista de eventos de acordo com a organização do contexto. """
+
+        self._login()
         first_list = self._get_context_list()
 
         # Primeiro contexto de usuário

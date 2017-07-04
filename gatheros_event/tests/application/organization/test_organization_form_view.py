@@ -24,7 +24,7 @@ class MockRequest(HttpRequest):
         super(MockRequest, self).__init__()
 
 
-class OrganizationFormAddTest(TestCase):
+class OrganizationFormViewTest(TestCase):
     fixtures = [
         '005_user',
         '006_person',
@@ -34,10 +34,33 @@ class OrganizationFormAddTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
+        """ Realiza login. """
         self.client.force_login(self.user)
+
+    # noinspection PyMethodMayBeStatic
+    def _get_url(self):
+        """ Resgata URL. """
+        return reverse_lazy('gatheros_event:organization-add')
+
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(), follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
+    def test_200(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
+        response = self.client.get(self._get_url())
+        self.assertEqual(response.status_code, 200)
 
     def test_add(self):
         """ Testa criação de organização pela view. """
+        self._login()
         data = {
             'name': 'Added organization',
             'description_html': '<p style="color:red>Some text</p>',
@@ -71,7 +94,7 @@ class OrganizationFormAddTest(TestCase):
 
     def test_edit(self):
         """ Testa edição de organização pela view. """
-
+        self._login()
         org = Organization.objects.get(slug='in2-web-solucoes-e-servicos')
         data = {
             'name': org.name + ' edited',
@@ -96,7 +119,7 @@ class OrganizationFormAddTest(TestCase):
 
     def test_delete(self):
         """ Testa exclusão de organização pela view. """
-
+        self._login()
         org = Organization.objects.get(slug='in2-web-solucoes-e-servicos')
 
         response = self.client.post(

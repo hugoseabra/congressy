@@ -52,15 +52,20 @@ class EventDetailBannersUploadTest(TestCase):
         self.persisted_path = 'event'
 
         self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.client.force_login(self.user)
-        self._switch_context()
         self._clear_uploaded_directory()
 
+    def _login(self):
+        """ Realiza login. """
+        self.client.force_login(self.user)
+        self._switch_context()
+
     def _get_active_organization(self):
+        """ Resgata organização ativa no contexto de usuário. """
         request = MockRequest(self.user, self.client.session)
         return account.get_organization(request)
 
     def _switch_context(self, group=Member.ADMIN):
+        """ Muda organização do contexto de usuário. """
         organization = self._get_active_organization()
         other = Organization.objects.exclude(pk=organization.pk).filter(
             members__person=self.user.person,
@@ -70,6 +75,7 @@ class EventDetailBannersUploadTest(TestCase):
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_url(self, pk=None):
+        """ Resgata URL. """
         if not pk:
             event = self._get_event()
             pk = event.pk
@@ -80,10 +86,12 @@ class EventDetailBannersUploadTest(TestCase):
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
+        """ Resgata instância de Event. """
         return Event.objects.get(slug='seo-e-resultados')
 
     # noinspection PyMethodMayBeStatic
     def _clear_uploaded_directory(self):
+        """ Exclui diretório de upload com todos os arquivos. """
         event = self._get_event()
         path = os.path.join(self.event_path, str(event.pk))
         if os.path.isdir(path):
@@ -92,7 +100,23 @@ class EventDetailBannersUploadTest(TestCase):
     def tearDown(self):
         self._clear_uploaded_directory()
 
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(), follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
+    def test_200(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
+        response = self.client.get(self._get_url())
+        self.assertEqual(response.status_code, 200)
+
     def test_upload(self):
+        """ Testa upload de banners. """
+        self._login()
         file_names = {
             'banner_top': 'Evento_Banner_topo.png',
             'banner_slide': 'Evento_Banner_destaque.png',
@@ -161,14 +185,19 @@ class EventDetailPlaceTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="flavia@in2web.com.br")
+
+    def _login(self):
+        """ Realiza login. """
         self.client.force_login(self.user)
         self._switch_context()
 
     def _get_active_organization(self):
+        """ Resgata organização ativa no contexto do login. """
         request = MockRequest(self.user, self.client.session)
         return account.get_organization(request)
 
     def _switch_context(self, group=Member.ADMIN):
+        """ Muda organização do contexto de login. """
         organization = self._get_active_organization()
         other = Organization.objects.exclude(pk=organization.pk).filter(
             members__person=self.user.person,
@@ -178,6 +207,7 @@ class EventDetailPlaceTest(TestCase):
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_url(self, pk=None):
+        """ Recupera URL. """
         if not pk:
             event = self._get_event()
             pk = event.pk
@@ -186,9 +216,26 @@ class EventDetailPlaceTest(TestCase):
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
+        """ Recupera instância de evento. """
         return Event.objects.get(slug='encontro-de-lideres-2017')
 
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(), follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
+    def test_200(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
+        response = self.client.get(self._get_url())
+        self.assertEqual(response.status_code, 200)
+
     def test_upload_place(self):
+        """ Testa atualização de local de evento. """
+        self._login()
         event = self._get_event()
         place = event.place
 
@@ -232,9 +279,13 @@ class EventDetailSocialMediaTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
+        """ Realiza login """
         self.client.force_login(self.user)
 
     def _get_url(self, pk=None):
+        """ Recupera URL """
         if not pk:
             event = self._get_event()
             pk = event.pk
@@ -243,9 +294,26 @@ class EventDetailSocialMediaTest(TestCase):
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
+        """ Recupera instância de evento. """
         return Event.objects.get(slug='a-arte-de-usar-linux')
 
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(), follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
+    def test_200(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
+        response = self.client.get(self._get_url())
+        self.assertEqual(response.status_code, 200)
+
     def test_update_social_media(self):
+        """ Testa atualização de social media. """
+        self._login()
         event = self._get_event()
         place = event.place
 

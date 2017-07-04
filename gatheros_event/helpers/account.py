@@ -33,10 +33,13 @@ def get_organization(request):
     """Retorna a organização ativa na sessão."""
 
     if not request.user.is_authenticated():
-        return
+        return None
+
+    account = request.session.get('account')
+    if not account:
+        return None
 
     if not hasattr(request, 'cached_organization'):
-        account = request.session.get('account')
         try:
             org = Organization.objects.get(
                 pk=account.get('organization'),

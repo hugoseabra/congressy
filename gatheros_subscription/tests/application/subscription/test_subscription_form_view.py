@@ -57,36 +57,88 @@ class SubscriptionFormViewTest(TestCase):
             ],
         })
 
-    def _get_url(self, event=None):
-        if not event:
-            event = self.event
-
-        return reverse('gatheros_subscription:subscription-add', kwargs={
-            'event_pk': event.pk
-        })
-
     def _login(self):
         self.client.force_login(self.user)
-
-    def test_not_logged(self):
+        
+    def test_add_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
-        response = self.client.get(self._get_url(), follow=True)
+        url = reverse('gatheros_subscription:subscription-add', kwargs={
+            'event_pk': self.event.pk,
+        })
+        response = self.client.get(url, follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+        
+    def test_edit_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        sub = Subscription.objects.filter(event=self.event).first()
+        url = reverse('gatheros_subscription:subscription-edit', kwargs={
+            'event_pk': self.event.pk,
+            'pk': sub.pk
+        })
+        response = self.client.get(url, follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+    
+    def test_delete_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        sub = Subscription.objects.filter(event=self.event).first()
+        url = reverse('gatheros_subscription:subscription-delete', kwargs={
+            'event_pk': self.event.pk,
+            'pk': sub.pk
+        })
+        response = self.client.get(url, follow=True)
 
         redirect_url = reverse('gatheros_front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
-    def test_200_logged(self):
+    def test_add_200_logged(self):
         """ 200 quando logado. """
         self._login()
-        response = self.client.get(self._get_url())
+        url = reverse('gatheros_subscription:subscription-add', kwargs={
+            'event_pk': self.event.pk,
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_edit_200_logged(self):
+        """ 200 quando logado. """
+        sub = Subscription.objects.filter(event=self.event).first()
+        url = reverse('gatheros_subscription:subscription-edit', kwargs={
+            'event_pk': self.event.pk,
+            'pk': sub .pk
+        })
+
+        self._login()
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete_200_logged(self):
+        """ 200 quando logado. """
+        sub = Subscription.objects.filter(event=self.event).first()
+        url = reverse('gatheros_subscription:subscription-delete', kwargs={
+            'event_pk': self.event.pk,
+            'pk': sub .pk
+        })
+
+        self._login()
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_add_new_person(self):
         """ Testa adição de nova inscrição. """
 
+        url = reverse('gatheros_subscription:subscription-add', kwargs={
+            'event_pk': self.event.pk,
+        })
+        
         self._login()
-        response = self.client.post(self._get_url(), self.data, follow=True)
+        response = self.client.post(url, self.data, follow=True)
         self.assertContains(response, 'Pré-inscrição criada com sucesso')
 
     def test_add_subscription_existing_person(self):
@@ -105,8 +157,12 @@ class SubscriptionFormViewTest(TestCase):
             'user': person.user.pk
         })
 
+        url = reverse('gatheros_subscription:subscription-add', kwargs={
+            'event_pk': self.event.pk,
+        })
+
         self._login()
-        response = self.client.post(self._get_url(), self.data, follow=True)
+        response = self.client.post(url, self.data, follow=True)
         self.assertContains(response, 'Pré-inscrição criada com sucesso')
 
     def test_add_expired_lot(self):
@@ -118,7 +174,10 @@ class SubscriptionFormViewTest(TestCase):
         self.lot.save()
 
         self._login()
-        response = self.client.post(self._get_url(), self.data, follow=True)
+        url = reverse('gatheros_subscription:subscription-add', kwargs={
+            'event_pk': self.event.pk,
+        })
+        response = self.client.post(url, self.data, follow=True)
         self.assertContains(response, 'Lote(s) não disponível(is)')
 
     def test_edit(self):

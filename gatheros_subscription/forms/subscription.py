@@ -108,7 +108,7 @@ class SubscriptionForm(EventConfigForm):
             if isinstance(answer, City):
                 answer = answer.pk
 
-            else:
+            elif isinstance(answer, Answer):
                 try:
                     answer = json.loads(answer.value)
 
@@ -118,7 +118,9 @@ class SubscriptionForm(EventConfigForm):
                 if isinstance(answer, dict):
                     answer = answer['value']
 
-            answer = answer.strip() if isinstance(answer, str) else answer
+            elif isinstance(answer, str):
+                answer = answer.strip()
+
             self.initial.update({field_name: answer})
 
     def _save_or_create_subscription(self):
