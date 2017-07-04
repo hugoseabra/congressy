@@ -113,6 +113,7 @@ class OrganizationAddInternalFormView(
         except ObjectDoesNotExist as e:
             raise PermissionDenied('Um error ocorreu: ' + str(e))
 
+    # noinspection PyMethodMayBeStatic
     def get_success_url(self):
         return reverse_lazy('gatheros_event:event-add')
 

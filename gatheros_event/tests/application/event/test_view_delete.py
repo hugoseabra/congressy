@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.backends.db import SessionStore
 from django.http import HttpRequest
 from django.test import TestCase
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 
 from gatheros_event.helpers import account
 from gatheros_event.models import Event
@@ -36,13 +36,18 @@ class EventDeleteTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
+        """ Realiza login. """
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
+        """ Resgata organização ativa no contexto de usuário. """
         request = MockRequest(self.user, self.client.session)
         return account.get_organization(request)
 
     def _get_event(self, pk=None):
+        """ Resgata instância de Event. """
         if not pk:
             organization = self._get_active_organization()
             return organization.events.first()
@@ -50,30 +55,29 @@ class EventDeleteTest(TestCase):
         return Event.objects.get(pk=pk)
 
     def _get_url(self, pk=None):
+        """ Resgata URL. """
         if not pk:
             event = self._get_event()
             pk = event.pk
 
         return reverse('gatheros_event:event-delete', kwargs={'pk': pk})
 
-    def test_status_not_allowed_redirects(self):
-        result = self.client.get(self._get_url())
-        self.assertEqual(result.status_code, 200)
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(pk=1), follow=True)
 
-    def test_status_is_200(self):
-        member_pks = [member.pk for member in self.user.person.members.all()]
-        event = Event.objects.exclude(
-            organization__members__in=member_pks
-        ).first()
-        url = self._get_url(event.pk)
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
 
-        response = self.client.get(url)
-        self.assertRedirects(
-            response,
-            reverse_lazy('gatheros_event:event-list')
-        )
+    def test_200(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
+        response = self.client.get(self._get_url())
+        self.assertEqual(response.status_code, 200)
 
     def test_delete(self):
+        self._login()
         response = self.client.post(self._get_url(), follow=True)
         self.assertContains(
             response,
@@ -81,6 +85,7 @@ class EventDeleteTest(TestCase):
         )
 
     def test_cannot_delete(self):
+        self._login()
         member_pks = [member.pk for member in self.user.person.members.all()]
         event = Event.objects.exclude(
             organization__members__in=member_pks

@@ -182,10 +182,12 @@ class Event(models.Model, GatherosModelMixin):
         completed = 0.0
 
         if hasattr(self, 'lots'):
-            for lot in self.lots.all():
-                completed += lot.percent_completed
+            num_lots = self.lots.count()
+            if num_lots > 0:
+                for lot in self.lots.all():
+                    completed += lot.percent_completed
 
-            completed = completed / self.lots.count()
+                completed = completed / self.lots.count()
 
         return round(completed, 2)
 

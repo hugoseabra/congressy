@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 
-from gatheros_event.models import Event
+from gatheros_event.models import Organization
 
 
 class MockSession(SessionStore):
@@ -37,8 +37,10 @@ class EventPanelTest(TestCase):
 
     def setUp(self):
         # Usuário que possui eventos em sua organização interna
-        self.user = User.objects.get(username="diegotolentino@gmail.com")
-        self.event = Event.objects.get(slug='django-muito-alem-do-python')
+        self.user = User.objects.get(username="lucianasilva@gmail.com")
+        self.org = Organization.objects.get(
+            slug='in2-web-solucoes-e-servicos'
+        )
 
     def _login(self):
         """ Realiza login """
@@ -46,8 +48,8 @@ class EventPanelTest(TestCase):
 
     def _get_url(self):
         """ Recupera URL """
-        pk = self.event.pk
-        return reverse('gatheros_event:event-panel', kwargs={'pk': pk})
+        pk = self.org.pk
+        return reverse('gatheros_event:organization-panel', kwargs={'pk': pk})
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """

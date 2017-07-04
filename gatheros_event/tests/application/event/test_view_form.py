@@ -41,6 +41,9 @@ class EventAddViewTest(TestCase):
     def setUp(self):
         self.url = reverse_lazy('gatheros_event:event-add')
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
+        """ Realiza login. """
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
@@ -49,6 +52,7 @@ class EventAddViewTest(TestCase):
         return account.get_organization(request)
 
     def _switch_context(self, group=Member.ADMIN):
+        """ Muda para outra organização do contexto do usuário. """
         organization = self._get_active_organization()
         other = Organization.objects.exclude(pk=organization.pk).filter(
             members__person=self.user.person,
@@ -58,11 +62,23 @@ class EventAddViewTest(TestCase):
         url = reverse('gatheros_event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self.url, follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
     def test_status_is_200_ok(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_add_event(self):
+        """ Testa adição de evento. """
+        self._login()
         org = self._get_active_organization()
         data = {
             'organization': org.pk,
@@ -79,6 +95,8 @@ class EventAddViewTest(TestCase):
         self.assertContains(response, 'Evento criado com sucesso.')
 
     def test_cannot_add_event(self):
+        """ Testa restrição de adição de evento. """
+        self._login()
         self._switch_context(group=Member.HELPER)
         org = self._get_active_organization()
 
@@ -115,29 +133,47 @@ class EventEditViewTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
+        """ Realiza login. """
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
+        """ Recupera organização ativa do contexto do usuário. """
         request = MockRequest(self.user, self.client.session)
         return account.get_organization(request)
 
     # noinspection PyMethodMayBeStatic
     def _get_url(self, pk):
+        """ Resgata URL. """
         return reverse('gatheros_event:event-edit', kwargs={'pk': pk})
 
     def _get_event(self, pk=None):
+        """ Resgata instânica de Event. """
         if not pk:
             organization = self._get_active_organization()
             return organization.events.first()
 
         return Event.objects.get(pk=pk)
 
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(pk=1), follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
     def test_status_is_200_ok(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
         event = self._get_event()
         result = self.client.get(self._get_url(pk=event.pk))
         self.assertEqual(result.status_code, 200)
 
     def test_edit_event(self):
+        """ Testa edição de evento. """
+        self._login()
         event = self._get_event()
 
         data = model_to_dict(event, fields=(
@@ -177,6 +213,8 @@ class EventEditViewTest(TestCase):
         self.assertEqual(event.name, data['name'])
 
     def test_cannot_edit_event(self):
+        """ Testa restrição de edição de evento. """
+        self._login()
         organization = self._get_active_organization()
         pks = [event.pk for event in organization.events.all()]
         event = Event.objects.exclude(pk__in=pks).first()
@@ -215,6 +253,9 @@ class EventDatesEditViewTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
+        """ Realiza login. """
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
@@ -223,9 +264,11 @@ class EventDatesEditViewTest(TestCase):
 
     # noinspection PyMethodMayBeStatic
     def _get_url(self, pk):
+        """ Resgata URL. """
         return reverse('gatheros_event:event-edit-dates', kwargs={'pk': pk})
 
     def _get_event(self, pk=None):
+        """ Resgata instânica de Event. """
         if not pk:
             organization = self._get_active_organization()
             event = organization.events.first()
@@ -253,12 +296,24 @@ class EventDatesEditViewTest(TestCase):
 
         return event
 
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(pk=1), follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
     def test_status_is_200_ok(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
         event = self._get_event()
         result = self.client.get(self._get_url(pk=event.pk))
         self.assertEqual(result.status_code, 200)
 
     def test_edit_event(self):
+        """ Testa edição de datas de evento. """
+        self._login()
         event = self._get_event()
 
         data = model_to_dict(event, fields=(
@@ -294,6 +349,8 @@ class EventDatesEditViewTest(TestCase):
         )
 
     def test_cannot_edit_event(self):
+        """ Testa restrição de edição de datas de evento. """
+        self._login()
         organization = self._get_active_organization()
         pks = [event.pk for event in organization.events.all()]
         event = Event.objects.exclude(pk__in=pks).first()
@@ -335,6 +392,9 @@ class EventSubscriptionTypeEditViewTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
+        """ Realiza login. """
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
@@ -378,12 +438,24 @@ class EventSubscriptionTypeEditViewTest(TestCase):
 
         return event
 
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(pk=1), follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
     def test_status_is_200_ok(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
         event = self._get_event()
         result = self.client.get(self._get_url(pk=event.pk))
         self.assertEqual(result.status_code, 200)
 
     def test_edit_event(self):
+        """ Testa edição de tipo de inscrição de evento. """
+        self._login()
         event = self._get_event()
 
         data = model_to_dict(event, fields=(
@@ -421,6 +493,8 @@ class EventSubscriptionTypeEditViewTest(TestCase):
         )
 
     def test_cannot_edit_event(self):
+        """ Testa restrição de edição de tipo de inscrição de evento. """
+        self._login()
         organization = self._get_active_organization()
         pks = [event.pk for event in organization.events.all()]
         event = Event.objects.exclude(pk__in=pks).first()
@@ -457,6 +531,9 @@ class EventPublicationEditViewTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
+        """ Realiza login. """
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
@@ -477,12 +554,24 @@ class EventPublicationEditViewTest(TestCase):
 
         return Event.objects.get(pk=pk)
 
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(pk=1), follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
     def test_status_is_405(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
         event = self._get_event()
         result = self.client.get(self._get_url(pk=event.pk))
         self.assertEqual(result.status_code, 405)
 
     def test_edit_event(self):
+        """ Testa edição de publicação de evento. """
+        self._login()
         event = self._get_event()
 
         data = model_to_dict(event, fields=('published',))
@@ -500,6 +589,8 @@ class EventPublicationEditViewTest(TestCase):
         self.assertEqual(event.published, data['published'])
 
     def test_cannot_edit_event(self):
+        """ Testa restrição de edição de publicação de evento. """
+        self._login()
         organization = self._get_active_organization()
         pks = [event.pk for event in organization.events.all()]
         event = Event.objects.exclude(pk__in=pks).first()

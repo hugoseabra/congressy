@@ -64,7 +64,13 @@ class Field(AbstractField):
         return super(Field, self).save(**kwargs)
 
     def answer(self, subscription):
-        """ Recupera resposta de uma pergunta de acordo com inscrição. """
+        """
+        Recupera resposta de uma pergunta de acordo com inscrição.
+
+        :param subscription:
+        :return: Answer | Mixed
+            Pode retornar um valor puro de `Person` ou um objeto Answer
+        """
 
         person = subscription.person
         if self.form_default_field and hasattr(person, self.name):

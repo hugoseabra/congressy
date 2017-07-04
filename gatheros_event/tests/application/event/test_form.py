@@ -453,6 +453,7 @@ class EventTransferFormTest(TestCase):
         )
 
     def test_render_correct_orgs(self):
+        """ Testa renderização de formulário. """
         members = self.member.person.members.filter(group=Member.ADMIN)
         pks_admin = [member.organization.pk for member in members if
                      member.organization.pk != self.organization.pk]
@@ -477,6 +478,10 @@ class EventTransferFormTest(TestCase):
             self.assertNotIn(str(pk), rendered)
 
     def test_transfer_not_member(self):
+        """
+        Testa registrição de transferência de evento por não-membro de
+        organização.
+        """
         org = self._get_org_not_member()
         form = self._get_form(data={
             'organization_to': org.pk
@@ -485,6 +490,10 @@ class EventTransferFormTest(TestCase):
         self.assertIn('organization_to', form.errors)
 
     def test_transfer_org_not_admin(self):
+        """
+        Testa restrição de transferência de evento por uma organização na qual
+        ele não é admin.
+        """
         person = self.member.person
         member = person.members.exclude(group=Member.ADMIN).first()
 
@@ -495,6 +504,7 @@ class EventTransferFormTest(TestCase):
         self.assertIn('organization_to', form.errors)
 
     def test_transfer(self):
+        """ Testa transferência de evento para outra organização. """
         form = self._get_form()
         member = self.member.person.members.filter(
             group=Member.ADMIN

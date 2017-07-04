@@ -49,9 +49,13 @@ class EventInfoTest(TestCase):
             'info'
         )
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
+        """ Realiza login. """
         self.client.force_login(self.user)
 
     def _get_url(self, pk=None):
+        """ Resgata URL. """
         if not pk:
             event = self._get_event()
             pk = event.pk
@@ -62,6 +66,7 @@ class EventInfoTest(TestCase):
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
+        """ Resgata instância de Event. """
         return Event.objects.get(slug='cafe-expresso-como-preparar')
 
     def tearDown(self):
@@ -74,7 +79,23 @@ class EventInfoTest(TestCase):
         if os.path.isdir(path):
             shutil.rmtree(path)
 
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(pk=1), follow=True)
+
+        redirect_url = reverse('gatheros_front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
+    def test_200(self):
+        """ Testa se está tudo ok com view com submissão GET. """
+        self._login()
+        response = self.client.get(self._get_url())
+        self.assertEqual(response.status_code, 200)
+
     def test_text(self):
+        """ Testa exibição somente texto. """
+        self._login()
         event = self._get_event()
         data = {
             'event': event.pk,
@@ -89,6 +110,8 @@ class EventInfoTest(TestCase):
         )
 
     def test_4_images(self):
+        """ Testa exibição de 4 imagens. """
+        self._login()
         file_names = {
             'image1': 'image1.jpg',
             'image2': 'image2.jpg',
@@ -114,6 +137,8 @@ class EventInfoTest(TestCase):
         )
 
     def test_main_image(self):
+        """ Testa exibição de imagem principal. """
+        self._login()
         file_names = {
             'main_image': 'image_main.jpg',
         }
@@ -136,6 +161,8 @@ class EventInfoTest(TestCase):
         )
 
     def test_video(self):
+        """ Testa exibição de vídeo. """
+        self._login()
         event = self._get_event()
         data = {
             'event': event.pk,
