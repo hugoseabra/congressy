@@ -94,12 +94,12 @@ def deploy(target='prod', document_root='/var/www/'):
 
 
 @task
-def remove(target='prod', document_root='/var/www/'):
+def disable(target='prod', document_root='/var/www/'):
     """
-    Remove uma instância
+    Desabilita uma instância
 
     Para preservar os dados do banco e arquivos da instância, tanto o banco
-    quando o diretório de deploy serão renomeados
+    quando o diretório de deploy são renomeados
 
     :param target:
         prefixo a ser colocado no nome do projeto para indicar sua
@@ -144,35 +144,6 @@ def remove(target='prod', document_root='/var/www/'):
 
 
 @task
-def getgit():
-    config = ConfigParser.SafeConfigParser()
-    config.read('.git/config')
-    print(config.sections())
-
-
-def install_packages():
-    """
-    Instala os pacotes de sistema configurados
-    """
-    require('local_dir')
-    config_file = os.path.join(env.local_dir, 'requirements_os.conf')
-    config = ConfigParser.SafeConfigParser()
-    config.read(config_file)
-
-    run(u"apt-get update")
-    for role in config.sections():
-        run(u"apt-get install -y %s" % config.get(role, 'packages'))
-
-
-def config_ssh_key():
-    """
-    Configura as chaves ssh
-    """
-    put(os.path.join(env.conf_root, 'id_rsa'), '~/.ssh/', mode='600')
-    put(os.path.join(env.conf_root, 'id_rsa.pub'), '~/.ssh/', mode='600')
-
-
-@task
 def setup_server(target='prod', document_root='/var/www/'):
     """
     Configura o servidor e faz o primeiro deploy
@@ -182,10 +153,7 @@ def setup_server(target='prod', document_root='/var/www/'):
         finalidade 'prod': produção, 'test': teste etc
     :param document_root:
         Diretório onde será colocado o projeto
-
-    :return:
     """
-    """ Perform initial deploy on the target """
     defaults(target=target, document_root=document_root)
 
     require('deploy_dir')
@@ -269,9 +237,51 @@ def setup_server(target='prod', document_root='/var/www/'):
     check()
 
 
+@task
+def restore(target='prod', document_root='/var/www/'):
+    """
+    Restaura uma instância removida anteriormente, desfazendo o efeito de
+    remove
+
+    :param target:
+        prefixo a ser colocado no nome do projeto para indicar sua
+        finalidade 'prod': produção, 'test': teste etc
+    :param document_root:
+        Diretório onde será colocado o projeto
+    """
+    abort('Não terminado')
+    # Listar as opções que combinam com o target
+    # Mostrar menu com a escolha para o usuário
+    # Proceder o rename do diretorio, banco e usuário
+    # Redefinir a senha do usuário conforma a configuração
+    # Recriar as configurações do supervisor e nginx
+
+
 ##############################################################################
 # Funções auxiliares
 ##############################################################################
+
+def install_packages():
+    """
+    Instala os pacotes de sistema configurados
+    """
+    require('local_dir')
+    config_file = os.path.join(env.local_dir, 'requirements_os.conf')
+    config = ConfigParser.SafeConfigParser()
+    config.read(config_file)
+
+    run(u"apt-get update")
+    for role in config.sections():
+        run(u"apt-get install -y %s" % config.get(role, 'packages'))
+
+
+def config_ssh_key():
+    """
+    Configura as chaves ssh
+    """
+    put(os.path.join(env.conf_root, 'id_rsa'), '~/.ssh/', mode='600')
+    put(os.path.join(env.conf_root, 'id_rsa.pub'), '~/.ssh/', mode='600')
+
 
 def get_settings_value(name):
     with cd(env.deploy_dir), prefix('source venv/bin/activate'):
