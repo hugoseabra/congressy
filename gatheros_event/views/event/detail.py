@@ -65,12 +65,17 @@ class EventDetailView(AccountMixin, DetailView):
     template_name = 'gatheros_event/event/detail.html'
     object = None
 
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if not self._can_view():
-            return redirect(reverse_lazy('gatheros_event:event-list'))
+    def get_object(self, queryset=None):
+        if self.object:
+            return self.object
 
-        return super(EventDetailView, self).dispatch(request, *args, **kwargs)
+        return super(EventDetailView, self).get_object(queryset)
+
+    def pre_dispatch(self, request):
+        self.object = self.get_object()
+
+    def get_permission_denied_url(self):
+        return reverse_lazy('gatheros_event:event-list')
 
     def get_context_data(self, **kwargs):
         context = super(EventDetailView, self).get_context_data(**kwargs)
@@ -103,10 +108,11 @@ class EventDetailView(AccountMixin, DetailView):
 
         return update_function(request, self.object)
 
-    def _can_view(self):
+    def can_access(self):
+        event = self.get_object()
         can_edit = self.request.user.has_perm(
             'gatheros_event.change_event',
-            self.object
+            event
         )
-        same_organization = self.object.organization == self.organization
+        same_organization = event.organization.pk == self.organization.pk
         return can_edit and same_organization

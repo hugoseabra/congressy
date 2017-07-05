@@ -64,7 +64,7 @@
                             &rightarrow; <a href="{% url 'gatheros_event:invitation-list' object.pk %}">Convites</a>
                         </div>
                     {% endif %}
-                    {% if can_manage_members %}
+                    {% if can_view_members or can_view_members %}
                         <div style="padding:15px">
                             &rightarrow; <a href="{% url 'gatheros_event:member-list' object.pk %}">Membros</a>
                         </div>
@@ -75,10 +75,13 @@
                         </div>
                     {% endif %}
                     <div style="padding:15px">
-                        &rightarrow; <a href="#">Campos de Formulário</a>
+                        &rightarrow; <a href="#">Formulário Padrão</a>
                     </div>
                     <div style="padding:15px">
                         &rightarrow; <a href="#">Pessoas</a>
+                    </div>
+                    <div style="padding:15px">
+                        &rightarrow; <a href="{% url 'gatheros_event:organization-cancel-membership' object.pk %}">Sair da Organização</a>
                     </div>
                 </div>
             </td>

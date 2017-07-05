@@ -378,6 +378,7 @@ class Migration(migrations.Migration):
                     ("can_invite", "Can invite members"),
                     ('can_view', 'Can view'),
                     ('can_add_event', 'Can add event'),
+                    ("can_view_members", "Can view members"),
                     ("can_manage_members", "Can manage members"),
                     ("can_manage_places", "Can manage places"),
                 ),

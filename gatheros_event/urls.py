@@ -76,6 +76,11 @@ url_organization = [
         name='organization-delete'
     ),
     url(
+        r'^(?P<pk>[\d]+)/cancel-membership/$',
+        views.OrganizationCancelMembershipView.as_view(),
+        name='organization-cancel-membership'
+    ),
+    url(
         r'^(?P<pk>[\d]+)/edit/$',
         views.OrganizationEditFormView.as_view(),
         name='organization-edit'

@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView
 
-from gatheros_event.models import Organization
+from gatheros_event.models import Member, Organization
 from gatheros_event.views.mixins import AccountMixin
 
 
@@ -34,11 +34,12 @@ class OrganizationPanelView(AccountMixin, DetailView):
         context.update({
             'invitations': self._get_invitations(),
             'events': self.object.events.all()[0:6],
-            'can_manage_places': self._can_manage_places,
-            'can_manage_invitations': self._can_manage_invitations,
-            'can_manage_members': self._can_manage_members,
-            'can_change': self._can_change,
-            'can_delete': self._can_delete,
+            'can_manage_places': self._can_manage_places(),
+            'can_manage_invitations': self._can_manage_invitations(),
+            'can_view_members': self._can_view_members(),
+            'can_manage_members': self._can_manage_members(),
+            'can_change': self._can_change(),
+            'can_delete': self._can_delete(),
         })
         return context
 
@@ -54,6 +55,12 @@ class OrganizationPanelView(AccountMixin, DetailView):
     def _can_manage_invitations(self):
         return self.request.user.has_perm(
             'gatheros_event.can_invite',
+            self.object
+        )
+
+    def _can_view_members(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_view_members',
             self.object
         )
 
@@ -76,7 +83,7 @@ class OrganizationPanelView(AccountMixin, DetailView):
         )
 
     def _can_view(self):
-        if self.is_participant:
+        if not self.is_manager:
             return False
 
         org = self.get_object()
@@ -84,3 +91,44 @@ class OrganizationPanelView(AccountMixin, DetailView):
         member = org.get_member(user)
 
         return org.internal is False and member and member.active
+
+
+class OrganizationCancelMembershipView(AccountMixin, DetailView):
+    template_name = 'gatheros_event/organization/cancel-membership.html'
+    model = Organization
+    object = None
+    member = None
+
+    def get_object(self, queryset=None):
+        if self.object:
+            return self.object
+
+        parent = super(OrganizationCancelMembershipView, self)
+        self.object = parent.get_object()
+        return self.object
+
+    def pre_dispatch(self, request):
+        try:
+            self.member = Member.objects.get(
+                person=self.request.user.person,
+                organization=self.get_object()
+            )
+
+        except Member.DoesNotExist:
+            pass
+
+    def get_permission_denied_url(self):
+        return reverse('gatheros_event:event-panel', kwargs={
+            'pk': self.kwargs.get('pk')
+        })
+
+    def get_context_data(self, **kwargs):
+        parent = super(OrganizationCancelMembershipView, self)
+        cxt = parent.get_context_data(**kwargs)
+        cxt.update({
+            'member': self.member,
+        })
+        return cxt
+
+    def can_access(self):
+        return self.member is not None

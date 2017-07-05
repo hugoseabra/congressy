@@ -83,7 +83,7 @@
                         </div>
                     </div>
                 {% endif %}
-                {% if organizations %}
+                {% if organizations and organizations|length > 1 %}
                     <div style="padding:5px;overflow: hidden">
                         <label style="font-weight: bold" for="organization-context-pk">Mudar para:</label>
                         <form action="{% url 'gatheros_event:organization-switch' %}"

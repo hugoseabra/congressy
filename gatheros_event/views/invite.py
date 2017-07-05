@@ -72,12 +72,11 @@ class InvitationListView(AccountMixin, ListView):
         return self.invitation_organization
 
     def _can_view(self):
-        not_participant = not self.is_participant
         can_manage = self.request.user.has_perm(
             'gatheros_event.can_invite',
             self.get_invitation_organization()
         )
-        return not_participant and can_manage
+        return self.is_manager and can_manage
 
 
 class InvitationCreateView(AccountMixin, FormView):

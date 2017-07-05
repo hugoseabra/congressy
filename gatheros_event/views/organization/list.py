@@ -38,4 +38,4 @@ class OrganizationListView(AccountMixin, ListView):
         ).distinct()
 
     def _can_view(self):
-        return not self.is_participant
+        return self.is_manager

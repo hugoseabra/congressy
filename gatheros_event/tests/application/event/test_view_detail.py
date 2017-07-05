@@ -87,7 +87,7 @@ class EventDetailBannersUploadTest(TestCase):
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
         """ Resgata instância de Event. """
-        return Event.objects.get(slug='seo-e-resultados')
+        return Event.objects.get(slug='a-arte-de-usar-linux')
 
     # noinspection PyMethodMayBeStatic
     def _clear_uploaded_directory(self):
@@ -330,7 +330,8 @@ class EventDetailSocialMediaTest(TestCase):
             'skype': 'seoresultados',
             'submit_type': 'update_social_media',
         }, follow=True)
+
         self.assertContains(
             response,
-            'Informações sociais atualizadas com sucesso.'
+            'Informações sociais atualizadas com sucesso'
         )

@@ -134,7 +134,6 @@ logic = MemberPermissionLogic(
         'change_organization',
         'delete_organization',
         'can_manage_members',
-        'can_manage_places',
     ],
 )
 add_permission_logic(Organization, logic)
@@ -142,7 +141,11 @@ add_permission_logic(Organization, logic)
 # Organização -> Membro
 logic = MemberPermissionLogic(
     member_is_member,
-    ['can_view', ],
+    [
+        'can_view',
+        'can_view_members',
+        'can_manage_places',
+    ],
 )
 add_permission_logic(Organization, logic)
 
@@ -157,7 +160,7 @@ logic = MemberPermissionLogic(
 )
 add_permission_logic(Member, logic)
 
-# Organização -> Admin -> eventos
+# Organização -> Admin -> Event
 logic = MemberPermissionLogic(
     member_is_admin,
     ['change_event', 'delete_event'],

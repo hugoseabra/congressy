@@ -34,7 +34,10 @@ from .organization.form import (
     OrganizationEditFormView,
 )
 from .organization.list import OrganizationListView
-from .organization.panel import OrganizationPanelView
+from .organization.panel import (
+    OrganizationCancelMembershipView,
+    OrganizationPanelView,
+)
 from .organization.switch import OrganizationSwitch
 # PLACE
 from .place.delete import PlaceDeleteView
