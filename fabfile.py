@@ -7,6 +7,8 @@ Ex:
 fab --list
 fab -H landare setup_server:target='test',document_root='/var/www/testes'
 fab -H landare deploy:target='test',document_root='/var/www/testes'
+fab -H landare deploy:target='test',document_root='/var/www/testes',reinstalldb=True
+fab -H landare disable:target='test',document_root='/var/www/testes'
 
 Requisitos:
 Fabric==1.13.2
@@ -52,20 +54,44 @@ DATABASES = {
 }
 """
 
+FIXTURES = [
+    '001_user',
+    '005_user',
+    '006_person',
+    '007_organization',
+    '008_member',
+    '009_place',
+    '010_event',
+    '011_info',
+    '012_invitation',
+    '001_default_field',
+    '002_default_field_option',
+    '003_form',
+    '004_field',
+    '005_field_option',
+    '006_lot',
+    '007_subscription',
+    '008_answer'
+]  # Dados de teste usados na execução do 'deploy' com 'reinstalldb=True'
+
 
 ##############################################################################
 # Tarefas executaveis
 ##############################################################################
 @task
-def deploy(target='prod', document_root='/var/www/'):
+def deploy(target='prod', document_root='/var/www/', reinstalldb=False):
     """
-    Distribui uma alteração
+    Atualiza uma instância para a versão mais nova
 
     :param target:
         prefixo a ser colocado no nome do projeto para indicar sua
         finalidade 'prod': produção, 'test': teste etc
     :param document_root:
         Diretório onde será colocado o projeto
+    :param reinstalldb:
+        Usado em instancias de teste para recarregar os dados de teste,
+        para evistar problemas um backup é gerado antes de qualquer
+        alteração ser executada
     """
     defaults(target=target, document_root=document_root)
 
@@ -73,64 +99,14 @@ def deploy(target='prod', document_root='/var/www/'):
         run('git pull origin master')
         install_requirements()
         run('supervisorctl stop %s' % ' '.join(get_supervisor_services()))
-        migrate()
+
+        if reinstalldb == 'True' or reinstalldb is True:
+            reinstall_database()
+        else:
+            migrate()
+
         config_supervisor()
         config_nginx()
-
-
-@task
-def reinstalldb(target='prod', document_root='/var/www/', fixtures=None):
-    """
-    Reinstala o banco de dados e executa os fixtures, para evistar problemas
-    um backup é gerado antes de qualquer alteração ser executada
-
-    :param target:
-        prefixo a ser colocado no nome do projeto para indicar sua
-        finalidade 'prod': produção, 'test': teste etc
-    :param document_root:
-        Diretório onde será colocado o projeto
-    :param fixtures: lista separada por virgula
-    :return:
-    """
-    defaults(target=target, document_root=document_root)
-
-    # Se o banco existe, precisa fazer um backup antes de excluir
-    if check_dbname(raise_error=False):
-        # Verifica se existe o diretório para salvar o backup
-        if not files.exists('/backup/'):
-            abort('Não foi possível criar um backup do banco, '
-                  'o diretório "/backup/" não existe.')
-
-        # Executa o backup
-        bkp_name = '/backup/reinstalldb_{0}_{1}.sql'.format(
-            datetime.now().strftime('%Y%m%d%H%M'),
-            env.dbname
-        )
-        command = 'pg_dump --format=c --file="{0}" {1}'.format(
-            bkp_name, env.dbname)
-        sudo(command, user='postgres')
-
-        # Informa o usuário
-        warn('Um backup foi criado em: {0}'.format(bkp_name))
-
-        # Para os serviços do supervisor
-        run('supervisorctl stop %s' % ' '.join(get_supervisor_services()))
-
-        # Removendo o banco antigo
-        sudo('psql -c "DROP DATABASE %s;"' % env.dbname, user='postgres')
-
-    # Criando banco novo
-    create_dbinstance()
-
-    # Migrando banco
-    migrate()
-
-    # Instalando fixtures informados
-    for item in fixtures.split(';'):
-        management_cmd("loaddata %s" % item)
-
-    # Iniciando os serviços do supervisor
-    run('supervisorctl start %s' % ' '.join(get_supervisor_services()))
 
 
 @task
@@ -279,8 +255,7 @@ trusted-host=pypi.kanusoftware.com
 @task
 def restore(target='prod', document_root='/var/www/'):
     """
-    Restaura uma instância removida anteriormente, desfazendo o efeito de
-    remove
+    Restaura uma instância desabilitada
 
     :param target:
         prefixo a ser colocado no nome do projeto para indicar sua
@@ -486,13 +461,13 @@ def check_dbname(raise_error=True):
     :return: bool
     """
     require('dbname')
-    with cd('/'):
-        sql = "SELECT 1 FROM pg_database WHERE datname='%s'" % env.dbname
 
-        if sudo('psql -tAc "%s"' % sql, user='postgres') == '1':
-            if raise_error:
-                raise Exception('O banco de dados "%s" existe' % env.dbname)
-            return True
+    sql = "SELECT 1 FROM pg_database WHERE datname='%s'" % env.dbname
+
+    if sudo('psql -tAc "%s"' % sql, user='postgres') == '1':
+        if raise_error:
+            raise Exception('O banco de dados "%s" existe' % env.dbname)
+        return True
     return False
 
 
@@ -503,14 +478,14 @@ def check_dbuser(raise_error=True):
     :return: bool
     """
     require('dbuser')
-    with cd('/'):
-        sql = "SELECT 1 FROM pg_roles WHERE rolname='%s'" % env.dbuser
 
-        if sudo('psql -tAc "%s"' % sql, user='postgres') == '1':
-            if raise_error:
-                raise Exception('O usuário de banco "%s" existe' % env.dbuser)
-            return True
-        return False
+    sql = "SELECT 1 FROM pg_roles WHERE rolname='%s'" % env.dbuser
+
+    if sudo('psql -tAc "%s"' % sql, user='postgres') == '1':
+        if raise_error:
+            raise Exception('O usuário de banco "%s" existe' % env.dbuser)
+        return True
+    return False
 
 
 def check_project(raise_error=True):
@@ -589,3 +564,44 @@ def create_dbinstance():
         CONNECTION LIMIT = -1;
     """.format(env.dbname, env.dbuser)
     sudo('psql -c "%s"' % sql, user='postgres')
+
+
+def reinstall_database():
+    """
+    Reinstala o banco de dados e executa os fixtures, para evistar problemas
+    um backup é gerado antes de qualquer alteração ser executada
+
+    :param fixtures: lista de fixtures
+    """
+
+    # Se o banco existe, precisa fazer um backup antes de excluir
+    if check_dbname(raise_error=False):
+        # Verifica se existe o diretório para salvar o backup
+        if not files.exists('/backup/'):
+            abort('Não foi possível criar um backup do banco, '
+                  'o diretório "/backup/" não existe.')
+
+        # Executa o backup
+        bkp_name = '/backup/reinstalldb_{0}_{1}.sql'.format(
+            datetime.now().strftime('%Y%m%d%H%M'),
+            env.dbname
+        )
+        command = 'pg_dump --format=c --file="{0}" {1}'.format(
+            bkp_name, env.dbname)
+        sudo(command, user='postgres')
+
+        # Informa o usuário
+        warn('Um backup foi criado em: {0}'.format(bkp_name))
+
+        # Removendo o banco antigo
+        sudo('psql -c "DROP DATABASE %s;"' % env.dbname, user='postgres')
+
+    # Criando banco novo
+    create_dbinstance()
+
+    # Migrando banco
+    migrate()
+
+    # Instalando fixtures informados
+    for item in FIXTURES:
+        management_cmd("loaddata %s" % item)
