@@ -20,7 +20,7 @@ def account(request):
     if not configured and authenticated:
         _account_helper.update_account(request)
 
-    if _account_helper.is_participant(request):
+    if not _account_helper.is_manager(request):
         return {'context_type': 'participant'}
 
     return {

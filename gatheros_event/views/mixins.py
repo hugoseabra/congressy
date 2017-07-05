@@ -12,7 +12,7 @@ from gatheros_event.helpers.account import (
     get_member,
     get_organization,
     get_organizations,
-    is_participant,
+    is_manager,
 )
 
 
@@ -28,9 +28,9 @@ class AccountMixin(LoginRequiredMixin, View):
         return user.is_authenticated() if user else False
 
     @property
-    def is_participant(self):
+    def is_manager(self):
         """ Verifica se usuário é participante apenas. """
-        return is_participant(self.request)
+        return is_manager(self.request)
 
     @property
     def organization(self):
