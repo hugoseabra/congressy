@@ -1,160 +1,180 @@
-from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.views import generic
 
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
+from gatheros_subscription.forms import FieldOptionForm
 from gatheros_subscription.models import Field, FieldOption
-from gatheros_event.models import Event
-from .event_form import BaseFormFieldView
 
 
-class BaseFieldViewMixin(AccountMixin, generic.View):
+class BaseFieldOptionViewMixin(AccountMixin, generic.TemplateView):
     """ Mixin de view para FieldOption. """
-    http_method_names = ['post']
-    event = None
+    form_title = 'Opções de Campo'
     field = None
 
-    def get_success_url(self):
-        """ URL de redirecionamento. """
-        return reverse('gatheros_subscription:field-options', kwargs={
-            'event_pk': self.event.pk,
-            'field_pk': self.field.pk
-        })
-
-    def set_event(self, pk):
-        """ Insere instância de Event. """
-        self.event = get_object_or_404(Event, pk=pk)
-
-    def set_field(self, pk):
-        """ Insere instância de Field. """
-        self.field = get_object_or_404(Field, pk=pk)
-
-
-class FieldOptionAddView(BaseFieldViewMixin):
-    """ View para adicionar FieldOption em Field. """
-
-    def pre_dispatch(self, request):
-        if request.method == 'POST':
-            self.set_event(request.POST.get('event_pk'))
-            self.set_field(request.POST.get('field_pk'))
-
-        super(FieldOptionAddView, self).pre_dispatch(request)
-
-    # noinspection PyUnusedLocal, PyMethodMayBeStatic
-    def post(self, request, *args, **kwargs):
-        url = reverse('gatheros_event:event-list')
-
-        try:
-            name = request.POST.get('name')
-
-            if not name:
-                raise Exception('Informe um nome válido.')
-
-            FieldOption.objects.create(field=self.field, name=name, value=name)
-
-        except (Field.DoesNotExist, Exception) as e:
-            messages.error(request, str(e))
-
-        return redirect(self.get_success_url())
-
-
-class FieldOptionEditView(BaseFieldViewMixin):
-    """ View para editar FieldOption em Field. """
-    field_option = None
-
-    def pre_dispatch(self, request):
-        if request.method == 'POST':
-            self.set_event(request.POST.get('event_pk'))
-
-            pk = self.kwargs.get('pk')
-            self.field_option = get_object_or_404(FieldOption, pk=pk)
-            self.field = self.field_option.field
-
-        super(FieldOptionEditView, self).pre_dispatch(request)
-
-    # noinspection PyUnusedLocal, PyMethodMayBeStatic
-    def post(self, request, *args, **kwargs):
-        url = reverse('gatheros_event:event-list')
-
-        try:
-            name = request.POST.get('name')
-
-            if not name:
-                raise Exception('Informe um nome válido.')
-
-            self.field_option.name = name
-            self.field_option.save()
-
-        except (FieldOption.DoesNotExist, Exception) as e:
-            messages.error(request, str(e))
-
-        return redirect(self.get_success_url())
-
-
-class FieldOptionDeleteView(DeleteViewMixin):
-    """ View para excluir FieldOption. """
-    model = FieldOption
-    event = None
-    success_message = None
-    http_method_names = ['post']
-
-    def pre_dispatch(self, request):
-        super(FieldOptionDeleteView, self).pre_dispatch(request)
-
-        if request.method == 'POST':
-            event_pk = request.POST.get('event_pk')
-            self.event = get_object_or_404(Event, pk=event_pk)
-
-    def get_success_url(self):
-        """ URL de redirecionamento. """
-        return reverse('gatheros_front:start')
-
-    def get_permission_denied_url(self):
-        return self.get_success_url()
-
-    def can_delete(self):
-        can_access = self.can_access()
-        can_change = self.request.user.has_perm(
-            'gatheros_subscription.change_field',
-            self.object.field
-        )
-
-        return can_access and can_change
-
-
-class FieldOptionsView(BaseFormFieldView):
-    template_name = 'gatheros_subscription/event_form/field_options.html'
-    form_title = 'Opções de Campo'
-
-    def get_permission_denied_url(self):
-        return reverse(
-            'gatheros_subscription:fields-config',
-            kwargs={'event_pk': self.kwargs['event_pk']}
-        )
-
     def get_field(self):
-        pk = self.kwargs.get('field_pk')
-        return get_object_or_404(Field, pk=pk)
+        """ Resgata instância de `Field` a partir da QueryString """
+        if self.field:
+            return self.field
+
+        self.field = get_object_or_404(Field, pk=self.kwargs.get('field_pk'))
+        return self.field
 
     def get_context_data(self, **kwargs):
-        cxt = super(FieldOptionsView, self).get_context_data(**kwargs)
-
-        field = self.get_field()
+        cxt = super(BaseFieldOptionViewMixin, self).get_context_data(**kwargs)
         cxt.update({
-            'field': field,
-            'options': field.options.all()
+            'form_title': self.form_title,
+            'field': self.get_field(),
+            'options': self.get_field().options.all().order_by('pk')
         })
         return cxt
 
     def can_access(self):
-        can_access = super(FieldOptionsView, self).can_access()
-        field = self.get_field()
-        has_options = field.with_options
-        if not has_options:
-            messages.warning(
-                self.request,
+        if not self.field.with_options:
+            self.permission_denied_message = \
                 'Este campo não possui suporte a opções.'
+            return False
+
+        organization = self.field.organization
+        is_member = organization.is_member(self.request.user)
+        can_manage = self.request.user.has_perm(
+            'gatheros_event.can_manage_fields',
+            organization
+        )
+        is_default = self.field.form_default_field
+
+        return self.is_manager and is_member and can_manage and not is_default
+
+    def get_success_url(self):
+        raise NotImplementedError()
+
+    def get_permission_denied_url(self):
+        raise NotImplementedError()
+
+
+class BaseFieldOptionFormViewMixin(BaseFieldOptionViewMixin):
+    """ Base para views de formulário de `FieldOption` """
+    http_method_names = ['post']
+    form_class = FieldOptionForm
+    object = None
+        
+    def pre_dispatch(self, request):
+        if request.method == 'GET':
+            raise PermissionDenied(self.get_permission_denied_message())
+
+        super(BaseFieldOptionFormViewMixin, self).pre_dispatch(request)
+    
+    def get_object(self, queryset=None):
+        if self.object:
+            return self.object
+
+        parent = super(BaseFieldOptionFormViewMixin, self)
+        # noinspection PyUnresolvedReferences
+        self.object = parent.get_object(queryset)
+        return self.object
+
+    def get_form_kwargs(self):
+        parent = super(BaseFieldOptionFormViewMixin, self)
+        # noinspection PyUnresolvedReferences
+        kwargs = parent.get_form_kwargs()
+        kwargs.update({'field': self.field})
+        return kwargs
+    
+    def form_invalid(self, form):
+        return redirect(self.get_success_url())
+
+
+class FieldOptionsView(
+    BaseFieldOptionViewMixin,
+    generic.TemplateView
+):
+    """ View para gerenciar `FieldOption`"""
+    template_name = \
+        'gatheros_subscription/field/field_options.html'
+
+    def pre_dispatch(self, request):
+        self.field = self.get_field()
+        super(FieldOptionsView, self).pre_dispatch(request)
+
+    def get_permission_denied_url(self):
+        return reverse(
+            'subscription:fields',
+            kwargs={'organization_pk': self.field.organization.pk}
+        )
+
+
+class FieldOptionAddView(
+    BaseFieldOptionFormViewMixin,
+    generic.CreateView
+):
+    """ View para adicionar `FieldOption` """
+
+    def pre_dispatch(self, request):
+        if request.method == 'POST':
+            self.field = get_object_or_404(
+                Field,
+                pk=request.POST.get('field_pk')
             )
 
-        return can_access and has_options
+        super(FieldOptionAddView, self).pre_dispatch(request)
+
+    def get_success_url(self):
+        return reverse('subscription:field-options', kwargs={
+            'field_pk': self.field.pk
+        })
+
+    def get_permission_denied_url(self):
+        return reverse('front:start')
+
+
+class FieldOptionEditView(
+    BaseFieldOptionFormViewMixin,
+    generic.UpdateView
+):
+    """ View para editar FieldOption em Field. """
+    model = BaseFieldOptionFormViewMixin.form_class.Meta.model
+
+    def pre_dispatch(self, request):
+        self.object = self.get_object()
+        self.field = self.object.field
+        super(FieldOptionEditView, self).pre_dispatch(request)
+
+    def get_success_url(self):
+        return reverse('subscription:field-options', kwargs={
+            'field_pk': self.field.pk
+        })
+
+    def get_permission_denied_url(self):
+        return reverse('subscription:fields',kwargs={
+            'organization_pk': self.field.organization.pk
+        })
+
+
+class FieldOptionDeleteView(
+    BaseFieldOptionViewMixin,
+    DeleteViewMixin
+):
+    """ View para excluir `FieldOption`. """
+    model = FieldOption
+    field = None
+    success_message = None
+    http_method_names = ['post']
+
+    def pre_dispatch(self, request):
+        self.object = self.get_object()
+        self.field = self.object.field
+        super(FieldOptionDeleteView, self).pre_dispatch(request)
+
+    def get_success_url(self):
+        return reverse('subscription:field-options', kwargs={
+            'field_pk': self.field.pk
+        })
+
+    def get_permission_denied_url(self):
+        return reverse('subscription:fields', kwargs={
+            'organization_pk': self.field.organization.pk
+        })
+
+    def can_delete(self):
+        return True
