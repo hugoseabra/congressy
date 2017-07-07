@@ -40,12 +40,12 @@ class InvitationListView(AccountMixin, ListView):
         if not self._can_view():
             if self.organization.internal:
                 messages.warning(request, 'Você não pode acessar esta área.')
-                return redirect(reverse_lazy('gatheros_front:start'))
+                return redirect(reverse_lazy('front:start'))
             else:
                 org = self.get_invitation_organization()
                 messages.warning(request, 'Você não pode realizar esta ação.')
                 return redirect(reverse(
-                    'gatheros_event:organization-panel',
+                    'event:organization-panel',
                     kwargs={'pk': org.pk}
                 ))
 
@@ -85,7 +85,7 @@ class InvitationCreateView(AccountMixin, FormView):
 
     def get_permission_denied_url(self):
         return reverse(
-            'gatheros_event:organization-panel',
+            'event:organization-panel',
             kwargs={'pk': self.kwargs.get('organization_pk')}
         )
 
@@ -137,7 +137,7 @@ class InvitationCreateView(AccountMixin, FormView):
         return self.invitation_organization
 
     def get_success_url(self):
-        return reverse('gatheros_event:invitation-list', kwargs={
+        return reverse('event:invitation-list', kwargs={
             'organization_pk': self.get_invitation_organization().pk
         })
 
@@ -159,7 +159,7 @@ class InvitationResendView(UpdateView):
             messages.warning(request, 'Você não pode realizar esta ação.')
             org = self.get_invitation_organization()
             return redirect(reverse(
-                'gatheros_event:organization-panel',
+                'event:organization-panel',
                 kwargs={'pk': org.pk}
             ))
 
@@ -187,7 +187,7 @@ class InvitationResendView(UpdateView):
                 'O convite não está expirado e não precisa ser renovado.'
             )
 
-        return redirect(reverse('gatheros_event:invitation-list', kwargs={
+        return redirect(reverse('event:invitation-list', kwargs={
             'organization_pk': self.object.author.organization_id
         }))
 
@@ -231,7 +231,7 @@ class InvitationDecisionView(TemplateView):
 
         # Se tem perfil, precisa do login login
         if not authenticated and hasattr(invite.to, 'person'):
-            return redirect('gatheros_front:login')
+            return redirect('event:login')
 
         # Se o usuário autenticado for diferente do usuário do convite
         if authenticated and not request.user == invite.to:
@@ -288,11 +288,11 @@ class InvitationDecisionView(TemplateView):
                 # Atualização contexto de organizações
                 update_account(request=self.request, force=True)
 
-                return redirect('gatheros_event:organization-panel', pk=org_id)
+                return redirect('event:organization-panel', pk=org_id)
             except ValidationError:
                 # Se errado direciona para a criação do perfil
                 return redirect(
-                    'gatheros_event:invitation-profile',
+                    'event:invitation-profile',
                     pk=kwargs.get('pk')
                 )
 
@@ -382,7 +382,7 @@ class InvitationProfileView(TemplateView):
             update_account(request=self.request, force=True)
 
             return redirect(reverse(
-                'gatheros_event:organization-panel',
+                'event:organization-panel',
                 kwargs={'pk': invite.author.organization_id}
             ))
         except ValidationError:
@@ -409,7 +409,7 @@ class InvitationDeleteView(DeleteViewMixin):
 
     def get_success_url(self):
         org = self.get_invitation_organization()
-        return reverse('gatheros_event:invitation-list', kwargs={
+        return reverse('event:invitation-list', kwargs={
             'organization_pk': org.pk
         })
 
@@ -422,7 +422,7 @@ class MyInvitationsListView(AccountMixin, ListView):
     ordering = ('created', 'author__person__name', '-expired',)
 
     def get_permission_denied_url(self):
-        return reverse('gatheros_front:start')
+        return reverse('front:start')
 
     def get_queryset(self):
         query_set = super(MyInvitationsListView, self).get_queryset()

@@ -27,7 +27,7 @@ class OrganizationPanelTest(TestCase):
         organization = member.organization
 
         return reverse(
-            'gatheros_event:organization-panel',
+            'event:organization-panel',
             kwargs={'pk': organization.pk}
         )
 
@@ -38,7 +38,7 @@ class OrganizationPanelTest(TestCase):
         assert member is not None
         organization = member.organization
         self.client.post(
-            reverse('gatheros_event:organization-switch'),
+            reverse('event:organization-switch'),
             {'organization-context-pk': organization.pk}
         )
 

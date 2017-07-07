@@ -17,13 +17,13 @@ class LoginTest(TestCase):
         self.user = User.objects.get(username='lucianasilva@gmail.com')
 
     def test_get_login_is_200_ok(self):
-        self.result = self.client.get(reverse('gatheros_front:login'))
+        self.result = self.client.get(reverse('front:login'))
         self.assertEqual(self.result.status_code, 200)
 
     def test_if_login_ok_redirect(self):
         self.client.force_login(self.user)
-        self.result = self.client.get(reverse('gatheros_front:login'))
-        self.assertRedirects(self.result, reverse('gatheros_front:start'))
+        self.result = self.client.get(reverse('front:login'))
+        self.assertRedirects(self.result, reverse('front:start'))
 
     def test_check_login_ok(self):
         password = '12345'
@@ -34,10 +34,10 @@ class LoginTest(TestCase):
             'password': password
         }
         self.result = self.client.post(
-            reverse('gatheros_front:login'),
+            reverse('event:login'),
             data=data
         )
-        self.assertRedirects(self.result, reverse('gatheros_front:start'))
+        self.assertRedirects(self.result, reverse('front:start'))
 
     def test_check_login_fail(self):
         data = {
@@ -45,7 +45,7 @@ class LoginTest(TestCase):
             'password': 'senha'
         }
         self.result = self.client.post(
-            reverse('gatheros_front:login'),
+            reverse('front:login'),
             data=data
         )
         self.assertEqual(self.result.status_code, 200)

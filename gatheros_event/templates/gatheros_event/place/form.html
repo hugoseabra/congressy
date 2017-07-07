@@ -6,7 +6,7 @@
         {% if next_path %}
             <a href="{{ next_path|urlencode }}">Voltar</a>
         {% else %}
-            <a href="{% url 'gatheros_event:organization-panel' place_organization.pk %}">Voltar</a>
+            <a href="{% url 'event:organization-panel' place_organization.pk %}">Voltar</a>
         {% endif %}
     </div>
     <hr/>
@@ -27,7 +27,7 @@
             <a href="{{ next_path|urlencode }}">Cancelar</a>
             <input type="hidden" name="next" value="{{ next_path }}"/>
         {% else %}
-            <a href="{% url 'gatheros_event:organization-panel' place_organization.pk %}">Voltar</a>
+            <a href="{% url 'event:organization-panel' place_organization.pk %}">Voltar</a>
         {% endif %}
     </form>
 {% endblock %}

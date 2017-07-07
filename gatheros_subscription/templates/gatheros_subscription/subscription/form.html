@@ -1,8 +1,12 @@
 {% extends "gatheros_event/event/base_panel.html" %}
 
+{% block sidebar_organization %}{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content_width %}99%{% endblock %}
+
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_subscription:subscription-list' event.pk %}">Voltar</a>
+        <a href="{% url 'subscription:subscription-list' event.pk %}">Voltar</a>
     </div>
     <hr/>
     <h1>{{ event.name }}</h1>
@@ -165,6 +169,6 @@
         <br />
         <hr />
         <input type="submit" value="Salvar"/>
-        <a href="{% url 'gatheros_subscription:subscription-list' event.pk %}">Cancelar</a>
+        <a href="{% url 'subscription:subscription-list' event.pk %}">Cancelar</a>
     </form>
 {% endblock %}

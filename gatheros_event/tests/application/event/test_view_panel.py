@@ -30,13 +30,13 @@ class EventPanelTest(TestCase):
     def _get_url(self):
         """ Recupera URL """
         pk = self.event.pk
-        return reverse('gatheros_event:event-panel', kwargs={'pk': pk})
+        return reverse('event:event-panel', kwargs={'pk': pk})
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 

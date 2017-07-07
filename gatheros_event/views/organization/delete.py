@@ -9,7 +9,7 @@ class OrganizationDeleteView(DeleteViewMixin):
     model = Organization
     delete_message = 'Tem certeza que deseja excluir a organização "{name}"?'
     success_message = 'Organização excluída com sucesso.'
-    success_url = reverse_lazy('gatheros_event:organization-list')
+    success_url = reverse_lazy('event:organization-list')
 
     def dispatch(self, request, *args, **kwargs):
         can_delete = self.can_delete()

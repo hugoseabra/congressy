@@ -8,7 +8,7 @@
 
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:event-panel' object.pk %}">Voltar</a>
+        <a href="{% url 'event:event-panel' object.pk %}">Voltar</a>
     </div>
     <hr/>
     <h1>Sair da Organização</h1>
@@ -23,8 +23,8 @@
             só poderá retornar à mesma se receber um convite de um dos administradores.
         </div>
         <br />
-        <form action="{% url 'gatheros_event:member-manage' member.organization.pk member.pk %}" method="post">{% csrf_token %}
-            <a href="{% url 'gatheros_event:organization-panel' object.pk %}">Cancelar</a>
+        <form action="{% url 'event:member-manage' member.organization.pk member.pk %}" method="post">{% csrf_token %}
+            <a href="{% url 'event:organization-panel' object.pk %}">Cancelar</a>
             &nbsp; &nbsp;
             <input type="submit" value="Sim, pode prosseguir"/>
             <input type="hidden" name="action" value="delete" />

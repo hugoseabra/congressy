@@ -17,7 +17,7 @@ from gatheros_event.models.rules import check_invite
 
 def send_invitation(invitation):
     url = reverse(
-        'gatheros_event:invitation-decision',
+        'event:invitation-decision',
         kwargs={'pk': str(invitation.pk)}
     )
 

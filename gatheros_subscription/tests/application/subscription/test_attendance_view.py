@@ -34,7 +34,7 @@ class SubscriptionAttendanceSearchViewTest(TestCase):
             event = self.event
 
         return reverse(
-            'gatheros_subscription:subscription-attendance-search',
+            'subscription:subscription-attendance-search',
             kwargs={'event_pk': event.pk}
         )
 
@@ -45,7 +45,7 @@ class SubscriptionAttendanceSearchViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -140,7 +140,7 @@ class SubscriptionAttendanceSearchViewTest(TestCase):
         }
 
         url = reverse(
-            'gatheros_subscription:subscription-attendance',
+            'subscription:subscription-attendance',
             kwargs={'event_pk': self.event.pk, 'pk': subscription.pk}
         )
 
@@ -169,7 +169,7 @@ class SubscriptionAttendanceSearchViewTest(TestCase):
         }
 
         url = reverse(
-            'gatheros_subscription:subscription-attendance',
+            'subscription:subscription-attendance',
             kwargs={'event_pk': self.event.pk, 'pk': subscription.pk}
         )
 

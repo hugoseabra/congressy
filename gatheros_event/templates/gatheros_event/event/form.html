@@ -3,9 +3,9 @@
 {% block content %}
     <div style="padding:10px">
         {% if object %}
-            <a href="{% url 'gatheros_event:event-panel' object.pk %}">Voltar</a>
+            <a href="{% url 'event:event-panel' object.pk %}">Voltar</a>
         {% else %}
-            <a href="{% url 'gatheros_event:event-list' %}">Voltar</a>
+            <a href="{% url 'event:event-list' %}">Voltar</a>
         {% endif %}
     </div>
     <hr/>
@@ -23,7 +23,7 @@
         <div style="background-color: darkgreen;color:#fff;padding:10px;margin:10px 0">
             Você não é organizador de eventos. Para criar seus próprios eventos, clique no botão abaixo:
             <br /><br />
-            <form onsubmit="return confirm('Deseja realmente se tornar um organizador?')" action="{% url 'gatheros_event:organization-add-internal' %}" method="post">{% csrf_token %}
+            <form onsubmit="return confirm('Deseja realmente se tornar um organizador?')" action="{% url 'event:organization-add-internal' %}" method="post">{% csrf_token %}
                 <button type="submit">Quero ser um organizador de eventos.</button>
             </form>
         </div>
@@ -40,7 +40,7 @@
             <a href="{{ next_path|urlencode }}">Cancelar</a>
             <input type="hidden" name="next" value="{{ next_path }}"/>
         {% else %}
-            <a href="{% url 'gatheros_event:event-list' %}">Cancelar</a>
+            <a href="{% url 'event:event-list' %}">Cancelar</a>
         {% endif %}
     </form>
 {% endblock %}

@@ -71,7 +71,7 @@ class EventDetailBannersUploadTest(TestCase):
             members__person=self.user.person,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_url(self, pk=None):
@@ -80,7 +80,7 @@ class EventDetailBannersUploadTest(TestCase):
             event = self._get_event()
             pk = event.pk
 
-        return reverse('gatheros_event:event-detail', kwargs={
+        return reverse('event:event-detail', kwargs={
             'pk': pk
         })
 
@@ -104,7 +104,7 @@ class EventDetailBannersUploadTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -203,7 +203,7 @@ class EventDetailPlaceTest(TestCase):
             members__person=self.user.person,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_url(self, pk=None):
@@ -212,7 +212,7 @@ class EventDetailPlaceTest(TestCase):
             event = self._get_event()
             pk = event.pk
 
-        return reverse('gatheros_event:event-detail', kwargs={'pk': pk})
+        return reverse('event:event-detail', kwargs={'pk': pk})
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
@@ -223,7 +223,7 @@ class EventDetailPlaceTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -290,7 +290,7 @@ class EventDetailSocialMediaTest(TestCase):
             event = self._get_event()
             pk = event.pk
 
-        return reverse('gatheros_event:event-detail', kwargs={'pk': pk})
+        return reverse('event:event-detail', kwargs={'pk': pk})
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
@@ -301,7 +301,7 @@ class EventDetailSocialMediaTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 

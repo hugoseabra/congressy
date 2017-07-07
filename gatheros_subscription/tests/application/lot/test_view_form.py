@@ -39,7 +39,7 @@ class LotAddTest(TestCase):
     ]
 
     def setUp(self):
-        self.url = reverse_lazy('gatheros_event:event-add')
+        self.url = reverse_lazy('event:event-add')
         self.user = User.objects.get(username="lucianasilva@gmail.com")
 
     def _login(self):
@@ -49,7 +49,7 @@ class LotAddTest(TestCase):
     # noinspection PyMethodMayBeStatic
     def _get_url(self, event_pk):
         return reverse(
-            'gatheros_subscription:lot-add',
+            'subscription:lot-add',
             kwargs={'event_pk': event_pk}
         )
 
@@ -63,7 +63,7 @@ class LotAddTest(TestCase):
             members__person=self.user.person,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_event(self, pk=None):
@@ -100,7 +100,7 @@ class LotAddTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -204,7 +204,7 @@ class LotEditTest(TestCase):
     ]
 
     def setUp(self):
-        self.url = reverse_lazy('gatheros_event:event-add')
+        self.url = reverse_lazy('event:event-add')
         self.user = User.objects.get(username="lucianasilva@gmail.com")
 
     def _login(self):
@@ -214,7 +214,7 @@ class LotEditTest(TestCase):
     # noinspection PyMethodMayBeStatic
     def _get_url(self, event_pk, pk):
         return reverse(
-            'gatheros_subscription:lot-edit',
+            'subscription:lot-edit',
             kwargs={'event_pk': event_pk, 'lot_pk': pk}
         )
 
@@ -228,7 +228,7 @@ class LotEditTest(TestCase):
             members__person=self.user.person,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_event(self, pk=None):
@@ -277,7 +277,7 @@ class LotEditTest(TestCase):
             follow=True
         )
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -402,7 +402,7 @@ class LotDeleteTest(TestCase):
     # noinspection PyMethodMayBeStatic
     def _get_url(self, event_pk, pk):
         return reverse(
-            'gatheros_subscription:lot-delete',
+            'subscription:lot-delete',
             kwargs={'event_pk': event_pk, 'lot_pk': pk}
         )
 
@@ -415,7 +415,7 @@ class LotDeleteTest(TestCase):
             members__person=self.user.person,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_event(self, pk=None):
@@ -464,7 +464,7 @@ class LotDeleteTest(TestCase):
             follow=True
         )
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 

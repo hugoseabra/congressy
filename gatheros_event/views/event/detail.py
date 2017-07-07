@@ -22,7 +22,7 @@ def update_banners(request, event):
         messages.error(request, form.errors)
         messages.error(request, form.non_field_errors())
 
-    return redirect(reverse('gatheros_event:event-detail', kwargs={
+    return redirect(reverse('event:event-detail', kwargs={
         'pk': event.pk
     }))
 
@@ -37,7 +37,7 @@ def update_place(request, event):
         messages.error(request, form.errors)
         messages.error(request, form.non_field_errors())
 
-    return redirect(reverse('gatheros_event:event-detail', kwargs={
+    return redirect(reverse('event:event-detail', kwargs={
         'pk': event.pk
     }))
 
@@ -55,7 +55,7 @@ def update_social_media(request, event):
         messages.error(request, form.errors)
         messages.error(request, form.non_field_errors())
 
-    return redirect(reverse('gatheros_event:event-detail', kwargs={
+    return redirect(reverse('event:event-detail', kwargs={
         'pk': event.pk
     }))
 
@@ -72,10 +72,11 @@ class EventDetailView(AccountMixin, DetailView):
         return super(EventDetailView, self).get_object(queryset)
 
     def pre_dispatch(self, request):
+        super(EventDetailView, self).pre_dispatch(request)
         self.object = self.get_object()
 
     def get_permission_denied_url(self):
-        return reverse_lazy('gatheros_event:event-list')
+        return reverse_lazy('event:event-list')
 
     def get_context_data(self, **kwargs):
         context = super(EventDetailView, self).get_context_data(**kwargs)

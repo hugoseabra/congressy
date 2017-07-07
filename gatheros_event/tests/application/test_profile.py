@@ -165,7 +165,7 @@ class ProfileViewTest(TestCase):
             'new_password2': '123',
         }
 
-        self.url = reverse('gatheros_event:profile')
+        self.url = reverse('event:profile')
 
         user = User.objects.get(email=self.data['email'])
         self.client.force_login(user)
@@ -255,7 +255,7 @@ class ProfileCreateViewTest(TestCase):
             "city": 5413,
         }
 
-        self.url = reverse('gatheros_event:profile_create')
+        self.url = reverse('event:profile_create')
 
     def test_get(self):
         """

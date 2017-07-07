@@ -1,8 +1,12 @@
 {% extends "gatheros_event/event/base_panel.html" %}
 
+{% block sidebar_organization %}{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content_width %}99%{% endblock %}
+
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:event-panel' event.pk %}">Voltar</a>
+        <a href="{% url 'event:event-panel' event.pk %}">Voltar</a>
     </div>
     <hr/>
     <h1>Pré-inscrições</h1>
@@ -10,7 +14,7 @@
 
     <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
         {% if can_add_subscription %}
-            <a href="{% url 'gatheros_subscription:subscription-add' event.pk %}">Adicionar</a>
+            <a href="{% url 'subscription:subscription-add' event.pk %}">Adicionar</a>
         {% else %}
             <span style="font-weight: bold">Lotes não disponíveis.</span>
         {% endif %}
@@ -64,7 +68,7 @@
                                 {{ forloop.counter }}
                             </td>
                             <td style="background: #FFF;padding:10px;margin-bottom: 3px">
-                                <a href="{% url 'gatheros_subscription:subscription-edit' event.pk item.pk %}">
+                                <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">
                                     {{ item.person.name }}
                                 </a>
                             </td>
@@ -80,9 +84,9 @@
                                 {% endif %}
                             </td>
                             <td style="text-align:center;background: #FFF;padding:10px;margin-bottom: 3px">
-                                <a href="{% url 'gatheros_subscription:subscription-edit' event.pk item.pk %}">Editar</a>
+                                <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">Editar</a>
                                 &nbsp;
-                                <a href="{% url 'gatheros_subscription:subscription-delete' event.pk item.pk %}">Excluir</a>
+                                <a href="{% url 'subscription:subscription-delete' event.pk item.pk %}">Excluir</a>
                             </td>
                         </tr>
                     {% endfor %}

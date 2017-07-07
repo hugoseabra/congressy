@@ -26,7 +26,7 @@ class PlaceListView(AccountMixin, ListView):
                 'Você não tem permissão de realizar esta ação.'
             )
             return redirect(reverse(
-                'gatheros_event:organization-panel',
+                'event:organization-panel',
                 kwargs={'pk': org.pk}
             ))
 

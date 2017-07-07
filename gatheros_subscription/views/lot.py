@@ -23,12 +23,12 @@ class BaseLotView(AccountMixin, View):
                 request,
                 "Evento não informado."
             )
-            return redirect(reverse_lazy('gatheros_event:event-list'))
+            return redirect(reverse_lazy('event:event-list'))
 
         else:
             if not self.can_view():
                 return redirect(reverse(
-                    'gatheros_event:event-panel',
+                    'event:event-panel',
                     kwargs={'pk': self.event.pk}
                 ))
 
@@ -113,7 +113,7 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
 
     def get_success_url(self):
         return reverse(
-            'gatheros_subscription:lot-list',
+            'subscription:lot-list',
             kwargs={'event_pk': self.event.pk}
         )
 
@@ -159,7 +159,7 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
 
     def get_success_url(self):
         return reverse(
-            'gatheros_subscription:lot-list',
+            'subscription:lot-list',
             kwargs={'event_pk': self.event.pk}
         )
 
@@ -187,7 +187,7 @@ class LotDeleteView(BaseLotView, DeleteViewMixin):
 
     def get_success_url(self):
         return reverse(
-            'gatheros_subscription:lot-list',
+            'subscription:lot-list',
             kwargs={'event_pk': self.kwargs['event_pk']}
         )
 

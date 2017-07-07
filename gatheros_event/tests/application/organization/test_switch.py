@@ -24,7 +24,7 @@ class OrganizationSwitchTest(TestCase):
         # Usuário com várias organizações
         self.user = User.objects.get(username="lucianasilva@gmail.com")
         self.client.force_login(self.user)
-        self.url = reverse('gatheros_event:organization-switch')
+        self.url = reverse('event:organization-switch')
 
     def _get_organization(self, wsgi_request=None):
         if wsgi_request is None:

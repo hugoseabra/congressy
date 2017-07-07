@@ -1,11 +1,9 @@
 {% extends "gatheros_front/base.html" %}
 
-{% block title %}Gatheros - Eventos{% endblock %}
-
 {% block content %}
 
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:organization-panel' member_organization.pk %}">Voltar</a>
+        <a href="{% url 'event:organization-panel' member_organization.pk %}">Voltar</a>
     </div>
     <hr/>
 
@@ -48,20 +46,20 @@
                                     {% if can_manage %}
                                         <td width="20%" style="color: #333;background-color: #FFF; padding:10px;margin-bottom: 3px">
                                             <div style="float:left">
-                                                <form action="{% url 'gatheros_event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
+                                                <form action="{% url 'event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
                                                     <button type="submit">Tornar {% if item.group == item.HELPER %}Administrador{% else %}Auxiliar{% endif %}</button>
                                                     <input type="hidden" name="action" value="change_group" />
                                                     <input type="hidden" name="group" value="{% if item.group == item.HELPER %}{{ item.ADMIN }}{% else %}{{ item.HELPER }}{% endif %}" />
                                                 </form>
                                             </div>
                                             <div style="float:left;margin-left: 4px">
-                                                <form action="{% url 'gatheros_event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
+                                                <form action="{% url 'event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
                                                     <button type="submit">Desativar</button>
                                                     <input type="hidden" name="action" value="deactivate" />
                                                 </form>
                                             </div>
                                             <div style="float:left;margin-left: 4px">
-                                                <form action="{% url 'gatheros_event:member-delete' member_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja realmente excluir?')">{% csrf_token %}
+                                                <form action="{% url 'event:member-delete' member_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja realmente excluir?')">{% csrf_token %}
                                                     <button type="submit">Excluir</button>
                                                 </form>
                                             </div>
@@ -108,13 +106,13 @@
                             </td>
                             <td width="10%" style="text-align: center;color: #333;background-color: #FFF; padding:10px;margin-bottom: 3px">
                                 <div style="float:left;margin-left: 4px">
-                                    <form action="{% url 'gatheros_event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
+                                    <form action="{% url 'event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
                                         <button type="submit">Ativar</button>
                                         <input type="hidden" name="action" value="activate" />
                                     </form>
                                 </div>
                                 <div style="float:left;margin-left: 4px">
-                                    <form action="{% url 'gatheros_event:member-delete' member_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja realmente excluir?')">{% csrf_token %}
+                                    <form action="{% url 'event:member-delete' member_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja realmente excluir?')">{% csrf_token %}
                                         <button type="submit">Excluir</button>
                                     </form>
                                 </div>

@@ -66,7 +66,7 @@ class MemberManageViewTest(TestCase):
         member = self._get_member()
         organization = member.organization
 
-        url = reverse('gatheros_event:member-delete', kwargs={
+        url = reverse('event:member-delete', kwargs={
             'organization_pk': organization.pk,
             'pk': member.pk
         })
@@ -83,7 +83,7 @@ class MemberManageViewTest(TestCase):
         member.active = False
         member.save()
 
-        url = reverse('gatheros_event:member-manage', kwargs={
+        url = reverse('event:member-manage', kwargs={
             'organization_pk': organization.pk,
             'pk': member.pk
         })
@@ -105,7 +105,7 @@ class MemberManageViewTest(TestCase):
         member.active = True
         member.save()
 
-        url = reverse('gatheros_event:member-manage', kwargs={
+        url = reverse('event:member-manage', kwargs={
             'organization_pk': organization.pk,
             'pk': member.pk
         })
@@ -126,7 +126,7 @@ class MemberManageViewTest(TestCase):
 
         self.assertEqual(member.group, Member.ADMIN)
 
-        url = reverse('gatheros_event:member-manage', kwargs={
+        url = reverse('event:member-manage', kwargs={
             'organization_pk': organization.pk,
             'pk': member.pk
         })
@@ -151,7 +151,7 @@ class MemberManageViewTest(TestCase):
 
         self.assertEqual(member.group, Member.ADMIN)
 
-        url = reverse('gatheros_event:member-manage', kwargs={
+        url = reverse('event:member-manage', kwargs={
             'organization_pk': organization.pk,
             'pk': member.pk
         })

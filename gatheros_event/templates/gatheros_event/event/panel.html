@@ -4,7 +4,7 @@
 {% block sidebar %}
     {% if can_change %}
         <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
-            <a href="{% url 'gatheros_event:event-transfer' object.pk %}">Mudar realizador</a>
+            <a href="{% url 'event:event-transfer' object.pk %}">Mudar realizador</a>
         </div>
         <br/>
         <div style="background-color: whitesmoke;border: 1px solid #DDD;">
@@ -12,9 +12,9 @@
                 Página do evento
             </div>
             <div style="padding:15px">
-                &rightarrow; <a href="{% url 'gatheros_event:event-detail' object.pk %}">Configurar detalhes do evento</a>
+                &rightarrow; <a href="{% url 'event:event-detail' object.pk %}">Configurar detalhes do evento</a>
             </div>
-            <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_event:event-info' object.pk %}">Configurar capa</a></div>
+            <div style="padding:15px">&rightarrow; <a href="{% url 'event:event-info' object.pk %}">Configurar capa</a></div>
             {# <div style="padding:15px">&rightarrow; <a href="#">Seções</a></div>#}
         </div>
     {% endif %}
@@ -26,13 +26,13 @@
                 Inscrições
             </div>
             {% if can_view_lots %}
-                <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:lot-list' object.pk %}">Lotes</a></div>
+                <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:lot-list' object.pk %}">Lotes</a></div>
             {% endif %}
-            <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:fields-config' object.pk %}">Configuração de Formulário</a></div>
+{#            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:event-fields-config' object.pk %}">Configuração de Formulário</a></div>#}
             {% if can_manage_subscriptions %}
-                <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:subscription-list' object.pk %}">Pré-inscrições</a></div>
+                <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-list' object.pk %}">Pré-inscrições</a></div>
             {% endif %}
-            <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>
+            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>
             <div style="padding:15px">&rightarrow; <a href="#">Exportação de dados</a></div>
         </div>
     {% endif %}
@@ -40,20 +40,20 @@
 
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:event-list' %}">Lista de eventos</a>
+        <a href="{% url 'event:event-list' %}">Lista de eventos</a>
     </div>
     <hr/>
     <h1>Painel do Evento</h1>
     <h2>{{ object.name }}</h2>
     <div style="padding: 10px;background-color: #DDDDDD;text-align: center;">
         {% if can_change %}
-            <a href="{% url 'gatheros_event:event-edit' object.pk %}">Editar</a>
+            <a href="{% url 'event:event-edit' object.pk %}">Editar</a>
         {% endif %}
         {% if can_change and can_delete %}
             &nbsp &nbsp &nbsp &nbsp | &nbsp &nbsp &nbsp &nbsp
         {% endif %}
         {% if can_delete %}
-            <a href="{% url 'gatheros_event:event-delete' object.pk %}">Excluir</a>
+            <a href="{% url 'event:event-delete' object.pk %}">Excluir</a>
         {% endif %}
     </div>
     <div style="margin-bottom:10px; width: 100%;height:3px;background-color: {% if object.published %}darkgreen{% else %}darkred{% endif %}"></div>
@@ -99,13 +99,13 @@
 
                             <div>
                                 <strong>Período:</strong> {{ object.get_period }}
-                                [<a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar</a>]
+                                [<a href="{% url 'event:event-edit-dates' object.pk %}">Alterar</a>]
                             </div>
                             <div style="margin-top: 20px;border-top: 1px solid #DDD">
                                 {% if object.place %}
                                     <p>
                                         <strong>Local:</strong> {{ object.place.name }}
-                                        [<a href="{% url 'gatheros_event:event-detail' object.pk %}">Alterar</a>]
+                                        [<a href="{% url 'event:event-detail' object.pk %}">Alterar</a>]
                                     </p>
                                     <p style="color:dimgray;text-indent: 20px;">{{ object.place.get_complete_address }}</p>
                                 {% else %}
@@ -129,7 +129,7 @@
                                            Insira uma descrição. Será muito bom para localizar o seu evento nos sites de busca.
                                        </span>
                                     </p>
-                                    <p style="text-align: center;">[<a href="{% url 'gatheros_event:event-info' object.pk %}">Alterar</a>]</p>
+                                    <p style="text-align: center;">[<a href="{% url 'event:event-info' object.pk %}">Alterar</a>]</p>
                                 {% endif %}
                             </div>
                         </td>
@@ -172,7 +172,7 @@
             </td>
             <td width="20%" style="vertical-align: top">
                 <form name="change_status"
-                      action="{% url 'gatheros_event:event-edit-publication' object.pk %}"
+                      action="{% url 'event:event-edit-publication' object.pk %}"
                       method="post">{% csrf_token %}
                     {% if status.published %}
                         {% if status.status == 'future' %}
@@ -226,7 +226,7 @@
                                 </div>
                                 <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
                                     {% if can_change %}
-                                        <a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar data</a>
+                                        <a href="{% url 'event:event-edit-dates' object.pk %}">Alterar data</a>
                                         &nbsp;&nbsp; | &nbsp;&nbsp;
                                         <a href="#"
                                            onclick="document.change_status.submit()">Publicar</a>
@@ -243,7 +243,7 @@
                                 </div>
                                 <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
                                     {% if can_change %}
-                                        <a href="{% url 'gatheros_event:event-edit-dates' object.pk %}">Alterar data</a>
+                                        <a href="{% url 'event:event-edit-dates' object.pk %}">Alterar data</a>
                                     {% endif %}
                                 </div>
                             </div>
@@ -282,7 +282,7 @@
                             {% endif %}
                             <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
                                 {% if can_change %}
-                                    <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -303,7 +303,7 @@
                             {% endif %}
                             <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
                                 {% if can_change %}
-                                    <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -316,7 +316,7 @@
                             </div>
                             <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
                                 {% if can_change %}
-                                    <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -372,7 +372,7 @@
                         </div>
                         <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
                             {% if can_view_lots %}
-                                <a href="{% url 'gatheros_subscription:lot-list' object.pk %}"
+                                <a href="{% url 'subscription:lot-list' object.pk %}"
                                    onclick="document.change_status.submit()">
                                    Gerenciar lotes
                                 </a>
@@ -408,7 +408,7 @@
                         </div>
                         <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
                             {% if can_change %}
-                                <a href="{% url 'gatheros_event:event-edit-subscription_type' object.pk %}">Ativar</a>
+                                <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Ativar</a>
                             {% endif %}
                         </div>
                     </div>

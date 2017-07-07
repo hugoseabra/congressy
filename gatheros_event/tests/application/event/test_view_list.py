@@ -39,7 +39,7 @@ class EventListTest(TestCase):
     def setUp(self):
         # Usuário com várias organizações
         self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.url = reverse('gatheros_event:event-list')
+        self.url = reverse('event:event-list')
 
     def _login(self):
         """ Realiza login. """
@@ -61,7 +61,7 @@ class EventListTest(TestCase):
             members__person=self.user.person,
         ).first()
 
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_context_list(self):
@@ -73,7 +73,7 @@ class EventListTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self.url, follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 

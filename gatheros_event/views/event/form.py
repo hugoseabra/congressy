@@ -17,7 +17,7 @@ class BaseEventView(AccountMixin, View):
 
     def dispatch(self, request, *args, **kwargs):
         if not self.can_view():
-            return redirect(reverse_lazy('gatheros_event:event-list'))
+            return redirect(reverse_lazy('event:event-list'))
 
         return super(BaseEventView, self).dispatch(request, *args, **kwargs)
 
@@ -71,7 +71,7 @@ class BaseSimpleEditlView(BaseEventView):
 
     def get_success_url(self):
         event = self.get_object()
-        url = reverse('gatheros_event:event-panel', kwargs={'pk': event.pk})
+        url = reverse('event:event-panel', kwargs={'pk': event.pk})
         return url
 
 
@@ -81,7 +81,7 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     form_title = 'Novo evento'
 
     def get_permission_denied_url(self):
-        return reverse_lazy('gatheros_event:event-list')
+        return reverse_lazy('event:event-list')
 
     def get_form(self, form_class=None):
         if not form_class:
@@ -114,7 +114,7 @@ class EventAddFormView(BaseEventView, generic.CreateView):
         form = self.get_form()
         event = form.instance
         return reverse(
-            'gatheros_event:event-panel',
+            'event:event-panel',
             kwargs={'pk': event.pk}
         )
 
@@ -125,7 +125,7 @@ class EventAddFormView(BaseEventView, generic.CreateView):
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
     form_class = forms.EventForm
     model = forms.EventForm.Meta.model
-    success_url = reverse_lazy('gatheros_event:event-list')
+    success_url = reverse_lazy('event:event-list')
     success_message = 'Evento alterado com sucesso.'
 
     def get_form(self, form_class=None):

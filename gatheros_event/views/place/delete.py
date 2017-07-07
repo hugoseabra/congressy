@@ -45,7 +45,7 @@ class PlaceDeleteView(DeleteViewMixin):
 
     def get_success_url(self):
         org = self.get_place_organization()
-        return reverse('gatheros_event:place-list', kwargs={
+        return reverse('event:place-list', kwargs={
             'organization_pk': org.pk
         })
 

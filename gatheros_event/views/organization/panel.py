@@ -22,7 +22,7 @@ class OrganizationPanelView(AccountMixin, DetailView):
                 request,
                 'Você não tem permissão de realizar esta ação.'
             )
-            return redirect(reverse_lazy('gatheros_front:start'))
+            return redirect(reverse_lazy('front:start'))
 
         return dispatch
 
@@ -108,6 +108,7 @@ class OrganizationCancelMembershipView(AccountMixin, DetailView):
         return self.object
 
     def pre_dispatch(self, request):
+        super(OrganizationCancelMembershipView, self).pre_dispatch(request)
         try:
             self.member = Member.objects.get(
                 person=self.request.user.person,
@@ -118,7 +119,7 @@ class OrganizationCancelMembershipView(AccountMixin, DetailView):
             pass
 
     def get_permission_denied_url(self):
-        return reverse('gatheros_event:event-panel', kwargs={
+        return reverse('event:event-panel', kwargs={
             'pk': self.kwargs.get('pk')
         })
 

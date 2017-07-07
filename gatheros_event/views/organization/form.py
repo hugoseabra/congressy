@@ -16,7 +16,7 @@ class BaseOrganizationView(AccountMixin, View):
     form_title = None
 
     def get_permission_denied_url(self):
-        return reverse_lazy('gatheros_event:organization-list')
+        return reverse_lazy('event:organization-list')
 
     def get_form(self, form_class=None):
         """
@@ -81,7 +81,7 @@ class OrganizationAddFormView(BaseOrganizationView, generic.CreateView):
 
     def get_success_url(self):
         return reverse(
-            'gatheros_event:organization-panel',
+            'event:organization-panel',
             kwargs={'pk': self.object.pk}
         )
 
@@ -115,7 +115,7 @@ class OrganizationAddInternalFormView(
 
     # noinspection PyMethodMayBeStatic
     def get_success_url(self):
-        return reverse_lazy('gatheros_event:event-add')
+        return reverse_lazy('_event:event-add')
 
     def can_access(self):
         return not self.has_internal_organization
@@ -124,7 +124,7 @@ class OrganizationAddInternalFormView(
 class OrganizationEditFormView(BaseOrganizationView, generic.UpdateView):
     form_class = forms.OrganizationForm
     model = forms.OrganizationForm.Meta.model
-    success_url = reverse_lazy('gatheros_event:organization-list')
+    success_url = reverse_lazy('event:organization-list')
     success_message = 'Organização alterada com sucesso.'
 
     def can_access(self):

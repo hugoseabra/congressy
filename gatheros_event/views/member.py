@@ -16,7 +16,7 @@ class BaseOrganizationMixin(AccountMixin, View):
 
     def get_permission_denied_url(self):
         return reverse(
-            'gatheros_event:organization-panel',
+            'event:organization-panel',
             kwargs={'pk': self.kwargs.get('organization_pk')}
         )
 
@@ -109,7 +109,7 @@ class MemberManageView(BaseOrganizationMixin, FormView):
         return self.object
 
     def get_permission_denied_url(self):
-        return reverse('gatheros_front:start')
+        return reverse('front:start')
 
     def get_form_kwargs(self):
         kwargs = super(MemberManageView, self).get_form_kwargs()
@@ -148,7 +148,7 @@ class MemberManageView(BaseOrganizationMixin, FormView):
             member.group = group
             member.save()
             messages.success(request, 'Membro alterado com sucesso.')
-            return redirect(reverse('gatheros_event:member-list', kwargs={
+            return redirect(reverse('event:member-list', kwargs={
                 'organization_pk': member.organization_id
             }))
 
@@ -156,7 +156,7 @@ class MemberManageView(BaseOrganizationMixin, FormView):
             method = getattr(form, action)
             method(member)
             messages.success(request, 'Membro alterado com sucesso.')
-            return redirect(reverse('gatheros_event:member-list', kwargs={
+            return redirect(reverse('event:member-list', kwargs={
                 'organization_pk': member.organization_id
             }))
 
@@ -179,7 +179,7 @@ class MemberManageView(BaseOrganizationMixin, FormView):
                     )
                 )
 
-            return redirect(reverse('gatheros_front:start'))
+            return redirect(reverse('front:start'))
 
         else:
             raise ImproperlyConfigured(
@@ -237,6 +237,6 @@ class MemberDeleteView(BaseOrganizationMixin, DeleteViewMixin):
 
     def get_success_url(self):
         org = self.get_member_organization()
-        return reverse('gatheros_event:member-list', kwargs={
+        return reverse('event:member-list', kwargs={
             'organization_pk': org.pk
         })

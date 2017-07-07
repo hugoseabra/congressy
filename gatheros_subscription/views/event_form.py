@@ -18,7 +18,7 @@ class BaseFormFieldView(AccountMixin, generic.TemplateView):
     event = None
 
     def get_permission_denied_url(self):
-        return reverse('gatheros_event:event-panel', kwargs={
+        return reverse('event:event-panel', kwargs={
             'pk': self.kwargs.get('event_pk')
         })
 
@@ -77,10 +77,11 @@ class BaseEventFormFieldForm(BaseFormFieldView):
         return super(BaseEventFormFieldForm, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse(
-            'gatheros_subscription:fields-config',
-            kwargs={'event_pk': self.kwargs['event_pk']}
-        )
+        pass
+        # return reverse(
+        #     'subscription:event-fields-config',
+        #     kwargs={'event_pk': self.kwargs['event_pk']}
+        # )
 
 
 class EventConfigFormFieldView(BaseFormFieldView, generic.FormView):
@@ -130,10 +131,11 @@ class EventFormFieldAddView(BaseEventFormFieldForm, generic.CreateView):
     success_message = 'Campo criado com sucesso.'
 
     def get_success_url(self):
-        return reverse(
-            'gatheros_subscription:fields-config',
-            kwargs={'event_pk': self.kwargs['event_pk']}
-        )
+        pass
+        # return reverse(
+        #     'subscription:event-fields-config',
+        #     kwargs={'event_pk': self.kwargs['event_pk']}
+        # )
 
     def can_access(self):
         can_access = super(EventFormFieldAddView, self).can_access()
@@ -175,10 +177,11 @@ class EventFormFieldDeleteView(DeleteViewMixin, BaseFormFieldView):
     pk_url_kwarg = 'field_pk'
 
     def get_success_url(self):
-        return reverse(
-            'gatheros_subscription:fields-config',
-            kwargs={'event_pk': self.kwargs['event_pk']}
-        )
+        pass
+        # return reverse(
+        #     'subscription:event-fields-config',
+        #     kwargs={'event_pk': self.kwargs['event_pk']}
+        # )
 
     def post_delete(self):
         event = self._get_event()
@@ -237,10 +240,11 @@ class EventFormFieldReorderView(BaseFormFieldView):
             messages.error(request, 'Algum erro ocorreu: ' + str(e))
 
         finally:
-            return redirect(reverse(
-                'gatheros_subscription:fields-config',
-                kwargs={'event_pk': self.kwargs['event_pk']}
-            ))
+            pass
+            # return redirect(reverse(
+            #     'subscription:event-fields-config',
+            #     kwargs={'event_pk': self.kwargs['event_pk']}
+            # ))
 
     def can_access(self):
         can_access = super(EventFormFieldReorderView, self).can_access()

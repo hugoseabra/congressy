@@ -16,7 +16,7 @@ class StartTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(username='lucianasilva@gmail.com')
         self.client.force_login(self.user)
-        self.result = self.client.get(reverse('gatheros_front:start'))
+        self.result = self.client.get(reverse('front:start'))
 
     def test_status_is_200_ok(self):
         self.assertEqual(self.result.status_code, 200)
@@ -24,7 +24,7 @@ class StartTest(TestCase):
 
 class StartWithoutLoginTest(TestCase):
     def setUp(self):
-        self.result = self.client.get(reverse('gatheros_front:start'))
+        self.result = self.client.get(reverse('front:start'))
 
     def test_redireciona_login(self):
         self.assertEqual(self.result.status_code, 302)

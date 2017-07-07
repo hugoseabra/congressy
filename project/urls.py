@@ -3,46 +3,24 @@
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
-from django.contrib.auth import views
+
+from gatheros_event.urls.me import urlpatterns_public_me
+from gatheros_event.urls.invitation import urlpatterns_public_invitation
 
 url_admin = [url(r'^admin/', admin.site.urls)]
 
-url_manager = [
-    url(
-        r'^lembrar-senha/$',
-        views.PasswordResetView.as_view(),
-        name='password_reset'
-    ),
-    url(
-        r'^lembrar-senha/completo/$',
-        views.PasswordResetDoneView.as_view(),
-        name='password_reset_done'
-    ),
-    url(
-        r'^redefinir/'
-        '(?P<uidb64>[0-9A-Za-z_\-]+)/'
-        '(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-        views.PasswordResetConfirmView.as_view(),
-        name='password_reset_confirm'
-    ),
-    url(
-        r'^redefinir/completo/$',
-        views.PasswordResetCompleteView.as_view(),
-        name='password_reset_complete'
-    ),
-    url(r'^manager/', include(
-        'gatheros_subscription.urls',
-        'gatheros_subscription'
-    )),
-    url(r'^', include(
-        'gatheros_event.urls',
-        'gatheros_event'
-    )),
+private_urls = [
+    url(r'^', include('gatheros_subscription.urls', 'subscription')),
+    url(r'^', include('gatheros_event.urls', 'event')),
+    url(r'^', include('gatheros_front.urls', 'front'))
 ]
 
-url_front = [url(r'^', include('gatheros_front.urls', 'gatheros_front'))]
+public_urls = [
+    url(r'^', include(urlpatterns_public_me, 'public-me')),
+    url(r'^', include(urlpatterns_public_invitation, 'public-invitation')),
+]
 
-urlpatterns = url_admin + url_manager + url_front
+urlpatterns = url_admin + private_urls
 
 urlpatterns += static.static(
     settings.STATIC_URL,

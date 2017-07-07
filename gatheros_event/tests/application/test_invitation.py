@@ -86,7 +86,7 @@ class InvitationCreateViewTest(TestCase):
         self.organization = Organization.objects.get(
             slug="in2-web-solucoes-e-servicos"
         )
-        self.url = reverse('gatheros_event:invitation-add', kwargs={
+        self.url = reverse('event:invitation-add', kwargs={
             'organization_pk': self.organization.pk
         })
         self.data = {'to': 'joao@teste.com, diegotolentino@gmail.com'}
@@ -111,7 +111,7 @@ class InvitationCreateViewTest(TestCase):
         """
         Organização que o usuário é membro mas não é admin
         """
-        url = reverse('gatheros_event:invitation-add', kwargs={
+        url = reverse('event:invitation-add', kwargs={
             'organization_pk': 6
         })
         response = self.client.post(url, self.data, follow=True)
@@ -170,12 +170,12 @@ class InvitationDecisionViewWithProfile(TestCase):
         ).pk
 
         self.url = reverse(
-            'gatheros_event:invitation-decision',
+            'event:invitation-decision',
             kwargs={
                 'pk': self.invite_pk
             }
         )
-        self.url_redirect = reverse('gatheros_front:login')
+        self.url_redirect = reverse('event:login')
 
     def test_get_without_login(self):
         """
@@ -263,16 +263,16 @@ class InvitationDecisionViewWithoutProfileTest(TestCase):
         ).pk
 
         self.url = reverse(
-            'gatheros_event:invitation-decision',
+            'event:invitation-decision',
             kwargs={
                 'pk': self.invite_pk
             }
         )
         self.url_login = reverse(
-            'gatheros_front:login'
+            'event:login'
         )
         self.url_profile = reverse(
-            'gatheros_event:invitation-profile',
+            'event:invitation-profile',
             kwargs={
                 'pk': self.invite_pk
             }
@@ -342,14 +342,14 @@ class InvitationProfileViewTest(TestCase):
         self.invite_pk = invite.pk
         self.organization = invite.author.organization
         self.url = reverse(
-            'gatheros_event:invitation-profile',
+            'event:invitation-profile',
             kwargs={
                 'pk': self.invite_pk
             }
         )
 
         self.url_success = reverse(
-            'gatheros_event:invitation-list',
+            'event:invitation-list',
             kwargs={
                 'organization_pk': self.organization.pk
             }
@@ -454,7 +454,7 @@ class InvitationDeleteViewTest(TestCase):
         member = self.user.person.members.first()
         invitation = Invitation.objects.filter(author=member).first()
 
-        url = reverse('gatheros_event:invitation-delete', kwargs={
+        url = reverse('event:invitation-delete', kwargs={
             'organization_pk': invitation.author.organization.pk,
             'pk': invitation.pk
         })
@@ -493,7 +493,7 @@ class InvitationRenewViewTest(TestCase):
 
         self.assertTrue(invitation.is_expired)
 
-        url = reverse('gatheros_event:invitation-resend', kwargs={
+        url = reverse('event:invitation-resend', kwargs={
             'organization_pk': invitation.author.organization.pk,
             'pk': invitation.pk
         })
@@ -519,7 +519,7 @@ class InvitationRenewViewTest(TestCase):
 
         self.assertFalse(invitation.is_expired)
 
-        url = reverse('gatheros_event:invitation-resend', kwargs={
+        url = reverse('event:invitation-resend', kwargs={
             'organization_pk': invitation.author.organization.pk,
             'pk': invitation.pk
         })

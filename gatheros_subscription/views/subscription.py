@@ -23,7 +23,7 @@ class EventViewMixin(AccountMixin, generic.View):
 
     def dispatch(self, request, *args, **kwargs):
         self.permission_denied_url = reverse(
-            'gatheros_event:event-panel',
+            'event:event-panel',
             kwargs={'pk': self.kwargs.get('event_pk')}
         )
         return super(EventViewMixin, self).dispatch(request, *args, **kwargs)
@@ -80,7 +80,7 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
         return kwargs
 
     def get_success_url(self):
-        return reverse('gatheros_subscription:subscription-list', kwargs={
+        return reverse('subscription:subscription-list', kwargs={
             'event_pk': self.kwargs.get('event_pk')
         })
 
@@ -224,7 +224,7 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                 'Lote(s) não disponível(is).'
 
             self.permission_denied_url = reverse(
-                'gatheros_subscription:subscription-list',
+                'subscription:subscription-list',
                 kwargs={'event_pk': event.pk}
             )
 
@@ -331,12 +331,12 @@ class SubscriptionDeleteView(EventViewMixin, DeleteViewMixin):
     place_organization = None
 
     def get_permission_denied_url(self):
-        return reverse('gatheros_subscription:subscription-list', kwargs={
+        return reverse('subscription:subscription-list', kwargs={
             'event_pk': self.kwargs.get('event_pk')
         })
 
     def get_success_url(self):
-        return reverse('gatheros_subscription:subscription-list', kwargs={
+        return reverse('subscription:subscription-list', kwargs={
             'event_pk': self.kwargs.get('event_pk')
         })
 
@@ -353,7 +353,7 @@ class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
 
     def get_permission_denied_url(self):
         return reverse(
-            'gatheros_event:event-panel',
+            'event:event-panel',
             kwargs={'pk': self.kwargs.get('event_pk')},
         )
 
@@ -455,7 +455,7 @@ class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
 
     def get_success_url(self):
         url = reverse(
-            'gatheros_subscription:subscription-attendance-search',
+            'subscription:subscription-attendance-search',
             kwargs={'event_pk': self.kwargs.get('event_pk')}
         )
         if self.search_by is not None and self.search_by != 'name':
@@ -525,7 +525,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
     ordering = ('event__name', 'event__date_start', 'event__date_end',)
 
     def get_permission_denied_url(self):
-        return reverse('gatheros_front:start')
+        return reverse('front:start')
 
     def get_queryset(self):
         person = self.request.user.person

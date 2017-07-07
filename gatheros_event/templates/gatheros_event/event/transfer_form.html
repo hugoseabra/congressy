@@ -2,7 +2,7 @@
 
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:event-panel' object.pk %}">Voltar</a>
+        <a href="{% url 'event:event-panel' object.pk %}">Voltar</a>
     </div>
     <hr/>
     {% if object %}
@@ -32,7 +32,7 @@
         <br />
         <hr />
         <input type="submit" value="Transferir"/>
-        <a href="{% url 'gatheros_event:event-panel' object.pk %}">Cancelar</a>
+        <a href="{% url 'event:event-panel' object.pk %}">Cancelar</a>
     </form>
 
 {% endblock %}

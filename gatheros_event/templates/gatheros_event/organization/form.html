@@ -4,9 +4,9 @@
 {% block content %}
     <div style="padding:10px">
         {% if object %}
-            <a href="{% url 'gatheros_event:event-panel' object.pk %}">Voltar</a>
+            <a href="{% url 'event:event-panel' object.pk %}">Voltar</a>
         {% else %}
-            <a href="{% url 'gatheros_event:event-list' %}">Voltar</a>
+            <a href="{% url 'event:event-list' %}">Voltar</a>
         {% endif %}
     </div>
     <hr/>
@@ -30,7 +30,7 @@
             <a href="{{ next_path|urlencode }}">Cancelar</a>
             <input type="hidden" name="next" value="{{ next_path }}"/>
         {% else %}
-            <a href="{% url 'gatheros_event:event-list' %}">Cancelar</a>
+            <a href="{% url 'event:event-list' %}">Cancelar</a>
         {% endif %}
     </form>
 {% endblock %}

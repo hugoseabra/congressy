@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.urls import reverse_lazy
 from django.views.generic import DetailView
 
 from gatheros_event.models import Event
@@ -9,6 +10,7 @@ from gatheros_event.views.mixins import AccountMixin
 class EventPanelView(AccountMixin, DetailView):
     model = Event
     template_name = 'gatheros_event/event/panel.html'
+    permission_denied_url = reverse_lazy('event:event-list')
 
     def get_context_data(self, **kwargs):
         context = super(EventPanelView, self).get_context_data(**kwargs)

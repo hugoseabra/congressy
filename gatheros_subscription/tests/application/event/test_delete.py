@@ -27,17 +27,17 @@ class EventDeleteTest(TestCase):
 
     def _get_delete_url(self):
         return reverse(
-            'gatheros_event:event-delete',
+            'event:event-delete',
             kwargs={'pk': self.event_pk}
         )
 
     # noinspection PyMethodMayBeStatic
     def _get_login_url(self):
-        return reverse('gatheros_front:login')
+        return reverse('event:login')
 
     # noinspection PyMethodMayBeStatic
     def _get_event_list_url(self):
-        return reverse('gatheros_event:event-list')
+        return reverse('event:event-list')
 
     def _event_exists(self):
         return Event.objects.filter(pk=self.event_pk).exists()
@@ -46,7 +46,7 @@ class EventDeleteTest(TestCase):
         member = self._get_event_member(group=group)
         organization = member.organization
 
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': organization.pk})
 
     def _get_event_member(self, group):

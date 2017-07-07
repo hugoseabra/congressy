@@ -3,7 +3,7 @@
 
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_subscription:subscription-list' event.pk %}">Voltar</a>
+        <a href="{% url 'subscription:subscription-list' event.pk %}">Voltar</a>
     </div>
     <hr/>
     <h1>{{ event.name }}</h1>
@@ -47,7 +47,7 @@
         <hr />
         <input type="submit" name="confirmation_yes" value="Sim, é esta pessoa"/>
         <input type="submit" name="confirmation_no" value="Não, é outra pessoa"/>
-        <a href="{% url 'gatheros_subscription:subscription-add' event.pk %}">Cancelar</a>
+        <a href="{% url 'subscription:subscription-add' event.pk %}">Cancelar</a>
         <input type="hidden" name="subscription_user_reply" value="1" >
 
         {% for field_name, value in submitted_data.items %}

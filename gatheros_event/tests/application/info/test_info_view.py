@@ -60,7 +60,7 @@ class EventInfoTest(TestCase):
             event = self._get_event()
             pk = event.pk
 
-        return reverse('gatheros_event:event-info', kwargs={
+        return reverse('event:event-info', kwargs={
             'pk': pk
         })
 
@@ -83,7 +83,7 @@ class EventInfoTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 

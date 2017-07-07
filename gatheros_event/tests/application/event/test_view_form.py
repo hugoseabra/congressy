@@ -39,7 +39,7 @@ class EventAddViewTest(TestCase):
     ]
 
     def setUp(self):
-        self.url = reverse_lazy('gatheros_event:event-add')
+        self.url = reverse_lazy('event:event-add')
         self.user = User.objects.get(username="lucianasilva@gmail.com")
 
     def _login(self):
@@ -59,14 +59,14 @@ class EventAddViewTest(TestCase):
             internal=False,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self.url, follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -146,7 +146,7 @@ class EventEditViewTest(TestCase):
     # noinspection PyMethodMayBeStatic
     def _get_url(self, pk):
         """ Resgata URL. """
-        return reverse('gatheros_event:event-edit', kwargs={'pk': pk})
+        return reverse('event:event-edit', kwargs={'pk': pk})
 
     def _get_event(self, pk=None):
         """ Resgata instânica de Event. """
@@ -160,7 +160,7 @@ class EventEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -265,7 +265,7 @@ class EventDatesEditViewTest(TestCase):
     # noinspection PyMethodMayBeStatic
     def _get_url(self, pk):
         """ Resgata URL. """
-        return reverse('gatheros_event:event-edit-dates', kwargs={'pk': pk})
+        return reverse('event:event-edit-dates', kwargs={'pk': pk})
 
     def _get_event(self, pk=None):
         """ Resgata instânica de Event. """
@@ -300,7 +300,7 @@ class EventDatesEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -404,7 +404,7 @@ class EventSubscriptionTypeEditViewTest(TestCase):
     # noinspection PyMethodMayBeStatic
     def _get_url(self, pk):
         return reverse(
-            'gatheros_event:event-edit-subscription_type',
+            'event:event-edit-subscription_type',
             kwargs={'pk': pk}
         )
 
@@ -442,7 +442,7 @@ class EventSubscriptionTypeEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -543,7 +543,7 @@ class EventPublicationEditViewTest(TestCase):
     # noinspection PyMethodMayBeStatic
     def _get_url(self, pk):
         return reverse(
-            'gatheros_event:event-edit-publication',
+            'event:event-edit-publication',
             kwargs={'pk': pk}
         )
 
@@ -558,7 +558,7 @@ class EventPublicationEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('event:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 

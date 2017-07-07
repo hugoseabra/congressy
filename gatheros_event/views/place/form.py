@@ -25,7 +25,7 @@ class BaseFormView(AccountMixin, View):
                 'Você não tem permissão de realizar esta ação.'
             )
             return redirect(reverse(
-                'gatheros_event:organization-panel',
+                'event:organization-panel',
                 kwargs={'pk': org.pk}
             ))
 
@@ -69,7 +69,7 @@ class BaseFormView(AccountMixin, View):
             return next_path
 
         org = self.get_place_organization()
-        return reverse('gatheros_event:place-list', kwargs={
+        return reverse('event:place-list', kwargs={
             'organization_pk': org.pk
         })
 

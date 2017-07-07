@@ -7,7 +7,7 @@
 {% block content %}
     <h1>Lista de Eventos</h1>
     <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
-        <a href="{% url 'gatheros_event:event-add' %}">Adicionar</a>
+        <a href="{% url 'event:event-add' %}">Adicionar</a>
     </div>
     <div style="background: #DDD">
         {% if object_list %}
@@ -22,7 +22,7 @@
                             style="background-color: {% if event.published %}green{% else %}gray{% endif %}"></td>
                         <td style="background: #FFF;padding:10px;margin-bottom: 3px">
                             <div>{{ forloop.counter }} -
-                                <a href="{% url 'gatheros_event:event-panel' event.pk %}">{{ event.name }}</a>
+                                <a href="{% url 'event:event-panel' event.pk %}">{{ event.name }}</a>
                             </div>
                             <hr/>
                             <div style="text-indent: 10px;">
@@ -63,11 +63,11 @@
                         <td width="5%"
                             style="text-align:center;background: #FFF;padding:10px;margin-bottom: 3px">
                             {% if user has 'gatheros_event.change_event' of event %}
-                                <a href="{% url 'gatheros_event:event-edit' event.pk %}">Editar</a>
+                                <a href="{% url 'event:event-edit' event.pk %}">Editar</a>
                             {% endif %}
                             &nbsp; &nbsp;
                             {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
-                                <a href="{% url 'gatheros_event:event-delete' event.pk %}">Excluir</a>
+                                <a href="{% url 'event:event-delete' event.pk %}">Excluir</a>
                             {% endif %}
                         </td>
                     </tr>
