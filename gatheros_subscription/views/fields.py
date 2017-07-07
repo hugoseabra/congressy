@@ -38,7 +38,7 @@ class BaseFieldsView(AccountMixin, generic.View):
 class FieldsListView(BaseFieldsView, generic.FormView):
     """ View de Lista de campos da organização. """
 
-    template_name = 'gatheros_subscription/field/organization_fields.html'
+    template_name = 'gatheros_subscription/field/fields.html'
     form_class = FieldsForm
 
     def get_fields_organization(self):
