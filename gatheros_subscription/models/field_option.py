@@ -29,18 +29,12 @@ class FieldOption(AbstractDefaultFieldOption):
         unique_together = (('field', 'value'),)
 
     def save(self, *args, **kwargs):
-
-        to_slug = None
-        if self.field.form_default_field and not self.value:
-            to_slug = self.name
-        elif not self.field.form_default_field:
-            to_slug = self.value
-
-        if to_slug:
+        default = self.field.form_default_field is True
+        if default and not self.value or not default:
             self.value = model_field_slugify(
                 model_class=self.__class__,
                 instance=self,
-                string=to_slug,
+                string=self.name,
                 filter_keys={'field': self.field},
                 slug_field='value'
             )

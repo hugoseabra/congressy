@@ -48,18 +48,15 @@ class Field(AbstractField):
         unique_together = (('organization', 'name'),)
 
     def save(self, **kwargs):
-        if self.form_default_field:
-            to_slug = self.label if not self.name else self.name
-        else:
-            to_slug = self.label
-
-        self.name = model_field_slugify(
-            model_class=self.__class__,
-            instance=self,
-            string=to_slug,
-            filter_keys={'organization': self.organization},
-            slug_field='name'
-        )
+        is_default = self.form_default_field is True
+        if is_default and not self.name or not is_default:
+            self.name = model_field_slugify(
+                model_class=self.__class__,
+                instance=self,
+                string=self.label,
+                filter_keys={'organization': self.organization},
+                slug_field='name'
+            )
 
         return super(Field, self).save(**kwargs)
 
