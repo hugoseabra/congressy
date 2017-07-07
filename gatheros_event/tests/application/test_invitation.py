@@ -169,12 +169,9 @@ class InvitationDecisionViewWithProfile(TestCase):
             to=self.to
         ).pk
 
-        self.url = reverse(
-            'event:invitation-decision',
-            kwargs={
-                'pk': self.invite_pk
-            }
-        )
+        self.url = reverse('public:invitation-decision', kwargs={
+            'pk': self.invite_pk
+        })
         self.url_redirect = reverse('front:login')
 
     def test_get_without_login(self):
@@ -262,20 +259,15 @@ class InvitationDecisionViewWithoutProfileTest(TestCase):
             to=self.to
         ).pk
 
-        self.url = reverse(
-            'event:invitation-decision',
-            kwargs={
-                'pk': self.invite_pk
-            }
-        )
+        self.url = reverse('public:invitation-decision', kwargs={
+            'pk': self.invite_pk
+        })
         self.url_login = reverse(
             'front:login'
         )
         self.url_profile = reverse(
-            'event:invitation-profile',
-            kwargs={
-                'pk': self.invite_pk
-            }
+            'public:invitation-profile',
+            kwargs={'pk': self.invite_pk}
         )
 
     def test_get(self):
@@ -342,10 +334,8 @@ class InvitationProfileViewTest(TestCase):
         self.invite_pk = invite.pk
         self.organization = invite.author.organization
         self.url = reverse(
-            'event:invitation-profile',
-            kwargs={
-                'pk': self.invite_pk
-            }
+            'public:invitation-profile',
+            kwargs={'pk': self.invite_pk}
         )
 
         self.url_success = reverse(

@@ -115,7 +115,7 @@ class OrganizationAddInternalFormView(
 
     # noinspection PyMethodMayBeStatic
     def get_success_url(self):
-        return reverse_lazy('_event:event-add')
+        return reverse_lazy('event:event-add')
 
     def can_access(self):
         return not self.has_internal_organization

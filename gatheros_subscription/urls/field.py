@@ -5,12 +5,12 @@ from gatheros_subscription import views
 urls_organization_fields = [
     url(
         r'^add/$',
-        views.OrganizationFieldsAddView.as_view(),
+        views.FieldsAddView.as_view(),
         name='field-add'
     ),
     url(
         r'^',
-        views.OrganizationFieldsListView.as_view(),
+        views.FieldsListView.as_view(),
         name='fields'
     ),
 ]
@@ -23,12 +23,12 @@ url_fields = [
     ),
     url(
         r'^(?P<pk>[\d]+)/delete/$',
-        views.OrganizationFieldsDeleteView.as_view(),
+        views.FieldsDeleteView.as_view(),
         name='field-delete'
     ),
     url(
         r'^(?P<pk>[\d]+)/edit/$',
-        views.OrganizationFieldsEditView.as_view(),
+        views.FieldsEditView.as_view(),
         name='field-edit'
     ),
 

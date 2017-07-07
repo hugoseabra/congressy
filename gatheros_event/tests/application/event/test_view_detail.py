@@ -13,21 +13,6 @@ from gatheros_event.helpers import account
 from gatheros_event.models import Event, Member, Organization
 
 
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
-
-
 class EventDetailBannersUploadTest(TestCase):
     fixtures = [
         'kanu_locations_city_test',
@@ -52,17 +37,16 @@ class EventDetailBannersUploadTest(TestCase):
         self.persisted_path = 'event'
 
         self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self._clear_uploaded_directory()
 
     def _login(self):
         """ Realiza login. """
         self.client.force_login(self.user)
+        self._clear_uploaded_directory()
         self._switch_context()
 
     def _get_active_organization(self):
         """ Resgata organização ativa no contexto de usuário. """
-        request = MockRequest(self.user, self.client.session)
-        return account.get_organization(request)
+        return account.get_organization(self.client.request().wsgi_request)
 
     def _switch_context(self, group=Member.ADMIN):
         """ Muda organização do contexto de usuário. """
@@ -87,7 +71,8 @@ class EventDetailBannersUploadTest(TestCase):
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
         """ Resgata instância de Event. """
-        return Event.objects.get(slug='a-arte-de-usar-linux')
+        org = self._get_active_organization()
+        return org.events.first()
 
     # noinspection PyMethodMayBeStatic
     def _clear_uploaded_directory(self):
@@ -98,11 +83,14 @@ class EventDetailBannersUploadTest(TestCase):
             shutil.rmtree(path)
 
     def tearDown(self):
-        self._clear_uploaded_directory()
+        org = account.get_organization(self.client.request().wsgi_request)
+        # Se não tiver organização no contexto, não precisa limpar o diretório
+        if org:
+            self._clear_uploaded_directory()
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
-        response = self.client.get(self._get_url(), follow=True)
+        response = self.client.get(self._get_url(1), follow=True)
 
         redirect_url = reverse('front:login')
         redirect_url += '?next=/'
@@ -193,8 +181,7 @@ class EventDetailPlaceTest(TestCase):
 
     def _get_active_organization(self):
         """ Resgata organização ativa no contexto do login. """
-        request = MockRequest(self.user, self.client.session)
-        return account.get_organization(request)
+        return account.get_organization(self.client.request().wsgi_request)
 
     def _switch_context(self, group=Member.ADMIN):
         """ Muda organização do contexto de login. """
@@ -221,7 +208,7 @@ class EventDetailPlaceTest(TestCase):
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
-        response = self.client.get(self._get_url(), follow=True)
+        response = self.client.get(self._get_url(1), follow=True)
 
         redirect_url = reverse('front:login')
         redirect_url += '?next=/'

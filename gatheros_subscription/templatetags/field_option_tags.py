@@ -10,7 +10,7 @@ register = template.Library()
 def count_field_option_answers(option):
     counter = 0
     for answer in option.field.answers.all():
-        if option.name in answer.value:
+        if option.value in answer.value:
             counter += 1
 
     return counter

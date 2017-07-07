@@ -292,7 +292,7 @@ class InvitationDecisionView(TemplateView):
             except ValidationError:
                 # Se errado direciona para a criação do perfil
                 return redirect(
-                    'event:invitation-profile',
+                    'public:invitation-profile',
                     pk=kwargs.get('pk')
                 )
 

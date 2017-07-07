@@ -88,6 +88,7 @@ class AccountMixin(LoginRequiredMixin, View):
                 *args,
                 **kwargs
             )
+
         except PermissionDenied as e:
             messages.warning(request, str(e))
             return redirect(self.get_permission_denied_url())
@@ -146,8 +147,16 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         context['title'] = 'Excluir {}'.format(verbose_name)
 
         data = model_to_dict(self.get_object())
-        context['delete_message'] = self.delete_message.format(**data)
+        delete_message = self.get_delete_message()
+        context['delete_message'] = delete_message.format(**data)
         return context
+
+    def get_delete_message(self):
+        """
+        Recupera mensagem de remoção a ser perguntada ao usuário antes da
+        remoção.
+        """
+        return self.delete_message
 
     def post(self, request, *args, **kwargs):
         try:

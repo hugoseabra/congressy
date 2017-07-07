@@ -6,17 +6,17 @@ urls = [
     url(
         r'^(?P<pk>[\d]+)/delete/$',
         views.FieldOptionDeleteView.as_view(),
-        name='organization-field-option-delete'
+        name='field-option-delete'
     ),
     url(
         r'^(?P<pk>[\d]+)/edit/$',
         views.FieldOptionEditView.as_view(),
-        name='organization-field-option-edit'
+        name='field-option-edit'
     ),
     url(
         r'^add/$',
         views.FieldOptionAddView.as_view(),
-        name='organization-field-option-add'
+        name='field-option-add'
     ),
 ]
 
