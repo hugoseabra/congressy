@@ -381,6 +381,7 @@ class Migration(migrations.Migration):
                     ("can_view_members", "Can view members"),
                     ("can_manage_members", "Can manage members"),
                     ("can_manage_places", "Can manage places"),
+                    ("can_manage_fields", "Can manage form fields"),
                 ),
             },
             bases=(models.Model, GatherosModelMixin),

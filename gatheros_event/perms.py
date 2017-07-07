@@ -145,6 +145,7 @@ logic = MemberPermissionLogic(
         'can_view',
         'can_view_members',
         'can_manage_places',
+        'can_manage_fields',
     ],
 )
 add_permission_logic(Organization, logic)

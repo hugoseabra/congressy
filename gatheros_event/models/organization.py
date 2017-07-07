@@ -84,6 +84,7 @@ class Organization(models.Model, GatherosModelMixin):
             ("can_view_members", "Can view members"),
             ("can_manage_members", "Can manage members"),
             ("can_manage_places", "Can manage places"),
+            ("can_manage_fields", "Can manage form fields"),
         )
 
     def __str__(self):
