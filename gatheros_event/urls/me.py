@@ -16,24 +16,17 @@ private_urls = [
     ),
 ]
 
-public_urls = [
+public_account_urls = [
     url(
         r'^create-account/$',
         views.ProfileCreateView.as_view(),
         name='profile_create'
     ),
+]
+
+public_password_urls = [
     url(
-        r'^remember-password/$',
-        auth_views.PasswordResetView.as_view(),
-        name='password_reset'
-    ),
-    url(
-        r'^remember-password/complete/$',
-        auth_views.PasswordResetDoneView.as_view(),
-        name='password_reset_done'
-    ),
-    url(
-        r'^reset-password/'
+        r'^reset-password/confirmation/'
         '(?P<uidb64>[0-9A-Za-z_\-]+)/'
         '(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         auth_views.PasswordResetConfirmView.as_view(),
@@ -44,7 +37,18 @@ public_urls = [
         auth_views.PasswordResetCompleteView.as_view(),
         name='password_reset_complete'
     ),
+    url(
+        r'^reset-password/done/$',
+        auth_views.PasswordResetDoneView.as_view(),
+        name='password_reset_done'
+    ),
+    url(
+        r'^reset-password/$',
+        auth_views.PasswordResetView.as_view(),
+        name='password_reset'
+    ),
 ]
 
 urlpatterns_private_me = [url(r'^', include(private_urls))]
-urlpatterns_public_me = [url(r'^', include(public_urls))]
+urlpatterns_public_account = [url(r'^', include(public_account_urls))]
+urlpatterns_public_password = [url(r'^', include(public_password_urls))]
