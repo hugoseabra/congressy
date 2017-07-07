@@ -27,9 +27,9 @@ class BaseEventFieldTest(TestCase):
         if not event:
             event = self.event
 
-        return reverse('gatheros_subscription:fields-config', kwargs={
-            'event_pk': event.pk
-        })
+        # return reverse('subscription:event-fields-config', kwargs={
+        #     'event_pk': event.pk
+        # })
 
     def _login(self):
         self.client.force_login(self.user)
@@ -38,7 +38,7 @@ class BaseEventFieldTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -74,7 +74,7 @@ class EventFormFieldAddViewTest(BaseEventFieldTest):
         if not event:
             event = self.event
 
-        return reverse('gatheros_subscription:field-add', kwargs={
+        return reverse('event:event-field-add', kwargs={
             'event_pk': event.pk
         })
 
@@ -101,8 +101,7 @@ class EventFormFieldEditViewTest(BaseEventFieldTest):
         if not field:
             field = event.form.fields.filter(form_default_field=False).first()
 
-        return reverse('gatheros_subscription:field-edit', kwargs={
-            'event_pk': event.pk,
+        return reverse('event:event-field-edit', kwargs={
             'field_pk': field.pk
         })
 
@@ -158,8 +157,7 @@ class EventFormFieldDeleteViewTest(BaseEventFieldTest):
         if not field:
             field = event.form.fields.filter(form_default_field=False).first()
 
-        return reverse('gatheros_subscription:field-delete', kwargs={
-            'event_pk': event.pk,
+        return reverse('event:field-delete', kwargs={
             'field_pk': field.pk
         })
 
@@ -187,7 +185,7 @@ class EventFormFieldReorderViewTest(BaseEventFieldTest):
         if not field:
             field = event.form.fields.filter(form_default_field=False).first()
 
-        return reverse('gatheros_subscription:field-order', kwargs={
+        return reverse('event:event-field-order', kwargs={
             'event_pk': event.pk,
             'field_pk': field.pk
         })

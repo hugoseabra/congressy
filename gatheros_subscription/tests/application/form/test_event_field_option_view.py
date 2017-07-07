@@ -30,8 +30,7 @@ class FieldOptionViewTest(TestCase):
         if not field:
             field = event.form.fields.filter(with_options=True).first()
 
-        return reverse('gatheros_subscription:field-options', kwargs={
-            'event_pk': event.pk,
+        return reverse('event:event-field-options', kwargs={
             'field_pk': field.pk
         })
 
@@ -42,7 +41,7 @@ class FieldOptionViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -79,7 +78,7 @@ class FieldOptionAddViewTest(TestCase):
 
     # noinspection PyMethodMayBeStatic
     def _get_url(self):
-        return reverse('gatheros_subscription:field-option-add')
+        return reverse('event:event-field-option-add')
 
     def _login(self):
         self.client.force_login(self.user)
@@ -88,16 +87,14 @@ class FieldOptionAddViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
     def test_get_405(self):
         """ 405 quando acessado por GET. """
         self._login()
-        response = self.client.get(
-            self._get_url()
-        )
+        response = self.client.get(self._get_url())
         self.assertEqual(response.status_code, 405)
 
     def test_add(self):
@@ -143,9 +140,10 @@ class FieldOptionEditViewTest(TestCase):
             field = self.event.form.fields.filter(with_options=True).first()
             field_option = field.options.first()
 
-        return reverse('gatheros_subscription:field-option-edit', kwargs={
-            'pk': field_option.pk
-        })
+        return reverse(
+            'event:event-field-option-edit',
+            kwargs={'pk': field_option.pk}
+        )
 
     def _login(self):
         self.client.force_login(self.user)
@@ -154,7 +152,7 @@ class FieldOptionEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -208,9 +206,10 @@ class FieldOptionDeleteViewTest(TestCase):
             field = self.event.form.fields.filter(with_options=True).first()
             field_option = field.options.first()
 
-        return reverse('gatheros_subscription:field-option-delete', kwargs={
-            'pk': field_option.pk
-        })
+        return reverse(
+            'event:event-field-option-delete',
+            kwargs={'pk': field_option.pk}
+        )
 
     def _login(self):
         self.client.force_login(self.user)
@@ -219,7 +218,7 @@ class FieldOptionDeleteViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 

@@ -36,10 +36,13 @@
 {% endblock %}
 
 {% block extrascript %}
+
     <script type="application/javascript">
-        window.setTimeout(function () {
-            document.getElementById("id_username").focus();
-        }, 500);
+        document.addEventListener('DOMContentLoaded', function() {
+            window.setTimeout(function () {
+                document.getElementById("id_username").focus();
+            }, 100);
+        }, false);
     </script>
 {% endblock %}
 
@@ -88,7 +91,7 @@
             </p>
             <p>
                 Não possui uma conta?
-                <a href="{% url 'gatheros_event:profile_create' %}">
+                <a href="{% url 'event:profile_create' %}">
                     Clique aqui
                 </a>
             </p>

@@ -33,7 +33,7 @@ class EventDeleteTest(TestCase):
 
     # noinspection PyMethodMayBeStatic
     def _get_login_url(self):
-        return reverse('event:login')
+        return reverse('front:login')
 
     # noinspection PyMethodMayBeStatic
     def _get_event_list_url(self):

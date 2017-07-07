@@ -34,7 +34,7 @@ class LoginTest(TestCase):
             'password': password
         }
         self.result = self.client.post(
-            reverse('event:login'),
+            reverse('front:login'),
             data=data
         )
         self.assertRedirects(self.result, reverse('front:start'))

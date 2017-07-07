@@ -175,7 +175,7 @@ class InvitationDecisionViewWithProfile(TestCase):
                 'pk': self.invite_pk
             }
         )
-        self.url_redirect = reverse('event:login')
+        self.url_redirect = reverse('front:login')
 
     def test_get_without_login(self):
         """
@@ -269,7 +269,7 @@ class InvitationDecisionViewWithoutProfileTest(TestCase):
             }
         )
         self.url_login = reverse(
-            'event:login'
+            'front:login'
         )
         self.url_profile = reverse(
             'event:invitation-profile',
