@@ -1,10 +1,9 @@
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
-from gatheros_event.models import Event, Organization
+from gatheros_event.models import Organization
 from gatheros_subscription.forms import FieldOptionForm
 from gatheros_subscription.models import FieldOption
-
 
 FIXTURES = [
     '007_organization',

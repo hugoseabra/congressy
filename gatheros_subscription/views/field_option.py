@@ -1,5 +1,5 @@
-from django.shortcuts import get_object_or_404, redirect
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import generic
 
@@ -53,18 +53,19 @@ class BaseFieldOptionViewMixin(AccountMixin, generic.TemplateView):
         raise NotImplementedError()
 
 
+# noinspection PyAbstractClass
 class BaseFieldOptionFormViewMixin(BaseFieldOptionViewMixin):
     """ Base para views de formulário de `FieldOption` """
     http_method_names = ['post']
     form_class = FieldOptionForm
     object = None
-        
+
     def pre_dispatch(self, request):
         if request.method == 'GET':
             raise PermissionDenied(self.get_permission_denied_message())
 
         super(BaseFieldOptionFormViewMixin, self).pre_dispatch(request)
-    
+
     def get_object(self, queryset=None):
         if self.object:
             return self.object
@@ -80,15 +81,14 @@ class BaseFieldOptionFormViewMixin(BaseFieldOptionViewMixin):
         kwargs = parent.get_form_kwargs()
         kwargs.update({'field': self.field})
         return kwargs
-    
+
+    # noinspection PyUnusedLocal
     def form_invalid(self, form):
         return redirect(self.get_success_url())
 
 
-class FieldOptionsView(
-    BaseFieldOptionViewMixin,
-    generic.TemplateView
-):
+# noinspection PyAbstractClass
+class FieldOptionsView(BaseFieldOptionViewMixin, generic.TemplateView):
     """ View para gerenciar `FieldOption`"""
     template_name = \
         'gatheros_subscription/field/field_options.html'
@@ -146,7 +146,7 @@ class FieldOptionEditView(
         })
 
     def get_permission_denied_url(self):
-        return reverse('subscription:fields',kwargs={
+        return reverse('subscription:fields', kwargs={
             'organization_pk': self.field.organization.pk
         })
 

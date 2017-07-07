@@ -265,4 +265,3 @@ class FormFieldDeleteViewTest(BaseEventFieldTest):
         ).first()
         response = self.client.post(self._get_url(field), follow=True)
         self.assertContains(response, 'Campo excluído com sucesso')
-

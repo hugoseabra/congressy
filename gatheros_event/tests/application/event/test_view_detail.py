@@ -3,8 +3,6 @@ import shutil
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import six
