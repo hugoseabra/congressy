@@ -16,10 +16,9 @@ from gatheros_event.models.rules import check_invite
 
 
 def send_invitation(invitation):
-    url = reverse(
-        'event:invitation-decision',
-        kwargs={'pk': str(invitation.pk)}
-    )
+    url = reverse('public:invitation-decision', kwargs={
+        'pk': invitation.pk
+    })
 
     send_mail(
         'Novo convite para organização',

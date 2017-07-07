@@ -72,12 +72,6 @@
             {{ form.password.label_tag }} {{ form.password }}
             <input type="hidden" name="next" value="{{ next }}"/>
         </div>
-        {% url 'admin_password_reset' as password_reset_url %}
-        {% if password_reset_url %}
-            <div class="password-reset-link">
-                <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
-            </div>
-        {% endif %}
         <div class="submit-row">
             <input type="submit" value="{% trans 'Log in' %}"/>
         </div>
@@ -91,7 +85,7 @@
             </p>
             <p>
                 Não possui uma conta?
-                <a href="{% url 'event:profile_create' %}">
+                <a href="{% url 'public:profile_create' %}">
                     Clique aqui
                 </a>
             </p>

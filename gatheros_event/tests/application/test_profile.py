@@ -255,7 +255,7 @@ class ProfileCreateViewTest(TestCase):
             "city": 5413,
         }
 
-        self.url = reverse('event:profile_create')
+        self.url = reverse('public:profile_create')
 
     def test_get(self):
         """
