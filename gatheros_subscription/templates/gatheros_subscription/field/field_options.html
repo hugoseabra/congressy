@@ -1,0 +1,80 @@
+{% extends "gatheros_front/base.html" %}
+{% load field_option_tags %}
+
+{% block sidebar_organization %}{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content_width %}99%{% endblock %}
+
+{% block extrascript %}
+    <script type="application/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            window.setTimeout(function () {
+                document.getElementById("new_option").focus();
+            }, 100);
+        }, false);
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div style="padding:10px">
+        <a href="{% url 'subscription:fields' field.organization.pk %}">Voltar</a>
+    </div>
+    <hr/>
+    <h1>{{ field.organization.name }}</h1>
+    <h2>{{ field.label }}</h2>
+    <div style="margin-bottom:10px;padding: 10px;background-color: #DDDDDD;text-align: center;"></div>
+
+    {% if form_title %}
+        <h2>{{ form_title }}</h2>
+    {% endif %}
+    <pre>Importar opções com um arquivo?</pre>
+    <table border="0" width="50%" cellspacing="1" cellpadding="5">
+        <tr>
+            <th width="12%" style="background-color: darkgrey">#</th>
+            <th style="background-color: darkgrey">Opção</th>
+            <th width="18%" style="background-color: darkgrey"># Inscrições</th>
+            <th width="20%" style="background-color: darkgrey">&nbsp;</th>
+        </tr>
+        {% for option in options %}
+            {% count_field_option_answers option as num_answers %}
+            <tr>
+                <td style="text-align: center;border-bottom:1px solid #DDD">{{ forloop.counter }}</td>
+                <td style="border-bottom:1px solid #DDD">
+                    <input onkeyup="document.getElementById('field_option_{{ option.pk }}').value=this.value" type="text" value="{{ option.name }}" />
+                </td>
+                <td style="text-align: center;border-bottom:1px solid #DDD">
+                    {{ num_answers }}
+                </td>
+                <td style="border-bottom:1px solid #DDD">
+                    <div style="width: 88px;margin:0 auto">
+                        <div style="float:left">
+                            <form method="post" action="{% url 'subscription:field-option-edit' option.pk %}">{% csrf_token %}
+                                <button>Salvar</button>
+                                <input type="hidden" name="name" id="field_option_{{ option.pk }}" value="{{ option.name }}" />
+                            </form>
+                        </div>
+                        <div style="float:left;margin-left: 5px">
+                            <form onsubmit="return confirm('Tem certeza que deseja excluir a opção?')" method="post" action="{% url 'subscription:field-option-delete' option.pk %}">{% csrf_token %}
+                                <button>X</button>
+                            </form>
+                        </div>
+                        <div style="clear:both"></div>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td style="text-align: center;border-bottom:1px solid #DDD">Novo</td>
+            <td style="border-bottom:1px solid #DDD" colspan="3">
+                <form method="post" action="{% url 'subscription:field-option-add' %}">{% csrf_token %}
+                    <input type="text" name="name" id="new_option" value="" />
+                    <button>Adicionar</button>
+                    <input type="hidden" name="field_pk" value="{{ field.pk }}" />
+                </form>
+            </td>
+        </tr>
+    </table>
+    <div style="padding:10px">
+        <a href="{% url 'subscription:fields' field.organization.pk %}">Voltar</a>
+    </div>
+{% endblock %}

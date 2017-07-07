@@ -1,0 +1,75 @@
+{% extends "gatheros_front/base.html" %}
+{% load subscription_tags %}
+
+{% block sidebar_organization %}{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content_width %}99%{% endblock %}
+
+{% block content %}
+
+    <div style="padding:10px">
+        <a href="{% url 'event:organization-panel' fields_organization.pk %}">Voltar</a>
+    </div>
+    <hr/>
+    <h1>Formulário Padrão</h1>
+    <h2>{{ fields_organization.name }}</h2>
+
+    <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
+        <a href="{% url 'subscription:field-add' fields_organization.pk %}">Adicionar</a>
+    </div>
+
+    <div style="border: 1px solid #DDD;margin-bottom: 3px;padding:10px">
+        Os campos são ordenados por ordem de importância: os que possuem maior
+        número de inscrições são os mais importantes.
+    </div>
+    <div style="background: #DDD">
+        <table border="0" width="100%" cellpadding="10" cellspacing="1" style="background-color:#DDD">
+            <tr>
+                <td colspan="3" style="font-weight: bold">Campos</td>
+                <td style="text-align:center;font-weight: bold">Obrigatório</td>
+                <td style="text-align:center;font-weight: bold"># Eventos</td>
+                <td style="text-align:center;font-weight: bold"># Inscrições</td>
+                <td style="text-align:center;font-weight: bold">Ações</td>
+            </tr>
+            {% for field in form %}
+                {% get_gatheros_field form field as gatheros_field %}
+                <tr>
+                    <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
+                    </th>
+                    <td style="vertical-align: top;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}" {% if not gatheros_field.with_options %}colspan="2"{% endif %}>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <br />
+                            <strong>Instrução:</strong> {{ field.help_text|safe }}
+                        {% endif %}
+                        {{ field.errors }}
+                    </td>
+                    {% if gatheros_field.with_options %}
+                    <td width="13%" style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                        <a style="text-decoration: none" href="{% url 'subscription:field-options' gatheros_field.pk %}">Gerenciar opções</a>
+                    </td>
+                    {% endif %}
+                    <td width="6%" style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                        {% if gatheros_field.required %}&#10004;{% endif %}
+                    </td>
+                    <td width="6%" style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                        {{ gatheros_field.forms.count }}
+                    </td>
+                    <td width="6%" style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                        {{ gatheros_field.answers.count }}
+                    </td>
+                    <td width="8%" style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                        <a style="text-decoration: none" href="{% url 'subscription:field-edit' gatheros_field.pk %}">Editar</a>
+                        &nbsp;
+                        <a style="text-decoration: none" href="{% url 'subscription:field-delete' gatheros_field.pk %}">Excluir</a>
+                        {% if not gatheros_field.active %}
+                            <div style="text-align: center;font-style: italic;padding: 4px">Desativado</div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}
