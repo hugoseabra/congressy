@@ -1,9 +1,9 @@
-from .event_form import (
-    EventConfigForm,
-    EventFormFieldForm,
-    EventFormFieldOrderForm,
-)
+from .field import FieldForm, OrganizationFieldsForm
 from .field_option import FieldOptionForm
-from .fields import FieldForm, FieldsForm
+from .form import (
+    EventFieldsForm,
+    FormFieldForm,
+    FormFieldOrderForm,
+)
 from .lot import LotForm
 from .subscription import SubscriptionAttendanceForm, SubscriptionForm

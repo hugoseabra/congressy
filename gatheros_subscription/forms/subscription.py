@@ -9,10 +9,10 @@ from kanu_locations.models import City
 
 from gatheros_event.models import Person
 from gatheros_subscription.models import Answer, Field, Lot, Subscription
-from .event_form import EventConfigForm
+from .form import EventFieldsForm
 
 
-class SubscriptionForm(EventConfigForm):
+class SubscriptionForm(EventFieldsForm):
     """ Formulário de pré-inscrição. """
     def __init__(self, instance=None, hide_lot=True, *args, **kwargs):
         self.instance = instance
