@@ -44,7 +44,7 @@ class Field(AbstractField):
     class Meta:
         verbose_name = 'Campo de Formulário'
         verbose_name_plural = 'Campos de Formulário'
-        ordering = ['organization__id', 'order', 'name']
+        ordering = ['organization__id', 'name']
         unique_together = (('organization', 'name'),)
 
     def save(self, **kwargs):

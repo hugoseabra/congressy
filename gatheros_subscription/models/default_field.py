@@ -4,6 +4,7 @@ Campo padrão de formulário, que deve conter nos formulários de todos os
 eventos da plataforma.
 """
 
+from django.db import models
 from core.util import model_field_slugify
 
 from . import AbstractField
@@ -11,6 +12,12 @@ from . import AbstractField
 
 class DefaultField(AbstractField):
     """ Modelo de camp padrão. """
+
+    order = models.PositiveIntegerField(
+        verbose_name='ordem',
+        null=True,
+        blank=True
+    )
 
     class Meta:
         verbose_name = 'Campo Padrão'

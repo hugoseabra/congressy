@@ -5,13 +5,13 @@ from __future__ import unicode_literals
 import uuid
 
 import django.db.models.deletion
+import jsonfield.fields
 from django.db import migrations, models
 
 from gatheros_event.models.mixins import GatherosModelMixin
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                     serialize=False,
                     verbose_name='ID'
                 )),
-                ('value', models.TextField(
+                ('value', jsonfield.fields.JSONField(
                     blank=True,
                     null=True,
                     verbose_name='valor'
@@ -192,11 +192,6 @@ class Migration(migrations.Migration):
                     max_length=20,
                     verbose_name='tipo'
                 )),
-                ('order', models.PositiveIntegerField(
-                    blank=True,
-                    null=True,
-                    verbose_name='ordem'
-                )),
                 ('required', models.BooleanField(
                     default=False,
                     verbose_name='obrigatório'
@@ -237,7 +232,7 @@ class Migration(migrations.Migration):
                 )),
             ],
             options={
-                'ordering': ['organization__id', 'order', 'name'],
+                'ordering': ['organization__id', 'name'],
                 'verbose_name': 'Campo de Formulário',
                 'verbose_name_plural': 'Campos de Formulário',
             },
@@ -284,6 +279,27 @@ class Migration(migrations.Migration):
                     primary_key=True,
                     serialize=False,
                     verbose_name='ID'
+                )),
+                ('required_configuration', jsonfield.fields.JSONField(
+                    blank=True,
+                    null=True,
+                    verbose_name='Config. de Obrigatoriedade',
+                    help_text='Configuração de camops cujas obrigatoriedades'
+                              ' foram alteradas do campo original.'
+                )),
+                ('inactive_fields', models.TextField(
+                    blank=True,
+                    null=True,
+                    verbose_name='campos inativos',
+                    help_text='Campos que estão inativos especificamente para'
+                              ' este formulário.'
+                )),
+                ('order', models.TextField(
+                    blank=True,
+                    null=True,
+                    verbose_name='ordem',
+                    help_text='Nome dos campos do formulário separados por'
+                              ' víngula.'
                 )),
                 ('created', models.DateTimeField(
                     auto_now_add=True,
