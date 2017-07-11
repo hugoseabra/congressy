@@ -6,6 +6,8 @@ from django.test import TestCase
 from openpyxl import load_workbook
 
 from gatheros_event.models import Event, Person
+from gatheros_subscription.helpers.subscription import export
+from gatheros_subscription.models import Subscription
 
 
 class BaseExportViewTest(TestCase):
@@ -153,3 +155,45 @@ class CannotExportViewTest(BaseExportViewTest):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
+
+
+class ExportHelperTest(BaseExportViewTest):
+    fixtures = [
+        '001_user',
+        '003_occupation',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+        '009_place',
+        '010_event',
+        '006_lot',
+        '007_subscription',
+        '008_answer',
+        '008_answer',
+
+        '001_default_field',
+        '002_default_field_option',
+        '003_form',
+        '004_field',
+        '005_field_option',
+        '006_lot',
+        '007_subscription',
+        '008_answer',
+    ]
+
+    def setUp(self):
+        event = Event.objects.get(
+            slug='encontro-de-casais-2017'
+        )
+        self.queryset = Subscription.objects.filter(event=event)
+
+    def test_export(self):
+        """
+        Garante que o conteúdo retornado pela função de export é um xlsx
+        """
+        try:
+            output = io.BytesIO(export(self.queryset))
+            workbook = load_workbook(output)
+        except Exception as e:
+            self.fail(str(e))

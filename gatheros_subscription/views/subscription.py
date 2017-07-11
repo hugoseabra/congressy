@@ -1,4 +1,3 @@
-import io
 from datetime import datetime
 
 from django.contrib import messages
@@ -590,15 +589,12 @@ class SubscriptionExportView(AccountMixin, FormListViewMixin):
 
     def get(self, request, *args, **kwargs):
         if request.GET.get('format') == 'xls':
-            # Criando buffer de bytes
-            output = io.BytesIO()
-
             # Chamando exportação
-            subscription_export(output, self.get_queryset())
+            output = subscription_export(self.get_queryset())
 
             # Criando resposta http com arquivo de download
-            response = HttpResponse(
-                output.getbuffer(), content_type="application/vnd.ms-excel")
+            response = HttpResponse(output,
+                                    content_type="application/vnd.ms-excel")
 
             # Definindo nome do arquivo
             event = Event.objects.get(pk=self.kwargs.get('event_pk'))
@@ -611,11 +607,7 @@ class SubscriptionExportView(AccountMixin, FormListViewMixin):
                                                        **kwargs)
 
     def can_access(self):
-        """
-        Só admin da organização dona do evento pode exportar,
-        então verifica se o usuário é admin
-        :return: Bool
-        """
-        user = self.request.user
-        event = Event.objects.get(pk=self.kwargs.get('event_pk'))
-        return event.organization.is_admin(user)
+        return self.request.user.has_perm(
+            'gatheros_event.can_manage_subscriptions',
+            Event.objects.get(pk=self.kwargs.get('event_pk'))
+        )

@@ -33,7 +33,7 @@
                 <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:subscription-list' object.pk %}">Pré-inscrições</a></div>
             {% endif %}
             <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>
-            <div style="padding:15px">&rightarrow; <a href="#">Exportação de dados</a></div>
+            <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_subscription:subscriptions-export' object.pk %}">Exportação de dados</a></div>
         </div>
     {% endif %}
 {% endblock %}
