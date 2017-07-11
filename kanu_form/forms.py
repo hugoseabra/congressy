@@ -1,51 +1,35 @@
+from collections import OrderedDict
+
 from django import forms
-from django.forms import model_to_dict
-from django.utils import six
+from django.forms.fields import Field as DjangoField
+
+from .field import Field as KanuField
 
 
 class KanuForm(forms.Form):
     """ Formulário Dinâmico. """
 
-    field_manager = None
-
-    def __init__(self, field_manager, *args, **kwargs):
-        self.field_manager = field_manager
+    def __init__(self, *args, **kwargs):
         super(KanuForm, self).__init__(*args, **kwargs)
-        self._add_fields()
-
-    def _add_fields(self):
+        self.kanu_fields = OrderedDict()
         self.fields.keyOrder = []
-        for name, django_field in six.iteritems(self.field_manager.fields):
-            self.fields[name] = django_field
-            self.fields.keyOrder.append(name)
 
-    @staticmethod
-    def get_field_dict(gatheros_field):
+    def create_field(self, name, field_type, initial=None, required=True,
+                     label=None, **kwargs):
         """
-        Resgata dict de `Field` com a estrutura correta.
-
-        :param gatheros_field: `gatheros_subscription.models.Field`
-        :return: Dict
+        Cria um campo para o formulário conforme interface django field:
+        field e widget.
+        :param name: Nome do campo
+        :param field_type: tipo do campo, conforme kanu_form.fields.field.Field
+        :param initial: valor inicial
+        :param required: se obrigatório
+        :param label: valor do rótulo
+        :param kwargs: outros valores
+        :rtype: DjangoField
         """
-        field_dict = model_to_dict(gatheros_field, exclude=[
-            'active',
-            'default_value',
-            'form_default_field',
-            'form',
-            'id',
-            'instruction',
-            'order',
-            'with_options',
-        ])
+        field = KanuField(field_type, initial, required, label, **kwargs)
+        self.fields[name] = field.get_django_field()
+        self.fields.keyOrder.append(name)
+        self.kanu_fields.update({name: field})
 
-        field_dict['help_text'] = gatheros_field.instruction
-
-        if gatheros_field.default_value:
-            field_dict['initial'] = gatheros_field.default_value
-
-        if gatheros_field.with_options:
-            field_dict['options'] = [
-                (opt.value, opt.name) for opt in gatheros_field.options.all()
-            ]
-
-        return field_dict
+        return field.get_django_field()
