@@ -4,7 +4,7 @@ from django.test import TestCase
 from gatheros_event.models import Organization
 from gatheros_subscription.forms import (
     FieldForm,
-    FieldsForm
+    OrganizationFieldsForm
 )
 from gatheros_subscription.models import Field
 
@@ -28,13 +28,10 @@ class FieldsFormRenderTest(TestCase):
         """
         Testa se formulário possui todos os campos `não-padrão` da organização.
         """
-        form = FieldsForm(organization=self.organization)
+        form = OrganizationFieldsForm(organization=self.organization)
         content = form.as_ul()
 
-        fields = self.organization.fields.filter(
-            organization=self.organization,
-            form_default_field=False,
-        )
+        fields = self.organization.fields.filter(form_default_field=False)
         for field in fields:
             self.assertIn(field.name, content)
 
