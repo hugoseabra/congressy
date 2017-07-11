@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import generic
 
@@ -33,6 +33,22 @@ class BaseFieldsView(AccountMixin, generic.View):
         )
 
         return self.is_manager and is_member and can_manage
+
+    def get_next_path(self):
+        """
+        Resgata se após o post a view será redirecionada para uma URL
+        específica.
+        """
+        request = self.request
+        previous_url = request.META.get('HTTP_REFERER')
+
+        if not previous_url:
+            return None
+
+        host = request.scheme + '://' + request.META.get('HTTP_HOST', '')
+        previous_url = previous_url.replace(host, '')
+
+        return previous_url if previous_url != request.path else None
 
 
 class FieldsListView(BaseFieldsView, generic.FormView):
@@ -139,11 +155,20 @@ class FieldsEditView(BaseFieldsView, generic.UpdateView):
         kwargs.update({'organization': self.fields_organization})
         return kwargs
 
+    def post(self, request, *args, **kwargs):
+        next_path = request.POST.get('next_path')
+        response = super(FieldsEditView, self).post(request, *args, **kwargs)
+        if next_path:
+            return redirect(next_path)
+
+        return response
+
     def get_context_data(self, **kwargs):
         cxt = super(FieldsEditView, self).get_context_data(**kwargs)
         cxt.update({
             'form_title': 'Editar Campo',
             'field_organization': self.fields_organization,
+            'next_path': self.get_next_path()
         })
         return cxt
 

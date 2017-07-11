@@ -17,6 +17,11 @@
         <br />
         <hr />
         <input type="submit" value="Salvar"/>
-        <a href="{% url 'subscription:fields' field_organization.pk %}">Cancelar</a>
+        {% if next_path %}
+            <a href="{{ next_path }}">Cancelar</a>
+            <input type="hidden" name="next_path" value="{{ next_path }}" />
+        {% else %}
+            <a href="{% url 'subscription:fields' field_organization.pk %}">Cancelar</a>
+        {% endif %}
     </form>
 {% endblock %}

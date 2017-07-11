@@ -39,8 +39,5 @@ urlpatterns_field = [
         r'^organizations/(?P<organization_pk>[\d]+)/fields/',
         include(urls_organization_fields)
     ),
-    url(
-        r'^fields/',
-        include(url_fields)
-    ),
+    url(r'^fields/', include(url_fields)),
 ]

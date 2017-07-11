@@ -26,7 +26,8 @@ class BaseFieldOptionViewMixin(AccountMixin, generic.TemplateView):
         cxt.update({
             'form_title': self.form_title,
             'field': self.get_field(),
-            'options': self.get_field().options.all().order_by('pk')
+            'options': self.get_field().options.all().order_by('pk'),
+            'event_pk': self.request.GET.get('event_pk')
         })
         return cxt
 
@@ -59,11 +60,13 @@ class BaseFieldOptionFormViewMixin(BaseFieldOptionViewMixin):
     http_method_names = ['post']
     form_class = FieldOptionForm
     object = None
+    event_pk = None
 
     def pre_dispatch(self, request):
         if request.method == 'GET':
             raise PermissionDenied(self.get_permission_denied_message())
 
+        self.event_pk = request.GET.get('event_pk')
         super(BaseFieldOptionFormViewMixin, self).pre_dispatch(request)
 
     def get_object(self, queryset=None):
@@ -120,9 +123,13 @@ class FieldOptionAddView(
         super(FieldOptionAddView, self).pre_dispatch(request)
 
     def get_success_url(self):
-        return reverse('subscription:field-options', kwargs={
+        url = reverse('subscription:field-options', kwargs={
             'field_pk': self.field.pk
         })
+        if self.event_pk:
+            url += '?event_pk='+self.event_pk
+
+        return url
 
     def get_permission_denied_url(self):
         return reverse('front:start')
@@ -141,9 +148,13 @@ class FieldOptionEditView(
         super(FieldOptionEditView, self).pre_dispatch(request)
 
     def get_success_url(self):
-        return reverse('subscription:field-options', kwargs={
+        url = reverse('subscription:field-options', kwargs={
             'field_pk': self.field.pk
         })
+        if self.event_pk:
+            url += '?event_pk=' + self.event_pk
+
+        return url
 
     def get_permission_denied_url(self):
         return reverse('subscription:fields', kwargs={
@@ -158,18 +169,24 @@ class FieldOptionDeleteView(
     """ View para excluir `FieldOption`. """
     model = FieldOption
     field = None
+    event_pk = None
     success_message = None
     http_method_names = ['post']
 
     def pre_dispatch(self, request):
         self.object = self.get_object()
         self.field = self.object.field
+        self.event_pk = request.GET.get('event_pk')
         super(FieldOptionDeleteView, self).pre_dispatch(request)
 
     def get_success_url(self):
-        return reverse('subscription:field-options', kwargs={
+        url = reverse('subscription:field-options', kwargs={
             'field_pk': self.field.pk
         })
+        if self.event_pk:
+            url += '?event_pk=' + self.event_pk
+
+        return url
 
     def get_permission_denied_url(self):
         return reverse('subscription:fields', kwargs={

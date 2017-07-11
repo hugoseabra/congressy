@@ -17,7 +17,11 @@
 
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'subscription:fields' field.organization.pk %}">Voltar</a>
+        {% if event_pk %}
+            <a href="{% url 'subscription:event-fields-config' event_pk %}">Voltar</a>
+        {% else %}
+            <a href="{% url 'subscription:fields' field.organization.pk %}">Voltar</a>
+        {% endif %}
     </div>
     <hr/>
     <h1>{{ field.organization.name }}</h1>
@@ -48,13 +52,13 @@
                 <td style="border-bottom:1px solid #DDD">
                     <div style="width: 88px;margin:0 auto">
                         <div style="float:left">
-                            <form method="post" action="{% url 'subscription:field-option-edit' option.pk %}">{% csrf_token %}
+                            <form method="post" action="{% url 'subscription:field-option-edit' option.pk %}{% if event_pk %}?event_pk={{ event_pk }}{% endif %}">{% csrf_token %}
                                 <button>Salvar</button>
                                 <input type="hidden" name="name" id="field_option_{{ option.pk }}" value="{{ option.name }}" />
                             </form>
                         </div>
                         <div style="float:left;margin-left: 5px">
-                            <form onsubmit="return confirm('Tem certeza que deseja excluir a opção?')" method="post" action="{% url 'subscription:field-option-delete' option.pk %}">{% csrf_token %}
+                            <form onsubmit="return confirm('Tem certeza que deseja excluir a opção?')" method="post" action="{% url 'subscription:field-option-delete' option.pk %}{% if event_pk %}?event_pk={{ event_pk }}{% endif %}">{% csrf_token %}
                                 <button>X</button>
                             </form>
                         </div>
@@ -66,7 +70,7 @@
         <tr>
             <td style="text-align: center;border-bottom:1px solid #DDD">Novo</td>
             <td style="border-bottom:1px solid #DDD" colspan="3">
-                <form method="post" action="{% url 'subscription:field-option-add' %}">{% csrf_token %}
+                <form method="post" action="{% url 'subscription:field-option-add' %}{% if event_pk %}?event_pk={{ event_pk }}{% endif %}">{% csrf_token %}
                     <input type="text" name="name" id="new_option" value="" />
                     <button>Adicionar</button>
                     <input type="hidden" name="field_pk" value="{{ field.pk }}" />
@@ -75,6 +79,10 @@
         </tr>
     </table>
     <div style="padding:10px">
-        <a href="{% url 'subscription:fields' field.organization.pk %}">Voltar</a>
+        {% if event_pk %}
+            <a href="{% url 'subscription:event-fields-config' event_pk %}">Voltar</a>
+        {% else %}
+            <a href="{% url 'subscription:fields' field.organization.pk %}">Voltar</a>
+        {% endif %}
     </div>
 {% endblock %}
