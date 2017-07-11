@@ -5,7 +5,7 @@ from django.views import generic
 
 from gatheros_event.models import Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
-from gatheros_subscription.forms import FieldForm, FieldsForm
+from gatheros_subscription.forms import FieldForm, OrganizationFieldsForm
 from gatheros_subscription.models import Field
 
 
@@ -39,7 +39,7 @@ class FieldsListView(BaseFieldsView, generic.FormView):
     """ View de Lista de campos da organização. """
 
     template_name = 'gatheros_subscription/field/fields.html'
-    form_class = FieldsForm
+    form_class = OrganizationFieldsForm
 
     def get_fields_organization(self):
         """ Resgata instância de organização da view """
