@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import PermissionDenied
+from django.utils import six
 
 from gatheros_subscription.models import Field, Form
 from .field import FieldForm, FieldsRendererMixin
@@ -19,6 +20,7 @@ class EventFieldsForm(FieldsRendererMixin):
     Formulário para construção de campos para o formulário do Django a partir
     do modelos `Field` de um modelo `Form` de evento.
     """
+
     def __init__(self, form, show_inactive=False, *args, **kwargs):
         """
         :type form: Form
@@ -29,12 +31,31 @@ class EventFieldsForm(FieldsRendererMixin):
         self.show_inactive = show_inactive
         super(EventFieldsForm, self).__init__(*args, **kwargs)
 
-    def _get_fields_queryset(self):
-        fields_qs = self.form.fields.all()
-        if not self.show_inactive:
-            fields_qs = fields_qs.filter(active=True)
+        self.set_required_fields()
 
-        return fields_qs.all()
+    def _get_fields_queryset(self):
+        fields_qs = self.form.fields.filter(active=True)
+        inactive_list = self.form.get_inactive_field_list()
+
+        # Refaz retorno da lista de acordo com a ordem dos campos.
+        field_ordered_list = []
+        for field_name in self.form.get_order_list():
+            if not self.show_inactive \
+                    and inactive_list \
+                    and field_name in inactive_list:
+                continue
+
+            for field in fields_qs:
+                if field.name == field_name:
+                    field_ordered_list.append(field)
+
+        return field_ordered_list
+
+    def set_required_fields(self):
+        """ Define campos obrigatórios. """
+        for field_name, field in six.iteritems(self.gatheros_fields):
+            if self.form.is_required(field):
+                self.set_attr(field_name, 'required', 'required')
 
 
 class FormFieldForm(forms.Form):
@@ -89,6 +110,29 @@ class FormFieldForm(forms.Form):
         """ Desativa campo no formulário. """
         _check_field_restriction(self.form, field)
         self.form.deactivate_field(field)
+        self.form.save()
+
+    def set_as_required(self, field):
+        """ Configura o campo como obrigatório. """
+        config = self.form.required_configuration
+        item = config.get(field.name)
+        if not item and field.required is True:
+            return
+
+        if item and item is True:
+            return
+
+        self._change_required_value(field)
+
+    def set_as_not_required(self, field):
+        """ Configura o campo como não-obrigatório. """
+        config = self.form.required_configuration
+        item = config.get(field.name)
+
+        if item:
+            del config[field.name]
+
+        self.form.required_configuration = config
         self.form.save()
 
     def _change_required_value(self, field):
@@ -156,7 +200,7 @@ class FormFieldOrderForm(forms.Form):
             updated_order.append(field_name)
             counter += 1
 
-        self.form.set_order(updated_order)
+        self.form.set_order_list(updated_order)
         self.form.save()
 
     def order_up(self, field):
@@ -193,7 +237,7 @@ class FormFieldOrderForm(forms.Form):
             updated_order.append(field_name)
             counter += 1
 
-        self.form.set_order(updated_order)
+        self.form.set_order_list(updated_order)
         self.form.save()
 
     def _check_field_restriction(self, field):
