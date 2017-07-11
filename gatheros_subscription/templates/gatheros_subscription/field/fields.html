@@ -33,6 +33,7 @@
             </tr>
             {% for field in form %}
                 {% get_gatheros_field form field as gatheros_field %}
+                {% if gatheros_field %}
                 <tr>
                     <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
                         <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
@@ -68,6 +69,7 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% endif %}
             {% endfor %}
         </table>
     </div>
