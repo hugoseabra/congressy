@@ -118,7 +118,7 @@ def _preverse_order(default_fields, form):
 
         updated_orders.append(field_name)
 
-    form.set_order(updated_orders)
+    form.set_order_list(updated_orders)
     form.save()
 
 
