@@ -29,21 +29,22 @@ class Form(models.Model):
         verbose_name='Config. de Obrigatoriedade',
         null=True,
         blank=True,
-        help_text='Configuração de camops cujas obrigatoriedades foram'
-                  ' alteradas do campo original.'
+        help_text='CUIDADO: Configuração de camops cujas obrigatoriedades'
+                  ' foram alteradas do campo original.'
     )
     inactive_fields = models.TextField(
         verbose_name='campos inativos',
         null=True,
         blank=True,
-        help_text='Campos que estão inativos especificamente para este'
-                  ' formulário.'
+        help_text='CUIDADO: Campos que estão inativos especificamente para'
+                  ' este formulário.'
     )
     order = models.TextField(
         verbose_name='ordem',
         null=True,
         blank=True,
-        help_text='Nome dos campos do formulário separados por víngula.'
+        help_text='CUIDADO: Nome dos campos do formulário separados por'
+                  ' víngula.'
     )
 
     class Meta:
@@ -100,12 +101,11 @@ class Form(models.Model):
         order_list = re.split('[;,\r\n]', self.order) if self.order else []
         return list(filter(None, order_list))
 
-    def set_order(self, fields_list):
+    def set_order_list(self, fields_list):
         """
         Seta valor em `order` de forma padronizada.
         :param fields_list: Lista de `name` dos campos.
         :type fields_list: list
-        :return:
         """
         fields_list = list(filter(None, fields_list))
         self.order = "\n".join(fields_list)
@@ -117,7 +117,27 @@ class Form(models.Model):
         """
         order_list = self.get_order_list()
         order_list.append(field.name)
-        self.set_order(order_list)
+        self.set_order_list(order_list)
+
+    def get_inactive_fields_list(self):
+        """
+        Resgata lista de ordem de campos.
+        :rtype: list
+        """
+        if not self.inactive_fields:
+            return []
+
+        order_list = re.split('[;,\r\n]', self.inactive_fields)
+        return list(filter(None, order_list))
+
+    def set_inactive_fields_list(self, fields_list):
+        """
+        Seta valor em `inactive_fields` de forma padronizada.
+        :param fields_list: Lista de `name` dos campos.
+        :type fields_list: list
+        """
+        fields_list = list(filter(None, fields_list))
+        self.inactive_fields = "\n".join(fields_list)
 
     def is_active(self, field):
         """

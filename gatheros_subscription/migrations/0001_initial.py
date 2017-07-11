@@ -284,22 +284,23 @@ class Migration(migrations.Migration):
                     blank=True,
                     null=True,
                     verbose_name='Config. de Obrigatoriedade',
-                    help_text='Configuração de camops cujas obrigatoriedades'
-                              ' foram alteradas do campo original.'
+                    help_text='CUIDADO: Configuração de camops cujas'
+                              ' obrigatoriedades foram alteradas do campo'
+                              ' original.'
                 )),
                 ('inactive_fields', models.TextField(
                     blank=True,
                     null=True,
                     verbose_name='campos inativos',
-                    help_text='Campos que estão inativos especificamente para'
-                              ' este formulário.'
+                    help_text='CUIDADO: Campos que estão inativos'
+                              ' especificamente para este formulário.'
                 )),
                 ('order', models.TextField(
                     blank=True,
                     null=True,
                     verbose_name='ordem',
-                    help_text='Nome dos campos do formulário separados por'
-                              ' víngula.'
+                    help_text='CUIDADO: Nome dos campos do formulário'
+                              ' separados por víngula.'
                 )),
                 ('created', models.DateTimeField(
                     auto_now_add=True,

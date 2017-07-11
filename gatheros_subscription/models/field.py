@@ -7,11 +7,13 @@ dos participantes de eventos através de suas inscrições.
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
+from core.model import track_data
 from core.util import model_field_slugify
 from gatheros_event.models import Organization
 from . import AbstractField, Form
 
 
+@track_data('name')
 class Field(AbstractField):
     """ Modelo de campo de formulário. """
 
