@@ -564,10 +564,12 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             return True
 
 
-class SubscriptionExportView(FormListViewMixin):
+class SubscriptionExportView(AccountMixin, FormListViewMixin):
     template_name = 'gatheros_subscription/subscription_filter.html'
     form_class = SubscriptionFilterForm
     model = Subscription
+    paginate_by = 5
+    allow_empty = True
 
     def get_form_kwargs(self):
         kwargs = super(SubscriptionExportView, self).get_form_kwargs()
@@ -581,13 +583,13 @@ class SubscriptionExportView(FormListViewMixin):
             .filter(event__pk=self.kwargs.get('event_pk'))
 
         form = self.get_form()
-        if self.request.POST and form.is_valid():
+        if form.is_valid():
             queryset = form.filter(queryset)
 
         return queryset
 
-    def post(self, request, *args, **kwargs):
-        if request.POST.get('format') == 'xls':
+    def get(self, request, *args, **kwargs):
+        if request.GET.get('format') == 'xls':
             # Criando buffer de bytes
             output = io.BytesIO()
 
@@ -605,4 +607,15 @@ class SubscriptionExportView(FormListViewMixin):
 
             return response
 
-        return self.get(request, *args, **kwargs)
+        return super(SubscriptionExportView, self).get(request, *args,
+                                                       **kwargs)
+
+    def can_access(self):
+        """
+        Só admin da organização dona do evento pode exportar,
+        então verifica se o usuário é admin
+        :return: Bool
+        """
+        user = self.request.user
+        event = Event.objects.get(pk=self.kwargs.get('event_pk'))
+        return event.organization.is_admin(user)

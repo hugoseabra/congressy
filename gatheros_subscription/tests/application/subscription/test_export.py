@@ -8,13 +8,14 @@ from openpyxl import load_workbook
 from gatheros_event.models import Event, Person
 
 
-class ExportViewTest(TestCase):
+class BaseExportViewTest(TestCase):
     fixtures = [
         '001_user',
         '003_occupation',
         '005_user',
         '006_person',
         '007_organization',
+        '008_member',
         '009_place',
         '010_event',
         '006_lot',
@@ -22,8 +23,6 @@ class ExportViewTest(TestCase):
     ]
 
     def setUp(self):
-        self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.client.force_login(self.user)
         self.event = Event.objects.get(
             slug='seo-e-resultados'
         )
@@ -31,7 +30,14 @@ class ExportViewTest(TestCase):
         self.url = reverse('gatheros_subscription:subscriptions-export',
                            kwargs={'event_pk': self.event.pk})
 
-    def test_get_ok(self):
+
+class CanExportViewTest(BaseExportViewTest):
+    def setUp(self):
+        super(CanExportViewTest, self).setUp()
+        self.user = User.objects.get(username="lucianasilva@gmail.com")
+        self.client.force_login(self.user)
+
+    def test_get_200(self):
         """
         Retornar a página com o formulário deve ser ok
         """
@@ -44,12 +50,13 @@ class ExportViewTest(TestCase):
         Filtrando por estado
         """
         data = {'format': 'html'}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 7)  # Todos os inscritos
+        self.assertContains(response, '<tr', 5)  # Todos os inscritos
+        self.assertContains(response, 'Pagina 1 de 2')  # Todos os inscritos
 
         data = {'format': 'html', 'uf': ['TO']}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<tr', 1)  # Inscritos de 'TO'
 
@@ -58,27 +65,28 @@ class ExportViewTest(TestCase):
         Filtrando por idade
         """
         data = {'format': 'html'}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 7)  # Todos os inscritos
+        self.assertContains(response, '<tr', 5)  # Todos os inscritos
+        self.assertContains(response, 'Pagina 1 de 2')  # Todos os inscritos
 
         data = {'format': 'html', 'age_0': 30, 'age_1': 40}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<tr', 3)  # Inscritos de 30 a 40 anos
 
         data = {'format': 'html', 'age_0': 40}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<tr', 1)  # Inscritos maiores de 40 anos
 
         data = {'format': 'html', 'age_1': 35}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<tr', 3)  # Inscritos menores de 35 anos
 
         data = {'format': 'html', 'age_0': '', 'age_1': ''}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)  # Post com campos vazios
 
     def test_filter_by_gender(self):
@@ -86,24 +94,26 @@ class ExportViewTest(TestCase):
         Filtrando por sexo
         """
         data = {'format': 'html'}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 7)  # Todos os inscritos
+        self.assertContains(response, '<tr', 5)  # Todos os inscritos
+        self.assertContains(response, 'Pagina 1 de 2')  # Todos os inscritos
 
         data = {'format': 'html', 'gender': [Person.GENDER_MALE]}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<tr', 5)  # Inscritos Homens
 
         data = {'format': 'html', 'gender': [Person.GENDER_FEMALE]}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<tr', 2)  # Inscritos Mulheres
 
-    # def test_pagination(self):
-    #     """
-    #     Testar paginação
-    #     """
+    def test_pagination(self):
+        """
+        Testar paginação
+        """
+
     #     pass
     # @Todo: fazer/testar paginação
 
@@ -112,7 +122,7 @@ class ExportViewTest(TestCase):
         Testando o download do arquivo
         """
         data = {'format': 'xls'}
-        response = self.client.post(self.url, data)
+        response = self.client.get(self.url, data)
 
         # Resposta deve ser OK
         self.assertEqual(response.status_code, 200)
@@ -129,3 +139,17 @@ class ExportViewTest(TestCase):
             workbook = load_workbook(output)
         except Exception as e:
             self.fail(str(e))
+
+
+class CannotExportViewTest(BaseExportViewTest):
+    def setUp(self):
+        super(CannotExportViewTest, self).setUp()
+        self.user = User.objects.get(username="flavia@in2web.com.br")
+        self.client.force_login(self.user)
+
+    def test_get_302(self):
+        """
+        Retornar um erro 302 informando que não pode acessar a exportação
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
