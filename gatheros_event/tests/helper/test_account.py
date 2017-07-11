@@ -1,26 +1,9 @@
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
 from django.test import TestCase
 
 from gatheros_event.helpers import account
 from gatheros_event.models import Member, Organization
 from gatheros_event.views.mixins import AccountMixin
-
-
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user=None, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
 
 
 class AccountHelperIsConfiguredTest(TestCase):
@@ -35,31 +18,32 @@ class AccountHelperIsConfiguredTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self.request = MockRequest(self.user, self.client.session)
-        account.clean_account(self.request)
+        account.clean_account(self.client.request().wsgi_request)
 
     def test_configured_on_login(self):
         """ Testa configuração após o login. """
-        self.assertFalse(account.is_configured(self.request))
+        request = self.client.request().wsgi_request
+        self.assertFalse(account.is_configured(request))
         self.client.force_login(self.user)
 
         # Login utiliza outro objeto de session. Recriando para resgatar dados.
-        self.request = MockRequest(self.user, self.client.session)
-        self.assertTrue(account.is_configured(self.request))
+        self.assertTrue(account.is_configured(request))
 
     def test_configured_on_update_account(self):
         """ Testa configuração após a atualização de conta. """
-        self.assertFalse(account.is_configured(self.request))
-        account.update_account(self.request)
-        self.assertTrue(account.is_configured(self.request))
+        request = self.client.request().wsgi_request
+        self.assertFalse(account.is_configured(request))
+        account.update_account(request)
+        self.assertTrue(account.is_configured(request))
 
     def test_not_configured_after_clean_account(self):
         """ Testa configuração após limpeza de dados de conta. """
-        self.assertFalse(account.is_configured(self.request))
-        account.update_account(self.request)
-        self.assertTrue(account.is_configured(self.request))
-        account.clean_account(self.request)
-        self.assertFalse(account.is_configured(self.request))
+        request = self.client.request().wsgi_request
+        self.assertFalse(account.is_configured(request))
+        account.update_account(request)
+        self.assertTrue(account.is_configured(request))
+        account.clean_account(request)
+        self.assertFalse(account.is_configured(request))
 
 
 class BaseAccountHelperTest(TestCase):
@@ -116,7 +100,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         user = self._get_user_normal()
         self.client.force_login(user)
 
-        request = MockRequest(user=user, session=self.client.session)
+        request = self.client.request().wsgi_request
         self.assertIn('account', request.session)
 
     def test_by_default_active_organization_is_the_internal(self):
@@ -128,7 +112,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         user = self._get_user_normal()
         self.client.force_login(user)
 
-        request = MockRequest(user=user, session=self.client.session)
+        request = self.client.request().wsgi_request
         member = user.person.members.get(organization__internal=True)
         assert member is not None
 
@@ -137,7 +121,7 @@ class AccountHelperTest(BaseAccountHelperTest):
 
     def test_not_logged(self):
         """ Testa funções de helper sem usuário logado. """
-        request = MockRequest(session=self.client.session)
+        request = self.client.request().wsgi_request
 
         account.update_account(request)
         account.update_account(request, self.organization)
@@ -156,7 +140,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         user = self._get_user_no_person()
         self.client.force_login(user)
 
-        request = MockRequest(user, self.client.session)
+        request = self.client.request().wsgi_request
 
         account.update_account(request)
         account.update_account(request, self.organization)
@@ -178,7 +162,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         user = self._get_user_not_manager()
         self.client.force_login(user)
 
-        request = MockRequest(user, self.client.session)
+        request = self.client.request().wsgi_request
 
         account.update_account(request)
 
@@ -215,7 +199,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         organization = member.organization
         self.assertTrue(organization.internal)
 
-        request = MockRequest(user, self.client.session)
+        request = self.client.request().wsgi_request
 
         account.update_account(request)
 
@@ -243,7 +227,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         internal = [org.pk for org in orgs if org.internal]
         self.assertEqual(internal, [])
 
-        request = MockRequest(user, self.client.session)
+        request = self.client.request().wsgi_request
 
         account.update_account(request)
 
@@ -281,7 +265,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         internal = [org.pk for org in orgs if org.internal]
         self.assertEqual(len(internal), 1)
 
-        request = MockRequest(user, self.client.session)
+        request = self.client.request().wsgi_request
         account.update_account(request)
 
         self.assertTrue(account.is_eligible(request))
@@ -308,7 +292,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         user = self._get_user_normal()
         self.client.force_login(user)
 
-        request = MockRequest(user, self.client.session)
+        request = self.client.request().wsgi_request
 
         organization1 = Organization.objects.get(slug="luciana-silva")
         account.set_active_organization(request, organization1)
@@ -326,7 +310,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         user = self._get_user_normal()
         self.client.force_login(user)
 
-        request = MockRequest(user, self.client.session)
+        request = self.client.request().wsgi_request
 
         # Membro da organização 1
         organization1 = Organization.objects.get(slug="luciana-silva")
@@ -351,7 +335,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         user = self._get_user_normal()
         self.client.force_login(user)
 
-        request = MockRequest(user, self.client.session)
+        request = self.client.request().wsgi_request
 
         # Organizações do usuário 1
         organizations1 = list(account.get_organizations(request))
@@ -364,7 +348,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         # Organizações do usuário 2
         user = User.objects.get(email='flavia@in2web.com.br')
         self.client.force_login(user)
-        request = MockRequest(user, self.client.session)
+        request = self.client.request().wsgi_request
 
         organizations2 = list(account.get_organizations(request))
 
@@ -390,7 +374,7 @@ class AccountHelperTest(BaseAccountHelperTest):
         user = self._get_user_normal()
         self.client.force_login(user)
 
-        request = MockRequest(user, self.client.session)
+        request = self.client.request().wsgi_request
 
         account.get_member(request)
         account.get_organization(request)
