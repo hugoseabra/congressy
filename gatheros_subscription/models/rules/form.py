@@ -24,13 +24,17 @@ def rule_2_form_possui_todos_campos_padrao(form):
     Garantia de que todas as inscrição terão as informações exigidas pelo
     sistema.
     """
-    existing_fields = []
-    for f in form.fields.all():
-        existing_fields.append(f.name)
+    existing_fields = [
+        f.name for f in form.fields.filter(form_default_field=True)
+    ]
 
+    missing_fields = []
     for default_field in DefaultField.objects.all():
         if default_field.name not in existing_fields:
-            raise IntegrityError(
-                'O evento {} não possui os campos obrigatórios'
-                ' necessários.'.format(form.event.name)
-            )
+            missing_fields.append(default_field.label)
+
+    if missing_fields:
+        raise IntegrityError(
+            'O evento "{}" não possui o(s) seguinte(s) campo(s)'
+            ' padrão: {}'.format(form.event.name, ', '.join(missing_fields))
+        )
