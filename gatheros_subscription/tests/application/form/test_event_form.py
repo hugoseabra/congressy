@@ -55,7 +55,7 @@ class EventFieldsFormRenderTest(TestCase):
         form = EventFieldsForm(form=self.form, show_inactive=True)
         content = form.as_ul()
 
-        fields = self.form.fields.all()
+        fields = self.form.fields.filter(active=True)
         for field in fields:
             self.assertIn(field.name, content)
 
