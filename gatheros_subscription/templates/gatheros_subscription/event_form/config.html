@@ -1,35 +1,42 @@
 {% extends "gatheros_event/event/base_panel.html" %}
 {% load event_form_tags %}
 
+{% block sidebar_organization %}{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content_width %}99%{% endblock %}
+
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:event-panel' event.pk %}">Voltar</a>
+        <a href="{% url 'event:event-panel' event.pk %}">Voltar</a>
     </div>
     <hr/>
     <h1>{{ event.name }}</h1>
     <div style="margin-bottom:10px;padding: 10px;background-color: #DDDDDD;text-align: center;">
-        <a href="{% url 'gatheros_subscription:field-add' event.pk %}">Adicionar</a>
+        <a href="{% url 'subscription:field-add' event.pk %}">Adicionar</a>
     </div>
 
     {% if form_title %}
         <h2>{{ form_title }}</h2>
     {% endif %}
-    <table border="0" width="65%" cellpadding="10" cellspacing="1" style="background-color:#DDD">
+    <table border="0" width="100%" cellpadding="10" cellspacing="1" style="background-color:#DDD">
         <tr>
-            <td colspan="6" style="font-weight: bold">Campos principais</td>
+            <td colspan="9" style="font-weight: bold">Campos principais</td>
             <td style="text-align:center;font-weight: bold"># Inscrições</td>
         </tr>
         {% for item in default_fields %}
-            {% user_can_delete user item.field as can_delete %}
-            {% user_can_edit user item.field as can_edit %}
+            {% is_required event.form item.field as is_required %}
+            {% is_default_configuration event.form item.field as is_default_config %}
             <tr>
-                <td width="1%" style="text-align:center;background-color:#F6F6F6">
-                    {{ item.field.order }}
+                <td width="1%" style="text-align:center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    {{ forloop.counter }}
                 </td>
-                <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                <td width="7%" style="text-align:center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    {% if is_default_config %}Padrão{% else %}Personalizado{% endif %}
+                </td>
+                <th style="text-align: right;vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
                 </th>
-                <td colspan="4" style="vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                <td colspan="{% if item.field.required %}6{% else %}5{% endif %}" style="vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     {{ item.form_field }}
                     {% if item.form_field.help_text %}
                         <br />
@@ -37,8 +44,21 @@
                     {% endif %}
                     {{ item.form_field.errors }}
                 </td>
+                {% if not item.field.required %}
+                <td width="10%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    <form method="post" action="{% url 'subscription:event-manage-requirement' event.pk item.field.pk %}">{% csrf_token %}
+                        {% if is_required and not is_inactive %}
+                            <button>Tornar não-obrigatório</button>
+                            <input type="hidden" name="action" value="not-required" />
+                        {% elif not is_inactive %}
+                            <button>Tornar obrigatório</button>
+                            <input type="hidden" name="action" value="required" />
+                        {% endif %}
+                    </form>
+                </td>
+                {% endif %}
                 {% if forloop.first %}
-                <td rowspan="{{ default_fields|length }}" width="10%" style="text-align: center;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                <td rowspan="{{ default_fields|length }}" width="6%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     {{ event.subscriptions.count }}
                 </td>
                 {% endif %}
@@ -46,20 +66,25 @@
         {% endfor %}
         {% if additional_fields %}
             <tr>
-                <td colspan="6" style="font-weight: bold">Campos adicionais</td>
+                <td colspan="10" style="font-weight: bold">Campos adicionais</td>
             </tr>
         {% endif %}
         {% for item in additional_fields %}
-            {% user_can_delete user item.field as can_delete %}
-            {% user_can_edit user item.field as can_edit %}
+            {% user_can_manage user item.field as can_manage %}
+            {% is_inactive event.form item.field as is_inactive %}
+            {% is_required event.form item.field as is_required %}
+            {% is_default_configuration event.form item.field as is_default_config %}
             <tr>
                 <td width="1%" style="text-align:center;background-color:#F6F6F6">
-                    {{ item.field.order }}
+                    {% get_field_order form.form item.field %}
                 </td>
-                <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                <td width="1%" style="text-align:center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    {% if is_default_config %}Padrão{% else %}Personalizado{% endif %}
+                </td>
+                <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
                 </th>
-                <td style="vertical-align: top;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}" {% if not item.field.with_options %}colspan="2"{% endif %}>
+                <td style="vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}" {% if not item.field.with_options %}colspan="2"{% endif %}>
                     {{ item.form_field }}
                     {% if item.form_field.help_text %}
                         <br />
@@ -68,12 +93,12 @@
                     {{ item.form_field.errors }}
                 </td>
                 {% if item.field.with_options %}
-                <td width="13%" style="text-align: center;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                    <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-options' event.pk item.field.pk %}">Gerenciar opções</a>
+                <td width="13%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    <a style="text-decoration: none" href="{% url 'subscription:field-options' item.field.pk %}?event_pk={{ event.pk }}">Gerenciar opções</a>
                 </td>
                 {% endif %}
-                <td width="2%" style="text-align: center;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                    <form method="post" action="{% url 'gatheros_subscription:field-order' event.pk item.field.pk %}">{% csrf_token %}
+                <td width="2%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    <form method="post" action="{% url 'subscription:event-field-order' event.pk item.field.pk %}">{% csrf_token %}
                         {% if not item.field.form_default_field %}
                             {% if not forloop.first %}
                                 <button name="down">&uparrow;</button>
@@ -87,20 +112,50 @@
                         {% endif %}
                     </form>
                 </td>
-                <td width="11%" style=";background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                    {% if can_edit %}
-                        <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-edit' event.pk item.field.pk %}">Editar</a>
+                <td width="10%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    {% if item.field.field_type != item.field.FIELD_BOOLEAN %}
+                        <form method="post" action="{% url 'subscription:event-manage-requirement' event.pk item.field.pk %}">{% csrf_token %}
+                            {% if is_required and not is_inactive %}
+                                <button>Tornar não-obrigatório</button>
+                                <input type="hidden" name="action" value="not-required" />
+                            {% elif not is_inactive %}
+                                <button>Tornar obrigatório</button>
+                                <input type="hidden" name="action" value="required" />
+                            {% endif %}
+                        </form>
                     {% endif %}
-                    &nbsp;
-                    {% if can_delete %}
-                        <a style="text-decoration: none" href="{% url 'gatheros_subscription:field-delete' event.pk item.field.pk %}">Excluir</a>
+                </td>
+                <td width="6%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    <form method="post" action="{% url 'subscription:event-manage-activation' event.pk item.field.pk %}">{% csrf_token %}
+                        {% if is_inactive %}
+                            <button>Ativar</button>
+                            <input type="hidden" name="action" value="activate" />
+                        {% else %}
+                            <button>Desativar</button>
+                            <input type="hidden" name="action" value="deactivate" />
+                        {% endif %}
+                    </form>
+                </td>
+                <td width="8%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    {% if can_manage %}
+                        <div style="width:135px">
+                            <div style="float:left">
+                                <button type="button" onclick="window.location.href='{% url 'subscription:field-edit' item.field.pk %}'">Editar</button>
+                            </div>
+                            <div style="float:left;margin-left:8px">
+                                <form method="post" action="{% url 'subscription:event-field-delete' event.pk item.field.pk %}" onsubmit="return confirm('Deseja realmente excluir este campo do formulário?')">
+                                    {% csrf_token %}
+                                    <button>Remover</button>
+                                </form>
+                            </div>
+                            <div style="clear: both"></div>
+                        </div>
                     {% endif %}
-
-                    {% if not item.field.active %}
+                    {% if is_inactive %}
                         <div style="text-align: center;font-style: italic;padding: 4px">Desativado</div>
                     {% endif %}
                 </td>
-                <td width="10%" style="text-align: center;background-color:{% if not item.field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                <td style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     {{ item.field.answers.count }}
                 </td>
             </tr>
@@ -108,6 +163,6 @@
     </table>
     <hr />
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:event-panel' event.pk %}">Voltar</a>
+        <a href="{% url 'event:event-panel' event.pk %}">Voltar</a>
     </div>
 {% endblock %}

@@ -28,7 +28,7 @@
             {% if can_view_lots %}
                 <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:lot-list' object.pk %}">Lotes</a></div>
             {% endif %}
-{#            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:event-fields-config' object.pk %}">Configuração de Formulário</a></div>#}
+            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:event-fields-config' object.pk %}">Configuração de Formulário</a></div>
             {% if can_manage_subscriptions %}
                 <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-list' object.pk %}">Pré-inscrições</a></div>
             {% endif %}
