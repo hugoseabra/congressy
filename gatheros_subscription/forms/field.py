@@ -44,11 +44,7 @@ class FieldsRendererMixin(KanuForm):
         :type field_name: str
         :rtype: Field
         """
-        try:
-            return self.organization.fields.get(name=field_name)
-
-        except Field.DoesNotExist:
-            return None
+        return self.gatheros_fields.get(field_name)
 
     def _get_fields_queryset(self):
         """

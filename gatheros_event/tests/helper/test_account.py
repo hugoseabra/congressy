@@ -9,7 +9,6 @@ from gatheros_event.views.mixins import AccountMixin
 class AccountHelperIsConfiguredTest(TestCase):
     fixtures = [
         '001_user',
-        '003_occupation',
         '005_user',
         '006_person',
         '007_organization',
@@ -27,21 +26,27 @@ class AccountHelperIsConfiguredTest(TestCase):
         self.client.force_login(self.user)
 
         # Login utiliza outro objeto de session. Recriando para resgatar dados.
+        request = self.client.request().wsgi_request
         self.assertTrue(account.is_configured(request))
 
     def test_configured_on_update_account(self):
         """ Testa configuração após a atualização de conta. """
+        self.client.force_login(self.user)
         request = self.client.request().wsgi_request
+        account.clean_account(request)
+
         self.assertFalse(account.is_configured(request))
+
         account.update_account(request)
         self.assertTrue(account.is_configured(request))
 
     def test_not_configured_after_clean_account(self):
         """ Testa configuração após limpeza de dados de conta. """
+        self.client.force_login(self.user)
+
         request = self.client.request().wsgi_request
-        self.assertFalse(account.is_configured(request))
-        account.update_account(request)
         self.assertTrue(account.is_configured(request))
+
         account.clean_account(request)
         self.assertFalse(account.is_configured(request))
 

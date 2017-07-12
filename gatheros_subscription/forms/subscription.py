@@ -110,7 +110,7 @@ class SubscriptionForm(EventFieldsForm):
 
             elif isinstance(answer, Answer):
                 try:
-                    answer = json.loads(answer.value)
+                    answer = answer.value
 
                 except ValueError:
                     continue
@@ -128,18 +128,16 @@ class SubscriptionForm(EventFieldsForm):
 
         lot = self.cleaned_data.get('lot')
 
-        if self.instance:
-            instance = self.instance
-            instance.modified = datetime.now()
-
-        else:
+        if not self.instance:
             # @TODO Registrar autor da inscrição.
-            instance = Subscription(
+            self.instance = Subscription(
                 origin=Subscription.DEVICE_ORIGIN_WEB,
                 created_by=1,
             )
 
-        self.instance = instance
+        else:
+            self.instance.modified = datetime.now()
+
         self.instance.person = self._save_or_create_person()
         self.instance.lot = lot
         self.instance.save()
@@ -149,19 +147,19 @@ class SubscriptionForm(EventFieldsForm):
     def _save_or_create_person(self):
         """ Salva uma pessoa existente ou cria uma nova caso não exista. """
         try:
-            if not self.instance:
-                if not self.cleaned_data.get('user'):
-                    raise User.DoesNotExist()
-
+            user_pk = self.cleaned_data.get('user')
+            # Ser vier `pk` do `User`, prioriza resgate de `Person` por ele
+            if user_pk:
                 user = User.objects.get(pk=self.cleaned_data['user'])
                 person = user.person
 
+            # Verifica se instância já possui `Person` e reaproveita-o
             else:
                 person = self.instance.person
 
         except ObjectDoesNotExist:
             # Para esta condição, os campos obrigatórios já deve estar contidos
-            # nos campos padrão da plataforma.
+            # nos campos padrão do formuláiro de inscrição.
             person = Person()
 
         for f_name, gatheros_field in six.iteritems(self.gatheros_fields):
@@ -187,10 +185,9 @@ class SubscriptionForm(EventFieldsForm):
 
         # Campos
         for f_name, gatheros_field in six.iteritems(self.gatheros_fields):
-            # Resgata responsta preexistente
+            # Resgata resposta pre-existente
             gatheros_answer = gatheros_field.answer(subscription=self.instance)
 
-            # Se a resposta vir de Person ou outro objeto, ignorar
             if not isinstance(gatheros_answer, Answer):
                 continue
 
@@ -198,29 +195,31 @@ class SubscriptionForm(EventFieldsForm):
 
             if gatheros_field.field_type == Field.FIELD_BOOLEAN:
                 output = 'Sim' if value is True else 'Não'
+
             else:
                 output = None
 
             if value and gatheros_field.with_options:
+                # Campos com suporte a múltiplas opções.
+                is_multiple = gatheros_field.field_type in (
+                    Field.FIELD_CHECKBOX_GROUP,
+                )
+
                 value, output = self._process_option_answers(
                     options=gatheros_field.options.all(),
                     output=output,
                     value=value,
-                    is_multiple=gatheros_field.field_type in [
-                        Field.FIELD_CHECKBOX_GROUP
-                    ]
+                    is_multiple=is_multiple
                 )
 
             if value:
                 value = {'value': value}
 
                 if output:
-                    value.update({'output': output})
-
-                value = json.dumps(value)
+                    value['output'] = output
 
             elif gatheros_field.field_type == Field.FIELD_BOOLEAN:
-                value = json.dumps({'value': value, 'output': "Não"})
+                value = {'value': False, 'output': "Não"}
 
             # Se há resposta anterior e não há valor, exclui
             if gatheros_answer and not value:
@@ -251,7 +250,8 @@ class SubscriptionForm(EventFieldsForm):
         :param output: Saída de leitura humana
         :param value: valor a ser gravado
         :param is_multiple: se seleção é múltipla
-        :return: tuple
+        :type is_multiple: bool
+        :rtype: tuple
         """
 
         is_list = isinstance(value, list)

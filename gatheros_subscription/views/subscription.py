@@ -11,8 +11,11 @@ from django.utils.decorators import classonlymethod
 from django.views import generic
 
 from gatheros_event.models import Event, Person
-from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin, \
-    FormListViewMixin
+from gatheros_event.views.mixins import (
+    AccountMixin,
+    DeleteViewMixin,
+    FormListViewMixin,
+)
 from gatheros_subscription.forms import (
     SubscriptionAttendanceForm,
     SubscriptionForm,

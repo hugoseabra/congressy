@@ -250,7 +250,7 @@ def update_account(request, organization=None, force=False):
         return
 
     has_account = 'account' in request.session
-    account = request.session['account'] if has_account else None
+    account = request.session['account'] if has_account else {}
     no_orgs = account is not None and account.get('organizations') is None
 
     if force or no_orgs:
@@ -264,7 +264,6 @@ def update_account(request, organization=None, force=False):
             ]
         })
         request.session.modified = True
-        clean_cache(request)
 
     # # Busca instâncias de organização de acordo com o request
     # organizations = get_organizations(request)

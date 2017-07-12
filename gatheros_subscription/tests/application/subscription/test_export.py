@@ -28,8 +28,10 @@ class ExportViewTest(TestCase):
             slug='seo-e-resultados'
         )
 
-        self.url = reverse('gatheros_subscription:subscriptions-export',
-                           kwargs={'event_pk': self.event.pk})
+        self.url = reverse(
+            'subscription:subscriptions-export',
+            kwargs={'event_pk': self.event.pk}
+        )
 
     def test_get_ok(self):
         """

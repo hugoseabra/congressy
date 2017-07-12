@@ -200,6 +200,7 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         """ Processo a ser executado antes de deletar. """
         pass
 
+    # noinspection PyMethodMayBeStatic
     def post_delete(self):
         """ Processo a ser executado depois de deletar. """
         pass
