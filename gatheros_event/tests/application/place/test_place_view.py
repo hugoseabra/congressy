@@ -1,3 +1,4 @@
+""" Testes de aplicação com `Place` - Formulários pela view. """
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
@@ -6,6 +7,7 @@ from gatheros_event.models import Member, Place
 
 
 class PlaceFormViewTest(TestCase):
+    """ Testes de formulário de local de evento pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',

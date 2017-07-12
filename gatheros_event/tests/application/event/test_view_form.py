@@ -1,28 +1,13 @@
+""" Testes de aplicação com `Event` - Formulários pela view. """
 from datetime import datetime, timedelta
+
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
+from django.forms.models import model_to_dict
 from django.test import TestCase
 from django.urls import reverse, reverse_lazy
-from django.forms.models import model_to_dict
 
 from gatheros_event.helpers import account
-from gatheros_event.models import Event, Organization, Member
-
-
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
+from gatheros_event.models import Event, Member, Organization
 
 
 class EventAddViewTest(TestCase):
@@ -48,7 +33,7 @@ class EventAddViewTest(TestCase):
 
     def _get_active_organization(self):
         """ Resgata organização ativa. """
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     def _switch_context(self, group=Member.ADMIN):
@@ -119,6 +104,7 @@ class EventAddViewTest(TestCase):
 
 
 class EventEditViewTest(TestCase):
+    """ Testes de view para editar evento. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -140,7 +126,7 @@ class EventEditViewTest(TestCase):
 
     def _get_active_organization(self):
         """ Recupera organização ativa do contexto do usuário. """
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     # noinspection PyMethodMayBeStatic
@@ -241,6 +227,7 @@ class EventEditViewTest(TestCase):
 
 
 class EventDatesEditViewTest(TestCase):
+    """ Testes de views para editar datas de evento. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -259,7 +246,7 @@ class EventDatesEditViewTest(TestCase):
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     # noinspection PyMethodMayBeStatic
@@ -378,6 +365,7 @@ class EventDatesEditViewTest(TestCase):
 
 
 class EventSubscriptionTypeEditViewTest(TestCase):
+    """ Testes de view para editar tipo de inscrição de evento. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -398,7 +386,7 @@ class EventSubscriptionTypeEditViewTest(TestCase):
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     # noinspection PyMethodMayBeStatic
@@ -517,6 +505,7 @@ class EventSubscriptionTypeEditViewTest(TestCase):
 
 
 class EventPublicationEditViewTest(TestCase):
+    """ Testes de view para publicar/despublicar evento. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -537,7 +526,7 @@ class EventPublicationEditViewTest(TestCase):
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     # noinspection PyMethodMayBeStatic

@@ -1,3 +1,4 @@
+""" Testes de aplicação de perfil de usuário. """
 import uuid
 
 from django.contrib.auth.models import User
@@ -5,12 +6,16 @@ from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
 
-from gatheros_event.forms import InvitationCreateForm, ProfileCreateForm, \
-    ProfileForm
+from gatheros_event.forms import (
+    InvitationCreateForm,
+    ProfileCreateForm,
+    ProfileForm,
+)
 from gatheros_event.models import Person
 
 
 class ProfileFormTest(TestCase):
+    """ Testes de formulário de perfil de usuário. """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -34,6 +39,7 @@ class ProfileFormTest(TestCase):
         }
 
     def test_init_without_user(self):
+        """ Testa se instância de formulário deve possuir user no __init__"""
         """
         Form sem usuário deve emitir um exception
         """
@@ -43,9 +49,11 @@ class ProfileFormTest(TestCase):
 
     @staticmethod
     def get_user(email="joao-das-couves@gmail.com"):
+        """ Resgata usuário """
         return User.objects.get(email=email)
 
     def get_form(self, email="joao-das-couves@gmail.com", user=None, **kwargs):
+        """ Resgata formulário """
         if not user:
             user = self.get_user(email)
         return ProfileForm(user, **kwargs)
@@ -143,6 +151,7 @@ class ProfileFormTest(TestCase):
 
 
 class ProfileViewTest(TestCase):
+    """ Testes de gestão de perfil de usuário pela view """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -186,6 +195,7 @@ class ProfileViewTest(TestCase):
 
 
 class ProfileCreateFormTest(TestCase):
+    """ Testes de criação de perfil de usuário pela view. """
     def setUp(self):
         self.data = {
             # Informações do perfil
@@ -247,6 +257,7 @@ class ProfileCreateFormTest(TestCase):
 
 
 class ProfileCreateViewTest(TestCase):
+    """ Testes de criação de perfil de usuário pela view. """
     def setUp(self):
         self.data = {
             "name": "João Das Couves",
@@ -307,6 +318,7 @@ class ProfileCreateViewTest(TestCase):
 
 
 class ProfileResetPasswordViewTest(TestCase):
+    """ Testes de reset e senha do usuário pela view. """
     fixtures = [
         '001_user',
         '003_occupation',

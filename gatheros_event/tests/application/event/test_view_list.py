@@ -1,6 +1,5 @@
+""" Testes de aplicação com `Event` - Lista pela view. """
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 
@@ -8,22 +7,8 @@ from gatheros_event.helpers import account
 from gatheros_event.models import Event, Organization
 
 
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
-
-
 class EventListTest(TestCase):
+    """ Testes lista de eventos pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -46,11 +31,11 @@ class EventListTest(TestCase):
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     def _get_events(self):
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         organization = account.get_organization(request)
         events = Event.objects.filter(organization=organization)
         return list(events)

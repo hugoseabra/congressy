@@ -31,6 +31,7 @@ class Answer(models.Model):
     value = JSONField(verbose_name='valor', null=True, blank=True)
 
     def save(self, *args, **kwargs):
+        """ Salva entidade. """
         self.check_rules()
         super(Answer, self).save(*args, **kwargs)
 

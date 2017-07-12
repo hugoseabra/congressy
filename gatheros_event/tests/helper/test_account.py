@@ -1,3 +1,4 @@
+""" Testes para helper/account e AccountMixin: mixin para views """
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -7,6 +8,7 @@ from gatheros_event.views.mixins import AccountMixin
 
 
 class AccountHelperIsConfiguredTest(TestCase):
+    """ Testes para verificação de status de `configurado`. """
     fixtures = [
         '001_user',
         '005_user',
@@ -52,6 +54,7 @@ class AccountHelperIsConfiguredTest(TestCase):
 
 
 class BaseAccountHelperTest(TestCase):
+    """ Classe base para testes de helper/account """
     fixtures = [
         '001_user',
         '005_user',
@@ -100,6 +103,8 @@ class BaseAccountHelperTest(TestCase):
 
 
 class AccountHelperTest(BaseAccountHelperTest):
+    """ Testes de helper/account """
+
     def test_account_in_session(self):
         """ Testa se sessão possui informações de conta. """
         user = self._get_user_normal()
@@ -403,6 +408,7 @@ class AccountHelperTest(BaseAccountHelperTest):
 
 
 class AccountMixinViewTest(TestCase):
+    """ Testes de AccountMixin """
     fixtures = [
         '001_user',
         '003_occupation',

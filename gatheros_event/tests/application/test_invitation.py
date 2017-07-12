@@ -1,5 +1,4 @@
-# test_resend_invitation_differente_type(self):
-# test_expiration_days_as_configured(self):
+""" Testes de aplicação com `Invitation`. """
 
 from datetime import datetime, timedelta
 
@@ -15,6 +14,7 @@ from gatheros_event.models import Invitation, Member, Organization, Person
 
 
 class InvitationCreateFormTest(TestCase):
+    """ Testes de criação de `Invitation` """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -71,6 +71,7 @@ class InvitationCreateFormTest(TestCase):
 
 
 class InvitationCreateViewTest(TestCase):
+    """ Testes de criação de `Invitation` pela view """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -150,6 +151,7 @@ class InvitationCreateViewTest(TestCase):
 
 
 class InvitationDecisionViewWithProfile(TestCase):
+    """ Testes de decisão de aceite/recusa de `Invitation` pela view. """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -240,6 +242,10 @@ class InvitationDecisionViewWithProfile(TestCase):
 
 
 class InvitationDecisionViewWithoutProfileTest(TestCase):
+    """
+    Testes de decisão de aceite/recusa de `Invitation` pela view de usuário sem
+    vínculo com `Person`.
+    """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -312,6 +318,7 @@ class InvitationDecisionViewWithoutProfileTest(TestCase):
 
 
 class InvitationProfileViewTest(TestCase):
+    """ Testes criação de perfil pela view. """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -426,6 +433,7 @@ class InvitationProfileViewTest(TestCase):
 
 
 class InvitationDeleteViewTest(TestCase):
+    """ Testes de exclusão de `Invitation` pela view. """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -441,6 +449,7 @@ class InvitationDeleteViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_delete(self):
+        """ Testa exclusão de convite. """
         member = self.user.person.members.first()
         invitation = Invitation.objects.filter(author=member).first()
 
@@ -453,6 +462,7 @@ class InvitationDeleteViewTest(TestCase):
 
 
 class InvitationRenewViewTest(TestCase):
+    """ Testes de renovação de `Invitation` pela view"""
     fixtures = [
         '001_user',
         '003_occupation',
@@ -468,6 +478,7 @@ class InvitationRenewViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_renew(self):
+        """ Testa renovação de convite. """
         now = datetime.now()
         created_date = now - timedelta(days=30)
 
@@ -494,6 +505,7 @@ class InvitationRenewViewTest(TestCase):
         self.assertFalse(invitation.is_expired)
 
     def test_renew_not_expired(self):
+        """ Testa renovação de convites que ainda não expiraram. """
         created_date = datetime.now()
 
         days = settings.INVITATION_ACCEPT_DAYS

@@ -1,3 +1,4 @@
+""" Formulários de `Subscription` """
 from datetime import datetime
 
 from django import forms
@@ -43,7 +44,7 @@ class SubscriptionForm(EventFieldsForm):
         return name
 
     def clean(self):
-
+        """ Limpa valores dos campos. """
         force_string = [
             Field.FIELD_INPUT_DATETIME,
             Field.FIELD_INPUT_DATE,

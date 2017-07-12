@@ -57,6 +57,7 @@ class Form(models.Model):
         )
 
     def save(self, *args, **kwargs):
+        """ Salva entidade. """
         self.check_rules()
         super(Form, self).save(*args, **kwargs)
 

@@ -1,6 +1,5 @@
+""" Testes de aplicação com `Event`. """
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 
@@ -8,22 +7,8 @@ from gatheros_event.helpers import account
 from gatheros_event.models import Event
 
 
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
-
-
 class EventDeleteTest(TestCase):
+    """ Testes de exclusão de evento pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -43,7 +28,7 @@ class EventDeleteTest(TestCase):
 
     def _get_active_organization(self):
         """ Resgata organização ativa no contexto de usuário. """
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     def _get_event(self, pk=None):
@@ -77,6 +62,7 @@ class EventDeleteTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_delete(self):
+        """ Testa exclusão de evento. """
         self._login()
         response = self.client.post(self._get_url(), follow=True)
         self.assertContains(
@@ -85,6 +71,7 @@ class EventDeleteTest(TestCase):
         )
 
     def test_cannot_delete(self):
+        """ Testa restrição de exclusão de evento. """
         self._login()
         member_pks = [member.pk for member in self.user.person.members.all()]
         event = Event.objects.exclude(

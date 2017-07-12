@@ -1,3 +1,4 @@
+""" Formulários de `FieldOption` """
 from django import forms
 from django.core.exceptions import PermissionDenied
 
@@ -8,6 +9,7 @@ class FieldOptionForm(forms.ModelForm):
     """ Formulário de opção de campo de formulário. """
 
     class Meta:
+        """ Meta """
         model = FieldOption
         fields = ('name', 'value',)
 
@@ -24,5 +26,6 @@ class FieldOptionForm(forms.ModelForm):
             raise PermissionDenied('Você não pode editar esta opção.')
 
     def save(self, commit=True):
+        """ Salva dados. """
         self.instance.field = self.field
         return super(FieldOptionForm, self).save(commit=commit)

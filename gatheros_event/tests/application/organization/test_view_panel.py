@@ -1,28 +1,13 @@
+""" Testes de aplicação com `Organization` - Painel. """
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 
 from gatheros_event.models import Organization
 
 
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
-
-
 class EventPanelTest(TestCase):
+    """ Testes de painel de organização pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',

@@ -1,3 +1,4 @@
+""" Testes de aplicação com `Organization` - Formulários. """
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -57,6 +58,7 @@ class OrganizationFormTest(TestCase):
         self.assertTrue(saved_organization.internal)
 
     def test_error_user_not_member(self):
+        """ Testa erro se usuário não é membro da organização. """
         organization = Organization.objects.get(slug='paroquias-unidas')
 
         with self.assertRaises(ValidationError) as e:
@@ -68,6 +70,7 @@ class OrganizationFormTest(TestCase):
             )
 
     def test_edit(self):
+        """ Testa edição de organização. """
         organization = Organization.objects.get(
             slug='in2-web-solucoes-e-servicos',
             internal=False

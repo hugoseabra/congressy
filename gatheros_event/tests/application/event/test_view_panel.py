@@ -1,3 +1,4 @@
+""" Testes de aplicação com `Event` - Painela pela view. """
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
@@ -6,6 +7,7 @@ from gatheros_event.models import Event
 
 
 class EventPanelTest(TestCase):
+    """ Testes de view de painel de evento. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',

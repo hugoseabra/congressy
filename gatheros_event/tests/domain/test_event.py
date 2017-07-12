@@ -1,3 +1,4 @@
+""" Testes `Event` """
 from datetime import datetime, timedelta
 
 from kanu_locations.models import City
@@ -8,6 +9,7 @@ from gatheros_event.models.rules import event as rule
 
 
 class EventModelTest(GatherosTestCase):
+    """ Testes de `Event` """
     fixtures = [
         'kanu_locations_city_test',
         '004_category',

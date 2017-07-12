@@ -1,12 +1,15 @@
+""" Formulários de `Lot` """
 from django import forms
 
 from gatheros_subscription.models import Lot
 
 
 class LotForm(forms.ModelForm):
+    """ Formulário de lote. """
     event = None
 
     class Meta:
+        """ Meta """
         model = Lot
         fields = [
             'event',

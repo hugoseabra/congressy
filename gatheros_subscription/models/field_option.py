@@ -29,6 +29,7 @@ class FieldOption(AbstractDefaultFieldOption):
         unique_together = (('field', 'value'),)
 
     def save(self, *args, **kwargs):
+        """ Salva entidade. """
         default = self.field.form_default_field is True
         if default and not self.value or not default:
             self.value = model_field_slugify(

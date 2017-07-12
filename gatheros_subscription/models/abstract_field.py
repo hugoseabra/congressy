@@ -88,6 +88,7 @@ class AbstractField(models.Model, GatherosModelMixin):
         abstract = True
 
     def save(self, **kwargs):
+        """ Salva entidade. """
         self._accepts_options()
         return super(AbstractField, self).save(**kwargs)
 

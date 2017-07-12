@@ -28,6 +28,7 @@ class DefaultField(AbstractField):
         return self.label
 
     def save(self, **kwargs):
+        """ Salva entidade. """
         self.name = model_field_slugify(
             model_class=self.__class__,
             instance=self,

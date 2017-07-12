@@ -1,3 +1,4 @@
+""" Signals do model `Form`. """
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.forms import model_to_dict

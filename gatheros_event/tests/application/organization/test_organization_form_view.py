@@ -1,6 +1,5 @@
+""" Testes de aplicação com `Organization` - Formulários pela view. """
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse, reverse_lazy
 
@@ -9,22 +8,8 @@ from gatheros_event.models import Organization
 
 # @TODO Testar upload de avatar
 
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
-
-
 class OrganizationFormViewTest(TestCase):
+    """ Testes de formulário de organização pela view. """
     fixtures = [
         '005_user',
         '006_person',

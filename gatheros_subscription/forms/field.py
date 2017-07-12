@@ -1,3 +1,4 @@
+""" Formulários de `Field` """
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.forms import ModelForm, model_to_dict
@@ -130,6 +131,7 @@ class FieldForm(ModelForm):
     organization = None
 
     class Meta:
+        """ Meta """
         model = Field
         fields = (
             'field_type',
@@ -161,5 +163,6 @@ class FieldForm(ModelForm):
                 raise PermissionDenied('Este campo não pode ser editado.')
 
     def save(self, commit=True):
+        """ Salva dados. """
         self.instance.organization = self.organization
         return super(FieldForm, self).save(commit)

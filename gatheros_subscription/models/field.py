@@ -50,6 +50,7 @@ class Field(AbstractField):
         unique_together = (('organization', 'name'),)
 
     def save(self, **kwargs):
+        """ Salva entidade. """
         is_default = self.form_default_field is True
         if is_default and not self.name or not is_default:
             self.name = model_field_slugify(

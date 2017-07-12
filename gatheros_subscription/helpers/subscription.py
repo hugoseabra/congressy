@@ -1,3 +1,4 @@
+""" Helper para inscrições. """
 import locale
 from collections import OrderedDict
 from uuid import UUID

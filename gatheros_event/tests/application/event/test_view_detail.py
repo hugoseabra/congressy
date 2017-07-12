@@ -1,3 +1,4 @@
+""" Testes de aplicação com `Event` - Detalhes de evento. """
 import os
 import shutil
 
@@ -12,6 +13,7 @@ from gatheros_event.models import Event, Member, Organization
 
 
 class EventDetailBannersUploadTest(TestCase):
+    """ Testes de upload de banners nos detalhes de evento pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -81,6 +83,9 @@ class EventDetailBannersUploadTest(TestCase):
             shutil.rmtree(path)
 
     def tearDown(self):
+        """
+        Limpa arquivos enviados se há organização no contexto do usuário.
+        """
         org = account.get_organization(self.client.request().wsgi_request)
         # Se não tiver organização no contexto, não precisa limpar o diretório
         if org:
@@ -159,6 +164,7 @@ class EventDetailBannersUploadTest(TestCase):
 
 
 class EventDetailPlaceTest(TestCase):
+    """ Testes edição de local de evento nos detalhes de evento pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -252,6 +258,9 @@ class EventDetailPlaceTest(TestCase):
 
 
 class EventDetailSocialMediaTest(TestCase):
+    """
+    Testes edição de informações sociais nos detalhes de evento pela view.
+    """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',

@@ -19,12 +19,15 @@ class LotManager(models.Manager):
     """ Manager - Gerenciador de lote. """
 
     def num_lots(self, lot):
+        """ Resgata números em um evento. """
         return self.filter(event=lot.event_id).count()
 
     def get_next_lot_number(self, event):
+        """ Resgata número do próximo lote a ser registrado em um evento. """
         return self.filter(event=event).count() + 1
 
     def generate_promo_code(self):
+        """ Gera código promocional para o lote. """
         while True:
             code = str(uuid.uuid4()).split('-')[0].upper()
             try:
@@ -136,6 +139,7 @@ class Lot(models.Model, GatherosModelMixin):
 
     @property
     def percent_completed(self):
+        """ Resgata percentual de vagas preenchidas no lote. """
         completed = 0.00
         if self.limit:
             completed = ((self.subscriptions.count() * 100) / self.limit)
@@ -144,6 +148,7 @@ class Lot(models.Model, GatherosModelMixin):
 
     @property
     def percent_attended(self):
+        """ Resgata percentual de inscritos que compareceram no evento. """
         queryset = self.subscriptions
         num_subs = queryset.count()
         if num_subs == 0:
@@ -179,6 +184,7 @@ class Lot(models.Model, GatherosModelMixin):
         )
 
     def save(self, **kwargs):
+        """ Salva entidade. """
         self.full_clean()
         self.check_rules()
         super(Lot, self).save(**kwargs)
@@ -186,6 +192,7 @@ class Lot(models.Model, GatherosModelMixin):
         rule.rule_10_lote_privado_deve_ter_codigo_promocional(self)
 
     def clean(self):
+        """ Limpa valores dos campos. """
         if not self.date_end:
             self.date_end = self.event.date_start - timedelta(seconds=1)
 
