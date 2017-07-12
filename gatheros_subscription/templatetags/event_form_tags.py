@@ -30,7 +30,7 @@ def get_field_order(form, field):
 @register.simple_tag
 def is_inactive(form, field):
     """ Verifica se campo está inativo no formulário. """
-    inactive_list = form.get_inactive_field_list()
+    inactive_list = form.get_inactive_fields_list()
     return field.name in inactive_list if inactive_list else False
 
 
@@ -38,9 +38,9 @@ def is_inactive(form, field):
 def is_required(form, field):
     """ Verifica se campo obrigatório. """
     config = form.required_configuration
-    custom_required = config.get(field.name)
+    custom_required = config.get(field.name) if config else None
     if not custom_required:
-        return field.required
+        return field.required is True
 
     return custom_required is True
 
@@ -49,5 +49,5 @@ def is_required(form, field):
 def is_default_configuration(form, field):
     """ Verifica se configuração do campo no formulário é padrão. """
     config = form.required_configuration
-    custom_required = config.get(field.name)
+    custom_required = config.get(field.name) if config else None
     return not is_inactive(form, field) and not custom_required

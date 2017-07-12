@@ -1,1 +1,1 @@
-# perguntas com respotas obrigatórias devem ser resposta
+# perguntas com respotas obrigatórias devem ter resposta

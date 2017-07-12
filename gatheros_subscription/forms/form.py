@@ -36,7 +36,7 @@ class EventFieldsForm(FieldsRendererMixin):
 
     def _get_fields_queryset(self):
         fields_qs = self.form.fields.filter(active=True)
-        inactive_list = self.form.get_inactive_field_list()
+        inactive_list = self.form.get_inactive_fields_list()
 
         # Refaz retorno da lista de acordo com a ordem dos campos.
         field_ordered_list = []
@@ -116,7 +116,7 @@ class FormFieldForm(forms.Form):
     def set_as_required(self, field):
         """ Configura o campo como obrigatório. """
         config = self.form.required_configuration
-        item = config.get(field.name)
+        item = config.get(field.name) if config else None
         if not item and field.required is True:
             return
 
@@ -128,10 +128,15 @@ class FormFieldForm(forms.Form):
     def set_as_not_required(self, field):
         """ Configura o campo como não-obrigatório. """
         config = self.form.required_configuration
-        item = config.get(field.name)
+        item = config.get(field.name) if config else None
 
-        if item:
+        if item and item is True:
             del config[field.name]
+
+        config = config if config else {}
+
+        if not item and field.required is True:
+            config[field.name] = False
 
         self.form.required_configuration = config
         self.form.save()
@@ -165,6 +170,7 @@ class FormFieldForm(forms.Form):
 
 
 class FormFieldOrderForm(forms.Form):
+    """ Formulário para ordenação de campos em um formulário. """
     def __init__(self, form, *args, **kwargs):
         """
         :type form: Form

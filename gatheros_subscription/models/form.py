@@ -94,6 +94,17 @@ class Form(models.Model):
 
         return custom_required is True
 
+    def get_field_order(self, field):
+        """ Resgata ordem do campo no formulário. """
+        counter = 0
+        for field_name in self.get_order_list():
+            if field.name == field_name:
+                break
+
+            counter += 1
+
+        return counter
+
     def get_order_list(self):
         """
         Resgata lista de ordem de campos.
@@ -122,14 +133,12 @@ class Form(models.Model):
 
     def get_inactive_fields_list(self):
         """
-        Resgata lista de ordem de campos.
+        Resgata lista de campos inativos para este formulário.
         :rtype: list
         """
-        if not self.inactive_fields:
-            return []
-
-        order_list = re.split('[;,\r\n]', self.inactive_fields)
-        return list(filter(None, order_list))
+        config = self.inactive_fields
+        inactive_list = re.split('[;,\r\n]', config) if config else []
+        return list(filter(None, inactive_list))
 
     def set_inactive_fields_list(self, fields_list):
         """
@@ -147,18 +156,12 @@ class Form(models.Model):
         :rtype: bool
         """
         config = self.inactive_fields
-        inactive_list = re.split('[;,\r\n]', config) if config else []
 
-        return field.name in inactive_list if config else True
+        if not config:
+            return True
 
-    def get_inactive_field_list(self):
-        """
-        Resgata lista de campos inativos para este formulário.
-        :rtype: list
-        """
-        config = self.inactive_fields
-        inactive_list = re.split('[;,\r\n]', config) if config else []
-        return list(filter(None, inactive_list))
+        inactive_list = re.split('[;,\r\n]', config)
+        return field.name not in inactive_list
 
     def activate_field(self, field):
         """

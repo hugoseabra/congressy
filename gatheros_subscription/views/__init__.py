@@ -1,7 +1,7 @@
 from .event_form import (
     EventConfigFormFieldView,
     # EventFormFieldAddView,
-    EventFormFieldDeleteView,
+    EventFormFieldRemoveView,
     EventFormFieldManageActivationView,
     EventFormFieldManageRequirementView,
     EventFormFieldReorderView,

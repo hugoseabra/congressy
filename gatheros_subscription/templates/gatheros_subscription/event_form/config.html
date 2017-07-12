@@ -143,7 +143,7 @@
                                 <button type="button" onclick="window.location.href='{% url 'subscription:field-edit' item.field.pk %}'">Editar</button>
                             </div>
                             <div style="float:left;margin-left:8px">
-                                <form method="post" action="{% url 'subscription:event-field-delete' event.pk item.field.pk %}" onsubmit="return confirm('Deseja realmente excluir este campo do formulário?')">
+                                <form method="post" action="{% url 'subscription:event-field-remove' event.pk item.field.pk %}" onsubmit="return confirm('Deseja realmente excluir este campo do formulário?')">
                                     {% csrf_token %}
                                     <button>Remover</button>
                                 </form>

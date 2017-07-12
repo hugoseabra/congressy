@@ -1,11 +1,11 @@
 """ Testes de aplicação com `Member`. """
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.urls import reverse
-from django.core.exceptions import ImproperlyConfigured
 
-from gatheros_event.models import Member, Organization
+from gatheros_event.models import Member
 
 
 class MemberManageViewTest(TestCase):

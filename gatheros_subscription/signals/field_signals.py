@@ -120,12 +120,12 @@ def _post_remove_form_update(instance, pk_set):
 
         form.set_order_list(updated_list)
 
-    def update_inactive_field_list(form):
+    def update_inactive_fields_list(form):
         """
         Atualiza lista de campos inativos removendo os `Fields` que foram
         removidos da relação.
         """
-        inactive_list = form.get_inactive_field_list()
+        inactive_list = form.get_inactive_fields_list()
         if not inactive_list:
             return
 
@@ -153,7 +153,7 @@ def _post_remove_form_update(instance, pk_set):
 
     for form_instance in form_instances:
         update_order_list(form_instance)
-        update_inactive_field_list(form_instance)
+        update_inactive_fields_list(form_instance)
         update_required_configuration(form_instance)
         form_instance.save()
 

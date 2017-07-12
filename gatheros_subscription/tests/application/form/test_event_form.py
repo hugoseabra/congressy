@@ -1,3 +1,4 @@
+""" Testes de aplicação `Form` - Formulários. """
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
@@ -19,7 +20,7 @@ FIXTURES = [
 ]
 
 
-class EventFieldsFormRenderTest(TestCase):
+class EventFormRenderTest(TestCase):
     """ Testa exibição de formulário com campos de um evento. """
     fixtures = FIXTURES
 
@@ -60,7 +61,7 @@ class EventFieldsFormRenderTest(TestCase):
             self.assertIn(field.name, content)
 
 
-class FormFieldFormTest(TestCase):
+class EventFormFormTest(TestCase):
     """ Testa formulário que relaciona formulário de evento com campos. """
     fixtures = FIXTURES
 
@@ -197,7 +198,7 @@ class FormFieldFormTest(TestCase):
         field = self.event.form.fields.last()
         self.form.deactivate(field)
 
-        inactive_fields = self.event.form.get_inactive_field_list()
+        inactive_fields = self.event.form.get_inactive_fields_list()
         self.assertIn(field.name, inactive_fields)
 
     def test_activate_field(self):
@@ -206,11 +207,11 @@ class FormFieldFormTest(TestCase):
         self.form.deactivate(field)
 
         self.form.activate(field)
-        inactive_fields = self.event.form.get_inactive_field_list()
+        inactive_fields = self.event.form.get_inactive_fields_list()
         self.assertNotIn(field.name, inactive_fields)
 
 
-class FormFieldOrderFormTest(TestCase):
+class EventFormFieldOrderFormTest(TestCase):
     """ Testa reordenação de campos no formulário. """
     fixtures = FIXTURES
 
@@ -268,8 +269,8 @@ class FormFieldOrderFormTest(TestCase):
         """
         Testa reposicionamento de campo para uma posição anterior a atual.
         """
-
         def get_field_by_order(order):
+            """ Resgata campo pela sua ordem no formulário. """
             order_list = self.form.get_order_list()
             return self.form.fields.get(name=order_list[order])
 
@@ -285,8 +286,8 @@ class FormFieldOrderFormTest(TestCase):
         """
         Testa reposicionamento de campo para uma posição posterior a atual.
         """
-
         def get_field_by_order(order):
+            """ Resgata campo pela sua ordem no formulário. """
             order_list = self.form.get_order_list()
             return self.form.fields.get(name=order_list[order])
 

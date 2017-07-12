@@ -20,6 +20,8 @@ from gatheros_subscription import views
 #     ),
 # ]
 
+# prefix é 'event-' porque a relação é de 1-1 e fica mais simples de encontrar
+# dados de 'Event' por causa das relações entre models.
 url_fields = [
     url(
         r'^(?P<pk>[\d]+)/requirement/$',
@@ -38,8 +40,8 @@ url_fields = [
     ),
     url(
         r'^(?P<pk>[\d]+)/delete/$',
-        views.EventFormFieldDeleteView.as_view(),
-        name='event-field-delete'
+        views.EventFormFieldRemoveView.as_view(),
+        name='event-field-remove'
     ),
     url(
         r'^add/$',
@@ -53,6 +55,6 @@ url_fields = [
     ),
 ]
 
-urlpatterns_event = [
+urlpatterns_form = [
     url(r'^events/(?P<event_pk>[\d]+)/fields/?', include(url_fields))
 ]
