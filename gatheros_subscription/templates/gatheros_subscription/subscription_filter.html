@@ -1,0 +1,35 @@
+{{ form.errors }}
+<form action="" method="POST">{% csrf_token %}
+    {{ form.as_p }}
+    <button name="format" value="html">Exibir em tela</button>
+    <button name="format" value="xls">Exportar</button>
+</form>
+
+Resultados:
+<table>
+    {% for obj in object_list %}
+        <tr>
+            <td>{{ obj }}</td>
+            <td>{{ obj.person.name }}</td>
+            <td>{{ obj.person.gender }}</td>
+            <td>{{ obj.person.city.uf }}</td>
+            <td>{{ obj.person.age }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% if is_paginated %}
+    <div class="pagination">
+        <span class="page-links">
+            {% if page_obj.has_previous %}
+                <a href="/cars?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+            <span class="page-current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+            {% if page_obj.has_next %}
+                <a href="/cars?page={{ page_obj.next_page_number }}">next</a>
+            {% endif %}
+            </span>
+    </div>
+{% endif %}

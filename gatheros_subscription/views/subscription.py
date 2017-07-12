@@ -1,7 +1,9 @@
+import io
 from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import six
@@ -9,12 +11,16 @@ from django.utils.decorators import classonlymethod
 from django.views import generic
 
 from gatheros_event.models import Event, Person
-from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
+from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin, \
+    FormListViewMixin
 from gatheros_subscription.forms import (
     SubscriptionAttendanceForm,
     SubscriptionForm,
 )
+from gatheros_subscription.helpers.subscription import \
+    export as subscription_export
 from gatheros_subscription.models import Subscription
+from .filters import SubscriptionFilterForm
 
 
 class EventViewMixin(AccountMixin, generic.View):
@@ -556,3 +562,47 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             return False
         else:
             return True
+
+
+class SubscriptionExportView(FormListViewMixin):
+    template_name = 'gatheros_subscription/subscription_filter.html'
+    form_class = SubscriptionFilterForm
+    model = Subscription
+
+    def get_form_kwargs(self):
+        kwargs = super(SubscriptionExportView, self).get_form_kwargs()
+        kwargs.update({
+            'event': self.kwargs.get('event_pk')
+        })
+        return kwargs
+
+    def get_queryset(self):
+        queryset = Subscription.objects \
+            .filter(event__pk=self.kwargs.get('event_pk'))
+
+        form = self.get_form()
+        if self.request.POST and form.is_valid():
+            queryset = form.filter(queryset)
+
+        return queryset
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('format') == 'xls':
+            # Criando buffer de bytes
+            output = io.BytesIO()
+
+            # Chamando exportação
+            subscription_export(output, self.get_queryset())
+
+            # Criando resposta http com arquivo de download
+            response = HttpResponse(
+                output.getbuffer(), content_type="application/vnd.ms-excel")
+
+            # Definindo nome do arquivo
+            event = Event.objects.get(pk=self.kwargs.get('event_pk'))
+            name = "%s-%s.xls" % (event.pk, event.slug)
+            response['Content-Disposition'] = 'attachment; filename=%s' % name
+
+            return response
+
+        return self.get(request, *args, **kwargs)

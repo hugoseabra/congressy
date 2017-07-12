@@ -3,15 +3,15 @@
 Pessoa, nesta aplicação, é o principal objetivo de toda a plataforma, que
 serão os usuários e/ou participantes de eventos na plataforma.
 """
-
 import uuid
+from datetime import date
 
 from django.contrib.auth.models import User
 from django.db import models
-from kanu_locations.models import City
 
 from core.model import track_data
 from core.model.validator import cpf_validator, phone_validator
+from kanu_locations.models import City
 from . import Occupation
 from .mixins import GatherosModelMixin
 
@@ -22,9 +22,11 @@ class Person(models.Model, GatherosModelMixin):
 
     RESOURCE_URI = '/api/core/people/'
 
+    GENDER_MALE = 'M'
+    GENDER_FEMALE = 'F'
     GENDER_CHOICES = (
-        ('M', 'Masculino'),
-        ('F', 'Feminino'),
+        (GENDER_MALE, 'Masculino'),
+        (GENDER_FEMALE, 'Feminino'),
     )
 
     uuid = models.UUIDField(
@@ -153,6 +155,17 @@ class Person(models.Model, GatherosModelMixin):
     twitter = models.CharField(max_length=255, null=True, blank=True)
     linkedin = models.CharField(max_length=255, null=True, blank=True)
     skype = models.CharField(max_length=255, null=True, blank=True)
+
+    @property
+    def age(self):
+        if not self.birth_date:
+            return None
+
+        current = date.today()
+
+        was_earlier = (current.month, current.day) < \
+                      (self.birth_date.month, self.birth_date.day)
+        return current.year - self.birth_date.year - (was_earlier)
 
     class Meta:
         verbose_name = 'pessoa'
