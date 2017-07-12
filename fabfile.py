@@ -570,8 +570,6 @@ def reinstall_database():
     """
     Reinstala o banco de dados e executa os fixtures, para evistar problemas
     um backup é gerado antes de qualquer alteração ser executada
-
-    :param fixtures: lista de fixtures
     """
 
     # Se o banco existe, precisa fazer um backup antes de excluir

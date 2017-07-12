@@ -180,7 +180,7 @@ def update_form_configurations(instance, **kwargs):
     old_name = instance.old_value('name')
     name = instance.name
 
-    def _update_fields_list(fields_list, old_name, name):
+    def _update_fields_list(fields_list):
         """ Resgata lista e substitui valor antigo pelo novo. """
         updated_list = []
         for field_name in fields_list:
@@ -198,7 +198,7 @@ def update_form_configurations(instance, **kwargs):
         if not order_list:
             return
 
-        updated_list = _update_fields_list(order_list, old_name, name)
+        updated_list = _update_fields_list(order_list)
         form.set_order_list(updated_list)
 
     def update_inactive_fields(form):
@@ -207,7 +207,7 @@ def update_form_configurations(instance, **kwargs):
         if not inactive_list:
             return
 
-        updated_list = _update_fields_list(inactive_list, old_name, name)
+        updated_list = _update_fields_list(inactive_list)
         form.set_inactive_fields_list(updated_list)
 
     def update_required_configuration(form):

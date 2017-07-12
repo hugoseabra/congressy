@@ -1,3 +1,4 @@
+""" Mixins de views. """
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -21,6 +22,7 @@ from gatheros_event.helpers.account import (
 
 
 class AccountMixin(LoginRequiredMixin, View):
+    """ Mixin para gerenciamento de contexto de conta de usuário na view. """
     permission_denied_url = '/'
     raise_exception = True  # If not logged
     permission_denied_message = 'Você não pode realizar esta ação.'
@@ -76,6 +78,7 @@ class AccountMixin(LoginRequiredMixin, View):
         return self.permission_denied_url
 
     def pre_dispatch(self, request):
+        """ Operações executadas antes do dispatch de uma view. """
         if not self.is_authenticated:
             raise PermissionDenied(self.get_permission_denied_message())
 
@@ -113,6 +116,7 @@ class DeleteViewMixin(AccountMixin, DeleteView):
     template_name = 'generic/delete.html'
 
     def get_object(self, queryset=None):
+        """ Resgata objeto principal da view. """
         if not self.object:
             self.object = super(DeleteViewMixin, self).get_object(queryset)
 
@@ -207,9 +211,9 @@ class DeleteViewMixin(AccountMixin, DeleteView):
 
 
 class FormListViewMixin(FormMixin, ListView):
-    """
-    Lista com formulário
-    """
+    """ Lista com formulário """
+    object_list = None
+    form = None
 
     def get_form_kwargs(self):
         """

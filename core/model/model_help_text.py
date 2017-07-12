@@ -1,3 +1,4 @@
+""" Helper para help_text de campo de model.  """
 from django.utils.functional import curry
 
 

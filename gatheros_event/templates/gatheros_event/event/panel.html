@@ -4,7 +4,7 @@
 {% block sidebar %}
     {% if can_change %}
         <div style="margin-top:10px; padding: 10px;background-color: #CCC;text-align: center;border-bottom:1px solid dimgray">
-            <a href="{% url 'gatheros_event:event-transfer' object.pk %}">Mudar realizador</a>
+            <a href="{% url 'event:event-transfer' object.pk %}">Mudar realizador</a>
         </div>
         <br/>
         <div style="background-color: whitesmoke;border: 1px solid #DDD;">
@@ -12,9 +12,9 @@
                 Página do evento
             </div>
             <div style="padding:15px">
-                &rightarrow; <a href="{% url 'gatheros_event:event-detail' object.pk %}">Configurar detalhes do evento</a>
+                &rightarrow; <a href="{% url 'event:event-detail' object.pk %}">Configurar detalhes do evento</a>
             </div>
-            <div style="padding:15px">&rightarrow; <a href="{% url 'gatheros_event:event-info' object.pk %}">Configurar capa</a></div>
+            <div style="padding:15px">&rightarrow; <a href="{% url 'event:event-info' object.pk %}">Configurar capa</a></div>
             {# <div style="padding:15px">&rightarrow; <a href="#">Seções</a></div>#}
         </div>
     {% endif %}

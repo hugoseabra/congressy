@@ -20,6 +20,7 @@ class BaseExportViewTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
+        '003_form',
         '006_lot',
         '007_subscription',
     ]
@@ -113,6 +114,7 @@ class CanExportViewTest(BaseExportViewTest):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<tr', 2)  # Inscritos Mulheres
 
+    # noinspection PyMethodMayBeStatic
     def test_pagination(self):
         """
         Testar paginação
@@ -140,7 +142,8 @@ class CanExportViewTest(BaseExportViewTest):
         # Conteúdo deve ser um arquivo xlsx válido
         try:
             output = io.BytesIO(response.content)
-            workbook = load_workbook(output)
+            load_workbook(output)
+
         except Exception as e:
             self.fail(str(e))
 
@@ -148,7 +151,7 @@ class CanExportViewTest(BaseExportViewTest):
 class CannotExportViewTest(BaseExportViewTest):
     def setUp(self):
         super(CannotExportViewTest, self).setUp()
-        self.user = User.objects.get(username="flavia@in2web.com.br")
+        self.user = User.objects.get(username="hugoseabra19@gmail.com")
         self.client.force_login(self.user)
 
     def test_get_302(self):
@@ -185,9 +188,7 @@ class ExportHelperTest(BaseExportViewTest):
     ]
 
     def setUp(self):
-        event = Event.objects.get(
-            slug='encontro-de-casais-2017'
-        )
+        event = Event.objects.get(slug='encontro-de-casais-2017')
         self.queryset = Subscription.objects.filter(event=event)
 
     def test_export(self):
@@ -196,6 +197,7 @@ class ExportHelperTest(BaseExportViewTest):
         """
         try:
             output = io.BytesIO(export(self.queryset))
-            workbook = load_workbook(output)
+            load_workbook(output)
+
         except Exception as e:
             self.fail(str(e))

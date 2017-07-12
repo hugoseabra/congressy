@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 from django import forms
@@ -14,6 +13,7 @@ from .form import EventFieldsForm
 
 class SubscriptionForm(EventFieldsForm):
     """ Formulário de pré-inscrição. """
+
     def __init__(self, instance=None, hide_lot=True, *args, **kwargs):
         self.instance = instance
 
@@ -318,6 +318,7 @@ class SubscriptionForm(EventFieldsForm):
 
 class SubscriptionAttendanceForm(forms.Form):
     """ Formulário de credenciamento de Inscrições. """
+
     def __init__(self, instance=None, *args, **kwargs):
         self.instance = instance
         super(SubscriptionAttendanceForm, self).__init__(*args, **kwargs)
