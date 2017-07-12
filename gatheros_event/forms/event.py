@@ -107,14 +107,17 @@ class EventBannerForm(forms.ModelForm):
         ]
 
     def clean_banner_small(self):
+        """ Limpa campo banner_small """
         self._clear_file('banner_small')
         return self.cleaned_data['banner_small']
 
     def clean_banner_top(self):
+        """ Limpa campo banner_top """
         self._clear_file('banner_top')
         return self.cleaned_data['banner_top']
 
     def clean_banner_slide(self):
+        """ Limpa campo banner_slide """
         self._clear_file('banner_slide')
         return self.cleaned_data['banner_slide']
 
@@ -145,6 +148,7 @@ class EventPlaceForm(forms.ModelForm):
     """Formulário de edição de local de evento."""
 
     class Meta:
+        """ Meta """
         model = Event
         fields = [
             'place',
@@ -169,6 +173,7 @@ class EventSocialMediaForm(forms.ModelForm):
     """Formulário de edição de local de evento."""
 
     class Meta:
+        """ Meta """
         model = Event
         fields = [
             'website',
@@ -208,6 +213,7 @@ class EventTransferForm(forms.Form):
         self.fields['organization_to'].choices = organizations
 
     def clean(self):
+        """ Limpa campos. """
         organization = get_object_or_404(
             Organization,
             pk=self.data['organization_to']
@@ -224,6 +230,7 @@ class EventTransferForm(forms.Form):
         return self.cleaned_data
 
     def save(self):
+        """ Salva dados em instância. """
         self.instance.organization = self.cleaned_data['organization_to']
         self.instance.place = None
         self.instance.save()

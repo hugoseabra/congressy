@@ -1,3 +1,4 @@
+""" gatheros_event urls """
 # pylint: skip-file
 
 from .event import urlpatterns_event

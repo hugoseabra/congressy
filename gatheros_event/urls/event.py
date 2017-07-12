@@ -1,3 +1,4 @@
+""" Urls de `Event` """
 from django.conf.urls import include, url
 from django.views.generic import RedirectView
 

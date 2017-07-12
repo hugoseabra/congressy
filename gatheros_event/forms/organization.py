@@ -50,6 +50,7 @@ class OrganizationForm(forms.ModelForm):
         super(OrganizationForm, self).__init__(data=data, *args, **kwargs)
 
     def save(self, commit=True):
+        """ Salva dados. """
         # noinspection PyProtectedMember
         is_new = self.instance._state.adding
         self.instance.internal = self.internal
@@ -68,6 +69,7 @@ class OrganizationForm(forms.ModelForm):
 
 
 class OrganizationManageMembershipForm(forms.Form):
+    """ Formulário de gerenciamento de membros de organização. """
     organization = None
 
     def __init__(self, organization, *args, **kwargs):

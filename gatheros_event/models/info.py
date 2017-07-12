@@ -17,6 +17,7 @@ from .mixins import GatherosModelMixin
 # @TODO Excluir imagens banners ao deletar evento.
 
 def get_image_path(instance, filename):
+    """ Resgata localização onde as imagens serão inseridas. """
     return os.path.join('event', str(instance.event.id), filename)
 
 
@@ -115,5 +116,6 @@ class Info(models.Model, GatherosModelMixin):
         return self.event.name
 
     def save(self, *args, **kwargs):
+        """ Salva """
         self.description = strip_tags(self.description_html)
         super(Info, self).save(*args, **kwargs)

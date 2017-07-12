@@ -91,6 +91,7 @@ class Organization(models.Model, GatherosModelMixin):
         return self.name
 
     def save(self, *args, **kwargs):
+        """ Salva entidade. """
         self._create_unique_slug()
         self.description = strip_tags(self.description_html)
         super(Organization, self).save(*args, **kwargs)
@@ -152,6 +153,7 @@ class Organization(models.Model, GatherosModelMixin):
         return len(self.get_members(group=Member.ADMIN, person=person)) > 0
 
     def is_member_active(self, person):
+        """ Verifica se membro está ativo na organização. """
         member = self.get_member(person)
         return member.active if member else False
 

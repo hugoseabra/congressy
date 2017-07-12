@@ -6,11 +6,7 @@ from . import event, invitation, member
 
 
 def check_invite(entity):
-    """
-    Regras para validação de convites
-
-    :param entity:
-    """
+    """ Regras para validação de convites """
     invitation.rule_1_organizacao_internas_nao_pode_ter_convites(entity)
     invitation.rule_2_nao_pode_mudar_autor(entity)
     invitation.rule_3_nao_pode_mudar_convidado(entity)

@@ -1,3 +1,4 @@
+""" Urls de `Organization` """
 from django.conf.urls import include, url
 
 from gatheros_event import views

@@ -1,3 +1,4 @@
+""" Migration """
 # -*- coding: utf-8 -*-
 # pylint: skip-file
 from __future__ import unicode_literals
@@ -18,6 +19,7 @@ from gatheros_event.models.mixins import GatherosModelMixin
 
 
 def load_initial_data(*_):
+    """ Carrega dados iniciais do sistema. """
     print('\nLoading initial data:')
     call_command('loaddata', '001_segment', app_label='gatheros_event')
     call_command('loaddata', '002_subject', app_label='gatheros_event')
@@ -26,6 +28,7 @@ def load_initial_data(*_):
 
 
 class Migration(migrations.Migration):
+    """ Migration """
     initial = True
 
     dependencies = [
