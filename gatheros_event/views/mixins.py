@@ -211,7 +211,31 @@ class FormListViewMixin(FormMixin, ListView):
     Lista com formulário
     """
 
+    def get_form_kwargs(self):
+        """
+        Retorna argumentos para inicializar o form
+
+        :return: dict
+        """
+        kwargs = super(FormListViewMixin, self).get_form_kwargs()
+
+        if self.request.method == 'GET':
+            kwargs.update({
+                'data': self.request.GET,
+            })
+
+        return kwargs
+
     def get(self, request, *args, **kwargs):
+        """
+        Processa o metodo get, devolvendo o form a lista e renderizando o
+        template
+
+        :param request:
+        :param args:
+        :param kwargs:
+        :return: Response
+        """
         # From ProcessFormMixin
         form_class = self.get_form_class()
         self.form = self.get_form(form_class)

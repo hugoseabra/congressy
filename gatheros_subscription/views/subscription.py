@@ -1,4 +1,3 @@
-import io
 from datetime import datetime
 
 from django.contrib import messages
@@ -567,10 +566,12 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             return True
 
 
-class SubscriptionExportView(FormListViewMixin):
+class SubscriptionExportView(AccountMixin, FormListViewMixin):
     template_name = 'gatheros_subscription/subscription_filter.html'
     form_class = SubscriptionFilterForm
     model = Subscription
+    paginate_by = 5
+    allow_empty = True
 
     def get_form_kwargs(self):
         kwargs = super(SubscriptionExportView, self).get_form_kwargs()
@@ -584,22 +585,19 @@ class SubscriptionExportView(FormListViewMixin):
             .filter(event__pk=self.kwargs.get('event_pk'))
 
         form = self.get_form()
-        if self.request.POST and form.is_valid():
+        if form.is_valid():
             queryset = form.filter(queryset)
 
         return queryset
 
-    def post(self, request, *args, **kwargs):
-        if request.POST.get('format') == 'xls':
-            # Criando buffer de bytes
-            output = io.BytesIO()
-
+    def get(self, request, *args, **kwargs):
+        if request.GET.get('format') == 'xls':
             # Chamando exportação
-            subscription_export(output, self.get_queryset())
+            output = subscription_export(self.get_queryset())
 
             # Criando resposta http com arquivo de download
-            response = HttpResponse(
-                output.getbuffer(), content_type="application/vnd.ms-excel")
+            response = HttpResponse(output,
+                                    content_type="application/vnd.ms-excel")
 
             # Definindo nome do arquivo
             event = Event.objects.get(pk=self.kwargs.get('event_pk'))
@@ -608,4 +606,11 @@ class SubscriptionExportView(FormListViewMixin):
 
             return response
 
-        return self.get(request, *args, **kwargs)
+        return super(SubscriptionExportView, self).get(request, *args,
+                                                       **kwargs)
+
+    def can_access(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_manage_subscriptions',
+            Event.objects.get(pk=self.kwargs.get('event_pk'))
+        )
