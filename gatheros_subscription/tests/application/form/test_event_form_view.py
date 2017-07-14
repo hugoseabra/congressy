@@ -63,6 +63,180 @@ class EventFormViewRenderTest(TestCase):
         self.assertContains(response, 'Você não pode realizar esta ação')
 
 
+class EventFormAddTest(TestCase):
+    """ Testes de adição de campos em formulário de evento. """
+    fixtures = FIXTURES
+
+    def setUp(self):
+        self.user = User.objects.get(email='diegotolentino@gmail.com')
+        self.organization = Organization.objects.get(slug='diego-tolentino')
+        self.event = self.organization.events.first()
+
+    def _login(self):
+        self.client.force_login(self.user)
+
+    def _get_url(self):
+        return reverse(
+            'subscription:event-field-add',
+            kwargs={'event_pk': self.event.pk}
+        )
+
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(), follow=True)
+
+        redirect_url = reverse('front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
+    def test_200_logged(self):
+        """ 200 quando logado. """
+        self._login()
+        response = self.client.get(self._get_url())
+        self.assertEqual(response.status_code, 200)
+
+    def test_not_org_member(self):
+        """
+        Não permite edição de opção de campo cuja organização o usuário não é
+        membro.
+        """
+        user = User.objects.get(email='lucianasilva@gmail.com')
+        self.client.force_login(user)
+
+        response = self.client.get(self._get_url(), follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
+
+    def test_copy_form(self):
+        """
+        Testa cópia de formulário de um evento para outro com todos os campos.
+        """
+        self._login()
+
+        event = self.organization.events.exclude(
+            pk=self.event.pk,
+            subscription_type=self.event.SUBSCRIPTION_DISABLED
+        ).first()
+
+        fields_list = []
+        required_fields_list = []
+        required_fields = []
+        not_required_fields_list = []
+        for field in event.form.fields.filter(form_default_field=False):
+            fields_list.append(field.name)
+
+            # Inversão
+            if not field.required:
+                required_fields_list.append('required')
+                required_fields.append(field)
+
+            else:
+                required_fields_list.append('not-required')
+                not_required_fields_list.append(field)
+
+        data = {
+            'fields_list': fields_list,
+            'requirement_list': required_fields_list,
+            'action': 'copy'
+        }
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Campos adicionados com sucesso')
+
+        form = Form.objects.get(pk=self.event.form.pk)
+
+        for field in required_fields:
+            self.assertTrue(form.is_required(field))
+
+        for field in not_required_fields_list:
+            self.assertFalse(form.is_required(field))
+
+    def test_add_existing_field(self):
+        """
+        Testa adição de campo existente em formulário de um evento.
+        """
+        self._login()
+
+        data = {
+            'field_type': Field.FIELD_INPUT_TEXT,
+            'label': 'Some strange name',
+            'organization': self.organization
+        }
+        field = Field.objects.create(**data)
+
+        # Obrigatório no formulário
+        data = {
+            'field_name': field.name,
+            'action': 'add_existing',
+            'requirement': 'required'
+        }
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Campo adicionado com sucesso')
+
+        field = Field.objects.get(pk=field.pk)
+
+        self.assertFalse(field.required)
+        self.assertTrue(self.event.form.is_required(field))
+
+        # Não-obrigatório no formulário
+        data.update({'requirement': 'not-required'})
+
+        # Campo é obrigatório por padrão
+        field.required = True
+        field.save()
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Campo adicionado com sucesso')
+
+        field = Field.objects.get(pk=field.pk)
+        form = Form.objects.get(pk=self.event.form.pk)
+
+        self.assertTrue(field.required)
+        self.assertFalse(form.is_required(field))
+
+    def test_add_new_field(self):
+        """
+        Testa adição de novo campo.
+        """
+        self._login()
+        data = {
+            'field_type': Field.FIELD_INPUT_TEXT,
+            'label': 'Some strange name',
+            'requirement': 'by_default',
+            'action': 'add'
+        }
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Campo adicionado com sucesso')
+
+        field = self.event.form.fields.last()
+        self.assertEqual(field.label, data['label'])
+
+        self.assertTrue(field.required)
+        self.assertTrue(self.event.form.is_required(field))
+
+    def test_add_field_custom_requirement(self):
+        """
+        Testa adição de novo campo com obrigatoriedade personalizada.
+        """
+        self._login()
+        data = {
+            'field_type': Field.FIELD_INPUT_TEXT,
+            'label': 'Some strange name',
+            'requirement': 'in_form',
+            'action': 'add'
+        }
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Campo adicionado com sucesso')
+
+        field = self.event.form.fields.last()
+        self.assertEqual(field.label, data['label'])
+
+        self.assertFalse(field.required)
+        self.assertTrue(self.event.form.is_required(field))
+
+
 class EventFormEditViewTest(TestCase):
     """ Testes de edição de campo de formulário. """
     fixtures = FIXTURES

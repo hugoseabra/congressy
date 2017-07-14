@@ -72,6 +72,17 @@ class EventFormFormTest(TestCase):
         ).first()
         self.form = FormFieldForm(form=self.event.form)
 
+    def test_no_existing_field(self):
+        """" Testa adição de campo que não existe na organização."""
+        field_name = 'my-field-strange-name'
+
+        with self.assertRaises(PermissionDenied) as e:
+            self.form.add_field(field_name)
+            self.assertEqual(
+                str(e),
+                'O campo `{}` não existe'.format(field_name)
+            )
+
     def test_field_restriction(self):
         """ Testa restrição de manipulação de `Field`. """
         default_field = self.organization.fields.filter(
@@ -111,7 +122,7 @@ class EventFormFormTest(TestCase):
         }
 
         field = Field.objects.create(**data)
-        self.form.add_field(field)
+        self.form.add_field(field.name)
 
         field_names = [field.name for field in self.event.form.fields.all()]
         self.assertIn(field.name, field_names)
@@ -125,7 +136,7 @@ class EventFormFormTest(TestCase):
         }
 
         field = Field.objects.create(**data)
-        self.form.add_field(field)
+        self.form.add_field_by_instance(field)
 
         order = self.event.form.get_order_list()
         last_field = order[-1]
@@ -149,7 +160,7 @@ class EventFormFormTest(TestCase):
             'required': True
         })
         field = Field.objects.create(**data)
-        self.form.add_field(field)
+        self.form.add_field_by_instance(field)
 
         config = self.event.form.required_configuration
         self.assertNotIn(field.name, config if config else {})
@@ -161,7 +172,7 @@ class EventFormFormTest(TestCase):
             'required': True
         })
         field = Field.objects.create(**data)
-        self.form.add_field(field, required=False)
+        self.form.add_field_by_instance(field, required=False)
 
         config = self.event.form.required_configuration
         self.assertIn(field.name, config)
@@ -173,7 +184,7 @@ class EventFormFormTest(TestCase):
             'required': False
         })
         field = Field.objects.create(**data)
-        self.form.add_field(field, required=True)
+        self.form.add_field_by_instance(field, required=True)
 
         config = self.event.form.required_configuration
         self.assertIn(field.name, config)
@@ -192,6 +203,39 @@ class EventFormFormTest(TestCase):
 
         field_names = [field.name for field in self.event.form.fields.all()]
         self.assertIn(field.name, field_names)
+
+    def test_add_fields_by_name(self):
+        """ Testa adição de campo no formulário de evento. """
+        fields_data = [
+            {
+                'organization': self.organization,
+                'field_type': Field.FIELD_INPUT_TEXT,
+                'label': 'New one',
+            },
+            {
+                'organization': self.organization,
+                'field_type': Field.FIELD_TEXTAREA,
+                'label': 'New one 2',
+            },
+            {
+                'organization': self.organization,
+                'field_type': Field.FIELD_SELECT,
+                'label': 'New one 3',
+            },
+        ]
+
+        fields_dict = {}
+        field_names = []
+        for data in fields_data:
+            field = Field.objects.create(**data)
+            fields_dict.update({field.name: None})
+            field_names.append(field.name)
+
+        self.form.add_fields_by_names(fields_dict)
+
+        persited_field_names = [f.name for f in self.event.form.fields.all()]
+        for field_name in field_names:
+            self.assertIn(field_name, persited_field_names)
 
     def test_deactivate_field(self):
         """ Testa desativação de campo ativo no formulário. """
@@ -269,6 +313,7 @@ class EventFormFieldOrderFormTest(TestCase):
         """
         Testa reposicionamento de campo para uma posição anterior a atual.
         """
+
         def get_field_by_order(order):
             """ Resgata campo pela sua ordem no formulário. """
             order_list = self.form.get_order_list()
@@ -286,6 +331,7 @@ class EventFormFieldOrderFormTest(TestCase):
         """
         Testa reposicionamento de campo para uma posição posterior a atual.
         """
+
         def get_field_by_order(order):
             """ Resgata campo pela sua ordem no formulário. """
             order_list = self.form.get_order_list()

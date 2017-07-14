@@ -13,7 +13,7 @@ from gatheros_subscription.forms import (
 from gatheros_subscription.models import Field
 
 
-class BaseEventViewMixin(AccountMixin, generic.View):
+class BaseEventViewMixin(AccountMixin, generic.TemplateView):
     """ Base de View para resgatar informações de evento. """
     event = None
 
@@ -30,8 +30,17 @@ class BaseEventViewMixin(AccountMixin, generic.View):
 
         return self.event
 
+    def get_context_data(self, **kwargs):
+        """ Recupera contexto da view. """
+        context = super(BaseEventViewMixin, self).get_context_data(**kwargs)
+        context.update({'event': self._get_event()})
+        return context
+
     def can_access(self):
         """ Verifica se usuário pode acessar o conteúdo da view. """
+        if not self.is_manager:
+            return False
+
         event = self._get_event()
         org = self.organization
         same_org = org and event.organization.pk == org.pk
@@ -44,27 +53,25 @@ class BaseEventViewMixin(AccountMixin, generic.View):
         return same_org and enabled and can_view
 
 
-class BaseFormFieldView(BaseEventViewMixin, generic.TemplateView):
+class BaseFormFieldView(BaseEventViewMixin):
     """ Classe base para view de formulários. """
     form_title = 'Formulário'
 
     def get_context_data(self, **kwargs):
         """ Recupera contexto da view. """
         context = super(BaseFormFieldView, self).get_context_data(**kwargs)
-        context.update({
-            'event': self._get_event(),
-            'form_title': self.get_form_title(),
-        })
+        context.update({'form_title': self.get_form_title()})
         return context
 
     def get_form_title(self):
+        """ Resgata título do formulário. """
         return self.form_title
 
 
 class EventConfigFormFieldView(BaseFormFieldView, generic.FormView):
     """ View para exibição de lista de campos do formulário de evento. """
     form_class = EventFieldsForm
-    template_name = 'gatheros_subscription/event_form/config.html'
+    template_name = 'gatheros_subscription/form/config.html'
     form_title = 'Configuração de Formulário'
 
     def get_context_data(self, **kwargs):
@@ -106,17 +113,108 @@ class EventConfigFormFieldView(BaseFormFieldView, generic.FormView):
         return kwargs
 
 
-class EventFormFieldAddView(BaseFormFieldView, generic.CreateView):
+class EventFormFieldAddView(BaseFormFieldView, generic.TemplateView):
+    """ View para adicionar campos ao formulário. """
+
+    template_name = 'gatheros_subscription/form/field_add.html'
     form_title = 'Adicionar Campo de Formulário'
     success_message = 'Campo criado com sucesso.'
+    form_class = FormFieldForm
+
+    # noinspection PyUnusedLocal
+    def post(self, request, *args, **kwargs):
+        """ request method POST """
+        event = self._get_event()
+        form = FormFieldForm(form=event.form)
+
+        try:
+            action = request.POST.get('action')
+
+            success = False
+            if action == 'add':
+                data = request.POST.copy()
+
+                requirement = request.POST.get('requirement')
+                is_required = None
+                if requirement == 'by_default':
+                    data.update({'required': True})
+
+                elif requirement == 'in_form':
+                    is_required = True
+
+                form.add_new_field(data, is_required)
+
+                messages.success(request, 'Campo adicionado com sucesso.')
+                success = True
+
+            elif action == 'add_existing':
+                field_name = request.POST.get('field_name')
+                requirement = request.POST.get('requirement')
+
+                if not field_name:
+                    raise Exception('Nenhum campo encontrado.')
+
+                if requirement == 'required':
+                    is_required = True
+
+                elif requirement == 'not-required':
+                    is_required = False
+
+                else:
+                    is_required = None
+
+                form.add_field(field_name, is_required)
+
+                messages.success(request, 'Campo adicionado com sucesso.')
+                success = True
+
+            elif action == 'copy':
+                fields_list = request.POST.getlist('fields_list')
+                requirement_list = request.POST.getlist('requirement_list')
+
+                if not fields_list:
+                    raise Exception('Nenhum campo foi enviado.')
+
+                fields_dict = {}
+                for idx, field_name in enumerate(fields_list):
+                    is_required = None
+                    try:
+                        requirement = requirement_list[idx]
+                        if requirement == 'required':
+                            is_required = True
+
+                        elif requirement == 'not-required':
+                            is_required = False
+
+                        else:
+                            is_required = None
+
+                    except IndexError:
+                        is_required = None
+
+                    fields_dict.update({field_name: is_required})
+
+                form.add_fields_by_names(fields_dict)
+
+                messages.success(request, 'Campos adicionados com sucesso.')
+                success = True
+
+            if not success:
+                raise Exception('Ação inválida. Envie `copy` ou `add`. ')
+
+        except Exception as e:
+            messages.error(request, 'Algum erro ocorreu: ' + str(e))
+            return self.render_to_response(self.get_context_data())
+
+        else:
+            return redirect(self.get_success_url())
 
     def get_success_url(self):
         """ Recupera URL de redirecionamento em caso de sucesso. """
-        pass
-        # return reverse(
-        #     'subscription:event-fields-config',
-        #     kwargs={'event_pk': self.kwargs['event_pk']}
-        # )
+        return reverse(
+            'subscription:event-fields-config',
+            kwargs={'event_pk': self.kwargs['event_pk']}
+        )
 
     def can_access(self):
         """ Verifica se usuário pode acessar o conteúdo da view. """
