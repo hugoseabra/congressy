@@ -7,8 +7,6 @@ from django.urls import reverse, reverse_lazy
 from gatheros_event.models import Organization
 
 
-# @TODO Testar upload de avatar
-
 class MockSession(SessionStore):
     def __init__(self):
         super(MockSession, self).__init__()

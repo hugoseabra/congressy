@@ -9,9 +9,6 @@ from gatheros_subscription import forms
 from gatheros_subscription.models import Lot
 
 
-# @TODO Resolver inconsistências de Base
-
-
 class BaseLotView(AccountMixin, View):
     event = None
 

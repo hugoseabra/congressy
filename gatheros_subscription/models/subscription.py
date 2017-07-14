@@ -34,9 +34,6 @@ class SubscriptionManager(models.Manager):
                 return code
 
 
-# @TODO - verificar se evento irá emitir certificado. Se sim, exigir CPF
-# @TODO Acrescentar campo boolean "PNE"
-
 class Subscription(models.Model, GatherosModelMixin):
     """ Modelo de inscrição """
 

@@ -11,7 +11,6 @@ from . import AbstractDefaultFieldOption, Field
 from .rules import field_option as rule
 
 
-# @TODO valores únicos para a pergunta
 class FieldOption(AbstractDefaultFieldOption):
     """ Modelo de opção de campo. """
 

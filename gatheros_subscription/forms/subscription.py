@@ -125,7 +125,6 @@ class SubscriptionForm(EventConfigForm):
 
     def _save_or_create_subscription(self):
         """ Salva inscrição existente ou cria uma nova caso não exista. """
-
         lot = self.cleaned_data.get('lot')
 
         if self.instance:
@@ -133,7 +132,6 @@ class SubscriptionForm(EventConfigForm):
             instance.modified = datetime.now()
 
         else:
-            # @TODO Registrar autor da inscrição.
             instance = Subscription(
                 origin=Subscription.DEVICE_ORIGIN_WEB,
                 created_by=1,

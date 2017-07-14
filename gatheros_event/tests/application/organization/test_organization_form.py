@@ -6,8 +6,6 @@ from gatheros_event.forms import OrganizationForm
 from gatheros_event.models import Member, Organization
 
 
-# @TODO Testar upload de avatar
-
 class OrganizationFormTest(TestCase):
     """ Testes de organization form """
 
