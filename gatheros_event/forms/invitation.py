@@ -16,10 +16,10 @@ from gatheros_event.models.rules import check_invite
 
 
 def send_invitation(invitation):
-    url = reverse(
-        'gatheros_event:invitation-decision',
-        kwargs={'pk': str(invitation.pk)}
-    )
+    """ Envia convite para e-mail de convidado(s) """
+    url = reverse('public:invitation-decision', kwargs={
+        'pk': invitation.pk
+    })
 
     send_mail(
         'Novo convite para organização',
@@ -44,6 +44,7 @@ class InvitationCreateForm(forms.Form):
         self._invites = []
 
     def clean(self):
+        """ Limpa campos. """
         if self.errors:
             return []
 
@@ -68,7 +69,7 @@ class InvitationCreateForm(forms.Form):
             self._invites.append(invite)
 
     def send_invite(self):
-        """Notifica pessoa convidada"""
+        """ Notifica pessoa convidada """
         for invite in self._invites:
             # Convite para um tipo inicialmente.
             invite.group = Member.HELPER
@@ -83,12 +84,13 @@ class InvitationDecisionForm(forms.ModelForm):
     Decide o resultado de um convite e suas implicações
     """
 
-    def accept(self):
-        """
-        Aceita o convite e criar o membro
+    class Meta:
+        """ Meta """
+        model = Invitation
+        exclude = []
 
-        :return:
-        """
+    def accept(self):
+        """ Aceita o convite e criar o membro """
         user = self.instance.to
 
         # Se não tiver um perfil de pessoa vinculado não permite aceitar
@@ -106,12 +108,5 @@ class InvitationDecisionForm(forms.ModelForm):
         self.instance.delete()
 
     def decline(self):
-        """
-        Recusa o convite
-        :return:
-        """
+        """ Recusa o convite """
         self.instance.delete()
-
-    class Meta:
-        model = Invitation
-        exclude = []

@@ -44,7 +44,7 @@
 
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:event-panel' event.pk %}">Voltar</a>
+        <a href="{% url 'event:event-panel' event.pk %}">Voltar</a>
     </div>
     <hr/>
     <h1>{{ event.name }}</h1>
@@ -164,7 +164,7 @@
                                 </table>
                             </td>
                             <td width="18%" style="text-align: center">
-                                <form method="post" action="{% url 'gatheros_subscription:subscription-attendance' event.pk result.pk %}">{% csrf_token %}
+                                <form method="post" action="{% url 'subscription:subscription-attendance' event.pk result.pk %}">{% csrf_token %}
                                     <input type="hidden" name="search_by" value="code" />
                                     <input type="hidden" name="action" value="{% if result.attended %}unregister{% else %}register{% endif %}" />
                                     <button id="registration_button" type="submit">{% if result.attended %}Cancelar credenciamento{% else %}Credenciar{% endif %}</button>
@@ -219,7 +219,7 @@
                                     {% endif %}
                                 </td>
                                 <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
-                                    <form method="post" action="{% url 'gatheros_subscription:subscription-attendance' event.pk item.pk %}">{% csrf_token %}
+                                    <form method="post" action="{% url 'subscription:subscription-attendance' event.pk item.pk %}">{% csrf_token %}
                                         <input type="hidden" name="search_by" value="name" />
                                         <input type="hidden" name="action" value="{% if item.attended %}unregister{% else %}register{% endif %}" />
                                         {% if item.attended %}

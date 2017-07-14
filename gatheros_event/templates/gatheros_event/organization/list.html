@@ -7,7 +7,7 @@
 {% block content %}
     <h1>Minhas Organizações</h1>
     <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
-        <a href="{% url 'gatheros_event:organization-add' %}">Adicionar</a>
+        <a href="{% url 'event:organization-add' %}">Adicionar</a>
     </div>
 
     <div style="background: #DDD">
@@ -32,10 +32,10 @@
                                         <img src="{{ item.avatar.url }}" width="100px" />
                                     </div>
                                 {% endif %}
-                                <div style="float:left;width: {% if item.avatar %}92%{% else %}99%{% endif %}">
-                                    <div>
+                                <div style="float:left;width: {% if item.avatar %}90%{% else %}99%{% endif %}">
+                                    <div style="padding: 10px">
                                         {{ forloop.counter }} -
-                                        <a href="{% url 'gatheros_event:organization-panel' item.pk %}">{{ item.name }}</a>
+                                        <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
                                     </div>
                                     {% if item.description_html %}
                                     <hr/>
@@ -51,10 +51,10 @@
                             </td>
                             {% if member_group == member.ADMIN %}
                             <td width="8%" style="background: #FFF;padding:10px;margin-bottom: 3px">
-                                <a href="{% url 'gatheros_event:organization-edit' item.pk %}">Editar</a>
+                                <a href="{% url 'event:organization-edit' item.pk %}">Editar</a>
                                 &nbsp; &nbsp; &nbsp;
                                     {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
-                                        <a href="{% url 'gatheros_event:organization-delete' item.pk %}">Excluir</a>
+                                        <a href="{% url 'event:organization-delete' item.pk %}">Excluir</a>
                                     {% endif %}
                             </td>
                             {% endif %}

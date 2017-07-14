@@ -7,6 +7,7 @@ import json
 
 from django.db import models
 from django.utils import six
+from jsonfield import JSONField
 
 from gatheros_subscription.models.rules import answer as rule
 from . import Field, Subscription
@@ -27,9 +28,10 @@ class Answer(models.Model):
         verbose_name='campo',
         related_name='answers'
     )
-    value = models.TextField(verbose_name='valor', null=True, blank=True)
+    value = JSONField(verbose_name='valor', null=True, blank=True)
 
     def save(self, *args, **kwargs):
+        """ Salva entidade. """
         self.check_rules()
         super(Answer, self).save(*args, **kwargs)
 

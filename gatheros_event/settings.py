@@ -1,3 +1,5 @@
+""" Settins gatheros_event """
+
 # pylint: skip-file
 from django.conf import settings
 

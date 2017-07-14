@@ -20,6 +20,7 @@ class BaseExportViewTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
+        '003_form',
         '006_lot',
         '007_subscription',
     ]
@@ -29,8 +30,10 @@ class BaseExportViewTest(TestCase):
             slug='seo-e-resultados'
         )
 
-        self.url = reverse('gatheros_subscription:subscriptions-export',
-                           kwargs={'event_pk': self.event.pk})
+        self.url = reverse(
+            'subscription:subscriptions-export',
+            kwargs={'event_pk': self.event.pk}
+        )
 
 
 class CanExportViewTest(BaseExportViewTest):
@@ -130,7 +133,8 @@ class CanExportViewTest(BaseExportViewTest):
         # Conteúdo deve ser um arquivo xlsx válido
         try:
             output = io.BytesIO(response.content)
-            workbook = load_workbook(output)
+            load_workbook(output)
+
         except Exception as e:
             self.fail(str(e))
 
@@ -138,7 +142,7 @@ class CanExportViewTest(BaseExportViewTest):
 class CannotExportViewTest(BaseExportViewTest):
     def setUp(self):
         super(CannotExportViewTest, self).setUp()
-        self.user = User.objects.get(username="flavia@in2web.com.br")
+        self.user = User.objects.get(username="hugoseabra19@gmail.com")
         self.client.force_login(self.user)
 
     def test_get_302(self):
@@ -175,9 +179,7 @@ class ExportHelperTest(BaseExportViewTest):
     ]
 
     def setUp(self):
-        event = Event.objects.get(
-            slug='encontro-de-casais-2017'
-        )
+        event = Event.objects.get(slug='encontro-de-casais-2017')
         self.queryset = Subscription.objects.filter(event=event)
 
     def test_export(self):
@@ -186,6 +188,7 @@ class ExportHelperTest(BaseExportViewTest):
         """
         try:
             output = io.BytesIO(export(self.queryset))
-            workbook = load_workbook(output)
+            load_workbook(output)
+
         except Exception as e:
             self.fail(str(e))

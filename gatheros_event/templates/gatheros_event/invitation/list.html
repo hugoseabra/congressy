@@ -3,14 +3,14 @@
 
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:organization-panel' invitation_organization.pk %}">Voltar</a>
+        <a href="{% url 'event:organization-panel' invitation_organization.pk %}">Voltar</a>
     </div>
     <hr/>
 
     <h1>Convites</h1>
     <h2>{{ invitation_organization.name }}</h2>
     <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
-        <a href="{% url 'gatheros_event:invitation-add' invitation_organization.pk %}">Enviar convites</a>
+        <a href="{% url 'event:invitation-add' invitation_organization.pk %}">Enviar convites</a>
     </div>
 
     {% if not open_invitations and not expired_invitations %}
@@ -55,7 +55,7 @@
                             {{ item.expired }}
                         </td>
                         <td width="10%" style="text-align:center; background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
-                            <a href="{% url 'gatheros_event:invitation-delete' invitation_organization.pk item.pk %}">Excluir</a>
+                            <a href="{% url 'event:invitation-delete' invitation_organization.pk item.pk %}">Excluir</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -107,13 +107,13 @@
                         </td>
                         <td width="12%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
                             <div style="float:left">
-                                <form action="{% url 'gatheros_event:invitation-resend' invitation_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja renovar este convite?')">{% csrf_token %}
+                                <form action="{% url 'event:invitation-resend' invitation_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja renovar este convite?')">{% csrf_token %}
                                     <button type="submit">Reenviar</button>
                                 </form>
                             </div>
                             &nbsp; &nbsp; &nbsp;
                             <div style="float:left; margin-left: 10px">
-                                <a href="{% url 'gatheros_event:invitation-delete' invitation_organization.pk item.pk %}">Excluir</a>
+                                <a href="{% url 'event:invitation-delete' invitation_organization.pk item.pk %}">Excluir</a>
                             </div>
                             <div style="clear:both"></div>
                         </td>

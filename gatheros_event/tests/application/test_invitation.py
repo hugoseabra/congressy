@@ -1,5 +1,4 @@
-# test_resend_invitation_differente_type(self):
-# test_expiration_days_as_configured(self):
+""" Testes de aplicação com `Invitation`. """
 
 from datetime import datetime, timedelta
 
@@ -15,6 +14,7 @@ from gatheros_event.models import Invitation, Member, Organization, Person
 
 
 class InvitationCreateFormTest(TestCase):
+    """ Testes de criação de `Invitation` """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -71,6 +71,7 @@ class InvitationCreateFormTest(TestCase):
 
 
 class InvitationCreateViewTest(TestCase):
+    """ Testes de criação de `Invitation` pela view """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -86,7 +87,7 @@ class InvitationCreateViewTest(TestCase):
         self.organization = Organization.objects.get(
             slug="in2-web-solucoes-e-servicos"
         )
-        self.url = reverse('gatheros_event:invitation-add', kwargs={
+        self.url = reverse('event:invitation-add', kwargs={
             'organization_pk': self.organization.pk
         })
         self.data = {'to': 'joao@teste.com, diegotolentino@gmail.com'}
@@ -111,7 +112,7 @@ class InvitationCreateViewTest(TestCase):
         """
         Organização que o usuário é membro mas não é admin
         """
-        url = reverse('gatheros_event:invitation-add', kwargs={
+        url = reverse('event:invitation-add', kwargs={
             'organization_pk': 6
         })
         response = self.client.post(url, self.data, follow=True)
@@ -150,6 +151,7 @@ class InvitationCreateViewTest(TestCase):
 
 
 class InvitationDecisionViewWithProfile(TestCase):
+    """ Testes de decisão de aceite/recusa de `Invitation` pela view. """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -169,13 +171,10 @@ class InvitationDecisionViewWithProfile(TestCase):
             to=self.to
         ).pk
 
-        self.url = reverse(
-            'gatheros_event:invitation-decision',
-            kwargs={
-                'pk': self.invite_pk
-            }
-        )
-        self.url_redirect = reverse('gatheros_front:login')
+        self.url = reverse('public:invitation-decision', kwargs={
+            'pk': self.invite_pk
+        })
+        self.url_redirect = reverse('front:login')
 
     def test_get_without_login(self):
         """
@@ -243,6 +242,10 @@ class InvitationDecisionViewWithProfile(TestCase):
 
 
 class InvitationDecisionViewWithoutProfileTest(TestCase):
+    """
+    Testes de decisão de aceite/recusa de `Invitation` pela view de usuário sem
+    vínculo com `Person`.
+    """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -262,20 +265,15 @@ class InvitationDecisionViewWithoutProfileTest(TestCase):
             to=self.to
         ).pk
 
-        self.url = reverse(
-            'gatheros_event:invitation-decision',
-            kwargs={
-                'pk': self.invite_pk
-            }
-        )
+        self.url = reverse('public:invitation-decision', kwargs={
+            'pk': self.invite_pk
+        })
         self.url_login = reverse(
-            'gatheros_front:login'
+            'front:login'
         )
         self.url_profile = reverse(
-            'gatheros_event:invitation-profile',
-            kwargs={
-                'pk': self.invite_pk
-            }
+            'public:invitation-profile',
+            kwargs={'pk': self.invite_pk}
         )
 
     def test_get(self):
@@ -320,6 +318,7 @@ class InvitationDecisionViewWithoutProfileTest(TestCase):
 
 
 class InvitationProfileViewTest(TestCase):
+    """ Testes criação de perfil pela view. """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -342,14 +341,12 @@ class InvitationProfileViewTest(TestCase):
         self.invite_pk = invite.pk
         self.organization = invite.author.organization
         self.url = reverse(
-            'gatheros_event:invitation-profile',
-            kwargs={
-                'pk': self.invite_pk
-            }
+            'public:invitation-profile',
+            kwargs={'pk': self.invite_pk}
         )
 
         self.url_success = reverse(
-            'gatheros_event:invitation-list',
+            'event:invitation-list',
             kwargs={
                 'organization_pk': self.organization.pk
             }
@@ -436,6 +433,7 @@ class InvitationProfileViewTest(TestCase):
 
 
 class InvitationDeleteViewTest(TestCase):
+    """ Testes de exclusão de `Invitation` pela view. """
     fixtures = [
         '001_user',
         '003_occupation',
@@ -451,10 +449,11 @@ class InvitationDeleteViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_delete(self):
+        """ Testa exclusão de convite. """
         member = self.user.person.members.first()
         invitation = Invitation.objects.filter(author=member).first()
 
-        url = reverse('gatheros_event:invitation-delete', kwargs={
+        url = reverse('event:invitation-delete', kwargs={
             'organization_pk': invitation.author.organization.pk,
             'pk': invitation.pk
         })
@@ -463,6 +462,7 @@ class InvitationDeleteViewTest(TestCase):
 
 
 class InvitationRenewViewTest(TestCase):
+    """ Testes de renovação de `Invitation` pela view"""
     fixtures = [
         '001_user',
         '003_occupation',
@@ -478,6 +478,7 @@ class InvitationRenewViewTest(TestCase):
         self.client.force_login(self.user)
 
     def test_renew(self):
+        """ Testa renovação de convite. """
         now = datetime.now()
         created_date = now - timedelta(days=30)
 
@@ -493,7 +494,7 @@ class InvitationRenewViewTest(TestCase):
 
         self.assertTrue(invitation.is_expired)
 
-        url = reverse('gatheros_event:invitation-resend', kwargs={
+        url = reverse('event:invitation-resend', kwargs={
             'organization_pk': invitation.author.organization.pk,
             'pk': invitation.pk
         })
@@ -504,6 +505,7 @@ class InvitationRenewViewTest(TestCase):
         self.assertFalse(invitation.is_expired)
 
     def test_renew_not_expired(self):
+        """ Testa renovação de convites que ainda não expiraram. """
         created_date = datetime.now()
 
         days = settings.INVITATION_ACCEPT_DAYS
@@ -519,7 +521,7 @@ class InvitationRenewViewTest(TestCase):
 
         self.assertFalse(invitation.is_expired)
 
-        url = reverse('gatheros_event:invitation-resend', kwargs={
+        url = reverse('event:invitation-resend', kwargs={
             'organization_pk': invitation.author.organization.pk,
             'pk': invitation.pk
         })

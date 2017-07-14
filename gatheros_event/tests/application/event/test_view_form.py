@@ -1,28 +1,13 @@
+""" Testes de aplicação com `Event` - Formulários pela view. """
 from datetime import datetime, timedelta
+
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
+from django.forms.models import model_to_dict
 from django.test import TestCase
 from django.urls import reverse, reverse_lazy
-from django.forms.models import model_to_dict
 
 from gatheros_event.helpers import account
-from gatheros_event.models import Event, Organization, Member
-
-
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
+from gatheros_event.models import Event, Member, Organization
 
 
 class EventAddViewTest(TestCase):
@@ -39,7 +24,7 @@ class EventAddViewTest(TestCase):
     ]
 
     def setUp(self):
-        self.url = reverse_lazy('gatheros_event:event-add')
+        self.url = reverse_lazy('event:event-add')
         self.user = User.objects.get(username="lucianasilva@gmail.com")
 
     def _login(self):
@@ -48,7 +33,7 @@ class EventAddViewTest(TestCase):
 
     def _get_active_organization(self):
         """ Resgata organização ativa. """
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     def _switch_context(self, group=Member.ADMIN):
@@ -59,14 +44,14 @@ class EventAddViewTest(TestCase):
             internal=False,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self.url, follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -119,6 +104,7 @@ class EventAddViewTest(TestCase):
 
 
 class EventEditViewTest(TestCase):
+    """ Testes de view para editar evento. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -140,13 +126,13 @@ class EventEditViewTest(TestCase):
 
     def _get_active_organization(self):
         """ Recupera organização ativa do contexto do usuário. """
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     # noinspection PyMethodMayBeStatic
     def _get_url(self, pk):
         """ Resgata URL. """
-        return reverse('gatheros_event:event-edit', kwargs={'pk': pk})
+        return reverse('event:event-edit', kwargs={'pk': pk})
 
     def _get_event(self, pk=None):
         """ Resgata instânica de Event. """
@@ -160,7 +146,7 @@ class EventEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -241,6 +227,7 @@ class EventEditViewTest(TestCase):
 
 
 class EventDatesEditViewTest(TestCase):
+    """ Testes de views para editar datas de evento. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -259,13 +246,13 @@ class EventDatesEditViewTest(TestCase):
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     # noinspection PyMethodMayBeStatic
     def _get_url(self, pk):
         """ Resgata URL. """
-        return reverse('gatheros_event:event-edit-dates', kwargs={'pk': pk})
+        return reverse('event:event-edit-dates', kwargs={'pk': pk})
 
     def _get_event(self, pk=None):
         """ Resgata instânica de Event. """
@@ -300,7 +287,7 @@ class EventDatesEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -378,6 +365,7 @@ class EventDatesEditViewTest(TestCase):
 
 
 class EventSubscriptionTypeEditViewTest(TestCase):
+    """ Testes de view para editar tipo de inscrição de evento. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -398,13 +386,13 @@ class EventSubscriptionTypeEditViewTest(TestCase):
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     # noinspection PyMethodMayBeStatic
     def _get_url(self, pk):
         return reverse(
-            'gatheros_event:event-edit-subscription_type',
+            'event:event-edit-subscription_type',
             kwargs={'pk': pk}
         )
 
@@ -442,7 +430,7 @@ class EventSubscriptionTypeEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -517,6 +505,7 @@ class EventSubscriptionTypeEditViewTest(TestCase):
 
 
 class EventPublicationEditViewTest(TestCase):
+    """ Testes de view para publicar/despublicar evento. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -537,13 +526,13 @@ class EventPublicationEditViewTest(TestCase):
         self.client.force_login(self.user)
 
     def _get_active_organization(self):
-        request = MockRequest(self.user, self.client.session)
+        request = self.client.request().wsgi_request
         return account.get_organization(request)
 
     # noinspection PyMethodMayBeStatic
     def _get_url(self, pk):
         return reverse(
-            'gatheros_event:event-edit-publication',
+            'event:event-edit-publication',
             kwargs={'pk': pk}
         )
 
@@ -558,7 +547,7 @@ class EventPublicationEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 

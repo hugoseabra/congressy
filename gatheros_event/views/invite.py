@@ -40,12 +40,12 @@ class InvitationListView(AccountMixin, ListView):
         if not self._can_view():
             if self.organization.internal:
                 messages.warning(request, 'Você não pode acessar esta área.')
-                return redirect(reverse_lazy('gatheros_front:start'))
+                return redirect(reverse_lazy('front:start'))
             else:
                 org = self.get_invitation_organization()
                 messages.warning(request, 'Você não pode realizar esta ação.')
                 return redirect(reverse(
-                    'gatheros_event:organization-panel',
+                    'event:organization-panel',
                     kwargs={'pk': org.pk}
                 ))
 
@@ -72,31 +72,21 @@ class InvitationListView(AccountMixin, ListView):
         return self.invitation_organization
 
     def _can_view(self):
-        not_participant = not self.is_participant
         can_manage = self.request.user.has_perm(
             'gatheros_event.can_invite',
             self.get_invitation_organization()
         )
-        return not_participant and can_manage
+        return self.is_manager and can_manage
 
 
 class InvitationCreateView(AccountMixin, FormView):
     template_name = 'gatheros_event/invitation/invitation-create.html'
     invitation_organization = None
 
-    def dispatch(self, request, *args, **kwargs):
-        if not self._can_view():
-            messages.warning(request, 'Você não pode realizar esta ação.')
-            org = self.get_invitation_organization()
-            return redirect(reverse(
-                'gatheros_event:organization-panel',
-                kwargs={'pk': org.pk}
-            ))
-
-        return super(InvitationCreateView, self).dispatch(
-            request,
-            *args,
-            **kwargs
+    def get_permission_denied_url(self):
+        return reverse(
+            'event:organization-panel',
+            kwargs={'pk': self.kwargs.get('organization_pk')}
         )
 
     def get_context_data(self, **kwargs):
@@ -147,11 +137,11 @@ class InvitationCreateView(AccountMixin, FormView):
         return self.invitation_organization
 
     def get_success_url(self):
-        return reverse('gatheros_event:invitation-list', kwargs={
+        return reverse('event:invitation-list', kwargs={
             'organization_pk': self.get_invitation_organization().pk
         })
 
-    def _can_view(self):
+    def can_access(self):
         return self.request.user.has_perm(
             'gatheros_event.can_invite',
             self.get_invitation_organization()
@@ -169,7 +159,7 @@ class InvitationResendView(UpdateView):
             messages.warning(request, 'Você não pode realizar esta ação.')
             org = self.get_invitation_organization()
             return redirect(reverse(
-                'gatheros_event:organization-panel',
+                'event:organization-panel',
                 kwargs={'pk': org.pk}
             ))
 
@@ -197,7 +187,7 @@ class InvitationResendView(UpdateView):
                 'O convite não está expirado e não precisa ser renovado.'
             )
 
-        return redirect(reverse('gatheros_event:invitation-list', kwargs={
+        return redirect(reverse('event:invitation-list', kwargs={
             'organization_pk': self.object.author.organization_id
         }))
 
@@ -235,12 +225,13 @@ class InvitationDecisionView(TemplateView):
         """
         invite = get_object_or_404(Invitation, pk=kwargs.get('pk'))
         context = self.get_context_data(**kwargs)
+        context.update({'request': request})
 
         authenticated = request.user.is_authenticated()
 
         # Se tem perfil, precisa do login login
         if not authenticated and hasattr(invite.to, 'person'):
-            return redirect('gatheros_front:login')
+            return redirect('front:login')
 
         # Se o usuário autenticado for diferente do usuário do convite
         if authenticated and not request.user == invite.to:
@@ -274,6 +265,9 @@ class InvitationDecisionView(TemplateView):
         :param kwargs:
         :return:
         """
+        context = self.get_context_data(**kwargs)
+        context.update({'request': request})
+
         invite = get_object_or_404(Invitation, pk=kwargs.get('pk'))
         org_id = invite.author.organization_id
         form = InvitationDecisionForm(instance=invite)
@@ -282,7 +276,8 @@ class InvitationDecisionView(TemplateView):
         if 'invitation_decline' in request.POST:
             form.decline()
             return render_to_response(
-                'gatheros_event/invitation/invitation-decline.html'
+                'gatheros_event/invitation/invitation-decline.html',
+                context
             )
 
         elif 'invitation_accept' in request.POST:
@@ -293,11 +288,11 @@ class InvitationDecisionView(TemplateView):
                 # Atualização contexto de organizações
                 update_account(request=self.request, force=True)
 
-                return redirect('gatheros_event:organization-panel', pk=org_id)
+                return redirect('event:organization-panel', pk=org_id)
             except ValidationError:
                 # Se errado direciona para a criação do perfil
                 return redirect(
-                    'gatheros_event:invitation-profile',
+                    'public:invitation-profile',
                     pk=kwargs.get('pk')
                 )
 
@@ -317,6 +312,7 @@ class InvitationProfileView(TemplateView):
         context.update({
             'invite': invite,
             'csrf_token': get_token(self.request),
+            'request': self.request,
             'author': invite.author,
             'organization': invite.author.organization,
         })
@@ -334,6 +330,7 @@ class InvitationProfileView(TemplateView):
 
         # Se não estiver logado e se o usuário convidado não tem perfil
         context.update({
+            'request': request,
             'form': ProfileForm(
                 user=context['invite'].to,
                 initial={
@@ -352,6 +349,8 @@ class InvitationProfileView(TemplateView):
         Cria o perfil e aceita o convite
         """
         context = self.get_context_data(**kwargs)
+        context.update({'request': request})
+
         invite = context.get('invite')
 
         # Cria os forms que fazem parte do post
@@ -383,7 +382,7 @@ class InvitationProfileView(TemplateView):
             update_account(request=self.request, force=True)
 
             return redirect(reverse(
-                'gatheros_event:organization-panel',
+                'event:organization-panel',
                 kwargs={'pk': invite.author.organization_id}
             ))
         except ValidationError:
@@ -410,7 +409,7 @@ class InvitationDeleteView(DeleteViewMixin):
 
     def get_success_url(self):
         org = self.get_invitation_organization()
-        return reverse('gatheros_event:invitation-list', kwargs={
+        return reverse('event:invitation-list', kwargs={
             'organization_pk': org.pk
         })
 
@@ -423,7 +422,7 @@ class MyInvitationsListView(AccountMixin, ListView):
     ordering = ('created', 'author__person__name', '-expired',)
 
     def get_permission_denied_url(self):
-        return reverse('gatheros_front:start')
+        return reverse('front:start')
 
     def get_queryset(self):
         query_set = super(MyInvitationsListView, self).get_queryset()
@@ -431,7 +430,3 @@ class MyInvitationsListView(AccountMixin, ListView):
             to=self.request.user,
             expired__gt=datetime.now(),
         )
-
-    def get_context_data(self, **kwargs):
-        cxt = super(MyInvitationsListView, self).get_context_data(**kwargs)
-        return cxt

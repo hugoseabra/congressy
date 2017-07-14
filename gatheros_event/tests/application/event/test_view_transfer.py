@@ -1,28 +1,13 @@
+""" Testes de aplicação com `Event` - Transferência de evento pela view. """
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 
 from gatheros_event.models import Event
 
 
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
-
-
 class EventTransferTest(TestCase):
+    """ Testes de transferência de evento pela view """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -47,13 +32,13 @@ class EventTransferTest(TestCase):
     def _get_url(self):
         """ Recupera URL """
         pk = self.event.pk
-        return reverse('gatheros_event:event-transfer', kwargs={'pk': pk})
+        return reverse('event:event-transfer', kwargs={'pk': pk})
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 

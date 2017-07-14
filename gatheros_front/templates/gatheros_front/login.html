@@ -2,7 +2,9 @@
 {% load i18n static %}
 
 {% block topnav %}{% endblock %}
+{% block sidebar_organization %}{% endblock %}
 {% block sidebar %}{% endblock %}
+{% block content_width %}100%{% endblock %}
 
 {% block extrastyle %}
     <style type="text/css">
@@ -34,10 +36,13 @@
 {% endblock %}
 
 {% block extrascript %}
+
     <script type="application/javascript">
-        window.setTimeout(function () {
-            document.getElementById("id_username").focus();
-        }, 500);
+        document.addEventListener('DOMContentLoaded', function() {
+            window.setTimeout(function () {
+                document.getElementById("id_username").focus();
+            }, 100);
+        }, false);
     </script>
 {% endblock %}
 
@@ -67,12 +72,6 @@
             {{ form.password.label_tag }} {{ form.password }}
             <input type="hidden" name="next" value="{{ next }}"/>
         </div>
-        {% url 'admin_password_reset' as password_reset_url %}
-        {% if password_reset_url %}
-            <div class="password-reset-link">
-                <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
-            </div>
-        {% endif %}
         <div class="submit-row">
             <input type="submit" value="{% trans 'Log in' %}"/>
         </div>
@@ -86,7 +85,7 @@
             </p>
             <p>
                 Não possui uma conta?
-                <a href="{% url 'gatheros_event:profile_create' %}">
+                <a href="{% url 'public:profile_create' %}">
                     Clique aqui
                 </a>
             </p>

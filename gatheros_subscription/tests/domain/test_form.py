@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from core.tests import GatherosTestCase
 from gatheros_event.models import Event
-from gatheros_subscription.models import Form, DefaultField
+from gatheros_subscription.models import Form
 from gatheros_subscription.models.rules import form as rule
 
 
@@ -65,10 +65,6 @@ class FormModelTest(GatherosTestCase):
 
         # No assertion
         rule_callback(form)
-
-        default_fields = [field.name for field in DefaultField.objects.all()]
-        for field in form.fields.filter(form_default_field=True):
-            self.assertIn(field.name, default_fields)
 
         # Remover 1 dos campos padrão.
         field = form.fields.first()

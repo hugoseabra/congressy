@@ -15,7 +15,18 @@ from gatheros_event.models import Person
 
 
 class ProfileCreateForm(forms.ModelForm):
+    """ Formulário de criação de Perfil de pessoa no Gatheros. """
     email = forms.EmailField(label='E-Mail')
+
+    class Meta:
+        """ Meta """
+        model = Person
+        exclude = [
+            'user',
+            'synchronized',
+            'term_version',
+            'politics_version',
+        ]
 
     def save(self, domain_override=None, request=None,
              subject_template='registration/account_confirmation_subject.txt',
@@ -59,15 +70,6 @@ class ProfileCreateForm(forms.ModelForm):
         )
         return self.instance
 
-    class Meta:
-        model = Person
-        exclude = [
-            'user',
-            'synchronized',
-            'term_version',
-            'politics_version',
-        ]
-
 
 class ProfileForm(forms.ModelForm):
     """
@@ -91,6 +93,16 @@ class ProfileForm(forms.ModelForm):
         required=False
     )
 
+    class Meta:
+        """ Meta """
+        model = Person
+        exclude = [
+            'user',
+            'synchronized',
+            'term_version',
+            'politics_version',
+        ]
+
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):
             kwargs.update({'instance': user.person})
@@ -102,6 +114,7 @@ class ProfileForm(forms.ModelForm):
         self.fields['new_password2'].required = password_required
 
     def clean_new_password2(self):
+        """ Limpa campo `password2` """
         password1 = self.cleaned_data.get('new_password1')
         password2 = self.cleaned_data.get('new_password2')
         if password1 and password2:
@@ -114,6 +127,7 @@ class ProfileForm(forms.ModelForm):
         return password2
 
     def save(self, **_):
+        """ Salva dados. """
         super(ProfileForm, self).save(commit=True)
 
         self.user.is_active = True
@@ -125,12 +139,3 @@ class ProfileForm(forms.ModelForm):
         self.instance.save()
 
         return self.instance
-
-    class Meta:
-        model = Person
-        exclude = [
-            'user',
-            'synchronized',
-            'term_version',
-            'politics_version',
-        ]

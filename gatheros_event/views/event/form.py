@@ -1,8 +1,7 @@
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
-from django.core.exceptions import PermissionDenied
 
 from gatheros_event import forms
 from gatheros_event.models import Organization
@@ -15,11 +14,8 @@ class BaseEventView(AccountMixin, View):
     success_url = None
     form_title = None
 
-    def dispatch(self, request, *args, **kwargs):
-        if not self.can_view():
-            return redirect(reverse_lazy('gatheros_event:event-list'))
-
-        return super(BaseEventView, self).dispatch(request, *args, **kwargs)
+    def get_permission_denied_url(self):
+        return reverse_lazy('event:event-list')
 
     def form_valid(self, form):
         messages.success(self.request, self.success_message)
@@ -50,12 +46,19 @@ class BaseEventView(AccountMixin, View):
     def get_form_title(self):
         return self.form_title
 
-    def can_view(self):
-        raise NotImplemented('Você deve implementar `can_view()`.')
-
 
 class BaseSimpleEditlView(BaseEventView):
-    def can_view(self):
+    object = None
+
+    def get_object(self, queryset=None):
+        """ Resgata objeto principal da view. """
+        if self.object:
+            return self.object
+
+        self.object = super(BaseSimpleEditlView, self).get_object(queryset)
+        return self.object
+
+    def can_access(self):
         event = self.get_object()
         can_edit = self.request.user.has_perm(
             'gatheros_event.change_event',
@@ -71,7 +74,7 @@ class BaseSimpleEditlView(BaseEventView):
 
     def get_success_url(self):
         event = self.get_object()
-        url = reverse('gatheros_event:event-panel', kwargs={'pk': event.pk})
+        url = reverse('event:event-panel', kwargs={'pk': event.pk})
         return url
 
 
@@ -79,9 +82,6 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     form_class = forms.EventForm
     success_message = 'Evento criado com sucesso.'
     form_title = 'Novo evento'
-
-    def get_permission_denied_url(self):
-        return reverse_lazy('gatheros_event:event-list')
 
     def get_form(self, form_class=None):
         if not form_class:
@@ -114,18 +114,18 @@ class EventAddFormView(BaseEventView, generic.CreateView):
         form = self.get_form()
         event = form.instance
         return reverse(
-            'gatheros_event:event-panel',
+            'event:event-panel',
             kwargs={'pk': event.pk}
         )
 
-    def can_view(self):
-        return True
+    def can_access(self):
+        return self.is_manager
 
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
     form_class = forms.EventForm
     model = forms.EventForm.Meta.model
-    success_url = reverse_lazy('gatheros_event:event-list')
+    success_url = reverse_lazy('event:event-list')
     success_message = 'Evento alterado com sucesso.'
 
     def get_form(self, form_class=None):

@@ -6,13 +6,13 @@
 
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:organization-panel' place_organization.pk %}">Voltar</a>
+        <a href="{% url 'event:organization-panel' place_organization.pk %}">Voltar</a>
     </div>
     <hr/>
     <h1>Locais de evento</h1>
     <h2>{{ place_organization.name }}</h2>
     <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
-        <a href="{% url 'gatheros_event:place-add' place_organization.pk %}">Adicionar</a>
+        <a href="{% url 'event:place-add' place_organization.pk %}">Adicionar</a>
     </div>
 
     <div style="background: #DDD">
@@ -28,7 +28,7 @@
                         <td style="background: #FFF;padding:10px;margin-bottom: 3px">
                             <div>
                                 {{ forloop.counter }} -
-                                <a href="{% url 'gatheros_event:place-edit' place_organization.pk item.pk %}">{{ item.name }}</a>
+                                <a href="{% url 'event:place-edit' place_organization.pk item.pk %}">{{ item.name }}</a>
                             </div>
                             <hr/>
                             <div style="text-indent: 10px;">
@@ -39,9 +39,9 @@
                             {{ item.events.count }}
                         </td>
                         <td width="8%" style="background: #FFF;padding:10px;margin-bottom: 3px">
-                            <a href="{% url 'gatheros_event:place-edit' place_organization.pk item.pk %}">Editar</a>
+                            <a href="{% url 'event:place-edit' place_organization.pk item.pk %}">Editar</a>
                             &nbsp; &nbsp; &nbsp;
-                            <a href="{% url 'gatheros_event:place-delete' place_organization.pk item.pk %}">Excluir</a>
+                            <a href="{% url 'event:place-delete' place_organization.pk item.pk %}">Excluir</a>
                         </td>
                     </tr>
                 {% endfor %}

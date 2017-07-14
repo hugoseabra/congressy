@@ -1,10 +1,9 @@
+""" Testes de aplicação com `Event` - Detalhes de evento. """
 import os
 import shutil
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import six
@@ -13,22 +12,8 @@ from gatheros_event.helpers import account
 from gatheros_event.models import Event, Member, Organization
 
 
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
-
-
 class EventDetailBannersUploadTest(TestCase):
+    """ Testes de upload de banners nos detalhes de evento pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -52,17 +37,16 @@ class EventDetailBannersUploadTest(TestCase):
         self.persisted_path = 'event'
 
         self.user = User.objects.get(username="lucianasilva@gmail.com")
-        self._clear_uploaded_directory()
 
     def _login(self):
         """ Realiza login. """
         self.client.force_login(self.user)
+        self._clear_uploaded_directory()
         self._switch_context()
 
     def _get_active_organization(self):
         """ Resgata organização ativa no contexto de usuário. """
-        request = MockRequest(self.user, self.client.session)
-        return account.get_organization(request)
+        return account.get_organization(self.client.request().wsgi_request)
 
     def _switch_context(self, group=Member.ADMIN):
         """ Muda organização do contexto de usuário. """
@@ -71,7 +55,7 @@ class EventDetailBannersUploadTest(TestCase):
             members__person=self.user.person,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_url(self, pk=None):
@@ -80,14 +64,15 @@ class EventDetailBannersUploadTest(TestCase):
             event = self._get_event()
             pk = event.pk
 
-        return reverse('gatheros_event:event-detail', kwargs={
+        return reverse('event:event-detail', kwargs={
             'pk': pk
         })
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
         """ Resgata instância de Event. """
-        return Event.objects.get(slug='seo-e-resultados')
+        org = self._get_active_organization()
+        return org.events.first()
 
     # noinspection PyMethodMayBeStatic
     def _clear_uploaded_directory(self):
@@ -98,13 +83,19 @@ class EventDetailBannersUploadTest(TestCase):
             shutil.rmtree(path)
 
     def tearDown(self):
-        self._clear_uploaded_directory()
+        """
+        Limpa arquivos enviados se há organização no contexto do usuário.
+        """
+        org = account.get_organization(self.client.request().wsgi_request)
+        # Se não tiver organização no contexto, não precisa limpar o diretório
+        if org:
+            self._clear_uploaded_directory()
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
-        response = self.client.get(self._get_url(), follow=True)
+        response = self.client.get(self._get_url(1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -173,6 +164,7 @@ class EventDetailBannersUploadTest(TestCase):
 
 
 class EventDetailPlaceTest(TestCase):
+    """ Testes edição de local de evento nos detalhes de evento pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -193,8 +185,7 @@ class EventDetailPlaceTest(TestCase):
 
     def _get_active_organization(self):
         """ Resgata organização ativa no contexto do login. """
-        request = MockRequest(self.user, self.client.session)
-        return account.get_organization(request)
+        return account.get_organization(self.client.request().wsgi_request)
 
     def _switch_context(self, group=Member.ADMIN):
         """ Muda organização do contexto de login. """
@@ -203,7 +194,7 @@ class EventDetailPlaceTest(TestCase):
             members__person=self.user.person,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_url(self, pk=None):
@@ -212,7 +203,7 @@ class EventDetailPlaceTest(TestCase):
             event = self._get_event()
             pk = event.pk
 
-        return reverse('gatheros_event:event-detail', kwargs={'pk': pk})
+        return reverse('event:event-detail', kwargs={'pk': pk})
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
@@ -221,9 +212,9 @@ class EventDetailPlaceTest(TestCase):
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
-        response = self.client.get(self._get_url(), follow=True)
+        response = self.client.get(self._get_url(1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -267,6 +258,9 @@ class EventDetailPlaceTest(TestCase):
 
 
 class EventDetailSocialMediaTest(TestCase):
+    """
+    Testes edição de informações sociais nos detalhes de evento pela view.
+    """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -290,7 +284,7 @@ class EventDetailSocialMediaTest(TestCase):
             event = self._get_event()
             pk = event.pk
 
-        return reverse('gatheros_event:event-detail', kwargs={'pk': pk})
+        return reverse('event:event-detail', kwargs={'pk': pk})
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
@@ -301,7 +295,7 @@ class EventDetailSocialMediaTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -330,7 +324,8 @@ class EventDetailSocialMediaTest(TestCase):
             'skype': 'seoresultados',
             'submit_type': 'update_social_media',
         }, follow=True)
+
         self.assertContains(
             response,
-            'Informações sociais atualizadas com sucesso.'
+            'Informações sociais atualizadas com sucesso'
         )

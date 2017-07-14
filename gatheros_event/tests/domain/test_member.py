@@ -1,3 +1,4 @@
+""" Testes de `Member` """
 from django.contrib.auth.models import User
 
 from core.tests import GatherosTestCase
@@ -6,6 +7,7 @@ from gatheros_event.models.rules import member as rule
 
 
 class MemberModelTest(GatherosTestCase):
+    """ Testes de `Member` """
     fixtures = [
         'kanu_locations_city_test',
         '003_occupation',

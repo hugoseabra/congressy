@@ -46,7 +46,7 @@
                         {{ item.expired }}
                     </td>
                     <td style="text-align: center; background: #FFF;padding:10px;margin-bottom: 3px">
-                        <form action="{% url 'gatheros_event:invitation-decision' item.pk %}" method="post">{% csrf_token %}
+                        <form action="{% url 'public:invitation-decision' item.pk %}" method="post">{% csrf_token %}
                             <input type="submit" name="invitation_accept" value="Aceitar"/>
                             <input type="submit" name="invitation_decline" value="Recusar"/>
                         </form>

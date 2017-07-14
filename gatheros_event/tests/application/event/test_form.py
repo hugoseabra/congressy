@@ -1,3 +1,4 @@
+""" Testes de aplicação com `Event` - Formulários. """
 import os
 import shutil
 from datetime import datetime, timedelta
@@ -22,6 +23,7 @@ from gatheros_event.models import Event, Member, Organization
 
 
 class BaseEventForm(TestCase):
+    """ Classe base para testes de formulários de evento. """
     fixtures = [
         '005_user',
         '006_person',
@@ -68,6 +70,7 @@ class BaseEventForm(TestCase):
         }
 
     def get_main_form(self, user=None, instance=None, data=None):
+        """ Resgata form principal """
         if not user:
             user = self._get_user()
 
@@ -78,6 +81,7 @@ class BaseEventForm(TestCase):
 
 
 class EventFormTest(BaseEventForm):
+    """ Testes de formulário de evento. """
     def test_render(self):
         """ Testa se organização """
         user = self._get_user()
@@ -93,7 +97,9 @@ class EventFormTest(BaseEventForm):
                 self.assertNotIn(content, org.name)
 
     def test_create_edit_event(self):
+        """ Testa criação e edição de evento. """
         def test_instance_data(form_obj, model_data):
+            """ Testa dados da instância. """
             model = form_obj.instance
             for key, value in six.iteritems(model_data):
                 model_v = getattr(model, key)
@@ -122,8 +128,11 @@ class EventFormTest(BaseEventForm):
 
 
 class EventDatesFormTest(BaseEventForm):
+    """ Testes de formulário de datas de evento. """
     def test_dates_edition_event(self):
+        """ Testa edição de dados de evento. """
         def test_instance_data(form_obj, model_data):
+            """ Testa dados da instância. """
             model = form_obj.instance
             for key, value in six.iteritems(model_data):
                 model_v = getattr(model, key)
@@ -152,8 +161,11 @@ class EventDatesFormTest(BaseEventForm):
 
 
 class EventSubscriptionTypeFormTest(BaseEventForm):
+    """ Testes de edição de tipo de inscrição de evento. """
     def test_subscription_type_edition_event(self):
+        """ Testa edição de tipo de inscrição de evento. """
         def test_instance_data(form_obj, model_data):
+            """ Testa dados da instância. """
             model = form_obj.instance
             for key, value in six.iteritems(model_data):
                 model_v = getattr(model, key)
@@ -182,8 +194,11 @@ class EventSubscriptionTypeFormTest(BaseEventForm):
 
 
 class EventPublicationFormTest(BaseEventForm):
+    """ Testes de formulário de publicação/despublicação de evento. """
     def test_publication_edition_event(self):
+        """ Testa edição de publicação/despublicação de evento. """
         def test_instance_data(form_obj, model_data):
+            """ Testa dados da instância. """
             model = form_obj.instance
             for key, value in six.iteritems(model_data):
                 model_v = getattr(model, key)
@@ -211,6 +226,7 @@ class EventPublicationFormTest(BaseEventForm):
 
 
 class EventBannersFormTest(TestCase):
+    """ Tests de formulário de banners de evento. """
     fixtures = [
         '007_organization',
         '009_place',
@@ -242,9 +258,11 @@ class EventBannersFormTest(TestCase):
             shutil.rmtree(path)
 
     def tearDown(self):
+        """ Limpa arquivos utilizados nos testes. """
         self._clear_uploaded_directory()
 
-    def test_banner(self):
+    def test_upload_banners(self):
+        """ Testa upload de banners. """
         event = self._get_event()
 
         file_names = {
@@ -315,6 +333,7 @@ class EventBannersFormTest(TestCase):
 
 
 class EventPlaceFormTest(TestCase):
+    """ Testes de formulário de local de event. """
     fixtures = [
         '007_organization',
         '009_place',
@@ -376,6 +395,7 @@ class EventPlaceFormTest(TestCase):
 
 
 class EventSocialMediaFormTest(TestCase):
+    """ Testas formulário de dados sociais de evento. """
     fixtures = [
         '007_organization',
         '009_place',
@@ -387,6 +407,7 @@ class EventSocialMediaFormTest(TestCase):
         return Event.objects.get(slug='encontro-de-lideres-2017')
 
     def test_social_media_edition_event(self):
+        """ Testa edição de dados sociais de evento. """
         data = {
             'website': 'http://seoresultados.com',
             'facebook': 'https://facebook.com/seo',
@@ -410,6 +431,7 @@ class EventSocialMediaFormTest(TestCase):
 
 
 class EventTransferFormTest(TestCase):
+    """ Testes de formulário de transferência de evento. """
     fixtures = [
         '005_user',
         '006_person',

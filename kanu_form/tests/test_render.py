@@ -1,23 +1,23 @@
 from django.test import TestCase
 
-from kanu_form.field_manager import FieldManager
-from kanu_form.fields.field import Field
+from kanu_form.field import Field
 from kanu_form.forms import KanuForm
 
 
 class FormRenderTest(TestCase):
+    """ Testa renderização de campos do formulário dinâmico. """
     def test_render_input_text(self):
+        """ Renderização de campo INPUT_TEXT. """
+        data = {
+            'name': 'name',
+            'field_type': Field.FIELD_INPUT_TEXT,
+            'label': 'nome',
+            'required': True,
+            'max_length': 10,
+        }
 
-        manager = FieldManager()
-        manager.create(
-            name='name',
-            field_type=Field.FIELD_INPUT_TEXT,
-            label='nome',
-            required=True,
-            max_length=10
-        )
-
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'input',
@@ -31,15 +31,16 @@ class FormRenderTest(TestCase):
             self.assertIn(part, form.as_ul())
 
     def test_render_input_number(self):
-        manager = FieldManager()
-        manager.create(
-            name='name',
-            field_type=Field.FIELD_INPUT_NUMBER,
-            label='nome',
-            required=True,
-        )
+        """ Renderização de campo INPUT_NUMBER. """
+        data = {
+            'name': 'name',
+            'field_type': Field.FIELD_INPUT_NUMBER,
+            'label': 'nome',
+            'required': True,
+        }
 
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'input',
@@ -52,16 +53,16 @@ class FormRenderTest(TestCase):
             self.assertIn(part, form.as_ul())
 
     def test_render_input_date(self):
+        """ Renderização de campo INPUT_DATE. """
+        data = {
+            'name': 'some_date',
+            'field_type': Field.FIELD_INPUT_DATE,
+            'label': 'date',
+            'required': True,
+        }
 
-        manager = FieldManager()
-        manager.create(
-            name='some_date',
-            field_type=Field.FIELD_INPUT_DATE,
-            label='date',
-            required=True
-        )
-
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'input',
@@ -74,15 +75,16 @@ class FormRenderTest(TestCase):
             self.assertIn(part, form.as_ul())
 
     def test_render_input_datetime(self):
-        manager = FieldManager()
-        manager.create(
-            name='some_datetime',
-            field_type=Field.FIELD_INPUT_DATETIME,
-            label='datetime',
-            required=True
-        )
+        """ Renderização de campo INPUT_DATETIME. """
+        data = {
+            'name': 'some_datetime',
+            'field_type': Field.FIELD_INPUT_DATETIME,
+            'label': 'datetime',
+            'required': True
+        }
 
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'input',
@@ -95,16 +97,16 @@ class FormRenderTest(TestCase):
             self.assertIn(part, form.as_ul())
 
     def test_render_input_email(self):
+        """ Renderização de campo INPUT_EMAIL. """
+        data = {
+            'name': 'some_email',
+            'field_type': Field.FIELD_INPUT_EMAIL,
+            'label': 'e-mail',
+            'required': True
+        }
 
-        manager = FieldManager()
-        manager.create(
-            name='some_email',
-            field_type=Field.FIELD_INPUT_EMAIL,
-            label='e-mail',
-            required=True
-        )
-
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'input',
@@ -117,16 +119,16 @@ class FormRenderTest(TestCase):
             self.assertIn(part, form.as_ul())
 
     def test_render_input_tel(self):
+        """ Renderização de campo INPUT_TEL. """
+        data = {
+            'name': 'some_tel',
+            'field_type': Field.FIELD_INPUT_PHONE,
+            'label': 'celular',
+            'required': True
+        }
 
-        manager = FieldManager()
-        manager.create(
-            name='some_tel',
-            field_type=Field.FIELD_INPUT_PHONE,
-            label='celular',
-            required=True
-        )
-
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'input',
@@ -140,15 +142,16 @@ class FormRenderTest(TestCase):
             self.assertIn(part, form.as_ul())
 
     def test_render_textarea(self):
-        manager = FieldManager()
-        manager.create(
-            name='textarea_example',
-            field_type=Field.FIELD_TEXTAREA,
-            label='my textarea',
-            required=True
-        )
+        """ Renderização de campo TEXTAREA. """
+        data = {
+            'name': 'textarea_example',
+            'field_type': Field.FIELD_TEXTAREA,
+            'label': 'my textarea',
+            'required': True
+        }
 
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'textarea',
@@ -162,15 +165,16 @@ class FormRenderTest(TestCase):
             self.assertIn(part, form.as_ul())
 
     def test_render_boolean(self):
-        manager = FieldManager()
-        manager.create(
-            name='boolean-field',
-            field_type=Field.FIELD_BOOLEAN,
-            label='my boolean field',
-            required=True
-        )
+        """ Renderização de campo BOOLEAN. """
+        data = {
+            'name': 'boolean-field',
+            'field_type': Field.FIELD_BOOLEAN,
+            'label': 'my boolean field',
+            'required': True
+        }
 
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'input',
@@ -182,7 +186,7 @@ class FormRenderTest(TestCase):
             self.assertIn(part, form.as_ul())
 
     def test_render_select(self):
-        manager = FieldManager()
+        """ Renderização de campo SELECT. """
 
         options = [
             ('option 1', 'Option 1'),
@@ -190,15 +194,16 @@ class FormRenderTest(TestCase):
             ('option 3', 'Option 3'),
         ]
 
-        manager.create(
-            name='select-field',
-            field_type=Field.FIELD_SELECT,
-            label='my select field',
-            required=True,
-            options=options
-        )
+        data = {
+            'name': 'select-field',
+            'field_type': Field.FIELD_SELECT,
+            'label': 'my select field',
+            'required': True,
+            'options': options
+        }
 
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'select',
@@ -214,23 +219,23 @@ class FormRenderTest(TestCase):
             self.assertIn(option[1], form.as_ul())
 
     def test_render_checkbox_group(self):
-        manager = FieldManager()
-
+        """ Renderização de campo CHECKBOX_GROUP. """
         options = [
             ('option 1', 'Option 1'),
             ('option 2', 'Option 2'),
             ('option 3', 'Option 3'),
         ]
 
-        manager.create(
-            name='checkbox-group',
-            field_type=Field.FIELD_CHECKBOX_GROUP,
-            label='my checkobox group',
-            required=True,
-            options=options
-        )
+        data = {
+            'name': 'checkbox-group',
+            'field_type': Field.FIELD_CHECKBOX_GROUP,
+            'label': 'my checkobox group',
+            'required': True,
+            'options': options
+        }
 
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'checkbox',
@@ -246,23 +251,23 @@ class FormRenderTest(TestCase):
             self.assertIn(option[1], form.as_ul())
 
     def test_render_radio_group(self):
-        manager = FieldManager()
-
+        """ Renderização de campo RADIO_GROUP. """
         options = [
             ('option 1', 'Option 1'),
             ('option 2', 'Option 2'),
             ('option 3', 'Option 3'),
         ]
 
-        manager.create(
-            name='radio-group',
-            field_type=Field.FIELD_RADIO_GROUP,
-            label='my radio group',
-            required=True,
-            options=options
-        )
+        data = {
+            'name': 'radio-group',
+            'field_type': Field.FIELD_RADIO_GROUP,
+            'label': 'my radio group',
+            'required': True,
+            'options': options
+        }
 
-        form = KanuForm(field_manager=manager)
+        form = KanuForm()
+        form.create_field(**data)
 
         expected_content = [
             'radio',

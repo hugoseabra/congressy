@@ -18,7 +18,7 @@ class EventInfoView(AccountMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self._can_view():
-            return redirect(reverse_lazy('gatheros_event:event-list'))
+            return redirect(reverse_lazy('event:event-list'))
 
         return super(EventInfoView, self).dispatch(request, *args, **kwargs)
 
@@ -119,7 +119,7 @@ class EventInfoView(AccountMixin, DetailView):
             messages.error(request, form.errors)
             messages.error(request, form.non_field_errors())
 
-        return redirect(reverse('gatheros_event:event-info', kwargs={
+        return redirect(reverse('event:event-info', kwargs={
             'pk': self.object.pk
         }))
 

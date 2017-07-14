@@ -39,15 +39,17 @@ class LotAddTest(TestCase):
     ]
 
     def setUp(self):
-        self.url = reverse_lazy('gatheros_event:event-add')
+        self.url = reverse_lazy('event:event-add')
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
         self.client.force_login(self.user)
         self._switch_context()
 
     # noinspection PyMethodMayBeStatic
     def _get_url(self, event_pk):
         return reverse(
-            'gatheros_subscription:lot-add',
+            'subscription:lot-add',
             kwargs={'event_pk': event_pk}
         )
 
@@ -61,7 +63,7 @@ class LotAddTest(TestCase):
             members__person=self.user.person,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_event(self, pk=None):
@@ -94,12 +96,23 @@ class LotAddTest(TestCase):
 
         return event
 
-    def test_status_is_200_ok(self):
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        response = self.client.get(self._get_url(1), follow=True)
+
+        redirect_url = reverse('front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
+    def test_200_logged(self):
+        """ 200 quando logado. """
+        self._login()
         event = self._get_event()
-        result = self.client.get(self._get_url(event.pk))
-        self.assertEqual(result.status_code, 200)
+        response = self.client.get(self._get_url(event.pk))
+        self.assertEqual(response.status_code, 200)
 
     def test_add(self):
+        self._login()
         event = self._get_event()
 
         date_start = event.date_start - timedelta(days=10)
@@ -135,6 +148,7 @@ class LotAddTest(TestCase):
         self.assertContains(response, 'Lote criado com sucesso.')
 
     def test_cannot_add_lot(self):
+        self._login()
         organization = self._get_active_organization()
         pks = [event.pk for event in organization.events.all()]
         event = Event.objects.exclude(pk__in=pks).filter(
@@ -190,15 +204,17 @@ class LotEditTest(TestCase):
     ]
 
     def setUp(self):
-        self.url = reverse_lazy('gatheros_event:event-add')
+        self.url = reverse_lazy('event:event-add')
         self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
         self.client.force_login(self.user)
         self._switch_context()
 
     # noinspection PyMethodMayBeStatic
     def _get_url(self, event_pk, pk):
         return reverse(
-            'gatheros_subscription:lot-edit',
+            'subscription:lot-edit',
             kwargs={'event_pk': event_pk, 'lot_pk': pk}
         )
 
@@ -212,7 +228,7 @@ class LotEditTest(TestCase):
             members__person=self.user.person,
             members__group=group
         ).first()
-        url = reverse('gatheros_event:organization-switch')
+        url = reverse('event:organization-switch')
         self.client.post(url, {'organization-context-pk': other.pk})
 
     def _get_event(self, pk=None):
@@ -253,12 +269,27 @@ class LotEditTest(TestCase):
 
         return Lot.objects.get(pk=pk)
 
-    def test_status_is_200_ok(self):
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        lot = self._get_lot(1)
+        response = self.client.get(
+            self._get_url(lot.event.pk, lot.pk),
+            follow=True
+        )
+
+        redirect_url = reverse('front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
+    def test_200_logged(self):
+        """ 200 quando logado. """
+        self._login()
         lot = self._get_lot()
         result = self.client.get(self._get_url(lot.event.pk, lot.pk))
         self.assertEqual(result.status_code, 200)
 
     def test_edit(self):
+        self._login()
         lot = self._get_lot()
 
         data = {
@@ -306,6 +337,7 @@ class LotEditTest(TestCase):
         self.assertEqual(lot.private, data['private'])
 
     def test_cannot_edit_lot(self):
+        self._login()
         organization = self._get_active_organization()
         pks = [event.pk for event in organization.events.all()]
         lot = Lot.objects.exclude(event_id__in=pks).first()
@@ -345,4 +377,134 @@ class LotEditTest(TestCase):
         self.assertContains(
             response,
             "Você não pode editar lote neste evento."
+        )
+
+
+class LotDeleteTest(TestCase):
+    fixtures = [
+        'kanu_locations_city_test',
+        '005_user',
+        '006_person',
+        '007_organization',
+        '008_member',
+        '009_place',
+        '010_event',
+        '006_lot',
+    ]
+
+    def setUp(self):
+        self.user = User.objects.get(username="lucianasilva@gmail.com")
+
+    def _login(self):
+        self.client.force_login(self.user)
+        self._switch_context()
+
+    # noinspection PyMethodMayBeStatic
+    def _get_url(self, event_pk, pk):
+        return reverse(
+            'subscription:lot-delete',
+            kwargs={'event_pk': event_pk, 'lot_pk': pk}
+        )
+
+    def _get_active_organization(self):
+        return account.get_organization(self.client.request().wsgi_request)
+
+    def _switch_context(self, group=Member.ADMIN):
+        organization = self._get_active_organization()
+        other = Organization.objects.exclude(pk=organization.pk).filter(
+            members__person=self.user.person,
+            members__group=group
+        ).first()
+        url = reverse('event:organization-switch')
+        self.client.post(url, {'organization-context-pk': other.pk})
+
+    def _get_event(self, pk=None):
+        if not pk:
+            organization = self._get_active_organization()
+            event = organization.events.annotate(num=Count('lots')).filter(
+                subscription_type=Event.SUBSCRIPTION_BY_LOTS,
+                num__gt=0
+            ).first()
+        else:
+            event = Event.objects.get(pk=pk)
+
+        date_start = datetime.now() + timedelta(days=1)
+        date_start = date_start.replace(
+            hour=8,
+            minute=0,
+            second=0,
+            microsecond=0
+        )
+        event.date_start = date_start
+
+        date_end = datetime.now() + timedelta(days=1, hours=6)
+        date_end = date_end.replace(
+            hour=12,
+            minute=0,
+            second=0,
+            microsecond=0
+        )
+        event.date_end = date_end
+        event.save()
+
+        return event
+
+    def _get_lot(self, pk=None):
+        if not pk:
+            event = self._get_event()
+            return event.lots.first()
+
+        return Lot.objects.get(pk=pk)
+
+    def test_not_logged(self):
+        """ Redireciona para tela de login quando não logado. """
+        lot = self._get_lot(1)
+        response = self.client.get(
+            self._get_url(lot.event.pk, lot.pk),
+            follow=True
+        )
+
+        redirect_url = reverse('front:login')
+        redirect_url += '?next=/'
+        self.assertRedirects(response, redirect_url)
+
+    def test_200_logged(self):
+        """ 200 quando logado. """
+        self._login()
+        lot = self._get_lot()
+        result = self.client.get(self._get_url(lot.event.pk, lot.pk))
+        self.assertEqual(result.status_code, 200)
+
+    def test_delete(self):
+        self._login()
+        lot = self._get_lot()
+
+        response = self.client.post(
+            self._get_url(lot.event.pk, lot.pk),
+            follow=True
+        )
+
+        self.assertContains(
+            response,
+            'Lote excluído com sucesso'
+        )
+
+        # Valores foram alterados na persistência
+        with self.assertRaises(Lot.DoesNotExist):
+            self._get_lot(pk=lot.pk)
+
+    def test_cannot_edit_lot(self):
+        self._login()
+        organization = self._get_active_organization()
+        pks = [event.pk for event in organization.events.all()]
+        lot = Lot.objects.exclude(event_id__in=pks).first()
+
+        response = self.client.post(
+            self._get_url(lot.event.pk, lot.pk),
+            follow=True
+        )
+
+        self.assertContains(
+            response,
+            "Você não pode excluir lote neste evento"
         )

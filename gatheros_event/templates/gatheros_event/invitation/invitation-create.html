@@ -4,9 +4,9 @@
 {% block content %}
     <div style="padding:10px">
         {% if object %}
-            <a href="{% url 'gatheros_event:event-panel' invitation_organization.pk %}">Voltar</a>
+            <a href="{% url 'event:event-panel' invitation_organization.pk %}">Voltar</a>
         {% else %}
-            <a href="{% url 'gatheros_event:invitation-list' invitation_organization.pk %}">Voltar</a>
+            <a href="{% url 'event:invitation-list' invitation_organization.pk %}">Voltar</a>
         {% endif %}
     </div>
     <hr/>
@@ -22,7 +22,7 @@
         </table>
 
         <button type="submit">Enviar</button>
-        <a href="{% url 'gatheros_event:invitation-list' invitation_organization.pk %}">Cancelar</a>
+        <a href="{% url 'event:invitation-list' invitation_organization.pk %}">Cancelar</a>
     </form>
 
 {% endblock %}

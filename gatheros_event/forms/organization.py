@@ -20,7 +20,6 @@ class OrganizationForm(forms.ModelForm):
         fields = (
             'name',
             'description_html',
-            'active',
             'avatar',
             'website',
             'facebook',
@@ -51,6 +50,7 @@ class OrganizationForm(forms.ModelForm):
         super(OrganizationForm, self).__init__(data=data, *args, **kwargs)
 
     def save(self, commit=True):
+        """ Salva dados. """
         # noinspection PyProtectedMember
         is_new = self.instance._state.adding
         self.instance.internal = self.internal
@@ -66,3 +66,45 @@ class OrganizationForm(forms.ModelForm):
             )
 
         return result
+
+
+class OrganizationManageMembershipForm(forms.Form):
+    """ Formulário de gerenciamento de membros de organização. """
+    organization = None
+
+    def __init__(self, organization, *args, **kwargs):
+        self.organization = organization
+        super(OrganizationManageMembershipForm, self).__init__(*args, **kwargs)
+
+    def deactivate(self, user):
+        """ Desativa membro da organização. """
+        member = self._get_member(user)
+        member.active = False
+        member.save()
+
+    def activate(self, user):
+        """ Ativa membro da organização. """
+        member = self._get_member(user)
+        member.active = True
+        member.save()
+
+    def delete(self, user):
+        """ Remove membro da organização. """
+        member = self._get_member(user)
+        member.delete()
+
+    def _get_member(self, user):
+        try:
+            return Member.objects.get(
+                organization=self.organization,
+                person=user.person
+            )
+
+        except Exception:
+            raise Exception(
+                'Não foi possível realizar cancelamento: membro `{}` não é da'
+                ' organização `{}`.'.format(
+                    user.get_full_name(),
+                    self.organization.name
+                )
+            )

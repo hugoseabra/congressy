@@ -55,10 +55,12 @@ class Member(models.Model, GatherosModelMixin):
         unique_together = (('person', 'organization',),)
 
     def save(self, *args, **kwargs):
+        """ Salva entidade. """
         self.check_rules()
         super(Member, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        """ Remove entidade. """
         rule.rule_4_nao_remover_member_organizacao_interna(self)
         super(Member, self).delete(*args, **kwargs)
 

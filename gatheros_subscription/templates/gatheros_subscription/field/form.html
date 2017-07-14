@@ -1,0 +1,27 @@
+{% extends "gatheros_front/base.html" %}
+{% load i18n static %}
+
+{% block sidebar_organization %}{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block content_width %}99%{% endblock %}
+
+{% block content %}
+    {% if form_title %}
+        <h2>{{ form_title }}</h2>
+    {% endif %}
+    <br />
+    <form action="" method="post">{% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <br />
+        <hr />
+        <input type="submit" value="Salvar"/>
+        {% if next_path %}
+            <a href="{{ next_path }}">Cancelar</a>
+            <input type="hidden" name="next_path" value="{{ next_path }}" />
+        {% else %}
+            <a href="{% url 'subscription:fields' field_organization.pk %}">Cancelar</a>
+        {% endif %}
+    </form>
+{% endblock %}

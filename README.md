@@ -77,6 +77,18 @@ Modelos e algumas classes não necessitam de `__init__()`.
 Comentários em português causam este erro.
 
 
+### Crash: ###
+
+#### C0103 - Invalid %s name "%s" ####
+
+Invalid %s name "%s"
+
+Invalid constant name "newline"
+Invalid variable name "MyVar"
+Invalid class name "myClass"
+
+Verifica nomes normalizados de constantes, variáveis e classes.
+
 ### Refactoring help: ###
  
 #### R0903 - Too few public methods (%s/%s) ####  
@@ -84,6 +96,9 @@ Comentários em português causam este erro.
 Classes de verificações simples. A decisão em refatorar classes assim fica a
 cargo do desenvolvedor.
   
+#### R0201 - Method could be a function ####
+
+Usado para verificar métodos que poderiam ser estáticos.
   
 ### Error detection: ###
 

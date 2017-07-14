@@ -4,34 +4,24 @@ from django.urls import reverse
 from django.views import generic
 
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
+from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.forms import (
-    EventConfigForm,
-    EventFormFieldForm,
-    EventFormFieldOrderForm,
+    EventFieldsForm,
+    FormFieldForm,
+    FormFieldOrderForm,
 )
 from gatheros_subscription.models import Field
 
 
-class BaseFormFieldView(AccountMixin, generic.TemplateView):
-    form_title = 'Formulário'
+class BaseEventViewMixin(AccountMixin, generic.View):
+    """ Base de View para resgatar informações de evento. """
     event = None
 
     def get_permission_denied_url(self):
-        return reverse('gatheros_event:event-panel', kwargs={
+        """ URL de redirecionamento caso a permissão seja negada. """
+        return reverse('event:event-panel', kwargs={
             'pk': self.kwargs.get('event_pk')
         })
-
-    def get_context_data(self, **kwargs):
-        context = super(BaseFormFieldView, self).get_context_data(**kwargs)
-        context.update({
-            'event': self._get_event(),
-            'form_title': self.get_form_title(),
-        })
-        return context
-
-    def get_form_title(self):
-        return self.form_title
 
     def _get_event(self):
         if not self.event:
@@ -41,6 +31,7 @@ class BaseFormFieldView(AccountMixin, generic.TemplateView):
         return self.event
 
     def can_access(self):
+        """ Verifica se usuário pode acessar o conteúdo da view. """
         event = self._get_event()
         org = self.organization
         same_org = org and event.organization.pk == org.pk
@@ -53,42 +44,31 @@ class BaseFormFieldView(AccountMixin, generic.TemplateView):
         return same_org and enabled and can_view
 
 
-class BaseEventFormFieldForm(BaseFormFieldView):
-    form_class = EventFormFieldForm
-    model = form_class.Meta.model
-    template_name = 'gatheros_subscription/event_form/form.html'
-    success_message = None
-    pk_url_kwarg = 'field_pk'
-    object = None
+class BaseFormFieldView(BaseEventViewMixin, generic.TemplateView):
+    """ Classe base para view de formulários. """
+    form_title = 'Formulário'
 
-    # noinspection PyUnresolvedReferences
-    def get_form_kwargs(self):
-        event = self._get_event()
-        kwargs = super(BaseEventFormFieldForm, self).get_form_kwargs()
-        kwargs.update({
-            'form': event.form,
+    def get_context_data(self, **kwargs):
+        """ Recupera contexto da view. """
+        context = super(BaseFormFieldView, self).get_context_data(**kwargs)
+        context.update({
+            'event': self._get_event(),
+            'form_title': self.get_form_title(),
         })
+        return context
 
-        return kwargs
-
-    def form_valid(self, form):
-        messages.success(self.request, self.success_message)
-        # noinspection PyUnresolvedReferences
-        return super(BaseEventFormFieldForm, self).form_valid(form)
-
-    def get_success_url(self):
-        return reverse(
-            'gatheros_subscription:fields-config',
-            kwargs={'event_pk': self.kwargs['event_pk']}
-        )
+    def get_form_title(self):
+        return self.form_title
 
 
 class EventConfigFormFieldView(BaseFormFieldView, generic.FormView):
-    form_class = EventConfigForm
+    """ View para exibição de lista de campos do formulário de evento. """
+    form_class = EventFieldsForm
     template_name = 'gatheros_subscription/event_form/config.html'
     form_title = 'Configuração de Formulário'
 
     def get_context_data(self, **kwargs):
+        """ Recupera contexto da view. """
         cxt = super(EventConfigFormFieldView, self).get_context_data(**kwargs)
         form = cxt['form']
         fields_dict = form.gatheros_fields
@@ -116,26 +96,30 @@ class EventConfigFormFieldView(BaseFormFieldView, generic.FormView):
 
     # noinspection PyUnresolvedReferences
     def get_form_kwargs(self):
+        """ Recupera atributos de início do formulário. """
         event = self._get_event()
         kwargs = super(EventConfigFormFieldView, self).get_form_kwargs()
         kwargs.update({
             'form': event.form,
-            'include_inactive': True
+            'show_inactive': True
         })
         return kwargs
 
 
-class EventFormFieldAddView(BaseEventFormFieldForm, generic.CreateView):
+class EventFormFieldAddView(BaseFormFieldView, generic.CreateView):
     form_title = 'Adicionar Campo de Formulário'
     success_message = 'Campo criado com sucesso.'
 
     def get_success_url(self):
-        return reverse(
-            'gatheros_subscription:fields-config',
-            kwargs={'event_pk': self.kwargs['event_pk']}
-        )
+        """ Recupera URL de redirecionamento em caso de sucesso. """
+        pass
+        # return reverse(
+        #     'subscription:event-fields-config',
+        #     kwargs={'event_pk': self.kwargs['event_pk']}
+        # )
 
     def can_access(self):
+        """ Verifica se usuário pode acessar o conteúdo da view. """
         can_access = super(EventFormFieldAddView, self).can_access()
         event = self._get_event()
         can_add = self.request.user.has_perm(
@@ -145,90 +129,64 @@ class EventFormFieldAddView(BaseEventFormFieldForm, generic.CreateView):
         return can_access and can_add
 
 
-class EventFormFieldEditView(BaseEventFormFieldForm, generic.UpdateView):
-    form_title = 'Editar Campo de Formulário'
-    success_message = 'Campo alterado com sucesso.'
+class EventFormFieldRemoveView(BaseEventViewMixin):
+    """ View para remover relação entre Formulário e Campo de formulário. """
+    http_method_names = ['post']
+    field = None
 
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        return super(EventFormFieldEditView, self).dispatch(
-            request,
-            *args,
-            **kwargs
-        )
-
-    def can_access(self):
-        can_access = super(EventFormFieldEditView, self).can_access()
-        can_change = self.request.user.has_perm(
-            'gatheros_subscription.change_field',
-            self.get_object()
-        )
-
-        return can_access and can_change
-
-
-class EventFormFieldDeleteView(DeleteViewMixin, BaseFormFieldView):
-    model = Field
-    delete_message = "Tem certeza que deseja excluir o campo \"{label}\"?"
-    success_message = "Campo excluído com sucesso!"
-    pk_url_kwarg = 'field_pk'
+    def pre_dispatch(self, request):
+        """ Operações executadas antes do dispatch de uma view. """
+        self.field = get_object_or_404(Field, pk=self.kwargs.get('pk'))
+        super(EventFormFieldRemoveView, self).pre_dispatch(request)
 
     def get_success_url(self):
+        """ Recupera URL de redirecionamento em caso de sucesso. """
         return reverse(
-            'gatheros_subscription:fields-config',
+            'subscription:event-fields-config',
             kwargs={'event_pk': self.kwargs['event_pk']}
-        )
-
-    def post_delete(self):
-        event = self._get_event()
-        form = event.form
-
-        # Reordena campos após deleção.
-        counter = 1
-        for field in form.fields.all():
-            field.order = counter
-            field.save()
-            counter += 1
-
-    def can_delete(self):
-        can_delete = super(EventFormFieldDeleteView, self).can_delete()
-        not_default = self.object.form_default_field is False
-        return can_delete and not_default
-
-
-class EventFormFieldReorderView(BaseFormFieldView):
-    http_method_names = ['post']
-    object = None
-
-    def dispatch(self, request, *args, **kwargs):
-        pk = self.kwargs.get('field_pk')
-        self.object = get_object_or_404(Field, pk=pk)
-
-        return super(EventFormFieldReorderView, self).dispatch(
-            request,
-            *args,
-            **kwargs
         )
 
     # noinspection PyUnusedLocal
     def post(self, request, *args, **kwargs):
+        """ request method POST """
+        event = self._get_event()
+        form = event.form
+
+        form.fields.remove(self.field)
+        form.save()
+
+        return redirect(self.get_success_url())
+
+
+class EventFormFieldReorderView(BaseEventViewMixin):
+    """ View para reordenação de campo no formulário. """
+    http_method_names = ['post']
+    order_form = None
+    form = None
+    field = None
+
+    def pre_dispatch(self, request):
+        """ Operações executadas antes do dispatch de uma view. """
+        event = self._get_event()
+        self.form = FormFieldOrderForm(form=event.form)
+        self.field = get_object_or_404(Field, pk=self.kwargs.get('pk'))
+        super(EventFormFieldReorderView, self).pre_dispatch(request)
+
+    # noinspection PyUnusedLocal
+    def post(self, request, *args, **kwargs):
+        """ request method POST """
         try:
             event = self._get_event()
-            form = EventFormFieldOrderForm(
-                form=event.form,
-                instance=self.object
-            )
 
             success = False
 
             if request.POST.get('up') is not None:
                 success = True
-                form.order_up()
+                self.form.order_up(self.field)
 
             if request.POST.get('down') is not None:
                 success = True
-                form.order_down()
+                self.form.order_down(self.field)
 
             if not success:
                 raise Exception('Envie o campo `order` como `up` ou `down`')
@@ -238,18 +196,116 @@ class EventFormFieldReorderView(BaseFormFieldView):
 
         finally:
             return redirect(reverse(
-                'gatheros_subscription:fields-config',
+                'subscription:event-fields-config',
                 kwargs={'event_pk': self.kwargs['event_pk']}
             ))
 
     def can_access(self):
+        """ Verifica se usuário pode acessar o conteúdo da view. """
         can_access = super(EventFormFieldReorderView, self).can_access()
-        event = self._get_event()
-        same_org = event.organization.pk == self.organization.pk
-        not_default = self.object.form_default_field is False
+        not_default = self.field.form_default_field is False
         can_change = self.request.user.has_perm(
             'gatheros_subscription.change_field',
-            self.object
+            self.field
         ) if not_default else False
 
-        return same_org and can_access and can_change
+        return can_access and can_change
+
+
+class EventFormFieldManageActivationView(BaseEventViewMixin):
+    """ View para gerenciar ativação/desativação de campo no formulário. """
+    http_method_names = ['post']
+    order_form = None
+    form = None
+    field = None
+
+    def pre_dispatch(self, request):
+        """ Operações executadas antes do dispatch de uma view. """
+        event = self._get_event()
+        self.form = FormFieldForm(form=event.form)
+        self.field = get_object_or_404(Field, pk=self.kwargs.get('pk'))
+        super(EventFormFieldManageActivationView, self).pre_dispatch(request)
+
+    # noinspection PyUnusedLocal
+    def post(self, request, *args, **kwargs):
+        """ request method POST """
+        try:
+            event = self._get_event()
+            success = False
+            action = request.POST.get('action')
+
+            if action == 'activate':
+                success = True
+                self.form.activate(self.field)
+
+            if action == 'deactivate':
+                success = True
+                self.form.deactivate(self.field)
+
+            if not success:
+                raise Exception(
+                    'Envie o campo `action` como `activate` ou `deactivate`'
+                )
+
+        except Exception as e:
+            messages.error(request, 'Algum erro ocorreu: ' + str(e))
+
+        finally:
+            return redirect(reverse(
+                'subscription:event-fields-config',
+                kwargs={'event_pk': self.kwargs['event_pk']}
+            ))
+
+    def can_access(self):
+        """ Verifica se usuário pode acessar o conteúdo da view. """
+        parent = super(EventFormFieldManageActivationView, self)
+        can_access = parent.can_access()
+        not_default = self.field.form_default_field is False
+        return can_access and not_default
+
+
+class EventFormFieldManageRequirementView(BaseEventViewMixin):
+    """
+    View para gerenciar campos obrigatórios e não-obrigatórios no formulário.
+    """
+    http_method_names = ['post']
+    order_form = None
+    form = None
+    field = None
+
+    def pre_dispatch(self, request):
+        """ Operações executadas antes do dispatch de uma view. """
+        event = self._get_event()
+        self.form = FormFieldForm(form=event.form)
+        self.field = get_object_or_404(Field, pk=self.kwargs.get('pk'))
+        super(EventFormFieldManageRequirementView, self).pre_dispatch(request)
+
+    # noinspection PyUnusedLocal
+    def post(self, request, *args, **kwargs):
+        """ request method POST """
+        try:
+            event = self._get_event()
+            success = False
+            action = request.POST.get('action')
+
+            if action == 'required':
+                success = True
+                self.form.set_as_required(self.field)
+
+            if action == 'not-required':
+                success = True
+                self.form.set_as_not_required(self.field)
+
+            if not success:
+                raise Exception(
+                    'Envie o campo `action` como `required` ou `not-required`'
+                )
+
+        except Exception as e:
+            messages.error(request, 'Algum erro ocorreu: ' + str(e))
+
+        finally:
+            return redirect(reverse(
+                'subscription:event-fields-config',
+                kwargs={'event_pk': self.kwargs.get('event_pk')}
+            ))

@@ -1,28 +1,13 @@
+""" Testes de aplicação com `Organization` - Formulários pela view. """
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse, reverse_lazy
 
 from gatheros_event.models import Organization
 
 
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
-
-
 class OrganizationFormViewTest(TestCase):
+    """ Testes de formulário de organização pela view. """
     fixtures = [
         '005_user',
         '006_person',
@@ -40,13 +25,13 @@ class OrganizationFormViewTest(TestCase):
     # noinspection PyMethodMayBeStatic
     def _get_url(self):
         """ Resgata URL. """
-        return reverse_lazy('gatheros_event:organization-add')
+        return reverse_lazy('event:organization-add')
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -65,7 +50,7 @@ class OrganizationFormViewTest(TestCase):
         }
 
         response = self.client.post(
-            path=reverse_lazy('gatheros_event:organization-add'),
+            path=reverse_lazy('event:organization-add'),
             data=data,
             follow=True
         )
@@ -82,7 +67,7 @@ class OrganizationFormViewTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.post(
-            path=reverse_lazy('gatheros_event:organization-add-internal'),
+            path=reverse_lazy('event:organization-add-internal'),
             follow=True
         )
         self.assertContains(
@@ -100,7 +85,7 @@ class OrganizationFormViewTest(TestCase):
         }
 
         response = self.client.post(
-            path=reverse('gatheros_event:organization-edit', kwargs={
+            path=reverse('event:organization-edit', kwargs={
                 'pk': org.pk
             }),
             data=data,
@@ -122,7 +107,7 @@ class OrganizationFormViewTest(TestCase):
 
         response = self.client.post(
             follow=True,
-            path=reverse('gatheros_event:organization-delete', kwargs={
+            path=reverse('event:organization-delete', kwargs={
                 'pk': org.pk
             })
         )

@@ -42,4 +42,4 @@ class EventTransferView(AccountMixin, FormView):
         return context
 
     def get_success_url(self):
-        return reverse_lazy('gatheros_event:event-list')
+        return reverse_lazy('event:event-list')

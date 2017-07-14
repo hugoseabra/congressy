@@ -24,7 +24,7 @@ class OrganizationListView(AccountMixin, ListView):
                 request,
                 'Você não tem permissão de realizar esta ação.'
             )
-            return redirect(reverse_lazy('gatheros_front:start'))
+            return redirect(reverse_lazy('front:start'))
 
         return dispatch
 
@@ -38,4 +38,4 @@ class OrganizationListView(AccountMixin, ListView):
         ).distinct()
 
     def _can_view(self):
-        return not self.is_participant
+        return self.is_manager

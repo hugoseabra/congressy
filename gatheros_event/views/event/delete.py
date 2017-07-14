@@ -7,7 +7,7 @@ from gatheros_event.views.mixins import DeleteViewMixin
 class EventDeleteView(DeleteViewMixin):
     """ View de exclusão de Event. """
     model = Event
-    success_url = reverse_lazy('gatheros_event:event-list')
+    success_url = reverse_lazy('event:event-list')
     delete_message = "Tem certeza que deseja excluir o evento \"{name}\"?"
     success_message = "Evento excluído com sucesso."
 

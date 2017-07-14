@@ -2,8 +2,10 @@ from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.views.generic import ListView, View
+from django.views.generic import FormView, ListView, View
 
+from gatheros_event.forms import OrganizationManageMembershipForm
+from gatheros_event.helpers import account
 from gatheros_event.models import Member, Organization
 from gatheros_event.views.mixins import DeleteViewMixin
 from .mixins import AccountMixin
@@ -12,22 +14,10 @@ from .mixins import AccountMixin
 class BaseOrganizationMixin(AccountMixin, View):
     member_organization = None
 
-    def dispatch(self, request, *args, **kwargs):
-        if not self._can_view():
-            messages.warning(
-                request,
-                'Você não tem permissão de realizar esta ação.'
-            )
-            org = self.get_member_organization()
-            return redirect(reverse(
-                'gatheros_event:organization-panel',
-                kwargs={'pk': org.pk}
-            ))
-
-        return super(BaseOrganizationMixin, self).dispatch(
-            request,
-            *args,
-            **kwargs
+    def get_permission_denied_url(self):
+        return reverse(
+            'event:organization-panel',
+            kwargs={'pk': self.kwargs.get('organization_pk')}
         )
 
     def get_member_organization(self):
@@ -42,16 +32,15 @@ class BaseOrganizationMixin(AccountMixin, View):
         )
         return self.member_organization
 
-    def _can_view(self):
+    def can_access(self):
         org = self.get_member_organization()
 
         not_internal = org.internal is False
-        not_participant = self.is_participant is False
-        can_manage = self.request.user.has_perm(
-            'gatheros_event.can_manage_members',
+        can_view = self.request.user.has_perm(
+            'gatheros_event.can_view_members',
             org
         )
-        return not_internal and not_participant and can_manage
+        return not_internal and self.is_manager and can_view
 
 
 class MemberListView(BaseOrganizationMixin, ListView):
@@ -90,6 +79,7 @@ class MemberListView(BaseOrganizationMixin, ListView):
             add_to_list(member)
 
         context.update({
+            'can_manage': self._can_manage(),
             'member_organization': self.get_member_organization(),
             'member_active_list': member_active_list,
             'member_inactive_list': member_inactive_list,
@@ -97,19 +87,40 @@ class MemberListView(BaseOrganizationMixin, ListView):
 
         return context
 
+    def _can_manage(self):
+        """ Checks if logged user can manage members. """
+        return self.request.user.has_perm(
+            'gatheros_event.can_manage_members',
+            self.get_member_organization()
+        )
 
-class MemberManageView(BaseOrganizationMixin):
+
+class MemberManageView(BaseOrganizationMixin, FormView):
     http_method_names = ['post']
+    form_class = OrganizationManageMembershipForm
+    object = None
+
+    def get_object(self):
+        """ Recupera instância de membro como objeto principal. """
+        if self.object:
+            return self.object
+
+        self.object = get_object_or_404(Member, pk=self.kwargs.get('pk'))
+        return self.object
+
+    def get_permission_denied_url(self):
+        return reverse('front:start')
+
+    def get_form_kwargs(self):
+        kwargs = super(MemberManageView, self).get_form_kwargs()
+        kwargs.update({
+            'organization': self.get_member_organization()
+        })
+        return kwargs
 
     # noinspection PyUnusedLocal
     def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
-
-        if not action:
-            raise ImproperlyConfigured(
-                'Campo `action` não encontrado ou vazio. Envie `action` com as'
-                ' seguintes opçoes: activate, deactivate, delete.'
-            )
 
         pk = self.kwargs.get('pk')
         if not pk:
@@ -117,6 +128,7 @@ class MemberManageView(BaseOrganizationMixin):
                 'Campo `pk` não encontrado ou vazio. Informe o `pk` do membro.'
             )
 
+        form = self.get_form()
         organization = self.get_member_organization()
         member = get_object_or_404(Member, pk=pk, organization=organization)
 
@@ -134,32 +146,87 @@ class MemberManageView(BaseOrganizationMixin):
                 )
 
             member.group = group
+            member.save()
+            messages.success(request, 'Membro alterado com sucesso.')
+            return redirect(reverse('event:member-list', kwargs={
+                'organization_pk': member.organization_id
+            }))
 
-        if action == 'activate':
-            member.active = True
+        if action == 'activate' or action == 'deactivate':
+            method = getattr(form, action)
+            method(member)
+            messages.success(request, 'Membro alterado com sucesso.')
+            return redirect(reverse('event:member-list', kwargs={
+                'organization_pk': member.organization_id
+            }))
 
-        if action == 'deactivate':
-            member.active = False
+        elif action == 'delete':
+            try:
+                member_is_user = self._member_is_user()
+                form.delete(member.person.user)
 
-        member.save()
+                if member_is_user:
+                    self._update_active_organization()
 
-        messages.success(request, 'Membro alterado com sucesso.')
-        return redirect(reverse('gatheros_event:member-list', kwargs={
-            'organization_pk': member.organization_id
-        }))
+            except Exception as e:
+                messages.error(request, str(e))
 
-    def _can_view(self):
-        pk = self.kwargs.get('pk')
+            else:
+                messages.success(
+                    request,
+                    'Você não é mais membro da organização `{}`.'.format(
+                        organization.name
+                    )
+                )
+
+            return redirect(reverse('front:start'))
+
+        else:
+            raise ImproperlyConfigured(
+                'Campo `action` não encontrado ou vazio. Envie `action` com as'
+                ' seguintes opçoes: activate, deactivate, delete.'
+            )
+
+    def can_access(self):
+        if self._member_is_user():
+            return True
+
         organization = self.get_member_organization()
-        member = get_object_or_404(Member, pk=pk, organization=organization)
-
-        can_view = super(MemberManageView, self)._can_view()
-        can_change = self.request.user.has_perm(
-            'gatheros_event.change_member',
-            member
+        can_view = super(MemberManageView, self).can_access()
+        can_manage = self.request.user.has_perm(
+            'gatheros_event.can_manage_members',
+            organization
         )
 
-        return can_view and can_change
+        can_change = self.request.user.has_perm(
+            'gatheros_event.change_member',
+            self.get_object()
+        )
+
+        return can_view and can_manage and can_change
+
+    def _member_is_user(self):
+        """
+        Verifica se usuário logado é o mesmo do membro a ser gerenciado.
+        """
+        pk = self.kwargs.get('pk')
+        organization = self.get_member_organization()
+        try:
+            member = Member.objects.get(
+                pk=pk,
+                organization=organization
+            )
+        except Member.DoesNotExist:
+            return False
+
+        member_person = member.person
+        user_person = self.request.user.person
+        return member_person.pk == user_person.pk
+
+    def _update_active_organization(self):
+        """ Atualiza contexto de usuário, definindo organização ativa. """
+        account.clean_account(self.request)
+        account.update_account(self.request)
 
 
 class MemberDeleteView(BaseOrganizationMixin, DeleteViewMixin):
@@ -170,6 +237,6 @@ class MemberDeleteView(BaseOrganizationMixin, DeleteViewMixin):
 
     def get_success_url(self):
         org = self.get_member_organization()
-        return reverse('gatheros_event:member-list', kwargs={
+        return reverse('event:member-list', kwargs={
             'organization_pk': org.pk
         })

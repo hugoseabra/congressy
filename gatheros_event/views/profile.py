@@ -22,7 +22,7 @@ class ProfileView(AccountMixin, FormView):
     def form_valid(self, form):
         form.save()
         messages.success(self.request, self.messages['success'])
-        return redirect('gatheros_event:profile')
+        return redirect('event:profile')
 
 
 class ProfileCreateView(TemplateView, FormView):
@@ -46,4 +46,4 @@ class ProfileCreateView(TemplateView, FormView):
             self.messages['success'] % form.cleaned_data["email"]
         )
 
-        return redirect('gatheros_event:profile')
+        return redirect('event:profile')

@@ -23,7 +23,7 @@
         <div style="width:300px;margin:0 auto">
             {% if can_change %}
                 <div style="float:left">
-                    <a href="{% url 'gatheros_event:organization-edit' object.pk %}">Editar</a>
+                    <a href="{% url 'event:organization-edit' object.pk %}">Editar</a>
                 </div>
             {% endif %}
             {% if can_change and can_delete %}
@@ -33,7 +33,7 @@
             {% endif %}
             {% if can_delete %}
                 <div style="float:left">
-                    <a href="{% url 'gatheros_event:organization-delete' object.pk %}">Excluir</a>
+                    <a href="{% url 'event:organization-delete' object.pk %}">Excluir</a>
                 </div>
             {% endif %}
             <div style="clear:both"></div>
@@ -57,28 +57,31 @@
                 <br/>
                 <div style="background-color: whitesmoke;border: 1px solid #dddddd;">
                     <div style="padding:15px">
-                        &rightarrow; <a href="{% url 'gatheros_event:organization-list' %}">Minhas organizações</a>
+                        &rightarrow; <a href="{% url 'event:organization-list' %}">Minhas organizações</a>
                     </div>
                     {% if can_manage_invitations %}
                         <div style="padding:15px">
-                            &rightarrow; <a href="{% url 'gatheros_event:invitation-list' object.pk %}">Convites</a>
+                            &rightarrow; <a href="{% url 'event:invitation-list' object.pk %}">Convites</a>
                         </div>
                     {% endif %}
-                    {% if can_manage_members %}
+                    {% if can_view_members or can_view_members %}
                         <div style="padding:15px">
-                            &rightarrow; <a href="{% url 'gatheros_event:member-list' object.pk %}">Membros</a>
+                            &rightarrow; <a href="{% url 'event:member-list' object.pk %}">Membros</a>
                         </div>
                     {% endif %}
                     {% if can_manage_places %}
                         <div style="padding:15px">
-                            &rightarrow; <a href="{% url 'gatheros_event:place-list' object.pk %}">Locais de eventos</a>
+                            &rightarrow; <a href="{% url 'event:place-list' object.pk %}">Locais de eventos</a>
                         </div>
                     {% endif %}
                     <div style="padding:15px">
-                        &rightarrow; <a href="#">Campos de Formulário</a>
+                        &rightarrow; <a href="{% url 'subscription:fields' object.pk %}">Formulário Padrão</a>
                     </div>
                     <div style="padding:15px">
                         &rightarrow; <a href="#">Pessoas</a>
+                    </div>
+                    <div style="padding:15px">
+                        &rightarrow; <a href="{% url 'event:organization-cancel-membership' object.pk %}">Sair da Organização</a>
                     </div>
                 </div>
             </td>
@@ -147,7 +150,7 @@
                                             {% endfor %}
                                         </table>
                                         <div style="margin-top:10px; padding: 10px;background-color: whitesmoke;text-align: center;border-bottom:1px solid dimgray">
-                                            <a href="{% url 'gatheros_event:invitation-list' object.pk %}">Ver todos os convites</a>
+                                            <a href="{% url 'event:invitation-list' object.pk %}">Ver todos os convites</a>
                                         </div>
                                     </div>
                                 </div>
@@ -308,8 +311,4 @@
             </td>
         </tr>
     </table>
-
-    <pre>
-        - Sair da organização.
-    </pre>
 {% endblock %}

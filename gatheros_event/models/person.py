@@ -165,7 +165,7 @@ class Person(models.Model, GatherosModelMixin):
 
         was_earlier = (current.month, current.day) < \
                       (self.birth_date.month, self.birth_date.day)
-        return current.year - self.birth_date.year - (was_earlier)
+        return current.year - self.birth_date.year - was_earlier
 
     class Meta:
         verbose_name = 'pessoa'

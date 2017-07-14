@@ -19,6 +19,7 @@ class SubscriptionManager(models.Manager):
     """ Gerenciador de inscrição - Manager"""
 
     def next_count(self, lot):
+        """ Resgata próximo número de inscrição. """
         count_max = self.filter(lot=lot).aggregate(Max('count'))
         if count_max['count__max']:
             return count_max['count__max'] + 1
@@ -26,6 +27,7 @@ class SubscriptionManager(models.Manager):
             return 1
 
     def generate_code(self, event):
+        """ Gera código de inscrição. """
         while True:
             code = str(uuid.uuid4()).split('-')[0].upper()
             try:
@@ -137,11 +139,13 @@ class Subscription(models.Model, GatherosModelMixin):
         return answers
 
     def save(self, *args, **kwargs):
+        """ Salva entidade. """
         self.full_clean()
         self.check_rules()
         super(Subscription, self).save(*args, **kwargs)
 
     def clean(self):
+        """ Limpa dados dos campos. """
         self.event = self.lot.event
 
     def check_rules(self):

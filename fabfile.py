@@ -183,7 +183,7 @@ def setup_server(target='prod', document_root='/var/www/'):
     except Exception as e:
         abort(
             """
-    %s. 
+    %s.
     Para limpar antes execute:
         fab -H %s setup_server:target='%s',document_root='%s'
             """ % (
@@ -570,8 +570,6 @@ def reinstall_database():
     """
     Reinstala o banco de dados e executa os fixtures, para evistar problemas
     um backup é gerado antes de qualquer alteração ser executada
-
-    :param fixtures: lista de fixtures
     """
 
     # Se o banco existe, precisa fazer um backup antes de excluir

@@ -8,6 +8,7 @@ register = template.Library()
 
 @register.simple_tag
 def get_member_group_name(organization, user):
+    """ Recupera nome do grupo em que o usuário está na organização. """
     member = organization.get_member(user)
     if not member:
         return '-'
@@ -17,6 +18,7 @@ def get_member_group_name(organization, user):
 
 @register.simple_tag
 def get_member_group(organization, user):
+    """ Recupera alias do grupo em que o usuário está na organização. """
     member = organization.get_member(user)
     if not member:
         return '-'

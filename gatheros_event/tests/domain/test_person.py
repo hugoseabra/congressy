@@ -1,3 +1,4 @@
+""" Testes de `Person` """
 from django.contrib.auth.models import User
 from django.test import TestCase
 from kanu_locations.models import City
@@ -6,6 +7,7 @@ from gatheros_event.models import Member, Person
 
 
 class PersonModelTest(TestCase):
+    """ Testes de `Organization` """
     fixtures = [
         'kanu_locations_city_test',
         '003_occupation',

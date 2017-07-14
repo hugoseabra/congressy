@@ -1,3 +1,4 @@
+""" Helper para inscrições. """
 import locale
 from collections import OrderedDict
 from uuid import UUID
@@ -59,8 +60,8 @@ class ExcelRenderer(BaseRenderer):
             # fall into.
             data = self.flatten_data(data)
 
-            # Create a row for each dictionary, filling in columns for which the
-            # item has no data with None values.
+            # Create a row for each dictionary, filling in columns for which
+            # the item has no data with None values.
             rows = []
             cols = data[0].keys()
             for item in data:

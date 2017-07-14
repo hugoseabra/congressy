@@ -8,6 +8,7 @@ register = template.Library()
 
 @register.simple_tag
 def event_payment_type(event):
+    """ Recupera status de evento de acordo com informações de lotes. """
     paied = False
     free = False
 

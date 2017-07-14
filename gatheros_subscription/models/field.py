@@ -7,11 +7,13 @@ dos participantes de eventos através de suas inscrições.
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
+from core.model import track_data
 from core.util import model_field_slugify
 from gatheros_event.models import Organization
 from . import AbstractField, Form
 
 
+@track_data('name')
 class Field(AbstractField):
     """ Modelo de campo de formulário. """
 
@@ -44,22 +46,20 @@ class Field(AbstractField):
     class Meta:
         verbose_name = 'Campo de Formulário'
         verbose_name_plural = 'Campos de Formulário'
-        ordering = ['organization__id', 'order', 'name']
+        ordering = ['organization__id', 'name']
         unique_together = (('organization', 'name'),)
 
     def save(self, **kwargs):
-        if self.form_default_field:
-            to_slug = self.label if not self.name else self.name
-        else:
-            to_slug = self.label
-
-        self.name = model_field_slugify(
-            model_class=self.__class__,
-            instance=self,
-            string=to_slug,
-            filter_keys={'organization': self.organization},
-            slug_field='name'
-        )
+        """ Salva entidade. """
+        is_default = self.form_default_field is True
+        if is_default and not self.name or not is_default:
+            self.name = model_field_slugify(
+                model_class=self.__class__,
+                instance=self,
+                string=self.label,
+                filter_keys={'organization': self.organization},
+                slug_field='name'
+            )
 
         return super(Field, self).save(**kwargs)
 

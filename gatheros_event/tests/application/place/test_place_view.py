@@ -1,11 +1,13 @@
+""" Testes de aplicação com `Place` - Formulários pela view. """
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from gatheros_event.models import Member, Place, Event
+from gatheros_event.models import Member, Place
 
 
 class PlaceFormViewTest(TestCase):
+    """ Testes de formulário de local de evento pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -32,45 +34,45 @@ class PlaceFormViewTest(TestCase):
 
     def test_add_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
-        url = reverse('gatheros_event:place-add', kwargs={
+        url = reverse('event:place-add', kwargs={
             'organization_pk': self.organization.pk
         })
         response = self.client.get(url, follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
     def test_edit_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         place = Place.objects.filter(organization=self.organization).first()
-        url = reverse('gatheros_event:place-edit', kwargs={
+        url = reverse('event:place-edit', kwargs={
             'organization_pk': self.organization.pk,
             'pk': place.pk
         })
         response = self.client.get(url, follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
     def test_delete_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         place = Place.objects.filter(organization=self.organization).first()
-        url = reverse('gatheros_event:place-delete', kwargs={
+        url = reverse('event:place-delete', kwargs={
             'organization_pk': self.organization.pk,
             'pk': place.pk
         })
         response = self.client.get(url, follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
     def test_add_status_is_200_ok(self):
         """ Testa se está tudo ok com view com submissão GET. """
         self._login()
-        url = reverse('gatheros_event:place-add', kwargs={
+        url = reverse('event:place-add', kwargs={
             'organization_pk': self.organization.pk
         })
         result = self.client.get(url)
@@ -80,7 +82,7 @@ class PlaceFormViewTest(TestCase):
         """ Testa se está tudo ok com view com submissão GET. """
         self._login()
         place = Place.objects.filter(organization=self.organization).first()
-        url = reverse('gatheros_event:place-edit', kwargs={
+        url = reverse('event:place-edit', kwargs={
             'organization_pk': self.organization.pk,
             'pk': place.pk
         })
@@ -97,7 +99,7 @@ class PlaceFormViewTest(TestCase):
             event.place = None
             event.save()
 
-        url = reverse('gatheros_event:place-delete', kwargs={
+        url = reverse('event:place-delete', kwargs={
             'organization_pk': self.organization.pk,
             'pk': place.pk
         })
@@ -110,7 +112,7 @@ class PlaceFormViewTest(TestCase):
         name = 'New Place'
         city = 5337
 
-        url = reverse('gatheros_event:place-add', kwargs={
+        url = reverse('event:place-add', kwargs={
             'organization_pk': self.organization.pk
         })
 
@@ -129,7 +131,7 @@ class PlaceFormViewTest(TestCase):
         name = place.name + ' edited'
         city = 5337
 
-        url = reverse('gatheros_event:place-edit', kwargs={
+        url = reverse('event:place-edit', kwargs={
             'organization_pk': self.organization.pk,
             'pk': place.pk
         })
@@ -146,7 +148,7 @@ class PlaceFormViewTest(TestCase):
         self._login()
         place = Place.objects.filter(organization=self.organization).first()
 
-        url = reverse('gatheros_event:place-delete', kwargs={
+        url = reverse('event:place-delete', kwargs={
             'organization_pk': self.organization.pk,
             'pk': place.pk
         })
@@ -168,7 +170,7 @@ class PlaceFormViewTest(TestCase):
             event.place = None
             event.save()
 
-        url = reverse('gatheros_event:place-delete', kwargs={
+        url = reverse('event:place-delete', kwargs={
             'organization_pk': self.organization.pk,
             'pk': place.pk
         })

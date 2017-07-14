@@ -1,3 +1,4 @@
+""" Testes de aplicação com `Info` - Formulários. """
 import os
 import shutil
 
@@ -16,6 +17,7 @@ from gatheros_event.models import Event, Info
 
 
 class BaseInfoFormTest(TestCase):
+    """ Classe base para formulário de informação de evento. """
     fixtures = [
         '007_organization',
         '009_place',
@@ -56,11 +58,14 @@ class BaseInfoFormTest(TestCase):
             shutil.rmtree(path)
 
     def tearDown(self):
+        """ Excluir arquivos enviados. """
         self._clear_uploaded_dir()
 
 
 class InfoTextFormTest(BaseInfoFormTest):
+    """ Testes de formulário de `Info` para somente texto. """
     def test_new_info(self):
+        """ Testa criação de nova `Info`. """
         info = self._get_info()
         info.delete()
 
@@ -80,56 +85,11 @@ class InfoTextFormTest(BaseInfoFormTest):
         self.assertIsInstance(info, Info)
         self.assertEqual(info.config_type, Info.CONFIG_TYPE_TEXT_ONLY)
 
-    def test_video(self):
-        info = self._get_info()
-        assert info is not None
-
-        data = {
-            'event': info.event.pk,
-            'description_html': '<p style="color:red>Some text</p>',
-            'config_type': Info.CONFIG_TYPE_TEXT_ONLY,
-        }
-
-        form = InfoTextForm(instance=info, data=data)
-        self.assertTrue(form.is_valid())
-        form.save()
-
-        info = self._get_info()
-        self.assertEqual(info.config_type, Info.CONFIG_TYPE_TEXT_ONLY)
-
 
 class Info4ImagesFormTest(BaseInfoFormTest):
+    """ Testes de formulário de `Info` para 4 imagens. """
     def test_new_info(self):
-        info = self._get_info()
-        data = {
-            'event': info.event_id,
-            'config_type': Info.CONFIG_TYPE_4_IMAGES,
-            'description_html': '<p style="color:red>Some text</p>',
-        }
-        info.delete()
-
-        file_path = os.path.join(self.file_base_path, 'image1.jpg')
-        persited_name = os.path.join(
-            self.persisted_path,
-            str(data['event']),
-            'image1.jpg'
-        )
-        file = open(file_path, 'rb')
-        file_dict = {'image1': SimpleUploadedFile(
-            persited_name,
-            file.read(),
-            'image/jpeg'
-        )}
-
-        form = Info4ImagesForm(data=data, files=file_dict)
-        self.assertTrue(form.is_valid())
-        form.save()
-
-        info = self._get_info()
-        self.assertIsInstance(info, Info)
-        self.assertEqual(info.config_type, Info.CONFIG_TYPE_4_IMAGES)
-
-    def test_images(self):
+        """ Testa criação de nova `Info`. """
         info = self._get_info()
         assert info is not None
 
@@ -192,37 +152,9 @@ class Info4ImagesFormTest(BaseInfoFormTest):
 
 
 class InfoMainImageFormTest(BaseInfoFormTest):
+    """ Testes de formulário de `Info` para imagem principal. """
     def test_new_info(self):
-        info = self._get_info()
-        data = {
-            'event': info.event_id,
-            'description_html': '<p style="color:red>Some text</p>',
-            'config_type': Info.CONFIG_TYPE_MAIN_IMAGE,
-        }
-        info.delete()
-
-        file_path = os.path.join(self.file_base_path, 'image_main.jpg')
-        persited_name = os.path.join(
-            self.persisted_path,
-            str(data['event']),
-            'image_main.jpg'
-        )
-        file = open(file_path, 'rb')
-        file_dict = {'image_main': SimpleUploadedFile(
-            persited_name,
-            file.read(),
-            'image/jpeg'
-        )}
-
-        form = InfoMainImageForm(data=data, files=file_dict)
-        self.assertTrue(form.is_valid())
-        form.save()
-
-        info = self._get_info()
-        self.assertIsInstance(info, Info)
-        self.assertEqual(info.config_type, Info.CONFIG_TYPE_MAIN_IMAGE)
-
-    def test_main_image(self):
+        """ Testa criação de nova `Info`. """
         info = self._get_info()
         assert info is not None
 
@@ -282,29 +214,10 @@ class InfoMainImageFormTest(BaseInfoFormTest):
 
 
 class InfoVideoFormTest(BaseInfoFormTest):
+    """ Testes de formulário de `Info` para vídeo. """
+
     def test_new_info(self):
-        info = self._get_info()
-        info.delete()
-
-        event = self._get_event()
-        data = {
-            'event': event.pk,
-            'description_html': '<p style="color:red>Some text</p>',
-            'config_type': Info.CONFIG_TYPE_VIDEO,
-            'youtube_video_id': 'jbVpFUGCw1o',
-        }
-
-        form = InfoVideoForm(data=data)
-        self.assertTrue(form.is_valid())
-        form.save()
-
-        event = self._get_event()
-        info = event.info
-        self.assertIsInstance(info, Info)
-        self.assertEqual(info.youtube_video_id, data['youtube_video_id'])
-        self.assertEqual(info.config_type, Info.CONFIG_TYPE_VIDEO)
-
-    def test_video(self):
+        """ Testa criação de nova `Info`. """
         info = self._get_info()
         assert info is not None
 

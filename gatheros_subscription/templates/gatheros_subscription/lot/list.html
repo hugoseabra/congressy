@@ -2,7 +2,7 @@
 
 {% block content %}
     <div style="padding:10px">
-        <a href="{% url 'gatheros_event:event-panel' event.pk %}">Voltar</a>
+        <a href="{% url 'event:event-panel' event.pk %}">Voltar</a>
     </div>
     <hr/>
     <h1>Lotes</h1>
@@ -11,7 +11,7 @@
 
     {% if can_add %}
         <div style="margin-bottom:10px; padding: 10px;background-color: #DDDDDD;text-align: center;">
-            <a href="{% url 'gatheros_subscription:lot-add' event.pk %}">Adicionar</a>
+            <a href="{% url 'subscription:lot-add' event.pk %}">Adicionar</a>
         </div>
     {% endif %}
 
@@ -39,7 +39,7 @@
                         <td style="background: #FFF;padding:10px;margin-bottom: 3px">
                             <div>{{ forloop.counter }} -
                                 {% if user has 'gatheros_subscription.change_lot' of lot %}
-                                    <a href="{% url 'gatheros_subscription:lot-edit' event.pk lot.pk %}">{{ lot.name }}</a>
+                                    <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">{{ lot.name }}</a>
                                 {% else %}
                                     {{ lot.name }}
                                 {% endif %}
@@ -66,10 +66,10 @@
                         </td>
                         <td width="5%" style="background: #FFF;padding:10px;margin-bottom: 3px">
                             {% if user has 'gatheros_subscription.change_lot' of lot %}
-                                <a href="{% url 'gatheros_subscription:lot-edit' event.pk lot.pk %}">Editar</a>
+                                <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">Editar</a>
                             {% endif %}
                             {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
-                                <a href="{% url 'gatheros_subscription:lot-delete' event.pk lot.pk %}">Excluir</a>
+                                <a href="{% url 'subscription:lot-delete' event.pk lot.pk %}">Excluir</a>
                             {% endif %}
                         </td>
                     </tr>

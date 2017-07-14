@@ -26,7 +26,7 @@ class PlaceListView(AccountMixin, ListView):
                 'Você não tem permissão de realizar esta ação.'
             )
             return redirect(reverse(
-                'gatheros_event:organization-panel',
+                'event:organization-panel',
                 kwargs={'pk': org.pk}
             ))
 
@@ -55,9 +55,8 @@ class PlaceListView(AccountMixin, ListView):
         return self.place_organization
 
     def _can_view(self):
-        not_participant = not self.is_participant
         can_manage = self.request.user.has_perm(
             'gatheros_event.can_manage_places',
             self.get_place_organization()
         )
-        return not_participant and can_manage
+        return self.is_manager and can_manage

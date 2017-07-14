@@ -19,7 +19,6 @@ class DefaultFieldAdmin(admin.ModelAdmin):
     list_display = (
         'label',
         'field_type',
-        'order',
         'required',
         'with_options',
         'pk'
@@ -29,7 +28,6 @@ class DefaultFieldAdmin(admin.ModelAdmin):
         'label',
         'name',
         'field_type',
-        'order',
         'required',
         'select_intro',
         'instruction',
@@ -107,7 +105,6 @@ class FieldAdmin(admin.ModelAdmin):
     list_display = (
         'organization',
         'get_events',
-        'order',
         'label',
         'name',
         'field_type',
@@ -123,7 +120,6 @@ class FieldAdmin(admin.ModelAdmin):
         'label',
         'name',
         'field_type',
-        'order',
         'required',
         'select_intro',
         'instruction',

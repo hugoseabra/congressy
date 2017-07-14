@@ -14,4 +14,4 @@ class EventListView(AccountMixin, ListView):
         return queryset.filter(organization=self.organization)
 
     def can_access(self):
-        return not self.is_participant
+        return self.is_manager

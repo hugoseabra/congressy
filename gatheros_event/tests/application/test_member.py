@@ -1,39 +1,15 @@
-# test_edit_type_resend_invitation
-# membro_deve_possuir_um_convite_antes_de_existir
-
-
-# test_internal_edition_not_allowed
+""" Testes de aplicação com `Member`. """
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.urls import reverse
-from django.core.exceptions import ImproperlyConfigured
 
-from gatheros_event.models import Member, Organization
-
-
-class OrganizationAdminNotInternalPermissionsTest(TestCase):
-    fixtures = [
-        '003_occupation',
-        '005_user',
-        '006_person',
-        '007_organization',
-        '008_member',
-    ]
-
-    def setUp(self):
-        self.user = User.objects.get(username='flavia@in2web.com.br')
-        self.organization = Organization.objects.get(slug="paroquias-unidas")
-
-    def test_admin_can_delete(self):
-        self.assertTrue(self.organization.is_admin(self.user))
-        self.assertTrue(self.user.has_perm(
-            'gatheros_event.delete_member',
-            self.organization.members.first()
-        ))
+from gatheros_event.models import Member
 
 
 class MemberManageViewTest(TestCase):
+    """ Testes de gerenciamento de membros pela view. """
     fixtures = [
         '003_occupation',
         '005_user',
@@ -63,10 +39,11 @@ class MemberManageViewTest(TestCase):
         return member.first()
 
     def test_delete(self):
+        """ Testa exclusão de membro. """
         member = self._get_member()
         organization = member.organization
 
-        url = reverse('gatheros_event:member-delete', kwargs={
+        url = reverse('event:member-delete', kwargs={
             'organization_pk': organization.pk,
             'pk': member.pk
         })
@@ -77,13 +54,14 @@ class MemberManageViewTest(TestCase):
             Member.objects.get(pk=member.pk)
 
     def test_activate(self):
+        """ Testa ativação de membro. """
         member = self._get_member()
         organization = member.organization
 
         member.active = False
         member.save()
 
-        url = reverse('gatheros_event:member-manage', kwargs={
+        url = reverse('event:member-manage', kwargs={
             'organization_pk': organization.pk,
             'pk': member.pk
         })
@@ -99,13 +77,14 @@ class MemberManageViewTest(TestCase):
         self.assertTrue(member.active)
 
     def test_deactivate(self):
+        """ Testa desativação de membro. """
         member = self._get_member()
         organization = member.organization
 
         member.active = True
         member.save()
 
-        url = reverse('gatheros_event:member-manage', kwargs={
+        url = reverse('event:member-manage', kwargs={
             'organization_pk': organization.pk,
             'pk': member.pk
         })
@@ -121,12 +100,13 @@ class MemberManageViewTest(TestCase):
         self.assertFalse(member.active)
 
     def test_change_group_wrong_group(self):
+        """ Testa mudança de grupo de membro para um grupo inexistente. """
         member = self._get_member(group=Member.ADMIN)
         organization = member.organization
 
         self.assertEqual(member.group, Member.ADMIN)
 
-        url = reverse('gatheros_event:member-manage', kwargs={
+        url = reverse('event:member-manage', kwargs={
             'organization_pk': organization.pk,
             'pk': member.pk
         })
@@ -146,12 +126,13 @@ class MemberManageViewTest(TestCase):
             )
 
     def test_change_group(self):
+        """ Testa mudança de grupo de membro. """
         member = self._get_member(group=Member.ADMIN)
         organization = member.organization
 
         self.assertEqual(member.group, Member.ADMIN)
 
-        url = reverse('gatheros_event:member-manage', kwargs={
+        url = reverse('event:member-manage', kwargs={
             'organization_pk': organization.pk,
             'pk': member.pk
         })

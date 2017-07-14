@@ -17,9 +17,11 @@ class RangeWidget(forms.MultiWidget):
     def decompress(self, value):
         return value
 
+    # noinspection PyMethodMayBeStatic
     def format_output(self, rendered_widgets):
         widget_context = {'min': rendered_widgets[0],
                           'max': rendered_widgets[1], }
+        # noinspection PyUnresolvedReferences
         return render_to_string('widgets/range_widget.html', widget_context)
 
 
@@ -30,7 +32,7 @@ class RangeField(forms.MultiValueField):
     }
 
     def __init__(self, field_class, widget=forms.TextInput, *args, **kwargs):
-        if not 'initial' in kwargs:
+        if 'initial' not in kwargs:
             kwargs['initial'] = ['', '']
 
         fields = (field_class(), field_class())
@@ -70,6 +72,7 @@ class SubscriptionFilterForm(forms.Form):
                                        choices=Person.GENDER_CHOICES,
                                        widget=forms.CheckboxSelectMultiple)
 
+    # noinspection PyTypeChecker
     age = RangeField(label='Faixa Etária', required=False,
                      field_class=forms.IntegerField, widget=forms.NumberInput)
 

@@ -7,6 +7,15 @@ register = template.Library()
 
 
 @register.simple_tag
+def get_user_person(user):
+    """ Recupera `Person` relacionado ao usuário. """
+    if hasattr(user, 'person') and user.person is not None:
+        return user.person
+    else:
+        return None
+
+
+@register.simple_tag
 def get_message_background_color(message):
     """ Recupera cor de fundo para messagens. """
 

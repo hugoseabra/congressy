@@ -1,10 +1,9 @@
+""" Testes de aplicação com `Event` - Formulários pela view. """
 import os
 import shutil
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
-from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import six
@@ -12,22 +11,8 @@ from django.utils import six
 from gatheros_event.models import Event, Info
 
 
-class MockSession(SessionStore):
-    def __init__(self):
-        super(MockSession, self).__init__()
-
-
-class MockRequest(HttpRequest):
-    def __init__(self, user, session=None):
-        self.user = user
-        if not session:
-            session = MockSession()
-
-        self.session = session
-        super(MockRequest, self).__init__()
-
-
 class EventInfoTest(TestCase):
+    """ Testes de formulário de informações de evento pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -60,7 +45,7 @@ class EventInfoTest(TestCase):
             event = self._get_event()
             pk = event.pk
 
-        return reverse('gatheros_event:event-info', kwargs={
+        return reverse('event:event-info', kwargs={
             'pk': pk
         })
 
@@ -70,6 +55,7 @@ class EventInfoTest(TestCase):
         return Event.objects.get(slug='cafe-expresso-como-preparar')
 
     def tearDown(self):
+        """ Limpa dados enviados nos testes se ainda estiverem lá. """
         event = self._get_event()
         path = os.path.join(
             settings.MEDIA_ROOT,
@@ -83,7 +69,7 @@ class EventInfoTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 

@@ -9,33 +9,38 @@
         <meta name="robots" content="NONE,NOARCHIVE"/>
     {% endblock %}
 </head>
+
+{% load gatheros_base_tags %}
+
 <body style="padding: 0;margin: 0">
 
 <!-- Container -->
 <div id="container">
     {% block topnav %}
+        {% get_user_person request.user as person %}
+
         <div style="background-color: #DDD;padding:10px;border-bottom:1px solid dimgray">
             <div style="float:left">
                 <h1 style="margin: 0">
-                    <a href="{% url 'gatheros_front:start' %}" style="text-decoration: none;color: #333;font-size: 26px">GATHEROS</a>
+                    <a href="{% url 'front:start' %}" style="text-decoration: none;color: #333;font-size: 26px">GATHEROS</a>
                 </h1>
             </div>
             <div style="float:right;margin-top: 6px">
                 {% if user.is_authenticated %}
                     <div style="float:right;margin-top: 3px">
                         &nbsp; | &nbsp;
-                        <a href="{% url 'gatheros_front:logout' %}">Sair</a>
+                        <a href="{% url 'front:logout' %}">Sair</a>
                     </div>
                     <div style="float:right;margin-top: 3px">
                         &nbsp; | &nbsp;
-                        <a href="{% url 'gatheros_event:profile' %}">Meus dados</a>
+                        <a href="{% url 'event:profile' %}">Meus dados</a>
                     </div>
                     <div style="float:right;margin-top: 3px">
                         <strong>{{ request.user.get_full_name }}</strong>
                     </div>
                     <div style="float:right">
-                        {% if request.user.person and request.user.person.avatar %}
-                            <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ request.user.person.avatar.url }}" />
+                        {% if person and person.avatar %}
+                            <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ person.avatar.url }}" />
                         {% else %}
                             <!--suppress CheckImageSize -->
                             <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
@@ -79,14 +84,14 @@
                         <div>{{ organization.name }}</div>
                         <div style="margin-top:5px;font-size: 14px">{{ member.get_group_display }}</div>
                         <div style="margin-top:5px;font-size: 14px">
-                            <a href="{% url 'gatheros_event:organization-panel' organization.pk %}">Gerenciar</a>
+                            <a href="{% url 'event:organization-panel' organization.pk %}">Gerenciar</a>
                         </div>
                     </div>
                 {% endif %}
-                {% if organizations %}
+                {% if organizations and organizations|length > 1 %}
                     <div style="padding:5px;overflow: hidden">
                         <label style="font-weight: bold" for="organization-context-pk">Mudar para:</label>
-                        <form action="{% url 'gatheros_event:organization-switch' %}"
+                        <form action="{% url 'event:organization-switch' %}"
                                   method="post" style="display: inline-block;">{% csrf_token %}
                             <select name="organization-context-pk"
                                     id="organization-context-pk"
@@ -111,26 +116,26 @@
                                 <div style="background-color: whitesmoke;border: 1px solid #dddddd;">
                                     <div style="padding: 10px;font-weight: bold">Como participante</div>
                                     <div style="padding:15px">
-                                        &rightarrow; <a href="{% url 'gatheros_subscription:my-subscriptions' %}">Minhas inscrições</a>
+                                        &rightarrow; <a href="{% url 'subscription:my-subscriptions' %}">Minhas inscrições</a>
                                     </div>
                                     <div style="padding:15px">
-                                        &rightarrow; <a href="{% url 'gatheros_event:my-invitations' %}">Meus convites</a>
+                                        &rightarrow; <a href="{% url 'event:my-invitations' %}">Meus convites</a>
                                     </div>
                                 </div>
                             </td>
                         </tr>
                     {% endif %}
-                    {% if organization and not organization.internal %}
+                    {% if organization %}
                         <tr>
                             <td width="12%" style="vertical-align: top">
                                 {% if context_type == 'member' %}
                                     <div style="background-color: whitesmoke;border: 1px solid #dddddd">
                                         <div style="padding: 10px;font-weight: bold">Como organizador</div>
                                         <div style="padding:15px">
-                                            &rightarrow; <a href="{% url 'gatheros_event:organization-list' %}">Organizações</a>
+                                            &rightarrow; <a href="{% url 'event:organization-list' %}">Organizações</a>
                                         </div>
                                         <div style="padding:15px">
-                                            &rightarrow; <a href="{% url 'gatheros_event:event-list' %}">Eventos</a>
+                                            &rightarrow; <a href="{% url 'event:event-list' %}">Eventos</a>
                                         </div>
                                     </div>
                                 {% endif %}

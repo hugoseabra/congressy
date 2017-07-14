@@ -1,3 +1,4 @@
+""" Testes de `Organization` """
 from django.db.models import Count
 from django.db.models.deletion import ProtectedError
 from django.test import TestCase
@@ -6,6 +7,7 @@ from gatheros_event.models import Organization
 
 
 class OrganizationModelTest(TestCase):
+    """ Testes de `Organization` """
     fixtures = [
         'kanu_locations_city_test',
         '004_category',

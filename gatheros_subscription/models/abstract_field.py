@@ -52,24 +52,16 @@ class AbstractField(models.Model, GatherosModelMixin):
         default='input-text',
         verbose_name='tipo'
     )
-    order = models.PositiveIntegerField(
-        verbose_name='ordem',
-        null=True,
-        blank=True
-    )
-
     required = models.BooleanField(
         default=False,
         verbose_name='obrigatório'
     )
-
     select_intro = models.BooleanField(
         default=False,
         verbose_name='Mostrar primeiro em branco',
         help_text="Acrescenta `- Selecione -` na primeira opção da lista"
                   " simples"
     )
-
     instruction = models.TextField(
         verbose_name='instrução',
         null=True,
@@ -86,18 +78,17 @@ class AbstractField(models.Model, GatherosModelMixin):
         null=True,
         blank=True
     )
-
     with_options = models.BooleanField(
         default=False,
         verbose_name='possui opções'
     )
-
     active = models.BooleanField(default=True, verbose_name='ativo')
 
     class Meta:
         abstract = True
 
     def save(self, **kwargs):
+        """ Salva entidade. """
         self._accepts_options()
         return super(AbstractField, self).save(**kwargs)
 

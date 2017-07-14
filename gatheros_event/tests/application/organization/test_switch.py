@@ -1,3 +1,6 @@
+"""
+Testes de aplicação com `Organization` - Mudança de organização no contexto.
+"""
 from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
 from django.test import TestCase
@@ -8,6 +11,7 @@ from gatheros_event.models import Organization
 
 
 class OrganizationSwitchTest(TestCase):
+    """ Testes de mudança de organização contexto pela view. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -24,7 +28,7 @@ class OrganizationSwitchTest(TestCase):
         # Usuário com várias organizações
         self.user = User.objects.get(username="lucianasilva@gmail.com")
         self.client.force_login(self.user)
-        self.url = reverse('gatheros_event:organization-switch')
+        self.url = reverse('event:organization-switch')
 
     def _get_organization(self, wsgi_request=None):
         if wsgi_request is None:
@@ -49,6 +53,7 @@ class OrganizationSwitchTest(TestCase):
         self.assertEqual(result.status_code, 302)
 
     def test_switch_organization(self):
+        """ Testa mudança de organização. """
         # First organization
         organization1 = self._get_organization()
 
@@ -61,6 +66,7 @@ class OrganizationSwitchTest(TestCase):
         self.assertEqual(other, organization2.pk)
 
     def test_not_allowed_organization_403(self):
+        """ Testa restrição quando mudança de organização não é permitida. """
         org = self._get_organization_not_member()
         response = self.client.post(
             self.url,
@@ -70,13 +76,15 @@ class OrganizationSwitchTest(TestCase):
         self.assertContains(response, 'Você não é membro desta organização.')
 
     def test_not_exist_organization_404(self):
+        """ Testa restrição para mudança para uma organização inexistente"""
         response = self.client.post(
-            self.url, {'organization-context-pk': 9999},
+            self.url, {'organization-context-pk': 9999999},
             follow=True
         )
         self.assertEqual(response.status_code, 404)
 
     def test_presentation(self):
+        """ Testa mensagem de sucesso ao mudar organização no contexto. """
         # First organization
         organization = self._get_organization()
         response = self.client.post(

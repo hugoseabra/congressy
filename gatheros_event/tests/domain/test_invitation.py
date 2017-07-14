@@ -1,3 +1,4 @@
+""" Testes de `Invitation` """
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
@@ -8,6 +9,7 @@ from gatheros_event.models import Invitation, Member, Organization, rules
 
 
 class InvitationModelTest(GatherosTestCase):
+    """ Testes de `Invitation` """
     fixtures = [
         '003_occupation',
         '005_user',

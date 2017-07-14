@@ -58,5 +58,5 @@ class OrganizationSwitch(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         return self.request.POST.get(
             'next',
-            reverse_lazy('gatheros_front:start')
+            reverse_lazy('front:start')
         )

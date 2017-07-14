@@ -1,48 +1,51 @@
+""" Testes de aplicação `Field` - views. """
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from gatheros_event.models import Event
+from gatheros_event.models import Organization
 from gatheros_subscription.models import Field, FieldOption
+
+FIXTURES = [
+    '005_user',
+    '006_person',
+    '007_organization',
+    '008_member',
+    '009_place',
+    '010_event',
+    '003_form',
+    '004_field',
+    '005_field_option',
+]
 
 
 class FieldOptionViewTest(TestCase):
-    fixtures = [
-        '005_user',
-        '006_person',
-        '007_organization',
-        '008_member',
-        '009_place',
-        '010_event',
-        '003_form',
-        '004_field',
-        '005_field_option',
-    ]
+    fixtures = FIXTURES
 
     def setUp(self):
         self.user = User.objects.get(email='diegotolentino@gmail.com')
-        self.event = Event.objects.get(slug='arte-e-agricultura-urbana')
-
-    def _get_url(self, event=None, field=None):
-        if not event:
-            event = self.event
-
-        if not field:
-            field = event.form.fields.filter(with_options=True).first()
-
-        return reverse('gatheros_subscription:field-options', kwargs={
-            'event_pk': event.pk,
-            'field_pk': field.pk
-        })
+        self.organization = Organization.objects.get(slug='diego-tolentino')
+        self.field = self.organization.fields.filter(
+            form_default_field=False,
+            with_options=True
+        ).first()
 
     def _login(self):
         self.client.force_login(self.user)
+
+    def _get_url(self, field=None):
+        if not field:
+            field = self.field
+
+        return reverse('subscription:field-options', kwargs={
+            'field_pk': field.pk
+        })
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -52,174 +55,219 @@ class FieldOptionViewTest(TestCase):
         response = self.client.get(self._get_url())
         self.assertEqual(response.status_code, 200)
 
+    def test_not_org_member(self):
+        """
+        Não permite edição de opção de campo cuja organização o usuário não é
+        membro.
+        """
+        user = User.objects.get(email='lucianasilva@gmail.com')
+        self.client.force_login(user)
+
+        field = self.organization.fields.filter(
+            form_default_field=False
+        ).first()
+
+        response = self.client.get(self._get_url(field=field), follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
+
     def test_error_no_option_support(self):
         """ Não permite edição de opção sem suporte a opções. """
         self._login()
-        field = self.event.form.fields.filter(with_options=False).first()
+        field = self.organization.fields.filter(with_options=False).first()
         response = self.client.get(self._get_url(field=field), follow=True)
         self.assertContains(response, 'Este campo não possui suporte a opções')
 
+    def test_error_default_field(self):
+        """ Não permite edição de opção de campo padrão. """
+        self._login()
+
+        # Sexo é padrão
+        field = self.organization.fields.get(name='gender')
+
+        response = self.client.get(self._get_url(field=field), follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
+
 
 class FieldOptionAddViewTest(TestCase):
-    fixtures = [
-        '005_user',
-        '006_person',
-        '007_organization',
-        '008_member',
-        '009_place',
-        '010_event',
-        '003_form',
-        '004_field',
-        '005_field_option',
-    ]
+    fixtures = FIXTURES
 
     def setUp(self):
         self.user = User.objects.get(email='diegotolentino@gmail.com')
-        self.event = Event.objects.get(slug='arte-e-agricultura-urbana')
-
-    # noinspection PyMethodMayBeStatic
-    def _get_url(self):
-        return reverse('gatheros_subscription:field-option-add')
+        self.organization = Organization.objects.get(slug='diego-tolentino')
+        self.field = self.organization.fields.filter(
+            form_default_field=False,
+            with_options=True
+        ).first()
 
     def _login(self):
         self.client.force_login(self.user)
+
+    # noinspection PyMethodMayBeStatic
+    def _get_url(self):
+        return reverse('subscription:field-option-add')
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
-    def test_get_405(self):
+    def test_get_forbidden(self):
         """ 405 quando acessado por GET. """
         self._login()
-        response = self.client.get(
-            self._get_url()
-        )
-        self.assertEqual(response.status_code, 405)
+        response = self.client.get(self._get_url(), follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
+
+    def test_not_org_member(self):
+        """
+        Não permite adição de opção de campo cuja organização o usuário não é
+        membro.
+        """
+        user = User.objects.get(email='lucianasilva@gmail.com')
+        self.client.force_login(user)
+        data = {'field_pk': self.field.pk}
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
+
+    def test_not_org_field(self):
+        """
+        Não permite adição de opção de campo cuja organização o usuário não é
+        membro.
+        """
+        field = Field.objects.filter(
+            form_default_field=False,
+            with_options=True
+        ).exclude(organization=self.organization).first()
+        data = {'field_pk': field.pk}
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
 
     def test_add(self):
         """ Testa adição de opção. """
         self._login()
-        field = self.event.form.fields.filter(with_options=True).first()
-        num = field.options.count()
+        num = self.field.options.count()
 
         data = {
-            'event_pk': self.event.pk,
-            'field_pk': field.pk,
+            'field_pk': self.field.pk,
             'name': 'New option 555'
         }
 
         self.client.post(self._get_url(), data=data, follow=True)
-        option = FieldOption.objects.get(name=data['name'], field=field)
-        self.assertIsInstance(option, FieldOption)
-
-        field = Field.objects.get(pk=field.pk)
-        self.assertEqual(field.options.count(), num + 1)
+        option = FieldOption.objects.get(name=data['name'], field=self.field)
+        self.assertIsNotNone(option)
+        self.assertEqual(self.field.options.count(), num + 1)
 
 
 class FieldOptionEditViewTest(TestCase):
-    fixtures = [
-        '005_user',
-        '006_person',
-        '007_organization',
-        '008_member',
-        '009_place',
-        '010_event',
-        '003_form',
-        '004_field',
-        '005_field_option',
-    ]
+    fixtures = FIXTURES
 
     def setUp(self):
         self.user = User.objects.get(email='diegotolentino@gmail.com')
-        self.event = Event.objects.get(
-            slug='arte-e-agricultura-urbana')
-
-    def _get_url(self, field_option=None):
-        if not field_option:
-            field = self.event.form.fields.filter(with_options=True).first()
-            field_option = field.options.first()
-
-        return reverse('gatheros_subscription:field-option-edit', kwargs={
-            'pk': field_option.pk
-        })
+        self.organization = Organization.objects.get(slug='diego-tolentino')
+        self.field = self.organization.fields.filter(
+            form_default_field=False,
+            with_options=True
+        ).first()
 
     def _login(self):
         self.client.force_login(self.user)
+
+    def _get_url(self, field_option=None):
+        if not field_option:
+            field_option = self.field.options.first()
+
+        return reverse('subscription:field-option-edit', kwargs={
+            'pk': field_option.pk
+        })
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
-    def test_get_405(self):
+    def test_get_forbidden(self):
         """ 405 quando acessado por GET. """
         self._login()
-        response = self.client.get(self._get_url())
-        self.assertEqual(response.status_code, 405)
+        response = self.client.get(self._get_url(), follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
+
+    def test_not_org_member(self):
+        """
+        Não permite edição de opção de campo cuja organização o usuário não é
+        membro.
+        """
+        user = User.objects.get(email='lucianasilva@gmail.com')
+        self.client.force_login(user)
+        data = {'field_pk': self.field.pk}
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
+
+    def test_not_org_field(self):
+        """
+        Não permite edição de opção de campo cuja organização o usuário não é
+        membro.
+        """
+        field = Field.objects.filter(
+            form_default_field=False,
+            with_options=True
+        ).exclude(organization=self.organization).first()
+        data = {'field_pk': field.pk}
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
 
     def test_edit(self):
         """ Testa edição. """
         self._login()
-        field = self.event.form.fields.filter(with_options=True).first()
-        field_option = field.options.first()
+        option = self.field.options.first()
 
-        data = {
-            'event_pk': self.event.pk,
-            'name': field_option.name + ' edited'
-        }
+        data = {'name': option.name + ' edited'}
 
         self.client.post(
-            self._get_url(field_option=field_option),
+            self._get_url(field_option=option),
             data=data,
             follow=True
         )
 
-        field_option = FieldOption.objects.get(pk=field_option.pk)
+        field_option = FieldOption.objects.get(pk=option.pk)
         self.assertEqual(field_option.name, data['name'])
 
 
 class FieldOptionDeleteViewTest(TestCase):
-    fixtures = [
-        '005_user',
-        '006_person',
-        '007_organization',
-        '008_member',
-        '009_place',
-        '010_event',
-        '003_form',
-        '004_field',
-        '005_field_option',
-    ]
+    fixtures = FIXTURES
 
     def setUp(self):
         self.user = User.objects.get(email='diegotolentino@gmail.com')
-        self.event = Event.objects.get(
-            slug='arte-e-agricultura-urbana')
-
-    def _get_url(self, field_option=None):
-        if not field_option:
-            field = self.event.form.fields.filter(with_options=True).first()
-            field_option = field.options.first()
-
-        return reverse('gatheros_subscription:field-option-delete', kwargs={
-            'pk': field_option.pk
-        })
+        self.organization = Organization.objects.get(slug='diego-tolentino')
+        self.field = self.organization.fields.filter(
+            form_default_field=False,
+            with_options=True
+        ).first()
 
     def _login(self):
         self.client.force_login(self.user)
+
+    def _get_url(self, field_option=None):
+        if not field_option:
+            field_option = self.field.options.first()
+
+        return reverse('subscription:field-option-delete', kwargs={
+            'pk': field_option.pk
+        })
 
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('gatheros_front:login')
+        redirect_url = reverse('front:login')
         redirect_url += '?next=/'
         self.assertRedirects(response, redirect_url)
 
@@ -229,16 +277,40 @@ class FieldOptionDeleteViewTest(TestCase):
         response = self.client.get(self._get_url())
         self.assertEqual(response.status_code, 405)
 
+    def test_not_org_member(self):
+        """
+        Não permite edição de opção de campo cuja organização o usuário não é
+        membro.
+        """
+        user = User.objects.get(email='lucianasilva@gmail.com')
+        self.client.force_login(user)
+        data = {'field_pk': self.field.pk}
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
+
+    def test_not_org_field(self):
+        """
+        Não permite edição de opção de campo cuja organização o usuário não é
+        membro.
+        """
+        field = Field.objects.filter(
+            form_default_field=False,
+            with_options=True
+        ).exclude(organization=self.organization).first()
+        data = {'field_pk': field.pk}
+
+        response = self.client.post(self._get_url(), data=data, follow=True)
+        self.assertContains(response, 'Você não pode realizar esta ação')
+
     def test_delete(self):
         self._login()
-        field = self.event.form.fields.filter(with_options=True).first()
-        field_option = field.options.first()
+        option = self.field.options.first()
 
         self.client.post(
-            self._get_url(field_option=field_option),
-            data={'event_pk': self.event.pk},
+            self._get_url(field_option=option),
             follow=True
         )
 
         with self.assertRaises(FieldOption.DoesNotExist):
-            FieldOption.objects.get(pk=field_option.pk)
+            FieldOption.objects.get(pk=option.pk)

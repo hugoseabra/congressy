@@ -1,3 +1,4 @@
+""" Mixins de views. """
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -16,11 +17,12 @@ from gatheros_event.helpers.account import (
     get_member,
     get_organization,
     get_organizations,
-    is_participant,
+    is_manager,
 )
 
 
 class AccountMixin(LoginRequiredMixin, View):
+    """ Mixin para gerenciamento de contexto de conta de usuário na view. """
     permission_denied_url = '/'
     raise_exception = True  # If not logged
     permission_denied_message = 'Você não pode realizar esta ação.'
@@ -32,9 +34,9 @@ class AccountMixin(LoginRequiredMixin, View):
         return user.is_authenticated() if user else False
 
     @property
-    def is_participant(self):
+    def is_manager(self):
         """ Verifica se usuário é participante apenas. """
-        return is_participant(self.request)
+        return is_manager(self.request)
 
     @property
     def organization(self):
@@ -76,6 +78,7 @@ class AccountMixin(LoginRequiredMixin, View):
         return self.permission_denied_url
 
     def pre_dispatch(self, request):
+        """ Operações executadas antes do dispatch de uma view. """
         if not self.is_authenticated:
             raise PermissionDenied(self.get_permission_denied_message())
 
@@ -92,6 +95,7 @@ class AccountMixin(LoginRequiredMixin, View):
                 *args,
                 **kwargs
             )
+
         except PermissionDenied as e:
             messages.warning(request, str(e))
             return redirect(self.get_permission_denied_url())
@@ -112,6 +116,7 @@ class DeleteViewMixin(AccountMixin, DeleteView):
     template_name = 'generic/delete.html'
 
     def get_object(self, queryset=None):
+        """ Resgata objeto principal da view. """
         if not self.object:
             self.object = super(DeleteViewMixin, self).get_object(queryset)
 
@@ -150,8 +155,16 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         context['title'] = 'Excluir {}'.format(verbose_name)
 
         data = model_to_dict(self.get_object())
-        context['delete_message'] = self.delete_message.format(**data)
+        delete_message = self.get_delete_message()
+        context['delete_message'] = delete_message.format(**data)
         return context
+
+    def get_delete_message(self):
+        """
+        Recupera mensagem de remoção a ser perguntada ao usuário antes da
+        remoção.
+        """
+        return self.delete_message
 
     def post(self, request, *args, **kwargs):
         try:
@@ -191,15 +204,16 @@ class DeleteViewMixin(AccountMixin, DeleteView):
         """ Processo a ser executado antes de deletar. """
         pass
 
+    # noinspection PyMethodMayBeStatic
     def post_delete(self):
         """ Processo a ser executado depois de deletar. """
         pass
 
 
 class FormListViewMixin(FormMixin, ListView):
-    """
-    Lista com formulário
-    """
+    """ Lista com formulário """
+    object_list = None
+    form = None
 
     def get_form_kwargs(self):
         """

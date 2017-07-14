@@ -20,6 +20,7 @@ from .rules import check_invite
 class InvitationManager(models.Manager):
     """ Manager - Gerenciador de Convites. """
     def get_invitations(self, organization):
+        """ Resgata Queryset de convite """
         return self.filter(organization=organization).all
 
 
