@@ -129,4 +129,4 @@ class FieldFormTest(TestCase):
 
         field = Field.objects.get(pk=field.pk)
         self.assertEqual(field.field_type, data['field_type'])
-        self.assertFalse(field.active)
+        self.assertTrue(field.active)
