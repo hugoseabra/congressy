@@ -100,3 +100,5 @@ for i, dict_dates in enumerate(lots_dates):
         lot.save()
 
         ii += 1
+
+print('Ok')
