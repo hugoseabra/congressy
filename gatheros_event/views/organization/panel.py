@@ -132,4 +132,5 @@ class OrganizationCancelMembershipView(AccountMixin, DetailView):
         return cxt
 
     def can_access(self):
-        return self.member is not None
+        org = self.get_object()
+        return org.is_member(self.request.user)
