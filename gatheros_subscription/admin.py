@@ -329,7 +329,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ['subscription', 'get_field', 'get_value']
-    ordering = ['field__label', 'subscription__person', 'field__order']
+    ordering = ['field__label', 'subscription__person']
     list_filter = ('field__forms__event',)
     search_fields = (
         'subscription__person__name',

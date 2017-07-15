@@ -162,12 +162,19 @@ class FormFieldForm(forms.Form):
         """ Configura o campo como obrigatório. """
         config = self.form.required_configuration
         item = config.get(field.name) if config else None
-        if not item and field.required is True:
+
+        # Se não há configuração e campo já é obrigatório
+        if item is None and field.required is True:
             return
 
-        if item and item is True:
+        # Se há configuração e campo já é obrigatorio, exclui config
+        if item is not None and field.required is True:
+            del config[field.name]
+            self.form.required_configuration = config
+            self.form.save()
             return
 
+        # Se campo não é obrigatório, atualiza configuração
         self._change_required_value(field)
 
     def set_as_not_required(self, field):
