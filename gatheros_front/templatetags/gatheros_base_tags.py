@@ -2,6 +2,7 @@
 gatheros_subscription templatetags
 """
 from django import template
+from core.util import git_util
 
 register = template.Library()
 
@@ -30,3 +31,9 @@ def get_message_background_color(message):
 
     if message.tags == 'info' or not message.tags:
         return '#D9EDF7'
+
+
+@register.simple_tag
+def get_project_git_revision():
+    """ Resgata versão de revisão do GIT do projeto. """
+    return git_util.get_git_revision()
