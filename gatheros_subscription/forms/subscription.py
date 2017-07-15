@@ -130,7 +130,6 @@ class SubscriptionForm(EventFieldsForm):
         lot = self.cleaned_data.get('lot')
 
         if not self.instance:
-            # @TODO Registrar autor da inscrição.
             self.instance = Subscription(
                 origin=Subscription.DEVICE_ORIGIN_WEB,
                 created_by=1,

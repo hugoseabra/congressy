@@ -13,8 +13,6 @@ $BASE_DIR/bin/createdb.sh || exit 1;
 
 # Importando fixtures
 # User
-
-# @TODO Decidir como ficará o usuário admin padrão
 python $BASE_DIR/manage.py loaddata 001_user
 
 ## gatheros_event

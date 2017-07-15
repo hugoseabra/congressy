@@ -198,7 +198,6 @@ class InvitationModelTest(GatherosTestCase):
             invitation.save()
 
     def invitation_has_already_been_created(self):
-        # @todo rever teste, está desligado e confuso e não consegui arrumar
         member = Member.objects.get(pk=5, group=Member.ADMIN)
         invited = User.objects.get(pk=3)
 

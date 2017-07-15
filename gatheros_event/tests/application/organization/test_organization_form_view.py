@@ -6,8 +6,6 @@ from django.urls import reverse, reverse_lazy
 from gatheros_event.models import Organization
 
 
-# @TODO Testar upload de avatar
-
 class OrganizationFormViewTest(TestCase):
     """ Testes de formulário de organização pela view. """
     fixtures = [

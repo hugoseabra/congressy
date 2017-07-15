@@ -5,14 +5,11 @@ participantes e exibição de mapa.
 """
 
 from django.db import models
-from kanu_locations.models import City
 
+from kanu_locations.models import City
 from . import Organization
 from .mixins import GatherosModelMixin
 
-
-# @TODO Usar GeoDjango para coodenadas
-# @TODO Ver integração com Google Maps
 
 class Place(models.Model, GatherosModelMixin):
     """Local de evento."""
@@ -107,7 +104,7 @@ class Place(models.Model, GatherosModelMixin):
     # noinspection PyMethodMayBeStatic
     def _add_prefix(self, *args, **kwargs):
         if [arg for arg in args if arg]:
-                return kwargs.get('prefix', '')
+            return kwargs.get('prefix', '')
 
         return ''
 
