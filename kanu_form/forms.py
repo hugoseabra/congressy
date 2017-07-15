@@ -14,7 +14,7 @@ class KanuForm(forms.Form):
         self.kanu_fields = OrderedDict()
         self.fields.keyOrder = []
 
-    def create_field(self, name, field_type, initial=None, required=True,
+    def create_field(self, name, field_type, initial=None, required=False,
                      label=None, **kwargs):
         """
         Cria um campo para o formulário conforme interface django field:
@@ -42,6 +42,13 @@ class KanuForm(forms.Form):
         :param value: valor do atributo
         """
         field = self.get_field_by_name(field_name)
+        kanu_field = self.kanu_fields.get(field_name)
+        if not field or not kanu_field:
+            return
+
+        if name == 'required' and not kanu_field.has_requirement():
+            return
+
         field.widget.attrs.update({name: value})
 
     def unset_attr(self, field_name, name):

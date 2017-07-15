@@ -69,17 +69,15 @@ class Form(models.Model):
 
         rule.rule_1_form_em_event_inscricao_desativada(self)
 
-    @property
     def get_additional_fields(self):
         """ Recupera os campos que são adicionais. """
 
         return self.fields.filter(form_default_field=False)
 
-    @property
     def has_additional_fields(self):
         """ Verifica se há campos adicionais. """
 
-        return self.get_additional_fields.count() > 0
+        return self.fields.filter(form_default_field=False).count() > 0
 
     def is_required(self, field):
         """

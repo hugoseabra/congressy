@@ -67,9 +67,69 @@ class FormFieldForm(forms.Form):
         self.form = form
         super(FormFieldForm, self).__init__(*args, **kwargs)
 
-    def add_field(self, field, required=None):
+    def add_fields_by_names(self, fields_dict):
         """
-        Adiciona relação de `Field` com o `Form` da instância.
+        Adiciona campos através de um `dict` {`field_name`: `required`}
+        :type fields_dict: dict
+        """
+        non_existing_fields = []
+        for field_name, is_required in six.iteritems(fields_dict):
+            try:
+                self.add_field(field_name, is_required)
+
+            except PermissionDenied:
+                non_existing_fields.append(field_name)
+
+        if non_existing_fields:
+            raise PermissionDenied(
+                'Os seguintes campos não puderam ser adicionados: {}'.format(
+                    ', '.join(non_existing_fields)
+                )
+            )
+
+    def add_new_field(self, data, required=None):
+        """
+        Cria campo a partir dos dados externos e adiciona ao `Form`.
+        :type data: dict
+        :type required: bool
+            Define se campo é ou não obrigatório especificamente neste
+            formulário. Caso seja `None`, prevalecerá o valor de `required`
+            original de `Field`.
+        """
+        organization = self.form.event.organization
+        field_form = FieldForm(organization=organization, data=data)
+
+        _check_field_restriction(self.form, field_form.save(commit=False))
+        field = field_form.save()
+
+        self.add_field_by_instance(field, required)
+
+        return field
+
+    def add_field(self, field_name, required=None):
+        """
+        Adiciona relação de `Field` com o `Form`.
+        :type field_name: str
+        :type required: bool
+            Define se campo é ou não obrigatório especificamente neste
+            formulário. Caso seja `None`, prevalecerá o valor de `required`
+            original de `Field`.
+        """
+        organization = self.form.event.organization
+        try:
+            field = organization.fields.get(name=field_name)
+
+        except Field.DoesNotExist:
+            raise PermissionDenied(
+                'O campo `{}` não existe.'.format(field_name)
+            )
+
+        else:
+            self.add_field_by_instance(field, required)
+
+    def add_field_by_instance(self, field, required=None):
+        """
+        Adiciona relação de `Field` com o `Form`.
         :type field: Field
         :type required: bool
             Define se campo é ou não obrigatório especificamente neste
@@ -85,21 +145,6 @@ class FormFieldForm(forms.Form):
             self._change_required_value(field)
 
         self._append_field_order(field)
-
-    def add_new_field(self, data):
-        """
-        Cria campo a partir dos dados externos e adiciona ao `Form`.
-        :type data: dict
-        """
-        organization = self.form.event.organization
-        field_form = FieldForm(organization=organization, data=data)
-
-        _check_field_restriction(self.form, field_form.save(commit=False))
-        field = field_form.save()
-
-        self.add_field(field)
-
-        return field
 
     def activate(self, field):
         """ Ativa campo no formulário. """
@@ -117,12 +162,19 @@ class FormFieldForm(forms.Form):
         """ Configura o campo como obrigatório. """
         config = self.form.required_configuration
         item = config.get(field.name) if config else None
-        if not item and field.required is True:
+
+        # Se não há configuração e campo já é obrigatório
+        if item is None and field.required is True:
             return
 
-        if item and item is True:
+        # Se há configuração e campo já é obrigatorio, exclui config
+        if item is not None and field.required is True:
+            del config[field.name]
+            self.form.required_configuration = config
+            self.form.save()
             return
 
+        # Se campo não é obrigatório, atualiza configuração
         self._change_required_value(field)
 
     def set_as_not_required(self, field):
@@ -148,13 +200,9 @@ class FormFieldForm(forms.Form):
         :param field: Field
         :return: None
         """
-        data = self.form.required_configuration
-        if data:
-            data.update({
-                field.name: not field.required
-            })
-        else:
-            data = {field.name: not field.required}
+        config = self.form.required_configuration
+        data = config if config else {}
+        data.update({field.name: not field.required})
 
         self.form.required_configuration = data
         self.form.save()

@@ -1,17 +1,11 @@
 from .event_form import (
     EventConfigFormFieldView,
-    # EventFormFieldAddView,
+    EventFormFieldAddView,
     EventFormFieldRemoveView,
     EventFormFieldManageActivationView,
     EventFormFieldManageRequirementView,
     EventFormFieldReorderView,
 )
-# from .field_event_option import (
-#     EventFieldOptionAddView,
-#     EventFieldOptionDeleteView,
-#     EventFieldOptionEditView,
-#     EventFieldOptionsView,
-# )
 from .field_option import (
     FieldOptionAddView,
     FieldOptionDeleteView,

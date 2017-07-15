@@ -1,3 +1,5 @@
+""" Testes de exclusão de evento influenciando na relação com inscrições. """
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -5,6 +7,7 @@ from gatheros_event.models import Event, Member
 
 
 class EventDeleteTest(TestCase):
+    """ Testes de exclusão de evento. """
     fixtures = [
         'kanu_locations_city_test',
         '005_user',
@@ -80,25 +83,8 @@ class EventDeleteTest(TestCase):
 
         return self.client.post(self._get_delete_url(), follow=True)
 
-    def test_delete_requires_login(self):
-        self.assertTrue(self._event_exists())
-
-        # NOT Authenticated
-        result = self._process_delete()
-        self.assertContains(
-            result,
-            "Você não pode realizar esta ação."
-        )
-
-        # Authenticated
-        self._event_admin_login()
-
-        self.assertTrue(self._event_exists())
-        result = self._process_delete()
-        self.assertFalse(self._event_exists())
-        self.assertRedirects(result, self._get_event_list_url())
-
     def test_event_with_subscriptions_cannot_be_deleted(self):
+        """ Testa eventos com inscrições que não podem ser excluídos. """
         self._event_admin_login()
 
         self.assertTrue(self._event_exists())
@@ -115,22 +101,3 @@ class EventDeleteTest(TestCase):
         result = self._process_delete()
         self.assertFalse(self._event_exists())
         self.assertRedirects(result, self._get_event_list_url())
-
-    def test_admin_can_delete(self):
-        self._event_admin_login()
-
-        self.assertTrue(self._event_exists())
-        result = self._process_delete()
-        self.assertFalse(self._event_exists())
-        self.assertRedirects(result, self._get_event_list_url())
-
-    def test_helper_cannot_delete(self):
-        self._event_helper_login()
-
-        self.assertTrue(self._event_exists())
-        result = self._process_delete()
-        self.assertContains(
-            result,
-            "Você não pode excluir este registro."
-        )
-        self.assertTrue(self._event_exists())

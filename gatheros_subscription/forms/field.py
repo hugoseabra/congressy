@@ -141,7 +141,7 @@ class FieldForm(ModelForm):
             'select_intro',
             'instruction',
             'default_value',
-            'active',
+            # 'active',
         )
 
     def __init__(self, organization, *args, **kwargs):

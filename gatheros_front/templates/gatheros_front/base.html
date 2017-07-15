@@ -157,7 +157,10 @@
     </div>
 
     {% block footer %}
-        <div id="footer"></div>
+        <br />
+        <div id="footer" style="position:relative;bottom:0;right:0;background-color:#DDD;text-align: right;padding: 10px">
+            <strong>Revisão:</strong> {% get_project_git_revision %}
+        </div>
     {% endblock %}
 </div>
 <!-- END Container -->

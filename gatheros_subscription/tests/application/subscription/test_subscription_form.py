@@ -110,8 +110,7 @@ class SubscriptionFormTest(TestCase):
                 self.assertEqual(value, data_value)
 
             else:
-                value = json.loads(answer.value)
-                value = value.get('value')
+                value = answer.value.get('value')
 
                 if isinstance(value, list):
                     value.sort()

@@ -189,7 +189,6 @@ class FormFieldEditViewTest(BaseEventFieldTest):
         data = {
             'field_type': Field.FIELD_INPUT_TEXT,
             'label': field.name + ' edited',
-            'active': False,
         }
 
         response = self.client.post(
@@ -202,7 +201,6 @@ class FormFieldEditViewTest(BaseEventFieldTest):
         field = Field.objects.get(pk=field.pk)
         self.assertEqual(field.field_type, data['field_type'])
         self.assertEqual(field.label, data['label'])
-        self.assertEqual(field.active, data['active'])
 
 
 class FormFieldDeleteViewTest(BaseEventFieldTest):

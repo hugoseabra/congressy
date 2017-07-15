@@ -13,6 +13,10 @@ from gatheros_event.models import Organization
 from . import AbstractField, Form
 
 
+class NotPersonAttribute(Exception):
+    pass
+
+
 @track_data('name')
 class Field(AbstractField):
     """ Modelo de campo de formulário. """
@@ -71,16 +75,16 @@ class Field(AbstractField):
         :return: Answer | Mixed
             Pode retornar um valor puro de `Person` ou um objeto Answer
         """
+        answer_value = self.get_person_attribute_value(subscription.person)
 
-        person = subscription.person
-        if self.form_default_field and hasattr(person, self.name):
-            return getattr(person, self.name)
+        if not answer_value:
+            try:
+                answer_value = self.answers.get(subscription=subscription)
 
-        try:
-            return self.answers.get(subscription=subscription)
+            except ObjectDoesNotExist:
+                answer_value = None
 
-        except ObjectDoesNotExist:
-            return None
+        return answer_value
 
     def __str__(self):
         required = ''
@@ -92,3 +96,17 @@ class Field(AbstractField):
             self.get_field_type_display(),
             self.organization.name
         )
+
+    def get_person_attribute_value(self, person):
+        """ Resgata valor de resposta a partir da instância de `Person` """
+        reserved_attrs = ['uuid']
+
+        try:
+            is_reserved = self.name in reserved_attrs
+            if is_reserved or not person.can_write_to_field(self.name):
+                raise NotPersonAttribute()
+
+            return getattr(person, self.name)
+
+        except NotPersonAttribute:
+            return None

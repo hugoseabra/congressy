@@ -57,7 +57,9 @@ class SubscriptionForm(EventFieldsForm):
                 required = False
 
             else:
-                required = gatheros_field.required
+                # Verifica se é obrigatório verificando critérios de
+                # configuração
+                required = self.form.is_required(gatheros_field)
 
             if gatheros_field.field_type in force_string:
                 value = str(value)
@@ -162,11 +164,12 @@ class SubscriptionForm(EventFieldsForm):
             # nos campos padrão do formuláiro de inscrição.
             person = Person()
 
-        for f_name, gatheros_field in six.iteritems(self.gatheros_fields):
-            value = self.cleaned_data.get(f_name)
-
-            if not hasattr(person, f_name):
+        for f_name, field in six.iteritems(self.gatheros_fields):
+            # Campo não pode ser escrito em `Person`
+            if not person.can_write_to_field(f_name):
                 continue
+
+            value = self.cleaned_data.get(f_name)
 
             if f_name == 'city':
                 value = City.objects.get(pk=value)
@@ -183,12 +186,18 @@ class SubscriptionForm(EventFieldsForm):
         if not self.instance:
             raise Exception('A instância de inscrição deve estar setada.')
 
+        person = self.instance.person
+
         # Campos
         for f_name, gatheros_field in six.iteritems(self.gatheros_fields):
-            # Resgata resposta pre-existente
-            gatheros_answer = gatheros_field.answer(subscription=self.instance)
+            # Se campo pode ser escrito em `Person`, não é `Answer`
+            if person.can_write_to_field(f_name):
+                continue
 
-            if not isinstance(gatheros_answer, Answer):
+            # Resgata resposta pre-existente
+            answer = gatheros_field.answer(subscription=self.instance)
+
+            if answer is not None and not isinstance(answer, Answer):
                 continue
 
             value = self.cleaned_data.get(f_name)
@@ -222,19 +231,20 @@ class SubscriptionForm(EventFieldsForm):
                 value = {'value': False, 'output': "Não"}
 
             # Se há resposta anterior e não há valor, exclui
-            if gatheros_answer and not value:
-                gatheros_answer.delete()
+            if answer and not value:
+                answer.delete()
                 continue
 
             # Se há valor e não há resposta anterior, criar
-            if value and not gatheros_answer:
-                gatheros_answer = Answer(
+            if not answer:
+                answer = Answer(
                     subscription=self.instance,
                     field=gatheros_field,
                 )
 
-            gatheros_answer.value = value
-            gatheros_answer.save()
+            if value:
+                answer.value = value
+                answer.save()
 
     # noinspection PyMethodMayBeStatic
     def _process_option_answers(

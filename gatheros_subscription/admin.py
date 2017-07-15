@@ -220,7 +220,7 @@ class FormAdmin(admin.ModelAdmin):
         )
 
     def has_additional_fields(self, instance):
-        return instance.has_additional_fields
+        return instance.has_additional_fields()
 
     has_additional_fields.__name__ = 'campos adicionais'
     has_additional_fields.boolean = True
@@ -329,7 +329,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ['subscription', 'get_field', 'get_value']
-    ordering = ['field__label', 'subscription__person', 'field__order']
+    ordering = ['field__label', 'subscription__person']
     list_filter = ('field__forms__event',)
     search_fields = (
         'subscription__person__name',

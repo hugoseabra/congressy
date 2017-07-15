@@ -12,7 +12,7 @@
     <hr/>
     <h1>{{ event.name }}</h1>
     <div style="margin-bottom:10px;padding: 10px;background-color: #DDDDDD;text-align: center;">
-        <a href="{% url 'subscription:field-add' event.pk %}">Adicionar</a>
+        <a href="{% url 'subscription:event-field-add' event.pk %}">Adicionar</a>
     </div>
 
     {% if form_title %}
