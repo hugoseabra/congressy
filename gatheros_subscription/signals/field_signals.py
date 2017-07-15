@@ -146,7 +146,7 @@ def _post_remove_form_update(instance, pk_set):
 
         for field_name in excluded_field_names:
             item = config.get(field_name)
-            if item:
+            if item is not None:
                 del config[field_name]
 
         form.required_configuration = config

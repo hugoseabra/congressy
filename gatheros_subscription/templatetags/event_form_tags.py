@@ -37,12 +37,7 @@ def is_inactive(form, field):
 @register.simple_tag
 def is_required(form, field):
     """ Verifica se campo obrigatório. """
-    config = form.required_configuration
-    custom_required = config.get(field.name) if config else None
-    if not custom_required:
-        return field.required is True
-
-    return custom_required is True
+    return form.is_required(field)
 
 
 @register.simple_tag
@@ -50,4 +45,4 @@ def is_default_configuration(form, field):
     """ Verifica se configuração do campo no formulário é padrão. """
     config = form.required_configuration
     custom_required = config.get(field.name) if config else None
-    return not is_inactive(form, field) and not custom_required
+    return not is_inactive(form, field) and custom_required is None

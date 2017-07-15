@@ -1,4 +1,7 @@
+""" Views de formulário de evento. """
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import generic
@@ -6,6 +9,7 @@ from django.views import generic
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.forms import (
+    FieldForm,
     EventFieldsForm,
     FormFieldForm,
     FormFieldOrderForm,
@@ -117,9 +121,119 @@ class EventFormFieldAddView(BaseFormFieldView, generic.TemplateView):
     """ View para adicionar campos ao formulário. """
 
     template_name = 'gatheros_subscription/form/field_add.html'
-    form_title = 'Adicionar Campo de Formulário'
     success_message = 'Campo criado com sucesso.'
-    form_class = FormFieldForm
+
+    def get_field_form(self):
+        """ Resgata instância de formulário de campo. """
+        event = self._get_event()
+        return FieldForm(organization=event.organization)
+
+    def get_context_data(self, **kwargs):
+        """ Recupera contexto da view. """
+        context = super(BaseFormFieldView, self).get_context_data(**kwargs)
+
+        action = self.request.GET.get('action')
+        context.update({'action': action})
+
+        event = self._get_event()
+        organization = event.organization
+
+        event_field_pks = [field.pk for field in event.form.fields.all()]
+
+        org_fields_qs = organization.fields.exclude(pk__in=event_field_pks)
+        org_fields_qs = org_fields_qs.filter(
+            active=True,
+            form_default_field=False
+        )
+        org_fields_qs = org_fields_qs.order_by('-required',  'label')
+
+        events_qs = organization.events.exclude(
+            Q(form__isnull=True) | Q(pk=event.pk)
+        )
+
+        events = [
+            ev for ev in events_qs
+            if len(ev.form.fields.exclude(pk__in=event_field_pks))
+        ]
+
+        context.update({
+            'form_title': 'Adicionar campo',
+            'org_fields': org_fields_qs,
+            'events': events
+        })
+
+        def not_allowed(extra_msg=None):
+            """ Envia exceção de permissão negada. """
+            msg = 'Você não pode inserir este campo'
+            if extra_msg:
+                msg += ': ' + extra_msg
+
+            msg += '.'
+            raise PermissionDenied(msg)
+
+        def select_event(ev_pk):
+            """ Resgata instância de evento. """
+            try:
+                # noinspection PyShadowingNames
+                event = Event.objects.exclude(form__isnull=True).get(pk=ev_pk)
+
+            except Event.DoesNotExist as e:
+                not_allowed(str(e))
+
+            else:
+                if event.organization.pk != organization.pk:
+                    not_allowed()
+
+                return event
+
+        def select_field(field_pk):
+            """ Resgata instância de `Field`"""
+            try:
+                field = Field.objects.exclude(
+                    form_default_field=True
+                ).get(pk=field_pk)
+
+            except Field.DoesNotExist as e:
+                not_allowed(str(e))
+
+            else:
+                if field.organization.pk != organization.pk:
+                    not_allowed()
+
+                return field
+
+        def select_event_fields(ev):
+            """" Resgata campos de `Event` """
+            return ev.form.fields.exclude(
+                Q(pk__in=event_field_pks) |
+                Q(form_default_field=True) |
+                Q(active=False)
+            ).order_by('-required',  'label')
+
+        if action == 'field':
+            selected_field = select_field(self.request.GET.get('field'))
+            context.update({
+                'form_title': 'Adicionar campo padrão',
+                'selected_field': selected_field
+            })
+
+        if action == 'copy':
+            selected_event = select_event(self.request.GET.get('from'))
+            selected_event_fields = select_event_fields(selected_event)
+
+            if selected_event_fields.count() == 0:
+                not_allowed()
+
+            context.update({
+                'form_title': 'Copiar formulário',
+                'selected_event': selected_event,
+                'selected_event_fields': selected_event_fields,
+            })
+
+        if action == 'add':
+            context.update({'form': self.get_field_form()})
+
+        return context
 
     # noinspection PyUnusedLocal
     def post(self, request, *args, **kwargs):
@@ -132,18 +246,7 @@ class EventFormFieldAddView(BaseFormFieldView, generic.TemplateView):
 
             success = False
             if action == 'add':
-                data = request.POST.copy()
-
-                requirement = request.POST.get('requirement')
-                is_required = None
-                if requirement == 'by_default':
-                    data.update({'required': True})
-
-                elif requirement == 'in_form':
-                    is_required = True
-
-                form.add_new_field(data, is_required)
-
+                form.add_new_field(request.POST)
                 messages.success(request, 'Campo adicionado com sucesso.')
                 success = True
 
@@ -200,7 +303,9 @@ class EventFormFieldAddView(BaseFormFieldView, generic.TemplateView):
                 success = True
 
             if not success:
-                raise Exception('Ação inválida. Envie `copy` ou `add`. ')
+                raise Exception(
+                    'Ação inválida. Envie `copy`, `add` ou `add_existing`.'
+                )
 
         except Exception as e:
             messages.error(request, 'Algum erro ocorreu: ' + str(e))

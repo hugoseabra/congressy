@@ -5,6 +5,157 @@
 {% block sidebar %}{% endblock %}
 {% block content_width %}99%{% endblock %}
 
+{% block extrascript %}
+    <script>
+    function show_requirement_field(element_id, show) {
+        var element = document.getElementById(element_id);
+        if (show) {
+            element.removeAttribute('disabled');
+        } else {
+            element.setAttribute('disabled', 'disabled');
+        }
+    }
+    </script>
+{% endblock %}
+
 {% block content %}
-    as
+    <div style="padding:10px">
+        <a href="{% url 'subscription:event-fields-config' event.pk %}">Voltar</a>
+    </div>
+    <hr/>
+    <h1>{{ event.name }}</h1>
+    <div style="margin-bottom:10px;padding: 10px;background-color: #DDDDDD;text-align: center;"></div>
+
+    {% if form_title %}
+        <h2>{{ form_title }}</h2>
+    {% endif %}
+
+    {% if not action %}
+        <div style="border:1px solid #DDD; padding: 20px">
+            <table width="50%">
+                {% if org_fields %}
+                    <tr>
+                        <th width="35%" style="text-align: right">Escolha um campo padrão:</th>
+                        <td>
+                            <form method="get" action="">
+                                <select name="field">
+                                    {% for field in org_fields %}
+                                        <option value="{{ field.pk }}">{{ field.label }} ({{ field.get_field_type_display }}) - {% if field.required %}obrigatório{% else %}não-obrigatório{% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                                <button>Enviar</button>
+                                <input type="hidden" name="action" value="field" />
+                            </form>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if events %}
+                    <tr>
+                        <th width="35%" style="text-align: right">Copiar formulário de outro evento:</th>
+                        <td>
+                            <form method="get" action="">
+                                <select name="from">
+                                    {% for event_item in events %}
+                                        <option value="{{ event_item.pk }}">{{ event_item.name }} (ID #{{ event_item.pk }})</option>
+                                    {% endfor %}
+                                </select>
+                                <button>Enviar</button>
+                                <input type="hidden" name="action" value="copy" />
+                            </form>
+                        </td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <th width="35%" style="text-align: right">Novo campo:</th>
+                    <td>
+                        <form method="get" action="">
+                            <button>Enviar</button>
+                            <input type="hidden" name="action" value="add" />
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    {% endif %}
+    {% if action %}
+        <div style="border:1px solid #DDD; padding: 20px;margin-top: 4px">
+            {% if action == 'field' %}
+                <table width="100%" border="0" cellpadding="4">
+                    <tr>
+                        <th colspan="2">{{ selected_field.label }} ({{ selected_field.get_field_type_display }})</th>
+                    </tr>
+                    <tr>
+                        <th width="35%" style="text-align: right">Obrigatoriedade:</th>
+                        <td>
+                            <form method="post" action="">{% csrf_token %}
+                                <select name="requirement">
+                                    <option selected="selected" value="">{% if selected_field.required %}Obrigatório{% else %}Não-obrigatório{% endif %} (padrão)</option>
+                                    {% if selected_field.required %}
+                                        <option value="not-required">Não-obrigatório neste formulário</option>
+                                    {% else %}
+                                        <option value="required">Obrigatório neste formulário</option>
+                                    {% endif %}
+                                </select>
+                                <button type="button" onclick="window.location.href='{% url 'subscription:event-field-add' event.pk %}'">Cancelar</button>
+                                <input type="hidden" name="field_name" value="{{ selected_field.name }}" />
+                                <input type="hidden" name="action" value="add_existing" />
+                                <button>Confirmar</button>
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+            {% endif %}
+            {% if action == 'copy' %}
+                <form method="post" action="">{% csrf_token %}
+                    <table width="100%" border="0" cellpadding="4">
+                        <tr>
+                            <th colspan="3"><h3>{{ selected_event.name }}</h3></th>
+                        </tr>
+                        {% for field in selected_event_fields %}
+                            <tr>
+                                <th width="25%" style="text-align: right">
+                                    <label for="field_list_{{ field.pk }}">{{ field.label }}</label>
+                                </th>
+                                <th width="1%" style="text-align: right">
+                                    <input checked="checked" onclick="show_requirement_field('requirement_item_{{ field.pk }}', this.checked)" type="checkbox" name="fields_list" id="field_list_{{ field.pk }}" value="{{ field.name }}" />
+                                </th>
+                                <td>
+                                    <select name="requirement_list" id="requirement_item_{{ field.pk }}">
+                                        <option selected="selected" value="">{% if field.required %}Obrigatório{% else %}Não-obrigatório{% endif %} (padrão)</option>
+                                        {% if field.required %}
+                                            <option value="not-required">Não-obrigatório neste formulário</option>
+                                        {% else %}
+                                            <option value="required">Obrigatório neste formulário</option>
+                                        {% endif %}
+                                    </select>
+                                    <input type="hidden" name="action" value="copy" />
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <th colspan="3">
+                                <button type="button" onclick="window.location.href='{% url 'subscription:event-field-add' event.pk %}'">Cancelar</button>
+                                <button>Confirmar</button>
+                            </th>
+                        </tr>
+                    </table>
+                </form>
+            {% endif %}
+            {% if action == 'add' %}
+                <form method="post" action="">{% csrf_token %}
+                    <table>
+                        {{ form.as_table }}
+                        <tr>
+                            <th colspan="2">
+                                <input type="hidden" name="action" value="add" />
+                                <button type="button" onclick="window.location.href='{% url 'subscription:event-field-add' event.pk %}'">Cancelar</button>
+                                <button>Confirmar</button>
+                            </th>
+                        </tr>
+                    </table>
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
+
 {% endblock %}

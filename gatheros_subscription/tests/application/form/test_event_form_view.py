@@ -202,8 +202,8 @@ class EventFormAddTest(TestCase):
         data = {
             'field_type': Field.FIELD_INPUT_TEXT,
             'label': 'Some strange name',
-            'requirement': 'by_default',
-            'action': 'add'
+            'action': 'add',
+            'required': True
         }
 
         response = self.client.post(self._get_url(), data=data, follow=True)
@@ -213,27 +213,6 @@ class EventFormAddTest(TestCase):
         self.assertEqual(field.label, data['label'])
 
         self.assertTrue(field.required)
-        self.assertTrue(self.event.form.is_required(field))
-
-    def test_add_field_custom_requirement(self):
-        """
-        Testa adição de novo campo com obrigatoriedade personalizada.
-        """
-        self._login()
-        data = {
-            'field_type': Field.FIELD_INPUT_TEXT,
-            'label': 'Some strange name',
-            'requirement': 'in_form',
-            'action': 'add'
-        }
-
-        response = self.client.post(self._get_url(), data=data, follow=True)
-        self.assertContains(response, 'Campo adicionado com sucesso')
-
-        field = self.event.form.fields.last()
-        self.assertEqual(field.label, data['label'])
-
-        self.assertFalse(field.required)
         self.assertTrue(self.event.form.is_required(field))
 
 

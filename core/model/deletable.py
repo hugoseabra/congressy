@@ -24,6 +24,7 @@ class CheckerCollector(Collector):
         self.protected = set()
 
     def collect(self, objs, **kwargs):
+        """ @see super(CheckerCollector, self).collect """
         try:
             return super(CheckerCollector, self).collect(objs, **kwargs)
 
