@@ -230,7 +230,6 @@ class FormRenderTest(TestCase):
             'name': 'checkbox-group',
             'field_type': Field.FIELD_CHECKBOX_GROUP,
             'label': 'my checkobox group',
-            'required': True,
             'options': options
         }
 
@@ -239,7 +238,6 @@ class FormRenderTest(TestCase):
 
         expected_content = [
             'checkbox',
-            'required',
             'id="id_checkbox-group"',
         ]
 
@@ -262,7 +260,6 @@ class FormRenderTest(TestCase):
             'name': 'radio-group',
             'field_type': Field.FIELD_RADIO_GROUP,
             'label': 'my radio group',
-            'required': True,
             'options': options
         }
 
@@ -271,7 +268,6 @@ class FormRenderTest(TestCase):
 
         expected_content = [
             'radio',
-            'required',
             'id="id_radio-group"',
         ]
 

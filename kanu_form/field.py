@@ -9,7 +9,7 @@ class Field(object):
     placeholder = None
     help_text = None
     value = None
-    max_length = 255
+    max_length = None
 
     FIELD_INPUT_TEXT = 'input-text'
     FIELD_INPUT_NUMBER = 'input-number'
@@ -42,6 +42,7 @@ class Field(object):
 
         if field_type in self.supported_types:
             self.type = field_type
+
         else:
             raise FieldError('`{}` não é um campo permitido: '.format(
                 field_type,
@@ -49,7 +50,7 @@ class Field(object):
             ))
 
         self.initial = initial
-        self.required = required
+        self.required = self.has_requirement() and required is True
         self.label = label
         self.placeholder = kwargs.get('placeholder', '')
         self.help_text = kwargs.get('help_text', '')
@@ -120,8 +121,8 @@ class Field(object):
         if self.type == self.FIELD_BOOLEAN:
             self.django_field = fields.BooleanField(
                 label=self.label.title(),
-                required=False,
                 initial=self.initial,
+                required=False,
                 help_text=self.help_text,
                 widget=self._get_widget()
             )
@@ -135,11 +136,20 @@ class Field(object):
                 widget=self._get_widget()
             )
 
-        if self.type == self.FIELD_RADIO_GROUP:
-            self.django_field = fields.ChoiceField(
+        if self.type == self.FIELD_TEXTAREA:
+            self.django_field = fields.CharField(
                 label=self.label.title(),
                 required=self.required,
                 initial=self.initial,
+                help_text=self.help_text,
+                widget=self._get_widget()
+            )
+
+        if self.type == self.FIELD_RADIO_GROUP:
+            self.django_field = fields.ChoiceField(
+                label=self.label.title(),
+                initial=self.initial,
+                required=False,
                 help_text=self.help_text,
                 widget=self._get_widget()
             )
@@ -147,17 +157,8 @@ class Field(object):
         if self.type == self.FIELD_CHECKBOX_GROUP:
             self.django_field = fields.MultipleChoiceField(
                 label=self.label.title(),
-                required=self.required,
                 initial=self.initial,
-                help_text=self.help_text,
-                widget=self._get_widget()
-            )
-
-        if self.type == self.FIELD_TEXTAREA:
-            self.django_field = fields.CharField(
-                label=self.label.title(),
-                required=self.required,
-                initial=self.initial,
+                required=False,
                 help_text=self.help_text,
                 widget=self._get_widget()
             )
@@ -197,10 +198,7 @@ class Field(object):
             widget = self._configure_widget(TelInput)
 
         if self.type == self.FIELD_BOOLEAN:
-            widget = self._configure_widget(
-                widgets.CheckboxInput,
-                as_required=False
-            )
+            widget = self._configure_widget(widgets.CheckboxInput)
 
         if self.type == self.FIELD_SELECT:
             widget = self._configure_widget(widgets.Select)
@@ -209,21 +207,21 @@ class Field(object):
                 intro_option = [('', '- Selecione -',)]
                 self.options = intro_option + self.options
 
+        if self.type == self.FIELD_TEXTAREA:
+            widget = self._configure_widget(widgets.Textarea)
+
         if self.type == self.FIELD_RADIO_GROUP:
             widget = self._configure_widget(widgets.RadioSelect)
 
         if self.type == self.FIELD_CHECKBOX_GROUP:
             widget = self._configure_widget(widgets.CheckboxSelectMultiple)
 
-        if self.type == self.FIELD_TEXTAREA:
-            widget = self._configure_widget(widgets.Textarea)
-
         return widget
 
-    def _configure_widget(self, widget_class, as_required=True, **kwargs):
+    def _configure_widget(self, widget_class, **kwargs):
         """ Configura widget inserindo parâmetros necessários. """
 
-        if as_required and self.required:
+        if self.has_requirement() and self.required:
             self.attrs.update({
                 'required': self.required
             })
@@ -237,3 +235,12 @@ class Field(object):
             kwargs.update({'attrs': self.attrs})
 
         return widget_class(**kwargs)
+
+    def has_requirement(self):
+        """ Verifica se campos possuem atributo `required`. """
+        not_requirable = [
+            self.FIELD_BOOLEAN,
+            self.FIELD_RADIO_GROUP,
+            self.FIELD_CHECKBOX_GROUP,
+        ]
+        return self.type not in not_requirable
