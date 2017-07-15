@@ -21,16 +21,6 @@ from .mixins import GatherosModelMixin
 from .rules import event as rule
 
 
-# @TODO Cores: encontrar 2 cores (primária e secundária) para hot site
-# @TODO gerenciar redirecionamento http em caso de mudança de slug
-
-# @TODO redimensionar banner pequeno para altura e largura corretas - 580 x 422
-# @TODO redimensionar banner destaque para alt. e lar. corretas - 1140 x 500
-# @TODO redimensionar banner de topo para alt. e larg. corretas - 1920 x 900
-
-# @TODO Excluir imagens banners ao deletar evento.
-
-
 def get_image_path(instance, filename):
     """ Resgata localização onde as imagens serão inseridas. """
     return os.path.join('event', str(instance.id), filename)

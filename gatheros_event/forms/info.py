@@ -7,8 +7,6 @@ from django import forms
 from gatheros_event.models import Info
 
 
-# @TODO Remover diretórios vazios de eventos que não possuem banners
-
 class BaseModelFileForm(forms.ModelForm):
     """ Base de classe ModelForm para gerenciado de arquivos. """
     def _clear_file(self, field_name):

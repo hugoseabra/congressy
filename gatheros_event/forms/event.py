@@ -8,8 +8,6 @@ from django.shortcuts import get_object_or_404
 from gatheros_event.models import Event, Member, Organization
 
 
-# @TODO Remover diretórios vazios de eventos que não possuem banners
-
 class EventForm(forms.ModelForm):
     """Formulário principal de evento"""
 

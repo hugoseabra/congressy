@@ -114,15 +114,6 @@ class CanExportViewTest(BaseExportViewTest):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<tr', 2)  # Inscritos Mulheres
 
-    # noinspection PyMethodMayBeStatic
-    def test_pagination(self):
-        """
-        Testar paginação
-        """
-
-    #     pass
-    # @Todo: fazer/testar paginação
-
     def test_download(self):
         """
         Testando o download do arquivo
