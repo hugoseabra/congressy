@@ -220,7 +220,7 @@ class FormAdmin(admin.ModelAdmin):
         )
 
     def has_additional_fields(self, instance):
-        return instance.has_additional_fields
+        return instance.has_additional_fields()
 
     has_additional_fields.__name__ = 'campos adicionais'
     has_additional_fields.boolean = True
