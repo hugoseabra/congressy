@@ -1,4 +1,3 @@
-import json
 from datetime import datetime, timedelta
 
 from django.test import TestCase
@@ -62,7 +61,7 @@ class SubscriptionFormTest(TestCase):
         """ Testa se formulário não está renderizado com campo de lote. """
 
         gatheros_form = self.event.form
-        form = SubscriptionForm(form=gatheros_form)
+        form = SubscriptionForm(created_by=1, form=gatheros_form)
         content = form.as_ul()
 
         self.assertIn(
@@ -74,7 +73,11 @@ class SubscriptionFormTest(TestCase):
         """ Testa se formulário está renderizado com campo de lote. """
 
         gatheros_form = self.event.form
-        form = SubscriptionForm(form=gatheros_form, hide_lot=False)
+        form = SubscriptionForm(
+            created_by=1,
+            form=gatheros_form,
+            hide_lot=False
+        )
         content = form.as_ul()
 
         self.assertIn('<select name="lot" ', content)
@@ -84,7 +87,11 @@ class SubscriptionFormTest(TestCase):
 
         gatheros_form = self.event.form
 
-        form = SubscriptionForm(form=gatheros_form, data=self.data)
+        form = SubscriptionForm(
+            created_by=1,
+            form=gatheros_form,
+            data=self.data,
+        )
         valid = form.is_valid()
 
         if not valid:
@@ -137,7 +144,11 @@ class SubscriptionFormTest(TestCase):
         })
 
         gatheros_form = self.event.form
-        form = SubscriptionForm(form=gatheros_form, data=self.data)
+        form = SubscriptionForm(
+            created_by=1,
+            form=gatheros_form,
+            data=self.data,
+        )
         valid = form.is_valid()
 
         if not valid:
@@ -190,9 +201,10 @@ class SubscriptionFormTest(TestCase):
 
         gatheros_form = self.event.form
         form = SubscriptionForm(
+            created_by=1,
             form=gatheros_form,
             data=self.data,
-            instance=sub
+            instance=sub,
         )
         valid = form.is_valid()
 

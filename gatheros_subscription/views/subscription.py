@@ -83,6 +83,7 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
         kwargs.update({
             'form': event.form,
             'hide_lot': False,
+            'created_by': self.request.user
         })
 
         return kwargs

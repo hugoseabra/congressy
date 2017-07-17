@@ -15,8 +15,13 @@ from .form import EventFieldsForm
 class SubscriptionForm(EventFieldsForm):
     """ Formulário de pré-inscrição. """
 
-    def __init__(self, instance=None, hide_lot=True, *args, **kwargs):
+    def __init__(self, created_by, instance=None, hide_lot=True, *args,
+                 **kwargs):
         self.instance = instance
+
+        if isinstance(created_by, User):
+            created_by = created_by.pk
+        self.created_by = created_by
 
         super(SubscriptionForm, self).__init__(*args, **kwargs)
 
@@ -134,7 +139,7 @@ class SubscriptionForm(EventFieldsForm):
         if not self.instance:
             self.instance = Subscription(
                 origin=Subscription.DEVICE_ORIGIN_WEB,
-                created_by=1,
+                created_by=self.created_by,
             )
 
         else:
