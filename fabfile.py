@@ -270,6 +270,19 @@ def restore(target='prod', document_root='/var/www/'):
     # Redefinir a senha do usuário conforma a configuração
     # Recriar as configurações do supervisor e nginx
 
+def create_reandonly_dbuser():
+    """
+    CREATE USER faeg_leitura WITH password '@Faeg#';
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO faeg_leitura;
+
+/etc/postgresql/9.4/main/pg_hba.conf
+echo >> host    faeg            faeg_leitura    0.0.0.0/0               md5
+
+
+/etc/init.d/postgresql reload
+    :return:
+    """
+
 
 ##############################################################################
 # Funções auxiliares
@@ -462,13 +475,13 @@ def check_dbname(raise_error=True):
     """
     require('dbname')
 
-    sql = "SELECT 1 FROM pg_database WHERE datname='%s'" % env.dbname
-
-    if sudo('psql -tAc "%s"' % sql, user='postgres') == '1':
-        if raise_error:
-            raise Exception('O banco de dados "%s" existe' % env.dbname)
-        return True
-    return False
+    with(cd(env.deploy_dir)):
+        sql = "SELECT 1 FROM pg_database WHERE datname='%s'" % env.dbname
+        if sudo('psql -tAc "%s"' % sql, user='postgres') == '1':
+            if raise_error:
+                raise Exception('O banco de dados "%s" existe' % env.dbname)
+            return True
+        return False
 
 
 def check_dbuser(raise_error=True):
@@ -479,13 +492,13 @@ def check_dbuser(raise_error=True):
     """
     require('dbuser')
 
-    sql = "SELECT 1 FROM pg_roles WHERE rolname='%s'" % env.dbuser
-
-    if sudo('psql -tAc "%s"' % sql, user='postgres') == '1':
-        if raise_error:
-            raise Exception('O usuário de banco "%s" existe' % env.dbuser)
-        return True
-    return False
+    with(cd(env.deploy_dir)):
+        sql = "SELECT 1 FROM pg_roles WHERE rolname='%s'" % env.dbuser
+        if sudo('psql -tAc "%s"' % sql, user='postgres') == '1':
+            if raise_error:
+                raise Exception('O usuário de banco "%s" existe' % env.dbuser)
+            return True
+        return False
 
 
 def check_project(raise_error=True):
