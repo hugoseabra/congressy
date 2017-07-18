@@ -1,5 +1,9 @@
 """ Testes de aplicação com `Organization` - Formulários pela view. """
+import os
+
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse, reverse_lazy
 
@@ -78,10 +82,23 @@ class OrganizationFormViewTest(TestCase):
     def test_edit(self):
         """ Testa edição de organização pela view. """
         self._login()
+
+        # Garantindo que o avatar foi apagado
         org = Organization.objects.get(slug='in2-web-solucoes-e-servicos')
+        org.avatar = None
+        org.save()
+        with self.assertRaises(ValueError):
+            org.avatar.path
+
+        # Enviando novo arquivo
+        with open(os.path.join(settings.MEDIA_ROOT, 'Diego.png'),
+                  'rb') as f:
+            avatar = SimpleUploadedFile("foto_perfil.png", f.read())
+
         data = {
             'name': org.name + ' edited',
             'description_html': '<p style="color:red>Some text</p>',
+            'avatar': avatar,
         }
 
         response = self.client.post(
@@ -91,6 +108,7 @@ class OrganizationFormViewTest(TestCase):
             data=data,
             follow=True
         )
+
         self.assertContains(
             response,
             "Organização alterada com sucesso."
@@ -99,6 +117,12 @@ class OrganizationFormViewTest(TestCase):
         org = Organization.objects.get(pk=org.pk)
         self.assertEqual(org.name, data['name'])
         self.assertEqual(org.description_html, data['description_html'])
+
+        # Checando se gravou a imagem
+        try:
+            org.avatar.path
+        except ValueError:
+            self.fail("O avatar não foi enviado")
 
     def test_delete(self):
         """ Testa exclusão de organização pela view. """
