@@ -4,6 +4,7 @@ Informação relacionada a um evento para estrutrar uma exibição mais elaborad
 das informações sobre o evento para os usuaŕios.
 """
 import os
+from urllib.parse import parse_qs, urlparse
 
 from django.db import models
 from django.utils.html import strip_tags
@@ -97,13 +98,47 @@ class Info(models.Model, GatherosModelMixin):
         validators=[MinSizeValidator(350, 350), MaxSizeValidator(1400, 1400)],
         help_text="Tamanho: 350px x 350px"
     )
-    youtube_video_id = models.CharField(
-        max_length=12,
-        verbose_name='ID do Youtube',
+
+    youtube_video = models.URLField(
+        verbose_name='URL do Youtube',
         null=True,
         blank=True,
-        help_text="Exemplo: https://www.youtube.com/watch?v=id_do_video"
+        help_text="Exemplo: https://www.youtube.com/embed/T2oI7M6DE7c"
     )
+
+    @property
+    def youtube_image(self):
+        if not self.youtube_video:
+            return None
+
+        uuid = self.youtube_video.split('/')[-1]
+        return 'https://img.youtube.com/vi/{0}/0.jpg'.format(uuid)
+
+    def save(self, **kwargs):
+        """
+        Sobrescrição do save padrão
+
+        :param kwargs:
+        :return: instance
+        """
+
+        "Remove tags da descrição em html para criar uma descrição puro texto"
+        self.description = strip_tags(self.description_html)
+
+        if self.youtube_video:
+            "Extrai o código do vídeo e cria url de embed"
+            parse_result = urlparse(self.youtube_video)
+            try:
+                "https://www.youtube.com/watch?v=T2oI7M6DE7c"
+                uuid = parse_qs(parse_result.query)['v'][0]
+            except KeyError:
+                "https://youtu.be/T2oI7M6DE7c"
+                uuid = parse_result.path[1:]
+
+            self.youtube_video = \
+                'https://www.youtube.com/embed/{0}'.format(uuid)
+
+        return super(Info, self).save(kwargs)
 
     class Meta:
         verbose_name = 'Informação de Evento'
@@ -112,8 +147,3 @@ class Info(models.Model, GatherosModelMixin):
 
     def __str__(self):
         return self.event.name
-
-    def save(self, *args, **kwargs):
-        """ Salva """
-        self.description = strip_tags(self.description_html)
-        super(Info, self).save(*args, **kwargs)

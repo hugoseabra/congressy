@@ -52,7 +52,7 @@
                 </td>
                 <td width="50%" style="padding:10px">
                     {% if selected_config_type == object.info.CONFIG_TYPE_VIDEO %}
-                        <img width="480px" height="360px" src="https://img.youtube.com/vi/{{ object.info.youtube_video_id }}/0.jpg"/>
+                        <img width="480px" height="360px" src="{{ object.info.youtube_image }}"/>
                     {% elif selected_config_type == object.info.CONFIG_TYPE_MAIN_IMAGE and object.info.image_main %}
                         <img src="{{ object.info.image_main.thumbnail.url }}"/>
                     {% elif selected_config_type == object.info.CONFIG_TYPE_4_IMAGES %}

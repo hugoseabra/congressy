@@ -64,6 +64,7 @@ class BaseInfoFormTest(TestCase):
 
 class InfoTextFormTest(BaseInfoFormTest):
     """ Testes de formulário de `Info` para somente texto. """
+
     def test_new_info(self):
         """ Testa criação de nova `Info`. """
         info = self._get_info()
@@ -88,6 +89,7 @@ class InfoTextFormTest(BaseInfoFormTest):
 
 class Info4ImagesFormTest(BaseInfoFormTest):
     """ Testes de formulário de `Info` para 4 imagens. """
+
     def test_new_info(self):
         """ Testa criação de nova `Info`. """
         info = self._get_info()
@@ -153,6 +155,7 @@ class Info4ImagesFormTest(BaseInfoFormTest):
 
 class InfoMainImageFormTest(BaseInfoFormTest):
     """ Testes de formulário de `Info` para imagem principal. """
+
     def test_new_info(self):
         """ Testa criação de nova `Info`. """
         info = self._get_info()
@@ -225,7 +228,7 @@ class InfoVideoFormTest(BaseInfoFormTest):
             'event': info.event.pk,
             'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_VIDEO,
-            'youtube_video_id': 'jbVpFUGCw1o',
+            'youtube_video': 'https://www.youtube.com/embed/jbVpFUGCw1o'
         }
 
         form = InfoVideoForm(instance=info, data=data)
@@ -234,3 +237,55 @@ class InfoVideoFormTest(BaseInfoFormTest):
 
         info = self._get_info()
         self.assertEqual(info.config_type, Info.CONFIG_TYPE_VIDEO)
+
+    def test_video_youtube(self):
+        """
+        Testando o recurso do modelo tratar as diferentes urls do youtube
+        """
+
+        def save_info(cls, youtube_video):
+            info = cls._get_info()
+            assert info is not None
+
+            data = {
+                'event': info.event.pk,
+                'description_html': '<p style="color:red>Some text</p>',
+                'config_type': Info.CONFIG_TYPE_VIDEO,
+                'youtube_video': youtube_video
+            }
+
+            form = InfoVideoForm(instance=info, data=data)
+            cls.assertTrue(form.is_valid())
+            return form.save()
+
+        """
+        Urls no padrão: https://www.youtube.com/watch?v=GFmzLy6z8W8
+        """
+        instance = save_info(
+            self,
+            'https://www.youtube.com/watch?v=GFmzLy6z8W8'
+        )
+        self.assertEqual(
+            instance.youtube_video,
+            'https://www.youtube.com/embed/GFmzLy6z8W8'
+        )
+
+        """
+        Urls no padrão: https://www.youtube.com/watch?v=GFmzLy6z8W8
+        """
+        instance = save_info(
+            self,
+            'https://youtu.be/GFmzLy6z8W8'
+        )
+        self.assertEqual(
+            instance.youtube_video,
+            'https://www.youtube.com/embed/GFmzLy6z8W8'
+        )
+
+        """
+        Imgagem do vídeo
+        """
+        self.assertEqual(
+            instance.youtube_image,
+            'https://img.youtube.com/vi/GFmzLy6z8W8/0.jpg'
+        )

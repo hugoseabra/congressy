@@ -795,14 +795,14 @@ class Migration(migrations.Migration):
                     ],
                     verbose_name='imagem pequena #4'
                 )),
-                ('youtube_video_id', models.CharField(
-                    blank=True,
-                    help_text='Exemplo: '
-                              'https://www.youtube.com/watch?v=id_do_video',
-                    max_length=12,
-                    null=True,
-                    verbose_name='ID do Youtube'
-                )),
+                ('youtube_video',
+                 models.URLField(
+                     blank=True,
+                     help_text='Exemplo: '
+                               'https://www.youtube.com/embed/T2oI7M6DE7c',
+                     null=True,
+                     verbose_name='URL do Youtube'
+                 )),
             ],
             options={
                 'verbose_name': 'Informação de Evento',

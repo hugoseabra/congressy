@@ -1,6 +1,7 @@
 """
 Formulários de Informação de evento
 """
+from copy import copy
 
 from django import forms
 
@@ -9,6 +10,7 @@ from gatheros_event.models import Info
 
 class BaseModelFileForm(forms.ModelForm):
     """ Base de classe ModelForm para gerenciado de arquivos. """
+
     def _clear_file(self, field_name):
         """Removes files from model"""
 
@@ -135,7 +137,7 @@ class InfoVideoForm(BaseModelFileForm):
         """ meta """
         model = Info
         fields = [
-            'youtube_video_id',
+            'youtube_video',
             'description_html',
             'event',
             'config_type',

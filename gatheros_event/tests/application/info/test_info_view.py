@@ -39,15 +39,15 @@ class EventInfoTest(TestCase):
         """ Realiza login. """
         self.client.force_login(self.user)
 
-    def _get_url(self, pk=None):
+    def _get_url(self, pk=None, **kwargs):
         """ Resgata URL. """
         if not pk:
             event = self._get_event()
             pk = event.pk
-
-        return reverse('event:event-info', kwargs={
+        kwargs.update({
             'pk': pk
         })
+        return reverse('event:event-info', kwargs=kwargs)
 
     # noinspection PyMethodMayBeStatic
     def _get_event(self):
@@ -146,6 +146,14 @@ class EventInfoTest(TestCase):
             "Informações de capa atualizadas com sucesso."
         )
 
+    def test_video_get(self):
+        """
+        Testa o carregamento da página do vídeo
+        """
+        self._login()
+        response = self.client.get(self._get_url(), data={'type': 'video'})
+        self.assertContains(response, "URL do Youtube")
+
     def test_video(self):
         """ Testa exibição de vídeo. """
         self._login()
@@ -154,7 +162,7 @@ class EventInfoTest(TestCase):
             'event': event.pk,
             'description_html': '<p style="color:red>Some text</p>',
             'config_type': Info.CONFIG_TYPE_VIDEO,
-            'youtube_video_id': 'jbVpFUGCw1o'
+            'youtube_video': 'https://www.youtube.com/embed/jbVpFUGCw1o'
         }
 
         response = self.client.post(self._get_url(), data=data, follow=True)
