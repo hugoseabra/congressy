@@ -1,8 +1,12 @@
 """ Testes de aplicação de perfil de usuário. """
+
+import os
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.shortcuts import reverse
 from django.test import TestCase
 
@@ -193,9 +197,78 @@ class ProfileViewTest(TestCase):
         response = self.client.post(self.url, self.data, follow=True)
         self.assertContains(response, 'Perfil atualizado com sucesso')
 
+    def test_update_fields(self):
+        new_data = {
+            "name": "Luciana Silva Oliveira",
+            "gender": "M",
+            "email": "lucianasilva@gmail.com",
+            "city": 5413,
+            "zip_code": "74023045",
+            "street": "Rua 12 Lote 10",
+            "number": "3912",
+            "complement": "Unidade 203",
+            "village": "Parque Atheneu",
+            "phone": "62992977058",
+            "avatar": "luciana.jpg",
+            "cpf": '01234567890',
+            "birth_date": "2017-04-11",
+            "rg": "123456",
+            "orgao_expedidor": "SSPGO",
+            "occupation": 19,
+            "pne": True,
+            "website": "http://in2web.com.br",
+            "facebook": "https://facebook.com/luciana.silva",
+            "twitter": "@LucianaSilvaOliveira",
+            "linkedin": "https://linkedin.com/luciana.silva",
+            "skype": "LucianaSilvaOliveira"
+        }
+        response = self.client.post(self.url, new_data, follow=True)
+
+        # Checando status da resposta
+        self.assertContains(response, 'Perfil atualizado com sucesso')
+
+        # Checando se os campos foram alterados
+        person = Person.objects.get(email=self.data['email'])
+        for key, val in new_data.items():
+            person_val = getattr(person, key)
+            if hasattr(person_val, 'pk'):
+                person_val = person_val.pk
+
+            assert str(person_val) == str(val), \
+                "'%s' não igual: '%s' == '%s'" % (key, person_val, val)
+
+    def test_update_avatar(self):
+        """
+        Testando envio da foto
+        """
+
+        # Garantindo que o avatar foi apagado
+        person = Person.objects.get(email=self.data['email'])
+        person.avatar = None
+        person.save()
+        with self.assertRaises(ValueError):
+            person.avatar.path
+
+        # Enviando novo arquivo
+        with open(os.path.join(settings.MEDIA_ROOT, 'Diego.png'), 'rb') as f:
+            avatar = SimpleUploadedFile("foto_perfil.png", f.read())
+            self.data.update({'avatar': avatar})
+            response = self.client.post(self.url, self.data, follow=True)
+
+        # Checando status da resposta
+        self.assertContains(response, 'Perfil atualizado com sucesso')
+
+        # Checando se gravou a imagem
+        try:
+            person = Person.objects.get(email=self.data['email'])
+            person.avatar.path
+        except ValueError:
+            self.fail("O avatar não foi enviado")
+
 
 class ProfileCreateFormTest(TestCase):
     """ Testes de criação de perfil de usuário pela view. """
+
     def setUp(self):
         self.data = {
             # Informações do perfil
@@ -258,6 +331,7 @@ class ProfileCreateFormTest(TestCase):
 
 class ProfileCreateViewTest(TestCase):
     """ Testes de criação de perfil de usuário pela view. """
+
     def setUp(self):
         self.data = {
             "name": "João Das Couves",
