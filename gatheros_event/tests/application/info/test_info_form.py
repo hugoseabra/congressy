@@ -31,7 +31,7 @@ class BaseInfoFormTest(TestCase):
             'gatheros_event',
             'tests',
             'fixtures',
-            'images',
+            'media',
             'info'
         )
         self.persisted_path = 'event'

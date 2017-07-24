@@ -46,7 +46,8 @@ class Organization(models.Model, GatherosModelMixin):
         null=True,
         width_field='avatar_width',
         height_field='avatar_height',
-        verbose_name='foto'
+        verbose_name='foto',
+        upload_to='organization',
     )
     website = models.CharField(max_length=255, null=True, blank=True)
     facebook = models.CharField(max_length=255, null=True, blank=True)

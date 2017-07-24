@@ -310,13 +310,13 @@ class Migration(migrations.Migration):
                     null=True
                 )),
                 ('avatar', models.ImageField(
-                    blank=True,
-                    height_field='avatar_height',
-                    null=True,
-                    upload_to='',
-                    verbose_name='foto',
-                    width_field='avatar_width'
-                )),
+                     blank=True,
+                     height_field='avatar_height',
+                     null=True,
+                     upload_to='organization',
+                     verbose_name='foto',
+                     width_field='avatar_width'
+                 )),
                 ('website', models.CharField(
                     blank=True,
                     max_length=255,
@@ -458,7 +458,7 @@ class Migration(migrations.Migration):
                 ('avatar', models.ImageField(
                     blank=True,
                     null=True,
-                    upload_to='',
+                    upload_to='person',
                     verbose_name='foto'
                 )),
                 ('cpf', models.CharField(

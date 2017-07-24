@@ -30,7 +30,7 @@ class EventDetailBannersUploadTest(TestCase):
             'gatheros_event',
             'tests',
             'fixtures',
-            'images',
+            'media',
             'event'
         )
         self.event_path = os.path.join(settings.MEDIA_ROOT, 'event')

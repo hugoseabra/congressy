@@ -30,7 +30,7 @@ class EventInfoTest(TestCase):
             'gatheros_event',
             'tests',
             'fixtures',
-            'images',
+            'media',
             'info'
         )
         self.user = User.objects.get(username="lucianasilva@gmail.com")

@@ -1,10 +1,11 @@
 """ Testes de aplicação com `Organization` - Formulários pela view. """
 import os
+import tempfile
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
 
 from gatheros_event.models import Organization
@@ -79,6 +80,7 @@ class OrganizationFormViewTest(TestCase):
             "Organização criada com sucesso"
         )
 
+    @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
     def test_edit(self):
         """ Testa edição de organização pela view. """
         self._login()
@@ -91,8 +93,10 @@ class OrganizationFormViewTest(TestCase):
             org.avatar.path
 
         # Enviando novo arquivo
-        with open(os.path.join(settings.MEDIA_ROOT, 'Diego.png'),
-                  'rb') as f:
+        DIR = os.path.dirname(__file__)
+        file_path = os.path.join(DIR, '..', '..', 'fixtures', 'media',
+                                 'person', 'Diego.png')
+        with open(file_path, 'rb') as f:
             avatar = SimpleUploadedFile("foto_perfil.png", f.read())
 
         data = {

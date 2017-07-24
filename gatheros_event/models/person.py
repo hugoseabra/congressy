@@ -99,7 +99,12 @@ class Person(models.Model, GatherosModelMixin):
         verbose_name='usuário',
         related_name='person'
     )
-    avatar = models.ImageField(blank=True, null=True, verbose_name='foto')
+    avatar = models.ImageField(
+        blank=True,
+        null=True,
+        verbose_name='foto',
+        upload_to='person',
+    )
     cpf = models.CharField(
         max_length=11,
         blank=True,

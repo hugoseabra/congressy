@@ -82,6 +82,7 @@ class BaseEventForm(TestCase):
 
 class EventFormTest(BaseEventForm):
     """ Testes de formulário de evento. """
+
     def test_render(self):
         """ Testa se organização """
         user = self._get_user()
@@ -98,6 +99,7 @@ class EventFormTest(BaseEventForm):
 
     def test_create_edit_event(self):
         """ Testa criação e edição de evento. """
+
         def test_instance_data(form_obj, model_data):
             """ Testa dados da instância. """
             model = form_obj.instance
@@ -129,8 +131,10 @@ class EventFormTest(BaseEventForm):
 
 class EventDatesFormTest(BaseEventForm):
     """ Testes de formulário de datas de evento. """
+
     def test_dates_edition_event(self):
         """ Testa edição de dados de evento. """
+
         def test_instance_data(form_obj, model_data):
             """ Testa dados da instância. """
             model = form_obj.instance
@@ -162,8 +166,10 @@ class EventDatesFormTest(BaseEventForm):
 
 class EventSubscriptionTypeFormTest(BaseEventForm):
     """ Testes de edição de tipo de inscrição de evento. """
+
     def test_subscription_type_edition_event(self):
         """ Testa edição de tipo de inscrição de evento. """
+
         def test_instance_data(form_obj, model_data):
             """ Testa dados da instância. """
             model = form_obj.instance
@@ -195,8 +201,10 @@ class EventSubscriptionTypeFormTest(BaseEventForm):
 
 class EventPublicationFormTest(BaseEventForm):
     """ Testes de formulário de publicação/despublicação de evento. """
+
     def test_publication_edition_event(self):
         """ Testa edição de publicação/despublicação de evento. """
+
         def test_instance_data(form_obj, model_data):
             """ Testa dados da instância. """
             model = form_obj.instance
@@ -239,7 +247,7 @@ class EventBannersFormTest(TestCase):
             'gatheros_event',
             'tests',
             'fixtures',
-            'images',
+            'media',
             'event'
         )
         self.event_path = os.path.join(settings.MEDIA_ROOT, 'event')

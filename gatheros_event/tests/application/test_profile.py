@@ -1,14 +1,14 @@
 """ Testes de aplicação de perfil de usuário. """
-
 import os
+import tempfile
 import uuid
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.shortcuts import reverse
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from gatheros_event.forms import (
     InvitationCreateForm,
@@ -209,7 +209,6 @@ class ProfileViewTest(TestCase):
             "complement": "Unidade 203",
             "village": "Parque Atheneu",
             "phone": "62992977058",
-            "avatar": "luciana.jpg",
             "cpf": '01234567890',
             "birth_date": "2017-04-11",
             "rg": "123456",
@@ -237,6 +236,7 @@ class ProfileViewTest(TestCase):
             assert str(person_val) == str(val), \
                 "'%s' não igual: '%s' == '%s'" % (key, person_val, val)
 
+    @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
     def test_update_avatar(self):
         """
         Testando envio da foto
@@ -250,7 +250,10 @@ class ProfileViewTest(TestCase):
             person.avatar.path
 
         # Enviando novo arquivo
-        with open(os.path.join(settings.MEDIA_ROOT, 'Diego.png'), 'rb') as f:
+        DIR = os.path.dirname(__file__)
+        file_path = os.path.join(DIR, '..', 'fixtures', 'media',
+                                 'person', 'Diego.png')
+        with open(file_path, 'rb') as f:
             avatar = SimpleUploadedFile("foto_perfil.png", f.read())
             self.data.update({'avatar': avatar})
             response = self.client.post(self.url, self.data, follow=True)

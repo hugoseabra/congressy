@@ -23,7 +23,11 @@ from .rules import event as rule
 
 def get_image_path(instance, filename):
     """ Resgata localização onde as imagens serão inseridas. """
-    return os.path.join('event', str(instance.id), filename)
+    return os.path.join(
+        'event',
+        str(instance.id),
+        os.path.basename(filename)
+    )
 
 
 @track_data('subscription_type', 'date_start', 'date_end')
