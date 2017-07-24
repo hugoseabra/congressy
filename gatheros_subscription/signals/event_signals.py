@@ -1,10 +1,28 @@
 """ Signals do model `Event`. """
+import os
+
 from django.db.models import Max
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
 from gatheros_event.models import Event
 from gatheros_subscription.models import Lot
+
+
+@receiver(post_delete, sender=Event)
+def clear_files_on_delete(instance, **_):
+    """ Apaga arquivos relacionados quando Evento é apagado """
+    if instance.banner_slide:
+        if os.path.isfile(instance.banner_slide.path):
+            os.remove(instance.banner_slide.path)
+
+    if instance.banner_small:
+        if os.path.isfile(instance.banner_small.path):
+            os.remove(instance.banner_small.path)
+
+    if instance.banner_top:
+        if os.path.isfile(instance.banner_top.path):
+            os.remove(instance.banner_top.path)
 
 
 @receiver(pre_save, sender=Event)
