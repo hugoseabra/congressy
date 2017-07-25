@@ -1,6 +1,7 @@
 """
 Formulários de Event
 """
+import os
 
 from django import forms
 from django.shortcuts import get_object_or_404
@@ -125,21 +126,18 @@ class EventBannerForm(forms.ModelForm):
         if field_name not in self.changed_data:
             return
 
-        file = getattr(self.instance, field_name)
-        if not file:
+        field = getattr(self.instance, field_name)
+        if not field:
             return
 
-        storage = file.storage
-        path = file.path
-        storage.delete(path)
+        path = os.path.dirname(field.file.name)
 
-        storage = file.default.storage
-        path = file.default.path
-        storage.delete(path)
+        # Executa lógica de remoção que trata cache e outros resizes
+        field.delete()
 
-        storage = file.thumbnail.storage
-        path = file.thumbnail.path
-        storage.delete(path)
+        # Remove diretórios vazios
+        if not os.listdir(path):
+            os.rmdir(path)
 
 
 class EventPlaceForm(forms.ModelForm):

@@ -1,12 +1,13 @@
 """ Testes de aplicação com `Event` - Formulários. """
 import os
-import shutil
+import tempfile
 from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import six
 
 from gatheros_event.forms import (
@@ -252,72 +253,70 @@ class EventBannersFormTest(TestCase):
         )
         self.event_path = os.path.join(settings.MEDIA_ROOT, 'event')
         self.persisted_path = 'event'
-        self._clear_uploaded_directory()
 
-    # noinspection PyMethodMayBeStatic
-    def _get_event(self):
-        return Event.objects.get(slug='streaming-de-sucesso')
-
-    # noinspection PyMethodMayBeStatic
-    def _clear_uploaded_directory(self):
-        event = self._get_event()
-        path = os.path.join(self.event_path, str(event.pk))
-        if os.path.isdir(path):
-            shutil.rmtree(path)
-
-    def tearDown(self):
-        """ Limpa arquivos utilizados nos testes. """
-        self._clear_uploaded_directory()
-
-    def test_upload_banners(self):
-        """ Testa upload de banners. """
-        event = self._get_event()
-
-        file_names = {
+        self.file_names = {
             'banner_top': 'Evento_Banner_topo.png',
             'banner_slide': 'Evento_Banner_destaque.png',
             'banner_small': 'Evento_Banner_pequeno.png',
         }
 
-        file_dict = {}
-        for field_name, file_name in six.iteritems(file_names):
-            assert hasattr(event, field_name)
-            attr = getattr(event, field_name)
+    # noinspection PyMethodMayBeStatic
+    def _get_event(self):
+        return Event.objects.get(slug='streaming-de-sucesso')
 
+    def _upload_banners(self):
+        """ Testa upload de banners. """
+        event = self._get_event()
+
+        file_dict = {}
+        for field_name, file_name in six.iteritems(self.file_names):
             # Campo ImageFile deve estar vazio
-            self.assertEqual(attr.name, '')
+            self.assertFalse(bool(getattr(event, field_name)))
 
             file_path = os.path.join(self.file_base_path, file_name)
+            with open(file_path, 'rb') as f:
+                file_dict.update({
+                    field_name: SimpleUploadedFile(
+                        f.name,
+                        f.read(),
+                        'image/png'
+                    )
+                })
 
-            file = open(file_path, 'rb')
-            file_dict[field_name] = SimpleUploadedFile(
-                file_name,
-                file.read(),
-                'image/png'
-            )
-
+        # Enviando arquivos
         form = EventBannerForm(instance=event, files=file_dict)
         self.assertTrue(form.is_valid())
         form.save()
 
+    @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+    def test_uploaded_files(self):
+        """ Verificando se tudo foi gravado corretamente """
+
+        # Envia os banners
+        self._upload_banners()
+
         event = self._get_event()
-        for field_name, file_name in six.iteritems(file_names):
-            assert hasattr(event, field_name)
+        for field_name in self.file_names.keys():
+            # Campo ImageFile deve estar preenchido
+            self.assertTrue(bool(getattr(event, field_name)))
+
+    @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+    def test_clear_fields(self):
+        """ Testa o submit dos campos clear """
+
+        # Envia os banners
+        self._upload_banners()
+
+        # Guardando path do arquivo para checagem
+        event = self._get_event()
+        file_paths = {}
+        for field_name in self.file_names.keys():
             attr = getattr(event, field_name)
-            file_dir = os.path.join(self.event_path, str(event.pk))
-            file_path = os.path.join(file_dir, file_name)
+            file_paths.update({field_name: attr.file.name})
 
-            # Campo ImageFile deve ter o arquivo enviado.
-            self.assertEqual(attr.name, '{}/{}/{}'.format(
-                self.persisted_path,
-                str(event.pk),
-                file_name
-            ))
-            self.assertTrue(os.path.isfile(file_path))
-
-        # Clear file deve limpar o campo no model e deletar os arquivos
+        # Limpando campos com "-clear"
         dict_clear = {}
-        for field_name in six.iterkeys(file_names):
+        for field_name in self.file_names.keys():
             key = field_name + '-clear'
             dict_clear[key] = 'on'
 
@@ -327,17 +326,35 @@ class EventBannersFormTest(TestCase):
         )
         form.save()
 
-        # Campos limpos e sem arquivos
+        # Verificando se os campos foram limpos e os arquivos apagados
         event = self._get_event()
-        for field_name, file_name in six.iteritems(file_names):
-            assert hasattr(event, field_name)
-            attr = getattr(event, field_name)
-            file_dir = os.path.join(self.event_path, str(event.pk))
-            file_path = os.path.join(file_dir, file_name)
+        dir_path = None
+        for field_name in self.file_names.keys():
+            # Campo ImageFile deve estar limpo
+            self.assertFalse(bool(getattr(event, field_name)))
 
-            # Campo ImageFile deve ter o arquivo enviado.
-            self.assertEqual(attr.name, '')
+            # Arquivo não deve mais existir no disco
+            file_path = file_paths.get(field_name)
+            dir_path = os.path.dirname(file_path)
             self.assertFalse(os.path.isfile(file_path))
+
+        # Diretório não deve mais existir
+        self.assertFalse(os.path.isdir(dir_path))
+
+    @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+    def test_signal_delete(self):
+        """ Testa o submit dos campos clear """
+
+        # Envia os banners
+        self._upload_banners()
+
+        # Remove o evento
+        event = self._get_event()
+        dir_path = os.path.dirname(event.banner_top.file.name)
+        event.delete()
+
+        # Diretório não deve mais existir
+        self.assertFalse(os.path.isdir(dir_path))
 
 
 class EventPlaceFormTest(TestCase):

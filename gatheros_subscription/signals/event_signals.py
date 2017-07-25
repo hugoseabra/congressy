@@ -12,17 +12,24 @@ from gatheros_subscription.models import Lot
 @receiver(post_delete, sender=Event)
 def clear_files_on_delete(instance, **_):
     """ Apaga arquivos relacionados quando Evento é apagado """
-    if instance.banner_slide:
-        if os.path.isfile(instance.banner_slide.path):
-            os.remove(instance.banner_slide.path)
 
-    if instance.banner_small:
-        if os.path.isfile(instance.banner_small.path):
-            os.remove(instance.banner_small.path)
+    path = None
 
-    if instance.banner_top:
-        if os.path.isfile(instance.banner_top.path):
-            os.remove(instance.banner_top.path)
+    def _delete_media(field):
+        """ Lógica de remoção de arquivos """
+        nonlocal path
+        if bool(field) and os.path.isfile(field.path):
+            path = os.path.dirname(field.path)
+            field.delete(False)
+
+    # Chamando remoção de arquivos
+    _delete_media(instance.banner_slide)
+    _delete_media(instance.banner_small)
+    _delete_media(instance.banner_top)
+
+    # Remove diretório se estiver vazio
+    if path and not os.listdir(path):
+        os.rmdir(path)
 
 
 @receiver(pre_save, sender=Event)
