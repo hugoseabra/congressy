@@ -3,12 +3,18 @@
 Local onde o evento vai acontecer, para facilitar a orientação aos possíveis
 participantes e exibição de mapa.
 """
+import os
 
 from django.db import models
 
 from kanu_locations.models import City
 from . import Organization
 from .mixins import GatherosModelMixin
+
+
+def get_image_path(_, filename):
+    """ Resgata localização onde as imagens serão inseridas. """
+    return os.path.join('place', os.path.basename(filename))
 
 
 class Place(models.Model, GatherosModelMixin):
@@ -85,12 +91,34 @@ class Place(models.Model, GatherosModelMixin):
         help_text="Alguma informação para ajudar a chegar ao local."
     )
 
-    google_street_view_link = models.TextField(
+    google_streetview_link = models.URLField(
         verbose_name='Link do Google StreetView',
         blank=True,
         null=True,
-        help_text="Informações do Google StreetView para exibir imagens do"
-                  " local no site."
+        help_text="Informações para exibir imagens do local"
+    )
+
+    google_streetview_img = models.ImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
+        verbose_name='Imagem Google StreetView',
+        help_text="Imagem estática do Google StreetView"
+    )
+
+    google_maps_link = models.URLField(
+        verbose_name='Link do Google Maps',
+        blank=True,
+        null=True,
+        help_text="Informações para exibir mapa do local"
+    )
+
+    google_maps_img = models.ImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
+        verbose_name='Imagem Google Maps',
+        help_text="Imagem estática do Google Maps"
     )
 
     class Meta:

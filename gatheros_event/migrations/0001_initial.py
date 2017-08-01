@@ -12,9 +12,10 @@ from django.conf import settings
 from django.core.management import call_command
 from django.db import migrations, models
 
+import gatheros_event.models.event
+import gatheros_event.models.info
+import gatheros_event.models.place
 from core.model import validator
-from gatheros_event.models.event import get_image_path
-from gatheros_event.models.info import get_image_path as get_info_image_path
 from gatheros_event.models.mixins import GatherosModelMixin
 
 
@@ -103,7 +104,7 @@ class Migration(migrations.Migration):
                     blank=True,
                     help_text='Banner de destaque (tamanho: 1140px x 500px)',
                     null=True,
-                    upload_to=get_image_path,
+                    upload_to=gatheros_event.models.event.get_image_path,
                     validators=[
                         stdimage.validators.MinSizeValidator(1140, 500),
                         stdimage.validators.MaxSizeValidator(2048, 898)
@@ -115,7 +116,7 @@ class Migration(migrations.Migration):
                     help_text='Banner pequeno para apresentação geral'
                               ' (tamanho: 580px x 422px)',
                     null=True,
-                    upload_to=get_image_path,
+                    upload_to=gatheros_event.models.event.get_image_path,
                     validators=[
                         stdimage.validators.MinSizeValidator(580, 422),
                         stdimage.validators.MaxSizeValidator(1024, 745)
@@ -127,7 +128,7 @@ class Migration(migrations.Migration):
                     help_text='Banner para o topo do site do evento'
                               ' (tamanho: 1920px x 900px)',
                     null=True,
-                    upload_to=get_image_path,
+                    upload_to=gatheros_event.models.event.get_image_path,
                     validators=[
                         stdimage.validators.MinSizeValidator(1920, 900),
                         stdimage.validators.MaxSizeValidator(4096, 1920)
@@ -310,13 +311,13 @@ class Migration(migrations.Migration):
                     null=True
                 )),
                 ('avatar', models.ImageField(
-                     blank=True,
-                     height_field='avatar_height',
-                     null=True,
-                     upload_to='organization',
-                     verbose_name='foto',
-                     width_field='avatar_width'
-                 )),
+                    blank=True,
+                    height_field='avatar_height',
+                    null=True,
+                    upload_to='organization',
+                    verbose_name='foto',
+                    width_field='avatar_width'
+                )),
                 ('website', models.CharField(
                     blank=True,
                     max_length=255,
@@ -627,11 +628,31 @@ class Migration(migrations.Migration):
                     null=True,
                     verbose_name='referência'
                 )),
-                ('google_street_view_link', models.TextField(
+                ('google_maps_img', models.ImageField(
                     blank=True,
-                    help_text='Informações do Google StreetView para exibir'
-                              ' imagens do local no site.',
-                    null=True, verbose_name='Link do Google StreetView'
+                    help_text='Imagem estática do Google Maps',
+                    null=True,
+                    upload_to=gatheros_event.models.place.get_image_path,
+                    verbose_name='Imagem Google Maps'
+                )),
+                ('google_maps_link', models.URLField(
+                    blank=True,
+                    help_text='Informações para exibir mapa do local',
+                    null=True,
+                    verbose_name='Link do Google Maps'
+                )),
+                ('google_streetview_img', models.ImageField(
+                    blank=True,
+                    help_text='Imagem estática do Google StreetView',
+                    null=True,
+                    upload_to=gatheros_event.models.place.get_image_path,
+                    verbose_name='Imagem Google StreetView'
+                )),
+                ('google_streetview_link', models.URLField(
+                    blank=True,
+                    help_text='Informações para exibir imagens do local',
+                    null=True,
+                    verbose_name='Link do Google StreetView'
                 )),
                 ('city', models.ForeignKey(
                     on_delete=django.db.models.deletion.PROTECT,
@@ -744,7 +765,7 @@ class Migration(migrations.Migration):
                     help_text='Imagem única da descrição do evento:'
                               ' 750px x 874px',
                     null=True,
-                    upload_to=get_info_image_path,
+                    upload_to=gatheros_event.models.info.get_image_path,
                     validators=[
                         stdimage.validators.MinSizeValidator(750, 874),
                         stdimage.validators.MaxSizeValidator(1400, 1400)
@@ -755,7 +776,7 @@ class Migration(migrations.Migration):
                     blank=True,
                     help_text='Tamanho: 350px x 350px',
                     null=True,
-                    upload_to=get_info_image_path,
+                    upload_to=gatheros_event.models.info.get_image_path,
                     validators=[
                         stdimage.validators.MinSizeValidator(350, 350),
                         stdimage.validators.MaxSizeValidator(1400, 1400)
@@ -766,7 +787,7 @@ class Migration(migrations.Migration):
                     blank=True,
                     help_text='Tamanho: 350px x 350px',
                     null=True,
-                    upload_to=get_info_image_path,
+                    upload_to=gatheros_event.models.info.get_image_path,
                     validators=[
                         stdimage.validators.MinSizeValidator(350, 350),
                         stdimage.validators.MaxSizeValidator(1400, 1400)
@@ -777,7 +798,7 @@ class Migration(migrations.Migration):
                     blank=True,
                     help_text='Tamanho: 350px x 350px',
                     null=True,
-                    upload_to=get_info_image_path,
+                    upload_to=gatheros_event.models.info.get_image_path,
                     validators=[
                         stdimage.validators.MinSizeValidator(350, 350),
                         stdimage.validators.MaxSizeValidator(1400, 1400)
@@ -788,7 +809,7 @@ class Migration(migrations.Migration):
                     blank=True,
                     help_text='Tamanho: 350px x 350px',
                     null=True,
-                    upload_to=get_info_image_path,
+                    upload_to=gatheros_event.models.info.get_image_path,
                     validators=[
                         stdimage.validators.MinSizeValidator(350, 350),
                         stdimage.validators.MaxSizeValidator(1400, 1400)
