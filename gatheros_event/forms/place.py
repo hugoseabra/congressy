@@ -12,7 +12,7 @@ from gatheros_event.models import Place
 
 
 class GooglePictureWidget(forms.widgets.Widget):
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, **_):
         if not value:
             return ''
 
