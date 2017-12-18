@@ -8,8 +8,15 @@ import $DJANGO_SETTINGS_MODULE as settings
 print(settings.BASE_DIR)"`
 
 export PYTHONPATH=$BASE_DIR
-$BASE_DIR/bin/dropdb.sh || exit 1;
-$BASE_DIR/bin/createdb.sh || exit 1;
+
+$BASE_DIR/bin/dev/create_db_container.sh
+$BASE_DIR/bin/dev/dropdb.sh
+$BASE_DIR/bin/dev/dropdb_test.sh
+$BASE_DIR/bin/dev/dropuser.sh
+$BASE_DIR/bin/dev/createuser.sh
+$BASE_DIR/bin/dev/createdb.sh
+
+python $BASE_DIR/manage.py migrate
 
 # Importando fixtures
 # User
@@ -27,4 +34,4 @@ python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
 python $BASE_DIR/manage.py loaddata 008_answer
 
 # Atualizando a data dos eventos
-python $BASE_DIR/bin/update_data.py
+python $BASE_DIR/bin/dev/update_data.py

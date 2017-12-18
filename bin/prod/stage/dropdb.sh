@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 set -ex
 
+export DJANGO_SETTINGS_MODULE=project.settings.prod
+
+export BASE_DIR=`python -c "
+import $DJANGO_SETTINGS_MODULE as settings
+print(settings.BASE_DIR)"`
+
+export DBHOST=`python -c "
+import $DJANGO_SETTINGS_MODULE as settings
+print (settings.DATABASES['default']['HOST'])
+"`
+
+run_psql() {
+    psql -h $DBHOST -U postgres -c "$@"
+}
+
 python -c "
 import $DJANGO_SETTINGS_MODULE as settings
 print(settings.DATABASES['default'])
@@ -19,6 +34,5 @@ import $DJANGO_SETTINGS_MODULE as settings
 print (settings.DATABASES['default']['USER'])
 "`
 
-f=`mktemp`
-echo "DROP DATABASE IF EXISTS $DBNAME;" > $f
-sudo sudo -u postgres psql < $f || exit 1;
+run_psql "DROP DATABASE IF EXISTS $DBNAME;"
+run_psql "DROP EXTENSION IF EXISTS unaccent;"
