@@ -29,6 +29,7 @@ INSTALLED_APPS = [
 
     # GATHEROS_APPS
     'core',
+    'frontend',
     'gatheros_event',
     'gatheros_subscription',
     'gatheros_front',
@@ -64,8 +65,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'gatheros_event/templates/'),
-            os.path.join(BASE_DIR, 'templates/'),
-            os.path.join(BASE_DIR, 'neuboard/'),
+            os.path.join(BASE_DIR, 'frontend/templates/'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -124,7 +124,10 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 # noinspection PyUnresolvedReferences
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

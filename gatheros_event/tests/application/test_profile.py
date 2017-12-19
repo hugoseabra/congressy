@@ -357,7 +357,7 @@ class ProfileCreateViewTest(TestCase):
         Cria o perfil
         """
         response = self.client.post(self.url, self.data, follow=True)
-        self.assertContains(response, 'Informações registradas com sucesso')
+        self.assertContains(response, 'Informações registradas com sucesso') #nsm this failed
 
     def test_post_error(self):
         """

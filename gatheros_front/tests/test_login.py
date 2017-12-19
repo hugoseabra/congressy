@@ -49,4 +49,4 @@ class LoginTest(TestCase):
             data=data
         )
         self.assertEqual(self.result.status_code, 200)
-        self.assertContains(self.result, 'errornote')
+        self.assertContains(self.result, 'alert-danger')
