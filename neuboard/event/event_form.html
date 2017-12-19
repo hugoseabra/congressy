@@ -1,0 +1,189 @@
+{% extends "neuboard/base.html" %}
+<!-- @ TODO adicionar timezone ao formulário. -->
+{% load static %}
+
+{% block head %}
+    {{ block.super }}
+    {{ form.media }}
+    <!-- Switchery -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/switchery/switchery.min.css' %}">
+{% endblock %}
+
+{% block title %}
+    {% if extra_title %}
+        {{extra_title}}
+    {% else %}
+        Criar Novo Evento
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+
+<section class="main-content-wrapper">
+    <div class="pageheader">
+        <h1>
+            {% if extra_title %}
+                {{extra_title}}
+            {% else %}
+                Criar Novo Evento
+            {% endif %}
+        </h1>
+    </div>
+    <section id="main-content">
+        <div class="row">
+            <div class="col-md-12 col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-body ng-binding">
+                        <div id="cgsy-btn-navbar">
+                            <nav class="cgsy-btn-navbar" role="navigation" style="padding:5px;border-top:none">
+                                <div class="container-fluid">
+                                    <ul class="nav navbar-nav navbar-right">
+
+
+                                        <button onclick="location.href = '{% url 'event:event-list' %}';"
+                                                type="button" class="btn btn-danger">Fechar
+                                        </button>
+                                        <div class="btn-group">
+                                            <button onclick="document.event_form.submit();"
+                                                    type="button" class="btn btn-success">Salvar
+                                            </button>
+                                            <button type="button" class="btn btn-success dropdown-toggle"
+                                                    data-toggle="dropdown" aria-expanded="false">
+                                                <span class="caret"></span>
+                                                <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu">
+
+                                                <li>
+                                                    <a href="dashboard.html" class="save-and-panel">Salvar
+                                                        e ir para painel</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <a href="dashboard.html" class="save-and-remain">Salvar
+                                                        e permanecer</a>
+                                                </li>
+                                                <li>
+                                                    <a href="dashboard.html" class="save-and-close">Salvar
+                                                        e fechar</a>
+                                                </li>
+                                                <li>
+                                                    <a href="dashboard.html" class="save-and-new">Salvar
+                                                        e novo</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </ul>
+
+                                </div>
+                            </nav>
+                        </div>
+
+
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+
+
+                                    <form action="" method="post" class="form-horizontal" role="form" name="event_form">
+
+                                        {% csrf_token %}
+
+                                        {% for field in form %}
+                                            <div class="form-group">
+                                                {{ field.errors }}
+                                                <label for="{{field.id_for_label}}"
+                                                       class="col-sm-3 control-label cgsy-label">{{field.label}}</label>
+                                                <div class="col-sm-6">
+                                                    {{ field }}
+                                                    {% if field.help_text %}
+                                                    <br/>
+                                                    <small class="text-muted">{{ field.help_text|safe }}</small>
+                                                    {% endif %}
+                                                </div>
+
+                                            </div>
+                                        {% endfor %}
+
+
+
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label cgsy-label">Inscrições</label>
+                                            <div class="col-sm-6">
+                                                <select class="form-control">
+                                                    <option value="">Desativadas</option>
+                                                    <option value="">Gratuitas</option>
+                                                    <option value="">Pagas</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+</section>
+
+
+{% endblock %}
+
+{% block global_js %}
+
+{{block.super}}
+
+<!--DateRange Picker-->
+<script src="{% static 'assets/plugins/daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'assets/plugins/daterangepicker/moment.min.js' %}"></script>
+
+<!-- Switchery -->
+<script src="{% static 'assets/plugins/switchery/switchery.min.js' %}"></script>
+
+<script type="application/javascript">
+
+    //@TODO add a better date here
+    //DateRange init
+    $('#config-demo').daterangepicker({
+        timePicker: true,
+        startDate: "11/24/2017",
+        endDate: "11/30/2017"
+    });
+
+    //Switchery init
+
+    // var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+    //
+    // elems.forEach(function(html) {
+    //   var switchery = new Switchery(html,{
+    //     color             : '#022140'
+    //   , secondaryColor    : '#dfdfdf'
+    //   , jackColor         : '#fff'
+    //   , jackSecondaryColor: null
+    //   , className         : 'switchery'
+    //   , disabled          : false
+    //   , disabledOpacity   : 0.5
+    //   , speed             : '0.1s'
+    //   , size              : 'default'
+    // });
+    // });
+
+
+
+
+
+
+</script>
+
+
+{% endblock %}
+
+
+

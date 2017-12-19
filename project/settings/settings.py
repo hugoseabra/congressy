@@ -65,6 +65,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'gatheros_event/templates/'),
             os.path.join(BASE_DIR, 'templates/'),
+            os.path.join(BASE_DIR, 'neuboard/'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
