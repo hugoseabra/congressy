@@ -51,6 +51,10 @@
 
 {% block content %}
 
+    <div class="pull-right" style="padding-right: 20px; padding-top: 10px">
+        <a href="{% url 'event:event-panel' event.pk %}" class="btn btn-danger btn-sm" role="button"
+           style=":hover: none ">Voltar</a>
+    </div>
 
     <div class="row">
         <div class="col-lg-6 col-lg-offset-3 " style="padding-top: 50px">
@@ -81,15 +85,19 @@
                             </div>
                         </div>
                         <br>
-                        <label for="search_input" class="col-sm-5 control-label">Informe o nome:</label>
+
+                        <label for="search_input" class="col-sm-3 control-label">Informe o nome:</label>
+
+
                         <div class="col-sm-6">
                             <input required class="form-control" type="search" name="value" value=""
                                    id="search_input"/>
                         </div>
                         <br>
-                        <br>
-                        <button class="btn-primary btn" type="submit">Buscar</button>
-
+                    <br>
+                        <div class="col-sm-6">
+                            <button class="btn-primary btn" type="submit">Buscar</button>
+                        </div>
 
                     </form>
 
@@ -241,7 +249,9 @@
 
         </div>
     {% endif %}
+    <div style="padding:10px">
 
-    <a href="{% url '' %}" class="btn btn-danger" role="button">Voltar</a>
+    </div>
+
 
 {% endblock %}
