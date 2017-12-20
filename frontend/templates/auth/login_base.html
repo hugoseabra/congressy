@@ -5,17 +5,20 @@
 <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>
 <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
+<!--[if gt IE 8]>
+<!-->
+
+
 <html class="no-js">
 <!--<![endif]-->
 
-    {% load static %}{% load base_tags %}
+{% load static %}
 
 <head>
     {% block head %}
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>{% block title %}Congressy-Platform{% endblock %}</title>
+        <title>{% block title %}Congressy{% endblock %}</title>
         <meta name="description" content="">
         <meta name="viewport"
               content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
@@ -31,15 +34,15 @@
 
 
         <!-- Custom styles for this theme -->
-        <link href="{% static "assets/css/main.less"%}" type="text/css" rel="stylesheet/less"/>
+        <link href="{% static "assets/css/main.less" %}" type="text/css" rel="stylesheet/less"/>
 
         <!--<script>less = {env: 'development'};</script>-->
-        <script src="{% static "assets/plugins/less.min.js"%}"></script>
+        <script src="{% static "assets/plugins/less.min.js" %}"></script>
         <!--<script> less.watch(); </script>-->
 
 
         <!-- Feature detection -->
-        <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js"%}"></script>
+        <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -49,49 +52,42 @@
     {% endblock %}
 </head>
 
-{% block messages %}
-    {% if messages %}
-        <div style="width:100%;margin-top:3px">
-            <ul class="messagelist" style="list-style: none;margin: 0; padding: 0">
-                {% for message in messages %}
-                    {% get_message_background_color message as bgcolor %}
-                    <li style="background-color: {{ bgcolor }};padding: 10px">
-                        {{ message|capfirst }}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-{% endblock messages %}
-
-
-
 <body id="cgsy_login_body">
 
 
-
-
 <section id="main-wrapper" class="theme-cgsy-full">
+    <section class="container animated fadeInUp">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <div id="login-wrapper">
+                    <header id="cgsy_login_header">
 
-    <!-- main content start -->
-            {% block content %}
+                        <a href="/" class="logo-img">
+                            <img id="cgsy__login_img" style="width: 250px"
+                                 src="{% static "assets/img/login_logo.png" %}">
+                        </a>
 
-            {% endblock %}
-    <!-- main content end -->
+                    </header>
 
+                    {% block form %}
+                    {% endblock %}
 
+                </div>
+            </div>
+        </div>
+    </section>
 </section>
 
 
 
 {% block global_js %}
-<!--Global JS-->
-<script src="{% static "assets/js/vendor/jquery-1.11.1.min.js"%}"></script>
-<script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js"%}"></script>
-<script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js"%}"></script>
-<script src="{% static "assets/plugins/pace/pace.min.js"%}"></script>
-<script src="{% static "assets/js/src/app.js"%}"></script>
-<script src="{% static "assets/js/cgsy.js"%}"></script>
+    <!--Global JS-->
+    <script src="{% static "assets/js/vendor/jquery-1.11.1.min.js" %}"></script>
+    <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
+    <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+    <script src="{% static "assets/js/src/app.js" %}"></script>
+    <script src="{% static "assets/js/cgsy.js" %}"></script>
 {% endblock %}
 
 

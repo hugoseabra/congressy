@@ -21,12 +21,7 @@ class ProfileCreateForm(forms.ModelForm):
     class Meta:
         """ Meta """
         model = Person
-        exclude = [
-            'user',
-            'synchronized',
-            'term_version',
-            'politics_version',
-        ]
+        fields = ['name', 'email']
 
     def save(self, domain_override=None, request=None,
              subject_template='registration/account_confirmation_subject.txt',
@@ -69,6 +64,25 @@ class ProfileCreateForm(forms.ModelForm):
             request=request,
         )
         return self.instance
+
+    def clean(self):
+
+        cleaned_data = super(ProfileCreateForm, self).clean()
+
+        email = cleaned_data.get('email')
+        found = None
+
+        try:
+            print('searching for user')
+            found = User.objects.get(username=email)
+        except User.DoesNotExist:
+            pass
+
+        if found:
+            print('Found! raising ValidationError')
+            raise forms.ValidationError("Esse email já existe em nosso sistema. Tente novamente.")
+
+        return cleaned_data
 
 
 class ProfileForm(forms.ModelForm):
