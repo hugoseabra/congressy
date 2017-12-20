@@ -73,13 +73,11 @@ class ProfileCreateForm(forms.ModelForm):
         found = None
 
         try:
-            print('searching for user')
             found = User.objects.get(username=email)
         except User.DoesNotExist:
             pass
 
         if found:
-            print('Found! raising ValidationError')
             raise forms.ValidationError("Esse email já existe em nosso sistema. Tente novamente.")
 
         return cleaned_data
