@@ -62,8 +62,18 @@
         {% endblock %}
     </header>
 
+
+
     <!--main content start-->
-    {% block content %}{% endblock %}
+    <section id="main-content-wrapper">
+        {% block pageheader %}
+    {% endblock %}
+        <section id="main-content">
+        {% block content %}
+
+        {% endblock %}
+        </section>
+    </section>
     <!-- main content end -->
 </section>
 
