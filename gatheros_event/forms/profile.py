@@ -108,12 +108,13 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         """ Meta """
         model = Person
-        exclude = [
-            'user',
-            'synchronized',
-            'term_version',
-            'politics_version',
-        ]
+        fields = ['name', 'email', 'new_password1', 'new_password2']
+        # exclude = [
+        #     'user',
+        #     'synchronized',
+        #     'term_version',
+        #     'politics_version',
+        # ]
 
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):
