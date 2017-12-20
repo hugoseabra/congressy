@@ -12,12 +12,12 @@
 <!--<![endif]-->
 
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>{% block title %}Congressy-Platform{% endblock %}</title>
-<meta name="description" content="">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}Congressy-Platform{% endblock %}</title>
+    <meta name="description" content="">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
     {% block head %}
         <!-- Bootstrap core CSS -->
@@ -31,15 +31,15 @@
 
         <!-- Custom styles for this theme -->
         <!-- <link rel="stylesheet" href="assets/css/main.css"> -->
-        <link href="{% static "assets/css/main.less"%}" type="text/css" rel="stylesheet/less"/>
+        <link href="{% static "assets/css/main.less" %}" type="text/css" rel="stylesheet/less"/>
 
         <!--<script>less = {env: 'development'};</script>-->
-        <script src="{% static "assets/plugins/less.min.js"%}"></script>
+        <script src="{% static "assets/plugins/less.min.js" %}"></script>
         <!--<script> less.watch(); </script>-->
     {% endblock %}
 
     <!-- Feature detection -->
-    <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js"%}"></script>
+    <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,8 +48,10 @@
     <![endif]-->
 </head>
 <body>
-    <section id="main-wrapper" class="theme-cgsy-full">
-        <header id="header">
+
+
+<section id="main-wrapper" class="theme-cgsy-full">
+    <header id="header">
         <!--logo start-->
         <div class="brand">
             <a href="{% url 'event:event-list' %}" class="logo">
@@ -62,19 +64,41 @@
         {% endblock %}
     </header>
 
+
+
     <!--main content start-->
-    {% block content %}{% endblock %}
-    <!-- main content end -->
+    <section class="main-content-wrapper">
+        {% block pageheader %}{% endblock %}
+        <section class="main-content">
+            {% load base_tags %}
+                {% block messages %}
+                    {% if messages %}
+                        <div style="width:100%;margin-top:3px">
+                            <ul class="messagelist" style="list-style: none;margin: 0; padding: 0">
+                                {% for message in messages %}
+                                    {% get_message_background_color message as bgcolor %}
+                                    <li style="background-color: {{ bgcolor }};padding: 10px">
+                                        {{ message|capfirst }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                {% endblock messages %}
+        {% block content %}{% endblock %}
+        </section>
+        <!-- main content end -->
+    </section>
 </section>
 
 {% block scripts %}
     <!--Global JS-->
-    <script src="{% static "assets/js/vendor/jquery-1.11.1.min.js"%}"></script>
-    <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js"%}"></script>
-    <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js"%}"></script>
-    <script src="{% static "assets/plugins/pace/pace.min.js"%}"></script>
-    <script src="{% static "assets/js/src/app.js"%}"></script>
-    <script src="{% static "assets/js/cgsy.js"%}"></script>
+    <script src="{% static "assets/js/vendor/jquery-1.11.1.min.js" %}"></script>
+    <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
+    <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+    <script src="{% static "assets/js/src/app.js" %}"></script>
+    <script src="{% static "assets/js/cgsy.js" %}"></script>
 {% endblock %}
 </body>
 

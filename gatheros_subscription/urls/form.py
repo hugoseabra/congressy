@@ -37,6 +37,7 @@ url_fields = [
     ),
 ]
 
+
 urlpatterns_form = [
     url(r'^events/(?P<event_pk>[\d]+)/fields/', include(url_fields))
 ]
