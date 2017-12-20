@@ -70,7 +70,7 @@ class ProfileFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertListEqual(
             sorted(list(form.errors.keys())),
-            sorted(list(['name', 'email', 'gender', 'city']))
+            sorted(list(['name', 'email']))
         )
 
     def test_save_sucess(self):
@@ -305,7 +305,7 @@ class ProfileCreateFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertListEqual(
             sorted(list(form.errors.keys())),
-            sorted(list(['name', 'email', 'gender', 'city']))
+            sorted(list(['name', 'email']))
         )
 
     def test_account_success(self):
@@ -338,9 +338,7 @@ class ProfileCreateViewTest(TestCase):
     def setUp(self):
         self.data = {
             "name": "João Das Couves",
-            "gender": "M",
             "email": "joao-das-couves@gmail.com",
-            "city": 5413,
         }
 
         self.url = reverse('public:profile_create')
@@ -364,7 +362,15 @@ class ProfileCreateViewTest(TestCase):
         Verifica se post sem dados mostra campos obrigatórios
         """
         response = self.client.post(self.url, data={})
-        self.assertContains(response, 'Este campo é obrigatório', 4)
+        self.assertContains(response, 'Este campo é obrigatório', 2)
+
+    def test_duplicate_email(self):
+        """
+        Recria um perfil já existente.
+        """
+        _ = self.client.post(self.url, self.data, follow=True)
+        response = self.client.post(self.url, self.data, follow=True)
+        self.assertContains(response, 'alert-danger')
 
     def test_follow_mail_link(self):
         """

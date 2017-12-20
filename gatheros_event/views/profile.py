@@ -7,6 +7,7 @@ from gatheros_event.views.mixins import AccountMixin
 
 
 class ProfileView(AccountMixin, FormView):
+
     template_name = 'gatheros_event/profile.html'
     messages = {
         'success': 'Perfil atualizado com sucesso'
@@ -26,7 +27,7 @@ class ProfileView(AccountMixin, FormView):
 
 
 class ProfileCreateView(TemplateView, FormView):
-    template_name = 'gatheros_event/profile.html'
+    template_name = 'auth/register.html'
     messages = {
         'success': 'Informações registradas com sucesso, um email com '
                    'instruções foi enviado para "%s" click no link para '

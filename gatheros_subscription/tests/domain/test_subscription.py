@@ -61,7 +61,7 @@ class SubscriptionModelTest(GatherosTestCase):
             lot = self._create_lot(persist=True)
 
         if not person:
-            person = self._create_person(persist=True)
+            person = self._create_person(email='person@person.com', persist=True)
 
         data = {
             'person': person,
@@ -84,12 +84,12 @@ class SubscriptionModelTest(GatherosTestCase):
 
         self._create_subscription(
             lot=lot,
-            person=self._create_person(cpf='53026113336', persist=True),
+            person=self._create_person(cpf='53026113336', email='person@person.com', persist=True),
             persist=True
         )
         self._create_subscription(
             lot=lot,
-            person=self._create_person(cpf='85221264455', persist=True),
+            person=self._create_person(cpf='85221264455', email='person@person.com', persist=True),
             persist=True
         )
         subscription = self._create_subscription(lot=lot)
@@ -123,7 +123,7 @@ class SubscriptionModelTest(GatherosTestCase):
 
         """ MODEL | FUNCIONANDO """
         subscription = self._create_subscription(
-            person=self._create_person(cpf='53026113336', persist=True)
+            person=self._create_person(cpf='53026113336', email='person@person.com', persist=True)
         )
         self.assertIsNone(subscription.code)
         subscription.save()
@@ -148,7 +148,7 @@ class SubscriptionModelTest(GatherosTestCase):
 
         """ MODEL | FUNCIONANDO """
         subscription = self._create_subscription(
-            person=self._create_person(cpf='53026113336', persist=True)
+            person=self._create_person(cpf='53026113336', email='person@person.com', persist=True)
         )
         self.assertIsNone(subscription.count)
         subscription.save()
@@ -231,7 +231,7 @@ class SubscriptionModelTest(GatherosTestCase):
 
         subscription = self._create_subscription(
             lot=lot,
-            person=self._create_person(cpf='53026113336', persist=True)
+            person=self._create_person(cpf='53026113336', email='person@person.com', persist=True)
         )
         subscription.save()
 
@@ -265,6 +265,6 @@ class SubscriptionModelTest(GatherosTestCase):
 
         subscription = self._create_subscription(
             lot=lot,
-            person=self._create_person(cpf='53026113336', persist=True)
+            person=self._create_person(cpf='53026113336', email='person@person.com', persist=True)
         )
         subscription.save()

@@ -1,0 +1,63 @@
+{% extends 'auth/login_base.html' %}
+{% block title %}Cadastro | Congressy{% endblock %}
+
+{% load static %}
+
+<pre>
+    Corrigir problema com o success message, talvez um if testando o contexto por mensagem de successo
+</pre>
+
+{% block form %}
+    <div id="cgsy_login_panel" class="panel panel-primary" style="padding-top: 10px">
+
+
+        {#        <div class="panel-heading">#}
+        {#            <h3 class="panel-title">#}
+        {#                Register#}
+        {#            </h3>#}
+        {#        </div>#}
+
+
+        <div class="panel-body">
+
+            <form action="" method="post" class="form-horizontal" role="form" name="event_form">
+
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="form-group">
+                        <div class="col-md-12 text-center">
+                            {{ field.label_tag }} {{ field }}
+                            {% if field.help_text %}
+                                <br/>
+                                <small class="text-muted">{{ field.help_text|safe }}</small>
+                            {% endif %}
+                            <small class="text-muted">{{ field.errors }}</small>
+                        </div>
+                    </div>
+
+                {% endfor %}
+
+                <button class="btn btn-primary btn-block">Cadastrar</button>
+                <br>
+                <p>Já é um membro? <a href="{% url 'front:login' %}"><strong>Entre</strong></a></p>
+
+            </form>
+
+            {#<button class="btn btn-danger btn-block" onclick="location.href=window.location.hostname+'/login';">Cancelar</button>#}
+
+        </div>
+    </div>
+{% endblock %}
+
+
+
+

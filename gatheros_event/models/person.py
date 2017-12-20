@@ -39,17 +39,18 @@ class Person(models.Model, GatherosModelMixin):
     gender = models.CharField(
         max_length=1,
         choices=GENDER_CHOICES,
-        verbose_name='sexo'
-    )
-    email = models.EmailField(
+        verbose_name='sexo',
         blank=True,
         null=True,
+    )
+    email = models.EmailField(
         verbose_name='email'
     )
     city = models.ForeignKey(
         City,
         on_delete=models.PROTECT,
         null=True,
+        blank=True,
         verbose_name='cidade'
     )
     zip_code = models.CharField(
