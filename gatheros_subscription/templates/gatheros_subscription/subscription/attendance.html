@@ -100,31 +100,48 @@
 
 
     <div class="row">
-        <div class="table-responsive">
-            {% if result_by in 'code,email'|slice:',' and result %}
-                <div class="col-lg-6 col-lg-offset-3 " style="padding-top: 10px">
-                    <div class="panel panel-default">
-                        <!-- Default panel contents -->
-                        <div class="panel-heading">
-                            {% if result_by == 'code' %}
-                                Resultado por "Código"
-                            {% endif %}
-                            {% if result_by == 'email' %}
-                                Resultado por "E-mail"
-                            {% endif %}
-                        </div>
 
-                        <!-- Table -->
+        {% if result_by in 'code,email'|slice:',' and result %}
+            <div class="col-md-12" style="padding-top: 10px">
+                <div class="panel panel-default">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading">
+                        {% if result_by == 'code' %}
+                            Resultado por "Código"
+                        {% endif %}
+                        {% if result_by == 'email' %}
+                            Resultado por "E-mail"
+                        {% endif %}
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-responsive">
                         <table class="table">
                             <thead>
                             <tr>
                                 {% if result.attended %}
                                     <th>Já foi credenciada?</th>
                                 {% endif %}
-                                <th>Nome:</th>
+
+                                <th>Nome</th>
+
                                 {% if result.person.user_id %}
                                     <th>Perfil:</th>
                                 {% endif %}
+
+
+                                <th>Lote</th>
+
+                                <th>E-mail</th>
+
+                                <th>Código de Inscrição</th>
+
+                                <th>Cadastrado em</th>
+
+                                <th>Cadastrado por</th>
+
+                                <th></th>
+
                             </tr>
                             </thead>
 
@@ -140,92 +157,46 @@
 
                                 <td>{{ result.person.name }}</td>
 
+                                {% if result.person.user_id %}
+                                    <td>
+                                        &#10004;
+                                    </td>
+                                {% endif %}
+
+
+                                <td>{{ result.lot.name }}</td>
+
+                                <td>{{ result.person.email }}</td>
+
+                                <td>{{ result.code }}</td>
+
+                                <td>{{ result.created }}</td>
+
+                                <td>{{ result.created_by }}</td>
+
+                                <td>
+                                    <form method="post"
+                                          action="{% url 'subscription:subscription-attendance' event.pk result.pk %}">{% csrf_token %}
+                                        <input type="hidden" name="search_by" value="code"/>
+                                        <input type="hidden" name="action"
+                                               value="{% if result.attended %}unregister{% else %}register{% endif %}"/>
+                                        <button id="registration_button" type="submit">{% if result.attended %}Cancelar
+                                            credenciamento{% else %}Credenciar{% endif %}</button>
+                                    </form>
+                                </td>
+
+
                             </tr>
 
 
                             </tbody>
-
-
-                            {#                            <tr>#}
-                            {##}
-                            {#                                <td>#}
-                            {#                                    <h5>{{ result.person.name }}</h5>#}
-                            {#                                    <table>#}
-                            {#                                        {% if result.person.user_id %}#}
-                            {#                                            <tr>#}
-                            {#                                                <th>#}
-                            {#                                                    Perfil#}
-                            {#                                                </th>#}
-                            {#                                                <td>#}
-                            {#                                                    &#10004;#}
-                            {#                                                </td>#}
-                            {#                                            </tr>#}
-                            {#                                        {% endif %}#}
-                            {#                                        <tr>#}
-                            {#                                            <th>#}
-                            {#                                                Lote#}
-                            {#                                            </th>#}
-                            {#                                            <td>#}
-                            {#                                                {{ result.lot.name }}#}
-                            {#                                            </td>#}
-                            {#                                        </tr>#}
-                            {#                                        <tr>#}
-                            {#                                            <th>#}
-                            {#                                                E-mail#}
-                            {#                                            </th>#}
-                            {#                                            <td>#}
-                            {#                                                {{ result.person.email }}#}
-                            {#                                            </td>#}
-                            {#                                        </tr>#}
-                            {#                                        <tr>#}
-                            {#                                            <th>#}
-                            {#                                                Código de Inscrição#}
-                            {#                                            </th>#}
-                            {#                                            <td>#}
-                            {#                                                {{ result.code }}#}
-                            {#                                            </td>#}
-                            {#                                        </tr>#}
-                            {#                                        <tr>#}
-                            {#                                            <th>#}
-                            {#                                                Cadastrado em#}
-                            {#                                            </th>#}
-                            {#                                            <td>#}
-                            {#                                                {{ result.created }}#}
-                            {#                                            </td>#}
-                            {#                                        </tr>#}
-                            {#                                        <tr>#}
-                            {#                                            <th>#}
-                            {#                                                Cadastrado por#}
-                            {#                                            </th>#}
-                            {#                                            <td>#}
-                            {#                                                {{ result.created_by }}#}
-                            {#                                            </td>#}
-                            {#                                        </tr>#}
-                            {#                                    </table>#}
-                            {#                                </td>#}
-                            {#                                <td>#}
-                            {#                                    <form method="post"#}
-                            {#                                          action="{% url 'subscription:subscription-attendance' event.pk result.pk %}">{% csrf_token %}#}
-                            {#                                        <input type="hidden" name="search_by" value="code"/>#}
-                            {#                                        <input type="hidden" name="action"#}
-                            {#                                               value="{% if result.attended %}unregister{% else %}register{% endif %}"/>#}
-                            {#                                        <button id="registration_button" type="submit">{% if result.attended %}Cancelar#}
-                            {#                                            credenciamento{% else %}Credenciar{% endif %}</button>#}
-                            {#                                    </form>#}
-                            {#                                </td>#}
-                            {#                            </tr>#}
-
-
                         </table>
                     </div>
-                </div>
+
+            </div>
 
 
-            {% endif %}
-
-
-
-
+        {% endif %}
 
 
 
@@ -233,74 +204,78 @@
 
 
 
-            {% if result_by == 'name' and result %}
-                <h2>Resultado por "Nome"</h2>
-                <br/>
 
-                <table width="100%" style="background: #DDD">
+
+
+
+        {% if result_by == 'name' and result %}
+            <h2>Resultado por "Nome"</h2>
+            <br/>
+
+            <table width="100%" style="background: #DDD">
+                <tr>
+                    <th width="4%" style="border:1px solid #fff;padding:10px"># ID</th>
+                    <th style="text-align: left;border:1px solid #fff;padding:10px">
+                        Nome do Participante
+                    </th>
+                    <th width="8%" style="text-align: left;border:1px solid #fff;padding:10px">
+                        Lote
+                    </th>
+                    <th width="10%" style="text-align: left;border:1px solid #fff;padding:10px">
+                        Cód. Inscrição
+                    </th>
+                    <th width="16%" style="text-align: left;border:1px solid #fff;padding:10px">
+                        Data Inscrição
+                    </th>
+                    <th width="2%" style="border:1px solid #fff;padding:10px">Perfil</th>
+                    <th width="15%" style="border:1px solid #fff;padding:10px">Credenciado em</th>
+                </tr>
+                {% for item in result %}
                     <tr>
-                        <th width="4%" style="border:1px solid #fff;padding:10px"># ID</th>
-                        <th style="text-align: left;border:1px solid #fff;padding:10px">
-                            Nome do Participante
-                        </th>
-                        <th width="8%" style="text-align: left;border:1px solid #fff;padding:10px">
-                            Lote
-                        </th>
-                        <th width="10%" style="text-align: left;border:1px solid #fff;padding:10px">
-                            Cód. Inscrição
-                        </th>
-                        <th width="16%" style="text-align: left;border:1px solid #fff;padding:10px">
-                            Data Inscrição
-                        </th>
-                        <th width="2%" style="border:1px solid #fff;padding:10px">Perfil</th>
-                        <th width="15%" style="border:1px solid #fff;padding:10px">Credenciado em</th>
-                    </tr>
-                    {% for item in result %}
-                        <tr>
-                            <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
-                                {{ forloop.counter }}
-                            </td>
-                            <td style="padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
-                                {{ item.person.name }}
-                            </td>
-                            <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
-                                {{ item.lot.name }}
-                            </td>
-                            <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
-                                {{ item.code }}
-                            </td>
-                            <td style="padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
-                                {{ item.created }}
-                            </td>
-                            <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
-                                {% if item.person.user_id %}
-                                    &#10004;
+                        <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                            {{ forloop.counter }}
+                        </td>
+                        <td style="padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                            {{ item.person.name }}
+                        </td>
+                        <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                            {{ item.lot.name }}
+                        </td>
+                        <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                            {{ item.code }}
+                        </td>
+                        <td style="padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                            {{ item.created }}
+                        </td>
+                        <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                            {% if item.person.user_id %}
+                                &#10004;
+                            {% endif %}
+                        </td>
+                        <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                            <form method="post"
+                                  action="{% url 'subscription:subscription-attendance' event.pk item.pk %}">{% csrf_token %}
+                                <input type="hidden" name="search_by" value="name"/>
+                                <input type="hidden" name="action"
+                                       value="{% if item.attended %}unregister{% else %}register{% endif %}"/>
+                                {% if item.attended %}
+                                    <div style="font-size: 14px">{{ item.attended_on }}</div>
+                                    <hr>
+                                    <button id="registration_button" type="submit">Cancelar credenciamento
+                                    </button>
+                                {% else %}
+                                    <div style="font-size: 14px">Não credenciado</div>
+                                    <hr>
+                                    <button id="registration_button" type="submit">Credenciar</button>
                                 {% endif %}
-                            </td>
-                            <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: darkgreen;color: #fff; font-weight: bold;{% else %}background: #FFF{% endif %}">
-                                <form method="post"
-                                      action="{% url 'subscription:subscription-attendance' event.pk item.pk %}">{% csrf_token %}
-                                    <input type="hidden" name="search_by" value="name"/>
-                                    <input type="hidden" name="action"
-                                           value="{% if item.attended %}unregister{% else %}register{% endif %}"/>
-                                    {% if item.attended %}
-                                        <div style="font-size: 14px">{{ item.attended_on }}</div>
-                                        <hr>
-                                        <button id="registration_button" type="submit">Cancelar credenciamento
-                                        </button>
-                                    {% else %}
-                                        <div style="font-size: 14px">Não credenciado</div>
-                                        <hr>
-                                        <button id="registration_button" type="submit">Credenciar</button>
-                                    {% endif %}
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            {% endif %}
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
 
-        </div>
+    </div>
 
     </div>
 
