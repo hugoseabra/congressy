@@ -138,8 +138,8 @@ FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'gatheros_subscription/tests/fixtures'),
 ]
 
-LOGIN_URL = '/entrar/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/entrar/'
+LOGOUT_REDIRECT_URL = '/login/'
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw'
