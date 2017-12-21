@@ -69,6 +69,25 @@
         {% endblock %}
     </header>
 
+    <aside class="sidebar sidebar-left" style="width: 160px">
+
+        <nav>
+            <br>
+            <ul class="nav nav-pills nav-stacked">
+                <li>
+                    <a href="{% url 'event:organization-list' %}" title="Organizações">
+                        <i class="fa  fa-fw fa-sitemap"></i> Organizações
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'event:event-list' %}" title="Eventos">
+                        <i class="fa  fa-fw fa-rocket"></i> Eventos
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
 
     <!--main content start-->
     <section class="main-content-wrapper">
