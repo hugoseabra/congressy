@@ -2,10 +2,9 @@
 <ul class="nav navbar-nav navbar-right">
 
     <li class="dropdown profile hidden-xs ">
-
-
     </li>
-   <li class="dropdown profile hidden-xs">
+
+    <li class="dropdown profile hidden-xs">
         <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
                 <span class="meta">
                 <span class="text  hidden-xs">{{ user.first_name }}</span>
@@ -14,9 +13,14 @@
         </a>
         <ul class="dropdown-menu animated fadeInRight " role="menu">
             <li>
-                <a href="javascript:void(0);">
+                <a href="{% url 'event:profile' %}">
                         <span class="icon"><i class="fa fa-user"></i>
-                        </span>My Account</a>
+                        </span>Meus Dados</a>
+            </li>
+            <li>
+                <a href="{% url 'front:logout' %}">
+                        <span class="icon"><i class="fa fa-sign-out"></i>
+                        </span>Sair</a>
             </li>
 
         </ul>
@@ -27,15 +31,16 @@
             <i class="fa fa-ellipsis-v"></i>
         </button>
         <div id="mobile-top-menu">
-            <h4>
-                Minhas informações:
-            </h4>
+{#            <h4>#}
+{#                Minhas informações:#}
+{#            </h4>#}
             <div class="mobile-top-menu-wrap">
                 <div class="row">
                     <div class="col-xs-12">
-                        <a href="#">My Account</a><br />
-                        <a href="#">Configurações</a><br />
-                        <a href="#">Logout</a><br />
+                        <span class="icon"><i class="fa fa-user"></i>
+                        </span><a href="{% url 'event:profile' %}"> Meus Dados</a><br/>
+                        <span class="icon"><i class="fa fa-sign-out"></i>
+                        </span><a href="{% url 'front:logout' %}"> Sair</a><br/>
                     </div>
                 </div>
             </div>
