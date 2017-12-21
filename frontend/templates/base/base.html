@@ -64,12 +64,60 @@
             </a>
         </div>
         <!--logo end-->
+
+
         {% block navbar %}
             {% include "base/navbar.html" %}
         {% endblock %}
     </header>
 
     <aside class="sidebar sidebar-left" style="width: 160px">
+
+
+        {% if organization and not organization.internal %}
+            <div class="sidebar-profile">
+                <div class="profile-body dropdown">
+                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <h4>
+                            {{ organization.name }}<span class="caret"></span></h4></a>
+                    <small class="title">{{ member.get_group_display }}</small>
+                    {#<a href="{% url 'event:organization-panel' organization.pk %}">Gerenciar</a>#}
+                    <ul class="dropdown-menu animated fadeInRight" role="menu">
+
+                        <li class="divider"></li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-user"></i>
+                        </span>My Account
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-envelope"></i>
+                        </span>Messages
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-cog"></i>
+                        </span>Settings
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-sign-out"></i>
+                        </span>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
 
         <nav>
             <br>
