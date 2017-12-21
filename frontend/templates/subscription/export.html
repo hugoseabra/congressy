@@ -36,12 +36,12 @@
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Genero</th>
-                                <th>UF</th>
-                                <th>Idade</th>
-                            </tr>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Genero</th>
+                                    <th>UF</th>
+                                    <th>Idade</th>
+                                </tr>
                             </thead>
 
                             <tbody>
@@ -80,7 +80,16 @@
 
 
 
-
+<script>
+<script>
+$(document).ready(function(){
+  $('input').iCheck({
+    checkboxClass: 'icheckbox_flat-red',
+    radioClass: 'iradio_flat-red'
+  });
+});
+</script>
+</script>
 
 {% endblock %}
 
