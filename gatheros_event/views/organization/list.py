@@ -10,6 +10,7 @@ from gatheros_event.views.mixins import AccountMixin
 class OrganizationListView(AccountMixin, ListView):
     model = Organization
     template_name = 'gatheros_event/organization/list.html'
+    #template_name = 'organization/list.html'
     ordering = ['name']
 
     def dispatch(self, request, *args, **kwargs):
