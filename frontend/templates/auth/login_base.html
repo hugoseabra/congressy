@@ -38,7 +38,7 @@
 
         <!--<script>less = {env: 'development'};</script>-->
         <script src="{% static "assets/plugins/less.min.js" %}"></script>
-        <!--<script> less.watch(); </script>-->
+        <script> less.watch(); </script>
 
 
         <!-- Feature detection -->
@@ -52,45 +52,33 @@
     {% endblock %}
 </head>
 
-<body id="cgsy_login_body">
-
-
-<section id="main-wrapper" class="theme-cgsy-full">
-    <section class="container animated fadeInUp">
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3">
-                <div id="login-wrapper">
-                    <header id="cgsy_login_header">
-
-                        <a href="/" class="logo-img">
-                            <img id="cgsy__login_img" style="width: 250px"
-                                 src="{% static "assets/img/login_logo.png" %}">
-                        </a>
-
-                    </header>
-
-                    {% block form %}
-                    {% endblock %}
-
+<body class="cgsy-login">
+    <section id="main-wrapper" class="theme-cgsy-full">
+        <section class="container animated fadeInUp">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <div id="login-wrapper">
+                        <header class="login-header">
+                            <a href="/" class="logo-img">
+                                <img class="logo" src="{% static "assets/img/login_logo.png" %}">
+                            </a>
+                        </header>
+                         {% block form %}{% endblock %}
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
     </section>
-</section>
 
-
-
-{% block global_js %}
-    <!--Global JS-->
-    <script src="{% static "assets/js/vendor/jquery-1.11.1.min.js" %}"></script>
-    <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
-    <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
-    <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
-    <script src="{% static "assets/js/src/app.js" %}"></script>
-    <script src="{% static "assets/js/cgsy.js" %}"></script>
-{% endblock %}
-
+    {% block global_js %}
+        <!--Global JS-->
+        <script src="{% static "assets/js/vendor/jquery-1.11.1.min.js" %}"></script>
+        <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+        <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
+        <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+        <script src="{% static "assets/js/src/app.js" %}"></script>
+        <script src="{% static "assets/js/cgsy.js" %}"></script>
+    {% endblock %}
 
 </body>
-
 </html>
