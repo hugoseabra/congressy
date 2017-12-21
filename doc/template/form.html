@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Form</title>
+    <meta name="description" content="">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet"
+          href="assets/plugins/bootstrap/css/bootstrap.min.css">
+    <!-- Fonts  -->
+    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/simple-line-icons.css">
+    <!-- CSS Animate -->
+    <link rel="stylesheet" href="assets/css/animate.css">
+
+    <!-- DateRange Picker -->
+    <link rel="stylesheet" href="assets/plugins/daterangepicker/daterangepicker-bs3.css">
+
+    <!-- Switchery -->
+    <link rel="stylesheet" href="assets/plugins/switchery/switchery.min.css">
+
+
+    <!-- Custom styles for this theme -->
+    <!-- <link rel="stylesheet" href="assets/css/main.css"> -->
+    <link href="assets/css/main.less" type="text/css" rel="stylesheet/less"/>
+
+
+    <!--<script>less = {env: 'development'};</script>-->
+    <script src="assets/plugins/less.min.js"></script>
+    <!--<script>less.watch();</script>-->
+
+
+
+    <!-- Feature detection -->
+    <script src="assets/js/vendor/modernizr-2.6.2.min.js"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="assets/js/vendor/html5shiv.js"></script>
+    <script src="assets/js/vendor/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<section id="main-wrapper" class="theme-cgsy-full">
+    <header id="header">
+        <!--logo start-->
+        <div class="brand">
+            <a href="index.html" class="logo">
+                <span>Congressy</span></a>
+        </div>
+        <!--logo end-->
+
+        <ul class="nav navbar-nav navbar-right">
+
+            <li class="dropdown profile hidden-xs ">
+
+                <button class="sidebar-toggle" id="toggle-left" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="true">
+                    <i class="fa fa-sitemap"></i>
+                </button>
+
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    <li><a href="#">Organização #1</a></li>
+                    <li><a href="#">Organização #2</a></li>
+                    <li><a href="#">Organização #3</a></li>
+                </ul>
+
+            </li>
+            <li class="dropdown profile hidden-xs">
+                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="meta">
+                            <span class="avatar">
+                                <img src="assets/img/profile.jpg" class="img-circle" alt="">
+                            </span>
+                        <span class="text  hidden-xs">Mike Adams</span>
+                        <span class="caret hidden-xs"></span>
+                        </span>
+                </a>
+                <ul class="dropdown-menu animated fadeInRight dropdown-menu-right" role="menu">
+                    <li>
+                        <a href="javascript:void(0);">
+                                <span class="icon"><i class="fa fa-user"></i>
+                                </span>Minha Conta</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0);">
+                                <span class="icon"><i class="fa fa-cog"></i>
+                                </span>Configurações</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="javascript:void(0);">
+                                <span class="icon"><i class="fa fa-sign-out"></i>
+                                </span>Logout</a>
+                    </li>
+                </ul>
+            </li>
+           <li class="dropdown mobile-menu hidden-sm hidden-md hidden-lg">
+                <button id="mobile-top-menu-button"
+                        class="sidebar-toggle">
+                    <i class="fa fa-ellipsis-v"></i>
+                </button>
+                <div id="mobile-top-menu">
+                    <h4>
+                        Minhas informações:
+                    </h4>
+                    <div class="mobile-top-menu-wrap">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <a href="#">Minha Conta</a><br />
+                                <a href="#">Configurações</a><br />
+                                <a href="#">Logout</a><br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+    </header>
+
+
+    <!--main content start-->
+    <section class="main-content-wrapper">
+        <div class="pageheader">
+            <h1>Criar Novo Evento</h1>
+            <div class="breadcrumb-wrapper hidden-xs">
+                <span class="label">You are here:</span>
+                <ol class="breadcrumb">
+                    <li class="active">Novo Evento</li>
+                </ol>
+            </div>
+        </div>
+        <section id="main-content">
+            <div class="row">
+                <div class="col-md-12 col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-body ng-binding">
+                             <div id="cgsy-btn-navbar">
+                                        <nav class="cgsy-btn-navbar" role="navigation" style="padding:5px;border-top:none">
+                                            <div class="container-fluid">
+                                                <ul class="nav navbar-nav navbar-right">
+                                                    <button onclick="location.href= window.location.origin + '/list.html';" type="button" class="btn btn-danger">Fechar
+                                                    </button>
+                                                    <div class="btn-group">
+                                                        <button onclick="location.href= window.location.origin  + '/dashboard.html';" type="button" class="btn btn-success">Salvar</button>
+                                                        <button type="button" class="btn btn-success dropdown-toggle"
+                                                                data-toggle="dropdown" aria-expanded="false">
+                                                            <span class="caret"></span>
+                                                            <span class="sr-only">Toggle Dropdown</span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" role="menu">
+
+                                                            <li>
+                                                                <a href="dashboard.html" class="save-and-panel">Salvar
+                                                                    e ir para painel</a>
+                                                            </li>
+                                                            <li class="divider"></li>
+                                                            <li>
+                                                                <a href="dashboard.html" class="save-and-remain">Salvar
+                                                                    e permanecer</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="dashboard.html" class="save-and-close">Salvar
+                                                                    e fechar</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="dashboard.html" class="save-and-new">Salvar
+                                                                    e novo</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </ul>
+
+                                            </div>
+                                        </nav>
+                                    </div>
+
+
+                            <div class="col-md-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <form class="form-horizontal" role="form">
+
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">Categoria:</label>
+                                                <div class="col-sm-2">
+                                                    <select class="form-control">
+                                                        <option value="">Seminário</option>
+                                                        <option value="">Palestra</option>
+                                                        <option value="">Workshop</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">Nome:</label>
+                                                <div class="col-sm-2">
+                                                    <input class="form-control" type="text">
+                                                </div>
+                                            </div>
+
+                                            <!-- @TODO add mobile version for daterange input -->
+                                            <div class="form-group hidden-xs">
+                                                <label class="col-sm-3 control-label">Normal Data:</label>
+                                                <div class="col-sm-2">
+                                                    <div class="input-group">
+                                                        <div class="input-group addon">
+                                                            <input id="config-demo" class="form-control" type="text">
+                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group hidden-sm hidden-md hidden-lg">
+                                                <label class="col-sm-3 control-label">Data Inicio Mobile:</label>
+                                                <div class="col-sm-2">
+                                                    <input id="datetime" type="datetime-local">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group hidden-sm hidden-md hidden-lg">
+                                                <label class="col-sm-3 control-label">Data Final Mobile:</label>
+                                                <div class="col-sm-2">
+                                                    <input id="datetime" type="datetime-local">
+                                                </div>
+                                            </div>
+
+
+
+
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">Inscrições:</label>
+                                                <div class="col-sm-2">
+                                                    <select class="form-control">
+                                                        <option value="">Desativadas</option>
+                                                        <option value="">Gratuitas</option>
+                                                        <option value="">Pagas</option>
+                                                        <option value="">Mista (Gratuitas e Pagas)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">Publicado:</label>
+                                                <div class="col-sm-2">
+                                                    <input type="checkbox" class="js-switch" checked />
+                                                </div>
+                                            </div>
+
+
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<!--main content end-->
+
+<!--sidebar right start-->
+<aside id="sidebar-right">
+    <h4 class="sidebar-title">Organizações:</h4>
+    <div id="contact-list-wrapper">
+        <div class="heading">
+            <ul>
+                <li class="new-contact"><a href="javascript:void(0)"><i
+                        class="fa fa-plus"></i></a>
+                </li>
+                <li>
+                    <input type="text" class="search"
+                           placeholder="Search">
+                    <button type="submit"
+                            class="btn btn-sm btn-search"><i
+                            class="fa fa-search"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div id="contact-list">
+
+        </div>
+        <div id="contact-user">
+            <div class="chat-user active"><span><i
+                    class="icon-bubble"></i></span>
+            </div>
+            <div class="email-user"><span><i
+                    class="icon-envelope-open"></i></span>
+            </div>
+            <div class="call-user"><span><i class="icon-call-out"></i></span>
+            </div>
+        </div>
+    </div>
+</aside>
+<!--/sidebar right end-->
+
+
+<!--Global JS-->
+<script src="assets/js/vendor/jquery-1.11.1.min.js"></script>
+<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="assets/plugins/navgoco/jquery.navgoco.min.js"></script>
+<script src="assets/plugins/pace/pace.min.js"></script>
+<script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
+<script src="assets/plugins/daterangepicker/moment.min.js"></script>
+<script src="assets/plugins/switchery/switchery.min.js"></script>
+<script src="assets/js/src/app.js"></script>
+<script src="assets/js/cgsy.js"></script>
+
+<script type="application/javascript">
+
+    //@TODO add a better date here
+    //DateRange init
+    $('#config-demo').daterangepicker({
+        timePicker: true,
+        startDate: "11/24/2017",
+        endDate: "11/30/2017"
+    });
+
+    //Switchery init
+    var elem = document.querySelector('.js-switch');
+    var init = new Switchery(elem);
+
+
+
+
+</script>
+
+
+</body>
+
+</html>
