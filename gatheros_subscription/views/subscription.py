@@ -116,7 +116,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
     """ Lista de inscrições """
 
     model = Subscription
-    template_name = 'gatheros_subscription/subscription/list.html'
+    template_name = 'subscription/pre_subscription_list.html'
 
     def get_queryset(self):
         query_set = super(SubscriptionListView, self).get_queryset()
@@ -147,7 +147,8 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
     """ Formulário de inscrição """
 
     form_class = SubscriptionForm
-    template_name = 'gatheros_subscription/subscription/form.html'
+    # template_name = 'gatheros_subscription/subscription/form.html'
+    template_name = 'subscription/form.html'
     success_message = 'Pré-inscrição criada com sucesso.'
 
     def get_context_data(self, **kwargs):

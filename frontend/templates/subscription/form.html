@@ -1,0 +1,138 @@
+{% extends "base/base.html" %}
+{% block title %}Pré-inscrição | Congressy{% endblock %}
+{% load i18n static %}
+
+{% block pageheader %}
+    <div class="pageheader">
+        <h1>
+            {% if form_title %}
+                {{ form_title }}
+            {% else %}
+                Pré-inscrição
+            {% endif %}
+        </h1>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="row" style="padding-top: 30px;">
+        <div class="col-lg-9 col-lg-offset-1">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ event.name }}</h3>
+                </div>
+                <div class="panel-body">
+
+
+                    <br/>
+
+                    {% if object %}
+
+                        <h3><b>Pessoa: </b>{{ object.person.pk }}</h3>
+
+                        <br/>
+
+                        <h3>
+                            <b>Perfil: </b>
+                            {% if object.person.user_id %}
+                                <i class="fa fa-check-square" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="fa fa-window-close" aria-hidden="true"></i>
+                            {% endif %}
+                        </h3>
+
+                        <br/>
+
+                        <h3><b>UUID: </b>{{ object.pk }}</h3>
+
+                        <br/>
+
+                        {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+
+                            <h3><b>Lote: </b>{{ object.lot.name }}</h3>
+
+                            <br/>
+
+                        {% endif %}
+
+                        <h3><b>Código de Inscrição: </b>{{ object.code }}</h3>
+
+                        <br/>
+
+                        <h3><b>Número de Inscrição: </b>{{ object.count }}</h3>
+
+                        <br/>
+
+                        <h3><b>Cadastrado em: </b>{{ object.created }}</h3>
+
+                        <br/>
+
+                        <h3><b>Cadastrado por: </b>{{ object.created_by }}</h3>
+
+                        <br/>
+                        <br/>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="padding-top: 30px;">
+        <div class="col-lg-9 col-lg-offset-1">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Campos principais</h3>
+                </div>
+                <div class="panel-body">
+
+                    <form action="" method="post">
+                        {% csrf_token %}
+
+                        {% for field in hidden_fields %}
+                            {{ field }}
+                        {% endfor %}
+
+
+                        {% for item in default_fields %}
+                            <div class="form-group">
+
+                                <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
+
+                                {{ item.form_field }}
+
+
+                                {% if item.form_field.help_text %}
+                                    <br/>
+                                    <small class="title"><strong>Instrução:</strong> {{ item.form_field.help_text|safe }}</small>
+                                {% endif %}
+
+                                {% if item.form_field.errors %}
+                                    <br>
+                                    <br>
+                                    <div class="alert alert-danger alert-dismissable col-md-offset-1">
+                                        style="width: 80%">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×
+                                        </button>
+                                        {{ item.form_field.errors }}
+                                    </div>
+                                {% endif %}
+
+                            </div>
+                        {% endfor %}
+
+                        <hr/>
+
+                        <input class="btn btn-primary" type="submit" value="Salvar"/>
+                        <a class="btn btn-danger" role="button"
+                           href="{% url 'subscription:subscription-list' event.pk %}">Cancelar</a>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
