@@ -1,0 +1,30 @@
+{% extends "base/base.html" %}
+
+{% load i18n static %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+            <div class="panel panel-primary" style="padding-top: 30px;">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Perfil</h3>
+                </div>
+                <div class="panel-body">
+                    <form action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <table>
+                            {{ form.as_table }}
+                        </table>
+                        <br/>
+                        <input class="btn btn-primary" type="submit" value="Salvar" />
+                        <a class="btn btn-danger" href="{% url 'front:start' %}" role="button">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
