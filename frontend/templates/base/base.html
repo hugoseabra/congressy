@@ -90,6 +90,7 @@
         <nav>
             <br>
             <ul class="nav nav-pills nav-stacked">
+                {% block nav_aside_itens %}
                 <li>
                     <a href="{% url 'event:organization-list' %}" title="Organizações">
                         <i class="fa  fa-fw fa-sitemap"></i> Organizações
@@ -100,6 +101,7 @@
                         <i class="fa  fa-fw fa-rocket"></i> Eventos
                     </a>
                 </li>
+                {% endblock %}
             </ul>
         </nav>
     </aside>
