@@ -12,12 +12,12 @@
 <!--<![endif]-->
 
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>{% block title %}Congressy-Platform{% endblock %}</title>
-<meta name="description" content="">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}Congressy-Platform{% endblock %}</title>
+    <meta name="description" content="">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
     {% block head %}
         <!-- Bootstrap core CSS -->
@@ -28,18 +28,23 @@
         <link rel="stylesheet" href="{% static "assets/css/simple-line-icons.css" %}">
         <!-- CSS Animate -->
         <link rel="stylesheet" href="{% static "assets/css/animate.css" %}">
+        <!-- icheck -->
+        <link rel="stylesheet" href="{% static "assets/css/flat/grey.css" %}">
+
 
         <!-- Custom styles for this theme -->
         <!-- <link rel="stylesheet" href="assets/css/main.css"> -->
-        <link href="{% static "assets/css/main.less"%}" type="text/css" rel="stylesheet/less"/>
+        <link href="{% static "assets/css/main.less" %}" type="text/css" rel="stylesheet/less"/>
 
         <!--<script>less = {env: 'development'};</script>-->
-        <script src="{% static "assets/plugins/less.min.js"%}"></script>
+        <script src="{% static "assets/plugins/less.min.js" %}"></script>
         <!--<script> less.watch(); </script>-->
     {% endblock %}
 
     <!-- Feature detection -->
-    <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js"%}"></script>
+    <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
+    <!-- icheck -->
+    <script src="{% static "assets/js/icheck.min.js" %}"></script>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -48,8 +53,10 @@
     <![endif]-->
 </head>
 <body>
-    <section id="main-wrapper" class="theme-cgsy-full">
-        <header id="header">
+
+
+<section id="main-wrapper" class="theme-cgsy-full">
+    <header id="header">
         <!--logo start-->
         <div class="brand">
             <a href="{% url 'event:event-list' %}" class="logo">
@@ -57,24 +64,124 @@
             </a>
         </div>
         <!--logo end-->
+
+
         {% block navbar %}
             {% include "base/navbar.html" %}
         {% endblock %}
     </header>
 
+    <aside class="sidebar sidebar-left" style="width: 160px">
+
+
+        {% if organization and not organization.internal %}
+            <div class="sidebar-profile">
+                <div class="profile-body dropdown">
+                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <h4>
+                            {{ organization.name }}<span class="caret"></span></h4></a>
+                    <small class="title">{{ member.get_group_display }}</small>
+                    {#<a href="{% url 'event:organization-panel' organization.pk %}">Gerenciar</a>#}
+                    <ul class="dropdown-menu animated fadeInRight" role="menu">
+
+                        <li class="divider"></li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-user"></i>
+                        </span>My Account
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-envelope"></i>
+                        </span>Messages
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-cog"></i>
+                        </span>Settings
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-sign-out"></i>
+                        </span>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+
+        <nav>
+            <br>
+            <ul class="nav nav-pills nav-stacked">
+                <li>
+                    <a href="{% url 'event:organization-list' %}" title="Organizações">
+                        <i class="fa  fa-fw fa-sitemap"></i> Organizações
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'event:event-list' %}" title="Eventos">
+                        <i class="fa  fa-fw fa-rocket"></i> Eventos
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+
     <!--main content start-->
-    {% block content %}{% endblock %}
-    <!-- main content end -->
+    <section class="main-content-wrapper">
+        {% block pageheader %}{% endblock %}
+        <section class="main-content">
+            {% load base_tags %}
+            {% block messages %}
+                {% if messages %}
+                    <div style="width:100%;margin-top:3px">
+                        <ul class="messagelist" style="list-style: none;margin: 0; padding: 0">
+                            {% for message in messages %}
+                                {% get_message_background_color message as bgcolor %}
+                                <li style="background-color: {{ bgcolor }};padding: 10px">
+                                    {{ message|capfirst }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endblock messages %}
+            {% block content %}{% endblock %}
+        </section>
+        <!-- main content end -->
+    </section>
 </section>
 
 {% block scripts %}
     <!--Global JS-->
-    <script src="{% static "assets/js/vendor/jquery-1.11.1.min.js"%}"></script>
-    <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js"%}"></script>
-    <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js"%}"></script>
-    <script src="{% static "assets/plugins/pace/pace.min.js"%}"></script>
-    <script src="{% static "assets/js/src/app.js"%}"></script>
-    <script src="{% static "assets/js/cgsy.js"%}"></script>
+    <script src="{% static "assets/js/vendor/jquery-1.11.1.min.js" %}"></script>
+    <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
+    <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+    <script src="{% static "assets/js/src/app.js" %}"></script>
+    <script src="{% static "assets/js/cgsy.js" %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_flat-grey',
+                radioClass: 'iradio_flat-grey'
+            });
+        });
+    </script>
+
+
+
 {% endblock %}
 </body>
 
