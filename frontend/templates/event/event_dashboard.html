@@ -11,19 +11,20 @@
 
 {% block nav_aside_itens %}
     <li>
-        <a href="{% url 'event:organization-list' %}" title="Organizações">
+        <a href="{% url 'event:event-list' %}" title="Voltar">
             <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
         </a>
     </li>
     <hr/>
 
     <li style="font-weight: bold; color: #ffffff">Inscrições</li>
-
-    <li>
+    {% if can_change %}
+        <li>
         <a href="{% url 'subscription:lot-list' object.pk %}" title="Lotes">
             <i class="fa  fa-fw fa-rocket"></i> Lotes
         </a>
     </li>
+    {% endif %}
     <li>
         <a href="{% url 'subscription:event-fields-config' object.pk %}" title="Configuração de Formulário">
             <i class="fa  fa-fw fa-rocket"></i> Configuração de Formulário
