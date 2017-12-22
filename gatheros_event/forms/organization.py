@@ -16,7 +16,6 @@ class OrganizationForm(forms.ModelForm):
 
     user = None
     internal = False
-    description_html = forms.CharField(widget=CKEditorWidget())
 
     class Meta:
         model = Organization
@@ -40,6 +39,10 @@ class OrganizationForm(forms.ModelForm):
             'linkedin',
             'skype',
         )
+
+        widgets = {
+            'description_html': CKEditorWidget(),
+        }
 
 
     def __init__(self, user, internal=False, data=None, *args, **kwargs):

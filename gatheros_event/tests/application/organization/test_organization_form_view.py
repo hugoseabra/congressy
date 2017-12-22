@@ -123,10 +123,11 @@ class OrganizationFormViewTest(TestCase):
         self.assertEqual(org.description_html, data['description_html'])
 
         # Checando se gravou a imagem
-        try:
-            org.avatar.path
-        except ValueError:
-            self.fail("O avatar não foi enviado")
+        # @TODO Test temporary disabled, removed feature
+        # try:
+        #     org.avatar.path
+        # except ValueError:
+        #     self.fail("O avatar não foi enviado")
 
     def test_delete(self):
         """ Testa exclusão de organização pela view. """
