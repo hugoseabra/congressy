@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     # THIRD PARTY
     'permission',
     'stdimage',
+    'ckeditor',
 
     # KANU_APPS
     'kanu_locations',
@@ -143,3 +144,9 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw'
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'width': 500,
+    },
+}

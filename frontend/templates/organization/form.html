@@ -1,6 +1,14 @@
 {% extends "base/base.html" %}
 
 {% load static %}
+{% block head %}
+    {{ block.super }}
+    <!-- ckeditor -->
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+{% endblock %}
+
+
 {% load organization_tags %}
 {% block title %}
     {% if object %}
@@ -50,7 +58,7 @@
                                 {{ field.errors }}
                                 <label for="{{ field.id_for_label }}"
                                        class="col-sm-3 control-label cgsy-label">{{ field.label }}</label>
-                                <div class="col-sm-6">
+                                <div class="col-sm-9">
                                     {{ field }}
                                     {% if field.help_text %}
                                         <br/>

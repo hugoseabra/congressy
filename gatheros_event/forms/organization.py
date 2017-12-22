@@ -6,6 +6,8 @@ from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
 
+from ckeditor.widgets import CKEditorWidget
+
 from gatheros_event.models import Member, Organization
 
 
@@ -14,6 +16,7 @@ class OrganizationForm(forms.ModelForm):
 
     user = None
     internal = False
+    description_html = forms.CharField(widget=CKEditorWidget())
 
     class Meta:
         model = Organization
