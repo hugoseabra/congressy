@@ -65,7 +65,7 @@
                                                    href="{% url 'event:organization-edit' item.pk %}">Editar</a>
 
                                                 {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
-                                                    <a class="btn btn-danger btn-sm">
+                                                    <a class="btn btn-danger btn-sm"
                                                        href="{% url 'event:organization-delete' item.pk %}">Excluir</a>
                                                 {% endif %}
                                             </td>
