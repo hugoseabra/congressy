@@ -6,7 +6,8 @@ from gatheros_event.views.mixins import AccountMixin
 
 class EventListView(AccountMixin, ListView):
     model = Event
-    template_name = 'gatheros_event/event/list.html'
+    # old template template_name = 'gatheros_event/event/list.html'
+    template_name = 'event/list.html'
     ordering = ['name']
 
     def get_queryset(self):

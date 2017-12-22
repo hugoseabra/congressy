@@ -46,21 +46,30 @@
 
 {% block pageheader %}
     <div class="pageheader">
-        <h1>Credenciamento: {{ event.name }} </h1>
+        <h1>Credenciamento</h1>
     </div>
 {% endblock %}
 
+{% block nav_aside_itens %}
+    <li>
+        <a href="{% url 'event:event-panel' event.pk %}" title="Voltar">
+
+            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
+        </a>
+    </li>
+    <hr/>
+    {{ block.super }}
+{% endblock %}
 
 {% block content %}
 
-    <div class="pull-right" style="padding-right: 20px; padding-top: 10px;padding-bottom: 20px;">
-        <a href="{% url 'event:event-panel' event.pk %}" class="btn btn-danger btn-sm" role="button"
-           style=":hover: none ">Voltar</a>
-    </div>
-
     <div class="row">
-        <div class="col-lg-6 col-lg-offset-2 " style="padding-top: 50px">
+        <div class="col-lg-7 col-sm-offset-1 " style="padding-top: 50px">
             <div id="cgsy_login_panel" class="panel panel-primary">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ event.name }}</h3>
+                </div>
                 <div class="panel-body">
                     <form method="post" action="" class="form-horizontal form-border">
 
@@ -106,30 +115,23 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-2 col-md-offset-2" style="padding-right: 30px">
+        <div class="col-sm-3 col-md-offset-1" style="padding-top: 50px;padding-right: 30px">
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">Histórico:</h3>
                 </div>
                 <div class="panel-body">
-                                        {% for attendance in attendances %}
+                    {% for attendance in attendances %}
                         <div style="background: #FFF;padding: 5px;border-bottom: 1px solid #DDD">
                             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
-                                    <td width="1%">
-                                        {% if attendance.person.avatar %}
-                                            <img src="{{ attendance.person.avatar.url }}" width="80px" />
-                                        {% else %}
-                                            <!--suppress CheckImageSize -->
-                                            <img src="/media/default_avatar.png" width="80px" />
-                                        {% endif %}
-                                    </td>
                                     <td style="padding: 5px">
                                         <div style="font-weight: bold;text-transform: uppercase">{{ attendance.person.name }}</div>
                                         <form method="post" action="">{% csrf_token %}
-                                            <input type="hidden" name="search_by" value="code" />
-                                            <input type="hidden" name="value" value="{{ attendance.code }}" />
-                                            <button id="registration_button" type="submit">{{ attendance.code }}</button>
+                                            <input type="hidden" name="search_by" value="code"/>
+                                            <input type="hidden" name="value" value="{{ attendance.code }}"/>
+                                            <button id="registration_button"
+                                                    type="submit">{{ attendance.code }}</button>
                                         </form>
                                         <div><strong>Data:</strong> {{ attendance.attended_on }}</div>
                                     </td>
@@ -242,7 +244,7 @@
                                     </td>
                                     <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: #3C763D;color: #000000; font-weight: bold;{% else %}background: #FFF{% endif %}">
                                         {% if item.person.user_id %}
-                                           <i class="fa fa-check" aria-hidden="true"></i>
+                                            <i class="fa fa-check" aria-hidden="true"></i>
 
                                         {% endif %}
                                     </td>
@@ -255,12 +257,15 @@
                                             {% if item.attended %}
                                                 <div style="font-size: 14px">{{ item.attended_on }}</div>
                                                 <hr>
-                                                <button  class="btn btn-danger" id="registration_button" type="submit">Cancelar credenciamento
+                                                <button class="btn btn-danger" id="registration_button" type="submit">
+                                                    Cancelar credenciamento
                                                 </button>
                                             {% else %}
                                                 <div style="font-size: 14px">Não credenciado</div>
                                                 <hr>
-                                                <button id="registration_button" type="submit">Credenciar</button>
+                                                <button class="btn btn-primary" id="registration_button" type="submit">
+                                                    Credenciar
+                                                </button>
                                             {% endif %}
                                         </form>
                                     </td>

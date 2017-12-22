@@ -1,0 +1,139 @@
+{% extends "base/base.html" %}
+
+{% load static %}
+{% load event_tags %}
+{% block title %} Lista de Eventos | Congressy{% endblock %}
+{% block pageheader %}
+    <div class="pageheader">
+        <h1>Lista de Eventos</h1>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row" style="padding-top: 30px;">
+        <div class="col-lg-10 col-lg-offset-1">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    <div id="cgsy-btn-navbar">
+                        <nav class="navbar" role="navigation">
+
+                            <ul class="nav navbar-nav navbar-left">
+                                <a href="{% url 'event:event-add' %}">
+                                    <button type="button" class="btn btn-success">
+                                        Novo Evento
+                                    </button>
+                                </a>
+                            </ul>
+
+                        </nav>
+                    </div>
+
+                    {% if object_list %}
+
+                        <div class="table-responsive">
+                            <table id="event_table" class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Publicado</th>
+                                    <th>Categoria</th>
+                                    <th>Local</th>
+                                    <th>Tipo de inscrição</th>
+                                    <th>Inscrições</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for event in object_list %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'event:event-panel' event.pk %}">
+                                                {{ event.name }}
+                                                <br/>
+                                                <small class="text-muted">{{ event.get_period }}</small>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if event.published == True %}
+                                                <i class="fa fa-check-circle " aria-hidden="true"
+                                                   style="color:greenyellow"></i>
+                                            {% else %}
+                                                <i class="fa fa-times-circle" aria-hidden="true"
+                                                   style="color:red"></i>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ event.category.name }}</td>
+                                        <td>
+                                            {% if event.place %}
+                                                {{ event.place.name }}
+                                            {% else %}
+                                                Online
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ event.get_subscription_type_display }}
+                                            {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+                                                {% event_payment_type event as payment_type %}
+                                                (
+                                                {% if payment_type == 'free' %}Gratuitas{% endif %}
+                                                {% if payment_type == 'paied' %}Pagas{% endif %}
+                                                {% if payment_type == 'mixed' %}Mistas: gratuitas e pagas{% endif %}
+                                                )
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
+
+                                                {{ event.subscriptions.all|length }}
+                                                {% if event.limit %} /
+                                                    {{ event.limit }}
+                                                {% endif %}
+
+                                            {% else %}
+                                                -----
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if user has 'gatheros_event.change_event' of event %}
+                                                <a class="btn btn-primary" href="{% url 'event:event-edit' event.pk %}">Editar</a>
+
+                                            {% endif %}
+                                            &nbsp; &nbsp;
+                                            {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
+                                                <a class="btn btn-danger"
+                                                   href="{% url 'event:event-delete' event.pk %}">Excluir</a>
+                                            {% endif %}
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    {% else %}
+
+                        <h3>Nenhum Evento</h3>
+
+                    {% endif %}
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block scripts %}
+    {{ block.super }}
+
+    <script>
+        $(document).ready(function () {
+            $('#event_table').DataTable();
+        });
+    </script>
+{% endblock %}
