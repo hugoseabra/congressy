@@ -10,7 +10,8 @@ from gatheros_event.views.mixins import AccountMixin
 
 
 class BaseOrganizationView(AccountMixin, View):
-    template_name = 'gatheros_event/organization/form.html'
+    # template_name = 'gatheros_event/organization/form.html'
+    template_name = 'organization/form.html'
     success_message = ''
     success_url = None
     form_title = None

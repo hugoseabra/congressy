@@ -9,7 +9,6 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.html import strip_tags
-
 from core.util import model_field_slugify
 from .member import Member
 from .mixins import GatherosModelMixin

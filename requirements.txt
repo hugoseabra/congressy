@@ -5,6 +5,8 @@ chardet==3.0.4
 coverage==4.3.4
 Django==1.11
 django-appconf==1.0.2
+django-ckeditor==5.4.0
+django-js-asset==0.1.1
 django-localflavor==1.4.1
 django-permission==1.0.4
 django-stdimage==2.4.1

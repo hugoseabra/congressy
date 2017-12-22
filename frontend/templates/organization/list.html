@@ -1,0 +1,91 @@
+{% extends "base/base.html" %}
+
+{% load static %}
+{{% load organization_tags %}
+{% block title %}Lista de Organizações | Congressy{% endblock %}
+{% block pageheader %}
+    <div class="pageheader">
+        <h1>Lista de Organizações</h1>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row" style="padding-top: 30px;">
+        <div class="col-lg-10 col-lg-offset-1">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    <div id="cgsy-btn-navbar">
+                        <nav class="navbar" role="navigation">
+
+                            <ul class="nav navbar-nav navbar-left">
+                                <a href="{% url 'event:organization-add' %}">
+                                    <button type="button" class="btn btn-success">
+                                        Nova Organização
+                                    </button>
+                                </a>
+                            </ul>
+
+                        </nav>
+                    </div>
+
+                    {% if object_list %}
+
+                        <div class="table-responsive">
+                            <table id="event_table" class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Cargo</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for item in object_list %}
+                                    {% get_member_group item user as member_group %}
+                                    <tr>
+                                        <td><a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
+                                        </td>
+                                        <td>
+                                            {% if item.description_html %}
+                                                {{ item.description_html|safe }}
+                                            {% else %}
+                                                -----
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% get_member_group_name item user %}
+                                        </td>
+                                        {% if member_group == member.ADMIN %}
+                                            <td>
+                                                <a class="btn btn-primary btn-sm"
+                                                   href="{% url 'event:organization-edit' item.pk %}">Editar</a>
+
+                                                {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
+                                                    <a class="btn btn-danger btn-sm">
+                                                       href="{% url 'event:organization-delete' item.pk %}">Excluir</a>
+                                                {% endif %}
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    {% else %}
+
+                        <h3>Nenhuma organização</h3>
+
+                    {% endif %}
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
