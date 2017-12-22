@@ -1,0 +1,23 @@
+version: '2.3'
+services:
+  postgres:
+      image: postgres:10-alpine
+      container_name: postgres
+      networks:
+        - postgres
+      environment:
+          - MYSQL_ROOT_PASSWORD=123
+          - MYSQL_USER=dev
+          - MYSQL_PASSWORD=dev
+          - MYSQL_DATABASE=congressy
+      ports:
+          - "5432:5432"
+      volumes:
+          - "postgres:/var/lib/postgresql:rw"
+
+volumes:
+  postgres:
+
+networks:
+  postgres:
+
