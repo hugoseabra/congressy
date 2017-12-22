@@ -73,7 +73,8 @@ class BaseFormLotView(BaseLotView):
 class LotListView(BaseLotView, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
     model = Lot
-    template_name = 'gatheros_subscription/lot/list.html'
+    # template_name = 'gatheros_subscription/lot/list.html'
+    template_name = 'lot/list.html'
     ordering = ['name']
 
     def get_queryset(self):

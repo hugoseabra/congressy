@@ -7,7 +7,16 @@
         <h1>Pré-inscrições</h1>
     </div>
 {% endblock %}
+{% block nav_aside_itens %}
+    <li>
+        <a href="{% url 'event:event-panel' event.pk %}" title="Voltar">
 
+            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
+        </a>
+    </li>
+    <hr/>
+    {{ block.super }}
+{% endblock %}
 {% block content %}
     <div class="row" style="padding-top: 30px;">
         <div class="col-lg-9 col-lg-offset-1">

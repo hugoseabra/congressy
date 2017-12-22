@@ -98,6 +98,7 @@ class AccountMixin(LoginRequiredMixin, View):
 
         except PermissionDenied as e:
             messages.warning(request, str(e))
+            # @TODO Delete an event is not working, not catching permission denied.
             return redirect(self.get_permission_denied_url())
 
         else:
