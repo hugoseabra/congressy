@@ -17,17 +17,6 @@
 
     <div style="background: #DDD">
         {% if object_list %}
-
-
-
-
-
-
-
-
-
-
-
             <table width="100%">
                 <tr>
                     <th style="text-align: left;border:1px solid #fff;padding:10px" colspan="2">
@@ -47,7 +36,7 @@
                             <td width="1%"
                                 style="background-color: darkgrey"></td>
                         {% endif %}
-                        <td style=padding:10px;margin-bottom: 3px">
+                        <td style="background: #FFF;padding:10px;margin-bottom: 3px">
                             <div>{{ forloop.counter }} -
                                 {% if user has 'gatheros_subscription.change_lot' of lot %}
                                     <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">{{ lot.name }}</a>
@@ -86,32 +75,6 @@
                     </tr>
                 {% endfor %}
             </table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         {% else %}
             <div style="background: #FFF;padding:10px;margin-bottom: 3px">
                 Nenhum evento

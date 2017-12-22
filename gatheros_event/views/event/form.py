@@ -9,7 +9,7 @@ from gatheros_event.views.mixins import AccountMixin
 
 
 class BaseEventView(AccountMixin, View):
-    template_name = 'gatheros_event/event/form.html'
+    template_name = 'event/form.html'
     success_message = ''
     success_url = None
     form_title = None

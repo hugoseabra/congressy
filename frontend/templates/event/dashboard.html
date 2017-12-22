@@ -126,12 +126,12 @@
                         {% else %}
                             <div style="padding: 10px 0 30px;text-align: center;">
                                 <div style="text-align: left;">
-                                    <strong>Inscrições:</strong></div>
-                                <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">{{ object.subscriptions.count }}</div>
+                                    <strong>Inscrições: {{ object.subscriptions.count }}</strong></div>
+
                             </div>
                         {% endif %}
                     {% else %}
-                        <div style="padding: 10px 0 0;text-align: center;">
+                        <div style="padding: 10px 0 0;text-align: left;">
                             <div style="text-align: left;">
                                 <strong>Inscrições:</strong></div>
                             <div style="font-weight: bold;font-size: 20px;color: darkred;padding: 10px 0">
