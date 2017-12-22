@@ -17,16 +17,27 @@ class OrganizationForm(forms.ModelForm):
 
     class Meta:
         model = Organization
+        # fields = (
+        #     'name',
+        #     'description_html',
+        #     'avatar',
+        #     'website',
+        #     'facebook',
+        #     'twitter',
+        #     'linkedin',
+        #     'skype',
+        # )
+
         fields = (
             'name',
             'description_html',
-            'avatar',
             'website',
             'facebook',
             'twitter',
             'linkedin',
             'skype',
         )
+
 
     def __init__(self, user, internal=False, data=None, *args, **kwargs):
         self.user = user
