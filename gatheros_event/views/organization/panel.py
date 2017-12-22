@@ -9,7 +9,8 @@ from gatheros_event.views.mixins import AccountMixin
 
 class OrganizationPanelView(AccountMixin, DetailView):
     model = Organization
-    template_name = 'gatheros_event/organization/panel.html'
+    # template_name = 'gatheros_event/organization/panel.html'
+    template_name = 'organization/panel.html'
 
     def dispatch(self, request, *args, **kwargs):
         dispatch = super(OrganizationPanelView, self).dispatch(

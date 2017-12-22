@@ -1,0 +1,91 @@
+{% extends "base/base.html" %}
+{# @TODO Change the icons in nav_aside_itens  #}
+{% load static %}
+{% load event_tags %}
+{% block title %} Painel da Organização | Congressy{% endblock %}
+{% block pageheader %}
+    <div class="pageheader">
+        <h2>Painel da Organização</h2>
+    </div>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <li>
+        <a href="{% url 'event:organization-list' %}" title="Voltar">
+            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
+        </a>
+    </li>
+
+    <hr/>
+
+    <li>
+        <a href="{% url 'event:organization-list' %}" title="Minhas organizações">
+            <i class="fa  fa-fw fa-rocket"></i> Minhas organizações
+        </a>
+    </li>
+
+    {% if can_manage_invitations %}
+        <li>
+            <a href="{% url 'event:invitation-list' object.pk %}" title="Convites">
+                <i class="fa  fa-fw fa-rocket"></i> Convites
+            </a>
+        </li>
+    {% endif %}
+
+    {% if can_view_members or can_view_members %}
+        <li>
+            <a href="{% url 'event:member-list' object.pk %}" title="Membros">
+                <i class="fa  fa-fw fa-rocket"></i> Membros
+            </a>
+        </li>
+    {% endif %}
+
+    {% if can_manage_places %}
+        <li>
+            <a href="{% url 'event:place-list' object.pk %}" title="Locais de eventos">
+                <i class="fa  fa-fw fa-rocket"></i> Locais de eventos
+            </a>
+        </li>
+    {% endif %}
+
+    <li>
+        <a href="{% url 'subscription:fields' object.pk %}" title="Formulário Padrão">
+            <i class="fa  fa-fw fa-rocket"></i>Formulário Padrão
+        </a>
+    </li>
+
+    <li>
+        <a href="#" title="Pessoas">
+            <i class="fa  fa-fw fa-rocket"></i>Pessoas
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'event:organization-cancel-membership' object.pk %}" title="Sair da Organização">
+            <i class="fa  fa-fw fa-rocket"></i>Sair da Organização
+        </a>
+    </li>
+
+
+{% endblock %}
+
+
+{% block content %}
+
+
+    <h1 style="padding-left: 15px; padding-top: 15px; font-weight: bold">{{ object.name }}</h1>
+
+    <div class="row" style="padding-top: 30px; padding-right: 30px; padding-left: 20px">
+        <div class="col-lg-9 ">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+{% endblock %}
