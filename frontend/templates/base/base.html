@@ -74,7 +74,7 @@
         {% endblock %}
     </header>
 
-    <aside class="sidebar sidebar-left" >
+    <aside class="sidebar sidebar-left">
 
 
         {% if organization and not organization.internal %}
@@ -82,24 +82,47 @@
                 <div class="profile-body">
                     <h4>{{ organization.name }}</h4>
                     <small class="title">{{ member.get_group_display }}</small>
+                    <hr/>
                     {#<a href="{% url 'event:organization-panel' organization.pk %}">Gerenciar</a>#}
+                    <label style="font-weight: bold" for="organization-context-pk">Mudar para:</label>
+
+                    <form action="{% url 'event:organization-switch' %}"
+                          method="post">
+                        {% csrf_token %}
+                        <select name="organization-context-pk"
+                                id="organization-context-pk"
+                                onchange="submit()" style="margin-top:3px;width: 100%">
+                            {% for org in organizations %}
+                                <option {% if organization.pk == org.pk %}selected="selected"{% endif %}
+                                        value="{{ org.pk }}">
+                                    {{ org.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="next" value="{{ request.path }}"/>
+                    </form>
                 </div>
             </div>
         {% endif %}
 
+
+
+
         <nav>
             <br>
             <ul class="nav nav-pills nav-stacked">
-                <li>
-                    <a href="{% url 'event:organization-list' %}" title="Organizações">
-                        <i class="fa  fa-fw fa-sitemap"></i> Organizações
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'event:event-list' %}" title="Eventos">
-                        <i class="fa  fa-fw fa-rocket"></i> Eventos
-                    </a>
-                </li>
+                {% block nav_aside_itens %}
+                    <li>
+                        <a href="{% url 'event:organization-list' %}" title="Organizações">
+                            <i class="fa  fa-fw fa-sitemap"></i> Organizações
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'event:event-list' %}" title="Eventos">
+                            <i class="fa  fa-fw fa-rocket"></i> Eventos
+                        </a>
+                    </li>
+                {% endblock %}
             </ul>
         </nav>
     </aside>
@@ -140,14 +163,14 @@
     <script src="{% static "assets/js/src/app.js" %}"></script>
     <script src="{% static "assets/js/cgsy.js" %}"></script>
 
-{#    <script>#}
-{#        $(document).ready(function () {#}
-{#            $('input').iCheck({#}
-{#                checkboxClass: 'icheckbox_flat-grey',#}
-{#                radioClass: 'iradio_flat-grey'#}
-{#            });#}
-{#        });#}
-{#    </script>#}
+    {#    <script>#}
+    {#        $(document).ready(function () {#}
+    {#            $('input').iCheck({#}
+    {#                checkboxClass: 'icheckbox_flat-grey',#}
+    {#                radioClass: 'iradio_flat-grey'#}
+    {#            });#}
+    {#        });#}
+    {#    </script>#}
 
 
 

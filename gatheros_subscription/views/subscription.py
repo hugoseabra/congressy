@@ -569,6 +569,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
 
 class SubscriptionExportView(AccountMixin, FormListViewMixin):
+    #template_name = 'gatheros_subscription/subscription/attendance.html'
     template_name = 'subscription/export.html'
     form_class = SubscriptionFilterForm
     model = Subscription
