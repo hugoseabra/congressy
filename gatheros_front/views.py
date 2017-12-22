@@ -10,5 +10,5 @@ class Start(LoginRequiredMixin, TemplateView):
 
 # noinspection PyClassHasNoInit
 class Login(auth_views.LoginView):
-    template_name = 'auth/login.html'
+    template_name = 'registration/login.html'
     redirect_authenticated_user = True
