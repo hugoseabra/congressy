@@ -1,0 +1,56 @@
+//congressy - dark-blue
+.theme-cgsy-full {
+    #header {
+        .brand{
+            background: @cgsyPrimary;
+            .logo{
+                color:#fff;
+            }
+        }
+        button.sidebar-toggle,button#toggle-profile,button#toggle-fullscreen, .nav li.profile > a{
+            color: #fff;
+        }
+        background: @cgsyPrimary;
+        button.sidebar-toggle:hover,
+        button#toggle-profile:hover,
+        button#toggle-fullscreen:hover {
+             background: lighten(@cgsyPrimary,5%)
+        }
+
+        button.sidebar-toggle:active,button.sidebar-toggle.active,
+        button#toggle-profile:active,button#toggle-profile.active
+        button#toggle-fullscreen:active,button#toggle-fullscreen.active {
+             background: lighten(@cgsyTertiary,5%)
+        }
+
+
+        .nav li.profile > a:hover, .nav li.profile > a:active, .nav li.profile > a:focus {
+            background: lighten(@cgsyPrimary,5%)
+        }
+    }
+    .sidebar-left {
+        background-color: @cgsyTertiary;
+    }
+    .sidebar-mini .sidebar-left .nav > li.active > a:focus, .sidebar-mini .sidebar-left .nav > li.active > a:hover, .sidebar-left .nav > li.active > a, .sidebar-left .nav > li.active > a:focus, .sidebar-left .nav > li.active > a:hover {
+        color: #fff;
+        background-color: @cgsySecondary;
+    }
+    .sidebar-left .nav > li.open > a, .sidebar-left .nav > li > a:hover {
+        color: @cgsyTertiary;
+        background-color: #ffffff;
+    }
+    &.sidebar-mini .sidebar-left .nav>li.nav-dropdown-open>.nav-sub, &.sidebar-mini .sidebar-left .nav>li:hover>.nav-sub {
+        background-color: @cgsyTertiary;
+    }
+    .sidebar-profile {
+        background: @cgsySecondary;
+    }
+    &.sidebar-mini .sidebar-left .nav>li.active>a, &.sidebar-mini .sidebar-left .nav>li.active>a:focus, &.sidebar-mini .sidebar-left .nav>li.active>a:hover, .sidebar-left .nav>li.active>a, .sidebar-left .nav>li.active>a:focus, .sidebar-left .nav>li.active>a:hover {
+        color: #fff;
+        background-color: @cgsySecondary;
+    }
+    &.sidebar-mini .sidebar-left .nav>li.nav-dropdown-open>a, &.sidebar-mini .sidebar-left .nav>li:hover>a {
+        color: @cgsyTertiary;
+        background-color: #fff;
+    }
+}

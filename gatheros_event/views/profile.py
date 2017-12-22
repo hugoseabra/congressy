@@ -27,7 +27,7 @@ class ProfileView(AccountMixin, FormView):
 
 
 class ProfileCreateView(TemplateView, FormView):
-    template_name = 'auth/register.html'
+    template_name = 'registration/register.html'
     messages = {
         'success': 'Informações registradas com sucesso, um email com '
                    'instruções foi enviado para "%s" click no link para '
