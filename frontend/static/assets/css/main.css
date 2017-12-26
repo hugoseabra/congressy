@@ -22,17 +22,20 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
+a {
+  font-size: 0.875em;
+}
 a:link,
 a:visited {
   text-decoration: none;
   outline: none;
-  color: #2E2E32;
+  color: #556B8D;
 }
 a:hover,
 a:active {
   outline: none;
   text-decoration: none;
-  color: #999;
+  color: #5f779d;
 }
 h1,
 h2,
@@ -3309,6 +3312,59 @@ label.valid {
   border-radius: 0;
   border: solid 10px rgba(255, 255, 255, 0.6);
 }
+.float-left {
+  float: left;
+}
+.float-right {
+  float: right;
+}
+.cgsy-label {
+  font-size: 0.938em;
+}
+.filter-box {
+  display: none;
+}
+.buttonbar {
+  padding: 18px 0 10px 0;
+  margin-bottom: 4px;
+}
+.buttonbar a.btn,
+.buttonbar button.btn {
+  color: #FFF;
+  margin-bottom: 0;
+}
+.alert {
+  font-size: 1em;
+}
+.panel {
+  box-shadow: 2px 2px 5px #c1b7b7;
+}
+.panel .panel-title {
+  font-weight: bold;
+}
+.table {
+  font-size: 0.875em;
+}
+.table a {
+  font-size: 1em;
+}
+.table > tbody > tr > td,
+.table > tbody > tr > th,
+.table > tfoot > tr > td,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > thead > tr > th {
+  vertical-align: middle;
+}
+.dataTables_length,
+.dataTables_filter,
+.dataTables_info,
+.dataTables_paginate {
+  font-size: 0.875em;
+}
+.dataTables_filter input {
+  margin-left: 5px;
+}
 .theme-cgsy-full #header {
   background: #000912;
 }
@@ -3402,51 +3458,43 @@ label.valid {
   border: 1px solid #CCC;
   padding: 5px;
 }
-#cgsy_login_body {
+.cgsy-login {
   color: #565656;
   background: #364150;
   font-family: "Open Sans", Helvetica, Arial, sans-serif;
   font-size: 100%;
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
   min-height: 100%;
   position: relative;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
-#cgsy_login_panel {
-  border-radius: 14px;
-}
-#cgsy_login_header {
+.cgsy-login .login-header {
   text-align: center;
 }
-#cgsy__login_img {
-  border-radius: 14px;
-  padding-bottom: 70px;
-  padding-top: 50px;
+.cgsy-login .login-header .logo {
+  margin-bottom: 30px;
+  margin-top: 50px;
+  width: 210px;
 }
-#login-wrapper .logo {
-  color: #000912;
+.cgsy-login .form-group .form-control.with-icon {
+  padding-left: 32px;
 }
-#login-wrapper .logo img {
-  margin: 0 auto;
-  margin-top: 0px;
-  margin-top: 60px;
-  padding: 15px;
-  text-align: center;
-}
-#login-wrapper .form-group i {
+.cgsy-login .form-group i {
   position: absolute;
   left: 27px;
   top: 11px;
 }
-#login-wrapper #email,
-#login-wrapper #password {
-  padding-left: 32px;
+.cgsy-login .panel {
+  background-color: #364150;
 }
-#login-wrapper #locked-screen .profile-pic {
-  margin: 15px 0;
+.cgsy-login .panel .panel-body {
+  background-color: #fff;
 }
-.cgsy-label {
-  font-size: 0.938em;
+.cgsy-login .secondary-links .help-block {
+  font-size: 1em;
+}
+.cgsy-login .secondary-links .help-block .info {
+  font-size: 0.875em;
 }
