@@ -1,0 +1,50 @@
+{% extends "base/base.html" %}
+
+{% load static %}{% load i18n static %}
+{% load event_tags %}
+{% block title %}Deletar organização| Congressy{% endblock %}
+{% block pageheader %}
+    <div class="pageheader">Sair da Organização</div>
+{% endblock %}
+{% block nav_aside_itens %}
+    <li>
+        <a href="{% url 'event:event-panel' object.pk %}" title="Voltar">
+            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
+        </a>
+    </li>
+    <hr/>
+    {{ block.super }}
+{% endblock %}
+{% block content %}
+
+
+    <div class="row" style="padding-top: 30px;">
+        <div class="col-lg-10 col-lg-offset-1">
+            <div class="panel panel-primary">
+
+                <div class="panel-body">
+
+                    <div style="padding: 5px">
+                        Você tem certeza que desejar sair da organização <strong>{{ object.name }}</strong>?
+                    </div>
+                    <div style="padding: 5px">
+                        Isto irá excluir todos os seus dados relacionados a esta organização e você
+                        só poderá retornar à mesma se receber um convite de um dos administradores.
+                    </div>
+                    <br/>
+                    <form action=""
+                          method="post">{% csrf_token %}
+                        <a class="btn btn-default" href="{% url 'event:organization-panel' object.pk %}">Cancelar</a>
+                        &nbsp; &nbsp;
+                        <input class="btn btn-danger" type="submit" value="Sim, pode prosseguir"/>
+                        <input type="hidden" name="action" value="delete"/>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

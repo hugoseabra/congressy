@@ -6,6 +6,7 @@ from gatheros_event.views.mixins import DeleteViewMixin
 
 
 class OrganizationDeleteView(DeleteViewMixin):
+    template_name = "organization/delete.html"
     model = Organization
     delete_message = 'Tem certeza que deseja excluir a organização "{name}"?'
     success_message = 'Organização excluída com sucesso.'
