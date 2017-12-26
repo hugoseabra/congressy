@@ -164,8 +164,7 @@
                                                 </li>
                                                 {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
                                                 <li>
-                                                    <a href="{% url 'event:organization-delete' item.pk %}"
-                                                       class="btn btn-primary btn-sm">
+                                                    <a href="{% url 'event:organization-delete' item.pk %}">
                                                         <i class="fa fa-trash"></i>
                                                         Excluir
                                                     </a>

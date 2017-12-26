@@ -116,7 +116,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
     """ Lista de inscrições """
 
     model = Subscription
-    template_name = 'subscription/pre_subscription_list.html'
+    template_name = 'subscription/list.html'
 
     def get_queryset(self):
         query_set = super(SubscriptionListView, self).get_queryset()

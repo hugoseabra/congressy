@@ -62,14 +62,6 @@
                 // Default order
                 "order": [[ 0, 'asc' ]]
             });
-
-            /**
-             * filter-button: botão de ação de exibição do filtro
-             * filter-box: caixa de filtros a ser exibida.
-             * active (default: false): se a caixa de filtro é para iniciar
-             * aberta ou não.
-             */
-            window.cgsy.Filter.init('.filter-button', '.filter-box', false)
         });
     </script>
 {% endblock %}
@@ -215,8 +207,7 @@
                                         {% endif %}
                                         {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
                                         <li>
-                                            <a href="{% url 'event:event-delete' event.pk %}"
-                                               class="btn btn-primary btn-sm">
+                                            <a href="{% url 'event:event-delete' event.pk %}">
                                                 <i class="fa fa-trash"></i>
                                                 Excluir
                                             </a>
