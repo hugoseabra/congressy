@@ -3460,15 +3460,11 @@ label.valid {
 .cgsy-login .secondary-links .help-block .info {
   font-size: 0.875em;
 }
-.main_logo {
-  margin-bottom: 30px;
-  margin-top: 50px;
+.logo-img .main_logo_icon {
   width: 210px;
   height: 105.27px;
+  fill: p;
 }
-.main_logo .main_logo_icon {
-  fill: #5B8790;
-}
-.main_logo .main_logo_text {
+.logo-img .main_logo_text {
   fill: white;
 }

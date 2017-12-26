@@ -64,7 +64,7 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-lg-7 col-sm-offset-1 " style="padding-top: 50px">
+        <div class="col-md-8">
             <div id="cgsy_login_panel" class="panel panel-primary">
 
                 <div class="panel-heading">
@@ -115,7 +115,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-3 col-md-offset-1" style="padding-top: 50px;padding-right: 30px">
+        <div class="col-md-4">
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h3 class="panel-title">Histórico:</h3>
@@ -142,13 +142,12 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     {% if result_by in 'code,email'|slice:',' and result %}
         <div class="row">
 
-            <div class="col-lg-6 col-lg-offset-3 ">
+            <div class="col-md-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">
@@ -201,7 +200,7 @@
     {% if result_by == 'name' and result %}
         <div class="row">
 
-            <div class="col-lg-8 col-lg-offset-2 ">
+            <div class="col-md-12 ">
                 <div class="panel panel-default">
 
                     <!-- Default panel contents -->

@@ -358,7 +358,7 @@ class SubscriptionDeleteView(EventViewMixin, DeleteViewMixin):
 
 
 class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
-    template_name = 'gatheros_subscription/subscription/attendance.html'
+    template_name = 'subscription/attendance.html'
     search_by = 'name'
 
     def get_permission_denied_url(self):
