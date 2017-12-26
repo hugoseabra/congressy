@@ -11,14 +11,61 @@
   font-size: @15px;
 }
 
+//============================== FILTERS ====================================//
+.filter-box {
+  display: none;
+}
+
+//============================== BUTTONS ====================================//
+.buttonbar {
+  //box-shadow: 1px 0 5px #c1b7b7;
+  padding: 18px 0 10px 0;
+  margin-bottom: 4px;
+
+  a.btn, button.btn {
+    color: #FFF;
+    margin-bottom: 0;
+  }
+}
+
 //=============================== ALERT =====================================//
 .alert {
-  font-size: @14px;
+  font-size: @16px;
 }
 
 //=============================== PANEL =====================================//
-.panel-title {
-  font-weight: bold;
+.panel {
+  box-shadow: 2px 2px 5px #c1b7b7;
+
+  .panel-title {
+    font-weight: bold;
+  }
 }
 
+//=============================== TABLE =====================================//
+.table {
+  font-size: @14px;
 
+  a {
+    font-size: @16px;
+  }
+}
+
+.table>tbody>tr>td,
+.table>tbody>tr>th,
+.table>tfoot>tr>td,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
+.table>thead>tr>th {
+    vertical-align: middle;
+}
+
+.dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_paginate {
+  font-size: @14px;
+}
+
+.dataTables_filter {
+  input {
+    margin-left: 5px;
+  }
+}

@@ -1,88 +1,184 @@
 {% extends "base/base.html" %}
-
 {% load static %}
-{{% load organization_tags %}
+{% load organization_tags %}
+
 {% block title %}Lista de Organizações | Congressy{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
+{% endblock %}
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
+    <script>
+
+
+        $(document).ready(function () {
+            $('#organization_table').DataTable({
+                "language": {
+                    sEmptyTable: "Nenhum registro encontrado",
+                    sInfo: "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    sInfoEmpty: "Mostrando 0 até 0 de 0 registros",
+                    sInfoFiltered: "(Filtrados de _MAX_ registros)",
+                    sInfoPostFix: "",
+                    sInfoThousands: ".",
+                    sLengthMenu: "_MENU_ resultados por página",
+                    sLoadingRecords: "Carregando...",
+                    sProcessing: "Processando...",
+                    sZeroRecords: "Nenhum registro encontrado",
+                    sSearch: "Pesquisar",
+                    oPaginate: {
+                        sNext: "Próximo",
+                        sPrevious: "Anterior",
+                        sFirst: "Primeiro",
+                        sLast: "Último"
+                    },
+                    oAria: {
+                        sSortAscending: ": Ordenar colunas de forma ascendente",
+                        sSortDescending: ": Ordenar colunas de forma descendente"
+                    }
+                },
+                "columnDefs": [
+                    // Disable sort in first, last column
+                    {
+                        "searchable": false,
+                        "orderable": false,
+                        "width": "3%",
+                        "className": "text-center",
+                        "targets": [-1]
+                    },
+                    {
+                        "width": "25%",
+                        "targets": 1
+                    }
+                ],
+                // Default order
+                "order": [[ 0, 'asc' ]]
+            });
+
+            /**
+             * filter-button: botão de ação de exibição do filtro
+             * filter-box: caixa de filtros a ser exibida.
+             * active (default: false): se a caixa de filtro é para iniciar
+             * aberta ou não.
+             */
+            window.cgsy.Filter.init('.filter-button', '.filter-box', false)
+        });
+    </script>
+{% endblock %}
+
 {% block pageheader %}
     <div class="pageheader">
-        <h1>Lista de Organizações</h1>
+        <h1>Organizações</h1>
     </div>
 {% endblock %}
 
 {% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+                    <button type="button" class="btn btn-default
+                    filter-button">
+                        <i class="fa fa-filter"></i>
+                    </button>
+                </div>
+                <div class="float-right">
+                    <a href="{% url 'event:organization-add' %}" class="btn
+                    btn-success">
+                        <i class="fa fa-plus"></i>
+                        Adicionar
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
 
-    <div class="row" style="padding-top: 30px;">
-        <div class="col-lg-10 col-lg-offset-1">
+    <div class="row filter-box">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Filtro avançado</h3>
+                </div>
+                <div class="panel-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-body">
-                    <div id="cgsy-btn-navbar">
-                        <nav class="navbar" role="navigation">
-
-                            <ul class="nav navbar-nav navbar-left">
-                                <a href="{% url 'event:organization-add' %}">
-                                    <button type="button" class="btn btn-success">
-                                        Nova Organização
-                                    </button>
-                                </a>
-                            </ul>
-
-                        </nav>
-                    </div>
-
                     {% if object_list %}
+                        <table id="organization_table"
+                               class="table table-striped table-bordered dataTable no-footer nowrap"
+                               cellspacing="0"
+                               width="100%"
+                        >
+                            <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Cargo</th>
+                                <th></th>
+                            </tr>
+                            </thead>
 
-                        <div class="table-responsive">
-                            <table id="event_table" class="table table-hover">
-                                <thead>
+                            <tbody>
+                            {% for item in object_list %}
+                                {% get_member_group item user as member_group %}
                                 <tr>
-                                    <th>Nome</th>
-                                    <th>Descrição</th>
-                                    <th>Cargo</th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-
-                                <tbody>
-                                {% for item in object_list %}
-                                    {% get_member_group item user as member_group %}
-                                    <tr>
-                                        <td><a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
-                                        </td>
-                                        <td>
-                                            {% if item.description_html %}
-                                                {{ item.description_html|safe }}
-                                            {% else %}
-                                                -----
-                                            {% endif %}
-                                        </td>
-
-                                        <td>
-                                            {% get_member_group_name item user %}
-                                        </td>
+                                    <td>
+                                        <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
+                                    </td>
+                                    <td>
+                                        {% get_member_group_name item user %}
+                                    </td>
+                                    <td>
                                         {% if member_group == member.ADMIN %}
-                                            <td>
-                                                <a class="btn btn-primary btn-sm"
-                                                   href="{% url 'event:organization-edit' item.pk %}">Editar</a>
-
+                                        <div class="btn-group">
+                                            <button
+                                                type="button"
+                                                class="btn
+                                                btn-primary btn-trans
+                                                btn-sm dropdown-toggle"
+                                                data-toggle="dropdown"
+                                                aria-expanded="false"
+                                            >
+                                                <span class="fa fa-gear"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                <li>
+                                                    <a href="{% url 'event:organization-edit' item.pk %}">
+                                                        <i class="fa fa-pencil"></i>
+                                                        Editar
+                                                    </a>
+                                                </li>
                                                 {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
-                                                    <a class="btn btn-danger btn-sm">
-                                                       href="{% url 'event:organization-delete' item.pk %}">Excluir</a>
+                                                <li>
+                                                    <a href="{% url 'event:organization-delete' item.pk %}"
+                                                       class="btn btn-primary btn-sm">
+                                                        <i class="fa fa-trash"></i>
+                                                        Excluir
+                                                    </a>
+                                                </li>
                                                 {% endif %}
-                                            </td>
+                                            </ul>
+                                        </div>
                                         {% endif %}
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     {% else %}
-
-                        <h3>Nenhuma organização</h3>
-
+                        <h3>Nenhum dado.</h3>
                     {% endif %}
-
-
                 </div>
             </div>
         </div>
