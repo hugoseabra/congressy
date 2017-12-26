@@ -2,7 +2,10 @@
 {% load static %}
 {% load organization_tags %}
 
-{% block title %}Lista de Organizações | Congressy{% endblock %}
+{% block title %}Organizações | Congressy{% endblock %}
+{% block page_title %}Organizações{% endblock %}
+{% block page_sub_title %}Organizações{% endblock %}
+{% block page_description %}Organizações{% endblock %}
 
 {% block styles %}
     {{ block.super }}
@@ -14,8 +17,6 @@
     <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
     <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
     <script>
-
-
         $(document).ready(function () {
             $('#organization_table').DataTable({
                 "language": {

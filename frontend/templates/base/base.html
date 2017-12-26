@@ -1,5 +1,4 @@
 {% load static %}
-{% load base_tags %}
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>
@@ -20,34 +19,30 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
-    {% block styles %}
-        <!-- Bootstrap core CSS -->
-        <link rel="stylesheet"
-              href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
-        <!-- Fonts  -->
-        <link rel="stylesheet" href="{% static "assets/css/font-awesome.min.css" %}">
-        <link rel="stylesheet" href="{% static "assets/css/simple-line-icons.css" %}">
-        <!-- CSS Animate -->
-        <link rel="stylesheet" href="{% static "assets/css/animate.css" %}">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
+    <!-- Fonts  -->
+    <link rel="stylesheet" href="{% static "assets/css/font-awesome.min.css" %}">
+    <link rel="stylesheet" href="{% static "assets/css/simple-line-icons.css" %}">
+    <!-- CSS Animate -->
+    <link rel="stylesheet" href="{% static "assets/css/animate.css" %}">
 
-        <!-- Main CSS -->
-        <link rel="stylesheet" href="{% static "assets/css/main.css" %}" />
+    <!-- Custom styles for this theme -->
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
 
-        <!-- Custom styles for this theme -->
-        <!-- <link rel="stylesheet" href="assets/css/main.css"> -->
-        <link href="{% static "assets/css/main.less" %}" type="text/css" rel="stylesheet/less"/>
-    {% endblock %}
-    {% block headscripts %}
+    {% block styles %}{% endblock %}
 
-        <!-- Feature detection -->
-        <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
+    {% block headscripts %}{% endblock %}
 
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-            <script src="{% static "assets/js/vendor/html5shiv.js"%}"></script>
-            <script src="{% static "assets/js/vendor/respond.min.js"%}"></script>
-        <![endif]-->
-    {% endblock %}
+    <!-- Feature detection -->
+    <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="{% static "assets/js/vendor/html5shiv.js"%}"></script>
+        <script src="{% static "assets/js/vendor/respond.min.js"%}"></script>
+    <![endif]-->
 </head>
 <body>
 
@@ -69,7 +64,6 @@
     </header>
 
     <aside class="sidebar sidebar-left">
-
 
         {% if organization and not organization.internal %}
             <div class="sidebar-profile">
@@ -99,9 +93,6 @@
             </div>
         {% endif %}
 
-
-
-
         <nav>
             <br>
             <ul class="nav nav-pills nav-stacked">
@@ -121,28 +112,31 @@
         </nav>
     </aside>
 
-
     <!--main content start-->
-    <section class="main-content-wrapper">
-        {% block pageheader %}{% endblock %}
+    <section class="main-content-wrapper" style="position: relative;">
+        <div class="pageheader">
+            <h1>{% block page_title %}{% endblock %}</h1>
+            <h2 style="padding-top: 5px; padding-left: 20px;">{% block page_sub_title %}{% endblock %}</h2>
+            <p class="description">{% block page_description %}{% endblock %}</p>
+        </div>
         <section id="main-content">
+            {% load base_tags %}
             {% block messages %}
                 {% if messages %}
-                    <div style="width:100%;margin-top:3px">
-                        <ul class="messagelist" style="list-style: none;margin: 0; padding: 0">
-                            {% for message in messages %}
-                                {% get_message_background_color message as bgcolor %}
-                                <li style="background-color: {{ bgcolor }};padding: 10px">
-                                    {{ message|capfirst }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            {{ message|capfirst }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
             {% endblock messages %}
             {% block content %}{% endblock %}
         </section>
         <!-- main content end -->
+    </section>
+    <section class="footer-wrapper text-center" style="position:absolute; bottom: 0; right:0; padding-right: 10px; padding-top: 10px">
+        <p class="text-muted">Congressy© 2017 All rights reserved</p>
     </section>
 </section>
 
@@ -156,5 +150,4 @@
     <script src="{% static "assets/js/cgsy.js" %}"></script>
 {% endblock %}
 </body>
-
 </html>

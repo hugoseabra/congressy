@@ -3321,49 +3321,11 @@ label.valid {
 .cgsy-label {
   font-size: 0.938em;
 }
-.filter-box {
-  display: none;
-}
-.buttonbar {
-  padding: 18px 0 10px 0;
-  margin-bottom: 4px;
-}
-.buttonbar a.btn,
-.buttonbar button.btn {
-  color: #FFF;
-  margin-bottom: 0;
-}
 .alert {
-  font-size: 1em;
+  font-size: 0.875em;
 }
-.panel {
-  box-shadow: 2px 2px 5px #c1b7b7;
-}
-.panel .panel-title {
+.panel-title {
   font-weight: bold;
-}
-.table {
-  font-size: 0.875em;
-}
-.table a {
-  font-size: 1em;
-}
-.table > tbody > tr > td,
-.table > tbody > tr > th,
-.table > tfoot > tr > td,
-.table > tfoot > tr > th,
-.table > thead > tr > td,
-.table > thead > tr > th {
-  vertical-align: middle;
-}
-.dataTables_length,
-.dataTables_filter,
-.dataTables_info,
-.dataTables_paginate {
-  font-size: 0.875em;
-}
-.dataTables_filter input {
-  margin-left: 5px;
 }
 .theme-cgsy-full #header {
   background: #000912;
@@ -3498,15 +3460,11 @@ label.valid {
 .cgsy-login .secondary-links .help-block .info {
   font-size: 0.875em;
 }
-.main_logo {
-  margin-bottom: 30px;
-  margin-top: 50px;
+.logo-img .main_logo_icon {
   width: 210px;
   height: 105.27px;
+  fill: p;
 }
-.main_logo .main_logo_icon {
-  fill: #5B8790;
-}
-.main_logo .main_logo_text {
+.logo-img .main_logo_text {
   fill: white;
 }
