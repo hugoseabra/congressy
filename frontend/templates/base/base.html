@@ -14,7 +14,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{% block title %}Congressy-Platform{% endblock %}</title>
+    <title>{%  block title %}Congressy-Platform{% endblock %}</title>
     <meta name="description" content="">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
@@ -141,7 +141,11 @@
 
     <!--main content start-->
     <section class="main-content-wrapper" style="position: relative;">
-        {% block pageheader %}{% endblock %}
+        <div class="pageheader">
+            <h1>{% block page_title %}{% endblock %}</h1>
+            <h2 style="padding-top: 5px; padding-left: 20px;">{% block page_sub_title %}{% endblock %}</h2>
+            <p class="description">{% block page_description %}{% endblock %}</p>
+        </div>
         <section class="main-content">
             {% load base_tags %}
             {% block messages %}
