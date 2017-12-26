@@ -14,7 +14,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{%  block title %}Congressy-Platform{% endblock %}</title>
+    <title>{% block title %}Congressy-Platform{% endblock %}</title>
     <meta name="description" content="">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
@@ -24,30 +24,28 @@
         <link rel="stylesheet"
               href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
         <!-- Fonts  -->
-        <link rel="stylesheet" href="{% static "assets/css/font-awesome.min.css" %}">
-        <link rel="stylesheet" href="{% static "assets/css/simple-line-icons.css" %}">
+        <link rel="stylesheet"
+              href="{% static "assets/css/font-awesome.min.css" %}">
+        <link rel="stylesheet"
+              href="{% static "assets/css/simple-line-icons.css" %}">
         <!-- CSS Animate -->
         <link rel="stylesheet" href="{% static "assets/css/animate.css" %}">
-        <!-- icheck -->
-        <link rel="stylesheet" href="{% static "assets/css/flat/grey.css" %}">
+        <link rel="stylesheet"
+              href="{% static "assets/plugins/switchery/switchery.min.css" %}">
 
         <!-- Datatables CSS -->
-        <link rel="stylesheet" href="{% static "assets/css/vendor/jquery.dataTables.min.css" %}">
+        <link rel="stylesheet"
+              href="{% static "assets/css/vendor/jquery.dataTables.min.css" %}">
 
 
         <!-- Custom styles for this theme -->
         <!-- <link rel="stylesheet" href="assets/css/main.css"> -->
-        <link href="{% static "assets/css/main.less" %}" type="text/css" rel="stylesheet/less"/>
+        <link rel="stylesheet" href="{% static "assets/css/main.css" %}">
 
-        <!--<script>less = {env: 'development'};</script>-->
-        <script src="{% static "assets/plugins/less.min.js" %}"></script>
-        <!--<script> less.watch(); </script>-->
     {% endblock %}
 
     <!-- Feature detection -->
     <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
-    <!-- icheck -->
-    <script src="{% static "assets/js/icheck.min.js" %}"></script>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -79,9 +77,11 @@
         {% if organization and not organization.internal %}
             <div class="sidebar-profile">
                 <div class="profile-body dropdown">
-                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <a href="javascript:void(0);" class="dropdown-toggle"
+                       data-toggle="dropdown" aria-expanded="false">
                         <h4>
-                            {{ organization.name }}<span class="caret"></span></h4></a>
+                            {{ organization.name }}<span class="caret"></span>
+                        </h4></a>
                     <small class="title"><a
                             href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a>
                     </small>
@@ -125,7 +125,8 @@
             <ul class="nav nav-pills nav-stacked">
                 {% block nav_aside_itens %}
                     <li>
-                        <a href="{% url 'event:organization-list' %}" title="Organizações">
+                        <a href="{% url 'event:organization-list' %}"
+                           title="Organizações">
                             <i class="fa  fa-fw fa-sitemap"></i> Organizações
                         </a>
                     </li>
@@ -137,14 +138,30 @@
                 {% endblock %}
             </ul>
         </nav>
+        <br/>
+        <div class="setting-list">
+            <div class="row">
+                <div class="col-xs-8">
+                    <label for="check1" class="control-label">Modo de
+                        Organizador</label>
+                </div>
+                <div class="col-xs-4">
+                    <input class="js-switch" checked="" id="check1"
+                           style="display: none;" data-switchery="true"
+                           type="checkbox">
+                </div>
+            </div>
+        </div>
     </aside>
 
     <!--main content start-->
     <section class="main-content-wrapper" style="position: relative;">
         <div class="pageheader">
             <h1>{% block page_title %}{% endblock %}</h1>
-            <h2 style="padding-top: 5px; padding-left: 20px;">{% block page_sub_title %}{% endblock %}</h2>
-            <p class="description">{% block page_description %}{% endblock %}</p>
+            <h2 style="padding-top: 5px; padding-left: 20px;">
+                {% block page_sub_title %}{% endblock %}</h2>
+            <p class="description">
+                {% block page_description %}{% endblock %}</p>
         </div>
         <section id="main-content">
             {% load base_tags %}
@@ -152,7 +169,9 @@
                 {% if messages %}
                     {% for message in messages %}
                         <div class="alert alert-{{ message.tags }} alert-dismissable">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <button type="button" class="close"
+                                    data-dismiss="alert" aria-hidden="true">×
+                            </button>
                             {{ message|capfirst }}
                         </div>
                     {% endfor %}
@@ -162,7 +181,8 @@
         </section>
         <!-- main content end -->
     </section>
-    <section class="footer-wrapper text-center" style="position:absolute; bottom: 0; right:0; padding-right: 10px; padding-top: 10px">
+    <section class="footer-wrapper text-center"
+             style="position:absolute; bottom: 0; right:0; padding-right: 10px; padding-top: 10px">
         <p class="text-muted">Congressy© 2017 All rights reserved</p>
     </section>
 </section>
@@ -176,18 +196,7 @@
     <script src="{% static "assets/js/vendor/jquery.dataTables.min.js" %}"></script>
     <script src="{% static "assets/js/src/app.js" %}"></script>
     <script src="{% static "assets/js/cgsy.js" %}"></script>
-
-    {#    <script>#}
-    {#        $(document).ready(function () {#}
-    {#            $('input').iCheck({#}
-    {#                checkboxClass: 'icheckbox_flat-grey',#}
-    {#                radioClass: 'iradio_flat-grey'#}
-    {#            });#}
-    {#        });#}
-    {#    </script>#}
-
-
-
+    <script src="{% static "assets/plugins/switchery/switchery.min.js" %}"></script>
 {% endblock %}
 </body>
 </html>
