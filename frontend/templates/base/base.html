@@ -1,4 +1,5 @@
 {% load static %}
+{% load base_tags %}
 
 <!DOCTYPE html>
 <!--[if lt IE 7]>
@@ -67,28 +68,44 @@
 
         {% if organization and not organization.internal %}
             <div class="sidebar-profile">
-                <div class="profile-body">
-                    <h4>{{ organization.name }}</h4>
-                    <small class="title">{{ member.get_group_display }}</small>
-                    <hr/>
-                    {#<a href="{% url 'event:organization-panel' organization.pk %}">Gerenciar</a>#}
-                    <label style="font-weight: bold" for="organization-context-pk">Mudar para:</label>
+                <div class="profile-body dropdown">
+                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <h4>
+                            {{ organization.name }}<span class="caret"></span></h4></a>
+                    <small class="title"><a
+                            href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a>
+                    </small>
+                    <ul class="dropdown-menu" role="menu">
 
-                    <form action="{% url 'event:organization-switch' %}"
-                          method="post">
-                        {% csrf_token %}
-                        <select name="organization-context-pk"
-                                id="organization-context-pk"
-                                onchange="submit()" style="margin-top:3px;width: 100%">
-                            {% for org in organizations %}
-                                <option {% if organization.pk == org.pk %}selected="selected"{% endif %}
-                                        value="{{ org.pk }}">
-                                    {{ org.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <input type="hidden" name="next" value="{{ request.path }}"/>
-                    </form>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-rocket"></i>
+                        </span>Painel
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-envelope"></i>
+                        </span>Convites
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-users"></i>
+                        </span>Membros
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                        <span class="icon">
+                            <i class="fa fa-map-marker"></i>
+                        </span>Locais
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         {% endif %}
@@ -116,11 +133,10 @@
     <section class="main-content-wrapper" style="position: relative;">
         <div class="pageheader">
             <h1>{% block page_title %}{% endblock %}</h1>
-            <h2 style="padding-top: 5px; padding-left: 20px;">{% block page_sub_title %}{% endblock %}</h2>
-            <p class="description">{% block page_description %}{% endblock %}</p>
+            <h2>{% block page_sub_title %}{% endblock %}</h2>
+            <p class="text-muted">{% block page_description %}{% endblock %}</p>
         </div>
         <section id="main-content">
-            {% load base_tags %}
             {% block messages %}
                 {% if messages %}
                     {% for message in messages %}
