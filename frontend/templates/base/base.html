@@ -66,87 +66,89 @@
         {% endblock %}
     </header>
 
-    <aside class="sidebar sidebar-left">
+    {% block sidebar %}
+        <aside class="sidebar sidebar-left">
 
-        {% if organization and not organization.internal %}
-            <div class="sidebar-profile">
-                <div class="profile-body dropdown">
-                    <a href="javascript:void(0);" class="dropdown-toggle"
-                       data-toggle="dropdown" aria-expanded="false">
-                        <h4>
-                            {{ organization.name }}<span class="caret"></span>
-                        </h4></a>
-                    <small class="title"><a
-                            href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a>
-                    </small>
-                    <ul class="dropdown-menu" role="menu">
+            {% if organization and not organization.internal %}
+                <div class="sidebar-profile">
+                    <div class="profile-body dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle"
+                           data-toggle="dropdown" aria-expanded="false">
+                            <h4>
+                                {{ organization.name }}<span class="caret"></span>
+                            </h4></a>
+                        <small class="title"><a
+                                href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a>
+                        </small>
+                        <ul class="dropdown-menu" role="menu">
 
+                            <li>
+                                <a href="javascript:void(0);">
+                            <span class="icon">
+                                <i class="fa fa-rocket"></i>
+                            </span>Painel
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">
+                            <span class="icon">
+                                <i class="fa fa-envelope"></i>
+                            </span>Convites
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">
+                            <span class="icon">
+                                <i class="fa fa-users"></i>
+                            </span>Membros
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">
+                            <span class="icon">
+                                <i class="fa fa-map-marker"></i>
+                            </span>Locais
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+
+            <nav>
+                <br>
+                <ul class="nav nav-pills nav-stacked">
+                    {% block nav_aside_itens %}
                         <li>
-                            <a href="javascript:void(0);">
-                        <span class="icon">
-                            <i class="fa fa-rocket"></i>
-                        </span>Painel
+                            <a href="{% url 'event:organization-list' %}"
+                               title="Organizações">
+                                <i class="fa  fa-fw fa-sitemap"></i> Organizações
                             </a>
                         </li>
                         <li>
-                            <a href="javascript:void(0);">
-                        <span class="icon">
-                            <i class="fa fa-envelope"></i>
-                        </span>Convites
+                            <a href="{% url 'event:event-list' %}" title="Eventos">
+                                <i class="fa  fa-fw fa-rocket"></i> Eventos
                             </a>
                         </li>
-                        <li>
-                            <a href="javascript:void(0);">
-                        <span class="icon">
-                            <i class="fa fa-users"></i>
-                        </span>Membros
-                            </a>
-                        </li>
-                        <li>
-                            <a href="javascript:void(0);">
-                        <span class="icon">
-                            <i class="fa fa-map-marker"></i>
-                        </span>Locais
-                            </a>
-                        </li>
-                    </ul>
+                    {% endblock %}
+                </ul>
+            </nav>
+            <br/>
+            <div class="setting-list">
+                <div class="row">
+                    <div class="col-xs-8">
+                        <label for="check1" class="control-label">Modo de
+                            Organizador</label>
+                    </div>
+                    <div class="col-xs-4">
+                        <input class="js-switch" checked="" id="check1"
+                               style="display: none;" data-switchery="true"
+                               type="checkbox">
+                    </div>
                 </div>
             </div>
-        {% endif %}
-
-        <nav>
-            <br>
-            <ul class="nav nav-pills nav-stacked">
-                {% block nav_aside_itens %}
-                    <li>
-                        <a href="{% url 'event:organization-list' %}"
-                           title="Organizações">
-                            <i class="fa  fa-fw fa-sitemap"></i> Organizações
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'event:event-list' %}" title="Eventos">
-                            <i class="fa  fa-fw fa-rocket"></i> Eventos
-                        </a>
-                    </li>
-                {% endblock %}
-            </ul>
-        </nav>
-        <br/>
-        <div class="setting-list">
-            <div class="row">
-                <div class="col-xs-8">
-                    <label for="check1" class="control-label">Modo de
-                        Organizador</label>
-                </div>
-                <div class="col-xs-4">
-                    <input class="js-switch" checked="" id="check1"
-                           style="display: none;" data-switchery="true"
-                           type="checkbox">
-                </div>
-            </div>
-        </div>
-    </aside>
+        </aside>
+    {% endblock %}
 
     <!--main content start-->
     <section class="main-content-wrapper" style="position: relative;">
@@ -178,15 +180,15 @@
     </section>
 </section>
 
-{% block scripts %}
-    <!--Global JS-->
-    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
-    <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
-    <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
-    <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
-    <script src="{% static "assets/plugins/switchery/switchery.min.js" %}"></script>
-    <script src="{% static "assets/js/src/app.js" %}"></script>
-    <script src="{% static "assets/js/cgsy.js" %}"></script>
-{% endblock %}
+<!--Global JS-->
+<script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+<script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+<script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
+<script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+<script src="{% static "assets/plugins/switchery/switchery.min.js" %}"></script>
+<script src="{% static "assets/js/src/app.js" %}"></script>
+<script src="{% static "assets/js/cgsy.js" %}"></script>
+
+{% block scripts %}{% endblock %}
 </body>
 </html>
