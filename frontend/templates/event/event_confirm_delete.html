@@ -2,16 +2,13 @@
 
 {% load static %}
 
-{% block head %}
+{% block styles %}
+    {{ block.super }}
+    <!-- DateRange Picker -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/daterangepicker/daterangepicker-bs3.css' %}">
 
-{{ block.super }}
-<!-- DateRange Picker -->
-<link rel="stylesheet" href="{% static 'assets/plugins/daterangepicker/daterangepicker-bs3.css' %}">
-
-<!-- Switchery -->
-<link rel="stylesheet" href="{% static 'assets/plugins/switchery/switchery.min.css' %}">
-
-
+    <!-- Switchery -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/switchery/switchery.min.css' %}">
 {% endblock %}
 
 {% block title %}Deletar evento{% endblock %}

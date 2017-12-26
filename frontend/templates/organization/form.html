@@ -1,12 +1,7 @@
 {% extends "base/base.html" %}
 
 {% load static %}
-{% block head %}
-    {{ block.super }}
-    <!-- ckeditor -->
-    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
-    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
-{% endblock %}
+
 
 
 {% load organization_tags %}
@@ -85,7 +80,11 @@
             </div>
         </div>
     </div>
+{% endblock %}
 
-
-
+{% block scripts %}
+    {{ block.super }}
+    <!-- ckeditor -->
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 {% endblock %}
