@@ -73,9 +73,6 @@
     </script>
 {% endblock %}
 
-
-
-
 {% block content %}
     <div class="row">
         <div class="col-md-12">
@@ -181,14 +178,13 @@
                                 </tr>
                             {% endfor %}
                             </tbody>
-                        </table>
-                    </div>
+                            </table>
+                    {% else %}
 
-                {% else %}
+                        <h3>Nenhum dado.</h3>
 
-                    <h3>Nenhum dado.</h3>
-
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
