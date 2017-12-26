@@ -76,75 +76,49 @@
 
     <aside class="sidebar sidebar-left">
 
+        {% if organization and not organization.internal %}
+            <div class="sidebar-profile">
+                <div class="profile-body dropdown">
+                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <h4>
+                            {{ organization.name }}<span class="caret"></span></h4></a>
+                    <small class="title"><a
+                            href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a>
+                    </small>
+                    <ul class="dropdown-menu" role="menu">
 
-        <div class="sidebar-profile">
-            <div class="profile-body dropdown">
-                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><h4>
-                    {{ organization.name }}<span class="caret"></span></h4></a>
-                <small class="title"><a
-                        href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a>
-                </small>
-                <ul class="dropdown-menu" role="menu">
-
-                    <li>
-                        <a href="javascript:void(0);">
+                        <li>
+                            <a href="javascript:void(0);">
                         <span class="icon">
                             <i class="fa fa-rocket"></i>
                         </span>Painel
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0);">
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
                         <span class="icon">
                             <i class="fa fa-envelope"></i>
                         </span>Convites
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0);">
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
                         <span class="icon">
                             <i class="fa fa-users"></i>
                         </span>Membros
-                        </a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0);">
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
                         <span class="icon">
                             <i class="fa fa-map-marker"></i>
                         </span>Locais
-                        </a>
-                    </li>
-                </ul>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-
-
-        {#            <div class="sidebar-profile">#}
-        {#                <div class="profile-body">#}
-        {#                    <h4>{{ organization.name }}</h4>#}
-        {#                    <small class="title">{{ member.get_group_display }}</small>#}
-        {#                    <hr/>#}
-        {#<a href="{% url 'event:organization-panel' organization.pk %}">Gerenciar</a>#}
-        {#                    <label style="font-weight: bold" for="organization-context-pk">Mudar para:</label>#}
-        {##}
-        {#                    <form action="{% url 'event:organization-switch' %}"#}
-        {#                          method="post">#}
-        {#                        {% csrf_token %}#}
-        {#                        <select name="organization-context-pk"#}
-        {#                                id="organization-context-pk"#}
-        {#                                onchange="submit()" style="margin-top:3px;width: 100%">#}
-        {#                            {% for org in organizations %}#}
-        {#                                <option {% if organization.pk == org.pk %}selected="selected"{% endif %}#}
-        {#                                        value="{{ org.pk }}">#}
-        {#                                    {{ org.name }}#}
-        {#                                </option>#}
-        {#                            {% endfor %}#}
-        {#                        </select>#}
-        {#                        <input type="hidden" name="next" value="{{ request.path }}"/>#}
-        {#                    </form>#}
-        {#                </div>#}
-        {#            </div>#}
-
+        {% endif %}
 
         <nav>
             <br>
