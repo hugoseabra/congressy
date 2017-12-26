@@ -81,7 +81,9 @@
             <div class="profile-body dropdown">
                 <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><h4>
                     {{ organization.name }}<span class="caret"></span></h4></a>
-                <small class="title"><a href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a></small>
+                <small class="title"><a
+                        href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a>
+                </small>
                 <ul class="dropdown-menu" role="menu">
 
                     <li>
@@ -115,7 +117,6 @@
                 </ul>
             </div>
         </div>
-
 
 
         {#            <div class="sidebar-profile">#}
@@ -171,16 +172,12 @@
             {% load base_tags %}
             {% block messages %}
                 {% if messages %}
-                    <div style="width:100%;margin-top:3px">
-                        <ul class="messagelist" style="list-style: none;margin: 0; padding: 0">
-                            {% for message in messages %}
-                                {% get_message_background_color message as bgcolor %}
-                                <li style="background-color: {{ bgcolor }};padding: 10px">
-                                    {{ message|capfirst }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            {{ message|capfirst }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
             {% endblock messages %}
             {% block content %}{% endblock %}
