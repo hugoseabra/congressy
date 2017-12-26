@@ -129,7 +129,7 @@
 
 
     <!--main content start-->
-    <section class="main-content-wrapper">
+    <section class="main-content-wrapper" style="position: relative;">
         {% block pageheader %}{% endblock %}
         <section class="main-content">
             {% load base_tags %}
@@ -150,6 +150,9 @@
             {% block content %}{% endblock %}
         </section>
         <!-- main content end -->
+    </section>
+    <section class="footer-wrapper text-center" style="position:absolute; bottom: 0; right:0; padding-right: 10px">
+       <p class="text-muted">Congressy©  2017 All rights reserved</p>
     </section>
 </section>
 
@@ -176,5 +179,4 @@
 
 {% endblock %}
 </body>
-
 </html>
