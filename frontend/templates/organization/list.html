@@ -59,14 +59,6 @@
                 // Default order
                 "order": [[ 0, 'asc' ]]
             });
-
-            /**
-             * filter-button: botão de ação de exibição do filtro
-             * filter-box: caixa de filtros a ser exibida.
-             * active (default: false): se a caixa de filtro é para iniciar
-             * aberta ou não.
-             */
-            window.cgsy.Filter.init('.filter-button', '.filter-box', false)
         });
     </script>
 {% endblock %}
@@ -77,12 +69,6 @@
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
-                <div class="float-left">
-                    <button type="button" class="btn btn-default
-                    filter-button">
-                        <i class="fa fa-filter"></i>
-                    </button>
-                </div>
                 <div class="float-right">
                     <a href="{% url 'event:organization-add' %}" class="btn
                     btn-success">
@@ -94,20 +80,6 @@
             </div>
         </div>
     </div>
-
-    <div class="row filter-box">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Filtro avançado</h3>
-                </div>
-                <div class="panel-body">
-
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">
