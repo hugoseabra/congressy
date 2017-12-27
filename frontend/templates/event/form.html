@@ -8,22 +8,19 @@
     {% else %}
         Novo evento | Congressy
     {% endif %}
-
 {% endblock %}
-{% block pageheader %}
-    <div class="pageheader">
-        {% if object %}
-            <h2>Editar evento</h2>
-        {% else %}
-            <h2>Novo evento</h2>
-        {% endif %}
-
-    </div>
+{% block page_title %}
+    {% if object %}
+        Editar evento
+    {% else %}
+        Novo evento
+    {% endif %}
 {% endblock %}
+{% if object %}
+    {% block page_sub_title %}{{ object.name }}{% endblock %}
+{% endif %}
 {% block nav_aside_itens %}
     <li>
-
-
         {% if object %}
             <a href="{% url 'event:event-panel' object.pk %}" title="Voltar">
         {% else %}
@@ -36,9 +33,6 @@
     {{ block.super }}
 {% endblock %}
 {% block content %}
-    {% if object %}
-        <h1 style="padding-left: 15px; padding-top: 15px; font-weight: bold">{{ object.name }}</h1>
-    {% endif %}
 
     <div class="row">
         <div class="col-md-12">
