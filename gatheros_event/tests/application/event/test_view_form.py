@@ -24,7 +24,7 @@ class EventAddViewTest(TestCase):
     ]
 
     def setUp(self):
-        self.url = reverse_lazy('event:event-add')
+        self.url = reverse('event:event-add')
         self.user = User.objects.get(username="lucianasilva@gmail.com")
 
     def _login(self):
@@ -52,7 +52,8 @@ class EventAddViewTest(TestCase):
         response = self.client.get(self.url, follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next='
+        redirect_url += self.url
         self.assertRedirects(response, redirect_url)
 
     def test_status_is_200_ok(self):
@@ -147,7 +148,7 @@ class EventEditViewTest(TestCase):
         response = self.client.get(self._get_url(pk=1), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url(pk=1)
         self.assertRedirects(response, redirect_url)
 
     def test_status_is_200_ok(self):
@@ -288,7 +289,7 @@ class EventDatesEditViewTest(TestCase):
         response = self.client.get(self._get_url(pk=1), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url(pk=1)
         self.assertRedirects(response, redirect_url)
 
     def test_status_is_200_ok(self):
@@ -431,7 +432,7 @@ class EventSubscriptionTypeEditViewTest(TestCase):
         response = self.client.get(self._get_url(pk=1), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url(pk=1)
         self.assertRedirects(response, redirect_url)
 
     def test_status_is_200_ok(self):
@@ -548,7 +549,7 @@ class EventPublicationEditViewTest(TestCase):
         response = self.client.get(self._get_url(pk=1), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url(pk=1)
         self.assertRedirects(response, redirect_url)
 
     def test_status_is_405(self):

@@ -2,28 +2,19 @@
 {# @TODO Change the icons in nav_aside_itens  #}
 {% load static %}
 {% load event_tags %}
-{% block title %} Painel da Organização | Congressy{% endblock %}
-{% block pageheader %}
-    <div class="pageheader">
-        <h2>Painel da Organização</h2>
-    </div>
-{% endblock %}
+
+{% block title %} {{ object.name }} | Congressy{% endblock %}
+
+{% block page_title %}Painel{% endblock %}
+{% block page_sub_title %}{{ object.name }} {% endblock %}
+
 
 {% block nav_aside_itens %}
     <li>
-        <a href="{% url 'event:organization-list' %}" title="Voltar">
-            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
+        <a href="{% url 'event:event-list' %}" title="Eventos">
+            <i class="fa  fa-fw fa-rocket"></i>Eventos
         </a>
     </li>
-
-    <hr/>
-
-    <li>
-        <a href="{% url 'event:organization-list' %}" title="Minhas organizações">
-            <i class="fa  fa-fw fa-rocket"></i> Minhas organizações
-        </a>
-    </li>
-
     {% if can_manage_invitations %}
         <li>
             <a href="{% url 'event:invitation-list' object.pk %}" title="Convites">
@@ -53,69 +44,20 @@
             <i class="fa  fa-fw fa-rocket"></i>Formulário Padrão
         </a>
     </li>
-
-    <li>
-        <a href="#" title="Pessoas">
-            <i class="fa  fa-fw fa-rocket"></i>Pessoas
-        </a>
-    </li>
     <li>
         <a href="{% url 'event:organization-cancel-membership' object.pk %}" title="Sair da Organização">
             <i class="fa  fa-fw fa-rocket"></i>Sair da Organização
         </a>
     </li>
-
-
 {% endblock %}
 
 
 {% block content %}
-
-
-    <h1 style="padding-left: 15px; padding-top: 15px; font-weight: bold">{{ object.name }}</h1>
-
     <div class="row">
-        <div class="col-md-9 ">
+        <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-body">
 
-
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="panel panel-primary">
-                <div class="panel-body">
-
-                    <div class="text-uppercase">
-                        Últimas atividades
-                    </div>
-                    <hr />
-                    <div style="margin-left: 4px;margin-top:4px;padding:5px 0;">
-                        <div>Hugo Seabras</div>
-                        <div style="font-size: small">Cadastrou um participante</div>
-                    </div>
-                    <hr />                    <hr />
-                    <div style="margin-left: 4px;margin-top:4px;padding:5px 0;">
-                        <div>Hugo Seabras</div>
-                        <div style="font-size: small">Cadastrou um participante</div>
-                    </div>
-                    <hr />                    <hr />
-                    <div style="margin-left: 4px;margin-top:4px;padding:5px 0;">
-                        <div>Hugo Seabras</div>
-                        <div style="font-size: small">Cadastrou um participante</div>
-                    </div>
-                    <hr />                    <hr />
-                    <div style="margin-left: 4px;margin-top:4px;padding:5px 0;">
-                        <div>Hugo Seabras</div>
-                        <div style="font-size: small">Cadastrou um participante</div>
-                    </div>
-                    <hr />
-
-
-                    <div style="margin-top:10px; padding: 10px;background-color: whitesmoke;text-align: center;">
-                        <a href="#">Ver todas as atividades</a>
-                    </div>
 
                 </div>
             </div>

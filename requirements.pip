@@ -35,4 +35,3 @@ six==1.10.0
 tolerance==0.1.2
 Unidecode==0.4.19
 urllib3==1.22
-websocket-client==0.44.0

@@ -43,13 +43,15 @@ class Place(models.Model, GatherosModelMixin):
         max_digits=8,
         decimal_places=3,
         blank=True,
-        null=True
+        null=True,
+        verbose_name='longitude'
     )
     lat = models.DecimalField(
         max_digits=8,
         decimal_places=3,
         blank=True,
-        null=True
+        null=True,
+        verbose_name='latitude'
     )
 
     zip_code = models.CharField(
@@ -91,35 +93,35 @@ class Place(models.Model, GatherosModelMixin):
         help_text="Alguma informação para ajudar a chegar ao local."
     )
 
-    google_streetview_link = models.URLField(
-        verbose_name='Link do Google StreetView',
-        blank=True,
-        null=True,
-        help_text="Informações para exibir imagens do local"
-    )
-
-    google_streetview_img = models.ImageField(
-        upload_to=get_image_path,
-        blank=True,
-        null=True,
-        verbose_name='Imagem Google StreetView',
-        help_text="Imagem estática do Google StreetView"
-    )
-
-    google_maps_link = models.URLField(
-        verbose_name='Link do Google Maps',
-        blank=True,
-        null=True,
-        help_text="Informações para exibir mapa do local"
-    )
-
-    google_maps_img = models.ImageField(
-        upload_to=get_image_path,
-        blank=True,
-        null=True,
-        verbose_name='Imagem Google Maps',
-        help_text="Imagem estática do Google Maps"
-    )
+    # google_streetview_link = models.URLField(
+    #     verbose_name='Link do Google StreetView',
+    #     blank=True,
+    #     null=True,
+    #     help_text="Informações para exibir imagens do local"
+    # )
+    #
+    # google_streetview_img = models.ImageField(
+    #     upload_to=get_image_path,
+    #     blank=True,
+    #     null=True,
+    #     verbose_name='Imagem Google StreetView',
+    #     help_text="Imagem estática do Google StreetView"
+    # )
+    #
+    # google_maps_link = models.URLField(
+    #     verbose_name='Link do Google Maps',
+    #     blank=True,
+    #     null=True,
+    #     help_text="Informações para exibir mapa do local"
+    # )
+    #
+    # google_maps_img = models.ImageField(
+    #     upload_to=get_image_path,
+    #     blank=True,
+    #     null=True,
+    #     verbose_name='Imagem Google Maps',
+    #     help_text="Imagem estática do Google Maps"
+    # )
 
     class Meta:
         verbose_name = 'local de evento'

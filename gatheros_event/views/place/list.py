@@ -9,7 +9,7 @@ from gatheros_event.views.mixins import AccountMixin
 
 class PlaceListView(AccountMixin, ListView):
     model = Place
-    template_name = 'gatheros_event/place/list.html'
+    template_name = 'place/list.html'
     place_organization = None
 
     def get_context_data(self, **kwargs):
