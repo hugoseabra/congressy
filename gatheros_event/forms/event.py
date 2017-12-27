@@ -5,9 +5,10 @@ import os
 
 from django import forms
 from django.shortcuts import get_object_or_404
-from django.core.exceptions import ValidationError
 
 from gatheros_event.models import Event, Member, Organization
+
+from datetimewidget.widgets import DateTimeWidget
 
 
 class EventForm(forms.ModelForm):
@@ -25,7 +26,10 @@ class EventForm(forms.ModelForm):
             'subscription_offline',
             'published'
         ]
-        widgets = {'organization': forms.HiddenInput}
+        widgets = {'organization': forms.HiddenInput,
+                   'date_start': DateTimeWidget,
+                   'date_end': DateTimeWidget,
+                   }
 
     def __init__(self, user, *args, **kwargs):
         self.user = user

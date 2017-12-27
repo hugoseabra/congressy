@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'permission',
     'stdimage',
     'ckeditor',
+    'datetimewidget',
 
     # KANU_APPS
     'kanu_locations',
