@@ -18,9 +18,17 @@ class BaseEventView(AccountMixin, View):
         return reverse_lazy('event:event-list')
 
     def form_valid(self, form):
-        messages.success(self.request, self.success_message)
-        # noinspection PyUnresolvedReferences
-        return super(BaseEventView, self).form_valid(form)
+        # @TODO: Change this to a FormView
+        try:
+            response = super(BaseEventView, self).form_valid(form)
+
+        except Exception as e:
+            messages.error(self.request, str(e))
+            return self.form_invalid(form)
+
+        else:
+            messages.success(self.request, self.success_message)
+            return response
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences

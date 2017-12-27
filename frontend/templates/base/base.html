@@ -36,6 +36,11 @@
 
     {% block styles %}{% endblock %}
 
+    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+    {% if form %}
+        {{ form.media }}
+    {% endif %}
+
     {% block headscripts %}{% endblock %}
 
     <!-- Feature detection -->
@@ -181,7 +186,7 @@
 </section>
 
 <!--Global JS-->
-<script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+
 <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
 <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
 <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>

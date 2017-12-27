@@ -15,19 +15,23 @@
     {% if form_title %}
         <h2>{{ form_title }}</h2>
     {% endif %}
-    <br />
+    <br/>
     {% if object %}
         <table border="0" width="50%" cellpadding="10" cellspacing="1">
             <tr>
                 {% if object.person.avatar %}
-                    <td width="1%" style="vertical-align:top;font-weight: bold">
-                        <img src="{{ object.person.avatar.url }}" width="240px" />
+                    <td width="1%"
+                        style="vertical-align:top;font-weight: bold">
+                        <img src="{{ object.person.avatar.url }}"
+                             width="240px"/>
                     </td>
                 {% endif %}
                 <td style="padding: 0">
-                    <table border="0" width="100%" cellpadding="10" cellspacing="0">
+                    <table border="0" width="100%" cellpadding="10"
+                           cellspacing="0">
                         <tr>
-                            <th width="26%" style="text-align: right;vertical-align: top">
+                            <th width="26%"
+                                style="text-align: right;vertical-align: top">
                                 Pessoa
                             </th>
                             <td style="vertical-align: top">
@@ -36,7 +40,8 @@
                         </tr>
                         {% if object.person.user_id %}
                             <tr>
-                                <th width="26%" style="text-align: right;vertical-align: top">
+                                <th width="26%"
+                                    style="text-align: right;vertical-align: top">
                                     Perfil
                                 </th>
                                 <td style="vertical-align: top">
@@ -45,7 +50,8 @@
                             </tr>
                         {% endif %}
                         <tr>
-                            <th width="26%" style="text-align: right;vertical-align: top">
+                            <th width="26%"
+                                style="text-align: right;vertical-align: top">
                                 UUID
                             </th>
                             <td style="vertical-align: top">
@@ -54,7 +60,8 @@
                         </tr>
                         {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
                             <tr>
-                                <th width="26%" style="text-align: right;vertical-align: top">
+                                <th width="26%"
+                                    style="text-align: right;vertical-align: top">
                                     Lote
                                 </th>
                                 <td style="vertical-align: top">
@@ -63,7 +70,8 @@
                             </tr>
                         {% endif %}
                         <tr>
-                            <th width="26%" style="text-align: right;vertical-align: top">
+                            <th width="26%"
+                                style="text-align: right;vertical-align: top">
                                 Código de Inscrição
                             </th>
                             <td style="vertical-align: top">
@@ -71,7 +79,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <th width="20%" style="text-align: right;vertical-align: top">
+                            <th width="20%"
+                                style="text-align: right;vertical-align: top">
                                 Número de Inscrição
                             </th>
                             <td style="vertical-align: top">
@@ -79,7 +88,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <th width="20%" style="text-align: right;vertical-align: top">
+                            <th width="20%"
+                                style="text-align: right;vertical-align: top">
                                 Cadastrado em
                             </th>
                             <td style="vertical-align: top">
@@ -87,7 +97,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <th width="20%" style="text-align: right;vertical-align: top">
+                            <th width="20%"
+                                style="text-align: right;vertical-align: top">
                                 Cadastrado por
                             </th>
                             <td style="vertical-align: top">
@@ -107,39 +118,74 @@
         <table border="0" width="50%" cellpadding="10" cellspacing="1">
             {% if internal_form_fields %}
                 <tr>
-                    <td colspan="2" style="font-weight: bold;background-color: #DDD">Campos internos</td>
+                    <td colspan="2"
+                        style="font-weight: bold;background-color: #DDD">Campos
+                        internos
+                    </td>
                 </tr>
                 {% for form_field in internal_form_fields %}
                     <tr>
-                        <th width="20%" style="text-align: right;vertical-align: top">
+                        <th width="20%"
+                            style="text-align: right;vertical-align: top">
                             <label for="{{ form_field.id_for_label }}">{{ form_field.label_tag }}</label>
                         </th>
                         <td style="vertical-align: top">
                             {{ form_field }}
                             {% if form_field.help_text %}
-                                <br />
-                                <strong>Instrução:</strong> {{ form_field.help_text|safe }}
+                                <br/>
+                                <strong>Instrução:</strong>
+                                {{ form_field.help_text|safe }}
                             {% endif %}
-                            {{ form_field.errors }}
+
+                            {% if form_field.errors %}
+                                {% for error in form_field.errors %}
+                                    <div class="alert alert-danger
+                                            alert-dismissable">
+                                        <button type="button"
+                                                class="close"
+                                                data-dismiss="alert"
+                                                aria-hidden="true">×
+                                        </button>
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
             {% endif %}
             <tr>
-                <td colspan="2" style="font-weight: bold;background-color: #DDD">Campos principais</td>
+                <td colspan="2"
+                    style="font-weight: bold;background-color: #DDD">Campos
+                    principais
+                </td>
             </tr>
             {% for item in default_fields %}
                 <tr>
-                    <th width="20%" style="text-align: right;vertical-align: top">
+                    <th width="20%"
+                        style="text-align: right;vertical-align: top">
                         <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
                     </th>
                     <td style="vertical-align: top">
                         {{ item.form_field }}
                         {% if item.form_field.help_text %}
-                            <br />
-                            <strong>Instrução:</strong> {{ item.form_field.help_text|safe }}
+                            <br/>
+                            <strong>Instrução:</strong>
+                            {{ item.form_field.help_text|safe }}
                         {% endif %}
-                        {{ item.form_field.errors }}
+                        {% if item.form_field.errors %}
+                            {% for error in item.form_field.errors %}
+                                <div class="alert alert-danger
+                                            alert-dismissable">
+                                    <button type="button"
+                                            class="close"
+                                            data-dismiss="alert"
+                                            aria-hidden="true">×
+                                    </button>
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
@@ -147,27 +193,44 @@
         {% if additional_fields %}
             <table border="0" width="50%" cellpadding="10" cellspacing="1">
                 <tr>
-                    <td colspan="2" style="font-weight: bold;background-color: #DDD">Campos adicionais</td>
+                    <td colspan="2"
+                        style="font-weight: bold;background-color: #DDD">Campos
+                        adicionais
+                    </td>
                 </tr>
                 {% for item in additional_fields %}
                     <tr>
-                        <th width="25%" style="text-align: right;vertical-align: top;">
+                        <th width="25%"
+                            style="text-align: right;vertical-align: top;">
                             <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
                         </th>
                         <td style="vertical-align: top;">
                             {{ item.form_field }}
                             {% if item.form_field.help_text %}
-                                <br />
-                                <strong>Instrução:</strong> {{ item.form_field.help_text|safe }}
+                                <br/>
+                                <strong>Instrução:</strong>
+                                {{ item.form_field.help_text|safe }}
                             {% endif %}
-                            {{ item.form_field.errors }}
+                            {% if item.form_field.errors %}
+                                {% for error in item.form_field.errors %}
+                                    <div class="alert alert-danger
+                                            alert-dismissable">
+                                        <button type="button"
+                                                class="close"
+                                                data-dismiss="alert"
+                                                aria-hidden="true">×
+                                        </button>
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
             </table>
         {% endif %}
-        <br />
-        <hr />
+        <br/>
+        <hr/>
         <input type="submit" value="Salvar"/>
         <a href="{% url 'subscription:subscription-list' event.pk %}">Cancelar</a>
     </form>
