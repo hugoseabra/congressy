@@ -1,6 +1,7 @@
 """
 gatheros_subscription templatetags
 """
+from ast import literal_eval
 from django import template
 from core.util import git_util
 
@@ -37,3 +38,10 @@ def get_message_background_color(message):
 def get_project_git_revision():
     """ Resgata versão de revisão do GIT do projeto. """
     return git_util.get_git_revision()
+
+
+@register.filter
+def get_first_item(dictionary):
+    dictionary = literal_eval(dictionary.message)
+    message = list(dictionary.values())[0]
+    return str(message[0])
