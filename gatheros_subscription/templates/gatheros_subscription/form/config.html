@@ -18,7 +18,8 @@
     {% if form_title %}
         <h2>{{ form_title }}</h2>
     {% endif %}
-    <table border="0" width="100%" cellpadding="10" cellspacing="1" style="background-color:#DDD">
+    <table border="0" width="100%" cellpadding="10" cellspacing="1"
+           style="background-color:#DDD">
         <tr>
             <td colspan="9" style="font-weight: bold">Campos principais</td>
             <td style="text-align:center;font-weight: bold"># Inscrições</td>
@@ -27,46 +28,69 @@
             {% is_required event.form item.field as is_required %}
             {% is_default_configuration event.form item.field as is_default_config %}
             <tr>
-                <td width="1%" style="text-align:center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                <td width="1%"
+                    style="text-align:center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     {{ forloop.counter }}
                 </td>
-                <td width="7%" style="text-align:center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
-                    {% if is_default_config %}Padrão{% else %}Personalizado{% endif %}
+                <td width="7%"
+                    style="text-align:center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    {% if is_default_config %}Padrão{% else %}
+                        Personalizado{% endif %}
                 </td>
                 <th style="text-align: right;vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
                 </th>
-                <td colspan="{% if item.field.required %}6{% else %}5{% endif %}" style="vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                <td colspan="{% if item.field.required %}6{% else %}5{% endif %}"
+                    style="vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     {{ item.form_field }}
                     {% if item.form_field.help_text %}
-                        <br />
-                        <strong>Instrução:</strong> {{ item.form_field.help_text|safe }}
+                        <br/>
+                        <strong>Instrução:</strong>
+                        {{ item.form_field.help_text|safe }}
                     {% endif %}
-                    {{ item.form_field.errors }}
+                    {% if item.form_field.errors %}
+                        {% for error in item.form_field.errors %}
+                            <div class="alert alert-danger
+                                            alert-dismissable">
+                                <button type="button"
+                                        class="close"
+                                        data-dismiss="alert"
+                                        aria-hidden="true">×
+                                </button>
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </td>
                 {% if not item.field.required %}
-                <td width="10%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
-                    <form method="post" action="{% url 'subscription:event-manage-requirement' event.pk item.field.pk %}">{% csrf_token %}
-                        {% if is_required and not is_inactive %}
-                            <button>Tornar não-obrigatório</button>
-                            <input type="hidden" name="action" value="not-required" />
-                        {% elif not is_inactive %}
-                            <button>Tornar obrigatório</button>
-                            <input type="hidden" name="action" value="required" />
-                        {% endif %}
-                    </form>
-                </td>
+                    <td width="10%"
+                        style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                        <form method="post"
+                              action="{% url 'subscription:event-manage-requirement' event.pk item.field.pk %}">{% csrf_token %}
+                            {% if is_required and not is_inactive %}
+                                <button>Tornar não-obrigatório</button>
+                                <input type="hidden" name="action"
+                                       value="not-required"/>
+                            {% elif not is_inactive %}
+                                <button>Tornar obrigatório</button>
+                                <input type="hidden" name="action"
+                                       value="required"/>
+                            {% endif %}
+                        </form>
+                    </td>
                 {% endif %}
                 {% if forloop.first %}
-                <td rowspan="{{ default_fields|length }}" width="6%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
-                    {{ event.subscriptions.count }}
-                </td>
+                    <td rowspan="{{ default_fields|length }}" width="6%"
+                        style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                        {{ event.subscriptions.count }}
+                    </td>
                 {% endif %}
             </tr>
         {% endfor %}
         {% if additional_fields %}
             <tr>
-                <td colspan="10" style="font-weight: bold">Campos adicionais</td>
+                <td colspan="10" style="font-weight: bold">Campos adicionais
+                </td>
             </tr>
         {% endif %}
         {% for item in additional_fields %}
@@ -75,36 +99,59 @@
             {% is_required event.form item.field as is_required %}
             {% is_default_configuration event.form item.field as is_default_config %}
             <tr>
-                <td width="1%" style="text-align:center;background-color:#F6F6F6">
+                <td width="1%"
+                    style="text-align:center;background-color:#F6F6F6">
                     {% get_field_order form.form item.field %}
                 </td>
-                <td width="1%" style="text-align:center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
-                    {% if is_default_config %}Padrão{% else %}Personalizado{% endif %}
+                <td width="1%"
+                    style="text-align:center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    {% if is_default_config %}Padrão{% else %}
+                        Personalizado{% endif %}
                 </td>
-                <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                <th width="20%"
+                    style="text-align: right;vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
                 </th>
-                <td style="vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}" {% if not item.field.with_options %}colspan="2"{% endif %}>
+                <td style="vertical-align: top;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}"
+                    {% if not item.field.with_options %}colspan="2"{% endif %}>
                     {{ item.form_field }}
                     {% if item.form_field.help_text %}
-                        <br />
-                        <strong>Instrução:</strong> {{ item.form_field.help_text|safe }}
+                        <br/>
+                        <strong>Instrução:</strong>
+                        {{ item.form_field.help_text|safe }}
                     {% endif %}
-                    {{ item.form_field.errors }}
+                    {% if item.form_field.errors %}
+                        {% for error in item.form_field.errors %}
+                            <div class="alert alert-danger
+                                            alert-dismissable">
+                                <button type="button"
+                                        class="close"
+                                        data-dismiss="alert"
+                                        aria-hidden="true">×
+                                </button>
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </td>
                 {% if item.field.with_options %}
-                <td width="13%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
-                    <a style="text-decoration: none" href="{% url 'subscription:field-options' item.field.pk %}?event_pk={{ event.pk }}">Gerenciar opções</a>
-                </td>
+                    <td width="13%"
+                        style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                        <a style="text-decoration: none"
+                           href="{% url 'subscription:field-options' item.field.pk %}?event_pk={{ event.pk }}">Gerenciar
+                            opções</a>
+                    </td>
                 {% endif %}
-                <td width="2%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
-                    <form method="post" action="{% url 'subscription:event-field-order' event.pk item.field.pk %}">{% csrf_token %}
+                <td width="2%"
+                    style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    <form method="post"
+                          action="{% url 'subscription:event-field-order' event.pk item.field.pk %}">{% csrf_token %}
                         {% if not item.field.form_default_field %}
                             {% if not forloop.first %}
                                 <button name="down">&uparrow;</button>
                             {% endif %}
                             {% if not forloop.first and not forloop.last %}
-                                <hr style="margin: 4px 0" />
+                                <hr style="margin: 4px 0"/>
                             {% endif %}
                             {% if not forloop.last %}
                                 <button name="up">&downarrow;</button>
@@ -112,38 +159,52 @@
                         {% endif %}
                     </form>
                 </td>
-                <td width="10%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                <td width="10%"
+                    style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     {% if item.field.field_type != item.field.FIELD_BOOLEAN %}
-                        <form method="post" action="{% url 'subscription:event-manage-requirement' event.pk item.field.pk %}">{% csrf_token %}
+                        <form method="post"
+                              action="{% url 'subscription:event-manage-requirement' event.pk item.field.pk %}">{% csrf_token %}
                             {% if is_required and not is_inactive %}
                                 <button>Tornar não-obrigatório</button>
-                                <input type="hidden" name="action" value="not-required" />
+                                <input type="hidden" name="action"
+                                       value="not-required"/>
                             {% elif not is_inactive %}
                                 <button>Tornar obrigatório</button>
-                                <input type="hidden" name="action" value="required" />
+                                <input type="hidden" name="action"
+                                       value="required"/>
                             {% endif %}
                         </form>
                     {% endif %}
                 </td>
-                <td width="6%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
-                    <form method="post" action="{% url 'subscription:event-manage-activation' event.pk item.field.pk %}">{% csrf_token %}
+                <td width="6%"
+                    style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                    <form method="post"
+                          action="{% url 'subscription:event-manage-activation' event.pk item.field.pk %}">{% csrf_token %}
                         {% if is_inactive %}
                             <button>Ativar</button>
-                            <input type="hidden" name="action" value="activate" />
+                            <input type="hidden" name="action"
+                                   value="activate"/>
                         {% else %}
                             <button>Desativar</button>
-                            <input type="hidden" name="action" value="deactivate" />
+                            <input type="hidden" name="action"
+                                   value="deactivate"/>
                         {% endif %}
                     </form>
                 </td>
-                <td width="8%" style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
+                <td width="8%"
+                    style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
                     {% if can_manage %}
                         <div style="width:135px">
                             <div style="float:left">
-                                <button type="button" onclick="window.location.href='{% url 'subscription:field-edit' item.field.pk %}'">Editar</button>
+                                <button type="button"
+                                        onclick="window.location.href='{% url 'subscription:field-edit' item.field.pk %}'">
+                                    Editar
+                                </button>
                             </div>
                             <div style="float:left;margin-left:8px">
-                                <form method="post" action="{% url 'subscription:event-field-remove' event.pk item.field.pk %}" onsubmit="return confirm('Deseja realmente excluir este campo do formulário?')">
+                                <form method="post"
+                                      action="{% url 'subscription:event-field-remove' event.pk item.field.pk %}"
+                                      onsubmit="return confirm('Deseja realmente excluir este campo do formulário?')">
                                     {% csrf_token %}
                                     <button>Remover</button>
                                 </form>
@@ -152,7 +213,9 @@
                         </div>
                     {% endif %}
                     {% if is_inactive %}
-                        <div style="text-align: center;font-style: italic;padding: 4px">Desativado</div>
+                        <div style="text-align: center;font-style: italic;padding: 4px">
+                            Desativado
+                        </div>
                     {% endif %}
                 </td>
                 <td style="text-align: center;background-color:{% if not is_inactive %}#FFF{% else %}#F6F6F6;font-style: italic{% endif %}">
@@ -161,7 +224,7 @@
             </tr>
         {% endfor %}
     </table>
-    <hr />
+    <hr/>
     <div style="padding:10px">
         <a href="{% url 'event:event-panel' event.pk %}">Voltar</a>
     </div>

@@ -23,52 +23,81 @@
         número de inscrições são os mais importantes.
     </div>
     <div style="background: #DDD">
-        <table border="0" width="100%" cellpadding="10" cellspacing="1" style="background-color:#DDD">
+        <table border="0" width="100%" cellpadding="10" cellspacing="1"
+               style="background-color:#DDD">
             <tr>
                 <td colspan="3" style="font-weight: bold">Campos</td>
-                <td style="text-align:center;font-weight: bold">Obrigatório</td>
+                <td style="text-align:center;font-weight: bold">Obrigatório
+                </td>
                 <td style="text-align:center;font-weight: bold"># Eventos</td>
-                <td style="text-align:center;font-weight: bold"># Inscrições</td>
+                <td style="text-align:center;font-weight: bold"># Inscrições
+                </td>
                 <td style="text-align:center;font-weight: bold">Ações</td>
             </tr>
             {% for field in form %}
                 {% get_gatheros_field form field as gatheros_field %}
                 {% if gatheros_field %}
-                <tr>
-                    <th width="20%" style="text-align: right;vertical-align: top;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                        <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
-                    </th>
-                    <td style="vertical-align: top;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}" {% if not gatheros_field.with_options %}colspan="2"{% endif %}>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <br />
-                            <strong>Instrução:</strong> {{ field.help_text|safe }}
+                    <tr>
+                        <th width="20%"
+                            style="text-align: right;vertical-align: top;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                            <label for="{{ field.id_for_label }}">{{ field.label_tag }}</label>
+                        </th>
+                        <td style="vertical-align: top;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}"
+                            {% if not gatheros_field.with_options %}colspan="2"{% endif %}>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <br/>
+                                <strong>Instrução:</strong>
+                                {{ field.help_text|safe }}
+                            {% endif %}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger
+                                            alert-dismissable">
+                                        <button type="button"
+                                                class="close"
+                                                data-dismiss="alert"
+                                                aria-hidden="true">×
+                                        </button>
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                        {% if gatheros_field.with_options %}
+                            <td width="13%"
+                                style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                                <a style="text-decoration: none"
+                                   href="{% url 'subscription:field-options' gatheros_field.pk %}">Gerenciar
+                                    opções</a>
+                            </td>
                         {% endif %}
-                        {{ field.errors }}
-                    </td>
-                    {% if gatheros_field.with_options %}
-                    <td width="13%" style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                        <a style="text-decoration: none" href="{% url 'subscription:field-options' gatheros_field.pk %}">Gerenciar opções</a>
-                    </td>
-                    {% endif %}
-                    <td width="6%" style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                        {% if gatheros_field.required %}&#10004;{% endif %}
-                    </td>
-                    <td width="6%" style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                        {{ gatheros_field.forms.count }}
-                    </td>
-                    <td width="6%" style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                        {{ gatheros_field.answers.count }}
-                    </td>
-                    <td width="8%" style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
-                        <a style="text-decoration: none" href="{% url 'subscription:field-edit' gatheros_field.pk %}">Editar</a>
-                        &nbsp;
-                        <a style="text-decoration: none" href="{% url 'subscription:field-delete' gatheros_field.pk %}">Excluir</a>
-                        {% if not gatheros_field.active %}
-                            <div style="text-align: center;font-style: italic;padding: 4px">Desativado</div>
-                        {% endif %}
-                    </td>
-                </tr>
+                        <td width="6%"
+                            style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                            {% if gatheros_field.required %}&#10004;{% endif %}
+                        </td>
+                        <td width="6%"
+                            style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                            {{ gatheros_field.forms.count }}
+                        </td>
+                        <td width="6%"
+                            style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                            {{ gatheros_field.answers.count }}
+                        </td>
+                        <td width="8%"
+                            style="text-align: center;background-color:{% if not gatheros_field.active %}#F6F6F6{% else %}#FFF{% endif %}">
+                            <a style="text-decoration: none"
+                               href="{% url 'subscription:field-edit' gatheros_field.pk %}">Editar</a>
+                            &nbsp;
+                            <a style="text-decoration: none"
+                               href="{% url 'subscription:field-delete' gatheros_field.pk %}">Excluir</a>
+                            {% if not gatheros_field.active %}
+                                <div style="text-align: center;font-style: italic;padding: 4px">
+                                    Desativado
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
                 {% endif %}
             {% endfor %}
         </table>
