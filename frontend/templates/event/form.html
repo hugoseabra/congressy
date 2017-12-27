@@ -1,7 +1,21 @@
 {% extends "base/base.html" %}
 {% load static %}
+{% load base_tags %}
+{% load widget_tweaks %}
 {% load event_tags %}
 
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissable">
+                <button type="button" class="close"
+                        data-dismiss="alert" aria-hidden="true">×
+                </button>
+                {{ message|get_first_item }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock messages %}
 {% block title %}
     {% if object %}Editar{% else %}Nova{% endif %} Evento | Congressy
 {% endblock %}
@@ -11,12 +25,6 @@
 {% block page_sub_title %}
     {% if object %}
         {{ object.name }} (ID: {{ object.pk }})
-    {% endif %}
-{% endblock %}
-
-{% block page_sub_title %}
-    {% if object %}
-        {{ object.name }}
     {% endif %}
 {% endblock %}
 {% block nav_aside_itens %}
@@ -33,7 +41,7 @@
     {{ block.super }}
 {% endblock %}
 {% block content %}
-    <form action="" method="post" class="form-horizontal" role="form" name="event_form">
+    <form action="" method="post" class="form-horizontal form-border" role="form" name="event_form">
         {% csrf_token %}
 
         <div class="row">
@@ -98,10 +106,12 @@
                             {% for field in form %}
                                 <div class="form-group">
 
-                                    <label for="{{ field.id_for_label }}"
-                                           class="col-sm-3 control-label cgsy-label">{{ field.label }}</label>
-                                    <div class="col-sm-6">
-                                        {{ field }}{% if field.errors %}
+                                    <label for="{{ field.id_for_label }}">
+                                        {{ field.label }}
+                                    </label>
+                                    <div class="">
+                                        {{ field|add_class:"form-control"}}
+                                        {% if field.errors %}
                                         {% for error in field.errors %}
                                             <div class="alert alert-danger
                                             alert-dismissable">
@@ -115,7 +125,6 @@
                                         {% endfor %}
                                     {% endif %}
                                         {% if field.help_text %}
-                                            <br/>
                                             <small class="text-muted">{{ field.help_text|safe }}</small>
                                         {% endif %}
                                     </div>
