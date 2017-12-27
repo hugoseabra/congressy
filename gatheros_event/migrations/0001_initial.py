@@ -413,9 +413,6 @@ class Migration(migrations.Migration):
                     verbose_name='sexo'
                 )),
                 ('email', models.EmailField(
-                    blank=True,
-                    max_length=254,
-                    null=True,
                     verbose_name='email'
                 )),
                 ('zip_code', models.CharField(
@@ -581,13 +578,15 @@ class Migration(migrations.Migration):
                     blank=True,
                     decimal_places=3,
                     max_digits=8,
-                    null=True
+                    null=True,
+                    verbose_name='longitude'
                 )),
                 ('lat', models.DecimalField(
                     blank=True,
                     decimal_places=3,
                     max_digits=8,
-                    null=True
+                    null=True,
+                    verbose_name='latitude'
                 )),
                 ('zip_code', models.CharField(
                     blank=True,
