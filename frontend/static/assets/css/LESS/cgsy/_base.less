@@ -109,3 +109,47 @@ a.btn, button.btn {
     margin-left: 5px;
   }
 }
+
+//======================== DANGER BOX MESSAGE ===============================//
+.danger-box-message.danger {
+  &:extend(.danger-bg-color);
+
+  h2 {
+    font-weight: bold;
+    color:#FFF;
+    font-size: 34px;
+    padding: 10px 0;
+  }
+
+  p {
+    color: #FFF;
+    padding: 4px 0;
+  }
+
+  form {
+    text-align: center;
+  }
+}
+
+.danger-box-message.warning {
+  &:extend(.warning-bg-color);
+
+  h2 {
+    font-weight: bold;
+    color:#FFF;
+    font-size: 34px;
+    padding: 10px 0;
+    text-shadow: 1px 0 5px #666;
+  }
+
+  p {
+    color: #FFF;
+    padding: 4px 0;
+    text-shadow: 1px 0 5px #666;
+  }
+
+  form {
+    text-align: center;
+  }
+}
+

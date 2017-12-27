@@ -95,7 +95,7 @@ class OrganizationPanelView(AccountMixin, DetailView):
 
 
 class OrganizationCancelMembershipView(AccountMixin, DetailView):
-    template_name = 'gatheros_event/organization/cancel-membership.html'
+    template_name = 'organization/cancel-membership.html'
     model = Organization
     object = None
     member = None

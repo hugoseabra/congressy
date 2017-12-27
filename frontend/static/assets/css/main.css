@@ -2145,10 +2145,12 @@ body.fullscreen-widget-active .panel .panel-heading .actions > .fa-times {
 .info-bg-color {
   background-color: #1F7BB6;
 }
-.warning-bg-color {
+.warning-bg-color,
+.danger-box-message.warning {
   background-color: #EC971F;
 }
-.danger-bg-color {
+.danger-bg-color,
+.danger-box-message.danger {
   background-color: #C9302C;
 }
 .text-muted {
@@ -3464,6 +3466,34 @@ button.btn {
 }
 .dataTables_filter input {
   margin-left: 5px;
+}
+.danger-box-message.danger h2 {
+  font-weight: bold;
+  color: #FFF;
+  font-size: 34px;
+  padding: 10px 0;
+}
+.danger-box-message.danger p {
+  color: #FFF;
+  padding: 4px 0;
+}
+.danger-box-message.danger form {
+  text-align: center;
+}
+.danger-box-message.warning h2 {
+  font-weight: bold;
+  color: #FFF;
+  font-size: 34px;
+  padding: 10px 0;
+  text-shadow: 1px 0 5px #666;
+}
+.danger-box-message.warning p {
+  color: #FFF;
+  padding: 4px 0;
+  text-shadow: 1px 0 5px #666;
+}
+.danger-box-message.warning form {
+  text-align: center;
 }
 #mobile-top-menu {
   background: #F0F3F3;
