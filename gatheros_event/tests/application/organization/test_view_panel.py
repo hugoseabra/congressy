@@ -41,7 +41,7 @@ class EventPanelTest(TestCase):
         response = self.client.get(self._get_url(), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_200(self):

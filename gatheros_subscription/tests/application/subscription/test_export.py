@@ -48,7 +48,7 @@ class CanExportViewTest(BaseExportViewTest):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<form', 1)
+        self.assertContains(response, '<form', 2)
 
     def test_filter_by_state(self):
         """

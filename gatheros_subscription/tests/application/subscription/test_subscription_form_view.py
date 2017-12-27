@@ -69,7 +69,7 @@ class SubscriptionFormViewTest(TestCase):
         response = self.client.get(url, follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + url
         self.assertRedirects(response, redirect_url)
 
     def test_edit_not_logged(self):
@@ -82,7 +82,7 @@ class SubscriptionFormViewTest(TestCase):
         response = self.client.get(url, follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + url
         self.assertRedirects(response, redirect_url)
 
     def test_delete_not_logged(self):
@@ -95,7 +95,7 @@ class SubscriptionFormViewTest(TestCase):
         response = self.client.get(url, follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + url
         self.assertRedirects(response, redirect_url)
 
     def test_add_200_logged(self):
@@ -112,7 +112,7 @@ class SubscriptionFormViewTest(TestCase):
         sub = Subscription.objects.filter(event=self.event).first()
         url = reverse('subscription:subscription-edit', kwargs={
             'event_pk': self.event.pk,
-            'pk': sub .pk
+            'pk': sub.pk
         })
 
         self._login()
@@ -124,7 +124,7 @@ class SubscriptionFormViewTest(TestCase):
         sub = Subscription.objects.filter(event=self.event).first()
         url = reverse('subscription:subscription-delete', kwargs={
             'event_pk': self.event.pk,
-            'pk': sub .pk
+            'pk': sub.pk
         })
 
         self._login()
