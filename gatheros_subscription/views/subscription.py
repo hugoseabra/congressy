@@ -56,13 +56,8 @@ class EventViewMixin(AccountMixin, generic.View):
         return self.event
 
     def get_lots(self):
-        event = self.get_event()
-        if event.subscription_type == Event.SUBSCRIPTION_DISABLED:
-            return None
-
-        return event.lots.filter(
-            date_start__lte=datetime.now(),
-            date_end__gt=datetime.now()
+        return self.get_event().lots.filter(
+            internal=False
         )
 
     def get_num_lots(self):
@@ -120,15 +115,26 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
     def get_queryset(self):
         query_set = super(SubscriptionListView, self).get_queryset()
+
+        lots = self.request.GET.getlist('lots', [])
+        if lots:
+            query_set = query_set.filter(lot_id__in=lots)
+
+        has_profile = self.request.GET.get('has_profile')
+        if has_profile:
+            query_set = query_set.filter(person__user__isnull=False)
+
         event = self.get_event()
 
         return query_set.filter(event=event)
 
     def get_context_data(self, **kwargs):
         cxt = super(SubscriptionListView, self).get_context_data(**kwargs)
+
         cxt.update({
             'can_add_subscription': self.can_add_subscription(),
-            'lots': self.get_lots()
+            'lots': self.get_lots(),
+            'filtered_lots': self.request.GET.getlist('lots', [])
         })
         return cxt
 
@@ -569,7 +575,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
 
 class SubscriptionExportView(AccountMixin, FormListViewMixin):
-    #template_name = 'gatheros_subscription/subscription/attendance.html'
+    # template_name = 'gatheros_subscription/subscription/attendance.html'
     template_name = 'subscription/export.html'
     form_class = SubscriptionFilterForm
     model = Subscription

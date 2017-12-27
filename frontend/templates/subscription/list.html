@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
 {% load i18n static %}
+{% load subscription_tags %}
 
 {% block title %} Pré-inscrições | Congressy{% endblock %}
 
@@ -14,13 +15,26 @@
 {% block styles %}
     <link rel="stylesheet"
           href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/icheck/css/all.css' %}">
 {% endblock %}
 
 {% block scripts %}
     <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
     <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
+    <script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
+
     <script>
+        var customCheckbox = function() {
+            $('input.icheck').iCheck({
+                checkboxClass: 'icheckbox_flat-green',
+                radioClass: 'iradio_flat-blue'
+            });
+        };
+
         $(document).ready(function () {
+            customCheckbox();
+
             $('#subscription_table').DataTable({
                 "language": {
                     sEmptyTable: "Nenhum registro encontrado",
@@ -70,8 +84,10 @@
              * active (default: false): se a caixa de filtro é para iniciar
              * aberta ou não.
              */
-            window.cgsy.Filter.init('.filter-button', '.filter-box', false)
+            window.cgsy.Filter.init('.filter-button', '.filter-box', true)
         });
+
+
     </script>
 {% endblock %}
 
@@ -86,9 +102,6 @@
     {{ block.super }}
 {% endblock %}
 {% block content %}
-
-
-
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
@@ -119,7 +132,56 @@
                     <h3 class="panel-title">Filtro avançado</h3>
                 </div>
                 <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form role="form">
+                                <div class="list-filters">
+                                    {% if lots %}
+                                    <div class="col-md-4">
+                                        <div class="form-group float-left">
+                                            <label>Lotes</label>
+                                            {% for lot in lots %}
+                                                <div class="radio">
+                                                    {% is_filter_selected 'lots' lot.pk as checked %}
+                                                    <input class="icheck"
+                                                        {% if checked %}checked=""{% endif %}
+                                                       type="checkbox"
+                                                       name="lots"
+                                                       id="lot{{ forloop.counter0 }}"
+                                                       value="{{ lot.id }}">
+                                                    <label for="lot{{ forloop.counter0 }}">
+                                                        {{ lot.name }}
+                                                    </label>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Possui perfil</label>
+                                            <div class="radio">
+                                                {% is_filter_selected 'has_profile' 1 as checked %}
+                                                <input class="icheck"
+                                                   {% if checked %}checked=""{% endif %}
+                                                   type="checkbox"
+                                                   name="has_profile"
+                                                   id="has_profile"
+                                                   value="1">
+                                                <label for="has_profile">
+                                                    Possui perfil
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    <div class="clearfix"></div>
+                                </div>
+                                <button type="submit" class="btn
+                                btn-primary">Enviar</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

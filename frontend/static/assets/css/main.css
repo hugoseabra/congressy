@@ -3411,6 +3411,12 @@ label.valid {
 .filter-box {
   display: none;
 }
+.checkbox label,
+.radio label {
+  padding-left: 6px;
+  position: relative;
+  top: 2px;
+}
 .buttonbar {
   padding: 18px 0 10px 0;
   margin-bottom: 4px;
