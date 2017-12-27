@@ -40,7 +40,7 @@ class PlaceFormViewTest(TestCase):
         response = self.client.get(url, follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + url
         self.assertRedirects(response, redirect_url)
 
     def test_edit_not_logged(self):
@@ -53,7 +53,7 @@ class PlaceFormViewTest(TestCase):
         response = self.client.get(url, follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + url
         self.assertRedirects(response, redirect_url)
 
     def test_delete_not_logged(self):
@@ -66,7 +66,7 @@ class PlaceFormViewTest(TestCase):
         response = self.client.get(url, follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + url
         self.assertRedirects(response, redirect_url)
 
     def test_add_status_is_200_ok(self):

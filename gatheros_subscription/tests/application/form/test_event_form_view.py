@@ -42,7 +42,7 @@ class EventFormViewRenderTest(TestCase):
         response = self.client.get(self._get_url(), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_200_logged(self):
@@ -86,7 +86,7 @@ class EventFormAddTest(TestCase):
         response = self.client.get(self._get_url(), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_200_logged(self):
@@ -242,7 +242,7 @@ class EventFormEditViewTest(TestCase):
         response = self.client.get(self._get_url(), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_200_logged(self):
@@ -325,7 +325,7 @@ class EventFormRemoveFieldViewTest(TestCase):
         response = self.client.get(self._get_url(), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_405_logged(self):
@@ -385,7 +385,7 @@ class EventFormManageActivatationViewTest(TestCase):
         response = self.client.get(self._get_url(), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_405_logged(self):
@@ -467,7 +467,7 @@ class EventFormFieldReorderViewTest(TestCase):
         response = self.client.get(self._get_url(), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_405_logged(self):
@@ -548,7 +548,7 @@ class EventFormFieldRequirementViewTest(TestCase):
         response = self.client.get(self._get_url(), follow=True)
 
         redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_405_logged(self):

@@ -4,8 +4,6 @@ from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
 
-from kanu_locations import urls as city_urls
-
 from gatheros_event.urls.me import (
     urlpatterns_public_account,
     urlpatterns_public_password,
