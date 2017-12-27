@@ -14,11 +14,6 @@
     {% endif %}
 {% endblock %}
 
-{% block page_sub_title %}
-    {% if object %}
-        {{ object.name }}
-    {% endif %}
-{% endblock %}
 {% block nav_aside_itens %}
     <li>
         {% if object %}
@@ -33,9 +28,8 @@
     {{ block.super }}
 {% endblock %}
 {% block content %}
-    <form action="" method="post" class="form-horizontal" role="form" name="event_form">
+    <form action="" method="post" class="form" role="form" name="event_form">
         {% csrf_token %}
-
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar">
@@ -65,43 +59,53 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-
-                <div class="panel-body">
+                    <div class="panel-body">
 
 
-                    {% if not is_manager %}
+                        {% if not is_manager %}
+                            <div id="cgsy-btn-navbar">
+                                <nav class="navbar" role="navigation">
+                                    <ul class="nav navbar-nav navbar-left">
+                                        Você não é organizador de eventos. Para
+                                        criar seus próprios eventos, clique no
+                                        botão
+                                        abaixo:
+                                        <br/><br/>
+                                        <form onsubmit="return confirm('Deseja realmente se tornar um organizador?')"
+                                              action="{% url 'event:organization-add-internal' %}"
+                                              method="post">{% csrf_token %}
+                                            <button class="btn btn-success"
+                                                    type="submit">Quero ser um
+                                                organizador de
+                                                eventos.
+                                            </button>
+                                        </form>
+                                    </ul>
 
-                        <div id="cgsy-btn-navbar">
-                            <nav class="navbar" role="navigation">
-                                <ul class="nav navbar-nav navbar-left">
-                                    Você não é organizador de eventos. Para criar seus próprios eventos, clique no botão
-                                    abaixo:
-                                    <br/><br/>
-                                    <form onsubmit="return confirm('Deseja realmente se tornar um organizador?')"
-                                          action="{% url 'event:organization-add-internal' %}"
-                                          method="post">{% csrf_token %}
-                                        <button class="btn btn-success" type="submit">Quero ser um organizador de
-                                            eventos.
-                                        </button>
-                                    </form>
-                                </ul>
+                                </nav>
+                            </div>
+                        {% endif %}
 
-                            </nav>
+
+                        {% for field in form %}
+
+                            <div class="form-group">
+                            <label for="exampleInputEmail1">Email address</label>
+                            <input class="form-control" id="exampleInputEmail1" placeholder="Enter email" type="email">
                         </div>
-                    {% endif %}
+                            <div class="form-group">
 
+                                <label for="{{ field.id_for_label }}"
+                                       class="col-sm-3 control-label cgsy-label">{{ field.label }}</label>
+                                <div class="col-sm-6">
 
-                            {% for field in form %}
-                                <div class="form-group">
+                                    {{ field }}
 
-                                    <label for="{{ field.id_for_label }}"
-                                           class="col-sm-3 control-label cgsy-label">{{ field.label }}</label>
-                                    <div class="col-sm-6">
-                                        {{ field }}{% if field.errors %}
+                                    {% if field.errors %}
                                         {% for error in field.errors %}
                                             <div class="alert alert-danger
                                             alert-dismissable">
@@ -114,11 +118,11 @@
                                             </div>
                                         {% endfor %}
                                     {% endif %}
-                                        {% if field.help_text %}
-                                            <br/>
-                                            <small class="text-muted">{{ field.help_text|safe }}</small>
-                                        {% endif %}
-                                    </div>
+                                    {% if field.help_text %}
+                                        <br/>
+                                        <small class="text-muted">{{ field.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
 
                             </div>
                         {% endfor %}
@@ -126,19 +130,21 @@
                 </div>
             </div>
         </div>
-
-                            <div class="row">
-                            <div class="col-md-12">
-                            <div class="buttonbar bottom">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar bottom">
                     <div class="float-right">
-                            {% if next_path %}
-                                <a href="{{ next_path|urlencode }}"class="btn btn-danger" >
+                        {% if next_path %}
+                            <a href="{{ next_path|urlencode }}"
+                               class="btn btn-danger">
                                 <i class="fa fa-close"></i>Cancelar</a>
-                                <input type="hidden" name="next" value="{{ next_path }}"/>
-                            {% else %}
-                                <a  href="{% url 'event:event-list' %}"class="btn btn-danger">
+                            <input type="hidden" name="next"
+                                   value="{{ next_path }}"/>
+                        {% else %}
+                            <a href="{% url 'event:event-list' %}"
+                               class="btn btn-danger">
                                 <i class="fa fa-close"></i>Cancelar</a>
-                            {% endif %}
+                        {% endif %}
 
 
                         <button type="submit" class="btn btn-success">
