@@ -1,6 +1,7 @@
 """ Mixins de views. """
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.forms.models import model_to_dict
 from django.http import Http404
@@ -79,15 +80,19 @@ class AccountMixin(LoginRequiredMixin, View):
 
     def pre_dispatch(self, request):
         """ Operações executadas antes do dispatch de uma view. """
-        if not self.is_authenticated:
-            raise PermissionDenied(self.get_permission_denied_message())
-
         if not self.can_access():
             raise PermissionDenied(self.get_permission_denied_message())
 
     def dispatch(self, request, *args, **kwargs):
         """ Dispatch padrão da view. """
         try:
+            if not self.is_authenticated:
+                return redirect_to_login(
+                    self.request.get_full_path(),
+                    self.get_login_url(),
+                    self.get_redirect_field_name()
+                )
+
             self.pre_dispatch(request)
 
             dispatch = super(AccountMixin, self).dispatch(
