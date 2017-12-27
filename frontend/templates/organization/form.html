@@ -3,7 +3,6 @@
 {% load static %}
 
 
-
 {% load organization_tags %}
 {% block title %}
     {% if object %}
@@ -44,17 +43,31 @@
 
                 <div class="panel-body">
 
-                    <form action="" method="post" class="form-horizontal" role="form" name="event_form">
+                    <form action="" method="post" class="form-horizontal"
+                          role="form" name="event_form">
 
                         {% csrf_token %}
 
                         {% for field in form %}
                             <div class="form-group">
-                                {{ field.errors }}
+
                                 <label for="{{ field.id_for_label }}"
                                        class="col-sm-3 control-label cgsy-label">{{ field.label }}</label>
                                 <div class="col-sm-9">
                                     {{ field }}
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="alert alert-danger
+                                            alert-dismissable">
+                                                <button type="button"
+                                                        class="close"
+                                                        data-dismiss="alert"
+                                                        aria-hidden="true">×
+                                                </button>
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
                                     {% if field.help_text %}
                                         <br/>
                                         <small class="text-muted">{{ field.help_text|safe }}</small>
@@ -66,12 +79,16 @@
 
                         <br/>
                         <hr/>
-                        <input class="btn btn-success" type="submit" value="Salvar"/>
+                        <input class="btn btn-success" type="submit"
+                               value="Salvar"/>
                         {% if next_path %}
-                            <a class="btn btn-danger" href="{{ next_path|urlencode }}">Cancelar</a>
-                            <input type="hidden" name="next" value="{{ next_path }}"/>
+                            <a class="btn btn-danger"
+                               href="{{ next_path|urlencode }}">Cancelar</a>
+                            <input type="hidden" name="next"
+                                   value="{{ next_path }}"/>
                         {% else %}
-                            <a class="btn btn-danger" href="{% url 'event:event-list' %}">Cancelar</a>
+                            <a class="btn btn-danger"
+                               href="{% url 'event:event-list' %}">Cancelar</a>
                         {% endif %}
                     </form>
 
@@ -85,6 +102,8 @@
 {% block scripts %}
     {{ block.super }}
     <!-- ckeditor -->
-    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
-    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 {% endblock %}

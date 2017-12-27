@@ -3387,6 +3387,10 @@ a.btn,
 button.btn {
   color: #FFF;
 }
+.alert {
+  margin-top: 10px;
+  width: 60%;
+}
 .theme-cgsy-full #header {
   background: #000912;
 }
