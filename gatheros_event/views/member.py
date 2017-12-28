@@ -45,7 +45,7 @@ class BaseOrganizationMixin(AccountMixin, View):
 
 class MemberListView(BaseOrganizationMixin, ListView):
     model = Member
-    template_name = 'gatheros_event/member/list.html'
+    template_name = 'member/list.html'
 
     def get_queryset(self):
         query_set = super(MemberListView, self).get_queryset()
