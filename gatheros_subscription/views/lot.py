@@ -98,7 +98,8 @@ class LotListView(BaseLotView, generic.ListView):
 
 class LotAddFormView(BaseFormLotView, generic.CreateView):
     form_class = forms.LotForm
-    template_name = 'gatheros_subscription/lot/form.html'
+    # template_name = 'gatheros_subscription/lot/form.html'
+    template_name = 'lot/form.html'
 
     def get_context_data(self, **kwargs):
         context = super(LotAddFormView, self).get_context_data(**kwargs)
@@ -135,7 +136,8 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
     show_not_allowed_message = True
     form_class = forms.LotForm
     model = forms.LotForm.Meta.model
-    template_name = 'gatheros_subscription/lot/form.html'
+    # template_name = 'gatheros_subscription/lot/form.html'
+    template_name = 'lot/form.html'
     pk_url_kwarg = 'lot_pk'
 
     def get_context_data(self, **kwargs):

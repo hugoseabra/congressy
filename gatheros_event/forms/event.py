@@ -23,8 +23,8 @@ class EventForm(forms.ModelForm):
             'date_start',
             'date_end',
             'subscription_type',
-            'subscription_offline',
-            'published'
+            # 'subscription_offline',
+            # 'published'
         ]
         widgets = {'organization': forms.HiddenInput,
                    'date_start': DateTimeWidget,

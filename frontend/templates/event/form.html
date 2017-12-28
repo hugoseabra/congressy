@@ -1,7 +1,21 @@
 {% extends "base/base.html" %}
 {% load static %}
+{% load base_tags %}
+{% load widget_tweaks %}
 {% load event_tags %}
 
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissable">
+                <button type="button" class="close"
+                        data-dismiss="alert" aria-hidden="true">×
+                </button>
+                {{ message|get_first_item }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock messages %}
 {% block title %}
     {% if object %}Editar{% else %}Nova{% endif %} Evento | Congressy
 {% endblock %}
@@ -13,7 +27,6 @@
         {{ object.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
-
 {% block nav_aside_itens %}
     <li>
         {% if object %}
@@ -28,7 +41,8 @@
     {{ block.super }}
 {% endblock %}
 {% block content %}
-    <form action="" method="post" class="form" role="form" name="event_form">
+    <form action="" method="post" class="form-horizontal form-border"
+          role="form" name="event_form">
         {% csrf_token %}
         <div class="row">
             <div class="col-md-12">
@@ -99,12 +113,14 @@
                             </div>
                             <div class="form-group">
 
-                                <label for="{{ field.id_for_label }}"
-                                       class="col-sm-3 control-label cgsy-label">{{ field.label }}</label>
-                                <div class="col-sm-6">
-
-                                    {{ field }}
-
+                                <label for="{{ field.id_for_label }}">
+                                    {{ field.label }}</label>
+                                <div>
+                                    {% if field.field.widget.input_type == "checkbox" %}
+                                        {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                    {% else %}
+                                        {{ field |add_class:"form-control" }}
+                                    {% endif %}
                                     {% if field.errors %}
                                         {% for error in field.errors %}
                                             <div class="alert alert-danger
@@ -119,8 +135,9 @@
                                         {% endfor %}
                                     {% endif %}
                                     {% if field.help_text %}
-                                        <br/>
-                                        <small class="text-muted">{{ field.help_text|safe }}</small>
+                                        <div>
+                                            <small class="text-muted">{{ field.help_text|safe }}</small>
+                                        </div>
                                     {% endif %}
                                 </div>
 
