@@ -112,6 +112,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
     model = Subscription
     template_name = 'subscription/list.html'
+    has_filter = False
 
     def get_queryset(self):
         query_set = super(SubscriptionListView, self).get_queryset()
@@ -119,10 +120,12 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         lots = self.request.GET.getlist('lots', [])
         if lots:
             query_set = query_set.filter(lot_id__in=lots)
+            self.has_filter = True
 
         has_profile = self.request.GET.get('has_profile')
         if has_profile:
             query_set = query_set.filter(person__user__isnull=False)
+            self.has_filter = True
 
         event = self.get_event()
 
@@ -134,7 +137,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         cxt.update({
             'can_add_subscription': self.can_add_subscription(),
             'lots': self.get_lots(),
-            'filtered_lots': self.request.GET.getlist('lots', [])
+            'has_filter': self.has_filter,
         })
         return cxt
 

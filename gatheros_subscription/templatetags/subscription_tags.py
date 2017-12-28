@@ -24,8 +24,6 @@ def is_filter_selected(context, filter_name, value):
     request = context['request']
     filter_values = request.GET.getlist(filter_name)
 
-    print(value)
-
     if not filter_values:
         return {}
 
