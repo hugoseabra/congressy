@@ -27,7 +27,6 @@
         {{ object.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
-
 {% block nav_aside_itens %}
     <li>
         {% if object %}
@@ -108,14 +107,10 @@
                         {% for field in form %}
 
                             <div class="form-group">
-                            <label for="exampleInputEmail1">Email address</label>
-                            <input class="form-control" id="exampleInputEmail1" placeholder="Enter email" type="email">
-                        </div>
-                            <div class="form-group">
 
                                     <label for="{{ field.id_for_label }}">
                                            {{ field.label }}</label>
-                                    <div class="">
+                                <div>
                                         {{ field |add_class:"form-control"}}{% if field.errors %}
                                         {% for error in field.errors %}
                                             <div class="alert alert-danger

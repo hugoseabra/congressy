@@ -40,11 +40,11 @@
             <i class="fa  fa-fw fa-rocket"></i> Credenciamento
         </a>
     </li>
-    <li>
-        <a href="{% url 'subscription:subscriptions-export' object.pk %}" title="Exportação de Dados">
-            <i class="fa  fa-fw fa-rocket"></i> Exportação de Dados
-        </a>
-    </li>
+{#    <li>#}
+{#        <a href="{% url 'subscription:subscriptions-export' object.pk %}" title="Exportação de Dados">#}
+{#            <i class="fa  fa-fw fa-rocket"></i> Exportação de Dados#}
+{#        </a>#}
+{#    </li>#}
 {% endblock %}
 {% block page_title %}Painel de Evento{% endblock %}
 {% block page_sub_title %}{{ object.name }}{% endblock %}
