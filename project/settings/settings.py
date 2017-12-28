@@ -1,6 +1,8 @@
 # pylint: skip-file
 import os
 
+from django.contrib.messages import constants as message_constants
+
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 
 SECRET_KEY = '1@==vhll7d5v(%=t++oy-38+639o-4*f73^!o=v!a^z$#(6x%$'
@@ -24,6 +26,7 @@ INSTALLED_APPS = [
     'stdimage',
     'ckeditor',
     'datetimewidget',
+    'widget_tweaks',
 
     # KANU_APPS
     'kanu_locations',
@@ -151,4 +154,12 @@ CKEDITOR_CONFIGS = {
         'width': 500,
         'height': 150,
     },
+}
+
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'debug',
+    message_constants.INFO: 'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.WARNING: 'warning',
+    message_constants.ERROR: 'danger',
 }
