@@ -584,6 +584,21 @@ class SubscriptionExportView(AccountMixin, FormListViewMixin):
     model = Subscription
     paginate_by = 5
     allow_empty = True
+    event = None
+
+    def get_event(self):
+        if self.event:
+            return self.event
+
+        self.event = get_object_or_404(Event, pk=self.kwargs.get('event_pk'))
+        return self.event
+
+    def get_context_data(self, **kwargs):
+        cxt = super().get_context_data(**kwargs)
+        cxt.update({
+            'event': self.get_event()
+        })
+        return cxt
 
     def get_form_kwargs(self):
         kwargs = super(SubscriptionExportView, self).get_form_kwargs()
@@ -612,7 +627,7 @@ class SubscriptionExportView(AccountMixin, FormListViewMixin):
                                     content_type="application/vnd.ms-excel")
 
             # Definindo nome do arquivo
-            event = Event.objects.get(pk=self.kwargs.get('event_pk'))
+            event = self.get_event()
             name = "%s-%s.xls" % (event.pk, event.slug)
             response['Content-Disposition'] = 'attachment; filename=%s' % name
 
