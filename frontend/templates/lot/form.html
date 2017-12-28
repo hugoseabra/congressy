@@ -117,6 +117,7 @@
                                         {% for field in form %}
 
                                             <div class="form-group">
+
                                                 {% if field.id_for_label == "id_limit" %}
                                                     <div class="form-group">
 
@@ -136,6 +137,8 @@
                                                         </div>
                                                     </div>
                                                 {% endif %}
+
+
                                                 <label for="{{ field.id_for_label }}">
                                                     {{ field.label }}</label>
 
@@ -144,9 +147,15 @@
                                                     {% if field.field.widget.input_type == "checkbox" %}
                                                         {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
                                                     {% else %}
-                                                        {{ field |add_class:"form-control" }}
-
+                                                        {% if field.id_for_label == "id_date_end" %}
+                                                            {{ field |add_class:"form-control" }}
+                                                        {% else %}
+                                                            {{ field |add_class:"form-control" }}
+                                                        {% endif %}
                                                     {% endif %}
+
+
+
                                                     {% if field.errors %}
                                                         {% for error in field.errors %}
                                                             <div class="alert alert-danger
