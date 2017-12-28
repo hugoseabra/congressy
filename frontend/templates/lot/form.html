@@ -14,7 +14,52 @@
         {{ form_title }}
     {% endif %}
 {% endblock %}
+{% block scripts %}
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $('#id_price').mask('#.##0,00', {reverse: true});
 
+            var privateCheckbox = document.querySelector('#id_private');
+            var limitCheckbox = document.querySelector('#limit_switch');
+
+            //Initial checking of the state
+            if (!limitCheckbox.checked) {
+                $('label[for=id_limit], input#id_limit').hide();
+                $('#id_limit').val('None')
+            }
+
+
+            //Initial checking of the state
+            if (!privateCheckbox.checked) {
+                $('label[for=id_exhibition_code], input#id_exhibition_code').hide();
+            }
+
+
+            limitCheckbox.onchange = function () {
+                if (!limitCheckbox.checked) {
+                    $('label[for=id_limit], input#id_limit').hide();
+                    $('#id_limit').val('None')
+                } else {
+                    $('label[for=id_limit], input#id_limit').show();
+
+                }
+            };
+
+            privateCheckbox.onchange = function () {
+                if (!privateCheckbox.checked) {
+                    $('label[for=id_exhibition_code], input#id_exhibition_code').hide();
+                } else {
+                    $('label[for=id_exhibition_code], input#id_exhibition_code').show();
+
+                }
+            };
+
+        });
+
+
+    </script>
+{% endblock %}
 
 {% block nav_aside_itens %}
     <li>
@@ -73,15 +118,43 @@
 
                                             <div class="form-group">
 
+                                                {% if field.id_for_label == "id_limit" %}
+                                                    <div class="form-group">
+
+                                                        <label>Limitar
+                                                            vagas</label>
+
+                                                        <div>
+
+                                                            <input name="limit_switch"
+                                                                   class="js-switch"
+                                                                   id="limit_switch"
+                                                                   data-switchery="true"
+
+                                                                   style="display:none"
+                                                                   type="checkbox"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+
+
                                                 <label for="{{ field.id_for_label }}">
                                                     {{ field.label }}</label>
 
                                                 <div>
+
                                                     {% if field.field.widget.input_type == "checkbox" %}
                                                         {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
                                                     {% else %}
-                                                        {{ field |add_class:"form-control" }}
+                                                        {% if field.id_for_label == "id_date_end" %}
+                                                            {{ field |add_class:"form-control" }}
+                                                        {% else %}
+                                                            {{ field |add_class:"form-control" }}
+                                                        {% endif %}
                                                     {% endif %}
+
+
 
                                                     {% if field.errors %}
                                                         {% for error in field.errors %}
@@ -105,37 +178,38 @@
                                                 </div>
                                             </div>
                                         {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="buttonbar bottom">
-                                    <div class="float-right">
-                                        {% if next_path %}
-                                            <a href="{{ next_path|urlencode }}"
-                                               class="btn btn-danger">
-                                                <i class="fa fa-close"></i>Cancelar</a>
-                                            <input type="hidden" name="next"
-                                                   value="{{ next_path }}"/>
-                                        {% else %}
-                                            <a href="{% url 'subscription:lot-list' event.pk %}"
-                                               class="btn btn-danger">
-                                                <i class="fa fa-close"></i>Cancelar</a>
-                                        {% endif %}
 
 
-                                        <button type="submit"
-                                                class="btn btn-success">
-                                            <i class="fa fa-save"></i>
-                                            Salvar
-                                        </button>
                                     </div>
-                                    <div class="clearfix"></div>
                                 </div>
-                            </div>
-                        </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="buttonbar bottom">
+                                            <div class="float-right">
+                                                {% if next_path %}
+                                                    <a href="{{ next_path|urlencode }}"
+                                                       class="btn btn-danger">
+                                                        <i class="fa fa-close"></i>Cancelar</a>
+                                                    <input type="hidden"
+                                                           name="next"
+                                                           value="{{ next_path }}"/>
+                                                {% else %}
+                                                    <a href="{% url 'subscription:lot-list' event.pk %}"
+                                                       class="btn btn-danger">
+                                                        <i class="fa fa-close"></i>Cancelar</a>
+                                                {% endif %}
+
+
+                                                <button type="submit"
+                                                        class="btn btn-success">
+                                                    <i class="fa fa-save"></i>
+                                                    Salvar
+                                                </button>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
                     </form>
                 </div>
             </div>
