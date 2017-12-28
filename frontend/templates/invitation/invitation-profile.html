@@ -1,0 +1,106 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+{% load widget_tweaks %}
+
+{% block title %} Convite | Congressy{% endblock %}
+{% block page_title %}Convite{% endblock %}
+{% block page_sub_title %}Criar conta{% endblock %}
+{% block page_description %}
+    Você precisa criar uma conta para acessar a organização na qual você foi
+    convidado(a).
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+    <form action="" method="post">{% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar">
+                    <div class="float-left">
+                        <a href="{% url 'public:invitation-decision' invite.pk %}" class="btn btn-primary" title="Voltar">
+                            <i class="fa fa-arrow-left"></i>
+                        </a>
+                    </div>
+                    <div class="float-right">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            {% for field in form %}
+                                <div class="form-group">
+
+                                    <label for="{{ field.id_for_label }}">
+                                        {{ field.label }}</label>
+                                    <div>
+                                        {% if field.field.widget.input_type == "checkbox" %}
+                                            {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                        {% else %}
+                                            {{ field |add_class:"form-control" }}
+                                        {% endif %}
+                                        {% if field.errors %}
+                                            {% for error in field.errors %}
+                                                <div class="alert alert-danger
+                                                alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if field.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ field.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar bottom">
+                    <div class="float-left">
+                        <a href="{% url 'public:invitation-decision' invite.pk %}" class="btn btn-primary" title="Voltar">
+                            <i class="fa fa-arrow-left"></i>
+                        </a>
+                    </div>
+                    <div class="float-right">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <form action="" method="post">{% csrf_token %}
+
+
+        <input type="submit" value="Salvar"/>
+        <a href="{% url 'public:invitation-decision' invite.pk %}">Voltar</a>
+    </form>
+
+{% endblock %}

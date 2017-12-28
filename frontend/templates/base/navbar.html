@@ -1,99 +1,97 @@
 {% load static %}
-<script type="application/javascript">
-    function cgsy_submit(value) {
-        console.log(value);
-        var org_context = document.getElementById('organization-context-pk');
-        org_context.value = value;
-        document.getElementById("organization_context").submit();
-    }
-</script>
+{% if user %}
+    <script type="application/javascript">
+        function cgsy_submit(value) {
+            console.log(value);
+            var org_context = document.getElementById('organization-context-pk');
+            org_context.value = value;
+            document.getElementById("organization_context").submit();
+        }
+    </script>
 
-<ul class="nav navbar-nav navbar-left">
-    <li class="toggle-navigation toggle-left">
-        <button class="sidebar-toggle" id="toggle-left">
-            <i class="fa fa-bars"></i>
-        </button>
-    </li>
-</ul>
-<ul class="nav navbar-nav navbar-right">
+    <ul class="nav navbar-nav navbar-left">
+        <li class="toggle-navigation toggle-left">
+            <button class="sidebar-toggle" id="toggle-left">
+                <i class="fa fa-bars"></i>
+            </button>
+        </li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown profile hidden-xs">
 
-    <li class="dropdown profile hidden-xs">
+            <button class="sidebar-toggle" id="toggle-left" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="true">
+                <i class="fa fa-sitemap"></i>
+            </button>
 
-        <button class="sidebar-toggle" id="toggle-left" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="true">
-            <i class="fa fa-sitemap"></i>
-        </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <form action="{% url 'event:organization-switch' %}" method="post" id="organization_context">
+                    {% csrf_token %}
 
-
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <form action="{% url 'event:organization-switch' %}" method="post" id="organization_context">
-                {% csrf_token %}
-
-                {% for org in organizations %}
-                    {% if org.internal %}
-                        <li onclick="cgsy_submit({{ org.pk }})"><a href="#">{{ org.name }}</a></li>
-                    {% endif %}
-                {% endfor %}
+                    {% for org in organizations %}
+                        {% if org.internal %}
+                            <li onclick="cgsy_submit({{ org.pk }})"><a href="#">{{ org.name }}</a></li>
+                        {% endif %}
+                    {% endfor %}
 
 
+                    <li class="divider"></li>
+
+                    {% for org in organizations %}
+                        {% if not org.internal %}
+                            <li onclick="cgsy_submit({{ org.pk }})"><a href="#">{{ org.name }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    <input type="hidden" name="organization-context-pk" id="organization-context-pk"/>
+                    <input type="hidden" name="next" value="{{ request.path }}"/>
+                </form>
                 <li class="divider"></li>
+                <li><a href="{% url 'event:organization-list' %}">Ver todas</a></li>
+            </ul>
 
-                {% for org in organizations %}
-                    {% if not org.internal %}
-                        <li onclick="cgsy_submit({{ org.pk }})"><a href="#">{{ org.name }}</a></li>
-                    {% endif %}
-                {% endfor %}
-                <input type="hidden" name="organization-context-pk" id="organization-context-pk"/>
-                <input type="hidden" name="next" value="{{ request.path }}"/>
-            </form>
-            <li class="divider"></li>
-            <li><a href="{% url 'event:organization-list' %}">Ver todas</a></li>
-        </ul>
+        </li>
 
-    </li>
+        <li class="dropdown profile hidden-xs">
+            <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                    <span class="meta">
+                    <span class="text  hidden-xs">{{ user.first_name }}</span>
+                    <span class="caret hidden-xs"></span>
+                    </span>
+            </a>
+            <ul class="dropdown-menu animated fadeInRight " role="menu">
+                <li>
+                    <a href="{% url 'event:profile' %}">
+                            <span class="icon"><i class="fa fa-user"></i>
+                            </span>Meus Dados</a>
+                </li>
+                <li>
+                    <a href="{% url 'front:logout' %}">
+                            <span class="icon"><i class="fa fa-sign-out"></i>
+                            </span>Sair</a>
+                </li>
 
-
-    <li class="dropdown profile hidden-xs">
-        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                <span class="meta">
-                <span class="text  hidden-xs">{{ user.first_name }}</span>
-                <span class="caret hidden-xs"></span>
-                </span>
-        </a>
-        <ul class="dropdown-menu animated fadeInRight " role="menu">
-            <li>
-                <a href="{% url 'event:profile' %}">
-                        <span class="icon"><i class="fa fa-user"></i>
-                        </span>Meus Dados</a>
-            </li>
-            <li>
-                <a href="{% url 'front:logout' %}">
-                        <span class="icon"><i class="fa fa-sign-out"></i>
-                        </span>Sair</a>
-            </li>
-
-        </ul>
-    </li>
-    <li class="dropdown mobile-menu hidden-sm hidden-md hidden-lg">
-        <button id="mobile-top-menu-button"
-                class="sidebar-toggle">
-            <i class="fa fa-ellipsis-v"></i>
-        </button>
-        <div id="mobile-top-menu">
-            {#            <h4>#}
-            {#                Minhas informações:#}
-            {#            </h4>#}
-            <div class="mobile-top-menu-wrap">
-                <div class="row">
-                    <div class="col-xs-12">
-                        <span class="icon"><i class="fa fa-user"></i>
-                        </span><a href="{% url 'event:profile' %}"> Meus Dados</a><br/>
-                        <span class="icon"><i class="fa fa-sign-out"></i>
-                        </span><a href="{% url 'front:logout' %}"> Sair</a><br/>
+            </ul>
+        </li>
+        <li class="dropdown mobile-menu hidden-sm hidden-md hidden-lg">
+            <button id="mobile-top-menu-button"
+                    class="sidebar-toggle">
+                <i class="fa fa-ellipsis-v"></i>
+            </button>
+            <div id="mobile-top-menu">
+                {#            <h4>#}
+                {#                Minhas informações:#}
+                {#            </h4>#}
+                <div class="mobile-top-menu-wrap">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <span class="icon"><i class="fa fa-user"></i>
+                            </span><a href="{% url 'event:profile' %}"> Meus Dados</a><br/>
+                            <span class="icon"><i class="fa fa-sign-out"></i>
+                            </span><a href="{% url 'front:logout' %}"> Sair</a><br/>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </li>
-
-</ul>
+        </li>
+    </ul>
+{% endif %}

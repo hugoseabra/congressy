@@ -1,0 +1,34 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+
+{% block title %} Convite | Congressy{% endblock %}
+{% block page_title %}Convite{% endblock %}
+{% block page_sub_title %}
+    {{ organization.name }}
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+    {% if not messages %}
+        <form action="" method="post">{% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <p style="font-size: 22px">
+                            <strong>{{ author.person.user.first_name }}</strong> convidou você para
+                            fazer parte da organização
+                            <strong>{{ organization.name }}</strong>.
+                        </p>
+                        <p class="text-center">
+                            <input type="submit" name="invitation_decline" value="Recusar" class="btn btn-danger"/>
+                            <input type="submit" name="invitation_accept" value="Aceitar" class="btn btn-success"/>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+    {% endif %}
+{% endblock %}

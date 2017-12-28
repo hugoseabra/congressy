@@ -1,0 +1,28 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+
+{% block title %} Convite | Congressy{% endblock %}
+{% block page_title %}Convite{% endblock %}
+{% block page_sub_title %}
+    {{ organization.name }}
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+    {% if not messages %}
+        <form action="" method="post">{% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <p>
+                            <strong>Convite recusado</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+    {% endif %}
+{% endblock %}
