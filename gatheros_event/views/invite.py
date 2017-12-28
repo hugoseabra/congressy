@@ -20,7 +20,7 @@ from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 
 class InvitationListView(AccountMixin, ListView):
     model = Invitation
-    template_name = 'gatheros_event/invitation/list.html'
+    template_name = 'invitation/list.html'
     invitation_organization = None
     context_object_name = 'open_invitations'
 
@@ -80,7 +80,7 @@ class InvitationListView(AccountMixin, ListView):
 
 
 class InvitationCreateView(AccountMixin, FormView):
-    template_name = 'gatheros_event/invitation/invitation-create.html'
+    template_name = 'invitation/invitation-create.html'
     invitation_organization = None
 
     def get_permission_denied_url(self):
@@ -240,7 +240,7 @@ class InvitationDecisionView(TemplateView):
                 'messages': messages.get_messages(request)
             })
             return render_to_response(
-                'gatheros_event/invitation/invitation-decision.html',
+                'invitation/invitation-decision.html',
                 context
             )
 
@@ -253,7 +253,7 @@ class InvitationDecisionView(TemplateView):
         })
 
         return render_to_response(
-            'gatheros_event/invitation/invitation-decision.html',
+            'invitation/invitation-decision.html',
             context
         )
 
@@ -265,18 +265,20 @@ class InvitationDecisionView(TemplateView):
         :param kwargs:
         :return:
         """
-        context = self.get_context_data(**kwargs)
-        context.update({'request': request})
 
         invite = get_object_or_404(Invitation, pk=kwargs.get('pk'))
         org_id = invite.author.organization_id
         form = InvitationDecisionForm(instance=invite)
         form.is_valid()
 
+        context = self.get_context_data(**kwargs)
+        context.update({'request': request})
+        context.update({'organization': invite.author.organization})
+
         if 'invitation_decline' in request.POST:
             form.decline()
             return render_to_response(
-                'gatheros_event/invitation/invitation-decline.html',
+                'invitation/invitation-decline.html',
                 context
             )
 
@@ -340,7 +342,7 @@ class InvitationProfileView(TemplateView):
         })
 
         return render_to_response(
-            'gatheros_event/invitation/invitation-profile.html',
+            'invitation/invitation-profile.html',
             context
         )
 
@@ -363,7 +365,7 @@ class InvitationProfileView(TemplateView):
                 'form': form,
             })
             return render_to_response(
-                'gatheros_event/invitation/invitation-profile.html',
+                'invitation/invitation-profile.html',
                 context
             )
 
@@ -418,7 +420,7 @@ class MyInvitationsListView(AccountMixin, ListView):
     """ Lista de inscrições """
 
     model = Invitation
-    template_name = 'gatheros_event/invitation/my_invitations.html'
+    template_name = 'invitation/my_invitations.html'
     ordering = ('created', 'author__person__name', '-expired',)
 
     def get_permission_denied_url(self):

@@ -16,7 +16,9 @@ from gatheros_event.models import Person
 
 class ProfileCreateForm(forms.ModelForm):
     """ Formulário de criação de Perfil de pessoa no Gatheros. """
-    email = forms.EmailField(label='E-Mail')
+    email = forms.EmailField(label='E-mail', widget=forms.EmailInput(
+        attrs={'class': 'form-control'}
+    ))
 
     class Meta:
         """ Meta """
@@ -78,7 +80,9 @@ class ProfileCreateForm(forms.ModelForm):
             pass
 
         if found:
-            raise forms.ValidationError("Esse email já existe em nosso sistema. Tente novamente.")
+            raise forms.ValidationError(
+                "Esse email já existe em nosso sistema. Tente novamente."
+            )
 
         return cleaned_data
 
