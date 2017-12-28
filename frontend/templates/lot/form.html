@@ -14,7 +14,14 @@
         {{ form_title }}
     {% endif %}
 {% endblock %}
-
+{% block scripts %}
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $('#id_price').mask('#.##0,00', {reverse: true});
+        });
+    </script>
+{% endblock %}
 
 {% block nav_aside_itens %}
     <li>
@@ -77,12 +84,12 @@
                                                     {{ field.label }}</label>
 
                                                 <div>
+
                                                     {% if field.field.widget.input_type == "checkbox" %}
                                                         {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
                                                     {% else %}
                                                         {{ field |add_class:"form-control" }}
                                                     {% endif %}
-
                                                     {% if field.errors %}
                                                         {% for error in field.errors %}
                                                             <div class="alert alert-danger

@@ -23,7 +23,9 @@ class LotForm(forms.ModelForm):
             'transfer_tax',
             'private'
         ]
-        widgets = {'event': forms.HiddenInput()}
+        widgets = {'event': forms.HiddenInput(),
+                   'price': forms.TextInput(),
+                   }
 
     def __init__(self, **kwargs):
         super(LotForm, self).__init__(**kwargs)
