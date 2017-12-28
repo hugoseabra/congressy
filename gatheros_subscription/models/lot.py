@@ -35,6 +35,15 @@ class LotManager(models.Manager):
             except Lot.DoesNotExist:
                 return code
 
+    def generate_exhibition_code(self):
+        """ Gera código de exibição para o lote. """
+        while True:
+            code = str(uuid.uuid4()).split('-')[0].upper()
+            try:
+                self.get(exhibition_code=code)
+            except Lot.DoesNotExist:
+                return code
+
 
 class Lot(models.Model, GatherosModelMixin):
     """ Modelo de Lote """
@@ -128,6 +137,13 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='interno'
     )
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
+
+    exhibition_code = models.CharField(
+        max_length=15,
+        null=True,
+        blank=True,
+        verbose_name='código de exibição'
+    )
 
     objects = LotManager()
 
