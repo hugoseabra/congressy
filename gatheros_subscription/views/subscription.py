@@ -112,6 +112,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
     model = Subscription
     template_name = 'subscription/list.html'
+    has_filter = False
 
     def get_queryset(self):
         query_set = super(SubscriptionListView, self).get_queryset()
@@ -119,10 +120,12 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         lots = self.request.GET.getlist('lots', [])
         if lots:
             query_set = query_set.filter(lot_id__in=lots)
+            self.has_filter = True
 
         has_profile = self.request.GET.get('has_profile')
         if has_profile:
             query_set = query_set.filter(person__user__isnull=False)
+            self.has_filter = True
 
         event = self.get_event()
 
@@ -134,7 +137,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         cxt.update({
             'can_add_subscription': self.can_add_subscription(),
             'lots': self.get_lots(),
-            'filtered_lots': self.request.GET.getlist('lots', [])
+            'has_filter': self.has_filter,
         })
         return cxt
 
@@ -581,6 +584,21 @@ class SubscriptionExportView(AccountMixin, FormListViewMixin):
     model = Subscription
     paginate_by = 5
     allow_empty = True
+    event = None
+
+    def get_event(self):
+        if self.event:
+            return self.event
+
+        self.event = get_object_or_404(Event, pk=self.kwargs.get('event_pk'))
+        return self.event
+
+    def get_context_data(self, **kwargs):
+        cxt = super().get_context_data(**kwargs)
+        cxt.update({
+            'event': self.get_event()
+        })
+        return cxt
 
     def get_form_kwargs(self):
         kwargs = super(SubscriptionExportView, self).get_form_kwargs()
@@ -609,7 +627,7 @@ class SubscriptionExportView(AccountMixin, FormListViewMixin):
                                     content_type="application/vnd.ms-excel")
 
             # Definindo nome do arquivo
-            event = Event.objects.get(pk=self.kwargs.get('event_pk'))
+            event = self.get_event()
             name = "%s-%s.xls" % (event.pk, event.slug)
             response['Content-Disposition'] = 'attachment; filename=%s' % name
 

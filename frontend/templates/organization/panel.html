@@ -44,15 +44,54 @@
             <i class="fa  fa-fw fa-rocket"></i>Formulário Padrão
         </a>
     </li>
-    <li>
-        <a href="{% url 'event:organization-cancel-membership' object.pk %}" title="Sair da Organização">
-            <i class="fa  fa-fw fa-rocket"></i>Sair da Organização
-        </a>
-    </li>
 {% endblock %}
 
 
 {% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-right">
+                    <div class="btn-group">
+                        <button
+                            type="button"
+                            class="btn
+                            btn-primary
+                            btn-sm dropdown-toggle"
+                            data-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <span class="fa fa-gear"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                            <li>
+                                <a href="{% url 'event:organization-edit' object.pk %}">
+                                    <i class="fa fa-pencil"></i>
+                                    Editar
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'event:organization-cancel-membership' object.pk %}">
+                                    <i class="fa fa-sign-out"></i>
+                                    Sair da organização
+                                </a>
+                            </li>
+                            {% if object.is_deletable and user has 'gatheros_event.delete_organization' of object %}
+                            <li>
+                                <a href="{% url 'event:organization-delete' object.pk %}">
+                                    <i class="fa fa-trash"></i>
+                                    Excluir
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">

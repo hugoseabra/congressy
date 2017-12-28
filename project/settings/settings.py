@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     'ckeditor',
     'datetimewidget',
     'widget_tweaks',
+    'rest_framework',
+    'rest_framework.authtoken',
 
     # KANU_APPS
     'kanu_locations',
@@ -120,6 +122,13 @@ AUTH_PASSWORD_VALIDATORS = [
     #             'NumericPasswordValidator',
     # },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
+}
 
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'

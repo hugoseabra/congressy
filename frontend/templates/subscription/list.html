@@ -84,10 +84,12 @@
              * active (default: false): se a caixa de filtro é para iniciar
              * aberta ou não.
              */
-            window.cgsy.Filter.init('.filter-button', '.filter-box', true)
+            window.cgsy.Filter.init(
+                '.filter-button',
+                '.filter-box',
+                {% if has_filter %}true{% else %}false{% endif %}
+            )
         });
-
-
     </script>
 {% endblock %}
 
@@ -136,7 +138,7 @@
                         <div class="col-md-12">
                             <form role="form">
                                 <div class="list-filters">
-                                    {% if lots %}
+                                    {% if lots and lots|length > 1 %}
                                     <div class="col-md-4">
                                         <div class="form-group float-left">
                                             <label>Lotes</label>
