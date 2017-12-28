@@ -4,6 +4,12 @@
 
 {% block title %}Credenciamento | Congressy{% endblock %}
 
+{% block page_title %}Credenciamento{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Realize o credenciamento de inscritos confirmando sua presença no evento.
+{% endblock %}
+
 {% block extrascript %}
     <script type="text/javascript">
         function configure_input(field_name) {
@@ -68,7 +74,7 @@
             <div id="cgsy_login_panel" class="panel panel-primary">
 
                 <div class="panel-heading">
-                    <h3 class="panel-title">{{ event.name }}</h3>
+                    <h3 class="panel-title">Buscar inscrito</h3>
                 </div>
                 <div class="panel-body">
                     <form method="post" action="" class="form-horizontal form-border">
@@ -118,7 +124,7 @@
         <div class="col-md-4">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Histórico:</h3>
+                    <h3 class="panel-title">Histórico</h3>
                 </div>
                 <div class="panel-body">
                     {% for attendance in attendances %}
