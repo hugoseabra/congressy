@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
+from rest_framework import routers
 
 from gatheros_event.urls.me import (
     urlpatterns_public_account,
@@ -29,9 +30,17 @@ public_urlpatterns = [
     url(r'^', include(urlpatterns_public_password)),
 ]
 
+# API
+api_urls = [
+    url(r'^', include('kanu_locations.urls', 'city')),
+]
+
+api_urlpatterns = [url(r'^api/', include(api_urls, 'api'))]
+
 urlpatterns = admin_urlpatterns
 urlpatterns += private_urlpatterns
 urlpatterns += public_urlpatterns
+urlpatterns += api_urlpatterns
 
 urlpatterns += static.static(
     settings.STATIC_URL,
@@ -42,3 +51,5 @@ urlpatterns += static.static(
     settings.MEDIA_URL,
     document_root=settings.MEDIA_ROOT
 )
+
+
