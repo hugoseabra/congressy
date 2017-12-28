@@ -18,8 +18,8 @@ class LotForm(forms.ModelForm):
             'date_end',
             'limit',
             'price',
-            'discount_type',
-            'discount',
+            # 'discount_type',
+            # 'discount',
             'transfer_tax',
             'private'
         ]
