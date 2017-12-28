@@ -41,7 +41,8 @@
     {{ block.super }}
 {% endblock %}
 {% block content %}
-    <form action="" method="post" class="form-horizontal form-border" role="form" name="event_form">
+    <form action="" method="post" class="form-horizontal form-border"
+          role="form" name="event_form">
         {% csrf_token %}
         <div class="row">
             <div class="col-md-12">
@@ -108,10 +109,15 @@
 
                             <div class="form-group">
 
-                                    <label for="{{ field.id_for_label }}">
-                                           {{ field.label }}</label>
+                                <label for="{{ field.id_for_label }}">
+                                    {{ field.label }}</label>
                                 <div>
-                                        {{ field |add_class:"form-control"}}{% if field.errors %}
+                                    {% if field.field.widget.input_type == "checkbox" %}
+                                        {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                    {% else %}
+                                        {{ field |add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if field.errors %}
                                         {% for error in field.errors %}
                                             <div class="alert alert-danger
                                             alert-dismissable">
@@ -124,10 +130,12 @@
                                             </div>
                                         {% endfor %}
                                     {% endif %}
-                                        {% if field.help_text %}
+                                    {% if field.help_text %}
+                                        <div>
                                             <small class="text-muted">{{ field.help_text|safe }}</small>
-                                        {% endif %}
-                                    </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
 
                             </div>
                         {% endfor %}
