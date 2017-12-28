@@ -1,4 +1,5 @@
 """ Formulários de `Lot` """
+import uuid
 from django import forms
 
 from gatheros_subscription.models import Lot
@@ -18,18 +19,27 @@ class LotForm(forms.ModelForm):
             'date_end',
             'limit',
             'price',
+            'private',
+            'exhibition_code',
             # 'discount_type',
             # 'discount',
             'transfer_tax',
-            'private'
+
         ]
         widgets = {'event': forms.HiddenInput(),
                    'price': forms.TextInput(),
+
                    }
 
     def __init__(self, **kwargs):
+
+        kwargs['initial']['exhibition_code'] = str(uuid.uuid4()).split(
+            '-')[0].upper()
+
         super(LotForm, self).__init__(**kwargs)
+
         self.event = kwargs.get('initial').get('event')
+
         self._set_dates_help_texts()
 
     def _set_dates_help_texts(self):
