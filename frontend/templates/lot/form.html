@@ -20,6 +20,20 @@
         $(document).ready(function () {
             $('#id_price').mask('#.##0,00', {reverse: true});
         });
+
+        var changeCheckbox = document.querySelector('#limit_switch');
+
+        changeCheckbox.onchange = function () {
+            if(changeCheckbox.checked){
+                $('label[for=id_limit], input#id_limit').show();
+            } else {
+                $('label[for=id_limit], input#id_limit').hide();
+                $('#id_limit').val('None')
+                console.log($('#id_limit').val())
+            }
+        };
+
+
     </script>
 {% endblock %}
 
@@ -79,7 +93,24 @@
                                         {% for field in form %}
 
                                             <div class="form-group">
+                                                {% if field.id_for_label == "id_limit" %}
+                                                    <div class="form-group">
 
+                                                        <label>Limitar
+                                                            vagas</label>
+
+                                                        <div>
+                                                            <input name="limit_switch"
+                                                                   class="js-switch"
+                                                                   id="limit_switch"
+                                                                   data-switchery="true"
+
+                                                                   style="display:none"
+                                                                   type="checkbox"
+                                                                   checked />
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
                                                 <label for="{{ field.id_for_label }}">
                                                     {{ field.label }}</label>
 
@@ -89,6 +120,7 @@
                                                         {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
                                                     {% else %}
                                                         {{ field |add_class:"form-control" }}
+
                                                     {% endif %}
                                                     {% if field.errors %}
                                                         {% for error in field.errors %}
@@ -112,37 +144,38 @@
                                                 </div>
                                             </div>
                                         {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="buttonbar bottom">
-                                    <div class="float-right">
-                                        {% if next_path %}
-                                            <a href="{{ next_path|urlencode }}"
-                                               class="btn btn-danger">
-                                                <i class="fa fa-close"></i>Cancelar</a>
-                                            <input type="hidden" name="next"
-                                                   value="{{ next_path }}"/>
-                                        {% else %}
-                                            <a href="{% url 'subscription:lot-list' event.pk %}"
-                                               class="btn btn-danger">
-                                                <i class="fa fa-close"></i>Cancelar</a>
-                                        {% endif %}
 
 
-                                        <button type="submit"
-                                                class="btn btn-success">
-                                            <i class="fa fa-save"></i>
-                                            Salvar
-                                        </button>
                                     </div>
-                                    <div class="clearfix"></div>
                                 </div>
-                            </div>
-                        </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="buttonbar bottom">
+                                            <div class="float-right">
+                                                {% if next_path %}
+                                                    <a href="{{ next_path|urlencode }}"
+                                                       class="btn btn-danger">
+                                                        <i class="fa fa-close"></i>Cancelar</a>
+                                                    <input type="hidden"
+                                                           name="next"
+                                                           value="{{ next_path }}"/>
+                                                {% else %}
+                                                    <a href="{% url 'subscription:lot-list' event.pk %}"
+                                                       class="btn btn-danger">
+                                                        <i class="fa fa-close"></i>Cancelar</a>
+                                                {% endif %}
+
+
+                                                <button type="submit"
+                                                        class="btn btn-success">
+                                                    <i class="fa fa-save"></i>
+                                                    Salvar
+                                                </button>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
                     </form>
                 </div>
             </div>
