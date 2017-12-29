@@ -12,7 +12,6 @@
         {{ object.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
-
 {% block content %}
     <form action="" method="post" class="form-horizontal" role="form" name="place_form">
     {% csrf_token %}

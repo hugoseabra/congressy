@@ -226,7 +226,7 @@ class Lot(models.Model, GatherosModelMixin):
         rule.rule_6_data_inicial_antes_data_inicial_evento(self)
         rule.rule_7_data_final_antes_data_inicial_evento(self)
         rule.rule_8_lot_interno_nao_pode_ter_preco(self)
-        rule.rule_9_lote_pago_deve_ter_limite(self)
+        # rule.rule_9_lote_pago_deve_ter_limite(self)
         rule.rule_11_evento_encerrado_nao_pode_ter_novo(
             self,
             self._state.adding

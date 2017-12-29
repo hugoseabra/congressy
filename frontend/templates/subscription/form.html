@@ -12,8 +12,6 @@
         {{ object.person.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
-
-
 {% block content %}
     <form action="" method="post">
         {% csrf_token %}

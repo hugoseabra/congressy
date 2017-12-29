@@ -92,4 +92,3 @@ class LotForm(forms.ModelForm):
         last_lot.date_end = date_start - timedelta(minutes=1)
         last_lot.save()
         return date_start
-
