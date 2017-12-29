@@ -8,7 +8,7 @@ from gatheros_event.views.mixins import AccountMixin
 
 class ProfileView(AccountMixin, FormView):
 
-    template_name = 'profile/profile_edit.html'
+    template_name = 'profile/form.html'
     messages = {
         'success': 'Perfil atualizado com sucesso'
     }
