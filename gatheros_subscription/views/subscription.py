@@ -148,6 +148,10 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         )
 
     def can_add_subscription(self):
+        event = self.get_event()
+        if event.subscription_type == event.SUBSCRIPTION_SIMPLE:
+            return True
+
         num_lots = self.get_num_lots()
         return num_lots > 0
 
@@ -236,8 +240,16 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
     def can_access(self):
         event = self.get_event()
-        num_lots = self.get_num_lots()
+        enabled = event.subscription_type != event.SUBSCRIPTION_DISABLED
+        can_manage = self.request.user.has_perm(
+            'gatheros_event.can_manage_subscriptions',
+            event
+        ) if enabled else False
 
+        if event.subscription_type == event.SUBSCRIPTION_SIMPLE:
+            return can_manage
+
+        num_lots = self.get_num_lots()
         if num_lots == 0:
             self.permission_denied_message = \
                 'Lote(s) não disponível(is).'
@@ -246,12 +258,6 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                 'subscription:subscription-list',
                 kwargs={'event_pk': event.pk}
             )
-
-        enabled = event.subscription_type != event.SUBSCRIPTION_DISABLED
-        can_manage = self.request.user.has_perm(
-            'gatheros_event.can_manage_subscriptions',
-            event
-        ) if enabled else False
 
         return can_manage and num_lots > 0
 
