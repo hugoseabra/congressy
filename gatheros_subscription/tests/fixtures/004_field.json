@@ -64,27 +64,6 @@
   },
   {
     "model": "gatheros_subscription.field",
-    "pk": 4,
-    "fields": {
-      "name": "city",
-      "label": "Cidade",
-      "field_type": "input-text",
-      "required": true,
-      "instruction": null,
-      "placeholder": null,
-      "default_value": null,
-      "form_default_field": true,
-      "organization": 1,
-      "active": true,
-      "with_options": false,
-      "forms": [
-        1,
-        2
-      ]
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
     "pk": 5,
     "fields": {
       "name": "gender",
@@ -162,27 +141,6 @@
       "form_default_field": true,
       "active": true,
       "with_options": false,
-      "forms": [
-        3,
-        4
-      ]
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 9,
-    "fields": {
-      "name": "city",
-      "label": "Cidade",
-      "field_type": "input-text",
-      "required": true,
-      "instruction": null,
-      "placeholder": null,
-      "default_value": null,
-      "form_default_field": true,
-      "active": true,
-      "with_options": false,
-      "organization": 7,
       "forms": [
         3,
         4
@@ -276,27 +234,6 @@
   },
   {
     "model": "gatheros_subscription.field",
-    "pk": 14,
-    "fields": {
-      "name": "city",
-      "label": "Cidade",
-      "field_type": "input-text",
-      "required": true,
-      "instruction": null,
-      "placeholder": null,
-      "default_value": null,
-      "form_default_field": true,
-      "active": true,
-      "with_options": false,
-      "organization": 6,
-      "forms": [
-        5,
-        6
-      ]
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
     "pk": 15,
     "fields": {
       "name": "gender",
@@ -374,27 +311,6 @@
       "form_default_field": true,
       "active": true,
       "with_options": false,
-      "forms": [
-        7,
-        8
-      ]
-    }
-  },
-  {
-    "model": "gatheros_subscription.field",
-    "pk": 19,
-    "fields": {
-      "name": "city",
-      "label": "Cidade",
-      "field_type": "input-text",
-      "required": true,
-      "instruction": null,
-      "placeholder": null,
-      "default_value": null,
-      "form_default_field": true,
-      "active": true,
-      "with_options": false,
-      "organization": 5,
       "forms": [
         7,
         8
