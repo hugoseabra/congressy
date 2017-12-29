@@ -56,19 +56,5 @@
       "placeholder": null,
       "default_value": ""
     }
-  },
-  {
-    "model": "gatheros_subscription.defaultfield",
-    "pk": 5,
-    "fields": {
-      "name": "city",
-      "label": "Cidade",
-      "field_type": "input-text",
-      "order": 4,
-      "required": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
   }
 ]

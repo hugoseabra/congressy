@@ -21,7 +21,7 @@ class GooglePictureWidget(forms.widgets.Widget):
         return mark_safe(
             """
             <a target="_blank" href="{link}">
-                <img src="{img}"/>
+                <img src="{img}"></path>
             </a>
             """.format(link=link, img=value.url)
         )

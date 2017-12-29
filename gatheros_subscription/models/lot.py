@@ -222,9 +222,9 @@ class Lot(models.Model, GatherosModelMixin):
         rule.rule_2_mais_de_1_lote_evento_inscricao_simples(self)
         rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)
         rule.rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(self)
-        rule.rule_5_data_inicial_antes_data_final(self)
-        rule.rule_6_data_inicial_antes_data_inicial_evento(self)
-        rule.rule_7_data_final_antes_data_inicial_evento(self)
+        # rule.rule_5_data_inicial_antes_data_final(self)
+        # rule.rule_6_data_inicial_antes_data_inicial_evento(self)
+        # rule.rule_7_data_final_antes_data_inicial_evento(self)
         rule.rule_8_lot_interno_nao_pode_ter_preco(self)
         # rule.rule_9_lote_pago_deve_ter_limite(self)
         rule.rule_11_evento_encerrado_nao_pode_ter_novo(

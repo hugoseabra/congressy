@@ -67,7 +67,7 @@ class LotForm(forms.ModelForm):
             self.fields['date_start'].help_text = date_start_help
 
         event_date_start = self.event.date_start.strftime('%d/%m/%Y %Hh%M')
-        lot_last_call = self.event.date_start - timedelta(minutes=1)
+
         self.fields['date_end'].help_text = \
             'O evento inicia-se em {}. O final do lote deve ser anterior a' \
             ' esta data.'.format(event_date_start)
@@ -76,6 +76,7 @@ class LotForm(forms.ModelForm):
 
         previous_lot_exist = self.event.lots.last()
         last_call = self.event.date_start - timedelta(minutes=1)
+
         if previous_lot_exist:
             if previous_lot_exist.date_start < datetime.now():
                 str_date = '{0:%d-%m-%Y %H:%M}'.format(datetime.now())
@@ -83,8 +84,12 @@ class LotForm(forms.ModelForm):
                 str_date = '{0:%d-%m-%Y %H:%M}'.format(
                     previous_lot_exist.date_start + timedelta(days=1))
             last_date_str = '{0:%d-%m-%Y %H:%M}'.format(last_call)
-            self.fields['date_start'].widget = DateTimeWidget(
-                options={'startDate': str_date, 'endDate': last_date_str})
+        else:
+            str_date = '{0:%d-%m-%Y %H:%M}'.format(datetime.now())
+            last_date_str = '{0:%d-%m-%Y %H:%M}'.format(last_call)
+
+        self.fields['date_start'].widget = DateTimeWidget(
+            options={'startDate': str_date, 'endDate': last_date_str})
 
     def clean_date_start(self):
         last_lot = self.event.lots.last()

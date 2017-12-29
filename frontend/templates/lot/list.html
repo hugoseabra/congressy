@@ -55,7 +55,7 @@
                     }
                 ],
                 // Default order
-                "order": [[ 0, 'asc' ]]
+                "order": [[0, 'asc']]
             });
         });
     </script>
@@ -77,25 +77,28 @@
         </li>
     {% endif %}
     <li>
-        <a href="{% url 'subscription:event-fields-config' event.pk %}" title="Configuração de Formulário">
+        <a href="{% url 'subscription:event-fields-config' event.pk %}"
+           title="Configuração de Formulário">
             <i class="fa  fa-fw fa-rocket"></i> Configuração de Formulário
         </a>
     </li>
     <li>
-        <a href="{% url 'subscription:subscription-list' event.pk %}" title="Pré-inscrições">
+        <a href="{% url 'subscription:subscription-list' event.pk %}"
+           title="Pré-inscrições">
             <i class="fa  fa-fw fa-rocket"></i> Pré-inscrições
         </a>
     </li>
     <li>
-        <a href="{% url 'subscription:subscription-attendance-search' event.pk %}" title="Credenciamento">
+        <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+           title="Credenciamento">
             <i class="fa  fa-fw fa-rocket"></i> Credenciamento
         </a>
     </li>
-{#    <li>#}
-{#        <a href="{% url 'subscription:subscriptions-export' event.pk %}" title="Exportação de Dados">#}
-{#            <i class="fa  fa-fw fa-rocket"></i> Exportação de Dados#}
-{#        </a>#}
-{#    </li>#}
+    {#    <li>#}
+    {#        <a href="{% url 'subscription:subscriptions-export' event.pk %}" title="Exportação de Dados">#}
+    {#            <i class="fa  fa-fw fa-rocket"></i> Exportação de Dados#}
+    {#        </a>#}
+    {#    </li>#}
 {% endblock %}
 {% block content %}
     <div class="row">
@@ -103,7 +106,8 @@
             <div class="buttonbar">
                 <div class="float-right">
                     {% if can_add %}
-                        <a href="{% url 'subscription:lot-add' event.pk %}" class="btn
+                        <a href="{% url 'subscription:lot-add' event.pk %}"
+                           class="btn
                         btn-success">
                             <i class="fa fa-plus"></i>
                             Adicionar
@@ -121,9 +125,9 @@
                 <div class="panel-body">
                     {% if object_list %}
                         <table id="lot_table"
-                           class="table table-striped table-bordered dataTable no-footer nowrap"
-                           cellspacing="0"
-                           width="100%">
+                               class="table table-striped table-bordered dataTable no-footer nowrap"
+                               cellspacing="0"
+                               width="100%">
                             <thead>
                             <tr>
                                 <th>Nome</th>
@@ -154,7 +158,8 @@
                                 <small class="text-muted">{{ lot.get_period }}</small>
                             </td>
 
-                            <td>{% if lot.price and lot.price > 0 %}Pago{% else %}Gratuito{% endif %}</td>
+                            <td>{% if lot.price and lot.price > 0 %}
+                                Pago{% else %}Gratuito{% endif %}</td>
 
 
                             <td>
@@ -179,31 +184,34 @@
                             <td>
                                 <div class="btn-group">
                                     <button
-                                        type="button"
-                                        class="btn
+                                            type="button"
+                                            class="btn
                                         btn-primary btn-trans
                                         btn-sm dropdown-toggle"
-                                        data-toggle="dropdown"
-                                        aria-expanded="false"
+                                            data-toggle="dropdown"
+                                            aria-expanded="false"
                                     >
                                         <span class="fa fa-gear"></span>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                    <ul class="dropdown-menu dropdown-menu-right"
+                                        role="menu">
                                         {% if user has 'gatheros_subscription.change_lot' of lot %}
-                                        <li>
-                                            <a href="{% url 'event:event-edit' event.pk %}">
-                                                <i class="fa fa-pencil"></i>
-                                                Editar
-                                            </a>
-                                        </li>
+                                            <li>
+                                                <a href="
+{% url 'subscription:lot-edit' event.pk lot.pk %}">
+                                                    <i class="fa fa-pencil"></i>
+                                                    Editar
+                                                </a>
+                                            </li>
                                         {% endif %}
                                         {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
-                                        <li>
-                                            <a href="{% url 'event:event-delete' event.pk %}">
-                                                <i class="fa fa-trash"></i>
-                                                Excluir
-                                            </a>
-                                        </li>
+                                            <li>
+                                                <a href="
+{% url 'subscription:lot-delete' event.pk lot.pk %}">
+                                                    <i class="fa fa-trash"></i>
+                                                    Excluir
+                                                </a>
+                                            </li>
                                         {% endif %}
                                     </ul>
                                 </div>
