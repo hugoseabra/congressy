@@ -1,7 +1,7 @@
 {% extends "base/base.html" %}
 {# @TODO Change the icons in nav_aside_itens  #}
 {% load static %}
-{% load event_tags %}
+{% load event_tags  base_tags%}
 {% load widget_tweaks %}
 {% block messages %}
     {% if messages %}
@@ -30,7 +30,7 @@
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script type="application/javascript">
         $(document).ready(function () {
-            $('#id_price').mask('#.##0,00', {reverse: true});
+            $('#id_price').mask('#.##0.00', {reverse: true});
 
             var privateCheckbox = document.querySelector('#id_private');
             var limitCheckbox = document.querySelector('#limit_switch');
