@@ -126,9 +126,6 @@ class EventAddFormView(BaseEventView, generic.CreateView):
             kwargs={'pk': event.pk}
         )
 
-    def can_access(self):
-        return self.is_manager
-
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
     form_class = forms.EventForm
