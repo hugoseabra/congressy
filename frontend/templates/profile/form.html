@@ -1,0 +1,60 @@
+{% extends "base/base.html" %}
+
+{% load i18n static widget_tweaks%}
+{% block title %}Editar Perfil || Congressy{% endblock %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Perfil</h3>
+                </div>
+                <div class="panel-body">
+                    <form action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                            <div class="form-group">
+
+                                <label for="{{ field.id_for_label }}">
+                                    {{ field.label }}</label>
+                                <div>
+                                    {% if field.field.widget.input_type == "checkbox" %}
+                                        {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                    {% else %}
+                                        {{ field |add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="alert alert-danger
+                                            alert-dismissable">
+                                                <button type="button"
+                                                        class="close"
+                                                        data-dismiss="alert"
+                                                        aria-hidden="true">×
+                                                </button>
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <div>
+                                            <small class="text-muted">{{ field.help_text|safe }}</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        {% endfor %}
+                        <br/>
+                        <input class="btn btn-primary" type="submit" value="Salvar" />
+                        <a class="btn btn-danger" href="{% url 'front:start' %}" role="button">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

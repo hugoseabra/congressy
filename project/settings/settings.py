@@ -160,7 +160,7 @@ GOOGLE_MAPS_API_KEY = 'AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw'
 
 CKEDITOR_CONFIGS = {
     'default': {
-        'width': 500,
+        'width': '100%',
         'height': 150,
     },
 }
