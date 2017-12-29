@@ -1,6 +1,5 @@
 {% extends "base/base.html" %}
-{% load i18n static %}
-
+{% load i18n static widget_tweaks %}
 {% block title %}
     {% if object %}Editar{% else %}Nova{% endif %} Pré-inscrição | Congressy
 {% endblock %}
@@ -42,41 +41,40 @@
                     </div>
                     <div class="panel-body">
 
-
                         {% for field in hidden_fields %}
                             {{ field }}
                         {% endfor %}
-
-
                         {% for item in default_fields %}
                             <div class="form-group">
 
-                                <label for="{{ item.form_field.id_for_label }}">{{ item.form_field.label_tag }}</label>
-
-                                {{ item.form_field }}
-
-
-                                {% if item.form_field.help_text %}
-                                    <br/>
-                                    <small class="title">
-                                        <strong>Instrução:</strong> {{ item.form_field.help_text|safe }}
-                                    </small>
-                                {% endif %}
-
-                                {% if item.form_field.errors %}
-                                    <br>
-                                    <br>
-                                    {% for error in item.form_field.errors %}
-                                        <div class="alert alert-danger alert-dismissable col-md-offset-1">
-                                            style="width: 80%">
-                                            <button type="button" class="close"
-                                                data-dismiss="alert"
-                                                aria-hidden="true">×
-                                            </button>
-                                            {{ error }}
+                                <label for="
+{{ item.form_field.id_for_label }}">
+                                    {{ item.form_field.label }}</label>
+                                <div>
+                                    {% if item.form_field.field.widget.input_type == "checkbox" %}
+                                        {{ item.form_field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                    {% else %}
+                                        {{ item.form_field |add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if fitem.form_ield.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="alert alert-danger
+                                            alert-dismissable">
+                                                <button type="button"
+                                                        class="close"
+                                                        data-dismiss="alert"
+                                                        aria-hidden="true">×
+                                                </button>
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if fitem.form_ield.help_text %}
+                                        <div>
+                                            <small class="text-muted">{{ item.form_field.help_text|safe }}</small>
                                         </div>
-                                    {% endfor %}
-                                {% endif %}
+                                    {% endif %}
+                                </div>
 
                             </div>
                         {% endfor %}
