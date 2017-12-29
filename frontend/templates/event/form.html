@@ -27,19 +27,6 @@
         {{ object.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
-{% block nav_aside_itens %}
-    <li>
-        {% if object %}
-            <a href="{% url 'event:event-panel' object.pk %}" title="Voltar">
-        {% else %}
-            <a href="{% url 'event:event-list' %}" title="Voltar">
-        {% endif %}
-        <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
-        </a>
-    </li>
-    <hr/>
-    {{ block.super }}
-{% endblock %}
 {% block content %}
     <form action="" method="post" class="form-horizontal form-border"
           role="form" name="event_form">
