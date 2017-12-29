@@ -1,8 +1,6 @@
 {% extends "base/base.html" %}
 
 {% load static %}
-
-
 {% load organization_tags %}
 
 {% block title %}
@@ -17,7 +15,6 @@
     {% endif %}
 {% endblock %}
 {% block sidebar %}{% endblock %}
-
 {% block content %}
     <form action="" method="post" class="form-horizontal" role="form" name="event_form">
     {% csrf_token %}
@@ -112,7 +109,6 @@
         </div>
     </form>
 {% endblock %}
-
 {% block scripts %}
     {{ block.super }}
     <!-- ckeditor -->
