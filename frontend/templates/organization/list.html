@@ -1,4 +1,7 @@
 {% extends "base/base.html" %}
+{% block navbar %}
+    {% include "base/simple-navbar.html" %}
+{% endblock %}
 {% load static %}
 {% load organization_tags %}
 
@@ -57,14 +60,97 @@
                     }
                 ],
                 // Default order
-                "order": [[ 0, 'asc' ]]
+                "order": [[0, 'asc']]
             });
         });
     </script>
 {% endblock %}
+{% block sidebar %}
+    <aside class="sidebar sidebar-left">
 
-{% block sidebar %}{% endblock %}
+        {% if organization and not organization.internal %}
+            <div class="sidebar-profile">
+                <div class="profile-body dropdown">
+                    <a href="javascript:void(0);" class="dropdown-toggle"
+                       data-toggle="dropdown" aria-expanded="false">
+                        <h4>
+                            {{ organization.name }}<span
+                                class="caret"></span>
+                        </h4></a>
+                    <small class="title"><a
+                            href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a>
+                    </small>
+                    <ul class="dropdown-menu" role="menu">
 
+                        <li>
+                            <a href="javascript:void(0);">
+                            <span class="icon">
+                                <i class="fa fa-rocket"></i>
+                            </span>Painel
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                            <span class="icon">
+                                <i class="fa fa-envelope"></i>
+                            </span>Convites
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                            <span class="icon">
+                                <i class="fa fa-users"></i>
+                            </span>Membros
+                            </a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);">
+                            <span class="icon">
+                                <i class="fa fa-map-marker"></i>
+                            </span>Locais
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+
+        <nav>
+            <br>
+            <ul class="nav nav-pills nav-stacked">
+                {% block nav_aside_itens %}
+                    <li class="active">
+                        <a href="{% url 'event:organization-list' %}"
+                           title="Organizações">
+                            <i class="fa  fa-fw fa-sitemap"></i>
+                            Organizações
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'event:event-list' %}"
+                           title="Eventos">
+                            <i class="fa  fa-fw fa-rocket"></i> Eventos
+                        </a>
+                    </li>
+                {% endblock %}
+            </ul>
+        </nav>
+        <br/>
+        <div class="setting-list">
+            <div class="row">
+                <div class="col-xs-8">
+                    <label for="check1" class="control-label">Modo de
+                        Organizador</label>
+                </div>
+                <div class="col-xs-4">
+                    <input class="js-switch" checked="" id="check1"
+                           style="display: none;" data-switchery="true"
+                           type="checkbox">
+                </div>
+            </div>
+        </div>
+    </aside>
+{% endblock %}
 {% block content %}
     <div class="row">
         <div class="col-md-12">
@@ -110,34 +196,35 @@
                                     </td>
                                     <td>
                                         {% if member_group == member.ADMIN %}
-                                        <div class="btn-group">
-                                            <button
-                                                type="button"
-                                                class="btn
+                                            <div class="btn-group">
+                                                <button
+                                                        type="button"
+                                                        class="btn
                                                 btn-primary btn-trans
                                                 btn-sm dropdown-toggle"
-                                                data-toggle="dropdown"
-                                                aria-expanded="false"
-                                            >
-                                                <span class="fa fa-gear"></span>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                                                <li>
-                                                    <a href="{% url 'event:organization-edit' item.pk %}">
-                                                        <i class="fa fa-pencil"></i>
-                                                        Editar
-                                                    </a>
-                                                </li>
-                                                {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
-                                                <li>
-                                                    <a href="{% url 'event:organization-delete' item.pk %}">
-                                                        <i class="fa fa-trash"></i>
-                                                        Excluir
-                                                    </a>
-                                                </li>
-                                                {% endif %}
-                                            </ul>
-                                        </div>
+                                                        data-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                >
+                                                    <span class="fa fa-gear"></span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-right"
+                                                    role="menu">
+                                                    <li>
+                                                        <a href="{% url 'event:organization-edit' item.pk %}">
+                                                            <i class="fa fa-pencil"></i>
+                                                            Editar
+                                                        </a>
+                                                    </li>
+                                                    {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
+                                                        <li>
+                                                            <a href="{% url 'event:organization-delete' item.pk %}">
+                                                                <i class="fa fa-trash"></i>
+                                                                Excluir
+                                                            </a>
+                                                        </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
                                         {% endif %}
                                     </td>
                                 </tr>
