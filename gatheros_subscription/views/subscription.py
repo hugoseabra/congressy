@@ -351,6 +351,7 @@ class SubscriptionEditFormView(SubscriptionAddFormView):
 
 
 class SubscriptionDeleteView(EventViewMixin, DeleteViewMixin):
+    template_name = 'subscription/delete.html'
     model = Subscription
     success_message = 'Pré-inscrição excluída com sucesso.'
     place_organization = None

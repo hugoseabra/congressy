@@ -1,8 +1,6 @@
 {% extends "base/base.html" %}
-{# @TODO Change the icons in nav_aside_itens  #}
-{% load static %}
-{% load event_tags  base_tags%}
-{% load widget_tweaks %}
+{% load static event_tags  base_tags  widget_tweaks%}
+
 {% block messages %}
     {% if messages %}
         {% for message in messages %}
@@ -15,17 +13,21 @@
         {% endfor %}
     {% endif %}
 {% endblock messages %}
+
 {% block title %}
     {% if form_title %}Editar{% else %}Nova{% endif %} Lotes | Congressy
 {% endblock %}
+
 {% block page_title %}
     {% if form_title %}Editar{% else %}Nova{% endif %} Lotes
 {% endblock %}
+
 {% block page_sub_title %}
     {% if form_title %}
         {{ form_title }}
     {% endif %}
 {% endblock %}
+
 {% block scripts %}
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script type="application/javascript">
@@ -72,6 +74,7 @@
 
     </script>
 {% endblock %}
+
 {% block nav_aside_itens %}
     <li>
         <a href="{% url 'event:event-panel' event.pk %}" title="Voltar">
@@ -80,6 +83,7 @@
     </li>
     <hr/>
 {% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col-md-12">
