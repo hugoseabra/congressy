@@ -3,17 +3,37 @@
 {% block title %}
     {% if object %}Editar{% else %}Nova{% endif %} Pré-inscrição | Congressy
 {% endblock %}
+
 {% block page_title %}
     {% if object %}Editar{% else %}Nova{% endif %} Pré-inscrição
 {% endblock %}
+
 {% block page_sub_title %}
     {% if object %}
         {{ object.person.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
+
+{% block scripts %}
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+            $('#id_phone').mask('(00) 0000-0000');
+            {#$('.phone_with_ddd').mask('(00) 0000-0000');#}
+            {#$('.phone').mask('0000-0000');#}
+            {#$('.phone_us').mask('(000) 000-0000')#}
+        });
+
+    </script>
+{% endblock %}
+
 {% block content %}
+
     <form action="" method="post">
+
         {% csrf_token %}
+
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar">
@@ -51,11 +71,16 @@
 {{ item.form_field.id_for_label }}">
                                     {{ item.form_field.label }}</label>
                                 <div>
+
                                     {% if item.form_field.field.widget.input_type == "checkbox" %}
                                         {{ item.form_field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+
+                                    {% elif item.form_field.id_for_label == "id_phone" %}
+                                        {{ item.form_field |add_class:"form-control" |attr:"type:tel"}}
                                     {% else %}
                                         {{ item.form_field |add_class:"form-control" }}
                                     {% endif %}
+
                                     {% if fitem.form_ield.errors %}
                                         {% for error in field.errors %}
                                             <div class="alert alert-danger
@@ -69,11 +94,13 @@
                                             </div>
                                         {% endfor %}
                                     {% endif %}
+
                                     {% if fitem.form_ield.help_text %}
                                         <div>
                                             <small class="text-muted">{{ item.form_field.help_text|safe }}</small>
                                         </div>
                                     {% endif %}
+
                                 </div>
 
                             </div>
@@ -84,6 +111,7 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar bottom">
