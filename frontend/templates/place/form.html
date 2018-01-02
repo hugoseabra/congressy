@@ -1,33 +1,42 @@
 {% extends "base/base.html" %}
-{% load i18n static %}
+{% load i18n static  widget_tweaks %}
 
 {% block title %}
     {% if object %}Editar{% else %}Nova{% endif %} Local | Congressy
 {% endblock %}
+
 {% block page_title %}
     {% if object %}Editar{% else %}Novo{% endif %} Local
 {% endblock %}
+
 {% block page_sub_title %}
     {% if object %}
         {{ object.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
+
 {% block content %}
-    <form action="" method="post" class="form-horizontal" role="form" name="place_form">
-    {% csrf_token %}
+
+    <form action="" method="post" class="form-horizontal" role="form"
+          name="place_form">
+
+        {% csrf_token %}
 
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar">
                     <div class="float-right">
                         {% if next_path %}
-                            <a href="{{ next_path|urlencode }}" class="btn btn-danger">
+                            <a href="{{ next_path|urlencode }}"
+                               class="btn btn-danger">
                                 <i class="fa fa-close"></i>
                                 Cancelar
                             </a>
-                            <input type="hidden" name="next" value="{{ next_path }}"/>
+                            <input type="hidden" name="next"
+                                   value="{{ next_path }}"/>
                         {% else %}
-                            <a href="{% url 'event:organization-panel' place_organization.pk %}" class="btn btn-danger">
+                            <a href="{% url 'event:organization-panel' place_organization.pk %}"
+                               class="btn btn-danger">
                                 <i class="fa fa-close"></i>
                                 Cancelar
                             </a>
@@ -47,38 +56,67 @@
             <div class="col-md-12">
                 <div class="panel panel-primary">
                     <div class="panel-body">
+
                         {% for field in form %}
-                            <div class="form-group">
-                                {{ field.errors }}
-                                <label for="{{ field.id_for_label }}"
-                                       class="col-sm-3 control-label cgsy-label">{{ field.label }}</label>
-                                <div class="col-sm-9">
-                                    {{ field }}
-                                    {% if field.help_text %}
-                                        <br/>
-                                        <small class="text-muted">{{ field.help_text|safe }}</small>
-                                    {% endif %}
+                            {% if field.field.widget.input_type == "hidden" %}
+                                {{ field }}
+                            {% else %}
+                                <div class="form-group">
+
+                                    <label for="{{ field.id_for_label }}">
+                                        {{ field.label }}</label>
+
+                                    <div>
+                                        {% if field.field.widget.input_type == "checkbox" %}
+                                            {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                        {% else %}
+                                            {{ field |add_class:"form-control" }}
+                                        {% endif %}
+                                        {% if field.errors %}
+                                            {% for error in field.errors %}
+                                                <div class="alert alert-danger
+                                            alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if field.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ field.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
                                 </div>
-                            </div>
+                            {% endif %}
                         {% endfor %}
+
                     </div>
                 </div>
             </div>
         </div>
-
 
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar bottom">
                     <div class="float-right">
                         {% if next_path %}
-                            <a href="{{ next_path|urlencode }}" class="btn btn-danger">
+                            <a href="{{ next_path|urlencode }}"
+                               class="btn btn-danger">
                                 <i class="fa fa-close"></i>
                                 Cancelar
                             </a>
-                            <input type="hidden" name="next" value="{{ next_path }}"/>
+                            <input type="hidden" name="next"
+                                   value="{{ next_path }}"/>
                         {% else %}
-                            <a href="{% url 'event:organization-panel' place_organization.pk %}" class="btn btn-danger">
+                            <a href="{% url 'event:organization-panel' place_organization.pk %}"
+                               class="btn btn-danger">
                                 <i class="fa fa-close"></i>
                                 Cancelar
                             </a>
@@ -95,4 +133,5 @@
         </div>
 
     </form>
+
 {% endblock %}
