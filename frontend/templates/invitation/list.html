@@ -2,10 +2,31 @@
 {% load organization_tags %}
 
 {% block title %}Convites | Congressy{% endblock %}
+
 {% block page_title %}Convites{% endblock %}
+
 {% block page_sub_title %}{{ invitation_organization.name }}{% endblock %}
+
 {% block page_description %}
     Convites pendentes que ainda não foram aceitos pelos convidados.
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <li>
+        <a href="{% url 'event:organization-list' %}"
+           title="Voltar">
+
+            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
+        </a>
+    </li>
+    <hr/>
+    <li class="active">
+        <a href="#"
+           title="Convites">
+            <i class="fa  fa-fw fa-rocket"></i> Convites
+        </a>
+    </li>
+    {{ block.super }}
 {% endblock %}
 
 {% block content %}
@@ -13,13 +34,15 @@
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-left">
-                    <a href="{% url 'event:organization-panel' invitation_organization.pk %}" class="btn btn-primary" title="Voltar">
+                    <a href="{% url 'event:organization-panel' invitation_organization.pk %}"
+                       class="btn btn-primary" title="Voltar">
                         <i class="fa fa-arrow-left"></i>
                     </a>
                 </div>
 
                 <div class="float-right">
-                    <a href="{% url 'event:invitation-add' invitation_organization.pk %}" class="btn btn-success">
+                    <a href="{% url 'event:invitation-add' invitation_organization.pk %}"
+                       class="btn btn-success">
                         <i class="fa fa-plus"></i>
                         Adicionar
                     </a>
@@ -30,15 +53,15 @@
     </div>
 
     {% if not open_invitations and not expired_invitations %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-body">
-                    Nenhum convite
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        Nenhum convite
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     {% endif %}
 
     {% if open_invitations %}
@@ -51,10 +74,18 @@
                     <div class="panel-body">
                         <table width="100%">
                             <tr>
-                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome (e-mail)</th>
-                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Autor</th>
-                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Criado em</th>
-                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Expira em</th>
+                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">
+                                    Nome (e-mail)
+                                </th>
+                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">
+                                    Autor
+                                </th>
+                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">
+                                    Criado em
+                                </th>
+                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">
+                                    Expira em
+                                </th>
                                 <th style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></th>
                             </tr>
                             {% for item in open_invitations %}
@@ -62,7 +93,9 @@
                                     <td style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                                         <div>
                                             {% if item.to.person and item.to.person.avatar %}
-                                                <img  style="float:left;padding-right:4px;margin-top: -3px" width="25px" src="{{ item.to.person.avatar.url }}" />
+                                                <img style="float:left;padding-right:4px;margin-top: -3px"
+                                                     width="25px"
+                                                     src="{{ item.to.person.avatar.url }}"/>
                                             {% endif %}
                                             {% if item.to.get_full_name %}
                                                 {{ item.to.get_full_name }}
@@ -72,21 +105,27 @@
                                             {% endif %}
                                         </div>
                                     </td>
-                                    <td width="25%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                                    <td width="25%"
+                                        style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                                         {% if item.author.person.avatar %}
-                                            <img  style="float:left;padding-right:4px" width="25px" src="{{ item.author.person.avatar.url }}" />
+                                            <img style="float:left;padding-right:4px"
+                                                 width="25px"
+                                                 src="{{ item.author.person.avatar.url }}"/>
                                         {% endif %}
                                         <div style="margin-top: 3px">
                                             {{ item.author.person.name }}
                                         </div>
                                     </td>
-                                    <td width="15%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                                    <td width="15%"
+                                        style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                                         {{ item.created|date:"d/m/Y H\hi" }}
                                     </td>
-                                    <td width="15%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                                    <td width="15%"
+                                        style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                                         {{ item.expired|date:"d/m/Y H\hi" }}
                                     </td>
-                                    <td width="18%" style="text-align:center; background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
+                                    <td width="18%"
+                                        style="text-align:center; background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
                                         <a href="{% url 'event:invitation-delete' invitation_organization.pk item.pk %}">Excluir</a>
                                     </td>
                                 </tr>
@@ -108,10 +147,18 @@
                     <div class="panel-body">
                         <table width="100%">
                             <tr>
-                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Nome (e-mail)</th>
-                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Autor</th>
-                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Criado em</th>
-                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">Expirado em</th>
+                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">
+                                    Nome (e-mail)
+                                </th>
+                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">
+                                    Autor
+                                </th>
+                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">
+                                    Criado em
+                                </th>
+                                <th style="text-align:left;border:1px solid #fff;padding:10px;margin-bottom: 3px">
+                                    Expirado em
+                                </th>
                                 <th style="border:1px solid #fff;padding:10px;margin-bottom: 3px"></th>
                             </tr>
                             {% for item in expired_invitations %}
@@ -119,7 +166,9 @@
                                     <td style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                                         <div>
                                             {% if item.to.person and item.to.person.avatar %}
-                                                <img  style="float:left;padding-right:4px;margin-top: -3px" width="25px" src="{{ item.to.person.avatar.url }}" />
+                                                <img style="float:left;padding-right:4px;margin-top: -3px"
+                                                     width="25px"
+                                                     src="{{ item.to.person.avatar.url }}"/>
                                             {% endif %}
 
                                             {% if item.to.get_full_name %}
@@ -130,24 +179,34 @@
                                             {% endif %}
                                         </div>
                                     </td>
-                                    <td width="25%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                                    <td width="25%"
+                                        style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                                         {% if item.author.person.avatar %}
-                                            <img  style="float:left;padding-right:4px" width="25px" src="{{ item.author.person.avatar.url }}" />
+                                            <img style="float:left;padding-right:4px"
+                                                 width="25px"
+                                                 src="{{ item.author.person.avatar.url }}"/>
                                         {% endif %}
                                         <div style="margin-top: 3px">
                                             {{ item.author.person.name }}
                                         </div>
                                     </td>
-                                    <td width="15%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                                    <td width="15%"
+                                        style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                                         {{ item.created|date:"d/m/Y H\hi" }}
                                     </td>
-                                    <td width="15%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
+                                    <td width="15%"
+                                        style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                                         {{ item.expired|date:"d/m/Y H\hi" }}
                                     </td>
-                                    <td width="18%" style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
+                                    <td width="18%"
+                                        style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};;padding:10px;margin-bottom: 3px">
                                         <div style="float:left">
-                                            <form action="{% url 'event:invitation-resend' invitation_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja renovar este convite?')">{% csrf_token %}
-                                                <button type="submit">Reenviar</button>
+                                            <form action="{% url 'event:invitation-resend' invitation_organization.pk item.pk %}"
+                                                  method="post"
+                                                  onsubmit="return confirm('Deseja renovar este convite?')">{% csrf_token %}
+                                                <button type="submit">
+                                                    Reenviar
+                                                </button>
                                             </form>
                                         </div>
                                         &nbsp; &nbsp; &nbsp;
@@ -166,3 +225,4 @@
     {% endif %}
 
 {% endblock %}
+

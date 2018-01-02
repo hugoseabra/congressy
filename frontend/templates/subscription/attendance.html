@@ -58,13 +58,34 @@
 
 {% block nav_aside_itens %}
     <li>
-        <a href="{% url 'event:event-panel' event.pk %}" title="Voltar">
+        <a href="{% url 'event:event-list' %}" title="Voltar">
 
             <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
         </a>
     </li>
     <hr/>
-    {{ block.super }}
+    <li style="font-weight: bold; color: #ffffff">Inscrições</li>
+    {% if can_change %}
+        <li>
+            <a href="{% url 'subscription:lot-list' event.pk %}"
+               title="Lotes">
+                <i class="fa  fa-fw fa-rocket"></i> Lotes
+            </a>
+        </li>
+    {% endif %}
+    <li>
+        <a href="{% url 'subscription:subscription-list' event.pk %}"
+           title="Pré-inscrições">
+            <i class="fa  fa-fw fa-rocket"></i> Pré-inscrições
+        </a>
+    </li>
+    <li class="active">
+        <a href="
+{% url 'subscription:subscription-attendance-search' event.pk %}"
+           title="Credenciamento">
+            <i class="fa  fa-fw fa-rocket"></i> Credenciamento
+        </a>
+    </li>
 {% endblock %}
 
 {% block content %}
@@ -77,25 +98,30 @@
                     <h3 class="panel-title">Buscar inscrito</h3>
                 </div>
                 <div class="panel-body">
-                    <form method="post" action="" class="form-horizontal form-border">
+                    <form method="post" action=""
+                          class="form-horizontal form-border">
 
                         {% csrf_token %}
 
                         <div class="form-group">
 
-                            <label class="col-sm-3 control-label">Procurar por:</label>
+                            <label class="col-sm-3 control-label">Procurar
+                                por:</label>
                             <div class="col-sm-6">
-                                <input {% if search_by == 'name' %}checked{% endif %} type="radio" name="search_by"
+                                <input {% if search_by == 'name' %}checked{% endif %}
+                                       type="radio" name="search_by"
                                        id="search_by_name" value="name"
                                        onclick="window.location.href=window.location.pathname"/>
                                 <label for="search_by_name">Nome</label>
                                 &nbsp; &nbsp; &nbsp;
-                                <input {% if search_by == 'email' %}checked{% endif %} type="radio" name="search_by"
+                                <input {% if search_by == 'email' %}checked{% endif %}
+                                       type="radio" name="search_by"
                                        id="search_by_email" value="email"
                                        onclick="window.location.href=window.location.pathname+'?search_by=email'"/>
                                 <label for="search_by_email">E-mail</label>
                                 &nbsp; &nbsp; &nbsp;
-                                <input {% if search_by == 'code' %}checked{% endif %} type="radio" name="search_by"
+                                <input {% if search_by == 'code' %}checked{% endif %}
+                                       type="radio" name="search_by"
                                        id="search_by_code" value="code"
                                        onclick="window.location.href=window.location.pathname+'?search_by=code'"/>
                                 <label for="search_by_code">Código</label>
@@ -103,17 +129,22 @@
                         </div>
                         <br>
 
-                        <label for="search_input" class="col-sm-3 control-label">Informe o nome:</label>
+                        <label for="search_input"
+                               class="col-sm-3 control-label">Informe o
+                            nome:</label>
 
 
                         <div class="col-sm-6">
-                            <input required class="form-control" type="search" name="value" value=""
+                            <input required class="form-control" type="search"
+                                   name="value" value=""
                                    id="search_input"/>
                         </div>
                         <br>
                         <br>
                         <div class="col-sm-6">
-                            <button class="btn-primary btn" type="submit">Buscar</button>
+                            <button class="btn-primary btn" type="submit">
+                                Buscar
+                            </button>
                         </div>
 
                     </form>
@@ -129,17 +160,24 @@
                 <div class="panel-body">
                     {% for attendance in attendances %}
                         <div style="background: #FFF;padding: 5px;border-bottom: 1px solid #DDD">
-                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <table width="100%" border="0" cellspacing="0"
+                                   cellpadding="0">
                                 <tr>
                                     <td style="padding: 5px">
                                         <div style="font-weight: bold;text-transform: uppercase">{{ attendance.person.name }}</div>
-                                        <form method="post" action="">{% csrf_token %}
-                                            <input type="hidden" name="search_by" value="code"/>
-                                            <input type="hidden" name="value" value="{{ attendance.code }}"/>
+                                        <form method="post"
+                                              action="">{% csrf_token %}
+                                            <input type="hidden"
+                                                   name="search_by"
+                                                   value="code"/>
+                                            <input type="hidden" name="value"
+                                                   value="{{ attendance.code }}"/>
                                             <button id="registration_button"
                                                     type="submit">{{ attendance.code }}</button>
                                         </form>
-                                        <div><strong>Data:</strong> {{ attendance.attended_on }}</div>
+                                        <div>
+                                            <strong>Data:</strong> {{ attendance.attended_on }}
+                                        </div>
                                     </td>
                                 </tr>
                             </table>
@@ -180,17 +218,22 @@
 
                             <p><b>E-mail: </b>{{ result.person.email }}</p>
 
-                            <p><b>Código de Inscrição: </b>{{ result.code }}</p>
+                            <p><b>Código de Inscrição: </b>{{ result.code }}
+                            </p>
 
                             <p><b>Cadastrado em: </b>{{ result.created }}</p>
 
-                            <p><b>Cadastrado por: </b>{{ result.created_by }}</p>
+                            <p><b>Cadastrado por: </b>{{ result.created_by }}
+                            </p>
 
 
                             {% if result.attended %}
-                                Esta inscrição já foi credenciada em '{{ result.attended_on }}'.
+                                Esta inscrição já foi credenciada em '
+                                {{ result.attended_on }}'.
                             {% else %}
-                                <button type="submit" class="btn btn-primary">Credenciar</button>
+                                <button type="submit" class="btn btn-primary">
+                                    Credenciar
+                                </button>
                             {% endif %}
 
                         </form>
@@ -249,26 +292,35 @@
                                     </td>
                                     <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: #3C763D;color: #000000; font-weight: bold;{% else %}background: #FFF{% endif %}">
                                         {% if item.person.user_id %}
-                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                            <i class="fa fa-check"
+                                               aria-hidden="true"></i>
 
                                         {% endif %}
                                     </td>
                                     <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: #3C763D;color: #000000; font-weight: bold;{% else %}background: #FFF{% endif %}">
                                         <form method="post"
                                               action="{% url 'subscription:subscription-attendance' event.pk item.pk %}">{% csrf_token %}
-                                            <input type="hidden" name="search_by" value="name"/>
+                                            <input type="hidden"
+                                                   name="search_by"
+                                                   value="name"/>
                                             <input type="hidden" name="action"
                                                    value="{% if item.attended %}unregister{% else %}register{% endif %}"/>
                                             {% if item.attended %}
                                                 <div style="font-size: 14px">{{ item.attended_on }}</div>
                                                 <hr>
-                                                <button class="btn btn-danger" id="registration_button" type="submit">
+                                                <button class="btn btn-danger"
+                                                        id="registration_button"
+                                                        type="submit">
                                                     Cancelar credenciamento
                                                 </button>
                                             {% else %}
-                                                <div style="font-size: 14px">Não credenciado</div>
+                                                <div style="font-size: 14px">
+                                                    Não credenciado
+                                                </div>
                                                 <hr>
-                                                <button class="btn btn-primary" id="registration_button" type="submit">
+                                                <button class="btn btn-primary"
+                                                        id="registration_button"
+                                                        type="submit">
                                                     Credenciar
                                                 </button>
                                             {% endif %}

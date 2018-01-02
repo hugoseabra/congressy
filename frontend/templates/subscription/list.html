@@ -5,6 +5,7 @@
 {% block title %} Pré-inscrições | Congressy{% endblock %}
 
 {% block page_title %}Pré-inscrições{% endblock %}
+
 {% block page_sub_title %}
     {{ event.name }}
     {% if not event.published %}
@@ -93,16 +94,38 @@
     </script>
 {% endblock %}
 
-
 {% block nav_aside_itens %}
     <li>
-        <a href="{% url 'event:event-panel' event.pk %}" title="Voltar">
+        <a href="{% url 'event:event-list' %}" title="Voltar">
+
             <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
         </a>
     </li>
     <hr/>
-    {{ block.super }}
+    <li style="font-weight: bold; color: #ffffff">Inscrições</li>
+    {% if can_change %}
+        <li>
+            <a href="{% url 'subscription:lot-list' event.pk %}"
+               title="Lotes">
+                <i class="fa  fa-fw fa-rocket"></i> Lotes
+            </a>
+        </li>
+    {% endif %}
+    <li class="active">
+        <a href="{% url 'subscription:subscription-list' event.pk %}"
+           title="Pré-inscrições">
+            <i class="fa  fa-fw fa-rocket"></i> Pré-inscrições
+        </a>
+    </li>
+    <li>
+        <a href="
+{% url 'subscription:subscription-attendance-search' event.pk %}"
+           title="Credenciamento">
+            <i class="fa  fa-fw fa-rocket"></i> Credenciamento
+        </a>
+    </li>
 {% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col-md-12">

@@ -6,10 +6,18 @@
 {% block title %} {{ object.name }} | Congressy{% endblock %}
 
 {% block page_title %}Painel{% endblock %}
+
 {% block page_sub_title %}{{ object.name }} {% endblock %}
 
-
 {% block nav_aside_itens %}
+    <li>
+        <a href="{% url 'event:organization-list' %}"
+           title="Voltar">
+
+            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
+        </a>
+    </li>
+    <hr/>
     <li>
         <a href="{% url 'event:event-list' %}" title="Eventos">
             <i class="fa  fa-fw fa-rocket"></i>Eventos

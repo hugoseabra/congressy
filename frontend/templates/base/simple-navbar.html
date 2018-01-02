@@ -1,0 +1,48 @@
+{% load static %}
+
+
+<ul class="nav navbar-nav navbar-right">
+
+    <li class="dropdown profile hidden-xs">
+        <a href="javascript:void(0);" class="dropdown-toggle"
+           data-toggle="dropdown">
+                    <span class="meta">
+                    <span class="text  hidden-xs">{{ user.first_name }}</span>
+                    <span class="caret hidden-xs"></span>
+                    </span>
+        </a>
+        <ul class="dropdown-menu animated fadeInRight " role="menu">
+            <li>
+                <a href="{% url 'event:profile' %}">
+                            <span class="icon"><i class="fa fa-user"></i>
+                            </span>Meus Dados</a>
+            </li>
+            <li>
+                <a href="{% url 'front:logout' %}">
+                            <span class="icon"><i class="fa fa-sign-out"></i>
+                            </span>Sair</a>
+            </li>
+
+        </ul>
+    </li>
+    <li class="dropdown mobile-menu hidden-sm hidden-md hidden-lg">
+        <button id="mobile-top-menu-button"
+                class="sidebar-toggle">
+            <i class="fa fa-ellipsis-v"></i>
+        </button>
+        <div id="mobile-top-menu">
+            <div class="mobile-top-menu-wrap">
+                <div class="row">
+                    <div class="col-xs-12">
+                            <span class="icon"><i class="fa fa-user"></i>
+                            </span><a href="{% url 'event:profile' %}"> Meus
+                        Dados</a><br/>
+                        <span class="icon"><i class="fa fa-sign-out"></i>
+                            </span><a href="{% url 'front:logout' %}"> Sair</a><br/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </li>
+</ul>
+
