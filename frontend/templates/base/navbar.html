@@ -19,18 +19,21 @@
     <ul class="nav navbar-nav navbar-right">
         <li class="dropdown profile hidden-xs">
 
-            <button class="sidebar-toggle" id="toggle-left" data-toggle="dropdown" aria-haspopup="true"
+            <button class="sidebar-toggle" id="toggle-left"
+                    data-toggle="dropdown" aria-haspopup="true"
                     aria-expanded="true">
                 <i class="fa fa-sitemap"></i>
             </button>
 
             <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                <form action="{% url 'event:organization-switch' %}" method="post" id="organization_context">
+                <form action="{% url 'event:organization-switch' %}"
+                      method="post" id="organization_context">
                     {% csrf_token %}
 
                     {% for org in organizations %}
                         {% if org.internal %}
-                            <li onclick="cgsy_submit({{ org.pk }})"><a href="#">{{ org.name }}</a></li>
+                            <li onclick="cgsy_submit({{ org.pk }})"><a
+                                    href="#">{{ org.name }}</a></li>
                         {% endif %}
                     {% endfor %}
 
@@ -39,20 +42,25 @@
 
                     {% for org in organizations %}
                         {% if not org.internal %}
-                            <li onclick="cgsy_submit({{ org.pk }})"><a href="#">{{ org.name }}</a></li>
+                            <li onclick="cgsy_submit({{ org.pk }})"><a
+                                    href="#">{{ org.name }}</a></li>
                         {% endif %}
                     {% endfor %}
-                    <input type="hidden" name="organization-context-pk" id="organization-context-pk"/>
-                    <input type="hidden" name="next" value="{{ request.path }}"/>
+                    <input type="hidden" name="organization-context-pk"
+                           id="organization-context-pk"/>
+                    <input type="hidden" name="next"
+                           value="{{ request.path }}"/>
                 </form>
                 <li class="divider"></li>
-                <li><a href="{% url 'event:organization-list' %}">Ver todas</a></li>
+                <li><a href="{% url 'event:organization-list' %}">Ver todas</a>
+                </li>
             </ul>
 
         </li>
 
         <li class="dropdown profile hidden-xs">
-            <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+            <a href="javascript:void(0);" class="dropdown-toggle"
+               data-toggle="dropdown">
                     <span class="meta">
                     <span class="text  hidden-xs">{{ user.first_name }}</span>
                     <span class="caret hidden-xs"></span>
@@ -69,6 +77,33 @@
                             <span class="icon"><i class="fa fa-sign-out"></i>
                             </span>Sair</a>
                 </li>
+                <li class="divider"></li>
+
+
+                {% if not organization and not internal_organization %}
+                    <form id="init_internal_org" action=
+                            "{% url 'event:organization-add-internal' %}"
+                          method="post">{% csrf_token %}
+
+                        <li>
+                            <a href="#" onclick="document.getElementById
+                            ('init_internal_org').submit()">
+                                <i class="fa fa-plus"></i>
+                                Novo evento
+                            </a>
+                        </li>
+                    </form>
+                {% else %}
+
+                    <li>
+                        <a href="{% url 'event:event-add' %}"
+                           class="btn-sm btn-success">
+                            <i class="fa fa-plus"></i>
+                            Novo evento
+                        </a>
+                    </li>
+                {% endif %}
+
 
             </ul>
         </li>
@@ -78,16 +113,66 @@
                 <i class="fa fa-ellipsis-v"></i>
             </button>
             <div id="mobile-top-menu">
-                {#            <h4>#}
-                {#                Minhas informações:#}
-                {#            </h4>#}
                 <div class="mobile-top-menu-wrap">
                     <div class="row">
                         <div class="col-xs-12">
+
+
                             <span class="icon"><i class="fa fa-user"></i>
-                            </span><a href="{% url 'event:profile' %}"> Meus Dados</a><br/>
+                            </span><a href="{% url 'event:profile' %}"> Meus
+                            Dados</a><br/>
+
+
                             <span class="icon"><i class="fa fa-sign-out"></i>
                             </span><a href="{% url 'front:logout' %}"> Sair</a><br/>
+
+                            {% if not organization and not internal_organization %}
+                                <span class="icon">
+                                    <i class="fa fa-plus"></i>
+                                </span>
+
+                                <a href="#" onclick="document.getElementById
+                            ('init_internal_org').submit()">
+                                    Novo evento
+                                </a>
+
+                            {% else %}
+                                <span class="icon">
+                                    <i class="fa fa-plus"></i>
+                                </span>
+                                <a href="{% url 'event:event-add' %}">
+                                    Novo evento
+                                </a>
+                            {% endif %}
+
+
+                            <form action="{% url 'event:organization-switch' %}"
+                                  method="post" id="organization_context">
+                                {% csrf_token %}
+
+                                {% for org in organizations %}
+                                    {% if org.internal %}
+                                        <hr/>
+                                        <a onclick="cgsy_submit({{ org.pk }})"
+                                           href="#">{{ org.name }}</a>
+                                    {% endif %}
+                                {% endfor %}
+
+
+                                {% for org in organizations %}
+                                    {% if not org.internal %}
+                                        <a href="#"
+                                           onclick="cgsy_submit({{ org.pk }})">{{ org.name }}</a>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </form>
+
+
+                            <hr/>
+                            <a href="{% url 'event:organization-list' %}">Ver
+                                todas</a>
+
                         </div>
                     </div>
                 </div>

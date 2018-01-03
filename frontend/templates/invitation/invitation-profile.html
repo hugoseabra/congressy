@@ -95,12 +95,4 @@
         </div>
     </form>
 
-
-    <form action="" method="post">{% csrf_token %}
-
-
-        <input type="submit" value="Salvar"/>
-        <a href="{% url 'public:invitation-decision' invite.pk %}">Voltar</a>
-    </form>
-
 {% endblock %}

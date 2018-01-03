@@ -12,7 +12,7 @@ def rule_1_data_inicial_antes_da_data_final(event):
     """
     if event.date_end < event.date_start:
         raise ValidationError({'date_start': [
-            'Data inicial deve anterior a data final'
+            'Data inicial deve ser anterior a data final.'
         ]})
 
 

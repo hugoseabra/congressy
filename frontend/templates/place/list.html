@@ -3,10 +3,13 @@
 {% load organization_tags %}
 
 {% block title %} Locais | Congressy{% endblock %}
+
 {% block page_title %}Locais{% endblock %}
+
 {% block page_sub_title %}
     {{ place_organization.name }}
 {% endblock %}
+
 {% block page_description %}
     Locais onde seus eventos acontecem.
 {% endblock %}
@@ -66,6 +69,24 @@
             });
         });
     </script>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <li>
+        <a href="{% url 'event:organization-list' %}"
+           title="Voltar">
+
+            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
+        </a>
+    </li>
+    <hr/>
+    <li class="active">
+        <a href="#"
+           title="Locais de eventos">
+            <i class="fa  fa-fw fa-rocket"></i> Locais de eventos
+        </a>
+    </li>
+    {{ block.super }}
 {% endblock %}
 
 {% block content %}

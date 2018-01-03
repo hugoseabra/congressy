@@ -1,9 +1,16 @@
 {% extends "base/base.html" %}
-{% load static %}
-{% load organization_tags %}
+
+{% block navbar %}
+    {% include "base/simple-navbar.html" %}
+{% endblock %}
+
+{% load static organization_tags%}
+
 
 {% block title %}Organizações | Congressy{% endblock %}
+
 {% block page_title %}Organizações{% endblock %}
+
 {% block page_description %}
     Todas as organizações nas quais você é membro.
 {% endblock %}
@@ -57,13 +64,14 @@
                     }
                 ],
                 // Default order
-                "order": [[ 0, 'asc' ]]
+                "order": [[0, 'asc']]
             });
         });
     </script>
 {% endblock %}
 
-{% block sidebar %}{% endblock %}
+{% block sidebar %}
+{% endblock %}
 
 {% block content %}
     <div class="row">
@@ -110,34 +118,35 @@
                                     </td>
                                     <td>
                                         {% if member_group == member.ADMIN %}
-                                        <div class="btn-group">
-                                            <button
-                                                type="button"
-                                                class="btn
+                                            <div class="btn-group">
+                                                <button
+                                                        type="button"
+                                                        class="btn
                                                 btn-primary btn-trans
                                                 btn-sm dropdown-toggle"
-                                                data-toggle="dropdown"
-                                                aria-expanded="false"
-                                            >
-                                                <span class="fa fa-gear"></span>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                                                <li>
-                                                    <a href="{% url 'event:organization-edit' item.pk %}">
-                                                        <i class="fa fa-pencil"></i>
-                                                        Editar
-                                                    </a>
-                                                </li>
-                                                {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
-                                                <li>
-                                                    <a href="{% url 'event:organization-delete' item.pk %}">
-                                                        <i class="fa fa-trash"></i>
-                                                        Excluir
-                                                    </a>
-                                                </li>
-                                                {% endif %}
-                                            </ul>
-                                        </div>
+                                                        data-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                >
+                                                    <span class="fa fa-gear"></span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-right"
+                                                    role="menu">
+                                                    <li>
+                                                        <a href="{% url 'event:organization-edit' item.pk %}">
+                                                            <i class="fa fa-pencil"></i>
+                                                            Editar
+                                                        </a>
+                                                    </li>
+                                                    {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
+                                                        <li>
+                                                            <a href="{% url 'event:organization-delete' item.pk %}">
+                                                                <i class="fa fa-trash"></i>
+                                                                Excluir
+                                                            </a>
+                                                        </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
                                         {% endif %}
                                     </td>
                                 </tr>

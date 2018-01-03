@@ -63,8 +63,8 @@
         <!--logo start-->
         <div class="brand">
             <a href="{% url 'front:start' %}">
-               <img  class="base_logo" src=
-                       "{% static "assets/img/logo.png" %}"/>
+                <img class="base_logo" src=
+                        "{% static "assets/img/logo.png" %}"/>
             </a>
         </div>
         <!--logo end-->
@@ -84,37 +84,42 @@
                         <a href="javascript:void(0);" class="dropdown-toggle"
                            data-toggle="dropdown" aria-expanded="false">
                             <h4>
+
                                 {{ organization.name }}<span
                                     class="caret"></span>
                             </h4></a>
-                        <small class="title"><a
-                                href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a>
+                        <small class="title">{{ member.get_group_display }}
                         </small>
                         <ul class="dropdown-menu" role="menu">
 
                             <li>
-                                <a href="javascript:void(0);">
+                                <a href="{% url 'event:organization-panel' organization.pk %}">
                             <span class="icon">
                                 <i class="fa fa-rocket"></i>
                             </span>Painel
                                 </a>
                             </li>
-                            <li>
-                                <a href="javascript:void(0);">
+                            {% if is_manager %}
+                                <li>
+                                    <a href="
+{% url 'event:invitation-list' organization.pk %}">
                             <span class="icon">
                                 <i class="fa fa-envelope"></i>
                             </span>Convites
-                                </a>
-                            </li>
+                                    </a>
+                                </li>
+                            {% endif %}
                             <li>
-                                <a href="javascript:void(0);">
+                                <a href="
+{% url 'event:member-list' organization.pk%}">
                             <span class="icon">
                                 <i class="fa fa-users"></i>
                             </span>Membros
                                 </a>
                             </li>
                             <li>
-                                <a href="javascript:void(0);">
+                                <a href="
+{% url 'event:place-list' organization.pk %}">
                             <span class="icon">
                                 <i class="fa fa-map-marker"></i>
                             </span>Locais
@@ -186,11 +191,11 @@
             {% block content %}{% endblock %}
         </section>
         <!-- main content end -->
+        <section class="cgsy-footer footer-wrapper">
+            Congressy© 2018 - Version: 0.0.1
+        </section>
     </section>
-    <section class="footer-wrapper text-center"
-             style="position:absolute; bottom: 0; right:0; padding-right: 10px; padding-top: 10px">
-        <p class="text-muted">Congressy© 2017 All rights reserved</p>
-    </section>
+
 </section>
 
 <!--Global JS-->

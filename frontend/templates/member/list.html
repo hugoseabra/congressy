@@ -1,9 +1,30 @@
 {% extends "base/base.html" %}
+{% load static event_tags %}
 
 {% block title %} Membros | Congressy{% endblock %}
+
 {% block page_title %}Membros{% endblock %}
+
 {% block page_sub_title %}
     {{ member_organization.name }}
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <li>
+        <a href="{% url 'event:organization-list' %}"
+           title="Voltar">
+
+            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
+        </a>
+    </li>
+    <hr/>
+    <li class="active">
+        <a href="#"
+           title="Membros">
+            <i class="fa  fa-fw fa-rocket"></i> Membros
+        </a>
+    </li>
+    {{ block.super }}
 {% endblock %}
 
 {% block content %}

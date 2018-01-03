@@ -16,7 +16,7 @@
 }
 
 .main-content-wrapper {
-  padding-bottom: 40px !important;
+  padding-bottom: 65px !important;
 }
 
 //============================= PAGE HEADER =================================//
@@ -71,6 +71,18 @@
 a.btn, button.btn {
   color: #FFF;
 }
+
+.dropdown-menu > li.active > a.btn-success, #header .dropdown-menu > li:active > a.btn-success,
+.dropdown-menu > li > a.btn-success:focus, .dropdown-menu > li > a.btn-success:hover,
+.btn-success, a.btn-success:link, a.btn-success:visited, a.btn-success:hover {
+  color: #FFF;
+  background-color: @successColorHover !important;
+  i {
+    color: #FFF !important;
+  }
+}
+
+
 
 //=============================== ALERT =====================================//
 .alert {
@@ -168,4 +180,27 @@ a.btn, button.btn {
 
 .base_logo {
   padding-top: 10px;
+}
+
+//=============================== FOOTER ====================================//
+.cgsy-footer {
+  border-top: 1px solid #cfcfe0;
+  height: 45px;
+  line-height: 45px;
+  text-align: left;
+  font-size: 12px;
+  width: 100%;
+  padding: 0 5px;
+  margin-top: 10px;
+  background: #fdfdfe;
+  position: absolute;
+  bottom: 0;
+}
+
+//=============================== NAVBAR ====================================//
+
+.profile:hover,
+.profile:focus,
+.profile{
+  background-color: @cgsyPrimary;
 }

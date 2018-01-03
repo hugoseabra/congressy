@@ -10,7 +10,7 @@ from gatheros_event.views.mixins import AccountMixin
 class EventPanelView(AccountMixin, DetailView):
     model = Event
     # template_name = 'gatheros_event/event/panel.html'
-    template_name = 'event/dashboard.html'
+    template_name = 'event/panel.html'
     permission_denied_url = reverse_lazy('event:event-list')
 
     def get_context_data(self, **kwargs):
