@@ -29,9 +29,8 @@ class ProfileView(AccountMixin, FormView):
 class ProfileCreateView(TemplateView, FormView):
     template_name = 'registration/register.html'
     messages = {
-        'success': 'Informações registradas com sucesso, um email com '
-                   'instruções foi enviado para "%s" click no link para '
-                   'terminar o cadastro'
+        'success': 'Sua conta foi criada com sucesso! git a'
+                   'Enviamos um email para "%s", click no link do email para ativar sua conta.'
     }
 
     def get_form(self, form_class=None):
