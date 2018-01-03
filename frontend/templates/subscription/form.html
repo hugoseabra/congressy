@@ -67,16 +67,24 @@
                         {% for item in default_fields %}
                             <div class="form-group">
 
+
                                 <label for="
 {{ item.form_field.id_for_label }}">
-                                    {{ item.form_field.label }}</label>
+                                     {{ item.form_field.label }}
+                                    {% if item.form_field.field.required %}
+                                        <small style="color:#C9302C">*
+                                        </small>
+                                    {% endif %}
+                                </label>
+
+
                                 <div>
 
                                     {% if item.form_field.field.widget.input_type == "checkbox" %}
                                         {{ item.form_field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
 
                                     {% elif item.form_field.id_for_label == "id_phone" %}
-                                        {{ item.form_field |add_class:"form-control" |attr:"type:tel"}}
+                                        {{ item.form_field |add_class:"form-control" |attr:"type:tel" }}
                                     {% else %}
                                         {{ item.form_field |add_class:"form-control" }}
                                     {% endif %}
