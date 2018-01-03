@@ -1,0 +1,32 @@
+/* ================== DEVICES 768px X 1024px ================== */
+/* ----------- 768 ----------- */
+@media screen
+and (device-width: 768px)
+and (device-height: 1024px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 88%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 18px;
+    }
+}
+
+/* ----------- 1024 ----------- */
+@media screen
+and (device-width: 1024px)
+and (device-height: 768px) {
+    .navbar-left {
+        width: 72%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 18px;
+    }
+}
