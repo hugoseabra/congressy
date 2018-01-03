@@ -69,6 +69,14 @@
                             <span class="icon"><i class="fa fa-sign-out"></i>
                             </span>Sair</a>
                 </li>
+                <li class="divider"></li>
+                <li>
+                    <a href="{% url 'event:event-add' %}"
+                       class="btn-sm btn-success">
+                        <i class="fa fa-plus"></i>
+                        Novo evento
+                    </a>
+                </li>
 
             </ul>
         </li>
@@ -78,9 +86,6 @@
                 <i class="fa fa-ellipsis-v"></i>
             </button>
             <div id="mobile-top-menu">
-                {#            <h4>#}
-                {#                Minhas informações:#}
-                {#            </h4>#}
                 <div class="mobile-top-menu-wrap">
                     <div class="row">
                         <div class="col-xs-12">
