@@ -1,17 +1,19 @@
 {% extends "base/base.html" %}
-{% load i18n static %}
+{% load i18n static base_tags %}
 
 {% block title %}Convites | Congressy{% endblock %}
 {% block page_title %}Novo Convite{% endblock %}
 {% block page_sub_title %}{{ invitation_organization.name }}{% endblock %}
 
 {% block content %}
-    <form role="form" action="" method="post" class="form-horizontal">{% csrf_token %}
+    <form role="form" action="" method="post"
+          class="form-horizontal">{% csrf_token %}
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar">
                     <div class="float-right">
-                        <a href="{% url 'event:invitation-list' invitation_organization.pk %}" class="btn btn-danger">
+                        <a href="{% url 'event:invitation-list' invitation_organization.pk %}"
+                           class="btn btn-danger">
                             <i class="fa fa-close"></i>
                             Cancelar
                         </a>
@@ -32,15 +34,31 @@
                     <div class="panel-body">
                         <div class="form-group">
                             <div class="col-md-12">
-                                <label for="name">E-mail<small style="color:#C9302C">*
-                                            </small></label>
+                                <label for="name">E-mail
+                                    <small style="color:#C9302C">*
+                                    </small>
+                                </label>
                                 <input type="email"
                                        required
                                        name="to"
                                        class="form-control"
                                        id="to"
                                        placeholder="me@you.com">
-                                <input type="hidden" name="organization" value="{{ invitation_organization.pk }}" />
+                                <input type="hidden" name="organization"
+                                       value="{{ invitation_organization.pk }}"/>
+                                {% if form.to.errors %}
+                                    {% for error in form.to.errors %}
+                                    <div class="alert alert-danger
+                                    alert-dismissable">
+                                        <button type="button" class="close"
+                                                data-dismiss="alert"
+                                                aria-hidden="true">×
+                                        </button>
+                                        {{ error }}
+                                    </div>
+                                    {% endfor %}
+                                {% endif %}
+
                             </div>
                         </div>
                     </div>
@@ -52,7 +70,8 @@
             <div class="col-md-12">
                 <div class="buttonbar bottom">
                     <div class="float-right">
-                        <a href="{% url 'event:invitation-list' invitation_organization.pk %}" class="btn btn-danger">
+                        <a href="{% url 'event:invitation-list' invitation_organization.pk %}"
+                           class="btn btn-danger">
                             <i class="fa fa-close"></i>
                             Cancelar
                         </a>
