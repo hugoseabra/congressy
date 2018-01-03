@@ -67,29 +67,29 @@
                     <div class="panel-body">
 
 
-                        {% if not is_manager %}
-                            <div id="cgsy-btn-navbar">
-                                <nav class="navbar" role="navigation">
-                                    <ul class="nav navbar-nav navbar-left">
-                                        Você não é organizador de eventos. Para
-                                        criar seus próprios eventos, clique no
-                                        botão
-                                        abaixo:
-                                        <br/><br/>
-                                        <form onsubmit="return confirm('Deseja realmente se tornar um organizador?')"
-                                              action="{% url 'event:organization-add-internal' %}"
-                                              method="post">{% csrf_token %}
-                                            <button class="btn btn-success"
-                                                    type="submit">Quero ser um
-                                                organizador de
-                                                eventos.
-                                            </button>
-                                        </form>
-                                    </ul>
-
-                                </nav>
-                            </div>
-                        {% endif %}
+{#                        {% if not is_manager %}#}
+{#                            <div id="cgsy-btn-navbar">#}
+{#                                <nav class="navbar" role="navigation">#}
+{#                                    <ul class="nav navbar-nav navbar-left">#}
+{#                                        Você não é organizador de eventos. Para#}
+{#                                        criar seus próprios eventos, clique no#}
+{#                                        botão#}
+{#                                        abaixo:#}
+{#                                        <br/><br/>#}
+{#                                        <form onsubmit="return confirm('Deseja realmente se tornar um organizador?')"#}
+{#                                              action="{% url 'event:organization-add-internal' %}"#}
+{#                                              method="post">{% csrf_token %}#}
+{#                                            <button class="btn btn-success"#}
+{#                                                    type="submit">Quero ser um#}
+{#                                                organizador de#}
+{#                                                eventos.#}
+{#                                            </button>#}
+{#                                        </form>#}
+{#                                    </ul>#}
+{##}
+{#                                </nav>#}
+{#                            </div>#}
+{#                        {% endif %}#}
 
                         {% for field in form %}
                             {% if field.field.widget.input_type == "hidden" %}
