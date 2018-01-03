@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load static event_tags  base_tags  widget_tweaks%}
+{% load static event_tags  base_tags  widget_tweaks %}
 
 {% block messages %}
     {% if messages %}
@@ -153,9 +153,15 @@
                                                     </div>
                                                 {% endif %}
 
-
                                                 <label for="{{ field.id_for_label }}">
-                                                    {{ field.label }}</label>
+                                                    {{ field.label }}
+                                                    {% if field.field.required %}
+                                                        <small style="color:#C9302C">
+                                                            *
+                                                        </small>
+                                                    {% endif %}
+                                                </label>
+
 
                                                 <div>
 
