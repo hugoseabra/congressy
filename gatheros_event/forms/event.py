@@ -26,10 +26,17 @@ class EventForm(forms.ModelForm):
             # 'subscription_offline',
             # 'published'
         ]
+
         widgets = {'organization': forms.HiddenInput,
-                   'date_start': DateTimeWidget,
-                   'date_end': DateTimeWidget,
+                   'date_start': forms.DateTimeInput,
+                   'date_end': forms.DateTimeInput,
                    }
+
+
+        # widgets = {'organization': forms.HiddenInput,
+        #            'date_start': DateTimeWidget,
+        #            'date_end': DateTimeWidget,
+        #            }
 
     def __init__(self, user, *args, **kwargs):
         self.user = user

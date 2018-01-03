@@ -168,3 +168,42 @@
         </div>
     </form>
 {% endblock %}
+
+
+{% block scripts %}
+
+    <script src="
+{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.full.min.js" %}"></script>
+    <script type="application/javascript">
+
+
+        var logic = function (currentDateTime) {
+            delete $('#id_date_end');
+            $('#id_date_end').datetimepicker({
+                format: 'd/m/y h:m:s',
+                minDate: currentDateTime
+            })
+        };
+
+
+        $('#id_date_start').datetimepicker({
+            format: 'd/m/y h:m:s',
+            onChangeDateTime: logic,
+        });
+
+
+        $('#id_date_end').datetimepicker({
+            format: 'd/m/y h:m:s',
+        });
+
+    </script>
+
+{% endblock %}
+
+{% block styles %}
+
+    <link rel="stylesheet"
+          href="
+{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.min.css" %}">
+
+{% endblock %}

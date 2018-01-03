@@ -21,7 +21,7 @@
     {% event_payment_type object as payment_type %}
     {% if can_change and object.subscription_type != object.SUBSCRIPTION_DISABLED and payment_type != 'free' %}
         <li>
-            <a href="{% urlg 'subscription:lot-list' object.pk %}"
+            <a href="{% url 'subscription:lot-list' object.pk %}"
                title="Lotes">
                 <i class="fa  fa-fw fa-rocket"></i> Lotes
             </a>

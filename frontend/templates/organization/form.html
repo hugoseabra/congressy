@@ -1,19 +1,26 @@
 {% extends "base/base.html" %}
 
-{% load static  widget_tweaks %}
-{% load organization_tags %}
+{% block navbar %}
+    {% include "base/simple-navbar.html" %}
+{% endblock %}
+
+{% load static  widget_tweaks organization_tags %}
+
 
 {% block title %}
     {% if object %}Editar{% else %}Nova{% endif %} Organização | Congressy
 {% endblock %}
+
 {% block page_title %}
     {% if object %}Editar{% else %}Nova{% endif %} Organização
 {% endblock %}
+
 {% block page_sub_title %}
     {% if object %}
         {{ object.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
+
 {% block styles %}
     <style type="text/css">
         .django-ckeditor-widget{
@@ -22,7 +29,9 @@
     </style>
 
 {% endblock %}
+
 {% block sidebar %}{% endblock %}
+
 {% block content %}
     <form action="" method="post" class="form-horizontal" role="form"
           name="event_form">
@@ -138,6 +147,7 @@
         </div>
     </form>
 {% endblock %}
+
 {% block scripts %}
     {{ block.super }}
     <!-- ckeditor -->
@@ -146,3 +156,4 @@
     <script type="text/javascript"
             src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 {% endblock %}
+
