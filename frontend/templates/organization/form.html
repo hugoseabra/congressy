@@ -16,20 +16,24 @@
 {% endblock %}
 {% block sidebar %}{% endblock %}
 {% block content %}
-    <form action="" method="post" class="form-horizontal" role="form" name="event_form">
-    {% csrf_token %}
+    <form action="" method="post" class="form-horizontal" role="form"
+          name="event_form">
+        {% csrf_token %}
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar">
                     <div class="float-right">
                         {% if next_path %}
-                            <a href="{{ next_path|urlencode }}" class="btn btn-danger">
+                            <a href="{{ next_path|urlencode }}"
+                               class="btn btn-danger">
                                 <i class="fa fa-close"></i>
                                 Cancelar
                             </a>
-                            <input type="hidden" name="next" value="{{ next_path }}"/>
+                            <input type="hidden" name="next"
+                                   value="{{ next_path }}"/>
                         {% else %}
-                            <a href="{% url 'event:organization-list' %}" class="btn btn-danger">
+                            <a href="{% url 'event:organization-list' %}"
+                               class="btn btn-danger">
                                 <i class="fa fa-close"></i>
                                 Cancelar
                             </a>
@@ -45,49 +49,54 @@
             </div>
         </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
 
-                <div class="panel-body">
-
-
+                    <div class="panel-body">
                         {% for field in form %}
-                            <div class="form-group">
+                            {% if field.field.widget.input_type == "hidden" %}
+                                {{ field }}
+                            {% else %}
+                                <div class="form-group">
 
-                                <label for="{{ field.id_for_label }}">
-                                    {{ field.label }}
-                                    {% if field.field.required %}
-                                        <small style="color:#C9302C">*</small>
-                                    {% endif %}
-                                </label>
-                                <div>
-                                    {% if field.field.widget.input_type == "checkbox" %}
-                                        {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
-                                    {% else %}
-                                        {{ field |add_class:"form-control" }}
-                                    {% endif %}
-                                    {% if field.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="alert alert-danger
+                                    <label for="{{ field.id_for_label }}">
+                                        {{ field.label }}
+                                        {% if field.field.required %}
+                                            <small style="color:#C9302C">*
+                                            </small>
+                                        {% endif %}
+                                    </label>
+
+                                    <div>
+                                        {% if field.field.widget.input_type == "checkbox" %}
+                                            {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                        {% else %}
+                                            {{ field |add_class:"form-control" }}
+                                        {% endif %}
+                                        {% if field.errors %}
+                                            {% for error in field.errors %}
+                                                <div class="alert alert-danger
                                             alert-dismissable">
-                                                <button type="button"
-                                                        class="close"
-                                                        data-dismiss="alert"
-                                                        aria-hidden="true">×
-                                                </button>
-                                                {{ error }}
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if field.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ field.help_text|safe }}</small>
                                             </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                    {% if field.help_text %}
-                                        <div>
-                                            <small class="text-muted">{{ field.help_text|safe }}</small>
-                                        </div>
-                                    {% endif %}
-                                </div>
+                                        {% endif %}
+                                    </div>
 
-                            </div>
+                                </div>
+                            {% endif %}
                         {% endfor %}
                     </div>
                 </div>
@@ -99,11 +108,14 @@
                 <div class="buttonbar bottom">
                     <div class="float-right">
                         {% if next_path %}
-                            <a href="{{ next_path|urlencode }}"class="btn btn-danger" >
+                            <a href="{{ next_path|urlencode }}"
+                               class="btn btn-danger">
                                 <i class="fa fa-close"></i>Cancelar</a>
-                            <input type="hidden" name="next" value="{{ next_path }}"/>
+                            <input type="hidden" name="next"
+                                   value="{{ next_path }}"/>
                         {% else %}
-                            <a  href="{% url 'event:organization-list' %}"class="btn btn-danger">
+                            <a href="{% url 'event:organization-list' %}"
+                               class="btn btn-danger">
                                 <i class="fa fa-close"></i>Cancelar</a>
                         {% endif %}
 
