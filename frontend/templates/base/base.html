@@ -84,37 +84,42 @@
                         <a href="javascript:void(0);" class="dropdown-toggle"
                            data-toggle="dropdown" aria-expanded="false">
                             <h4>
+
                                 {{ organization.name }}<span
                                     class="caret"></span>
                             </h4></a>
-                        <small class="title"><a
-                                href="{% url 'event:organization-panel' organization.pk %}">{{ member.get_group_display }}</a>
+                        <small class="title">{{ member.get_group_display }}
                         </small>
                         <ul class="dropdown-menu" role="menu">
 
                             <li>
-                                <a href="javascript:void(0);">
+                                <a href="{% url 'event:organization-panel' organization.pk %}">
                             <span class="icon">
                                 <i class="fa fa-rocket"></i>
                             </span>Painel
                                 </a>
                             </li>
-                            <li>
-                                <a href="javascript:void(0);">
+                            {% if is_manager %}
+                                <li>
+                                    <a href="
+{% url 'event:invitation-list' organization.pk %}">
                             <span class="icon">
                                 <i class="fa fa-envelope"></i>
                             </span>Convites
-                                </a>
-                            </li>
+                                    </a>
+                                </li>
+                            {% endif %}
                             <li>
-                                <a href="javascript:void(0);">
+                                <a href="
+{% url 'event:member-list' organization.pk%}">
                             <span class="icon">
                                 <i class="fa fa-users"></i>
                             </span>Membros
                                 </a>
                             </li>
                             <li>
-                                <a href="javascript:void(0);">
+                                <a href="
+{% url 'event:place-list' organization.pkgit  %}">
                             <span class="icon">
                                 <i class="fa fa-map-marker"></i>
                             </span>Locais
