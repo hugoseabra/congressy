@@ -29,7 +29,7 @@ class ProfileView(AccountMixin, FormView):
 class ProfileCreateView(TemplateView, FormView):
     template_name = 'registration/register.html'
     messages = {
-        'success': 'Sua conta foi criada com sucesso! git a'
+        'success': 'Sua conta foi criada com sucesso! '
                    'Enviamos um email para "%s", click no link do email para ativar sua conta.'
     }
 

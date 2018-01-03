@@ -42,6 +42,9 @@ def get_project_git_revision():
 
 @register.filter
 def get_first_item(dictionary):
-    dictionary = literal_eval(dictionary.message)
-    message = list(dictionary.values())[0]
-    return str(message[0])
+    try:
+        dictionary = literal_eval(dictionary.message)
+        message = list(dictionary.values())[0]
+        return str(message[0])
+    except SyntaxError:
+        return dictionary.message

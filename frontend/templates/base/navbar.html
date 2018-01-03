@@ -50,12 +50,10 @@
                            id="organization-context-pk"/>
                     <input type="hidden" name="next"
                            value="{{ request.path }}"/>
-
-                    <li class="divider"></li>
-                    <li><a href="{% url 'event:organization-list' %}">Ver
-                        todas</a>
-                    </li>
                 </form>
+                <li class="divider"></li>
+                <li><a href="{% url 'event:organization-list' %}">Ver todas</a>
+                </li>
             </ul>
 
         </li>
@@ -80,13 +78,32 @@
                             </span>Sair</a>
                 </li>
                 <li class="divider"></li>
-                <li>
-                    <a href="{% url 'event:event-add' %}"
-                       class="btn-sm btn-success">
-                        <i class="fa fa-plus"></i>
-                        Novo evento
-                    </a>
-                </li>
+
+
+                {% if not organization and not internal_organization %}
+                    <form id="init_internal_org" action=
+                            "{% url 'event:organization-add-internal' %}"
+                          method="post">{% csrf_token %}
+
+                        <li>
+                            <a href="#" onclick="document.getElementById
+                            ('init_internal_org').submit()">
+                                <i class="fa fa-plus"></i>
+                                Novo evento
+                            </a>
+                        </li>
+                    </form>
+                {% else %}
+
+                    <li>
+                        <a href="{% url 'event:event-add' %}"
+                           class="btn-sm btn-success">
+                            <i class="fa fa-plus"></i>
+                            Novo evento
+                        </a>
+                    </li>
+                {% endif %}
+
 
             </ul>
         </li>
@@ -100,51 +117,66 @@
                     <div class="row">
                         <div class="col-xs-12">
 
+
                             <span class="icon"><i class="fa fa-user"></i>
-                            </span><a href="{% url 'event:profile' %}">
-                            Perfil</a><br/>
+                            </span><a href="{% url 'event:profile' %}"> Meus
+                            Dados</a><br/>
+
 
                             <span class="icon"><i class="fa fa-sign-out"></i>
-                            </span>
-                            <a href="{% url 'front:logout' %}"> Sair</a><br/>
+                            </span><a href="{% url 'front:logout' %}"> Sair</a><br/>
 
-                            <span class="icon"><i class="fa fa-plus"></i>
-                            </span>
-                            <a href="{% url 'event:event-add' %}">
-                                Novo evento
-                            </a>
-                            <hr/>
+                            {% if not organization and not internal_organization %}
+                                <span class="icon">
+                                    <i class="fa fa-plus"></i>
+                                </span>
+
+                                <a href="#" onclick="document.getElementById
+                            ('init_internal_org').submit()">
+                                    Novo evento
+                                </a>
+
+                            {% else %}
+                                <span class="icon">
+                                    <i class="fa fa-plus"></i>
+                                </span>
+                                <a href="{% url 'event:event-add' %}">
+                                    Novo evento
+                                </a>
+                            {% endif %}
+
 
                             <form action="{% url 'event:organization-switch' %}"
                                   method="post" id="organization_context">
+                                {% csrf_token %}
 
                                 {% for org in organizations %}
                                     {% if org.internal %}
-                                        <span onclick="cgsy_submit({{ org.pk }})">
-                                    <a href="#">{{ org.name }}</a>
-                                    </span>
+                                        <hr/>
+                                        <a onclick="cgsy_submit({{ org.pk }})"
+                                           href="#">{{ org.name }}</a>
                                     {% endif %}
                                 {% endfor %}
+
 
                                 {% for org in organizations %}
                                     {% if not org.internal %}
-                                        <li onclick="cgsy_submit({{ org.pk }})">
-                                            <a
-                                                    href="#">{{ org.name }}</a>
-                                        </li>
+                                        <a href="#"
+                                           onclick="cgsy_submit({{ org.pk }})">{{ org.name }}</a>
                                     {% endif %}
                                 {% endfor %}
-        <hr/>
 
-        <a href="{% url 'event:organization-list' %}">
-            Ver todos</a><br/>
+                            </form>
 
-        </form>
 
-        </div>
-        </div>
-        </div>
-        </div>
+                            <hr/>
+                            <a href="{% url 'event:organization-list' %}">Ver
+                                todas</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </li>
     </ul>
 {% endif %}
