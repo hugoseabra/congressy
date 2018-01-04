@@ -50,75 +50,6 @@
     <!-- <link id="color-css" rel="stylesheet" href="css/colors/turquoise.css"> -->
     <!-- <link id="color-css" rel="stylesheet" href="css/colors/blue.css"> -->
     <style>
-        .header-section {
-            position: relative !important;
-            -webkit-transition: all .5s linear;
-            -moz-transition: all .5s linear;
-            -o-transition: all .5s linear;
-            transition: all .5s linear;
-        }
-        .header-section-fixed {
-            position: fixed !important;
-        }
-
-        .navbar-left {
-            width: 78%
-        }
-
-        .navbar-brand {
-            height: auto !important;
-        }
-
-        .navbar .top-title,
-        .navbar-default .top-title {
-            color: #333 !important;
-            font-weight: 600;
-            margin: 0;
-            font-size: 22px;
-
-            -webkit-transition: all .2s linear;
-            -moz-transition: all .2s linear;
-            -o-transition: all .2s linear;
-            transition: all .2s linear;
-        }
-
-        .navbar-left .navbar-default .top-title {
-            color: #333 !important;
-        }
-
-        .navbar-left .navbar .top-title {
-            color: #FFF !important;
-        }
-
-        .navbar .top-title-muted,
-        .navbar-default .top-title-muted {
-            color: darkgrey !important;
-            margin-top: -5px;
-            font-weight: 600;
-            font-size: 12px;
-        }
-
-        .navbar.floating .top-title,
-        .navbar-default.floating .top-title {
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .navbar.floating .top-title {
-            color: #FFF !important;
-        }
-
-        .navbar-default.floating .top-title {
-            color: #333 !important;
-        }
-
-        .navbar-default.floating .top-title-muted {
-            color: #333 !important;
-            margin: 0;
-            font-weight: 600;
-            font-size: 12px;
-        }
-
         img.blurred {
             -webkit-filter: blur(18px);
             -moz-filter: blur(18px);
@@ -148,7 +79,7 @@
     <!-- HEADER
     ================================= -->
     <header id="header"
-            class="header-section section section-dark navbar-default navbar-fixed-top">
+            class="header-section section section-dark navbar navbar-fixed-top">
 
         <div class="container-fluid">
 
@@ -165,14 +96,10 @@
 
                 <!-- HEADER LOGO -->
                 <a class="navbar-logo navbar-brand anchor-link" href="#hero">
-                    <h1 class="top-title">
-                        Celebração das Células
-                    </h1>
-                    <h3 class="top-title-muted">
-                        06/12/2018 19h00 | Centro de Convenções de Goiânia
-                    </h3>
+                    <img src="images/logos/header-logo.png"
+                         srcset="images/logos/header-logo@2x.png 2x"
+                         alt="Drew">
                 </a>
-
             </div>
 
             <nav id="navigation"
@@ -181,34 +108,24 @@
                 <!-- NAVIGATION LINKS -->
                 <ul id="header-nav" class="nav navbar-nav">
 
-                    <li><a href="#hero" class="hidden">Top</a></li>
-
-                    <!-- DROPDOWN MENU -->
-                    <li class="dropdown dropdown-hover">
-                        <a href="#" class="dropdown-toggle external"
-                           data-toggle="dropdown" role="button"
-                           aria-expanded="false">Navegar <span
-                                class="caret"></span></a>
-
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#about">About</a></li>
-                            <li><a href="#how-it-works">How it Works</a></li>
-                            <li><a href="#maps" class="anchor-link external">Contact
-                                Us</a></li>
-                        </ul>
+                    <li><a href="#hero" class="anchor-link">Capa</a></li>
+                    <li><a href="#about" class="anchor-link">Sobre o evento</a>
+                    </li>
+                    <li><a href="#map" class="anchor-link">Local</a></li>
+                    <li><a href="#owner" class="anchor-link">Organizador</a>
                     </li>
 
                     <!-- HEADER ACTION BUTTON -->
                     <li class="header-action-button">
+                        <a href="#hero" class="anchor-link btn-link">
+                            Entrar
+                        </a>
                         <a href="#hero" class="anchor-link btn btn-primary">
                             Inscreva-se
                         </a>
                     </li>
-
                 </ul>
-
             </nav>
-
         </div>
 
     </header>
@@ -225,23 +142,6 @@
                 <img src="images/celebracao_celulas_banner2.jpg"
                      alt="" style="opacity: 0.2;" class="blurred">
             </div>
-
-            <!-- VIDEO BACKGROUND -->
-            <!-- <div class="section-background-video section-background-dot-overlay parallax" data-stellar-ratio="0.4">
-                <video preload="auto" autoplay loop muted poster="images/backgrounds/video-fallback-bg.jpg" style="opacity: 0.3;">
-                    <source type="video/mp4" src="videos/video-bg.mp4">
-                    <source type="video/ogg" src="videos/video-bg.ogv">
-                    <source type="video/webm" src="videos/video-bg.webm">
-                </video>
-            </div> -->
-
-            <!-- SLIDESHOW BACKGROUND -->
-            <!-- <ul class="section-background-slideshow parallax" data-stellar-ratio="0.4" data-speed="800" data-timeout="4000">
-                <li><img src="images/backgrounds/hero-bg-slideshow-1.jpg" alt="" style="opacity: 0.25;"></li>
-                <li><img src="images/backgrounds/hero-bg-slideshow-2.jpg" alt="" style="opacity: 0.25;"></li>
-                <li><img src="images/backgrounds/hero-bg-slideshow-3.jpg" alt="" style="opacity: 0.2;"></li>
-            </ul> -->
-
         </div>
 
         <div class="container">
@@ -256,35 +156,20 @@
                             <h1 class="hero-title">Celebração das Células</h1>
 
                             <p class="hero-tagline">
-                                <div style="width: 50%;margin: 0 auto">
-                                    <div style="float:left">
-                                        <i class="fa fa-calendar"></i>
-                                        06/12/2018 19h00
-                                    </div>
+                            <div style="width: 50%;margin: 0 auto">
+                                <div style="float:left">
+                                    <i class="fa fa-calendar"></i>
+                                    06/12/2018 19h00
+                                </div>
 
-                                    <div style="float:right">
-                                        <i class="fa fa-map-marker"></i>
-                                        Centro de Convenções de Goiânia
-                                    </div>
-                                    <div class="clearfix"></div>
+                                <div style="float:right">
+                                    <i class="fa fa-map-marker"></i>
+                                    Centro de Convenções de Goiânia
                                 </div>
-                                <div style="width: 25%;margin: 10px auto">
-                                    <div style="float:left">
-                                        <i class="fa fa-facebook-square fa-2x"></i>
-                                    </div>
-                                    <div style="float:left;margin-left: 12px">
-                                        <i class="fa fa-twitter-square fa-2x"></i>
-                                    </div>
-                                    <div style="float:left;margin-left: 12px">
-                                        <i class="fa fa-instagram fa-2x"></i>
-                                    </div>
-                                    <div style="float:left;margin-left: 12px">
-                                        <i class="fa fa-linkedin-square fa-2x"></i>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+
                             </p>
-
                         </div>
                     </div>
 
@@ -299,31 +184,39 @@
                             </p>
                             <ul class="icon-list">
                                 <li>
-                                    <span class="icon-list-icon fa fa-soundcloud" data-animation="bounceIn"></span>
+                                    <span class="icon-list-icon fa fa-soundcloud"
+                                          data-animation="bounceIn"></span>
                                     <h4 class="icon-list-title">
                                         Louvor e Adoração
                                     </h4>
                                     <p>
-                                        Venha passar um maravilhoso tempo em louvor e adoração com Fred Arrais e Banda.
+                                        Venha passar um maravilhoso tempo em
+                                        louvor e adoração com Fred Arrais e
+                                        Banda.
                                     </p>
                                 </li>
                                 <li>
-                                    <span class="icon-list-icon fa fa-heart-o" data-animation="bounceIn"></span>
+                                    <span class="icon-list-icon fa fa-heart-o"
+                                          data-animation="bounceIn"></span>
                                     <h4 class="icon-list-title">
                                         Entrega e Agradecimento
                                     </h4>
                                     <p>
-                                        Nada mais justo que agradecer e dedicar um tempo nos braços do pai.
+                                        Nada mais justo que agradecer e dedicar
+                                        um tempo nos braços do pai.
                                     </p>
                                 </li>
                                 <li>
-                                    <span class="icon-list-icon fa fa-lightbulb-o" data-animation="bounceIn"></span>
+                                    <span class="icon-list-icon fa fa-lightbulb-o"
+                                          data-animation="bounceIn"></span>
                                     <h4 class="icon-list-title">
                                         Pregações Ungidas
                                     </h4>
                                     <p>
                                         Vamos ouvir e aprender em Deus com o
-                                        Pr. Jetro Paiva (Pastor Sênior da Primeira Igreja Batista de Junqueirópolis)
+                                        Pr. Jetro Paiva (Pastor Sênior da
+                                        Primeira Igreja Batista de
+                                        Junqueirópolis)
                                     </p>
                                 </li>
                             </ul>
@@ -332,12 +225,40 @@
 
                         <div class="hero-features-right col-md-5"
                              data-animation="fadeIn">
+                            <div style="width: 100%;margin: 0 auto 10px auto">
+                                <div style="float:left;margin-top: 3px;">
+                                    Compartilhar:
+                                </div>
+                                <div style="float:left;margin-left: 12px">
+                                    <a href="#" class="anchor-link external">
+                                        <i class="fa fa-facebook-square fa-2x"></i>
+                                    </a>
+                                </div>
+                                <div style="float:left;margin-left: 12px">
+                                    <a href="#" class="anchor-link external">
+                                        <i class="fa fa-twitter-square fa-2x"></i>
+                                    </a>
+                                </div>
+                                <div style="float:left;margin-left: 12px">
+                                    <a href="#" class="anchor-link external">
+                                        <i class="fa fa-instagram fa-2x"></i>
+                                    </a>
+                                </div>
+                                <div style="float:left;margin-left: 12px">
+                                    <a href="#" class="anchor-link external">
+                                        <i class="fa fa-linkedin-square fa-2x"></i>
+                                    </a>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
 
                             <!-- FORM -->
                             <form name="hero" action="" method="post" id="form"
                                   class="form" role="form">
 
-                                <h4 class="form-heading">Inscreva-se agora!</h4>
+                                <h4 class="form-heading"
+                                    style="font-weight: bold;">Inscreva-se
+                                    agora!</h4>
 
                                 <div class="form-validation alert"></div>
 
@@ -419,10 +340,10 @@
                         Programação
                     </p>
                     <p>
-                        <div>19h - Abertura</div>
-                        <div>20h - Louvor e adoração com Diante do Trono</div>
-                        <div>21h - Ministração Pr. Gustavo Bessa</div>
-                        <div>22h - Encerramento, louvor e adoração.</div>
+                    <div>19h - Abertura</div>
+                    <div>20h - Louvor e adoração com Diante do Trono</div>
+                    <div>21h - Ministração Pr. Gustavo Bessa</div>
+                    <div>22h - Encerramento, louvor e adoração.</div>
                     </p>
                 </div>
 
@@ -465,7 +386,7 @@
 
     <!-- GOOGLE MAPS
     ================================= -->
-    <section id="contact-maps" class="contact-maps-section section">
+    <section id="map" class="contact-maps-section section">
 
         <div class="section-background">
 
@@ -478,28 +399,99 @@
                 <!-- ref: http://maplacejs.com/ -->
                 <script>
                     var gmap_options = {
-                        generate_controls : true,
-                        locations : [{
-                            lat : -22.2198393,
-                            lon : -49.9524338,
-                            animation : google.maps.Animation.DROP,
-                            html : "Drew Headquarter",
-                            icon : "images/contents/map-1.png",
-                            clickable : false,
+                        generate_controls: true,
+                        locations: [{
+                            lat: -22.2198393,
+                            lon: -49.9524338,
+                            animation: google.maps.Animation.DROP,
+                            html: "Drew Headquarter",
+                            icon: "images/contents/map-1.png",
+                            clickable: false,
                         }],
-                        map_options : {
-                            scrollwheel : false,
-                            mapTypeControl : true,
-                            streetViewControl : true,
-                            zoomControlOptions : {
-                                style : google.maps.ZoomControlStyle.SMALL,
+                        map_options: {
+                            scrollwheel: false,
+                            mapTypeControl: true,
+                            streetViewControl: true,
+                            zoomControlOptions: {
+                                style: google.maps.ZoomControlStyle.SMALL,
                             },
-                            zoom : 16,
-                            set_center : [ -22.2198393, -49.9524338 ], // adjust the "lon" attribute of your first location
+                            zoom: 16,
+                            set_center: [-22.2198393, -49.9524338], // adjust the "lon" attribute of your first location
                         },
-                        styles : {
+                        styles: {
                             // source: https://snazzymaps.com/style/132/light-gray
-                            'custom' : [{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#d3d3d3"}]},{"featureType":"transit","stylers":[{"color":"#808080"},{"visibility":"off"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"visibility":"on"},{"color":"#b3b3b3"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#ffffff"},{"weight":1.8}]},{"featureType":"road.local","elementType":"geometry.stroke","stylers":[{"color":"#d7d7d7"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#ebebeb"}]},{"featureType":"administrative","elementType":"geometry","stylers":[{"color":"#a7a7a7"}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#efefef"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#696969"}]},{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"visibility":"on"},{"color":"#737373"}]},{"featureType":"poi","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road.arterial","elementType":"geometry.stroke","stylers":[{"color":"#d6d6d6"}]},{"featureType":"road","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"color":"#dadada"}]}],
+                            'custom': [{
+                                "featureType": "water",
+                                "elementType": "geometry.fill",
+                                "stylers": [{"color": "#d3d3d3"}]
+                            }, {
+                                "featureType": "transit",
+                                "stylers": [{"color": "#808080"}, {"visibility": "off"}]
+                            }, {
+                                "featureType": "road.highway",
+                                "elementType": "geometry.stroke",
+                                "stylers": [{"visibility": "on"}, {"color": "#b3b3b3"}]
+                            }, {
+                                "featureType": "road.highway",
+                                "elementType": "geometry.fill",
+                                "stylers": [{"color": "#ffffff"}]
+                            }, {
+                                "featureType": "road.local",
+                                "elementType": "geometry.fill",
+                                "stylers": [{"visibility": "on"}, {"color": "#ffffff"}, {"weight": 1.8}]
+                            }, {
+                                "featureType": "road.local",
+                                "elementType": "geometry.stroke",
+                                "stylers": [{"color": "#d7d7d7"}]
+                            }, {
+                                "featureType": "poi",
+                                "elementType": "geometry.fill",
+                                "stylers": [{"visibility": "on"}, {"color": "#ebebeb"}]
+                            }, {
+                                "featureType": "administrative",
+                                "elementType": "geometry",
+                                "stylers": [{"color": "#a7a7a7"}]
+                            }, {
+                                "featureType": "road.arterial",
+                                "elementType": "geometry.fill",
+                                "stylers": [{"color": "#ffffff"}]
+                            }, {
+                                "featureType": "road.arterial",
+                                "elementType": "geometry.fill",
+                                "stylers": [{"color": "#ffffff"}]
+                            }, {
+                                "featureType": "landscape",
+                                "elementType": "geometry.fill",
+                                "stylers": [{"visibility": "on"}, {"color": "#efefef"}]
+                            }, {
+                                "featureType": "road",
+                                "elementType": "labels.text.fill",
+                                "stylers": [{"color": "#696969"}]
+                            }, {
+                                "featureType": "administrative",
+                                "elementType": "labels.text.fill",
+                                "stylers": [{"visibility": "on"}, {"color": "#737373"}]
+                            }, {
+                                "featureType": "poi",
+                                "elementType": "labels.icon",
+                                "stylers": [{"visibility": "off"}]
+                            }, {
+                                "featureType": "poi",
+                                "elementType": "labels",
+                                "stylers": [{"visibility": "off"}]
+                            }, {
+                                "featureType": "road.arterial",
+                                "elementType": "geometry.stroke",
+                                "stylers": [{"color": "#d6d6d6"}]
+                            }, {
+                                "featureType": "road",
+                                "elementType": "labels.icon",
+                                "stylers": [{"visibility": "off"}]
+                            }, {}, {
+                                "featureType": "poi",
+                                "elementType": "geometry.fill",
+                                "stylers": [{"color": "#dadada"}]
+                            }],
                         }
                     };
                 </script>
@@ -510,30 +502,15 @@
 
     <!-- FOOTER
     ================================= -->
-    <section id="footer" class="footer-section section">
-        <div class="container-fluid">
+    <section id="owner" class="footer-section section">
+        <h2 class="section-heading text-center">Organizador</h2>
+        <div class="container">
             <div class="row">
                 <div class="col-md-2">
                     <h3 class="footer-logo">
-                        <img src="images/marca-da-igreja.png"
-                             srcset="images/marca-da-igreja@2x.png 2x" alt="1 Igreja Batista de Marília">
+                        <img src="images/Lagoinha.png" class="img-circle"
+                             alt="1 Igreja Batista de Marília" style="border:4px solid #ddd">
                     </h3>
-
-                    <div class="footer-socmed">
-                        <a href="#" target="_blank">
-                            <span class="fa fa-facebook"></span>
-                        </a>
-                        <a href="#" target="_blank">
-                            <span class="fa fa-twitter"></span>
-                        </a>
-                        <a href="#" target="_blank">
-                            <span class="fa fa-instagram"></span>
-                        </a>
-                        <a href="#" target="_blank">
-                            <span class="fa fa-pinterest"></span>
-                        </a>
-                    </div>
-
                 </div>
                 <div class="col-md-10">
                     <div class="row">
@@ -543,11 +520,6 @@
                                 Culto de Celebração, venha e participe conosco.
                                 Todos os Domingos às 10h | 17h e às 19h30.
                                 Transmissão ao vivo pelo Facebook, Live Stream.
-                            </div>
-                            <div class="team-member-description">
-                                <a href="#hero" class="anchor-link btn btn-lg btn-default">
-                                    Fale com o organizador
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -560,21 +532,16 @@
     <!-- CONGRESSY FOOTER
     ================================= -->
     <section id="about-platform" class="footer-section section section-dark">
-
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <h3 class="footer-logo">
-                        <img src="images/logos/header-logo.png "
-                             srcset="images/logos/header-logo@2x.png 2x"
-                             alt="Congressy">
+                        <img src="images/logos/header-logo.png" srcset="images/logos/header-logo@2x.png 2x" alt="Congressy">
                     </h3>
                 </div>
             </div>
         </div>
     </section>
-
-
 </div>
 
 <!-- LIBRARIES JS
