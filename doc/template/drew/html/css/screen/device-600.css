@@ -1,0 +1,68 @@
+/* ================== DEVICES 600px X 1024px ================== */
+/* ----------- 600 ----------- */
+@media screen
+and (device-width: 600px)
+and (device-height: 1024px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 76%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 18px;
+    }
+}
+
+/* ----------- 1024 ----------- */
+@media screen
+and (device-width: 1024px)
+and (device-height: 600px) {
+    .navbar-left {
+        width: 72%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 18px;
+    }
+}
+
+/* ================== DEVICES 600px X 960px ================== */
+/* ----------- 600 ----------- */
+@media screen
+and (device-width: 600px)
+and (device-height: 960px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 76%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 18px;
+    }
+}
+
+/* ----------- 960 ----------- */
+@media screen
+and (device-width: 960px)
+and (device-height: 600px) {
+    .navbar-left {
+        width: 100%;
+    }
+    .navbar-logo {
+        width: 92%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 18px;
+    }
+}
