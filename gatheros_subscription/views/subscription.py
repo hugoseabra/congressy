@@ -547,7 +547,8 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
     """ Lista de inscrições """
 
     model = Subscription
-    template_name = 'gatheros_subscription/subscription/my_subscriptions.html'
+    #template_name = 'gatheros_subscription/subscription/my_subscriptions.html'
+    template_name = 'subscription/my_subscriptions.html'
     ordering = ('event__name', 'event__date_start', 'event__date_end',)
 
     def get_permission_denied_url(self):
