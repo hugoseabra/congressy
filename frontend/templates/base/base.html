@@ -111,7 +111,7 @@
                             {% endif %}
                             <li>
                                 <a href="
-{% url 'event:member-list' organization.pk%}">
+{% url 'event:member-list' organization.pk %}">
                             <span class="icon">
                                 <i class="fa fa-users"></i>
                             </span>Membros
@@ -134,14 +134,14 @@
                 <br>
                 <ul class="nav nav-pills nav-stacked">
                     {% block nav_aside_itens %}
-                        <li>
+                        <li class="sidebar_main_items">
                             <a href="{% url 'event:organization-list' %}"
                                title="Organizações">
                                 <i class="fa  fa-fw fa-sitemap"></i>
                                 Organizações
                             </a>
                         </li>
-                        <li>
+                        <li class="sidebar_main_items">
                             <a href="{% url 'event:event-list' %}"
                                title="Eventos">
                                 <i class="fa  fa-fw fa-rocket"></i> Eventos
@@ -158,7 +158,7 @@
                             Organizador</label>
                     </div>
                     <div class="col-xs-4">
-                        <input class="js-switch" checked="" id="check1"
+                        <input class="js-switch" id="organizer_switch"
                                style="display: none;" data-switchery="true"
                                type="checkbox">
                     </div>
@@ -206,7 +206,38 @@
 <script src="{% static "assets/plugins/switchery/switchery.min.js" %}"></script>
 <script src="{% static "assets/js/src/app.js" %}"></script>
 <script src="{% static "assets/js/cgsy.js" %}"></script>
+<script>
 
+    {% if organization.internal  %}
+        $("#organization_button").hide();
+        $(".sidebar_main_items").hide();
+        $('#organizer_switch').prop('checked', false);
+    {% else %}
+        $(".sidebar_main_items").show();
+        $("#organization_button").show();
+        $('#organizer_switch').click();
+    {% endif %}
+
+    $('#organizer_switch').on("change", function () {
+
+        {% if not organization and not internal_organization %}
+            $("#init_internal_org").submit();
+        {% endif %}
+
+
+        if ($('#organizer_switch').prop('checked')) {
+            $("#organization_button").show();
+            $(".sidebar_main_items").show();
+        } else {
+            $("#organization_button").hide();
+            $(".sidebar_main_items").hide();
+            $("#organization-context-pk").val({{ request.session.account.organizations.0}});
+            $("#organization_context").submit()
+
+        }
+    });
+
+</script>
 {% block scripts %}{% endblock %}
 </body>
 </html>
