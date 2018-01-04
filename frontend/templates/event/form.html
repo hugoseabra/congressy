@@ -157,20 +157,20 @@
         var logic = function (currentDateTime) {
             delete $('#id_date_end');
             $('#id_date_end').datetimepicker({
-                format: 'd/m/y h:m:s',
+                format: 'd/m/y H:m:s',
                 minDate: currentDateTime
             })
         };
 
 
         $('#id_date_start').datetimepicker({
-            format: 'd/m/y h:m:s',
+            format: 'd/m/y H:m:s',
             onChangeDateTime: logic,
         });
 
 
         $('#id_date_end').datetimepicker({
-            format: 'd/m/y h:m:s',
+            format: 'd/m/y H:m:s',
         });
 
     </script>
