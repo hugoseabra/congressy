@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
+    'django.contrib.sites',
 
     # THIRD PARTY
     'permission',
@@ -41,6 +42,8 @@ INSTALLED_APPS = [
     'gatheros_subscription',
     'gatheros_front',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
