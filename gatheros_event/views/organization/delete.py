@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 
 from gatheros_event.models import Organization
 from gatheros_event.views.mixins import DeleteViewMixin
+from gatheros_event.helpers.account import update_account
 
 
 class OrganizationDeleteView(DeleteViewMixin):
@@ -36,3 +37,7 @@ class OrganizationDeleteView(DeleteViewMixin):
             event_list.append('"{} (ID: {})"'.format(e.name, e.pk))
 
         return event_list
+
+    def post_delete(self):
+        update_account(self.request)
+
