@@ -223,20 +223,10 @@
 		var toggleHeaderFloating = function() {
 			// Floating Header
 			if ( $window.scrollTop() > 80 ) {
-				$( '.header-section' )
-					.addClass( 'floating' )
-					.addClass( 'navbar' )
-					.addClass( 'header-section-fixed' )
-					.removeClass( 'navbar-default' )
-				;
+				$( '.header-section' ).addClass( 'floating' );
 			} else {
-				$( '.header-section' )
-					.removeClass( 'floating' )
-					.removeClass( 'navbar' )
-					.removeClass( 'header-section-fixed' )
-					.addClass( 'navbar-default' )
-				;
-			};
+				$( '.header-section' ).removeClass( 'floating' );
+			}
 		};
 
 		$window.on( 'scroll', toggleHeaderFloating );
@@ -248,10 +238,10 @@
 		 */
 		if ( $.fn.onePageNav ) {
 			$( '#header-nav' ).onePageNav({
-				scrollSpeed : 1000,
+				scrollSpeed : 800,
 				filter : ':not(.external)',
 				begin : function() {
-					$( '#navigation' ).collapse( 'toggle' );
+					// $( '#navigation' ).collapse( 'toggle' );
 				},
 			});
 		};

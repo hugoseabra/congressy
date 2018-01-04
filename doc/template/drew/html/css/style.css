@@ -14,7 +14,7 @@ html {
 }
 body {
 	height: 100%;
-	font-family: "Open Sans", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 15px;
 	line-height: 1.715;
 	background-color: #fff;
@@ -132,7 +132,7 @@ iframe {
 	color: #fff;
 }
 .icon-list-icon:not(.fa) {
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-weight: bold;
 }
 .section-accent .icon-list-icon {
@@ -140,7 +140,7 @@ iframe {
 }
 .icon-list-title {
 	margin: 0 0 10px;
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -159,7 +159,7 @@ iframe {
 	top: 0;
 	left: 0;
 	margin: 10px 0 0 10px;
-	font-family: "FontAwesome";
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 20px;
 	line-height: 1;
 	opacity: 0.5;
@@ -187,7 +187,7 @@ iframe {
 	text-align: center;
 }
 .countdown {
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	text-align: center;
 	display: table;
 	table-layout: fixed;
@@ -238,7 +238,7 @@ iframe {
 	position: relative;
 	padding-bottom: 20px;
 	margin: 0 0 30px;
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 24px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -443,7 +443,7 @@ iframe {
 	position: relative;
 	padding-bottom: 20px;
 	margin: 0 0 30px;
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 20px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -473,7 +473,7 @@ iframe {
 	margin-top: 30px;
 }
 .form-group > label {
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 12px;
 	font-weight: normal;
 	letter-spacing: 0.05em;
@@ -591,8 +591,8 @@ iframe {
 .btn {
 	padding: 9px 14px;
 	border-radius: 0;
-	font-family: "Montserrat", sans-serif;
-	font-size: 11px;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 12px;
 	line-height: 1.819;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -692,8 +692,8 @@ iframe {
 	box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 .navbar-nav {
-	font-family: "Montserrat", sans-serif;
-	font-size: 11px;
+	font-family: "Helvetica Neue", Helvetica,Arial,sans-serif;
+	font-size: 12px;
 	line-height: 1.819;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -1044,14 +1044,14 @@ iframe {
 	vertical-align: middle;
 }
 .hero-title {
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	margin-bottom: 10px;
 }
 .hero-subtitle {
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
@@ -1328,7 +1328,7 @@ iframe {
 	background-color: #444;
 }
 .benefit-title {
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -1389,7 +1389,7 @@ iframe {
 	border: 5px solid #fff;
 	border-radius: 50%;
 	color: #fff;
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 36px;
 	font-weight: bold;
 	line-height: 60px;
@@ -1408,7 +1408,7 @@ iframe {
 	background-color: #444;
 }
 .hiw-item-title {
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -1425,7 +1425,7 @@ iframe {
 }
 .numbers-item-counter {
 	margin-bottom: 15px;
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 48px;
 	font-weight: bold;
 	letter-spacing: 0.05em;
@@ -1435,7 +1435,7 @@ iframe {
 	color: #444;
 }
 .numbers-item-caption {
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -1496,7 +1496,7 @@ iframe {
 }
 .team-member-name {
 	margin: 0 0 5px;
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -1634,7 +1634,7 @@ iframe {
 	border-bottom-width: 1px;
 	border-bottom-style: solid;
 	border-bottom-color: rgba(255,255,255,0.1);
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -1646,7 +1646,7 @@ iframe {
 .price {
 	padding: 27px 30px 17px;
 	color: #fff;
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-weight: bold;
 	line-height: 0.7;
 	letter-spacing: 0.05em;
@@ -1693,7 +1693,7 @@ iframe {
 	position: absolute;
 	width: 100%;
 	padding: 10px 30px 11px;
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
@@ -1880,7 +1880,7 @@ iframe {
 .portfolio-item-title {
 	margin: 0 0 15px;
 	color: #fff;
-	font-family: "Montserrat", sans-serif;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 14px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
