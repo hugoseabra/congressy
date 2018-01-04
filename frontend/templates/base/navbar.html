@@ -2,10 +2,12 @@
 {% if user %}
     <script type="application/javascript">
         function cgsy_submit(value) {
+            console.log(typeof(value));
             console.log(value);
             var org_context = document.getElementById('organization-context-pk');
             org_context.value = value;
             document.getElementById("organization_context").submit();
+            console.log('SUBMITTED' + org_context.value)
         }
     </script>
 
@@ -17,7 +19,7 @@
         </li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown profile hidden-xs">
+        <li id="organization_button" class="dropdown profile hidden-xs">
 
             <button class="sidebar-toggle" id="toggle-left"
                     data-toggle="dropdown" aria-haspopup="true"
