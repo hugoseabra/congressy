@@ -129,27 +129,28 @@
                     </div>
                 </div>
             {% endif %}
-
-            <nav>
-                <br>
-                <ul class="nav nav-pills nav-stacked">
-                    {% block nav_aside_itens %}
-                        <li class="sidebar_main_items">
-                            <a href="{% url 'event:organization-list' %}"
-                               title="Organizações">
-                                <i class="fa  fa-fw fa-sitemap"></i>
-                                Organizações
-                            </a>
-                        </li>
-                        <li class="sidebar_main_items">
-                            <a href="{% url 'event:event-list' %}"
-                               title="Eventos">
-                                <i class="fa  fa-fw fa-rocket"></i> Eventos
-                            </a>
-                        </li>
-                    {% endblock %}
-                </ul>
-            </nav>
+            {% if organization %}
+                <nav>
+                    <br>
+                    <ul class="nav nav-pills nav-stacked">
+                        {% block nav_aside_itens %}
+                            <li class="sidebar_main_items">
+                                <a href="{% url 'event:organization-list' %}"
+                                   title="Organizações">
+                                    <i class="fa  fa-fw fa-sitemap"></i>
+                                    Organizações
+                                </a>
+                            </li>
+                            <li class="sidebar_main_items">
+                                <a href="{% url 'event:event-list' %}"
+                                   title="Eventos">
+                                    <i class="fa  fa-fw fa-rocket"></i> Eventos
+                                </a>
+                            </li>
+                        {% endblock %}
+                    </ul>
+                </nav>
+            {% endif %}
         </aside>
     {% endblock %}
 
