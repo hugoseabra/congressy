@@ -85,7 +85,7 @@ class Person(models.Model, GatherosModelMixin):
         verbose_name='bairro'
     )
     phone = models.CharField(
-        max_length=12,
+        max_length=15,
         blank=True,
         null=True,
         verbose_name='telefone',

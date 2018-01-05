@@ -15,28 +15,12 @@
   },
   {
     "model": "gatheros_subscription.defaultfield",
-    "pk": 2,
-    "fields": {
-      "name": "gender",
-      "label": "Sexo",
-      "field_type": "select",
-      "with_options": true,
-      "order": 1,
-      "required": false,
-      "select_intro": true,
-      "instruction": "",
-      "placeholder": null,
-      "default_value": ""
-    }
-  },
-  {
-    "model": "gatheros_subscription.defaultfield",
     "pk": 3,
     "fields": {
       "name": "email",
       "label": "E-mail",
       "field_type": "input-email",
-      "order": 2,
+      "order": 1,
       "required": false,
       "instruction": "",
       "placeholder": null,
@@ -50,7 +34,7 @@
       "name": "phone",
       "label": "Celular",
       "field_type": "input-phone",
-      "order": 3,
+      "order": 2,
       "required": true,
       "instruction": "",
       "placeholder": null,

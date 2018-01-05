@@ -32,7 +32,6 @@ class EventForm(forms.ModelForm):
                    'date_end': forms.DateTimeInput,
                    }
 
-
         # widgets = {'organization': forms.HiddenInput,
         #            'date_start': DateTimeWidget,
         #            'date_end': DateTimeWidget,
