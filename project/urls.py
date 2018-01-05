@@ -9,7 +9,10 @@ from gatheros_event.urls.me import (
     urlpatterns_public_account,
     urlpatterns_public_password,
 )
+
 from gatheros_event.urls.invitation import urlpatterns_public_invitation
+from hotsite.urls import urlpatterns_public_hotsite
+
 
 admin_urlpatterns = [url(r'^admin/', admin.site.urls)]
 
@@ -21,6 +24,7 @@ private_urlpatterns = [
 
 public_urls = urlpatterns_public_account
 public_urls += urlpatterns_public_invitation
+public_urls += urlpatterns_public_hotsite
 public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [

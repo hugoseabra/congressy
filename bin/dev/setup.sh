@@ -10,7 +10,7 @@ print(settings.BASE_DIR)"`
 export PYTHONPATH=$BASE_DIR
 
 docker-compose -f $BASE_DIR/bin/dev/docker-compose.yml up -d
-
+sleep 5
 $BASE_DIR/bin/dev/dropdb.sh
 $BASE_DIR/bin/dev/dropdb_test.sh
 $BASE_DIR/bin/dev/dropuser.sh

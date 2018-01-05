@@ -1,0 +1,36 @@
+/* ================== DEVICES 360px X 640px ================== */
+/* ----------- 360 ----------- */
+@media screen
+and (device-width: 360px)
+and (device-height: 640px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 76%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
+
+/* ----------- 640 ----------- */
+@media screen
+and (device-width: 640px)
+and (device-height: 360px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 84%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
