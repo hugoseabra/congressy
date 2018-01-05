@@ -10,8 +10,9 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
+from django.utils import six
 
-from gatheros_event.models import Person
+from gatheros_event.models import Person, Organization, Member
 
 
 class ProfileCreateForm(forms.ModelForm):
@@ -51,6 +52,25 @@ class ProfileCreateForm(forms.ModelForm):
         # Vinculando usuário ao perfil
         self.instance.user = user
         self.instance.save()
+
+        try:
+            self.instance.members.get(organization__internal=True)
+        except Member.DoesNotExist:
+            internal_org = Organization(
+                internal=True,
+                name=self.instance.name
+            )
+
+            for attr, value in six.iteritems(self.instance.get_profile_data()):
+                setattr(internal_org, attr, value)
+
+            internal_org.save()
+
+            Member.objects.create(
+                organization=internal_org,
+                person=self.instance,
+                group=Member.ADMIN
+            )
 
         # Criando o email de confirmação e definição de senha
         reset_form = PasswordResetForm(

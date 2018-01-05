@@ -95,21 +95,23 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <li style="font-weight: bold; color: #ffffff">Participantes</li>
-    <li class="active">
-        <a href="{% url 'subscription:subscription-list' event.pk %}"
-           title="Inscrições">
-            <i class="fa  fa-fw fa-rocket"></i>
-            Inscrições
-        </a>
-    </li>
-    <li>
-        <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
-           title="Check-in">
-            <i class="fa  fa-fw fa-rocket"></i>
-            Check-in
-        </a>
-    </li>
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+               title="Check-in">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Check-in
+            </a>
+        </li>
+    </ul>
 {% endblock %}
 
 {% block content %}

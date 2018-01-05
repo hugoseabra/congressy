@@ -236,17 +236,7 @@
             {% endif %}
             {% if organization %}
                 <nav>
-                    <br>
-                    <ul class="nav nav-pills nav-stacked">
-                        {% block nav_aside_itens %}
-                            <li class="sidebar_main_items">
-                                <a href="{% url 'event:event-list' %}"
-                                   title="Eventos">
-                                    <i class="fa  fa-fw fa-rocket"></i> Eventos
-                                </a>
-                            </li>
-                        {% endblock %}
-                    </ul>
+                    {% block nav_aside_itens %}{% endblock %}
                 </nav>
             {% endif %}
         </aside>
