@@ -1,0 +1,73 @@
+/* ================== DEVICES 375px X 667px ================== */
+/* ----------- 375 ----------- */
+@media screen
+and (device-width: 375px)
+and (device-height: 667px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 76%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
+
+/* ----------- 667 ----------- */
+@media screen
+and (device-width: 667px)
+and (device-height: 375px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 88%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
+
+/* ================== DEVICES 375px X 812px ================== */
+/* ----------- 375 ----------- */
+@media screen
+and (device-width: 375px)
+and (device-height: 812px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 76%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
+
+/* ----------- 812 ----------- */
+@media screen
+and (device-width: 812px)
+and (device-height: 375px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 90%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
