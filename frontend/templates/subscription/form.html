@@ -14,6 +14,24 @@
     {% endif %}
 {% endblock %}
 
+{% block nav_aside_itens %}
+    <li style="font-weight: bold; color: #ffffff">Participantes</li>
+    <li class="active">
+        <a href="{% url 'subscription:subscription-list' event.pk %}"
+           title="Inscrições">
+            <i class="fa  fa-fw fa-rocket"></i>
+            Inscrições
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+           title="Check-in">
+            <i class="fa  fa-fw fa-rocket"></i>
+            Check-in
+        </a>
+    </li>
+{% endblock %}
+
 {% block scripts %}
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script type="application/javascript">

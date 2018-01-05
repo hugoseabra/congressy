@@ -69,9 +69,8 @@
     </script>
 {% endblock %}
 
-{% block sidebar %}
-     {{ block.super }}
-{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
 
 {% block content %}
     <div class="row">
@@ -110,7 +109,8 @@
                             {% for event in object_list %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'event:event-panel' event.pk %}">
+{#                                        <a href="{% url 'event:event-panel' event.pk %}">#}
+                                        <a href="{% url 'subscription:subscription-list' event.pk %}">
                                             {{ event.name }}
                                             {% if event.published == True %}
                                                 &nbsp;&nbsp;

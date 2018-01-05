@@ -2,9 +2,9 @@
 {% load i18n static %}
 {% load subscription_tags %}
 
-{% block title %} Pré-inscrições | Congressy{% endblock %}
+{% block title %} Inscrições | Congressy{% endblock %}
 
-{% block page_title %}Pré-inscrições{% endblock %}
+{% block page_title %}Inscrições{% endblock %}
 
 {% block page_sub_title %}
     {{ event.name }}
@@ -95,33 +95,19 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <li>
-        <a href="{% url 'event:event-list' %}" title="Voltar">
-
-            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
-        </a>
-    </li>
-    <hr/>
-    <li style="font-weight: bold; color: #ffffff">Inscrições</li>
-    {% if can_change %}
-        <li>
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Lotes">
-                <i class="fa  fa-fw fa-rocket"></i> Lotes
-            </a>
-        </li>
-    {% endif %}
+    <li style="font-weight: bold; color: #ffffff">Participantes</li>
     <li class="active">
         <a href="{% url 'subscription:subscription-list' event.pk %}"
-           title="Pré-inscrições">
-            <i class="fa  fa-fw fa-rocket"></i> Pré-inscrições
+           title="Inscrições">
+            <i class="fa  fa-fw fa-rocket"></i>
+            Inscrições
         </a>
     </li>
     <li>
-        <a href="
-{% url 'subscription:subscription-attendance-search' event.pk %}"
-           title="Credenciamento">
-            <i class="fa  fa-fw fa-rocket"></i> Credenciamento
+        <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+           title="Check-in">
+            <i class="fa  fa-fw fa-rocket"></i>
+            Check-in
         </a>
     </li>
 {% endblock %}
