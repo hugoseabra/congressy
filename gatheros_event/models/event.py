@@ -96,6 +96,14 @@ class Event(models.Model, GatherosModelMixin):
     date_start = models.DateTimeField(verbose_name='data inicial')
     date_end = models.DateTimeField(verbose_name='data final')
 
+    lead = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name='descrição rápida',
+        help_text="Inspire aos visitantes a permanecerem no website do seu evento"
+    )
+
     place = models.ForeignKey(
         Place,
         on_delete=models.PROTECT,
