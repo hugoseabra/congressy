@@ -64,11 +64,10 @@
         <div class="brand">
             <a href="{% url 'front:start' %}">
                 <img class="base_logo" src=
-                        "{% static "assets/img/logo.png" %}"/>
+                        "{% static "assets/img/header-logo.png" %}" width="70%"/>
             </a>
         </div>
         <!--logo end-->
-
 
         {% block navbar %}
             {% include "base/navbar.html" %}
@@ -81,50 +80,38 @@
             {% if organization and not organization.internal %}
                 <div class="sidebar-profile">
                     <div class="profile-body dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle"
+                       {% if member.is_admin %}
+                       <a href="javascript:void(0);" class="dropdown-toggle"
                            data-toggle="dropdown" aria-expanded="false">
+                       {% endif %}
                             <h4>
-
-                                {{ organization.name }}<span
-                                    class="caret"></span>
-                            </h4></a>
-                        <small class="title">{{ member.get_group_display }}
+                                {{ organization.name }}
+                                {% if member.is_admin %}
+                                    <span class="caret"></span>
+                                {% endif %}
+                            </h4>
+                        {% if member.is_admin %}
+                        </a>
+                        {% endif %}
+                            <small class="title">{{ member.get_group_display }}
                         </small>
-                        <ul class="dropdown-menu" role="menu">
-
-                            <li>
-                                <a href="{% url 'event:organization-panel' organization.pk %}">
-                            <span class="icon">
-                                <i class="fa fa-rocket"></i>
-                            </span>Painel
-                                </a>
-                            </li>
-                            {% if member.is_admin %}
+                        {% if member.is_admin %}
+                            <ul class="dropdown-menu animated fadeInRight" role="menu">
                                 <li>
-                                    <a href="
-{% url 'event:invitation-list' organization.pk %}">
-                            <span class="icon">
-                                <i class="fa fa-envelope"></i>
-                            </span>Convites
+                                    <a href="{% url 'event:invitation-list' organization.pk %}">
+                                        <span class="icon">
+                                            <i class="fa fa-envelope"></i>
+                                        </span>Convites
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'event:member-list' organization.pk %}">
+                                        <span class="icon">
+                                            <i class="fa fa-users"></i>
+                                        </span>Membros
                                     </a>
                                 </li>
                             {% endif %}
-                            <li>
-                                <a href="
-{% url 'event:member-list' organization.pk %}">
-                            <span class="icon">
-                                <i class="fa fa-users"></i>
-                            </span>Membros
-                                </a>
-                            </li>
-                            <li>
-                                <a href="
-{% url 'event:place-list' organization.pk %}">
-                            <span class="icon">
-                                <i class="fa fa-map-marker"></i>
-                            </span>Locais
-                                </a>
-                            </li>
                         </ul>
                     </div>
                 </div>
@@ -134,13 +121,6 @@
                     <br>
                     <ul class="nav nav-pills nav-stacked">
                         {% block nav_aside_itens %}
-                            <li class="sidebar_main_items">
-                                <a href="{% url 'event:organization-list' %}"
-                                   title="Organizações">
-                                    <i class="fa  fa-fw fa-sitemap"></i>
-                                    Organizações
-                                </a>
-                            </li>
                             <li class="sidebar_main_items">
                                 <a href="{% url 'event:event-list' %}"
                                    title="Eventos">
@@ -176,6 +156,9 @@
                 {% endif %}
             {% endblock messages %}
             {% block content %}{% endblock %}
+            <div>
+
+            </div>
         </section>
         <!-- main content end -->
         <section class="cgsy-footer footer-wrapper">

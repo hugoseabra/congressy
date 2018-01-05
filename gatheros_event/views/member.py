@@ -80,6 +80,7 @@ class MemberListView(BaseOrganizationMixin, ListView):
 
         context.update({
             'can_manage': self._can_manage(),
+            'can_manage_invitations': self._can_manage_invitations(),
             'member_organization': self.get_member_organization(),
             'member_active_list': member_active_list,
             'member_inactive_list': member_inactive_list,
@@ -91,6 +92,12 @@ class MemberListView(BaseOrganizationMixin, ListView):
         """ Checks if logged user can manage members. """
         return self.request.user.has_perm(
             'gatheros_event.can_manage_members',
+            self.get_member_organization()
+        )
+
+    def _can_manage_invitations(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_invite',
             self.get_member_organization()
         )
 

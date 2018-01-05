@@ -34,6 +34,9 @@ class InvitationListView(AccountMixin, ListView):
         context['open_invitations'] = open_list
         context['expired_invitations'] = expired_list
 
+        context['can_view_members'] = self._can_view_members()
+        context['can_manage_members'] = self._can_manage_members()
+
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -78,6 +81,18 @@ class InvitationListView(AccountMixin, ListView):
         )
         return self.is_manager and can_manage
 
+    def _can_view_members(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_view_members',
+            self.get_invitation_organization()
+        )
+
+    def _can_manage_members(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_manage_members',
+            self.get_invitation_organization()
+        )
+
 
 class InvitationCreateView(AccountMixin, FormView):
     template_name = 'invitation/invitation-create.html'
@@ -92,6 +107,9 @@ class InvitationCreateView(AccountMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(InvitationCreateView, self).get_context_data(**kwargs)
         context['invitation_organization'] = self.get_invitation_organization()
+
+        context['can_view_members'] = self._can_view_members()
+        context['can_manage_members'] = self._can_manage_members()
 
         return context
 
@@ -144,6 +162,18 @@ class InvitationCreateView(AccountMixin, FormView):
     def can_access(self):
         return self.request.user.has_perm(
             'gatheros_event.can_invite',
+            self.get_invitation_organization()
+        )
+
+    def _can_view_members(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_view_members',
+            self.get_invitation_organization()
+        )
+
+    def _can_manage_members(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_manage_members',
             self.get_invitation_organization()
         )
 

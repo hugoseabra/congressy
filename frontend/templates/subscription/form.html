@@ -19,7 +19,7 @@
     <script type="application/javascript">
 
         $(document).ready(function () {
-            $('#id_phone').mask('(00) 0000-0000');
+            $('#id_phone').mask("(99) 99999-9999");
             {#$('.phone_with_ddd').mask('(00) 0000-0000');#}
             {#$('.phone').mask('0000-0000');#}
             {#$('.phone_us').mask('(000) 000-0000')#}
@@ -89,7 +89,7 @@
                                         {{ item.form_field |add_class:"form-control" }}
                                     {% endif %}
 
-                                    {% if fitem.form_ield.errors %}
+                                    {% if item.form_field.errors %}
                                         {% for error in field.errors %}
                                             <div class="alert alert-danger
                                             alert-dismissable">
@@ -103,7 +103,7 @@
                                         {% endfor %}
                                     {% endif %}
 
-                                    {% if fitem.form_ield.help_text %}
+                                    {% if item.form_field.help_text %}
                                         <div>
                                             <small class="text-muted">{{ item.form_field.help_text|safe }}</small>
                                         </div>

@@ -4,23 +4,22 @@
 {% block title %}Convites | Congressy{% endblock %}
 {% block page_title %}Novo Convite{% endblock %}
 {% block page_sub_title %}{{ invitation_organization.name }}{% endblock %}
-{% block nav_aside_itens %}
-    <li>
-        <a href="{% url 'event:organization-list' %}"
-           title="Voltar">
 
-            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
+{% block nav_aside_itens %}
+    {% if can_view_members or can_manage_members %}
+    <li>
+        <a href="{% url 'event:member-list' invitation_organization.pk %}" title="Membros">
+            <i class="fa  fa-fw fa-rocket"></i> Membros
         </a>
     </li>
-    <hr/>
+    {% endif %}
     <li class="active">
-        <a href="#"
-           title="Convites">
+        <a href="{% url 'event:invitation-list' invitation_organization.pk %}" title="Convites">
             <i class="fa  fa-fw fa-rocket"></i> Convites
         </a>
     </li>
-    {{ block.super }}
 {% endblock %}
+
 {% block content %}
     <form role="form" action="" method="post"
           class="form-horizontal">{% csrf_token %}

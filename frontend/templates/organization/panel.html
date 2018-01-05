@@ -10,19 +10,13 @@
 {% block page_sub_title %}{{ object.name }} {% endblock %}
 
 {% block nav_aside_itens %}
-    <li>
-        <a href="{% url 'event:organization-list' %}"
-           title="Voltar">
-
-            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
-        </a>
-    </li>
-    <hr/>
-    <li>
-        <a href="{% url 'event:event-list' %}" title="Eventos">
-            <i class="fa  fa-fw fa-rocket"></i>Eventos
-        </a>
-    </li>
+    {% if can_view_members or can_manage_members %}
+        <li>
+            <a href="{% url 'event:member-list' object.pk %}" title="Membros">
+                <i class="fa  fa-fw fa-rocket"></i> Membros
+            </a>
+        </li>
+    {% endif %}
     {% if can_manage_invitations %}
         <li>
             <a href="{% url 'event:invitation-list' object.pk %}" title="Convites">
@@ -31,27 +25,19 @@
         </li>
     {% endif %}
 
-    {% if can_view_members or can_view_members %}
-        <li>
-            <a href="{% url 'event:member-list' object.pk %}" title="Membros">
-                <i class="fa  fa-fw fa-rocket"></i> Membros
-            </a>
-        </li>
-    {% endif %}
+{#    {% if can_manage_places %}#}
+{#        <li>#}
+{#            <a href="{% url 'event:place-list' object.pk %}" title="Locais de eventos">#}
+{#                <i class="fa  fa-fw fa-rocket"></i> Locais de eventos#}
+{#            </a>#}
+{#        </li>#}
+{#    {% endif %}#}
 
-    {% if can_manage_places %}
-        <li>
-            <a href="{% url 'event:place-list' object.pk %}" title="Locais de eventos">
-                <i class="fa  fa-fw fa-rocket"></i> Locais de eventos
-            </a>
-        </li>
-    {% endif %}
-
-    <li>
-        <a href="{% url 'subscription:fields' object.pk %}" title="Formulário Padrão">
-            <i class="fa  fa-fw fa-rocket"></i>Formulário Padrão
-        </a>
-    </li>
+{#    <li>#}
+{#        <a href="{% url 'subscription:fields' object.pk %}" title="Formulário Padrão">#}
+{#            <i class="fa  fa-fw fa-rocket"></i>Formulário Padrão#}
+{#        </a>#}
+{#    </li>#}
 {% endblock %}
 
 
