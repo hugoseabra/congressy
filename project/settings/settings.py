@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'gatheros_event',
     'gatheros_subscription',
     'gatheros_front',
+    'hotsite',
 ]
 
 SITE_ID = 1
@@ -76,6 +77,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'gatheros_event/templates/'),
             os.path.join(BASE_DIR, 'frontend/templates/'),
+            os.path.join(BASE_DIR, 'hotsite/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
