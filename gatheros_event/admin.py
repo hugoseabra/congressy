@@ -45,6 +45,7 @@ class EventAdmin(admin.ModelAdmin):
                 'category',
                 'date_start',
                 'date_end',
+                'lead',
                 'published',
                 'slug',
             ),

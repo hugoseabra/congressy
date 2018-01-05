@@ -5,6 +5,7 @@ from . import views
 
 public_hotsite_urls = [
     url(r'^hotsite$', views.hotsite_base, name='hotsite_base'),
+    url(r'^event/(?P<pk>[\d]+)/$', views.HotsiteView.as_view(), name='hotsite'),
     url(r'^hotsite-form$', views.hotsite_form, name='hotsite_form'),
 ]
 

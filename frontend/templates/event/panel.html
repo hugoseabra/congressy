@@ -16,7 +16,24 @@
         </a>
     </li>
     <hr/>
+    <br/>
+    <li style="font-weight: bold; color: #ffffff">Pagina do Evento</li>
 
+    <li>
+        <a href="{% url 'public:hotsite' object.pk %}"
+           title="Ver pagina">
+            <i class="fa  fa-fw fa-rocket"></i> Ver pagina
+        </a>
+    </li>
+
+    <li>
+        <a href="{% url 'public:configure-hotsite' object.pk %}"
+           title="Configurar pagina">
+            <i class="fa  fa-fw fa-rocket"></i> Configurar pagina
+        </a>
+    </li>
+
+    <br/>
     <li style="font-weight: bold; color: #ffffff">Inscrições</li>
     {% event_payment_type object as payment_type %}
     {% if can_change and object.subscription_type != object.SUBSCRIPTION_DISABLED and payment_type != 'free' %}
@@ -39,6 +56,12 @@
             <i class="fa  fa-fw fa-rocket"></i> Credenciamento
         </a>
     </li>
+
+
+
+
+
+
 {% endblock %}
 {% block page_title %}Painel de Evento{% endblock %}
 {% block page_sub_title %}{{ object.name }}{% endblock %}
