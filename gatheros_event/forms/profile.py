@@ -25,6 +25,23 @@ class ProfileCreateForm(forms.ModelForm):
         model = Person
         fields = ['name', 'email']
 
+    def __init__(self, **kwargs):
+
+        data = kwargs.get('data')
+
+        # Buscar se person existe
+        try:
+            person = Person.objects.get(
+                email=data.get('email')
+            )
+
+            kwargs['instance'] = person
+
+        except Person.DoesNotExist:
+            pass
+
+        super().__init__(**kwargs)
+
     def save(self, domain_override=None, request=None,
              subject_template='registration/account_confirmation_subject.txt',
              email_template='registration/account_confirmation_email.html'):

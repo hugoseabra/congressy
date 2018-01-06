@@ -1,19 +1,9 @@
 from datetime import datetime
 
 from django.shortcuts import render
-from django.urls import reverse_lazy
-from django.views.generic import DetailView
-
-from gatheros_event.models import Event, Info
-from gatheros_event.views.mixins import AccountMixin
-
-
-def hotsite_base(request):
-    return render(request, 'hotsite/base.html')
-
-
-def hotsite_form(request):
-    return render(request, 'hotsite/form.html')
+from django.views.generic import DetailView, FormView
+from gatheros_event.forms import ProfileCreateForm
+from gatheros_event.models import Event, Info, Person
 
 
 class HotsiteView(DetailView):
@@ -93,3 +83,40 @@ class HotsiteView(DetailView):
         """ Resgata o prazo de duração do evento. """
         return self.object.get_period()
 
+
+class HotsiteFormView(DetailView):
+    template_name = 'hotsite/form.html'
+    form = ProfileCreateForm
+
+    def post(self, request, *args, **kwargs):
+
+        if self.request.POST.get('name'):
+
+            name = self.request.POST.get('name')
+            email = self.request.POST.get('email')
+
+            form = ProfileCreateForm(data={"name": name, "email": email})
+
+            if form.is_valid():
+                form.save()
+            else:
+                print('hi')
+                for error in form.errors:
+                    print(error)
+                    print('er')
+                    """ START HERE"""
+            person = Person.objects.get(email=email)
+
+            object_pk = kwargs['pk']
+
+            obj = Event.objects.get(pk=object_pk)
+            info = Info.objects.get(pk=object_pk)
+
+            period = obj.get_period()
+            return render(request, self.template_name, {"name": name,
+                                                        "email": email,
+                                                        "object": obj,
+                                                        "info": info,
+                                                        "peron": person,
+                                                        "period": period,
+                                                        })

@@ -46,6 +46,7 @@ class EventAdmin(admin.ModelAdmin):
                 'date_start',
                 'date_end',
                 'lead',
+                'image_main',
                 'published',
                 'slug',
             ),
