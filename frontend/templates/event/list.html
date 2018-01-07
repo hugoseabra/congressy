@@ -69,83 +69,8 @@
     </script>
 {% endblock %}
 
-{% block sidebar %}
-     <aside class="sidebar sidebar-left">
-
-            {% if organization and not organization.internal %}
-                <div class="sidebar-profile">
-                    <div class="profile-body dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle"
-                           data-toggle="dropdown" aria-expanded="false">
-                            <h4>
-
-                                {{ organization.name }}<span
-                                    class="caret"></span>
-                            </h4></a>
-                        <small class="title">{{ member.get_group_display }}
-                        </small>
-                        <ul class="dropdown-menu" role="menu">
-
-                            <li>
-                                <a href="{% url 'event:organization-panel' organization.pk %}">
-                            <span class="icon">
-                                <i class="fa fa-rocket"></i>
-                            </span>Painel
-                                </a>
-                            </li>
-                            {% if member.is_admin %}
-                                <li>
-                                    <a href="
-{% url 'event:invitation-list' organization.pk %}">
-                            <span class="icon">
-                                <i class="fa fa-envelope"></i>
-                            </span>Convites
-                                    </a>
-                                </li>
-                            {% endif %}
-                            <li>
-                                <a href="
-{% url 'event:member-list' organization.pk %}">
-                            <span class="icon">
-                                <i class="fa fa-users"></i>
-                            </span>Membros
-                                </a>
-                            </li>
-                            <li>
-                                <a href="
-{% url 'event:place-list' organization.pk %}">
-                            <span class="icon">
-                                <i class="fa fa-map-marker"></i>
-                            </span>Locais
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            {% endif %}
-
-            <nav>
-                <br>
-                <ul class="nav nav-pills nav-stacked">
-                    {% block nav_aside_itens %}
-                        <li class="sidebar_main_items">
-                            <a href="{% url 'event:organization-list' %}"
-                               title="Organizações">
-                                <i class="fa  fa-fw fa-sitemap"></i>
-                                Organizações
-                            </a>
-                        </li>
-                        <li class="sidebar_main_items active">
-                            <a href="{% url 'event:event-list' %}"
-                               title="Eventos">
-                                <i class="fa  fa-fw fa-rocket"></i> Eventos
-                            </a>
-                        </li>
-                    {% endblock %}
-                </ul>
-            </nav>
-        </aside>
-{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
 
 {% block content %}
     <div class="row">
@@ -184,7 +109,8 @@
                             {% for event in object_list %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'event:event-panel' event.pk %}">
+{#                                        <a href="{% url 'event:event-panel' event.pk %}">#}
+                                        <a href="{% url 'subscription:subscription-list' event.pk %}">
                                             {{ event.name }}
                                             {% if event.published == True %}
                                                 &nbsp;&nbsp;

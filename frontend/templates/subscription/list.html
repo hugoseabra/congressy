@@ -2,9 +2,9 @@
 {% load i18n static %}
 {% load subscription_tags %}
 
-{% block title %} Pré-inscrições | Congressy{% endblock %}
+{% block title %} Inscrições | Congressy{% endblock %}
 
-{% block page_title %}Pré-inscrições{% endblock %}
+{% block page_title %}Inscrições{% endblock %}
 
 {% block page_sub_title %}
     {{ event.name }}
@@ -95,47 +95,52 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <li>
-        <a href="{% url 'event:event-list' %}" title="Voltar">
-
-            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
-        </a>
-    </li>
-    <hr/>
-    <li style="font-weight: bold; color: #ffffff">Inscrições</li>
-    {% if can_change %}
+    <h5 class="sidebar-header">Página do evento</h5>
+    <ul class="nav nav-pills nav-stacked">
         <li>
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Lotes">
-                <i class="fa  fa-fw fa-rocket"></i> Lotes
+            <a href="{% url 'public:hotsite' event.pk %}"
+               title="Ver pagina">
+                <i class="fa  fa-fw fa-rocket"></i> Ver pagina
             </a>
         </li>
-    {% endif %}
-    <li class="active">
-        <a href="{% url 'subscription:subscription-list' event.pk %}"
-           title="Pré-inscrições">
-            <i class="fa  fa-fw fa-rocket"></i> Pré-inscrições
-        </a>
-    </li>
-    <li>
-        <a href="
-{% url 'subscription:subscription-attendance-search' event.pk %}"
-           title="Credenciamento">
-            <i class="fa  fa-fw fa-rocket"></i> Credenciamento
-        </a>
-    </li>
+
+        <li>
+            <a href="#"
+               title="Configurar pagina">
+                <i class="fa  fa-fw fa-rocket"></i> Configurar pagina
+            </a>
+        </li>
+    </ul>
+
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+               title="Check-in">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Check-in
+            </a>
+        </li>
+    </ul>
 {% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
-                <div class="float-left">
-                    <button type="button" class="btn btn-default
-                    filter-button">
-                        <i class="fa fa-filter"></i>
-                    </button>
-                </div>
+{#                <div class="float-left">#}
+{#                    <button type="button" class="btn btn-default#}
+{#                    filter-button">#}
+{#                        <i class="fa fa-filter"></i>#}
+{#                    </button>#}
+{#                </div>#}
                 <div class="float-right">
                     {% if can_add_subscription %}
                         <a href="{% url 'subscription:subscription-add' event.pk %}" class="btn
@@ -150,67 +155,67 @@
         </div>
     </div>
 
-    <div class="row filter-box">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Filtro avançado</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <form role="form">
-                                <div class="list-filters">
-                                    {% if lots and lots|length > 1 %}
-                                    <div class="col-md-4">
-                                        <div class="form-group float-left">
-                                            <label>Lotes</label>
-                                            {% for lot in lots %}
-                                                <div class="radio">
-                                                    {% is_filter_selected 'lots' lot.pk as checked %}
-                                                    <input class="icheck"
-                                                        {% if checked %}checked=""{% endif %}
-                                                       type="checkbox"
-                                                       name="lots"
-                                                       id="lot{{ forloop.counter0 }}"
-                                                       value="{{ lot.id }}">
-                                                    <label for="lot{{ forloop.counter0 }}">
-                                                        {{ lot.name }}
-                                                    </label>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Possui perfil</label>
-                                            <div class="radio">
-                                                {% is_filter_selected 'has_profile' 1 as checked %}
-                                                <input class="icheck"
-                                                   {% if checked %}checked=""{% endif %}
-                                                   type="checkbox"
-                                                   name="has_profile"
-                                                   id="has_profile"
-                                                   value="1">
-                                                <label for="has_profile">
-                                                    Possui perfil
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="clearfix"></div>
-                                </div>
-                                <button type="submit" class="btn
-                                btn-primary">Enviar</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{#    <div class="row filter-box">#}
+{#        <div class="col-md-12">#}
+{#            <div class="panel panel-primary">#}
+{#                <div class="panel-heading">#}
+{#                    <h3 class="panel-title">Filtro avançado</h3>#}
+{#                </div>#}
+{#                <div class="panel-body">#}
+{#                    <div class="row">#}
+{#                        <div class="col-md-12">#}
+{#                            <form role="form">#}
+{#                                <div class="list-filters">#}
+{#                                    {% if lots and lots|length > 1 %}#}
+{#                                    <div class="col-md-4">#}
+{#                                        <div class="form-group float-left">#}
+{#                                            <label>Lotes</label>#}
+{#                                            {% for lot in lots %}#}
+{#                                                <div class="radio">#}
+{#                                                    {% is_filter_selected 'lots' lot.pk as checked %}#}
+{#                                                    <input class="icheck"#}
+{#                                                        {% if checked %}checked=""{% endif %}#}
+{#                                                       type="checkbox"#}
+{#                                                       name="lots"#}
+{#                                                       id="lot{{ forloop.counter0 }}"#}
+{#                                                       value="{{ lot.id }}">#}
+{#                                                    <label for="lot{{ forloop.counter0 }}">#}
+{#                                                        {{ lot.name }}#}
+{#                                                    </label>#}
+{#                                                </div>#}
+{#                                            {% endfor %}#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                    {% endif %}#}
+{#                                    <div class="col-md-4">#}
+{#                                        <div class="form-group">#}
+{#                                            <label>Possui perfil</label>#}
+{#                                            <div class="radio">#}
+{#                                                {% is_filter_selected 'has_profile' 1 as checked %}#}
+{#                                                <input class="icheck"#}
+{#                                                   {% if checked %}checked=""{% endif %}#}
+{#                                                   type="checkbox"#}
+{#                                                   name="has_profile"#}
+{#                                                   id="has_profile"#}
+{#                                                   value="1">#}
+{#                                                <label for="has_profile">#}
+{#                                                    Possui perfil#}
+{#                                                </label>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{##}
+{#                                    <div class="clearfix"></div>#}
+{#                                </div>#}
+{#                                <button type="submit" class="btn#}
+{#                                btn-primary">Enviar</button>#}
+{#                            </form>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
     <div class="row">
         <div class="col-md-12">

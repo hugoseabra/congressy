@@ -10,34 +10,16 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <li>
-        <a href="{% url 'event:event-list' %}" title="Voltar">
-            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
-        </a>
-    </li>
-    <hr/>
-    <br/>
-    <li style="font-weight: bold; color: #ffffff">Pagina do Evento</li>
-
-    <li>
-        <a href="{% url 'public:hotsite' object.pk %}"
-           title="Ver pagina">
-            <i class="fa  fa-fw fa-rocket"></i> Ver pagina
-        </a>
-    </li>
-
-
-    <br/>
     <li style="font-weight: bold; color: #ffffff">Inscrições</li>
-    {% event_payment_type object as payment_type %}
-    {% if can_change and object.subscription_type != object.SUBSCRIPTION_DISABLED and payment_type != 'free' %}
-        <li>
-            <a href="{% url 'subscription:lot-list' object.pk %}"
-               title="Lotes">
-                <i class="fa  fa-fw fa-rocket"></i> Lotes
-            </a>
-        </li>
-    {% endif %}
+{#    {% event_payment_type object as payment_type %}#}
+{#    {% if can_change and object.subscription_type != object.SUBSCRIPTION_DISABLED and payment_type != 'free' %}#}
+{#        <li>#}
+{#            <a href="{% url 'subscription:lot-list' object.pk %}"#}
+{#               title="Lotes">#}
+{#                <i class="fa  fa-fw fa-rocket"></i> Lotes#}
+{#            </a>#}
+{#        </li>#}
+{#    {% endif %}#}
     <li>
         <a href="{% url 'subscription:subscription-list' object.pk %}"
            title="Pré-inscrições">

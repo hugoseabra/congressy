@@ -14,12 +14,48 @@
     {% endif %}
 {% endblock %}
 
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Página do evento</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'public:hotsite' event.pk %}"
+               title="Ver pagina">
+                <i class="fa  fa-fw fa-rocket"></i> Ver pagina
+            </a>
+        </li>
+
+        <li>
+            <a href="#"
+               title="Configurar pagina">
+                <i class="fa  fa-fw fa-rocket"></i> Configurar pagina
+            </a>
+        </li>
+    </ul>
+
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+               title="Check-in">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Check-in
+            </a>
+        </li>
+    </ul>
+{% endblock %}
 {% block scripts %}
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script type="application/javascript">
 
         $(document).ready(function () {
-            $('#id_phone').mask('(00) 0000-0000');
+            $('#id_phone').mask("(99) 99999-9999");
             {#$('.phone_with_ddd').mask('(00) 0000-0000');#}
             {#$('.phone').mask('0000-0000');#}
             {#$('.phone_us').mask('(000) 000-0000')#}
@@ -89,7 +125,7 @@
                                         {{ item.form_field |add_class:"form-control" }}
                                     {% endif %}
 
-                                    {% if fitem.form_ield.errors %}
+                                    {% if item.form_field.errors %}
                                         {% for error in field.errors %}
                                             <div class="alert alert-danger
                                             alert-dismissable">
@@ -103,7 +139,7 @@
                                         {% endfor %}
                                     {% endif %}
 
-                                    {% if fitem.form_ield.help_text %}
+                                    {% if item.form_field.help_text %}
                                         <div>
                                             <small class="text-muted">{{ item.form_field.help_text|safe }}</small>
                                         </div>

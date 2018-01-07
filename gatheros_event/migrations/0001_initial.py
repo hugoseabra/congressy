@@ -448,7 +448,7 @@ class Migration(migrations.Migration):
                 )),
                 ('phone', models.CharField(
                     blank=True,
-                    max_length=12,
+                    max_length=15,
                     null=True,
                     validators=[validator.phone_validator],
                     verbose_name='telefone'

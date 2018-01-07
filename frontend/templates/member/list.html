@@ -10,36 +10,21 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <li>
-        <a href="{% url 'event:organization-list' %}"
-           title="Voltar">
-
-            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
-        </a>
-    </li>
-    <hr/>
     <li class="active">
-        <a href="#"
-           title="Membros">
+        <a href="{% url 'event:member-list' member_organization.pk %}" title="Membros">
             <i class="fa  fa-fw fa-rocket"></i> Membros
         </a>
     </li>
-    {{ block.super }}
+    {% if can_manage_invitations %}
+    <li>
+        <a href="{% url 'event:invitation-list' member_organization.pk %}" title="Convites">
+            <i class="fa  fa-fw fa-rocket"></i> Convites
+        </a>
+    </li>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="buttonbar">
-                <div class="float-left">
-                    <a href="{% url 'event:organization-panel' member_organization.pk %}" class="btn btn-primary" title="Voltar">
-                        <i class="fa fa-arrow-left"></i>
-                    </a>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-    </div>
     {% if member_active_list %}
     <div class="row">
         <div class="col-md-12">

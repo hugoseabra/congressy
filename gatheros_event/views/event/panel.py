@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from django.urls import reverse_lazy
+from django.shortcuts import redirect
+from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView
 
 from gatheros_event.models import Event
@@ -12,6 +13,15 @@ class EventPanelView(AccountMixin, DetailView):
     # template_name = 'gatheros_event/event/panel.html'
     template_name = 'event/panel.html'
     permission_denied_url = reverse_lazy('event:event-list')
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        return redirect(reverse('subscription:subscription-list', kwargs={
+            'event_pk': self.object.pk
+        }))
+
+        # return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(EventPanelView, self).get_context_data(**kwargs)
