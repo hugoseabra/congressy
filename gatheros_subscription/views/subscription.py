@@ -560,7 +560,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         return query_set.filter(
             person=person,
             event__published=True,
-            attended=True,
+            # attended=True,
         )
 
     def get_context_data(self, **kwargs):
