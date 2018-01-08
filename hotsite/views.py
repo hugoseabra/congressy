@@ -217,7 +217,7 @@ class HotsiteView(DetailView):
         Sucesso! Foi feito o seu cadastro no evento: {0}
         
     Equipe Congressy,
-                """.format(self.object.name, full_reset_url, name)
+                """.format(self.object.name, name)
 
             send_mail(email_subject, email_template, ['equipe@congressy.com'], [email])
 
