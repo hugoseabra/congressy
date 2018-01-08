@@ -206,9 +206,9 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
 
-                            <form name="hero" action="/event/{{ object.pk }}/inscription" method="post" id="form"
+                            <form name="hero" action="/event/{{ object.pk }}/" method="post" id="form"
                                   class="form" role="form">
-                                <input name="user" id="id_user" type="hidden" value="{{ person }}">
+                                {% csrf_token %}
 
                                 <div class="form-group">
 
