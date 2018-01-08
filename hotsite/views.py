@@ -123,10 +123,14 @@ class HotsiteView(DetailView):
             person.save()
 
         try:
+
             user = User.objects.get(email=email)
-            if user and not user.is_authenticated:
+            logged_in = self.request.user.is_authenticated
+
+            if user != self.request.user and not logged_in:
                 messages.error(self.request, 'Faça login para continuar.')
-                return HttpResponseRedirect(reverse('front:login'))
+                full_url = reverse('front:login') + '?next=/event/' + str(self.object.pk) + "/form/"
+                return HttpResponseRedirect(full_url)
         except User.DoesNotExist:
             user.id = 0
             pass
@@ -144,7 +148,6 @@ class HotsiteView(DetailView):
             else:
                 messages.error(self.request,
                            'Ocorreu um erro durante a o processo de inscrição, tente novamente mais tarde.')
-
 
         context = super(HotsiteView, self).get_context_data(**kwargs)
         context['status'] = self._get_status()

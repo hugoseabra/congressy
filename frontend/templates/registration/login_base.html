@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="{% static "assets/css/animate.css" %}">
 
     <!-- Main CSS -->
-    <link rel="stylesheet" href="{% static "assets/css/main.css" %}" />
+    <link rel="stylesheet" href="{% static "assets/css/main.css" %}"/>
 
     <!-- Feature detection -->
     <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
@@ -52,8 +52,9 @@
                     <a href="/" class="logo-img">
                         <svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg"
                              height="72.643mm" width="144.96mm" version="1.1" xmlns:cc="http://creativecommons.org/ns#"
-                             xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 144.96001 72.643425" class="main_logo">
-                            <g transform="translate(-28.062 -143.51)" >
+                             xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 144.96001 72.643425"
+                             class="main_logo">
+                            <g transform="translate(-28.062 -143.51)">
                                 <g style="image-rendering:optimizeQuality;shape-rendering:geometricPrecision"
                                    clip-rule="evenodd" transform="matrix(.01 0 0 .01 -609.55 206.07)"
                                    fill-rule="evenodd">
@@ -93,21 +94,14 @@
                     <div class="panel-body">
                         {% block messages %}
                             {% if messages %}
-                                {# @ TODO Colocar tag padrão de alerta para mensagens #}
-                                <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                                    <ul class="messagelist" style="list-style: none;margin: 0; padding: 0">
-                                        {% for message in messages %}
-                                            {% if 'warning' == message.tags %}
-                                                <input type="hidden" value="{{ message|capfirst }}">
-                                            {% else %}
-                                                {% get_message_background_color message as bgcolor %}
-                                                <li style="background-color: {{ bgcolor }};padding: 10px;padding-bottom: 10px">
-                                                    {{ message|capfirst }}
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                </div>
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissable">
+                                        <button type="button" class="close"
+                                                data-dismiss="alert" aria-hidden="true">×
+                                        </button>
+                                        {{ message|capfirst }}
+                                    </div>
+                                {% endfor %}
                             {% endif %}
                         {% endblock messages %}
 
@@ -127,15 +121,15 @@
     </section>
 </section>
 
-    {% block global_js %}
-        <!--Global JS-->
-        <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
-        <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
-        <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
-        <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
-        <script src="{% static "assets/js/src/app.js" %}"></script>
-        <script src="{% static "assets/js/cgsy.js" %}"></script>
-    {% endblock %}
+{% block global_js %}
+    <!--Global JS-->
+    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+    <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
+    <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+    <script src="{% static "assets/js/src/app.js" %}"></script>
+    <script src="{% static "assets/js/cgsy.js" %}"></script>
+{% endblock %}
 
 </body>
 </html>
