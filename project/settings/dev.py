@@ -1,6 +1,6 @@
 # pylint: skip-file
 
-from .settings import *
+from . import *
 
 DEBUG = True
 
