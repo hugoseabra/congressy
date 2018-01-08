@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.contrib import messages
 from django.utils import six
 from django.utils.http import urlsafe_base64_encode
-from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -23,7 +22,7 @@ class HotsiteView(DetailView):
     # @TODO Use slug instead of PK to find event
     model = Event
     template_name = 'hotsite/base.html'
-    form_template = 'hotsite/form.html'
+    # form_template = 'hotsite/form.html'
 
     def get_context_data(self, **kwargs):
         context = super(HotsiteView, self).get_context_data(**kwargs)
@@ -101,31 +100,44 @@ class HotsiteView(DetailView):
 
         email = self.request.POST.get('email')
         name = self.request.POST.get('name')
-
+        phone = self.request.POST.get('phone')
         user = self.request.user
 
         self.object = Event.objects.get(pk=kwargs['pk'])
 
-        post_size = len(self.request.POST)
         shiny_user = None
+
+        if not email or not name or not phone:
+
+            if not email:
+                messages.error(self.request, "E-mail não pode estar vazio!")
+
+            if not name:
+                messages.error(self.request, "Nome não pode estar vazio!")
+
+            if not phone:
+                messages.error(self.request, "Phone não pode estar vazio!")
+
+            context = super(HotsiteView, self).get_context_data(**kwargs)
+            context['status'] = self._get_status()
+            context['report'] = self._get_report()
+            context['period'] = self._get_period()
+            context['name'] = name
+            context['email'] = email
+            context['info'] = Info.objects.get(pk=self.object.pk)
+            return render(self.request, template_name=self.template_name, context=context)
 
         try:
             person = Person.objects.get(email=email)
         except Person.DoesNotExist:
-            person = None
-            # return HttpResponseRedirect(reverse('public:profile_create'))
-
-        if not person:
 
             # hard post
 
-            email = self.request.POST.get('email')
-            name = self.request.POST.get('name')
             # gender = self.request.POST.get('gender')
-            # phone = self.request.POST.get('gender')
+
 
             # Criando perfil
-            person = Person(name=name, email=email)
+            person = Person(name=name, email=email, phone=phone)
             person.save()
 
             # Criando usuário
@@ -238,5 +250,5 @@ class HotsiteView(DetailView):
         context['name'] = name
         context['email'] = email
         context['info'] = Info.objects.get(pk=self.object.pk)
-        return render(self.request, template_name=self.form_template, context=context)
+        return render(self.request, template_name=self.template_name, context=context)
 

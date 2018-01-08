@@ -170,70 +170,107 @@
                             </div>
 
                             </p>
-                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hero-features row">
+                        <div class="hero-features-left col-md-7">
+                            {% if info.lead %}
+                                <p class="lead">
+                                    {{ info.lead }}
+                                </p>
+                            {% endif %}
                         </div>
 
-                        <div class="hero-features row">
-                            <div class="hero-features-left col-md-7">
-                                {% if info.lead %}
-                                    <p class="lead">
-                                        {{ info.lead }}
-                                    </p>
-                                {% endif %}
-                            </div>
+
+                        <div class="hero-features-right col-md-5"
+                             data-animation="fadeIn">
 
 
-                            <div class="hero-features-right col-md-5"
-                                 data-animation="fadeIn">
+                            <!-- FORM -->
+                            <form action="/event/{{ object.pk }}/form/" method="post" class="form" role="form">
 
+                                {% csrf_token %}
 
-                                <!-- FORM -->
-                                <form name="hero" action="/event/{{ object.pk }}/form/" method="post" id="form"
-                                      class="form" role="form">
+                                <h4 class="form-heading"
+                                    style="font-weight: bold;">Inscreva-se
+                                    agora!</h4>
+                                {% block messages %}
+                                    {% if messages %}
+                                        <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                        {% for message in messages %}
 
-                                    {% csrf_token %}
+                                            {% if message.tags %}
+                                                <div class="alert alert-{{ message.tags }} alert-dismissible"
+                                                     role="alert">
 
-                                    <h4 class="form-heading"
-                                        style="font-weight: bold;">Inscreva-se
-                                        agora!</h4>
+                                            {% else %}
+                                                <div class="alert alert-warning alert-dismissible" role="alert">
+                                            {% endif %}
 
-                                    <div class="form-validation alert"></div>
-
-                                    <div class="form-group">
-                                        <label for="id_name">
-                                            Nome Completo
-                                        </label>
-
-                                        <div>
-                                            <input name="name" id="id_name" class="form-control placeholder"
-                                                   maxlength="255"
-                                                   placeholder="Nome completo" required="" type="text">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="id_email">E-Mail</label>
-                                        <div>
-                                            <input name="email" placeholder="me@email.com" required="" class="form-control"
-                                                   id="id_email" type="email">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group form-group-submit">
-                                        <button class="btn btn-primary btn-lg btn-block" data-loading-text="Enviar">
-                                            Enviar
+                                        <button type="button" class="close" data-dismiss="alert"
+                                                aria-label="Close"><span aria-hidden="true">&times;</span>
                                         </button>
-                                    </div>
-                                </form>
+                                        {{ message|capfirst }}
+                                        </div>
 
-                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                {% endblock messages %}
+                                <div class="form-validation alert"></div>
+
+                                <div class="form-group">
+                                    <label for="id_name">
+                                        Nome Completo
+                                    </label>
+
+                                    <div>
+                                        <input name="name" id="id_name" class="form-control placeholder"
+                                               maxlength="255"
+                                               placeholder="Nome completo" required="" type="text">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="id_email">E-Mail</label>
+                                    <div>
+                                        <input name="email" placeholder="me@email.com" required class="form-control"
+                                               id="id_email" type="email">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+
+
+                                    <label for="id_phone">Celular</label>
+
+
+                                    <div>
+                                        <input name="phone" class="form-control"
+                                               maxlength="14" id="id_phone"
+                                               required="" type="tel" placeholder="(00) 0000-0000">
+                                    </div>
+
+
+                                </div>
+
+
+                                <div class="form-group form-group-submit">
+                                    <button class="btn btn-primary btn-lg btn-block" data-loading-text="Enviar">
+                                        Enviar
+                                    </button>
+                                </div>
+                            </form>
 
                         </div>
 
                     </div>
-                </div>
 
+                </div>
             </div>
+
+        </div>
 
     </section>
 
@@ -482,6 +519,12 @@
 <!-- MAIN SCRIPT
 ================================= -->
 <script src="{% static 'hotsite/js/script.js' %}"></script>
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $('#id_phone').mask('(00) 0000-0000');
+        });
+    </script>
 
 </body>
 
