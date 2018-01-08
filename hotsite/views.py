@@ -136,7 +136,7 @@ class HotsiteView(DetailView):
             person = Person(name=name, email=email, gender=gender)
             person.save()
             lot = Lot.objects.get(event=self.object)
-            subscription = Subscription(person=person, lot=lot, created_by=0git )
+            subscription = Subscription(person=person, lot=lot, created_by=0)
 
             try:
                 subscription.save()
