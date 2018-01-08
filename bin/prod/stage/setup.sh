@@ -10,7 +10,6 @@ print(settings.BASE_DIR)"`
 export PYTHONPATH=$BASE_DIR
 
 $BASE_DIR/bin/prod/stage/dropdb.sh
-$BASE_DIR/bin/prod/stage/dropdb.sh
 $BASE_DIR/bin/prod/stage/dropuser.sh
 $BASE_DIR/bin/prod/createuser.sh
 $BASE_DIR/bin/prod/createdb.sh
@@ -18,4 +17,5 @@ $BASE_DIR/bin/prod/createdb.sh
 python $BASE_DIR/manage.py migrate
 
 # Importando fixtures
-python $BASE_DIR/manage.py loaddata 00_admin_user
+python $BASE_DIR/manage.py loaddata 001_user
+python $BASE_DIR/manage.py loaddata 001_default_field

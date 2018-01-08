@@ -133,12 +133,8 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = False
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
-# noinspection PyUnresolvedReferences
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
-
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
 MEDIA_URL = '/media/'
@@ -169,3 +165,18 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'warning',
     message_constants.ERROR: 'danger',
 }
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+
+# # Congressy -> conforme configuração na conta do SparkPost
+# EMAIL_HOST = 'smtp.sparkpostmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'SMTP_Injection'
+# EMAIL_HOST_PASSWORD = '6dacd78f4c49080da7bbe942d4f36dc95d0c110a'
+# EMAIL_USE_TLS = True
+
+DEFAULT_FROM_EMAIL = 'mail@congressy.net'
+SPARKPOST_API_KEY = '6dacd78f4c49080da7bbe942d4f36dc95d0c110a'
+
+# CONGRESSY_REPLY_TO = 'congressy@congressy.com'

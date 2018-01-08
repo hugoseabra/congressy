@@ -6,6 +6,7 @@ from smtplib import SMTPAuthenticationError
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, get_connection
 from lxml import html
+from django.utils import six
 
 from mailer.celery import app
 
@@ -17,11 +18,11 @@ task_params = {
 
 
 @app.task(**task_params)
-def send_email(self, subject, body, to):
+def send_mail(self, subject, body, to):
     """ Envia um email """
     if not to:
         to = []
-    elif isinstance(to, str):
+    elif isinstance(to, six.string_types):
         to = list(to)
 
     try:
@@ -32,7 +33,7 @@ def send_email(self, subject, body, to):
             body=body_txt,
             to=to,
             from_email=settings.CONGRESSY_EMAIL_SENDER,
-            reply_to=settings.CONGRESSY_REPLY_TO
+            reply_to=[settings.CONGRESSY_REPLY_TO]
         )
 
         mail.attach_alternative(body, 'text/html')
@@ -44,7 +45,7 @@ def send_email(self, subject, body, to):
 
 
 @app.task(**task_params)
-def send_mass_email(self, subject, body, to):
+def send_mass_mail(self, subject, body, to):
     """
     Envia diversos e-mails, abrindo apenas uma conexão.
 

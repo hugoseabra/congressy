@@ -1,6 +1,6 @@
 """ Mailer service. """
 from django.template.loader import render_to_string
-from .tasks import send_email
+from .tasks import send_mail
 
 
 def notify_subscription(event, subscription):
@@ -26,7 +26,7 @@ def notify_subscription(event, subscription):
         'local': local
     })
 
-    return send_email.delay(
+    return send_mail.delay(
         subject=subject.strip(),
         body=body,
         to=person.email,
