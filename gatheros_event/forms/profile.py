@@ -31,15 +31,17 @@ class ProfileCreateForm(forms.ModelForm):
         data = kwargs.get('data')
 
         # Buscar se person existe
-        try:
-            person = Person.objects.get(
-                email=data.get('email')
-            )
+        if data:
+            try:
+                person = Person.objects.get(
+                    email=data.get('email')
+                )
 
-            kwargs['instance'] = person
+                kwargs['instance'] = person
 
-        except Person.DoesNotExist:
-            pass
+            except Person.DoesNotExist:
+                pass
+
 
         super().__init__(**kwargs)
 
@@ -56,7 +58,12 @@ class ProfileCreateForm(forms.ModelForm):
         :return:
         """
         # Criando perfil
-        super(ProfileCreateForm, self).save(commit=True)
+        try:
+            person = Person.objects.get(email=self.cleaned_data["email"])
+            self.instance = person
+        except Person.DoesNotExist:
+            super(ProfileCreateForm, self).save(commit=True)
+
 
         # Criando usuário
         user = User.objects.create_user(
@@ -120,6 +127,10 @@ class ProfileCreateForm(forms.ModelForm):
             raise forms.ValidationError(
                 "Esse email já existe em nosso sistema. Tente novamente."
             )
+
+
+
+
 
         return cleaned_data
 

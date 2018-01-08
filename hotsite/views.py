@@ -110,6 +110,7 @@ class HotsiteView(DetailView):
             person = Person.objects.filter(email=email).first()
 
         if not person:
+
             if post_size >= 3:
                 # hard post
                 email = self.request.POST.get('email')
@@ -127,11 +128,11 @@ class HotsiteView(DetailView):
                     messages.error(self.request, 'Faça login para continuar.')
                     return HttpResponseRedirect(reverse('front:login'))
             except User.DoesNotExist:
+                user.id = 0
                 pass
 
-
             lot = Lot.objects.get(event=self.object)
-            subscription = Subscription(person=person, lot=lot, created_by=0)
+            subscription = Subscription(person=person, lot=lot, created_by=user.id)
 
             try:
                 subscription.save()
