@@ -5,7 +5,7 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!-->
 <html lang="en"> <!--<![endif]-->
-{% load static %}
+{% load static base_tags %}
 <head>
 
     <meta charset="utf-8">
@@ -14,6 +14,9 @@
 
     <!-- BASIC INFO -->
     <title>{{ object.name }} | Congressy</title>
+    <meta name="author" content="{{ object.organization }}">
+    <meta name="description"
+          content="{{ info.description }}">
 
     <!-- FAVICONS -->
     <link rel="icon" href="{% static 'hotsite/images/favicons/favicon.ico' %}">
@@ -134,8 +137,13 @@
 
             <!-- IMAGE BACKGROUND -->
             <div class="section-background-image parallax">
-                <img src="{% static 'hotsite/images/main_background.png' %}"
-                     alt="" style="opacity: 0.2;" class="blurred">
+                <img
+                        {% if object.image_main.default %}
+                            src="{{ object.image_main.default.url }}"
+                        {% else %}
+                            src=""
+                        {% endif %}
+                            alt="" style="opacity: 0.2;" class="blurred">
             </div>
         </div>
 
@@ -147,6 +155,28 @@
                     <div class="hero-heading text-center row"
                          data-animation="fadeIn">
                         <div class="col-md-10 col-md-offset-1">
+                            {% block messages %}
+                                {% if messages %}
+                                    <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                    {% for message in messages %}
+
+                                        {% if message.tags %}
+                                            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+
+                                        {% else %}
+                                            <div class="alert alert-warning alert-dismissible" role="alert">
+                                        {% endif %}
+
+                                    <button type="button" class="close" data-dismiss="alert"
+                                            aria-label="Close"><span aria-hidden="true">&times;</span>
+                                    </button>
+                                    {{ message|capfirst }}
+                                    </div>
+
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            {% endblock messages %}
 
                             <h1 class="hero-title">{{ object.name }}</h1>
 
@@ -162,72 +192,74 @@
                             </div>
 
                             </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="hero-features row">
-
-                        {% if object.lead %}
+                        <div class="hero-features row">
                             <div class="hero-features-left col-md-7">
+                                {% if object.lead %}
 
-                                <p class="lead">
-                                    {{ object.lead }}
-                                </p>
+
+                                    <p class="lead">
+                                        {{ object.lead }}
+                                    </p>
+
+
+                                {% endif %}
+                            </div>
+
+
+                            <div class="hero-features-right col-md-5"
+                                 data-animation="fadeIn">
+
+
+                                <!-- FORM -->
+                                <form name="hero" action="/event/{{ object.pk }}/" method="post" id="form"
+                                      class="form" role="form">
+
+                                    {% csrf_token %}
+
+                                    <h4 class="form-heading"
+                                        style="font-weight: bold;">Inscreva-se
+                                        agora!</h4>
+
+                                    <div class="form-validation alert"></div>
+
+                                    <div class="form-group">
+                                        <label for="id_name">
+                                            Nome Completo
+                                        </label>
+
+                                        <div>
+                                            <input name="name" id="id_name" class="form-control placeholder"
+                                                   maxlength="255"
+                                                   placeholder="Nome completo" required="" type="text">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="id_email">E-Mail</label>
+                                        <div>
+                                            <input name="email" placeholder="me@email.com" class="form-control"
+                                                   id="id_email" type="email">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group form-group-submit">
+                                        <button class="btn btn-primary btn-lg btn-block" data-loading-text="Enviar">
+                                            Enviar
+                                        </button>
+                                    </div>
+                                </form>
 
                             </div>
-                        {% endif %}
-
-
-                        <div class="hero-features-right col-md-5"
-                             data-animation="fadeIn">
-
-
-                            <!-- FORM -->
-                            <form name="hero" action="" method="post" id="form"
-                                  class="form" role="form">
-
-                                <h4 class="form-heading"
-                                    style="font-weight: bold;">Inscreva-se
-                                    agora!</h4>
-
-                                <div class="form-validation alert"></div>
-
-                                <div class="form-group">
-                                    <label for="form-name">Nome</label>
-                                    <input type="text"
-                                           name="name"
-                                           id="form-name"
-                                           class="form-control"
-                                           placeholder="Nome completo"
-                                           autocomplete="off">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="form-email">E-mail</label>
-                                    <input type="email"
-                                           name="email"
-                                           id="form-email"
-                                           class="form-control"
-                                           placeholder="me@you.com"
-                                           autocomplete="off">
-                                </div>
-
-                                <div class="form-group form-group-submit">
-                                    <button class="btn btn-primary btn-lg btn-block"
-                                            data-loading-text="Enviar">
-                                        Enviar
-                                    </button>
-                                </div>
-                            </form>
 
                         </div>
 
                     </div>
-
                 </div>
-            </div>
 
-        </div>
+            </div>
 
     </section>
 
@@ -244,13 +276,18 @@
 
                 <!-- DESCRIPTION IMAGE -->
                 <div class="about-image col-md-6" data-animation="fadeIn">
-                    <img src="{% static 'hotsite/images/main_background.png' %}"
-                         alt="bbcs2018" class="img-responsive">
+                    <img
+                            {% if object.image_main.default %}
+                                src="{{ object.image_main.default.url }}"
+                            {% else %}
+                                src=""
+                            {% endif %}
+                                alt="" class="img-responsive">
                 </div>
 
                 <!-- DESCRIPTION TEXT -->
                 <div class="about-text col-md-6">
-                    {{ info.description }}
+                    {{ info.description_html|safe }}
                 </div>
 
             </div>
@@ -408,41 +445,28 @@
 
     <!-- REALIZADOR
     ================================= -->
-    <section id="owner" class="footer-section section">
-        <h2 class="section-heading text-center">Organizador</h2>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-2">
-                    <h3 class="footer-logo">
-                        <img src="{% static 'hotsite/images/lozi-eventos.png' %}"
-                             class="img-circle"
-                             alt="Lozi Eventos" style="border:10px solid #ddd">
-                    </h3>
-                </div>
-                <div class="col-md-10">
-                    <div class="row">
-                        <div class="col-md-12" style="text-align: left;">
-                            <h3>Lozi Eventos</h3>
-                            <div class="team-member-description">
-                                <p>
-                                    A Lozi Eventos nasceu para fazer parte dos momentos especiais da vida de seus
-                                    clientes. Para construir projetos com eles e, com uma equipe qualificada e um
-                                    trabalho primoroso de gestão de eventos, transformar esses projetos em realidade.
-                                </p>
-                                <p>
-                                    Participar da criação de eventos eficientes, bonitos e de sucesso é o que motiva a
-                                    Lozi Eventos a se envolver nas realizações de seus clientes. Por isso, não há
-                                    roteiros prontos, mas o conhecimento e a experiência que ajudam a fazer de cada
-                                    evento um momento único.
-                                </p>
+    <!-- REALIZADOR
+ ================================= -->
+    {% if not object.organization.internal %}
+        <section id="owner" class="footer-section section">
+            <h2 class="section-heading text-center">Organizador</h2>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-md-12" style="text-align: left;">
+                                <h3>{{ object.organization }}</h3>
+                                <div class="team-member-description">
+                                    {{ object.organization.description_html|safe }}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-    </section>
+        </section>
+    {% endif %}
 
     <!-- CONGRESSY FOOTER
     ================================= -->

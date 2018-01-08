@@ -5,7 +5,7 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!-->
 <html lang="en"> <!--<![endif]-->
-{% load static %}
+{% load static base_tags %}
 <head>
 
     <meta charset="utf-8">
@@ -13,7 +13,10 @@
           content="width=device-width, initial-scale=1, maximum-scale=1">
 
     <!-- BASIC INFO -->
-    <title>Brazilian Breast Cancer Symposium 2018 | Congressy</title>
+    <title>{{ object.name }} | Congressy</title>
+    <meta name="author" content="{{ object.organization }}">
+    <meta name="description"
+          content="{{ info.description }}">
 
     <!-- FAVICONS -->
     <link rel="icon" href="{% static 'hotsite/images/favicons/favicon.ico' %}">
@@ -30,8 +33,7 @@
 
     <!-- LIBRARIES CSS -->
     <link rel="stylesheet" href="{% static 'hotsite/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="
-{% static 'hotsite/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/font-awesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'hotsite/css/animate.min.css' %}">
 
     <!-- SPECIFIC CSS -->
@@ -44,8 +46,7 @@
     <!-- <link id="color-css" rel="stylesheet" href="css/colors/yellow.css"> -->
     <!-- <link id="color-css" rel="stylesheet" href="css/colors/green.css"> -->
     <!-- <link id="color-css" rel="stylesheet" href="css/colors/turquoise.css"> -->
-    <link id="color-css" rel="stylesheet" href="
-{% static 'hotsite/css/colors/blue.css' %}">
+    <link id="color-css" rel="stylesheet" href="{% static 'hotsite/css/colors/blue.css' %}">
     <style>
         img.blurred {
             -webkit-filter: blur(18px);
@@ -105,8 +106,8 @@
                 <!-- NAVIGATION LINKS -->
                 <ul id="header-nav" class="nav navbar-nav">
 
-                    <li><a href="#hero" class="anchor-link">Capa</a></li>
-                    <li><a href="#about" class="anchor-link">Inscrições</a>
+                    <li><a href="#hero" class="anchor-link">Inscrição</a></li>
+                    <li><a href="#about" class="anchor-link">Sobre o evento</a>
                     </li>
                     <li><a href="#map" class="anchor-link">Local</a></li>
                     <li><a href="#owner" class="anchor-link">Organizador</a>
@@ -133,8 +134,13 @@
 
             <!-- IMAGE BACKGROUND -->
             <div class="section-background-image parallax">
-                <img src="{% static 'hotsite/images/main_background.png' %}"
-                     alt="" style="opacity: 0.2;" class="blurred">
+                <img
+                        {% if object.image_main.default %}
+                            src="{{ object.image_main.default.url }}"
+                        {% else %}
+                            src=""
+                        {% endif %}
+                            alt="" style="opacity: 0.2;" class="blurred">
             </div>
         </div>
 
@@ -146,21 +152,35 @@
                     <div class="hero-heading text-center row"
                          data-animation="fadeIn">
                         <div class="col-md-10 col-md-offset-1">
+                            {% block messages %}
+                                {% if messages %}
+                                    <div style="width:100%;margin-top:3px;padding-bottom:10px">
 
-                            <h1 class="hero-title">Brazilian Breast Cancer Symposium 2018</h1>
+                                        {% for message in messages %}
+
+                                            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}warning{% endif %} alert-dismissible" role="alert">
+                                                <button type="button" class="close" data-dismiss="alert"
+                                                        aria-label="Close"><span aria-hidden="true">&times;</span>
+                                                </button>
+                                                {{ message|capfirst }}
+                                            </div>
+
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endblock messages %}
+
+                            <h1 class="hero-title">{{ object.name }}</h1>
 
                             <p class="hero-tagline">
-                            <div style="width: 50%;margin: 0 auto">
-                                <div style="float:left">
-                                    <i class="fa fa-calendar"></i>
-                                    17/05/2018 a 19/05/2018
-                                </div>
+                            <div>
+                                <i class="fa fa-calendar"></i>
+                                {{ period }}
+                            </div>
 
-                                <div style="float:right">
-                                    <i class="fa fa-map-marker"></i>
-                                    Camping Namaste, Pirinópolis-GO, Brazil.
-                                </div>
-                                <div class="clearfix"></div>
+                            <div>
+                                <i class="fa fa-map-marker"></i>
+                                {{ object.place.name }}
                             </div>
 
                             </p>
@@ -169,61 +189,15 @@
 
                     <div class="hero-features row">
 
-                        <div class="hero-features-left col-md-12">
+                        {% if object.lead %}
+                            <div class="hero-features-left col-md-12">
 
-                            <p class="lead">
-                                Come with us to participate, debate and be part of the greatest
-                                event in research of Breast Cancer in Brazil!
-                            </p>
-                            <ul class="icon-list">
-                                <li>
-                                    <span class="icon-list-icon fa fa-map-marker"
-                                          data-animation="bounceIn"></span>
-                                    <h4 class="icon-list-title">
-                                        Where
-                                    </h4>
-                                    <p>
-                                        <strong>Pirenópolis-GO, Brazil</strong> is a great
-                                        place where we can dedicate to the subject and meet
-                                        a beautiful and historical city.
-                                    </p>
-                                </li>
-                                <li>
-                                    <span class="icon-list-icon fa fa-envelope"
-                                          data-animation="bounceIn"></span>
-                                    <h4 class="icon-list-title">
-                                        Message
-                                    </h4>
-                                    <p>
-                                        Accompany all our message with exclusivity.
-                                    </p>
-                                </li>
-                                <li>
-                                    <span class="icon-list-icon fa fa-lightbulb-o"
-                                          data-animation="bounceIn"></span>
-                                    <h4 class="icon-list-title">
-                                        Workshops
-                                    </h4>
-                                    <p>
-                                        Find out and be part of the great on-going
-                                        research about Breast Cancer in Brazil.
-                                    </p>
-                                </li>
-                                <li>
-                                    <span class="icon-list-icon fa fa-paperclip"
-                                          data-animation="bounceIn"></span>
-                                    <h4 class="icon-list-title">
-                                        Abstracts
-                                    </h4>
-                                    <p>
-                                        Receive, at first hand, the exclusive abstracts
-                                        presented.
-                                    </p>
-                                </li>
-                            </ul>
+                                <p class="lead">
+                                    {{ object.lead }}
+                                </p>
 
-                        </div>
-
+                            </div>
+                        {% endif %}
                     </div>
 
                 </div>
@@ -236,155 +210,127 @@
 
     <!-- DESCRIPTION
     ================================= -->
-
     <section id="about" class="about-section section">
 
         <div class="container">
 
-            <h2 class="section-heading text-center">Faça sua inscrição!</h2>
+            <h2 class="section-heading text-center">Faça já inscrição</h2>
 
             <div class="about-row row">
+
+
                 <div class="col-md-12">
                     <div class="panel panel-default">
                         <div class="panel-body">
 
+                            <form name="hero" action="/event/{{ object.pk }}/" method="post" id="form"
+                                  class="form" role="form">
+                                {% csrf_token %}
 
-                            <input name="user" id="id_user" type="hidden">
-
-
-                            <div class="form-group">
-
-
-                                <label for="
-id_name">
-                                    Nome Completo
-
-                                    <small style="color:#C9302C">*
-                                    </small>
-
-                                </label>
+                                <div class="form-group">
 
 
-                                <div>
+                                    <label for="id_name">
+                                        Nome Completo
+                                        <small style="color:#C9302C">*
+                                        </small>
+                                    </label>
 
 
-                                    <input name="name" id="id_name"
-                                           class="form-control" maxlength="255"
-                                           placeholder="Nome completo"
-                                           required="" type="text">
+                                    <div>
 
+
+                                        <input name="name" id="id_name"
+                                               class="form-control" maxlength="255"
+                                               placeholder="Nome completo"
+                                               required="" type="text">
+                                    </div>
 
                                 </div>
 
-                            </div>
-
-                            <div class="form-group">
+                                <div class="form-group">
 
 
-                                <label for="
-id_gender">
-                                    Sexo
+                                    <label for="id_gender">
+                                        Sexo
 
-                                    <small style="color:#C9302C">*
-                                    </small>
+                                        <small style="color:#C9302C">*
+                                        </small>
 
-                                </label>
-
-
-                                <div>
+                                    </label>
 
 
-                                    <select name="gender" class="form-control"
-                                            id="id_gender" required="">
-                                        <option value="" selected="">-
-                                            Selecione -
-                                        </option>
-
-                                        <option value="F">F</option>
-
-                                        <option value="M">M</option>
-
-                                    </select>
+                                    <div>
 
 
-                                </div>
+                                        <select name="gender" class="form-control"
+                                                id="id_gender" required="">
+                                            <option value="" selected="">-
+                                                Selecione -
+                                            </option>
 
-                            </div>
+                                            <option value="F">F</option>
 
-                            <div class="form-group">
+                                            <option value="M">M</option>
 
-
-                                <label for="
-id_email">
-                                    E-Mail
-
-                                </label>
-
-
-                                <div>
+                                        </select>
 
 
-                                    <input name="email" class="form-control"
-                                           id="id_email" type="email">
-
+                                    </div>
 
                                 </div>
 
-                            </div>
-
-                            <div class="form-group">
+                                <div class="form-group">
 
 
-                                <label for="
+                                    <label for="id_email">E-Mail</label>
+
+                                    <div>
+                                        <input name="email" class="form-control"
+                                               id="id_email" type="email">
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+
+
+                                    <label for="
 id_phone">
-                                    Celular
+                                        Celular
 
-                                    <small style="color:#C9302C">*
-                                    </small>
+                                        <small style="color:#C9302C">*
+                                        </small>
 
-                                </label>
-
-
-                                <div>
+                                    </label>
 
 
-                                    <input name="phone" class="form-control"
-                                           maxlength="14" id="id_phone"
-                                           required="" type="tel">
+                                    <div>
+                                        <input name="phone" class="form-control"
+                                               maxlength="14" id="id_phone"
+                                               required="" type="tel">
+                                    </div>
 
 
                                 </div>
 
 
-                            </div>
+                                <button type="submit" class="btn btn-primary">
+                                    Submit
+                                </button>
+                            </form>
 
 
-                            <button type="submit" class="btn btn-primary">
-                                Submit
-                            </button>
                         </div>
                     </div>
                 </div>
+
             </div>
 
         </div>
 
     </section>
 
-
-        <div class="section-background">
-
-            <!-- IMAGE BACKGROUND -->
-            <div class="section-background-image parallax"
-                 data-stellar-ratio="0.4">
-                <img src="{% static 'hotsite/images/main_background.png' %}" alt=""
-                     style="opacity: 0.2;" class="blurred">
-            </div>
-
-        </div>
-
-
-    </section>
 
     <!-- GOOGLE MAPS
     ================================= -->
@@ -504,41 +450,26 @@ id_phone">
 
     <!-- REALIZADOR
     ================================= -->
-    <section id="owner" class="footer-section section">
-        <h2 class="section-heading text-center">Organizador</h2>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-2">
-                    <h3 class="footer-logo">
-                        <img src="{% static 'hotsite/images/lozi-eventos.png' %}"
-                             class="img-circle"
-                             alt="Lozi Eventos" style="border:10px solid #ddd">
-                    </h3>
-                </div>
-                <div class="col-md-10">
-                    <div class="row">
-                        <div class="col-md-12" style="text-align: left;">
-                            <h3>Lozi Eventos</h3>
-                            <div class="team-member-description">
-                                <p>
-                                    A Lozi Eventos nasceu para fazer parte dos momentos especiais da vida de seus
-                                    clientes. Para construir projetos com eles e, com uma equipe qualificada e um
-                                    trabalho primoroso de gestão de eventos, transformar esses projetos em realidade.
-                                </p>
-                                <p>
-                                    Participar da criação de eventos eficientes, bonitos e de sucesso é o que motiva a
-                                    Lozi Eventos a se envolver nas realizações de seus clientes. Por isso, não há
-                                    roteiros prontos, mas o conhecimento e a experiência que ajudam a fazer de cada
-                                    evento um momento único.
-                                </p>
+    {% if not object.organization.internal %}
+        <section id="owner" class="footer-section section">
+            <h2 class="section-heading text-center">Organizador</h2>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-md-12" style="text-align: left;">
+                                <h3>{{ object.organization }}</h3>
+                                <div class="team-member-description">
+                                    {{ object.organization.description_html|safe }}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-    </section>
+        </section>
+    {% endif %}
 
     <!-- CONGRESSY FOOTER
     ================================= -->
@@ -573,6 +504,17 @@ id_phone">
 <!-- MAIN SCRIPT
 ================================= -->
 <script src="{% static 'hotsite/js/script.js' %}"></script>
+<script type="application/javascript">
+    $(document).ready(function () {
+        {% if name %}
+            $("#id_name").val('{{ name }}');
+        {% endif %}
+
+        {% if email %}
+            $("#id_email").val('{{ email }}');
+        {% endif %}
+    });
+</script>
 
 </body>
 

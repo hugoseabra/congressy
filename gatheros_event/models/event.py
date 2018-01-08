@@ -148,6 +148,16 @@ class Event(models.Model, GatherosModelMixin):
                   " (tamanho: 1920px x 900px)"
     )
 
+    image_main = StdImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
+        verbose_name='imagem principal',
+        variations={'default': (480, 638), 'thumbnail': (200, 233, True)},
+        validators=[MinSizeValidator(480, 638), MaxSizeValidator(1400, 1400)],
+        help_text="Imagem única da descrição do evento: 480px x 638px"
+    )
+
     website = models.CharField(max_length=255, null=True, blank=True)
     facebook = models.CharField(max_length=255, null=True, blank=True)
     twitter = models.CharField(max_length=255, null=True, blank=True)
