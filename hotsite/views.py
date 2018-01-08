@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import uuid4
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -6,10 +7,15 @@ from django.contrib.auth.models import User
 from django.views.generic import DetailView
 from django.urls import reverse
 from django.contrib import messages
+from django.utils import six
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 
 from django.core.exceptions import ValidationError
-from gatheros_event.forms import ProfileCreateForm
-from gatheros_event.models import Event, Info, Person
+from gatheros_event.models import Event, Info, Person, Member, Organization
 from gatheros_subscription.models import Lot, Subscription
 
 
@@ -101,14 +107,13 @@ class HotsiteView(DetailView):
         self.object = Event.objects.get(pk=kwargs['pk'])
 
         post_size = len(self.request.POST)
+        shiny_user = None
 
         try:
             person = Person.objects.get(email=email)
         except Person.DoesNotExist:
             person = None
             # return HttpResponseRedirect(reverse('public:profile_create'))
-        except Person.MultipleObjectsReturned:
-            person = Person.objects.filter(email=email).first()
 
         if not person:
 
@@ -119,15 +124,60 @@ class HotsiteView(DetailView):
             # gender = self.request.POST.get('gender')
             # phone = self.request.POST.get('gender')
 
+            # Criando perfil
             person = Person(name=name, email=email)
             person.save()
 
-        try:
+            # Criando usuário
+            password = str(uuid4())
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password
+            )
+            user.save()
 
+            # Vinculando usuário ao perfil
+            person.user = user
+            person.save()
+
+            # Criando organização interna
+            try:
+                person.members.get(organization__internal=True)
+            except Member.DoesNotExist:
+                internal_org = Organization(
+                    internal=True,
+                    name=person.name
+                )
+
+                for attr, value in six.iteritems(person.get_profile_data()):
+                    setattr(internal_org, attr, value)
+
+                internal_org.save()
+
+                Member.objects.create(
+                    organization=internal_org,
+                    person=person,
+                    group=Member.ADMIN
+                )
+
+            # Criando a senha par o email de confirmação e definição de senha
+
+            """
+            Generates a one-use only link for resetting password and sends to the
+            user.
+            """
+            shiny_user = True
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            domain = 'http://localhost:8000'
+            full_reset_url = domain + '/reset-password/confirmation/' + str(uid, 'utf-8') + "/" + str(token)
+
+        try:
             user = User.objects.get(email=email)
             logged_in = self.request.user.is_authenticated
 
-            if user != self.request.user and not logged_in:
+            if user != self.request.user and not logged_in and user.last_login:
                 messages.error(self.request, 'Faça login para continuar.')
                 full_url = reverse('front:login') + '?next=/event/' + str(self.object.pk) + "/form/"
                 return HttpResponseRedirect(full_url)
@@ -140,14 +190,46 @@ class HotsiteView(DetailView):
 
         try:
             subscription.save()
+            # Send an email here
+
+            email_subject = "Congressy: Sucesso! Você está cadastrado no evento: {0}".format(self.object.name)
+
+            if shiny_user:
+                email_template = """
+                        
+    Olá {2},
+
+        Seja bem-vindo a Congressy Plataforma de Eventos!
+
+        Sucesso! Foi feito o seu cadastro no evento: {0}
+    
+        Click no link abaixo para confirmar seu email:
+    
+        {1}
+    
+    Equipe Congressy,
+                """.format(self.object.name, full_reset_url, name)
+            else:
+                email_template = """
+
+    Olá {1},
+    
+        Sucesso! Foi feito o seu cadastro no evento: {0}
+        
+    Equipe Congressy,
+                """.format(self.object.name, full_reset_url, name)
+
+            send_mail(email_subject, email_template, ['equipe@congressy.com'], [email])
+
             messages.success(self.request, 'Inscrição realizada com sucesso!')
+
         except ValidationError as e:
             error_message = e.messages[0]
             if error_message:
                 messages.error(self.request, error_message)
             else:
                 messages.error(self.request,
-                           'Ocorreu um erro durante a o processo de inscrição, tente novamente mais tarde.')
+                               'Ocorreu um erro durante a o processo de inscrição, tente novamente mais tarde.')
 
         context = super(HotsiteView, self).get_context_data(**kwargs)
         context['status'] = self._get_status()
@@ -158,210 +240,3 @@ class HotsiteView(DetailView):
         context['info'] = Info.objects.get(pk=self.object.pk)
         return render(self.request, template_name=self.form_template, context=context)
 
-
-# name = self.request.POST.get('name')
-# if
-
-
-#
-# # Testing if we have a user.
-#
-# if request.user.is_authenticated:
-#     user = self.request.user
-#
-# else:
-#
-#     # Test if we have a
-#
-#     # Test if we have a person.
-#     # Every user has a person, but not every person has a user.
-#     # If person:
-#     # login()
-#     # else:
-#     # register()
-#
-#     # try:
-#     #
-#     # except:
-#     #     pass
-#
-#     return HttpResponseRedirect(reverse('front:login'))
-#
-#     # Test if user is already registered in the event
-#
-#     print('asdasd')
-
-#
-#
-#
-# if user:
-#     return HttpResponse('user')
-#     # We have a user. Find the person.
-#     # try:
-#     #     person =
-#
-# else:
-#     return HttpResponse('no user')
-# #
-# if self.request.POST.get('name') or self.request.POST.get('email'):
-#
-#
-#
-#     # if user:
-#         # If user is logged in, create inscription
-#         # If user is not logged in, check if he already has a user, if so, ask for a login.
-#         # If user is not logged in, check if he already has a user, if not, send him to a create page.
-#     # else if not user:
-#         # Redirect to create user then redirect to event:inscription_status page.
-#
-#     # Always redirect back to the event:inscription_status page.
-#
-#     name = self.request.POST.get('name')
-#     email = self.request.POST.get('email')
-#
-#     form = ProfileCreateForm(data={"name": name, "email": email})
-#     validated_form = form.is_valid()
-#
-#
-#
-#     try:
-#         found_person = Person.objects.get(email=email)
-#     except Person.DoesNotExist:
-#         pass
-#
-#
-#
-#     if validated_form:
-#         form.save()
-#     else:
-#         # Add the event to the session.
-#         self.request.session['signing_up_for'] = kwargs['pk']
-#         errors = form.errors.as_data()
-#         for _, error_list in errors.items():
-#             for error in error_list:
-#                 print(error.message)
-#                 if error.message == "Esse email já existe em nosso sistema. Tente novamente.":
-#                     # Tell inform the user that he already has an account and must login in.
-#                     return HttpResponseRedirect(reverse('front:login'))
-#                     print('er')
-#             """ START HERE"""
-#     person = Person.objects.get(email=email)
-#
-#     object_pk = kwargs['pk']
-#
-#     obj = Event.objects.get(pk=object_pk)
-#     info = Info.objects.get(pk=object_pk)
-#
-#     period = obj.get_period()
-#     return render(request, self.template_name, {"name": name,
-#                                                 "email": email,
-#                                                 "object": obj,
-#                                                 "info": info,
-#                                                 "peron": person,
-#                                                 "period": period,
-#                                                 })
-
-
-class HotsiteFormView(DetailView):
-    template_name = 'hotsite/form.html'
-    form = ProfileCreateForm
-    model = Event
-
-    def post(self, request, *args, **kwargs):
-
-        # Testing if we have a user.
-
-        if request.user.is_authenticated:
-            user = self.request.user
-
-        else:
-
-            # Test if we have a
-
-            # Test if we have a person.
-            # Every user has a person, but not every person has a user.
-            # If person:
-            # login()
-            # else:
-            # register()
-
-            # try:
-            #
-            # except:
-            #     pass
-
-            return HttpResponseRedirect(reverse('front:login'))
-
-            # Test if user is already registered in the event
-
-            print('asdasd')
-
-        #
-        #
-        #
-        # if user:
-        #     return HttpResponse('user')
-        #     # We have a user. Find the person.
-        #     # try:
-        #     #     person =
-        #
-        # else:
-        #     return HttpResponse('no user')
-        # #
-        # if self.request.POST.get('name') or self.request.POST.get('email'):
-        #
-        #
-        #
-        #     # if user:
-        #         # If user is logged in, create inscription
-        #         # If user is not logged in, check if he already has a user, if so, ask for a login.
-        #         # If user is not logged in, check if he already has a user, if not, send him to a create page.
-        #     # else if not user:
-        #         # Redirect to create user then redirect to event:inscription_status page.
-        #
-        #     # Always redirect back to the event:inscription_status page.
-        #
-        #     name = self.request.POST.get('name')
-        #     email = self.request.POST.get('email')
-        #
-        #     form = ProfileCreateForm(data={"name": name, "email": email})
-        #     validated_form = form.is_valid()
-        #
-        #
-        #
-        #     try:
-        #         found_person = Person.objects.get(email=email)
-        #     except Person.DoesNotExist:
-        #         pass
-        #
-        #
-        #
-        #     if validated_form:
-        #         form.save()
-        #     else:
-        #         # Add the event to the session.
-        #         self.request.session['signing_up_for'] = kwargs['pk']
-        #         errors = form.errors.as_data()
-        #         for _, error_list in errors.items():
-        #             for error in error_list:
-        #                 print(error.message)
-        #                 if error.message == "Esse email já existe em nosso sistema. Tente novamente.":
-        #                     # Tell inform the user that he already has an account and must login in.
-        #                     return HttpResponseRedirect(reverse('front:login'))
-        #                     print('er')
-        #             """ START HERE"""
-        #     person = Person.objects.get(email=email)
-        #
-        #     object_pk = kwargs['pk']
-        #
-        #     obj = Event.objects.get(pk=object_pk)
-        #     info = Info.objects.get(pk=object_pk)
-        #
-        #     period = obj.get_period()
-        #     return render(request, self.template_name, {"name": name,
-        #                                                 "email": email,
-        #                                                 "object": obj,
-        #                                                 "info": info,
-        #                                                 "peron": person,
-        #                                                 "period": period,
-        #                                                 })
