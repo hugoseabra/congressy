@@ -16,6 +16,36 @@ $(document).ready(function() {
     });
 });
 
+//============================ FORM SUBMIT ==================================//
+function submit_form(form) {
+    var loader = '<div class="loader-block">';
+        loader += '<div class="img-block">';
+        loader += '<img src="/static/assets/img/loader.gif" />';
+        loader += '</div>';
+        loader += '</div>';
+
+    var button;
+
+    button = $(form).find('button')
+        .not(':button[type=button]')
+        .not(':button[type=reset]')
+    ;
+
+    if (!button.length) {
+        button = $(form).find('input[type=submit]');
+    }
+
+    if (button) {
+        loader = $(loader);
+        loader.insertAfter(button);
+        button.fadeOut('fast', function() {
+            loader.fadeIn(function() {
+                form.submit();
+            });
+        });
+    }
+}
+
 //========================= CAIXA DE FILTROS ================================//
 window.cgsy = window.cgsy || {};
 (function(window, $) {

@@ -4,13 +4,11 @@
 {% block title %}Nova conta | Congressy{% endblock %}
 {% block login_block_title %}Nova conta{% endblock %}
 
-
 {# @TODO Corrigir problema com o success message, talvez um if testando o contexto por mensagem de successo #}
 
 {% block form %}
     <p> Entre com suas credenciais para acessar sua conta.</p>
-    <form id="createForm" action="" method="post" class="form-horizontal"
-          enctype="multipart/form-data" role="form">
+    <form id="createForm" action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form" onsubmit="submit_form(this); return false;">
         {% csrf_token %}
         <div class="form-group">
             <div class="col-md-12">
@@ -73,23 +71,4 @@
             </div>
         </div>
     </form>
-
-
-
-
-
 {% endblock %}
-{% block global_js %}
-    {{ block.super }}
-    <script>
-        $('#submitButton').on('click', function () {
-            $(this).val('Please wait ...')
-                .attr('disabled', 'disabled');
-            console.log('potato')
-            $('#createForm').submit();
-        });
-    </script>
-{% endblock %}
-
-
-
