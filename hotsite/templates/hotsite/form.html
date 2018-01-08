@@ -135,8 +135,8 @@
             <!-- IMAGE BACKGROUND -->
             <div class="section-background-image parallax">
                 <img
-                        {% if object.image_main.default %}
-                            src="{{ object.image_main.default.url }}"
+                        {% if info.image_main.default %}
+                            src="{{ info.image_main.default.url }}"
                         {% else %}
                             src=""
                         {% endif %}
@@ -189,11 +189,11 @@
 
                     <div class="hero-features row">
 
-                        {% if object.lead %}
+                        {% if info.lead %}
                             <div class="hero-features-left col-md-12">
 
                                 <p class="lead">
-                                    {{ object.lead }}
+                                    {{ info.lead }}
                                 </p>
 
                             </div>
@@ -286,7 +286,7 @@
                                     <label for="id_email">E-Mail</label>
 
                                     <div>
-                                        <input name="email" class="form-control"
+                                        <input name="email" required="" class="form-control"
                                                id="id_email" type="email">
                                     </div>
 
