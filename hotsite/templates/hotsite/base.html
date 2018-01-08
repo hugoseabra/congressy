@@ -138,8 +138,8 @@
             <!-- IMAGE BACKGROUND -->
             <div class="section-background-image parallax">
                 <img
-                        {% if object.image_main.default %}
-                            src="{{ object.image_main.default.url }}"
+                        {% if info.image_main.default %}
+                            src="{{ info.image_main.default.url }}"
                         {% else %}
                             src=""
                         {% endif %}
@@ -197,11 +197,11 @@
 
                         <div class="hero-features row">
                             <div class="hero-features-left col-md-7">
-                                {% if object.lead %}
+                                {% if info.lead %}
 
 
                                     <p class="lead">
-                                        {{ object.lead }}
+                                        {{ info.lead }}
                                     </p>
 
 
@@ -240,7 +240,7 @@
                                     <div class="form-group">
                                         <label for="id_email">E-Mail</label>
                                         <div>
-                                            <input name="email" placeholder="me@email.com" class="form-control"
+                                            <input name="email" placeholder="me@email.com" required="" class="form-control"
                                                    id="id_email" type="email">
                                         </div>
                                     </div>
@@ -273,22 +273,24 @@
             <h2 class="section-heading text-center">Sobre o evento</h2>
 
             <div class="about-row row">
+                {% if info.image_main.default %}
+                    <!-- DESCRIPTION IMAGE -->
+                    <div class="about-image col-md-6" data-animation="fadeIn">
+                        <img src="{{ info.image_main.default.url }}" alt="" class="img-responsive">
 
-                <!-- DESCRIPTION IMAGE -->
-                <div class="about-image col-md-6" data-animation="fadeIn">
-                    <img
-                            {% if object.image_main.default %}
-                                src="{{ object.image_main.default.url }}"
-                            {% else %}
-                                src=""
-                            {% endif %}
-                                alt="" class="img-responsive">
-                </div>
+                    </div>
 
-                <!-- DESCRIPTION TEXT -->
-                <div class="about-text col-md-6">
-                    {{ info.description_html|safe }}
-                </div>
+                    <!-- DESCRIPTION TEXT -->
+                    <div class="about-text col-md-6">
+                        {{ info.description_html|safe }}
+                    </div>
+                {% else %}
+                    <!-- DESCRIPTION TEXT -->
+                    <div class="about-text col-md-12">
+                        {{ info.description_html|safe }}
+                    </div>
+
+                {% endif %}
 
             </div>
 
@@ -304,11 +306,16 @@
         <div class="section-background">
 
             <!-- IMAGE BACKGROUND -->
-            <div class="section-background-image parallax"
-                 data-stellar-ratio="0.4">
-                <img src="{% static 'hotsite/images/main_background.png' %}" alt=""
-                     style="opacity: 0.2;" class="blurred">
+            <div class="section-background-image parallax">
+                <img
+                        {% if info.image_main.default %}
+                            src="{{ info.image_main.default.url }}"
+                        {% else %}
+                            src=""
+                        {% endif %}
+                            alt="" style="opacity: 0.2;" class="blurred">
             </div>
+
 
         </div>
 
