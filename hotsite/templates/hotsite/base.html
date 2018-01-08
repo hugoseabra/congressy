@@ -158,20 +158,23 @@
                             {% block messages %}
                                 {% if messages %}
                                     <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                    {% for message in messages %}
 
-                                        {% for message in messages %}
+                                        {% if message.tags %}
+                                            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
 
-                                            <div class="alert alert-
-                                                    {% if message.tags %}{{ message.tags }}{% else %}warning{% endif %} alert-dismissible"
-                                                 role="alert">
-                                                <button type="button" class="close" data-dismiss="alert"
-                                                        aria-label="Close"><span aria-hidden="true">&times;</span>
-                                                </button>
-                                                {{ message|capfirst }}
-                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-warning alert-dismissible" role="alert">
+                                        {% endif %}
 
-                                        {% endfor %}
+                                    <button type="button" class="close" data-dismiss="alert"
+                                            aria-label="Close"><span aria-hidden="true">&times;</span>
+                                    </button>
+                                    {{ message|capfirst }}
                                     </div>
+
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
                             {% endblock messages %}
 
@@ -189,73 +192,74 @@
                             </div>
 
                             </p>
-                        </div>
-                    </div>
-
-                    <div class="hero-features row">
-                        <div class="hero-features-left col-md-7">
-                            {% if object.lead %}
-
-
-                                <p class="lead">
-                                    {{ object.lead }}
-                                </p>
-
-
-                            {% endif %}
+                            </div>
                         </div>
 
+                        <div class="hero-features row">
+                            <div class="hero-features-left col-md-7">
+                                {% if object.lead %}
 
-                        <div class="hero-features-right col-md-5"
-                             data-animation="fadeIn">
+
+                                    <p class="lead">
+                                        {{ object.lead }}
+                                    </p>
 
 
-                            <!-- FORM -->
-                            <form name="hero" action="/event/{{ object.pk }}/" method="post" id="form"
-                                  class="form" role="form">
+                                {% endif %}
+                            </div>
 
-                                {% csrf_token %}
 
-                                <h4 class="form-heading"
-                                    style="font-weight: bold;">Inscreva-se
-                                    agora!</h4>
+                            <div class="hero-features-right col-md-5"
+                                 data-animation="fadeIn">
 
-                                <div class="form-validation alert"></div>
 
-                                <div class="form-group">
-                                    <label for="id_name">
-                                        Nome Completo
-                                    </label>
+                                <!-- FORM -->
+                                <form name="hero" action="/event/{{ object.pk }}/" method="post" id="form"
+                                      class="form" role="form">
 
-                                    <div>
-                                        <input name="name" id="id_name" class="form-control placeholder" maxlength="255"
-                                               placeholder="Nome completo" required="" type="text">
+                                    {% csrf_token %}
+
+                                    <h4 class="form-heading"
+                                        style="font-weight: bold;">Inscreva-se
+                                        agora!</h4>
+
+                                    <div class="form-validation alert"></div>
+
+                                    <div class="form-group">
+                                        <label for="id_name">
+                                            Nome Completo
+                                        </label>
+
+                                        <div>
+                                            <input name="name" id="id_name" class="form-control placeholder"
+                                                   maxlength="255"
+                                                   placeholder="Nome completo" required="" type="text">
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="form-group">
-                                    <label for="id_email">E-Mail</label>
-                                    <div>
-                                        <input name="email" placeholder="me@email.com" class="form-control"
-                                               id="id_email" type="email">
+                                    <div class="form-group">
+                                        <label for="id_email">E-Mail</label>
+                                        <div>
+                                            <input name="email" placeholder="me@email.com" class="form-control"
+                                                   id="id_email" type="email">
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="form-group form-group-submit">
-                                    <button class="btn btn-primary btn-lg btn-block" data-loading-text="Enviar">
-                                        Enviar
-                                    </button>
-                                </div>
-                            </form>
+                                    <div class="form-group form-group-submit">
+                                        <button class="btn btn-primary btn-lg btn-block" data-loading-text="Enviar">
+                                            Enviar
+                                        </button>
+                                    </div>
+                                </form>
+
+                            </div>
 
                         </div>
 
                     </div>
-
                 </div>
-            </div>
 
-        </div>
+            </div>
 
     </section>
 

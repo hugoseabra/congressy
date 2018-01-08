@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
+from django.contrib.auth.models import User
 from django.views.generic import DetailView
 from django.urls import reverse
 from django.contrib import messages
@@ -98,54 +99,47 @@ class HotsiteView(DetailView):
 
         self.object = Event.objects.get(pk=kwargs['pk'])
 
-        # Test if its soft post or hard post:
-        # Soft post contains only 3 itens in the post:
-        # name, email, csrftoken
-        # hard post has 5 itens
-
         post_size = len(self.request.POST)
 
-        if post_size <= 3:
-            # soft post: we only have an email and a name
+        try:
+            person = Person.objects.get(email=email)
+        except Person.DoesNotExist:
+            person = None
+            # return HttpResponseRedirect(reverse('public:profile_create'))
+        except Person.MultipleObjectsReturned:
+            person = Person.objects.filter(email=email).first()
 
-            # test if we have a person.
+        if not person:
+            if post_size >= 3:
+                # hard post
+                email = self.request.POST.get('email')
+                name = self.request.POST.get('name')
+                gender = self.request.POST.get('gender')
+                phone = self.request.POST.get('gender')
+
+                person = Person(name=name, email=email, gender=gender)
+                person.save()
+
+        if person:
             try:
-                person = Person.objects.get(email=email)
-                if not user.is_authenticated:
+                user = User.objects.get(email=email)
+                if user and not user.is_authenticated:
                     messages.error(self.request, 'Faça login para continuar.')
                     return HttpResponseRedirect(reverse('front:login'))
-                lot = Lot.objects.get(event=self.object)
-                subscription = Subscription(person=person, lot=lot, created_by=user.id)
-
-                try:
-                    subscription.save()
-                except ValidationError as e:
-                    messages.error(self.request, 'an error ocorred and prevented the subscription')
-                messages.success(self.request, 'Inscrição realizada com sucesso!')
-            except Person.DoesNotExist:
+            except User.DoesNotExist:
                 pass
-                # return HttpResponseRedirect(reverse('public:profile_create'))
 
-        elif post_size > 3:
-            # hard post
-            email = self.request.POST.get('email')
-            name = self.request.POST.get('name')
-            gender = self.request.POST.get('gender')
-            phone = self.request.POST.get('gender')
 
-            person = Person(name=name, email=email, gender=gender)
-            person.save()
             lot = Lot.objects.get(event=self.object)
             subscription = Subscription(person=person, lot=lot, created_by=0)
 
             try:
                 subscription.save()
-            except ValidationError as e:
-                messages.error(self.request, 'an error ocorred and prevented the subscription')
-            messages.success(self.request, 'Inscrição realizada com sucesso!')
-        else:
-        # I dont know why this would happen but just render the inital event page anyway
-            pass
+                self.form_template = self.template_name
+                messages.success(self.request, 'Inscrição realizada com sucesso!')
+            except ValidationError:
+                messages.error(self.request,
+                               'Ocorreu um erro durante a o processo de inscrição, tente novamente mais tarde.')
 
         context = super(HotsiteView, self).get_context_data(**kwargs)
         context['status'] = self._get_status()
