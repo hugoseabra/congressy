@@ -1,11 +1,12 @@
 {% extends "base/base.html" %}
+{% load static organization_tags%}
 
 {% block navbar %}
     {% include "base/simple-navbar.html" %}
 {% endblock %}
 
-{% load static organization_tags%}
-
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
 
 {% block title %}Organizações | Congressy{% endblock %}
 
@@ -68,9 +69,6 @@
             });
         });
     </script>
-{% endblock %}
-
-{% block sidebar %}
 {% endblock %}
 
 {% block content %}

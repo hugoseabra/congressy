@@ -56,6 +56,7 @@ class EventAdmin(admin.ModelAdmin):
         }),
         ('Publicação', {
             'fields': (
+                'image_main',
                 'banner_top',
                 'banner_small',
                 'banner_slide',
