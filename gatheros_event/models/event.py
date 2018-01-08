@@ -96,14 +96,6 @@ class Event(models.Model, GatherosModelMixin):
     date_start = models.DateTimeField(verbose_name='data inicial')
     date_end = models.DateTimeField(verbose_name='data final')
 
-    lead = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True,
-        verbose_name='descrição rápida',
-        help_text="Inspire aos visitantes a permanecerem no website do seu evento"
-    )
-
     place = models.ForeignKey(
         Place,
         on_delete=models.PROTECT,
@@ -140,7 +132,17 @@ class Event(models.Model, GatherosModelMixin):
         blank=True,
         null=True,
         verbose_name='banner topo do site',
-        variations={'default': (1920, 900), 'thumbnail': (200, 94, True)},
+        variations={
+            'default': {
+                'width': 1920,
+                'height': 900
+            },
+            'thumbnail': {
+                'width': 200,
+                'height': 94,
+                'crop': True
+            }
+        },
         validators=[MinSizeValidator(1920, 900), MaxSizeValidator(4096, 1920)],
         help_text="Banner para o topo do site do evento"
                   " (tamanho: 1920px x 900px)"

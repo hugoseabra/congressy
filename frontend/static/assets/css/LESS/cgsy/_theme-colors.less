@@ -99,32 +99,80 @@
   //============================= BUTTONS ===================================//
   .buttonbar {
     //box-shadow: 1px 0 5px #c1b7b7;
-    padding: 18px 0 10px 0;
+    padding: 0 0 10px 0;
     margin-bottom: 4px;
 
     a.btn, button.btn {
-      color: #FFF;
       margin-bottom: 0;
     }
   }
 
   .buttonbar.bottom {
-    padding: 0 0 18px 0 !important;
+    padding: 0 0 24px 0 !important;
   }
 
-  a.btn.success,
-  a.btn.warning,
-  a.btn.info,
-  a.btn.danger,
-  a.btn.default,
-  a.btn.primary,
-  button.btn.success,
-  button.btn.warning,
-  button.btn.info,
-  button.btn.danger,
-  button.btn.default,
-  button.btn.primary {
+  #header .dropdown-menu > li:active > .btn-success,
+  .dropdown-menu > li.active > .btn-success,
+  .dropdown-menu > li > .btn-success:focus,
+  .dropdown-menu > li > .btn-success:hover,
+  .btn-success:link, .btn-success:visited, .btn-success:hover {
     color: #FFF;
+    background-color: @successColorHover;
+    i, span {
+      color: #FFF;
+    }
+  }
+
+  #header .dropdown-menu > li:active > .btn-primary,
+  #header .dropdown-menu > li:active > .btn-primary.btn-trans,
+  .dropdown-menu > li.active > .btn-primary,
+  .dropdown-menu > li.active > .btn-primary.btn-trans,
+  .dropdown-menu > li > .btn-primary:focus,
+  .dropdown-menu > li > .btn-primary.btn-trans:focus,
+  .dropdown-menu > li > .btn-primary:hover,
+  .dropdown-menu > li > .btn-primary.btn-trans:hover,
+  .btn-primary:link,
+  .btn-primary.btn-trans:link,
+  .btn-primary:visited,
+  .btn-primary.btn-trans:visited,
+  .btn-primary:hover,
+  .btn-primary.btn-trans:hover {
+    color: #FFF !important;
+    background-color: @primaryColorHover;
+    i, span {
+      color: #FFF !important;
+    }
+  }
+
+  #header .dropdown-menu > li:active > .btn-default,
+  .dropdown-menu > li.active > .btn-default,
+  .dropdown-menu > li > .btn-default:focus,
+  .dropdown-menu > li > .btn-default:hover,
+  .btn-default:link, .btn-default:visited, .btn-default:hover {
+    color: #FFF;
+    background-color: @defaultColorHover;
+    i, span {
+      color: #FFF;
+    }
+  }
+
+  #header .dropdown-menu > li:active > a.btn-danger,
+  .dropdown-menu > li.active > a.btn-danger,
+  .dropdown-menu > li > a.btn-danger:focus,
+  .dropdown-menu > li > a.btn-danger:hover,
+  .btn-danger, a.btn-danger:link,
+  a.btn-danger:visited, a.btn-danger:hover {
+    color: #FFF;
+    background-color: @dangerColor;
+    i, span {
+      color: #FFF;
+    }
+  }
+
+  .profile:hover,
+  .profile:focus,
+  .profile {
+    background-color: @cgsyPrimary;
   }
 
   //============================== ALERT ====================================//
@@ -239,64 +287,5 @@
     background: #fdfdfe;
     position: fixed;
     bottom: 0;
-  }
-
-  //============================== NAVBAR ===================================//
-  #header .dropdown-menu > li:active > a.btn-success,
-  .dropdown-menu > li.active > a.btn-success,
-  .dropdown-menu > li > a.btn-success:focus,
-  .dropdown-menu > li > a.btn-success:hover,
-  .btn-success, a.btn-success:link,
-  a.btn-success:visited, a.btn-success:hover {
-    color: #FFF;
-    background-color: @successColorHover !important;
-    i, span {
-      color: #FFF !important;
-    }
-  }
-
-  #header .dropdown-menu > li:active > a.btn-primary,
-  .dropdown-menu > li.active > a.btn-primary,
-  .dropdown-menu > li > a.btn-primary:focus,
-  .dropdown-menu > li > a.btn-primary:hover,
-  .btn-primary, a.btn-primary:link,
-  a.btn-primary:visited, a.btn-primary:hover {
-    color: #FFF;
-    background-color: @primaryColorHover !important;
-    i, span {
-      color: #FFF !important;
-    }
-  }
-
-  #header .dropdown-menu > li:active > a.btn-default,
-  .dropdown-menu > li.active > a.btn-default,
-  .dropdown-menu > li > a.btn-default:focus,
-  .dropdown-menu > li > a.btn-default:hover,
-  .btn-default, a.btn-default:link,
-  a.btn-default:visited, a.btn-default:hover {
-    color: #FFF;
-    background-color: @defaultColorHover !important;
-    i, span {
-      color: #FFF !important;
-    }
-  }
-
-  #header .dropdown-menu > li:active > a.btn-danger,
-  .dropdown-menu > li.active > a.btn-danger,
-  .dropdown-menu > li > a.btn-danger:focus,
-  .dropdown-menu > li > a.btn-danger:hover,
-  .btn-danger, a.btn-danger:link,
-  a.btn-danger:visited, a.btn-danger:hover {
-    color: #FFF;
-    background-color: @dangerColor !important;
-    i, span {
-      color: #FFF !important;
-    }
-  }
-
-  .profile:hover,
-  .profile:focus,
-  .profile {
-    background-color: @cgsyPrimary;
   }
 }

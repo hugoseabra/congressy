@@ -19,6 +19,7 @@ from .invitation import (
     InvitationCreateForm,
     InvitationDecisionForm,
 )
+from .hotsite import HotsiteForm
 from .organization import OrganizationForm, OrganizationManageMembershipForm
 from .place import PlaceForm
 from .profile import ProfileCreateForm, ProfileForm

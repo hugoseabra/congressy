@@ -56,14 +56,22 @@ class Info(models.Model, GatherosModelMixin):
         default=CONFIG_TYPE_TEXT_ONLY,
         choices=CONFIG_TYPE_CHOICES
     )
+    lead = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name='descrição rápida',
+        help_text="Inspire aos visitantes a permanecerem no website do seu"
+                  " evento"
+    )
     image_main = StdImageField(
         upload_to=get_image_path,
         blank=True,
         null=True,
         verbose_name='imagem principal',
-        variations={'default': (750, 874), 'thumbnail': (200, 233, True)},
-        validators=[MinSizeValidator(750, 874), MaxSizeValidator(1400, 1400)],
-        help_text="Imagem única da descrição do evento: 750px x 874px"
+        variations={'default': (480, 638), 'thumbnail': (200, 266, True)},
+        validators=[MinSizeValidator(480, 638), MaxSizeValidator(1400, 1861)],
+        help_text="Imagem única da descrição do evento: 480px x 638px"
     )
     image1 = StdImageField(
         upload_to=get_image_path,

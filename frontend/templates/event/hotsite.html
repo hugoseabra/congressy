@@ -1,0 +1,213 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %} Página do Evento | Congressy{% endblock %}
+
+{% block page_title %}Página do Evento{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+
+{% block page_description %}Configuração da página do evento.{% endblock %}
+
+{% block styles %}
+<style>
+    .event-info-status-item {
+        text-align: center;
+        padding: 10px 20px;
+    }
+    .event-info-status-item .title {
+        font-size: 14px;
+        font-weight:700;
+    }
+    .event-info-status-item .description {
+        font-size: 12px;
+    }
+    .django-ckeditor-widget{
+        display: block !important;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <!-- ckeditor -->
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+    <script>
+        function resize_status_block() {
+            $('#block-status-icons').height($('#block-form').height()-23);
+        }
+        $(document).ready(function() {
+            $(window).resize(resize_status_block);
+            resize_status_block();
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-8" id="block-form">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="buttonbar">
+                            <div class="float-right">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-body">
+                                {% for field in form %}
+                                    {% if field.field.widget.input_type == "hidden" %}
+                                        {{ field }}
+                                    {% else %}
+                                        <div class="form-group">
+                                            <label for="{{ field.id_for_label }}">
+                                                {{ field.label }}
+                                                {% if field.field.required %}
+                                                    <small style="color:#C9302C">*</small>
+                                                {% endif %}
+                                            </label>
+
+                                            <div>
+                                                {% if field.field.widget.input_type == "checkbox" %}
+                                                    {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                                {% else %}
+                                                    {{ field |add_class:"form-control" }}
+                                                {% endif %}
+                                                {% if field.errors %}
+                                                    {% for error in field.errors %}
+                                                        <div class="alert alert-danger
+                                                    alert-dismissable">
+                                                            <button type="button"
+                                                                    class="close"
+                                                                    data-dismiss="alert"
+                                                                    aria-hidden="true">
+                                                                ×
+                                                            </button>
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                                {% if field.help_text %}
+                                                    <div>
+                                                        <small class="text-muted">{{ field.help_text|safe }}</small>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="buttonbar bottom">
+                            <div class="float-right">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="panel panel-primary" id="block-status-icons">
+                    <div class="panel-heading">
+                        Etapas de configuração
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% if info and info.description_html %}
+                                    <button type="button"
+                                        class="btn btn-primary btn-block">
+                                        <i class="fa fa-globe"></i>
+                                        Visualizar página
+                                    </button>
+                                {% else %}
+                                    <button type="button"
+                                        class="btn btn-primary btn-trans btn-block disabled"
+                                        title="Você deve configurar pelo menos a descrição do seu evento.">
+                                        <i class="fa fa-globe"></i>
+                                        Visualizar página
+                                    </button>
+                                {% endif %}
+                                <div class="col-md-12 event-info-status-item">
+                                    <div>
+                                        {% if info and info.image_main %}
+                                        <i class="fa fa-check-circle-o fa-5x success-color"></i>
+                                        {% else %}
+                                        <i class="fa fa-close fa-5x"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div class="title">Banner principal</div>
+                                        <div class="text-muted description">
+                                            Deixa o site do evento mais apresentável.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 event-info-status-item">
+                                    <div>
+                                        {% if info and info.lead %}
+                                        <i class="fa fa-check-circle-o fa-5x success-color"></i>
+                                        {% else %}
+                                        <i class="fa fa-close fa-5x"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div class="title">Descrição rápida</div>
+                                        <div class="text-muted description">
+                                            Motiva o visitante a permanecer no site,
+                                            aumentando a possibilidade de conclusão de
+                                            sua inscrição.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 event-info-status-item">
+                                    <div>
+                                        {% if info and info.description_html %}
+                                        <i class="fa fa-check-circle-o fa-5x success-color"></i>
+                                        {% else %}
+                                        <i class="fa fa-close fa-5x"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div class="title">Sobre o evento</div>
+                                        <div class="text-muted description">
+                                            Deixa claro para o visitante que ainda não
+                                            conhece os detalhes do evento e gostaria de
+                                            saber do que se trata.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}

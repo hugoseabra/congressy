@@ -61,13 +61,13 @@
     <ul class="nav nav-pills nav-stacked">
         <li>
             <a href="{% url 'public:hotsite' event.pk %}"
-               title="Ver pagina">
+               title="Ver pagina" target="_blank">
                 <i class="fa  fa-fw fa-rocket"></i> Ver pagina
             </a>
         </li>
 
         <li>
-            <a href="#"
+            <a href="{% url 'event:event-hotsite' event.pk %}"
                title="Configurar pagina">
                 <i class="fa  fa-fw fa-rocket"></i> Configurar pagina
             </a>

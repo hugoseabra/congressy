@@ -140,14 +140,14 @@
                                             <span class="icon">
                                                 <i class="fa {% if org.pk == organization.pk %}fa-circle{% else %}fa-circle-thin{% endif %}"></i>
                                             </span>
-                                            <a href="#">{{ org.name }}</a>
+                                            <a href="#">{{ org.name|truncatechars:21 }}</a>
                                         </li>
                                     {% else %}
                                         <li onclick="cgsy_submit({{ org.pk }})">
                                             <span class="icon">
                                                 <i class="fa {% if org.pk == organization.pk %}fa-circle{% else %}fa-circle-thin{% endif %}"></i>
                                             </span>
-                                            <a href="#">{{ org.name }}</a>
+                                            <a href="#">{{ org.name|truncatechars:21 }}</a>
                                         </li>
                                     {% endif %}
                                 {% endfor %}
@@ -284,7 +284,6 @@
 <script src="{% static "assets/plugins/switchery/switchery.min.js" %}"></script>
 <script src="{% static "assets/js/src/app.js" %}"></script>
 <script src="{% static "assets/js/cgsy.js" %}"></script>
-{% block scripts %}{% endblock %}
 
 <script type="application/javascript">
     function cgsy_submit(value) {
@@ -296,5 +295,7 @@
         console.log('SUBMITTED' + org_context.value)
     }
 </script>
+
+{% block scripts %}{% endblock %}
 </body>
 </html>

@@ -10,18 +10,21 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <li class="active">
-        <a href="{% url 'event:member-list' member_organization.pk %}" title="Membros">
-            <i class="fa  fa-fw fa-rocket"></i> Membros
-        </a>
-    </li>
-    {% if can_manage_invitations %}
-    <li>
-        <a href="{% url 'event:invitation-list' member_organization.pk %}" title="Convites">
-            <i class="fa  fa-fw fa-rocket"></i> Convites
-        </a>
-    </li>
-    {% endif %}
+    <h5 class="sidebar-header">Equipe</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'event:member-list' member_organization.pk %}" title="Membros">
+                <i class="fa  fa-fw fa-rocket"></i> Membros
+            </a>
+        </li>
+        {% if can_manage_invitations %}
+        <li>
+            <a href="{% url 'event:invitation-list' member_organization.pk %}" title="Convites">
+                <i class="fa  fa-fw fa-rocket"></i> Convites
+            </a>
+        </li>
+        {% endif %}
+    </ul>
 {% endblock %}
 
 {% block content %}
