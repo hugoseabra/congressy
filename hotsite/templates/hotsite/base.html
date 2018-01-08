@@ -5,7 +5,7 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!-->
 <html lang="en"> <!--<![endif]-->
-{% load static %}
+{% load static base_tags %}
 <head>
 
     <meta charset="utf-8">
@@ -155,6 +155,25 @@
                     <div class="hero-heading text-center row"
                          data-animation="fadeIn">
                         <div class="col-md-10 col-md-offset-1">
+                            {% block messages %}
+                                {% if messages %}
+                                    <div style="width:100%;margin-top:3px;padding-bottom:10px">
+
+                                        {% for message in messages %}
+
+                                            <div class="alert alert-
+                                                    {% if message.tags %}{{ message.tags }}{% else %}warning{% endif %} alert-dismissible"
+                                                 role="alert">
+                                                <button type="button" class="close" data-dismiss="alert"
+                                                        aria-label="Close"><span aria-hidden="true">&times;</span>
+                                                </button>
+                                                {{ message|capfirst }}
+                                            </div>
+
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endblock messages %}
 
                             <h1 class="hero-title">{{ object.name }}</h1>
 
@@ -422,8 +441,8 @@
 
     <!-- REALIZADOR
     ================================= -->
-       <!-- REALIZADOR
-    ================================= -->
+    <!-- REALIZADOR
+ ================================= -->
     {% if not object.organization.internal %}
         <section id="owner" class="footer-section section">
             <h2 class="section-heading text-center">Organizador</h2>
