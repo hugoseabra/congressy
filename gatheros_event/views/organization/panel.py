@@ -13,19 +13,24 @@ class OrganizationPanelView(AccountMixin, DetailView):
     template_name = 'organization/panel.html'
 
     def dispatch(self, request, *args, **kwargs):
-        dispatch = super(OrganizationPanelView, self).dispatch(
-            request,
-            *args,
-            **kwargs
-        )
-        if self.organization and not self._can_view():
-            messages.warning(
-                request,
-                'Você não tem permissão de realizar esta ação.'
-            )
-            return redirect(reverse_lazy('front:start'))
 
-        return dispatch
+        return redirect(reverse('event:member-list', kwargs={
+            'organization_pk': self.organization.pk
+        }))
+
+        # dispatch = super(OrganizationPanelView, self).dispatch(
+        #     request,
+        #     *args,
+        #     **kwargs
+        # )
+        # if self.organization and not self._can_view():
+        #     messages.warning(
+        #         request,
+        #         'Você não tem permissão de realizar esta ação.'
+        #     )
+        #     return redirect(reverse_lazy('front:start'))
+        #
+        # return dispatch
 
     def get_context_data(self, **kwargs):
         context = super(OrganizationPanelView, self).get_context_data(**kwargs)

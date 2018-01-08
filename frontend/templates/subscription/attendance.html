@@ -57,23 +57,6 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <h5 class="sidebar-header">Página do evento</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'public:hotsite' event.pk %}"
-               title="Ver pagina" target="_blank">
-                <i class="fa  fa-fw fa-rocket"></i> Ver pagina
-            </a>
-        </li>
-
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Configurar pagina">
-                <i class="fa  fa-fw fa-rocket"></i> Configurar pagina
-            </a>
-        </li>
-    </ul>
-
     <h5 class="sidebar-header">Participantes</h5>
     <ul class="nav nav-pills nav-stacked">
         <li>
@@ -88,6 +71,16 @@
                title="Check-in">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Check-in
+            </a>
+        </li>
+    </ul>
+
+    <h5 class="sidebar-header">Página do evento</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Configurar pagina">
+                <i class="fa  fa-fw fa-rocket"></i> Configurar pagina
             </a>
         </li>
     </ul>
