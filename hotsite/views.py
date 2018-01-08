@@ -94,6 +94,7 @@ class HotsiteView(DetailView):
     def post(self, request, *args, **kwargs):
 
         email = self.request.POST.get('email')
+        name = self.request.POST.get('name')
 
         user = self.request.user
 
@@ -111,41 +112,46 @@ class HotsiteView(DetailView):
 
         if not person:
 
-            if post_size >= 3:
-                # hard post
-                email = self.request.POST.get('email')
-                name = self.request.POST.get('name')
-                gender = self.request.POST.get('gender')
-                phone = self.request.POST.get('gender')
+            # hard post
 
-                person = Person(name=name, email=email, gender=gender)
-                person.save()
+            email = self.request.POST.get('email')
+            name = self.request.POST.get('name')
+            # gender = self.request.POST.get('gender')
+            # phone = self.request.POST.get('gender')
 
-        if person:
-            try:
-                user = User.objects.get(email=email)
-                if user and not user.is_authenticated:
-                    messages.error(self.request, 'Faça login para continuar.')
-                    return HttpResponseRedirect(reverse('front:login'))
-            except User.DoesNotExist:
-                user.id = 0
-                pass
+            person = Person(name=name, email=email)
+            person.save()
 
-            lot = Lot.objects.get(event=self.object)
-            subscription = Subscription(person=person, lot=lot, created_by=user.id)
+        try:
+            user = User.objects.get(email=email)
+            if user and not user.is_authenticated:
+                messages.error(self.request, 'Faça login para continuar.')
+                return HttpResponseRedirect(reverse('front:login'))
+        except User.DoesNotExist:
+            user.id = 0
+            pass
 
-            try:
-                subscription.save()
-                self.form_template = self.template_name
-                messages.success(self.request, 'Inscrição realizada com sucesso!')
-            except ValidationError:
+        lot = Lot.objects.get(event=self.object)
+        subscription = Subscription(person=person, lot=lot, created_by=user.id)
+
+        try:
+            subscription.save()
+            messages.success(self.request, 'Inscrição realizada com sucesso!')
+        except ValidationError as e:
+            error_message = e.messages[0]
+            if error_message:
+                messages.error(self.request, error_message)
+            else:
                 messages.error(self.request,
-                               'Ocorreu um erro durante a o processo de inscrição, tente novamente mais tarde.')
+                           'Ocorreu um erro durante a o processo de inscrição, tente novamente mais tarde.')
+
 
         context = super(HotsiteView, self).get_context_data(**kwargs)
         context['status'] = self._get_status()
         context['report'] = self._get_report()
         context['period'] = self._get_period()
+        context['name'] = name
+        context['email'] = email
         context['info'] = Info.objects.get(pk=self.object.pk)
         return render(self.request, template_name=self.form_template, context=context)
 
