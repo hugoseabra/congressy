@@ -9,7 +9,7 @@
 
 {% block form %}
     <p> Entre com suas credenciais para acessar sua conta.</p>
-    <form action="" method="post" class="form-horizontal"
+    <form id="createForm" action="" method="post" class="form-horizontal"
           enctype="multipart/form-data" role="form">
         {% csrf_token %}
         <div class="form-group">
@@ -57,7 +57,7 @@
         </div>
         <div class="form-group">
             <div class="col-md-12">
-                <button class="btn btn-info btn-block">Enviar</button>
+                <button id="submitButton" class="btn btn-info btn-block">Enviar</button>
             </div>
         </div>
         <div class="form-group" style="margin-bottom: 0">
@@ -73,8 +73,23 @@
             </div>
         </div>
     </form>
-{% endblock %}
 
+
+
+
+
+{% endblock %}
+{% block global_js %}
+    {{ block.super }}
+    <script>
+        $('#submitButton').on('click', function () {
+            $(this).val('Please wait ...')
+                .attr('disabled', 'disabled');
+            console.log('potato')
+            $('#createForm').submit();
+        });
+    </script>
+{% endblock %}
 
 
 
