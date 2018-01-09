@@ -110,7 +110,9 @@
                     <li><a href="#about" class="anchor-link">Sobre o evento</a>
                     </li>
                     <li><a href="#map" class="anchor-link">Local</a></li>
-                    <li><a href="#owner" class="anchor-link">Organizador</a>
+                    {% if not object.organization.internal %}
+                        <li><a href="#owner" class="anchor-link">Organizador</a>
+                    {% endif %}
                     </li>
 
                     <!-- HEADER ACTION BUTTON -->
@@ -249,7 +251,7 @@
                                         {% endif %}
 
 
-                                        {% if   person.name != "" %}
+                                        {% if person and person.name != "" %}
                                             <input type="hidden" name="name" value="{{ person.name }}">
                                         {% else %}
                                             <div class="form-group">
@@ -266,7 +268,7 @@
                                         {% endif %}
 
 
-                                        {% if   person.email != "" %}
+                                        {% if person and  person.email != "" %}
                                             <input type="hidden" name="email" value="{{ person.email }}">
                                         {% else %}
                                             <div class="form-group">
@@ -279,7 +281,7 @@
                                             </div>
                                         {% endif %}
 
-                                        {% if   person.phone != "" %}
+                                        {% if person and  person.phone != "" %}
                                             <input type="hidden" name="phone" value="{{ person.phone }}">
                                         {% else %}
                                             <div class="form-group">
@@ -320,7 +322,8 @@
                                             </p>
 
                                             <div style="align-items: center;display: flex;justify-content: center;">
-                                                <i class="fa fa-check-circle fa-5x" style="color: darkgreen" aria-hidden="true"></i>
+                                                <i class="fa fa-check-circle fa-5x" style="color: darkgreen"
+                                                   aria-hidden="true"></i>
 
                                             </div>
                                         </div>
