@@ -3,28 +3,32 @@
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
-from rest_framework import routers
 
 from gatheros_event.urls.me import (
     urlpatterns_public_account,
     urlpatterns_public_password,
 )
 
+from gatheros_front.urls import (
+    urlpatterns_private as gatheros_front_private,
+    urlpatterns_public as gatheros_front_public,
+)
+
 from gatheros_event.urls.invitation import urlpatterns_public_invitation
 from hotsite.urls import urlpatterns_public_hotsite
-
 
 admin_urlpatterns = [url(r'^admin/', admin.site.urls)]
 
 private_urlpatterns = [
-    url(r'^', include('gatheros_subscription.urls', 'subscription')),
-    url(r'^', include('gatheros_event.urls', 'event')),
-    url(r'^', include('gatheros_front.urls', 'front')),
+    url(r'^manage/', include('gatheros_subscription.urls', 'subscription')),
+    url(r'^manage/', include('gatheros_event.urls', 'event')),
+    url(r'^manage/', include(gatheros_front_private, 'front')),
 ]
 
 public_urls = urlpatterns_public_account
 public_urls += urlpatterns_public_invitation
 public_urls += urlpatterns_public_hotsite
+public_urls += gatheros_front_public
 public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [

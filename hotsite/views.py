@@ -19,7 +19,6 @@ from gatheros_subscription.models import Lot, Subscription
 
 
 class HotsiteView(DetailView):
-    # @TODO Use slug instead of PK to find event
     model = Event
     template_name = 'hotsite/base.html'
     # form_template = 'hotsite/form.html'
@@ -103,7 +102,7 @@ class HotsiteView(DetailView):
         phone = self.request.POST.get('phone')
         user = self.request.user
 
-        self.object = Event.objects.get(pk=kwargs['pk'])
+        self.object = self.get_object()
 
         shiny_user = None
 
@@ -191,7 +190,7 @@ class HotsiteView(DetailView):
 
             if user != self.request.user and not logged_in and user.last_login:
                 messages.error(self.request, 'Faça login para continuar.')
-                full_url = reverse('front:login') + '?next=/event/' + str(self.object.pk) + "/form/"
+                full_url = reverse('public:login') + '?next=/event/' + str(self.object.pk) + "/form/"
                 return HttpResponseRedirect(full_url)
         except User.DoesNotExist:
             user.id = 0

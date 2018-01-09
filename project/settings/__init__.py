@@ -146,7 +146,7 @@ FIXTURE_DIRS = [
 ]
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/manage/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 GOOGLE_MAPS_API_KEY = 'AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw'

@@ -188,7 +188,7 @@
 
 
                             <!-- FORM -->
-                            <form action="/event/{{ object.pk }}/form/" method="post" class="form" role="form">
+                            <form action="{% url 'public:hotsite' object.slug %}" method="post" class="form" role="form">
 
                                 {% csrf_token %}
 
