@@ -559,7 +559,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         query_set = super(MySubscriptionsListView, self).get_queryset()
         return query_set.filter(
             person=person,
-            event__published=True,
+            # event__published=True,
             # attended=True,
         )
 
