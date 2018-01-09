@@ -17,5 +17,6 @@ $BASE_DIR/bin/prod/createdb.sh
 python $BASE_DIR/manage.py migrate
 
 # Importando fixtures
+python $BASE_DIR/manage.py loaddata 000_site
 python $BASE_DIR/manage.py loaddata 001_user
 python $BASE_DIR/manage.py loaddata 001_default_field
