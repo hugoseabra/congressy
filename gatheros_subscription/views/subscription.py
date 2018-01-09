@@ -162,12 +162,12 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
     form_class = SubscriptionForm
     # template_name = 'gatheros_subscription/subscription/form.html'
     template_name = 'subscription/form.html'
-    success_message = 'Pré-inscrição criada com sucesso.'
+    success_message = 'Inscrição criada com sucesso.'
 
     def get_context_data(self, **kwargs):
         cxt = super(SubscriptionAddFormView, self).get_context_data(**kwargs)
         cxt.update({
-            'form_title': 'Pré-inscrição'
+            'form_title': 'Inscrição'
         })
 
         internal_form_fields = []
@@ -308,7 +308,7 @@ class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
 
 class SubscriptionEditFormView(SubscriptionAddFormView):
     object = None
-    success_message = 'Pré-inscrição alterada com sucesso.'
+    success_message = 'Inscrição alterada com sucesso.'
 
     def dispatch(self, request, *args, **kwargs):
         self.object = get_object_or_404(Subscription, pk=self.kwargs.get('pk'))
@@ -353,7 +353,7 @@ class SubscriptionEditFormView(SubscriptionAddFormView):
 class SubscriptionDeleteView(EventViewMixin, DeleteViewMixin):
     template_name = 'subscription/delete.html'
     model = Subscription
-    success_message = 'Pré-inscrição excluída com sucesso.'
+    success_message = 'Inscrição excluída com sucesso.'
     place_organization = None
 
     def get_permission_denied_url(self):

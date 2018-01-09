@@ -1,16 +1,19 @@
 {% extends "base/base.html" %}
 {% load i18n static widget_tweaks %}
 {% block title %}
-    {% if object %}Editar{% else %}Nova{% endif %} Pré-inscrição | Congressy
+    {% if object %}Editar{% else %}Nova{% endif %} Inscrição | Congressy
 {% endblock %}
 
 {% block page_title %}
-    {% if object %}Editar{% else %}Nova{% endif %} Pré-inscrição
+    {% if object %}Editar{% else %}Nova{% endif %} Inscrição
 {% endblock %}
 
 {% block page_sub_title %}
+    <div>{{ event.name }}</div>
     {% if object %}
+        <div class="text-muted" style="margin-top: 12px;">
         {{ object.person.name }} (ID: {{ object.pk }})
+        </div>
     {% endif %}
 {% endblock %}
 

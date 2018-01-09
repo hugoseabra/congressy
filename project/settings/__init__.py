@@ -153,6 +153,67 @@ GOOGLE_MAPS_API_KEY = 'AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw'
 
 CKEDITOR_CONFIGS = {
     'default': {
+        'toolbar_Full': [
+            '/',
+            {
+                'name': 'styles',
+                'items': [
+                    'Styles',
+                    'Format',
+                    'FontSize'
+                ]
+            },
+            {
+                'name': 'basicstyles',
+                'items': [
+                    'Bold',
+                    'Italic',
+                    'Underline',
+                    'Strike',
+                    '-',
+                    'RemoveFormat'
+                ]
+            },
+            {
+                'name': 'paragraph',
+                'items': [
+                    'NumberedList',
+                    'BulletedList',
+                    '-',
+                    'Outdent',
+                    'Indent',
+                    '-',
+                    'JustifyLeft',
+                    'JustifyCenter',
+                    'JustifyRight',
+                    'JustifyBlock'
+                ]
+            },
+            {
+                'name': 'links',
+                'items': [
+                    'Link',
+                    'Unlink',
+                    'Anchor'
+                ]
+            },
+            {
+                'name': 'insert',
+                'items': [
+                    'Table',
+                    'HorizontalRule'
+                ]
+            },
+            {
+                'name': 'youcustomtools',
+                'items': [
+                    'Preview',
+                    'Maximize',
+                    'Source',
+                ]
+            },
+        ],
+        'toolbar': 'Full',
         'width': '100%',
         'height': 150,
     },

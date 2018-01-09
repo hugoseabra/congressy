@@ -46,4 +46,4 @@ class ProfileCreateView(TemplateView, FormView):
             self.messages['success'] % form.cleaned_data["email"]
         )
 
-        return redirect('event:profile')
+        return redirect('front:start')

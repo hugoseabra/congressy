@@ -157,11 +157,11 @@
                                 <tr>
                                     <td style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
                                         <div>
-                                            {% if item.to.person and item.to.person.avatar %}
-                                                <img style="float:left;padding-right:4px;margin-top: -3px"
-                                                     width="25px"
-                                                     src="{{ item.to.person.avatar.url }}"/>
-                                            {% endif %}
+{#                                            {% if item.to.person and item.to.person.avatar %}#}
+{#                                                <img style="float:left;padding-right:4px;margin-top: -3px"#}
+{#                                                     width="25px"#}
+{#                                                     src="{{ item.to.person.avatar.url }}"/>#}
+{#                                            {% endif %}#}
 
                                             {% if item.to.get_full_name %}
                                                 {{ item.to.get_full_name }}
@@ -173,11 +173,11 @@
                                     </td>
                                     <td width="25%"
                                         style="background: {% if item.is_expired %}#F6F6F6{% else %}#FFF{% endif %};color: {% if item.is_expired %}dimgray{% else %}#333{% endif %};{% if item.is_expired %}font-style: italic{% endif %};padding:10px;margin-bottom: 3px">
-                                        {% if item.author.person.avatar %}
-                                            <img style="float:left;padding-right:4px"
-                                                 width="25px"
-                                                 src="{{ item.author.person.avatar.url }}"/>
-                                        {% endif %}
+{#                                        {% if item.author.person.avatar %}#}
+{#                                            <img style="float:left;padding-right:4px"#}
+{#                                                 width="25px"#}
+{#                                                 src="{{ item.author.person.avatar.url }}"/>#}
+{#                                        {% endif %}#}
                                         <div style="margin-top: 3px">
                                             {{ item.author.person.name }}
                                         </div>
