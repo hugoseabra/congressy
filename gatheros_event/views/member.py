@@ -49,7 +49,8 @@ class MemberListView(BaseOrganizationMixin, ListView):
 
     def get_queryset(self):
         query_set = super(MemberListView, self).get_queryset()
-        organization = self.get_member_organization()
+        # organization = self.get_member_organization()
+        organization = self.organization
 
         return query_set.filter(organization=organization).exclude(
             person__user=self.request.user
@@ -81,7 +82,8 @@ class MemberListView(BaseOrganizationMixin, ListView):
         context.update({
             'can_manage': self._can_manage(),
             'can_manage_invitations': self._can_manage_invitations(),
-            'member_organization': self.get_member_organization(),
+            # 'member_organization': self.get_member_organization(),
+            'member_organization': self.organization,
             'member_active_list': member_active_list,
             'member_inactive_list': member_inactive_list,
         })

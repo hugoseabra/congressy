@@ -26,7 +26,8 @@ class InvitationListView(AccountMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(InvitationListView, self).get_context_data(**kwargs)
-        context['invitation_organization'] = self.get_invitation_organization()
+        # context['invitation_organization'] = self.get_invitation_organization()
+        context['invitation_organization'] = self.organization
 
         open_list = [item for item in self.object_list if not item.is_expired]
         expired_list = [item for item in self.object_list if item.is_expired]
@@ -60,7 +61,8 @@ class InvitationListView(AccountMixin, ListView):
 
     def get_queryset(self):
         query_set = super(InvitationListView, self).get_queryset()
-        organization = self.get_invitation_organization()
+        # organization = self.get_invitation_organization()
+        organization = self.organization
 
         return query_set.filter(author__organization=organization).distinct()
 
