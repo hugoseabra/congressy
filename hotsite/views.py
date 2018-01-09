@@ -13,7 +13,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from gatheros_event.models import Event, Info, Person, Member, Organization
 from gatheros_subscription.models import Lot, Subscription
 
@@ -31,7 +31,42 @@ class HotsiteView(DetailView):
         context['report'] = self._get_report()
         context['period'] = self._get_period()
         context['info'] = Info.objects.get(pk=self.object.pk)
+        context['person'] = self._get_person()
+        context['is_subscribed'] = self._get_subscribed_status()
         return context
+
+    def _get_person(self):
+        """
+            Se usuario possuir person
+        """
+        user = self.request.user
+
+        if user.is_authenticated:
+            try:
+                person = Person.objects.get(email=user.email)
+                if person:
+                    return person
+            except ObjectDoesNotExist:
+                pass
+
+        return False
+
+    def _get_subscribed_status(self):
+        """
+            Se já estiver inscrito retornar True
+        """
+        user = self.request.user
+
+        if user.is_authenticated:
+            try:
+                person = Person.objects.get(email=user.email)
+                found = Subscription.objects.filter(person_id=person.pk, event_id=self.object.id)
+                if found:
+                    return True
+            except ObjectDoesNotExist:
+                pass
+
+        return False
 
     def _get_status(self):
         """ Resgata o status. """
@@ -101,12 +136,12 @@ class HotsiteView(DetailView):
 
         self.object = self.get_object()
 
+        user = self.request.user
         email = self.request.POST.get('email')
         name = self.request.POST.get('name')
         phone = self.request.POST.get('phone')
-        user = self.request.user
 
-        if self.object.data.subscription_type != 'disabled':
+        if self.object.data['subscription_type'] != 'disabled':
 
             shiny_user = None
             full_reset_url = ''
@@ -249,8 +284,6 @@ class HotsiteView(DetailView):
                 send_mail(email_subject, email_template, ['equipe@congressy.com'],
                           [email])
 
-                messages.success(self.request, 'Inscrição realizada com sucesso!')
-
             except ValidationError as e:
                 error_message = e.messages[0]
                 if error_message:
@@ -266,6 +299,7 @@ class HotsiteView(DetailView):
         context['name'] = name
         context['email'] = email
         context['info'] = Info.objects.get(pk=self.object.pk)
+        context['is_subscribed'] = self._get_subscribed_status()
         return render(
             self.request,
             template_name=self.template_name,
