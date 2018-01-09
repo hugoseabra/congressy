@@ -11,11 +11,12 @@ from django.utils import six
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
+from django.contrib.sites.shortcuts import get_current_site
 
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from gatheros_event.models import Event, Info, Person, Member, Organization
 from gatheros_subscription.models import Lot, Subscription
+from mailer.services import notify_new_subscription, notify_new_user_and_subscription
 
 
 class HotsiteView(DetailView):
@@ -219,7 +220,7 @@ class HotsiteView(DetailView):
                 shiny_user = True
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 token = default_token_generator.make_token(user)
-                domain = 'http://localhost:8000'
+                domain = 'http://' + str(get_current_site(self.request))
                 full_reset_url = domain + '/reset-password/confirmation/' + str(
                     uid, 'utf-8') + "/" + str(token)
 
@@ -251,39 +252,13 @@ class HotsiteView(DetailView):
             )
 
             try:
-                subscription.save()
-                # Send an email here
 
-                email_subject = "Congressy: Sucesso! Você está cadastrado no" \
-                                " evento: {0}".format(self.object.name)
+                subscription.save()
 
                 if shiny_user:
-                    email_template = """
-    
-        Olá {2},
-    
-            Seja bem-vindo a Congressy Plataforma de Eventos!
-    
-            Sucesso! Foi feito o seu cadastro no evento: {0}
-        
-            Click no link abaixo para confirmar seu email:
-        
-            {1}
-        
-        Equipe Congressy,
-                    """.format(self.object.name, full_reset_url, name)
+                    notify_new_user_and_subscription(self.object, subscription, full_reset_url)
                 else:
-                    email_template = """
-    
-        Olá {1},
-        
-            Sucesso! Foi feito o seu cadastro no evento: {0}
-            
-        Equipe Congressy,
-                    """.format(self.object.name, name)
-
-                send_mail(email_subject, email_template, ['equipe@congressy.com'],
-                          [email])
+                    notify_new_subscription(self.object, subscription)
 
                 messages.success(self.request, 'Inscrição realizada com sucesso!')
 
