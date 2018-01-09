@@ -2,7 +2,11 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
 
+from gatheros_event.models import Member, Event
 from gatheros_subscription.views.subscription import MySubscriptionsListView
 
 
