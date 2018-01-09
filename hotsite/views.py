@@ -99,163 +99,165 @@ class HotsiteView(DetailView):
 
     def post(self, request, *args, **kwargs):
 
+        self.object = self.get_object()
+
         email = self.request.POST.get('email')
         name = self.request.POST.get('name')
         phone = self.request.POST.get('phone')
         user = self.request.user
 
-        self.object = self.get_object()
+        if self.object.data.subscription_type != 'disabled':
 
-        shiny_user = None
-        full_reset_url = ''
+            shiny_user = None
+            full_reset_url = ''
 
-        if not email or not name or not phone:
+            if not email or not name or not phone:
 
-            if not email:
-                messages.error(self.request, "E-mail não pode estar vazio!")
+                if not email:
+                    messages.error(self.request, "E-mail não pode estar vazio!")
 
-            if not name:
-                messages.error(self.request, "Nome não pode estar vazio!")
+                if not name:
+                    messages.error(self.request, "Nome não pode estar vazio!")
 
-            if not phone:
-                messages.error(self.request, "Phone não pode estar vazio!")
+                if not phone:
+                    messages.error(self.request, "Phone não pode estar vazio!")
 
-            context = super(HotsiteView, self).get_context_data(**kwargs)
-            context['status'] = self._get_status()
-            context['report'] = self._get_report()
-            context['period'] = self._get_period()
-            context['name'] = name
-            context['email'] = email
-            context['info'] = Info.objects.get(pk=self.object.pk)
-            return render(self.request, template_name=self.template_name,
-                          context=context)
+                context = super(HotsiteView, self).get_context_data(**kwargs)
+                context['status'] = self._get_status()
+                context['report'] = self._get_report()
+                context['period'] = self._get_period()
+                context['name'] = name
+                context['email'] = email
+                context['info'] = Info.objects.get(pk=self.object.pk)
+                return render(self.request, template_name=self.template_name,
+                              context=context)
 
-        try:
-            user = User.objects.get(email=email)
-            logged_in = self.request.user.is_authenticated
+            try:
+                user = User.objects.get(email=email)
+                logged_in = self.request.user.is_authenticated
 
-            if user != self.request.user and not logged_in and user.last_login:
-                messages.error(self.request, 'Faça login para continuar.')
+                if user != self.request.user and not logged_in and user.last_login:
+                    messages.error(self.request, 'Faça login para continuar.')
 
-                full_url = '{}?next={}'.format(
-                    reverse('public:login'),
-                    reverse('public:hotsite', kwargs={
-                        'slug': self.object.slug
-                    })
+                    full_url = '{}?next={}'.format(
+                        reverse('public:login'),
+                        reverse('public:hotsite', kwargs={
+                            'slug': self.object.slug
+                        })
+                    )
+
+                    return HttpResponseRedirect(full_url)
+
+            except User.DoesNotExist:
+                pass
+
+            try:
+                person = Person.objects.get(email=email)
+
+            except Person.DoesNotExist:
+
+                # hard post
+
+                # gender = self.request.POST.get('gender')
+
+                # Criando perfil
+                person = Person(name=name, email=email, phone=phone)
+
+                # Criando usuário
+                password = str(uuid4())
+                user = User.objects.create_user(
+                    username=email,
+                    email=email,
+                    password=password
                 )
 
-                return HttpResponseRedirect(full_url)
+                # Vinculando usuário ao perfil
+                person.user = user
+                person.save()
 
-        except User.DoesNotExist:
-            pass
+                # Criando a senha par o email de confirmação e definição de senha
+                """
+                Generates a one-use only link for resetting password and sends to the
+                user.
+                """
+                shiny_user = True
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+                domain = 'http://localhost:8000'
+                full_reset_url = domain + '/reset-password/confirmation/' + str(
+                    uid, 'utf-8') + "/" + str(token)
 
-        try:
-            person = Person.objects.get(email=email)
+                # Criando organização interna
+                try:
+                    person.members.get(organization__internal=True)
+                except Member.DoesNotExist:
+                    internal_org = Organization(
+                        internal=True,
+                        name=person.name
+                    )
 
-        except Person.DoesNotExist:
+                    for attr, value in six.iteritems(person.get_profile_data()):
+                        setattr(internal_org, attr, value)
 
-            # hard post
+                    internal_org.save()
 
-            # gender = self.request.POST.get('gender')
+                    Member.objects.create(
+                        organization=internal_org,
+                        person=person,
+                        group=Member.ADMIN
+                    )
 
-            # Criando perfil
-            person = Person(name=name, email=email, phone=phone)
-
-            # Criando usuário
-            password = str(uuid4())
-            user = User.objects.create_user(
-                username=email,
-                email=email,
-                password=password
+            lot = Lot.objects.get(event=self.object)
+            subscription = Subscription(
+                person=person,
+                lot=lot,
+                created_by=user.id
             )
 
-            # Vinculando usuário ao perfil
-            person.user = user
-            person.save()
-
-            # Criando a senha par o email de confirmação e definição de senha
-            """
-            Generates a one-use only link for resetting password and sends to the
-            user.
-            """
-            shiny_user = True
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
-            domain = 'http://localhost:8000'
-            full_reset_url = domain + '/reset-password/confirmation/' + str(
-                uid, 'utf-8') + "/" + str(token)
-
-            # Criando organização interna
             try:
-                person.members.get(organization__internal=True)
-            except Member.DoesNotExist:
-                internal_org = Organization(
-                    internal=True,
-                    name=person.name
-                )
+                subscription.save()
+                # Send an email here
 
-                for attr, value in six.iteritems(person.get_profile_data()):
-                    setattr(internal_org, attr, value)
+                email_subject = "Congressy: Sucesso! Você está cadastrado no" \
+                                " evento: {0}".format(self.object.name)
 
-                internal_org.save()
-
-                Member.objects.create(
-                    organization=internal_org,
-                    person=person,
-                    group=Member.ADMIN
-                )
-
-        lot = Lot.objects.get(event=self.object)
-        subscription = Subscription(
-            person=person,
-            lot=lot,
-            created_by=user.id
-        )
-
-        try:
-            subscription.save()
-            # Send an email here
-
-            email_subject = "Congressy: Sucesso! Você está cadastrado no" \
-                            " evento: {0}".format(self.object.name)
-
-            if shiny_user:
-                email_template = """
-
-    Olá {2},
-
-        Seja bem-vindo a Congressy Plataforma de Eventos!
-
-        Sucesso! Foi feito o seu cadastro no evento: {0}
+                if shiny_user:
+                    email_template = """
     
-        Click no link abaixo para confirmar seu email:
+        Olá {2},
     
-        {1}
+            Seja bem-vindo a Congressy Plataforma de Eventos!
     
-    Equipe Congressy,
-                """.format(self.object.name, full_reset_url, name)
-            else:
-                email_template = """
-
-    Olá {1},
-    
-        Sucesso! Foi feito o seu cadastro no evento: {0}
+            Sucesso! Foi feito o seu cadastro no evento: {0}
         
-    Equipe Congressy,
-                """.format(self.object.name, name)
+            Click no link abaixo para confirmar seu email:
+        
+            {1}
+        
+        Equipe Congressy,
+                    """.format(self.object.name, full_reset_url, name)
+                else:
+                    email_template = """
+    
+        Olá {1},
+        
+            Sucesso! Foi feito o seu cadastro no evento: {0}
+            
+        Equipe Congressy,
+                    """.format(self.object.name, name)
 
-            send_mail(email_subject, email_template, ['equipe@congressy.com'],
-                      [email])
+                send_mail(email_subject, email_template, ['equipe@congressy.com'],
+                          [email])
 
-            messages.success(self.request, 'Inscrição realizada com sucesso!')
+                messages.success(self.request, 'Inscrição realizada com sucesso!')
 
-        except ValidationError as e:
-            error_message = e.messages[0]
-            if error_message:
-                messages.error(self.request, error_message)
-            else:
-                messages.error(self.request,
-                               'Ocorreu um erro durante a o processo de inscrição, tente novamente mais tarde.')
+            except ValidationError as e:
+                error_message = e.messages[0]
+                if error_message:
+                    messages.error(self.request, error_message)
+                else:
+                    messages.error(self.request,
+                                   'Ocorreu um erro durante a o processo de inscrição, tente novamente mais tarde.')
 
         context = super(HotsiteView, self).get_context_data(**kwargs)
         context['status'] = self._get_status()

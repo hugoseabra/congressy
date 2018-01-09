@@ -179,8 +179,8 @@
                             {% endif %}
                         </div>
 
-
-                        <div class="hero-features-right col-md-5"
+                        {% if object.data.subscription_type != 'disabled' %}
+                            <div class="hero-features-right col-md-5"
                              data-animation="fadeIn">
 
 
@@ -261,6 +261,7 @@
                             </form>
 
                         </div>
+                        {% endif %}
 
                     </div>
 
