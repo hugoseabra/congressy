@@ -2,19 +2,13 @@
 
 {% load static %}{% load i18n static %}
 {% load event_tags %}
-{% block title %}Deletar organização| Congressy{% endblock %}
-{% block pageheader %}
-    <div class="pageheader">Sair da Organização</div>
-{% endblock %}
-{% block nav_aside_itens %}
-    <li>
-        <a href="{% url 'event:event-panel' object.pk %}" title="Voltar">
-            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
-        </a>
-    </li>
-    <hr/>
-    {{ block.super }}
-{% endblock %}
+{% block title %}Excluir organização| Congressy{% endblock %}
+{% block page_title %}Excluir organização{% endblock %}
+{% block page_sub_title %}{{ organization.name }}{% endblock %}
+
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
+
 {% block content %}
 
 
