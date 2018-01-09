@@ -82,9 +82,47 @@
                     {% block toptitle %}
                         {% if organization %}
                         <li>
-                           <h2 style="margin-top: 23px;color:#FFF;font-weight: bold;">
-                               {{ organization.name }}
-                           </h2>
+                            <div class="float:left" style="margin-top: 18px;">
+                               <h2 style="color:#FFF;font-weight: bold;">
+                                   <div class="btn-group">
+                                        <button
+                                            type="button"
+                                            class="btn btn-trans
+                                            btn-default
+                                            btn-sm dropdown-toggle"
+                                            data-toggle="dropdown"
+                                            aria-expanded="false"
+                                        >
+                                            <span class="fa fa-gear"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                            <li>
+                                                <a href="{% url 'event:organization-edit' organization.pk %}">
+                                                    <i class="fa fa-pencil"></i>
+                                                    Editar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'event:organization-cancel-membership' organization.pk %}">
+                                                    <i class="fa fa-sign-out"></i>
+                                                    Sair da organização
+                                                </a>
+                                            </li>
+                                            {% if organization.is_deletable and user has 'gatheros_event.delete_organization' of organization %}
+                                            <li>
+                                                <a href="{% url 'event:organization-delete' organization.pk %}">
+                                                    <i class="fa fa-trash"></i>
+                                                    Excluir
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                    &ensp;
+                                    {{ organization.name|truncatechars:50 }}
+                               </h2>
+                            </div>
+                            <div class="clearfix"></div>
                         </li>
                         {% endif %}
                     {% endblock %}
@@ -223,7 +261,7 @@
                            data-toggle="dropdown" aria-expanded="false">
                        {% endif %}
                             <h4>
-                                {{ organization.name }}
+                                {{ organization.name|truncatechars:50 }}
                             </h4>
                         {% if member.is_admin %}
                         </a>
