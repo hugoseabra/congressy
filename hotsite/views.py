@@ -21,6 +21,8 @@ from gatheros_subscription.models import Lot, Subscription
 class HotsiteView(DetailView):
     model = Event
     template_name = 'hotsite/base.html'
+    object = None
+
     # form_template = 'hotsite/form.html'
 
     def get_context_data(self, **kwargs):
@@ -105,6 +107,7 @@ class HotsiteView(DetailView):
         self.object = self.get_object()
 
         shiny_user = None
+        full_reset_url = ''
 
         if not email or not name or not phone:
 
@@ -124,20 +127,39 @@ class HotsiteView(DetailView):
             context['name'] = name
             context['email'] = email
             context['info'] = Info.objects.get(pk=self.object.pk)
-            return render(self.request, template_name=self.template_name, context=context)
+            return render(self.request, template_name=self.template_name,
+                          context=context)
+
+        try:
+            user = User.objects.get(email=email)
+            logged_in = self.request.user.is_authenticated
+
+            if user != self.request.user and not logged_in and user.last_login:
+                messages.error(self.request, 'Faça login para continuar.')
+
+                full_url = '{}?next={}'.format(
+                    reverse('public:login'),
+                    reverse('public:hotsite', kwargs={
+                        'slug': self.object.slug
+                    })
+                )
+
+                return HttpResponseRedirect(full_url)
+
+        except User.DoesNotExist:
+            pass
 
         try:
             person = Person.objects.get(email=email)
+
         except Person.DoesNotExist:
 
             # hard post
 
             # gender = self.request.POST.get('gender')
 
-
             # Criando perfil
             person = Person(name=name, email=email, phone=phone)
-            person.save()
 
             # Criando usuário
             password = str(uuid4())
@@ -146,11 +168,22 @@ class HotsiteView(DetailView):
                 email=email,
                 password=password
             )
-            user.save()
 
             # Vinculando usuário ao perfil
             person.user = user
             person.save()
+
+            # Criando a senha par o email de confirmação e definição de senha
+            """
+            Generates a one-use only link for resetting password and sends to the
+            user.
+            """
+            shiny_user = True
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            domain = 'http://localhost:8000'
+            full_reset_url = domain + '/reset-password/confirmation/' + str(
+                uid, 'utf-8') + "/" + str(token)
 
             # Criando organização interna
             try:
@@ -172,42 +205,23 @@ class HotsiteView(DetailView):
                     group=Member.ADMIN
                 )
 
-            # Criando a senha par o email de confirmação e definição de senha
-
-            """
-            Generates a one-use only link for resetting password and sends to the
-            user.
-            """
-            shiny_user = True
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
-            domain = 'http://localhost:8000'
-            full_reset_url = domain + '/reset-password/confirmation/' + str(uid, 'utf-8') + "/" + str(token)
-
-        try:
-            user = User.objects.get(email=email)
-            logged_in = self.request.user.is_authenticated
-
-            if user != self.request.user and not logged_in and user.last_login:
-                messages.error(self.request, 'Faça login para continuar.')
-                full_url = reverse('public:login') + '?next=/event/' + str(self.object.pk) + "/form/"
-                return HttpResponseRedirect(full_url)
-        except User.DoesNotExist:
-            user.id = 0
-            pass
-
         lot = Lot.objects.get(event=self.object)
-        subscription = Subscription(person=person, lot=lot, created_by=user.id)
+        subscription = Subscription(
+            person=person,
+            lot=lot,
+            created_by=user.id
+        )
 
         try:
             subscription.save()
             # Send an email here
 
-            email_subject = "Congressy: Sucesso! Você está cadastrado no evento: {0}".format(self.object.name)
+            email_subject = "Congressy: Sucesso! Você está cadastrado no" \
+                            " evento: {0}".format(self.object.name)
 
             if shiny_user:
                 email_template = """
-                        
+
     Olá {2},
 
         Seja bem-vindo a Congressy Plataforma de Eventos!
@@ -230,7 +244,8 @@ class HotsiteView(DetailView):
     Equipe Congressy,
                 """.format(self.object.name, name)
 
-            send_mail(email_subject, email_template, ['equipe@congressy.com'], [email])
+            send_mail(email_subject, email_template, ['equipe@congressy.com'],
+                      [email])
 
             messages.success(self.request, 'Inscrição realizada com sucesso!')
 
@@ -249,5 +264,8 @@ class HotsiteView(DetailView):
         context['name'] = name
         context['email'] = email
         context['info'] = Info.objects.get(pk=self.object.pk)
-        return render(self.request, template_name=self.template_name, context=context)
-
+        return render(
+            self.request,
+            template_name=self.template_name,
+            context=context
+        )

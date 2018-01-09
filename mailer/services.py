@@ -3,7 +3,7 @@ from django.template.loader import render_to_string
 from .tasks import send_mail
 
 
-def notify_subscription(event, subscription):
+def notify_new_subscription(event, subscription):
     """
     Define a notificação para uma nova inscrição
     """
@@ -14,10 +14,7 @@ def notify_subscription(event, subscription):
         event.braziliancity.uf
     )
 
-    subject = render_to_string('mailer/email_subject.txt', {
-        'event': event.name
-    })
-    body = render_to_string('mailer/email_body.html', {
+    body = render_to_string('mailer/notify_subscription.html', {
         'gender_article': 'a' if person.gender == 'F' else 'o',
         'person': person,
         'period': event.period,
@@ -27,7 +24,7 @@ def notify_subscription(event, subscription):
     })
 
     return send_mail.delay(
-        subject=subject.strip(),
+        subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
     )

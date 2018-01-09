@@ -115,11 +115,8 @@
 
                     <!-- HEADER ACTION BUTTON -->
                     <li class="header-action-button">
-                        <a href="#hero" class="anchor-link btn-link">
+                        <a href="{% url 'public:login' %}?next={% url 'public:hotsite' object.slug %}" class="external btn btn-primary">
                             Entrar
-                        </a>
-                        <a href="#hero" class="anchor-link btn btn-primary">
-                            Inscreva-se
                         </a>
                     </li>
                 </ul>
@@ -138,12 +135,12 @@
             <!-- IMAGE BACKGROUND -->
             <div class="section-background-image parallax">
                 <img
-                        {% if info.image_main.default %}
-                            src="{{ info.image_main.default.url }}"
-                        {% else %}
-                            src=""
-                        {% endif %}
-                            alt="" style="opacity: 0.2;" class="blurred">
+                    {% if info.image_main.default %}
+                        src="{{ info.image_main.default.url }}"
+                    {% else %}
+                        src=""
+                    {% endif %}
+                        alt="" style="opacity: 0.2;" class="blurred">
             </div>
         </div>
 
@@ -522,7 +519,7 @@
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script type="application/javascript">
         $(document).ready(function () {
-            $('#id_phone').mask('(00) 0000-0000');
+             $('#id_phone').mask("(99) 99999-9999");
         });
     </script>
 

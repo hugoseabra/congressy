@@ -25,10 +25,10 @@ private_urlpatterns = [
     url(r'^manage/', include(gatheros_front_private, 'front')),
 ]
 
-public_urls = urlpatterns_public_account
+public_urls = gatheros_front_public
+public_urls += urlpatterns_public_account
 public_urls += urlpatterns_public_invitation
 public_urls += urlpatterns_public_hotsite
-public_urls += gatheros_front_public
 public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [
