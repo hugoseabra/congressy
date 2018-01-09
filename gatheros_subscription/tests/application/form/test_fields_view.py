@@ -42,7 +42,7 @@ class FormFieldsViewTest(BaseEventFieldTest):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('front:login')
+        redirect_url = reverse('public:login')
         redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
@@ -88,7 +88,7 @@ class FormFieldAddViewTest(BaseEventFieldTest):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('front:login')
+        redirect_url = reverse('public:login')
         redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
@@ -135,7 +135,7 @@ class FormFieldEditViewTest(BaseEventFieldTest):
         ).first()
         response = self.client.get(self._get_url(field), follow=True)
 
-        redirect_url = reverse('front:login')
+        redirect_url = reverse('public:login')
         redirect_url += '?next=' + self._get_url(field)
         self.assertRedirects(response, redirect_url)
 
@@ -217,7 +217,7 @@ class FormFieldDeleteViewTest(BaseEventFieldTest):
         ).first()
         response = self.client.get(self._get_url(field), follow=True)
 
-        redirect_url = reverse('front:login')
+        redirect_url = reverse('public:login')
         redirect_url += '?next=' + self._get_url(field)
         self.assertRedirects(response, redirect_url)
 

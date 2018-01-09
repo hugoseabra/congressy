@@ -69,7 +69,7 @@ class EventInfoTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('front:login')
+        redirect_url = reverse('public:login')
         redirect_url += '?next=' + reverse('event:event-list')
         self.assertRedirects(response, redirect_url)
 

@@ -68,7 +68,7 @@ class SubscriptionFormViewTest(TestCase):
         })
         response = self.client.get(url, follow=True)
 
-        redirect_url = reverse('front:login')
+        redirect_url = reverse('public:login')
         redirect_url += '?next=' + url
         self.assertRedirects(response, redirect_url)
 
@@ -81,7 +81,7 @@ class SubscriptionFormViewTest(TestCase):
         })
         response = self.client.get(url, follow=True)
 
-        redirect_url = reverse('front:login')
+        redirect_url = reverse('public:login')
         redirect_url += '?next=' + url
         self.assertRedirects(response, redirect_url)
 
@@ -94,7 +94,7 @@ class SubscriptionFormViewTest(TestCase):
         })
         response = self.client.get(url, follow=True)
 
-        redirect_url = reverse('front:login')
+        redirect_url = reverse('public:login')
         redirect_url += '?next=' + url
         self.assertRedirects(response, redirect_url)
 

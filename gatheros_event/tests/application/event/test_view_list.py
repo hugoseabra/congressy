@@ -58,7 +58,7 @@ class EventListTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self.url, follow=True)
 
-        redirect_url = reverse('front:login')
+        redirect_url = reverse('public:login')
         redirect_url += '?next=' + self.url
         self.assertRedirects(response, redirect_url)
 

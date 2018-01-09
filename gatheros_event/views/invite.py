@@ -261,7 +261,7 @@ class InvitationDecisionView(TemplateView):
 
         # Se tem perfil, precisa do login login
         if not authenticated and hasattr(invite.to, 'person'):
-            return redirect('front:login')
+            return redirect('public:login')
 
         # Se o usuário autenticado for diferente do usuário do convite
         if authenticated and not request.user == invite.to:

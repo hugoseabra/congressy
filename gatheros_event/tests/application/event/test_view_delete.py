@@ -51,7 +51,7 @@ class EventDeleteTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('front:login')
+        redirect_url = reverse('public:login')
         redirect_url += '?next='
         redirect_url += self._get_url(pk=1)
         self.assertRedirects(response, redirect_url)

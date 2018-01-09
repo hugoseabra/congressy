@@ -108,7 +108,7 @@
                                 </span>
                         </a>
                         <ul class="dropdown-menu animated fadeInRight" aria-labelledby="dropdownMenu1">
-                            {% if member.is_admin %}
+                            {% if not organization.internal and member.is_admin %}
                                 <li>
                                     <span style="font-weight: 700">
                                         {{ organization.name|truncatechars:20 }}
@@ -198,7 +198,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'front:logout' %}">
+                                <a href="{% url 'public:logout' %}">
                                     <span class="icon">
                                         <i class="fa fa-sign-out"></i>
                                     </span>
