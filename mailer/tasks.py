@@ -32,7 +32,6 @@ def send_mail(self, subject, body, to):
             subject=subject.strip(),
             body=body_txt,
             to=to,
-            from_email=settings.CONGRESSY_EMAIL_SENDER,
             reply_to=[settings.CONGRESSY_REPLY_TO]
         )
 
