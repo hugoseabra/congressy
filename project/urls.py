@@ -24,17 +24,12 @@ private_urlpatterns = [
     url(r'^manage/', include(gatheros_front_private, 'front')),
 ]
 
-if settings.DEBUG:
-    public_urls_root = [url(r'^', RedirectView.as_view(
-        pattern_name='front:start',
-        permanent=False
-    ))]
-
 public_urls = gatheros_front_public
 public_urls += urlpatterns_public_account
+public_urls += urlpatterns_public_password
 public_urls += urlpatterns_public_invitation
 public_urls += urlpatterns_public_hotsite
-public_urls += public_urls_root
+
 public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [
@@ -43,6 +38,12 @@ public_urlpatterns = [
     # Patterns do Django não podem estar sob um 'namespace'
     url(r'^', include(urlpatterns_public_password)),
 ]
+
+if settings.DEBUG:
+    public_urlpatterns += [url(r'^', RedirectView.as_view(
+        pattern_name='front:start',
+        permanent=False
+    ))]
 
 # API
 api_urls = [
@@ -68,6 +69,7 @@ urlpatterns += static.static(
 
 if settings.DEBUG:
     import debug_toolbar
+
     urlpatterns = [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns
+                      url(r'^__debug__/', include(debug_toolbar.urls)),
+                  ] + urlpatterns
