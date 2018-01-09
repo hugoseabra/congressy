@@ -71,3 +71,29 @@ def notify_new_user_and_subscription(event, subscription, link):
         body=body,
         to=person.email,
     )
+
+
+def notify_invite(organization, link, invitator, invitnee,email):
+    """
+    Define a notificação para um novo convite
+    """
+
+    body = render_to_string('mailer/notify_invitation.html', {
+        'organizacao': organization,
+        'hospedeiro': invitator,
+        'convidado': invitnee,
+        'link': link,
+    })
+
+    if settings.DEBUG:
+        return send_mail(
+            subject='Convite: {}'.format(organization),
+            body=body,
+            to=email,
+        )
+
+    return send_mail.delay(
+        subject='Convite: {}'.format(organization),
+        body=body,
+        to=email,
+    )
