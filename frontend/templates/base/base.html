@@ -128,6 +128,7 @@
                     {% endblock %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    {% if has_subscriptions %}
                     <li class="dropdown profile hidden-xs">
                         <a href="{% url 'front:start' %}" aria-expanded="true">
                             <span class="meta">
@@ -136,6 +137,7 @@
                             </span>
                         </a>
                     </li>
+                    {% endif %}
                     <li class="dropdown profile hidden-xs">
                         <a href="javascript:void(0);" class="dropdown-toggle"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

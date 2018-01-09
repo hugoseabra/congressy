@@ -3,7 +3,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
 from django.utils.decorators import classonlymethod
@@ -547,7 +547,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
     """ Lista de inscrições """
 
     model = Subscription
-    #template_name = 'gatheros_subscription/subscription/my_subscriptions.html'
+    # template_name = 'gatheros_subscription/subscription/my_subscriptions.html'
     template_name = 'subscription/my_subscriptions.html'
     ordering = ('event__name', 'event__date_start', 'event__date_end',)
     has_filter = False
@@ -569,15 +569,28 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         if pastevents:
             query_set = query_set.filter(event__date_end__lt=now)
             self.has_filter = True
+
         else:
-
-
             query_set = query_set.filter(event__date_start__gt=now)
 
         return query_set.filter(
             person=person,
             # event__published=True,
         )
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+
+        if self.get_paginate_by(self.object_list) is not None and hasattr(
+                self.object_list, 'exists'):
+            is_empty = not self.object_list.exists()
+        else:
+            is_empty = len(self.object_list) == 0
+
+        if is_empty:
+            return redirect(reverse('event:event-list'))
+
+        return response
 
     def get_context_data(self, **kwargs):
         cxt = super(MySubscriptionsListView, self).get_context_data(**kwargs)
@@ -597,12 +610,12 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
     def get_events(self):
         """ Resgata eventos dos inscrições o usuário possui inscrições. """
         queryset = self.get_queryset()
-        return queryset\
+        return queryset \
             .values(
-                'event__name',
-                'event__id',
-            )\
-            .distinct()\
+            'event__name',
+            'event__id',
+        ) \
+            .distinct() \
             .order_by('event__name')
 
     def can_access(self):
