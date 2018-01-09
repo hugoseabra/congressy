@@ -3,18 +3,17 @@
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
+from django.views.generic import RedirectView
 
+from gatheros_event.urls.invitation import urlpatterns_public_invitation
 from gatheros_event.urls.me import (
     urlpatterns_public_account,
     urlpatterns_public_password,
 )
-
 from gatheros_front.urls import (
     urlpatterns_private as gatheros_front_private,
     urlpatterns_public as gatheros_front_public,
 )
-
-from gatheros_event.urls.invitation import urlpatterns_public_invitation
 from hotsite.urls import urlpatterns_public_hotsite
 
 admin_urlpatterns = [url(r'^admin/', admin.site.urls)]
@@ -25,10 +24,17 @@ private_urlpatterns = [
     url(r'^manage/', include(gatheros_front_private, 'front')),
 ]
 
+if settings.DEBUG:
+    public_urls_root = [url(r'^', RedirectView.as_view(
+        pattern_name='front:start',
+        permanent=False
+    ))]
+
 public_urls = gatheros_front_public
 public_urls += urlpatterns_public_account
 public_urls += urlpatterns_public_invitation
 public_urls += urlpatterns_public_hotsite
+public_urls += public_urls_root
 public_auth_urlpatterns = [url(r'^', include(public_urls, 'public'))]
 
 public_urlpatterns = [
