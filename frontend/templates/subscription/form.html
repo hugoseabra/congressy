@@ -117,7 +117,7 @@
                                         {{ item.form_field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
 
                                     {% elif item.form_field.id_for_label == "id_phone" %}
-                                        {{ item.form_field |add_class:"form-control" |attr:"type:tel" }}
+                                        {{ item.form_field |add_class:"form-control" |attr:"type:tel"|attr:"placeholder:(99) 99999-9999" }}
                                     {% else %}
                                         {{ item.form_field |add_class:"form-control" }}
                                     {% endif %}

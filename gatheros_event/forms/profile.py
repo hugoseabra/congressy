@@ -154,7 +154,7 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         """ Meta """
         model = Person
-        fields = ['name', 'email', 'new_password1', 'new_password2']
+        fields = ['name', 'email', 'phone', 'new_password1', 'new_password2']
         # exclude = [
         #     'user',
         #     'synchronized',

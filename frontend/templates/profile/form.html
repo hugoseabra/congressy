@@ -1,23 +1,47 @@
 {% extends "base/base.html" %}
 
 {% load i18n static widget_tweaks%}
-{% block title %}Editar Perfil || Congressy{% endblock %}
+{% block title %}Editar Perfil | Congressy{% endblock %}
+
+{% block page_title %}Editar Perfil{% endblock %}
+{% block page_sub_title %}{{ request.user.get_full_name }}{% endblock %}
 
 {% block sidebar %}{% endblock %}
 {% block sidebar-bars %}{% endblock %}
 
+{% block scripts %}
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+            $('#id_phone').mask("(99) 99999-9999");
+        });
+
+    </script>
+{% endblock %}
+
 {% block content %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Perfil</h3>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
                 </div>
-                <div class="panel-body">
-                    <form action="" method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
                         {% for field in form %}
                             {% if field.field.widget.input_type == "hidden" %}
                                 {{ field }}
@@ -35,6 +59,8 @@
                                     <div>
                                         {% if field.field.widget.input_type == "checkbox" %}
                                             {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                        {% elif field.id_for_label == "id_phone" %}
+                                            {{ field |add_class:"form-control" |attr:"type:tel" |attr:"placeholder:(99) 99999-9999" }}
                                         {% else %}
                                             {{ field |add_class:"form-control" }}
                                         {% endif %}
@@ -62,15 +88,25 @@
                                 </div>
                             {% endif %}
                         {% endfor %}
-
-                        <br/>
-                        <input class="btn btn-primary" type="submit" value="Salvar" />
-                        <a class="btn btn-danger" href="{% url 'front:start' %}" role="button">Cancelar</a>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+    </form>
 
 {% endblock %}
