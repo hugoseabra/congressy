@@ -164,6 +164,7 @@ class HotsiteView(DetailView):
                 context['name'] = name
                 context['email'] = email
                 context['info'] = Info.objects.get(pk=self.object.pk)
+                context['remove_preloader'] = True
                 return render(self.request, template_name=self.template_name,
                               context=context)
 
@@ -284,6 +285,8 @@ class HotsiteView(DetailView):
                 send_mail(email_subject, email_template, ['equipe@congressy.com'],
                           [email])
 
+                messages.success(self.request, 'Inscrição realizada com sucesso!')
+
             except ValidationError as e:
                 error_message = e.messages[0]
                 if error_message:
@@ -300,6 +303,7 @@ class HotsiteView(DetailView):
         context['email'] = email
         context['info'] = Info.objects.get(pk=self.object.pk)
         context['is_subscribed'] = self._get_subscribed_status()
+        context['remove_preloader'] = True
         return render(
             self.request,
             template_name=self.template_name,

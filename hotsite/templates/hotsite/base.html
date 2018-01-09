@@ -69,9 +69,11 @@
     <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-1024.css' %}">
     <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-1280.css' %}">
 </head>
-
-<body class="enable-animations enable-preloader preloader-dark">
-
+{% if remove_preloader %}
+    <body class="enable-animations">
+{% else %}
+    <body class="enable-animations enable-preloader preloader-dark">
+{% endif %}
 <div id="document" class="document">
 
     <!-- HEADER
@@ -204,9 +206,18 @@
 
                                 <!-- FORM -->
                                 <form action="{% url 'public:hotsite' object.slug %}" method="post" class="form"
-                                      role="form">
+                                      role="form" onsubmit="submit_form()">
 
                                     {% csrf_token %}
+
+                                    {% if user.is_authenticated %}
+                                        <h4 class="form-heading"
+                                            style="font-weight: bold;">Olá, {{ user.first_name }}</h4>
+                                    {% else %}
+                                        <h4 class="form-heading"
+                                            style="font-weight: bold;">Inscreva-se
+                                            agora!</h4>
+                                    {% endif %}
 
                                     {% block messages %}
                                         {% if messages %}
@@ -232,14 +243,6 @@
                                         {% endif %}
                                     {% endblock messages %}
 
-                                    {% if user.is_authenticated %}
-                                        <h4 class="form-heading"
-                                            style="font-weight: bold;">Olá, {{ user.first_name }}</h4>
-                                    {% else %}
-                                        <h4 class="form-heading"
-                                            style="font-weight: bold;">Inscreva-se
-                                            agora!</h4>
-                                    {% endif %}
 
 
                                     <div class="form-validation alert"></div>
