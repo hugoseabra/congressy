@@ -13,7 +13,7 @@ from .form import EventFieldsForm
 
 
 class SubscriptionForm(EventFieldsForm):
-    """ Formulário de pré-inscrição. """
+    """ Formulário de inscrição. """
 
     def __init__(self, created_by, instance=None, hide_lot=True, *args,
                  **kwargs):

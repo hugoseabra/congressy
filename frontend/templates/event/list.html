@@ -144,6 +144,7 @@
                                     </td>
                                     <td>
                                         <div class="btn-group">
+                                            {% if user has 'gatheros_event.change_event' of event or event.is_deletable and user has 'gatheros_event.delete_event' of event %}
                                             <button
                                                 type="button"
                                                 class="btn
@@ -172,6 +173,7 @@
                                                 </li>
                                                 {% endif %}
                                             </ul>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>

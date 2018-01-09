@@ -140,7 +140,7 @@ class SubscriptionFormViewTest(TestCase):
 
         self._login()
         response = self.client.post(url, self.data, follow=True)
-        self.assertContains(response, 'Pré-inscrição criada com sucesso')
+        self.assertContains(response, 'Inscrição criada com sucesso')
 
     def test_add_subscription_existing_person(self):
         """ Testa nova inscrição com usuário de pessoa já existente. """
@@ -164,7 +164,7 @@ class SubscriptionFormViewTest(TestCase):
 
         self._login()
         response = self.client.post(url, self.data, follow=True)
-        self.assertContains(response, 'Pré-inscrição criada com sucesso')
+        self.assertContains(response, 'Inscrição criada com sucesso')
 
     def test_add_expired_lot(self):
         """ Testa inscrição em lote expirado. """
@@ -201,7 +201,7 @@ class SubscriptionFormViewTest(TestCase):
 
         self._login()
         response = self.client.post(url, self.data, follow=True)
-        self.assertContains(response, 'Pré-inscrição alterada com sucesso')
+        self.assertContains(response, 'Inscrição alterada com sucesso')
 
     def test_delete(self):
         """ Testa exclusão de inscrição. """
@@ -214,4 +214,4 @@ class SubscriptionFormViewTest(TestCase):
         })
         self._login()
         response = self.client.post(url, self.data, follow=True)
-        self.assertContains(response, 'Pré-inscrição excluída com sucesso')
+        self.assertContains(response, 'Inscrição excluída com sucesso')
