@@ -1,13 +1,13 @@
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
-from django.contrib.auth.decorators import login_required
+
 from gatheros_subscription.views.subscription import MySubscriptionsListView
 
 
 @login_required
 def start(request):
-
     # org = account.get_organization(request)
     #
     # if org:
