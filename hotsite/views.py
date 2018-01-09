@@ -155,7 +155,7 @@ class HotsiteView(DetailView):
                     messages.error(self.request, "Nome não pode estar vazio!")
 
                 if not phone:
-                    messages.error(self.request, "Phone não pode estar vazio!")
+                    messages.error(self.request, "Celluar não pode estar vazio!")
 
                 context = super(HotsiteView, self).get_context_data(**kwargs)
                 context['status'] = self._get_status()
