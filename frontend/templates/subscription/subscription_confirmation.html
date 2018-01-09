@@ -1,0 +1,86 @@
+{% extends "base/base.html" %}
+{% load subscription_tags %}
+{% load static %}{% load i18n static %}
+{% load event_tags %}
+{% block title %}Confirmação de inscrição | Congressy{% endblock %}
+{% block page_title %}Confirmação de inscrição{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
+
+{% block content %}
+
+
+    <div class="row">
+        <div class="col-ms-12">
+            <div class="panel panel-primary">
+
+                <div class="panel-body">
+
+                    <div style="padding: 5px">
+                        Existe um perfil com este e-mail. Confirme os dados para saber se é a mesma pessoa.
+                    </div>
+                    <br/>
+
+                    <table width="60%" border="0">
+                        <tr>
+                            <td style="vertical-align: top">
+                                <table width="100%" border="0" cellpadding="10">
+                                    <tr>
+                                        <th width="25%" style="text-align: left;">Nome Informado:</th>
+                                        <td>{{ subscription_user.get_full_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align: left;">E-mail Informado:</th>
+                                        <td>{{ subscription_user.email }}</td>
+                                    </tr>
+
+                                    <tr height = 20px></tr>
+
+
+
+                                    {% if subscription_user.person %}
+
+                                        <tr>
+                                            <th style="text-align: left;">Nome Encontrado:</th>
+                                            <td>{{ subscription_user.person.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th style="text-align: left;">E-mail Encontrado:</th>
+                                            <td>{{ subscription_user.person.email }}</td>
+                                        </tr>
+                                    {% endif %}
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    <form method="post">{% csrf_token %}
+                        <br/>
+                        <hr/>
+                        <a class="btn btn-link"  href="javascript:history.back()">Voltar</a>
+                        <input class="btn btn-info" type="submit" name="confirmation_no" value="Não, é outra pessoa"/>
+                        <input class="btn btn-success" type="submit" name="confirmation_yes" value="Sim, é esta pessoa"/>
+
+                        <input type="hidden" name="subscription_user_reply" value="1">
+
+                        {% for field_name, value in submitted_data.items %}
+                            {% is_list value as is_list %}
+                            {% if is_list %}
+                                {% for item in value %}
+                                    <input type="hidden" name="{{ field_name }}" value="{{ item }}">
+                                {% endfor %}
+                            {% else %}
+                                <input type="hidden" name="{{ field_name }}" value="{{ value }}">
+                            {% endif %}
+                        {% endfor %}
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
