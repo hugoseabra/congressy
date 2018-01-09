@@ -4,6 +4,13 @@
 {% block title %} Minhas inscrições | Congressy{% endblock %}
 
 {% block page_title %}Minhas inscrições{% endblock %}
+{% block page_description %}
+    Inscrições em que você está inscrito.
+    <br />
+    Por padrão, serão exibidos
+    os eventos que ainda não fora realizados. Utilize os filtros para
+    buscar inscrições antigas.
+{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet"
@@ -91,6 +98,76 @@
 {% block toptitle %}{% endblock %}
 
 {% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+                    <button type="button" class="btn btn-default
+                    filter-button">
+                        <i class="fa fa-filter"></i>
+                    </button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row filter-box">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Filtro avançado</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form role="form">
+                                <div class="list-filters">
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label>Confirmação</label>
+                                            <div class="radio">
+                                                {% is_filter_selected 'notcheckedin' 1 as checked %}
+                                                <input class="icheck"
+                                                   {% if checked %}checked=""{% endif %}
+                                                   type="checkbox"
+                                                   name="notcheckedin"
+                                                   id="notcheckedin"
+                                                   value="1">
+                                                <label for="notcheckedin">
+                                                    Não Compareceu
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label>Eventos</label>
+                                            <div class="radio">
+                                                {% is_filter_selected 'pastevents' 1 as checked %}
+                                                <input class="icheck"
+                                                   {% if checked %}checked=""{% endif %}
+                                                   type="checkbox"
+                                                   name="pastevents"
+                                                   id="pastevents"
+                                                   value="1">
+                                                <label for="pastevents">
+                                                    Já realizados
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="clearfix"></div>
+                                </div>
+                                <button type="submit" class="btn
+                                btn-primary">Enviar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-12">
@@ -151,8 +228,10 @@
                                     </td>
                                     <td>
                                         {% if item.attended %}
-                                            {{ item.attended_on }}{% else %}
-                                            <span style="font-style: italic">Não compareceu</span>{% endif %}
+                                            {{ item.attended_on }}
+                                        {% elif item.event.status == item.event.EVENT_STATUS_FINISHED %}
+                                            <span style="font-style: italic">Não compareceu</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
