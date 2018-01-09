@@ -1,0 +1,44 @@
+{% load humanize %}
+
+<p style="text-align: justify;">
+    Prezad{{ gender_article }} Participante:&nbsp; <strong>{{ person.name }}</strong>
+</p>
+<p style="text-align: justify;">
+    Agradecemos por fazer sua pré-inscrição. Será uma honra
+    recebê-l{{ gender_article }} será muito bem vindo em nosso evento.
+</p>
+
+<p style="text-align: justify">
+    Click no link abaixo para completar seu cadastro:
+    <a href="{{ complete_sign_up_link }}">Complete seu cadastro!</a>
+</p>
+
+<hr/>
+
+<hr />
+<p style="text-align: justify;">
+    <h2>Dados da inscrição</h2>
+    <div style="margin-left:10px">
+        <strong>Nome do Evento:</strong> {{ event.name }}
+        <br/>
+        <strong>Data:</strong> {{ period }}
+        <br/>
+        <strong>Local:</strong> {{ local }}
+        <br/>
+        <strong>Número da inscrição:</strong> {{ count|intcomma }}
+        <br/>
+        <strong>Registrado em:</strong> {{ date|date:"DATETIME_FORMAT" }}
+    </div>
+</p>
+<hr />
+<p style="text-align: justify;">
+    Contamos com a sua presença!
+</p>
+
+<p style="text-align: justify;">
+    <strong>Congressy</strong>
+    &nbsp;&ndash; Crie seu evento agora mesmo!
+
+    <br />
+    <a target="_blank" href="congressy.com">www.congressy.com</a>
+</p>
