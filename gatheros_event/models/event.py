@@ -224,10 +224,10 @@ class Event(models.Model, GatherosModelMixin):
         """Status do evento de acordo com suas datas."""
         now = datetime.now()
         if now >= self.date_end:
-            return Event.LOT_STATUS_FINISHED
+            return Event.EVENT_STATUS_FINISHED
 
         if self.date_start <= now <= self.date_end:
-            return Event.LOT_STATUS_RUNNING
+            return Event.EVENT_STATUS_RUNNING
 
         return None
 

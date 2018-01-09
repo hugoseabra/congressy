@@ -550,6 +550,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
     #template_name = 'gatheros_subscription/subscription/my_subscriptions.html'
     template_name = 'subscription/my_subscriptions.html'
     ordering = ('event__name', 'event__date_start', 'event__date_end',)
+    has_filter = False
 
     def get_permission_denied_url(self):
         return reverse('front:start')
@@ -557,15 +558,32 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
     def get_queryset(self):
         person = self.request.user.person
         query_set = super(MySubscriptionsListView, self).get_queryset()
+
+        notcheckedin = self.request.GET.get('notcheckedin')
+        if notcheckedin:
+            query_set = query_set.filter(attended=False)
+            self.has_filter = True
+
+        pastevents = self.request.GET.get('pastevents')
+        now = datetime.now()
+        if pastevents:
+            query_set = query_set.filter(event__date_end__lt=now)
+            self.has_filter = True
+        else:
+
+
+            query_set = query_set.filter(event__date_start__gt=now)
+
         return query_set.filter(
             person=person,
             # event__published=True,
-            # attended=True,
         )
 
     def get_context_data(self, **kwargs):
         cxt = super(MySubscriptionsListView, self).get_context_data(**kwargs)
-        cxt.update({'filter_categories': self.get_categories()})
+        cxt['has_filter'] = self.has_filter
+        cxt['filter_events'] = self.get_events()
+        # cxt['filter_categories'] = self.get_categories()
         return cxt
 
     def get_categories(self):
@@ -575,6 +593,17 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             'event__category__name',
             'event__category__id'
         ).distinct().order_by('event__category__name')
+
+    def get_events(self):
+        """ Resgata eventos dos inscrições o usuário possui inscrições. """
+        queryset = self.get_queryset()
+        return queryset\
+            .values(
+                'event__name',
+                'event__id',
+            )\
+            .distinct()\
+            .order_by('event__name')
 
     def can_access(self):
         try:

@@ -8,6 +8,8 @@ from gatheros_event.helpers.account import update_account
 from gatheros_event import forms
 from gatheros_event.views.mixins import AccountMixin
 
+from gatheros_event.helpers import account
+
 
 class BaseOrganizationView(AccountMixin, View):
     # template_name = 'gatheros_event/organization/form.html'
@@ -81,10 +83,8 @@ class OrganizationAddFormView(BaseOrganizationView, generic.CreateView):
     form_title = 'Nova organização'
 
     def get_success_url(self):
-        return reverse(
-            'event:organization-panel',
-            kwargs={'pk': self.object.pk}
-        )
+        account.update_account(self.request, self.object)
+        return reverse('event:event-list')
 
     def can_access(self):
         return True
