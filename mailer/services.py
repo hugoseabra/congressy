@@ -97,3 +97,26 @@ def notify_invite(organization, link, invitator, invitnee,email):
         body=body,
         to=email,
     )
+
+
+def notify_new_user(context):
+    """
+    Define a notificação para um usuario na plataforma.
+    """
+
+    body = render_to_string('mailer/account_confirmation_email.html', context=context)
+
+    subject = 'Confirmação de cadastro na {0}'.format(context['site_name'])
+
+    if settings.DEBUG:
+        return send_mail(
+            subject=subject,
+            body=body,
+            to=context['email'],
+        )
+
+    return send_mail.delay(
+        subject=subject,
+        body=body,
+        to=context['email'],
+    )

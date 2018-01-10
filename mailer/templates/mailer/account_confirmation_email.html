@@ -5,7 +5,7 @@
 
     Por favor siga o link abaixo e defina sua senha:
     {% block reset_link %}
-        {{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+        <a href="https://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}">Defina sua Senha</a>
     {% endblock %}
 
     Equipe Congressy
