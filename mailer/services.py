@@ -19,7 +19,8 @@ def notify_new_subscription(event, subscription):
 
     # @TODO set event.date_start to period
     body = render_to_string('mailer/notify_subscription.html', {
-        'gender_article': 'a' if person.gender == 'F' else 'o',
+        # 'gender_article': 'a' if person.gender == 'F' else 'o',
+        'gender_article': 'o(a)',
         'person': person,
         'event': event,
         'period': event.date_start,
@@ -55,7 +56,8 @@ def notify_new_user_and_subscription(event, subscription, link):
     # @TODO set event.date_start to period
     body = render_to_string('mailer/notify_user_and_subscription.html', {
         'event': event,
-        'gender_article': 'a' if person.gender == 'F' else 'o',
+        # 'gender_article': 'a' if person.gender == 'F' else 'o',
+        'gender_article': 'o(a)',
         'person': person,
         'period': event.date_start,
         'count': subscription.count,
