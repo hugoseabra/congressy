@@ -1,0 +1,342 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+{% load subscription_tags %}
+
+{% block title %}Credenciamento | Congressy{% endblock %}
+
+{% block page_title %}Credenciamento{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+    Realize o credenciamento de inscritos confirmando sua presença no evento.
+{% endblock %}
+
+{% block extrascript %}
+    <script type="text/javascript">
+        function configure_input(field_name) {
+            var input = document.getElementById('search_input');
+            var size;
+            switch (field_name) {
+                case 'code':
+                    size = 10;
+                    input.setAttribute('type', 'search');
+                    break;
+                case 'email':
+                    input.setAttribute('type', 'email');
+                    size = 40;
+                    break;
+                default:
+                    input.setAttribute('type', 'search');
+                    size = 60;
+            }
+
+            input.setAttribute('size', size);
+            input.focus();
+            {% if search_by == 'code' and result %}
+                document.getElementById('registration_button').focus();
+            {% else %}
+                input.focus();
+            {% endif %}
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            configure_input('{{ search_by }}');
+
+            {% if search_by == 'code' and result %}
+                window.setTimeout(function () {
+                    document.getElementById('registration_button').focus()
+                }, 500);
+            {% endif %}
+        }, false);
+    </script>
+{% endblock %}
+
+{% block pageheader %}
+    <div class="pageheader">
+        <h1>Credenciamento</h1>
+    </div>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+        <li class="active">
+            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+               title="Check-in">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Check-in
+            </a>
+        </li>
+    </ul>
+
+    <h5 class="sidebar-header">Página do evento</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Configurar pagina">
+                <i class="fa  fa-fw fa-rocket"></i> Configurar pagina
+            </a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-8">
+            <div id="cgsy_login_panel" class="panel panel-primary">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">Buscar inscrito</h3>
+                </div>
+                <div class="panel-body">
+                    <form method="post" action=""
+                          class="form-horizontal form-border">
+
+                        {% csrf_token %}
+
+                        <div class="form-group">
+
+                            <label class="col-sm-3 control-label">Procurar
+                                por:</label>
+                            <div class="col-sm-6">
+                                <input {% if search_by == 'name' %}checked{% endif %}
+                                       type="radio" name="search_by"
+                                       id="search_by_name" value="name"
+                                       onclick="window.location.href=window.location.pathname"/>
+                                <label for="search_by_name">Nome</label>
+                                &nbsp; &nbsp; &nbsp;
+                                <input {% if search_by == 'email' %}checked{% endif %}
+                                       type="radio" name="search_by"
+                                       id="search_by_email" value="email"
+                                       onclick="window.location.href=window.location.pathname+'?search_by=email'"/>
+                                <label for="search_by_email">E-mail</label>
+                                &nbsp; &nbsp; &nbsp;
+                                <input {% if search_by == 'code' %}checked{% endif %}
+                                       type="radio" name="search_by"
+                                       id="search_by_code" value="code"
+                                       onclick="window.location.href=window.location.pathname+'?search_by=code'"/>
+                                <label for="search_by_code">Código</label>
+                            </div>
+                        </div>
+                        <br>
+
+                        <label for="search_input"
+                               class="col-sm-3 control-label">Informe o
+                            nome:</label>
+
+
+                        <div class="col-sm-6">
+                            <input required class="form-control" type="search"
+                                   name="value" value=""
+                                   id="search_input"/>
+                        </div>
+                        <br>
+                        <br>
+                        <div class="col-sm-6">
+                            <button class="btn-primary btn" type="submit">
+                                Buscar
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Histórico</h3>
+                </div>
+                <div class="panel-body">
+                    {% for attendance in attendances %}
+                        <div style="background: #FFF;padding: 5px;border-bottom: 1px solid #DDD">
+                            <table width="100%" border="0" cellspacing="0"
+                                   cellpadding="0">
+                                <tr>
+                                    <td style="padding: 5px">
+                                        <div style="font-weight: bold;text-transform: uppercase">{{ attendance.person.name }}</div>
+                                        <form method="post"
+                                              action="">{% csrf_token %}
+                                            <input type="hidden"
+                                                   name="search_by"
+                                                   value="code"/>
+                                            <input type="hidden" name="value"
+                                                   value="{{ attendance.code }}"/>
+                                            <button id="registration_button"
+                                                    type="submit">{{ attendance.code }}</button>
+                                        </form>
+                                        <div>
+                                            <strong>Data:</strong> {{ attendance.attended_on }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if result_by in 'code,email'|slice:',' and result %}
+        <div class="row">
+
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            {% if result_by == 'code' %}
+                                Resultado por "Código"
+                            {% endif %}
+                            {% if result_by == 'email' %}
+                                Resultado por "E-mail"
+                            {% endif %}
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <form role="form">
+
+                            <p><b>Nome:</b> {{ result.person.name }}</p>
+                            <p><b>Email: </b>{{ result.person.email }}</p>
+
+                            {% if result.person.user_id %}
+                                <p><b>Perfil:</b> &#10004;</p>
+                            {% endif %}
+
+                            <p><b>Lote: </b>{{ result.lot.name }}</p>
+
+                            <p><b>E-mail: </b>{{ result.person.email }}</p>
+
+                            <p><b>Código de Inscrição: </b>{{ result.code }}
+                            </p>
+
+                            <p><b>Cadastrado em: </b>{{ result.created }}</p>
+
+                            <p><b>Cadastrado por: </b>{{ result.created_by }}
+                            </p>
+
+
+                            {% if result.attended %}
+                                Esta inscrição já foi credenciada em '
+                                {{ result.attended_on }}'.
+                            {% else %}
+                                <button type="submit" class="btn btn-primary">
+                                    Credenciar
+                                </button>
+                            {% endif %}
+
+                        </form>
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    {% endif %}
+
+    {% if result_by == 'name' and result %}
+        <div class="row">
+
+            <div class="col-md-12 ">
+                <div class="panel panel-default">
+
+                    <!-- Default panel contents -->
+                    <div class="panel-heading">
+                        Resultado por "Nome"
+                    </div>
+
+                    <div class="table-responsive">
+                        <!-- Table -->
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th># ID</th>
+                                <th>Nome do Participante</th>
+                                <th>Lote</th>
+                                <th>Cód. Inscrição</th>
+                                <th>Data Inscrição</th>
+                                <th>Perfil</th>
+                                <th>Credenciado em</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in result %}
+                                <tr>
+                                    <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: #3C763D;color: #000000; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                                        {{ forloop.counter }}
+                                    </td>
+                                    <td style="padding:10px;margin-bottom: 3px;{% if item.attended %}background: #3C763D;color: #000000; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                                        {{ item.person.name }}
+                                    </td>
+                                    <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: #3C763D;color: #000000; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                                        {{ item.lot.name }}
+                                    </td>
+                                    <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: #3C763D;color: #000000; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                                        {{ item.code }}
+                                    </td>
+                                    <td style="padding:10px;margin-bottom: 3px;{% if item.attended %}background: #3C763D;color: #000000; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                                        {{ item.created }}
+                                    </td>
+                                    <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: #3C763D;color: #000000; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                                        {% if item.person.user_id %}
+                                            <i class="fa fa-check"
+                                               aria-hidden="true"></i>
+
+                                        {% endif %}
+                                    </td>
+                                    <td style="text-align:center;padding:10px;margin-bottom: 3px;{% if item.attended %}background: #3C763D;color: #000000; font-weight: bold;{% else %}background: #FFF{% endif %}">
+                                        <form method="post"
+                                              action="{% url 'subscription:subscription-attendance' event.pk item.pk %}">{% csrf_token %}
+                                            <input type="hidden"
+                                                   name="search_by"
+                                                   value="name"/>
+                                            <input type="hidden" name="action"
+                                                   value="{% if item.attended %}unregister{% else %}register{% endif %}"/>
+                                            {% if item.attended %}
+                                                <div style="font-size: 14px">{{ item.attended_on }}</div>
+                                                <hr>
+                                                <button class="btn btn-danger"
+                                                        id="registration_button"
+                                                        type="submit">
+                                                    Cancelar credenciamento
+                                                </button>
+                                            {% else %}
+                                                <div style="font-size: 14px">
+                                                    Não credenciado
+                                                </div>
+                                                <hr>
+                                                <button class="btn btn-primary"
+                                                        id="registration_button"
+                                                        type="submit">
+                                                    Credenciar
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    {% endif %}
+
+
+
+{% endblock %}

@@ -20,19 +20,23 @@ from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 
 class InvitationListView(AccountMixin, ListView):
     model = Invitation
-    template_name = 'gatheros_event/invitation/list.html'
+    template_name = 'invitation/list.html'
     invitation_organization = None
     context_object_name = 'open_invitations'
 
     def get_context_data(self, **kwargs):
         context = super(InvitationListView, self).get_context_data(**kwargs)
-        context['invitation_organization'] = self.get_invitation_organization()
+        # context['invitation_organization'] = self.get_invitation_organization()
+        context['invitation_organization'] = self.organization
 
         open_list = [item for item in self.object_list if not item.is_expired]
         expired_list = [item for item in self.object_list if item.is_expired]
 
         context['open_invitations'] = open_list
         context['expired_invitations'] = expired_list
+
+        context['can_view_members'] = self._can_view_members()
+        context['can_manage_members'] = self._can_manage_members()
 
         return context
 
@@ -57,7 +61,8 @@ class InvitationListView(AccountMixin, ListView):
 
     def get_queryset(self):
         query_set = super(InvitationListView, self).get_queryset()
-        organization = self.get_invitation_organization()
+        # organization = self.get_invitation_organization()
+        organization = self.organization
 
         return query_set.filter(author__organization=organization).distinct()
 
@@ -78,9 +83,21 @@ class InvitationListView(AccountMixin, ListView):
         )
         return self.is_manager and can_manage
 
+    def _can_view_members(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_view_members',
+            self.get_invitation_organization()
+        )
+
+    def _can_manage_members(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_manage_members',
+            self.get_invitation_organization()
+        )
+
 
 class InvitationCreateView(AccountMixin, FormView):
-    template_name = 'gatheros_event/invitation/invitation-create.html'
+    template_name = 'invitation/invitation-create.html'
     invitation_organization = None
 
     def get_permission_denied_url(self):
@@ -92,6 +109,9 @@ class InvitationCreateView(AccountMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(InvitationCreateView, self).get_context_data(**kwargs)
         context['invitation_organization'] = self.get_invitation_organization()
+
+        context['can_view_members'] = self._can_view_members()
+        context['can_manage_members'] = self._can_manage_members()
 
         return context
 
@@ -144,6 +164,18 @@ class InvitationCreateView(AccountMixin, FormView):
     def can_access(self):
         return self.request.user.has_perm(
             'gatheros_event.can_invite',
+            self.get_invitation_organization()
+        )
+
+    def _can_view_members(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_view_members',
+            self.get_invitation_organization()
+        )
+
+    def _can_manage_members(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_manage_members',
             self.get_invitation_organization()
         )
 
@@ -231,7 +263,7 @@ class InvitationDecisionView(TemplateView):
 
         # Se tem perfil, precisa do login login
         if not authenticated and hasattr(invite.to, 'person'):
-            return redirect('front:login')
+            return redirect('public:login')
 
         # Se o usuário autenticado for diferente do usuário do convite
         if authenticated and not request.user == invite.to:
@@ -240,7 +272,7 @@ class InvitationDecisionView(TemplateView):
                 'messages': messages.get_messages(request)
             })
             return render_to_response(
-                'gatheros_event/invitation/invitation-decision.html',
+                'invitation/invitation-decision.html',
                 context
             )
 
@@ -253,7 +285,7 @@ class InvitationDecisionView(TemplateView):
         })
 
         return render_to_response(
-            'gatheros_event/invitation/invitation-decision.html',
+            'invitation/invitation-decision.html',
             context
         )
 
@@ -265,18 +297,20 @@ class InvitationDecisionView(TemplateView):
         :param kwargs:
         :return:
         """
-        context = self.get_context_data(**kwargs)
-        context.update({'request': request})
 
         invite = get_object_or_404(Invitation, pk=kwargs.get('pk'))
         org_id = invite.author.organization_id
         form = InvitationDecisionForm(instance=invite)
         form.is_valid()
 
+        context = self.get_context_data(**kwargs)
+        context.update({'request': request})
+        context.update({'organization': invite.author.organization})
+
         if 'invitation_decline' in request.POST:
             form.decline()
             return render_to_response(
-                'gatheros_event/invitation/invitation-decline.html',
+                'invitation/invitation-decline.html',
                 context
             )
 
@@ -340,7 +374,7 @@ class InvitationProfileView(TemplateView):
         })
 
         return render_to_response(
-            'gatheros_event/invitation/invitation-profile.html',
+            'invitation/invitation-profile.html',
             context
         )
 
@@ -363,7 +397,7 @@ class InvitationProfileView(TemplateView):
                 'form': form,
             })
             return render_to_response(
-                'gatheros_event/invitation/invitation-profile.html',
+                'invitation/invitation-profile.html',
                 context
             )
 
@@ -418,7 +452,7 @@ class MyInvitationsListView(AccountMixin, ListView):
     """ Lista de inscrições """
 
     model = Invitation
-    template_name = 'gatheros_event/invitation/my_invitations.html'
+    template_name = 'invitation/my_invitations.html'
     ordering = ('created', 'author__person__name', '-expired',)
 
     def get_permission_denied_url(self):

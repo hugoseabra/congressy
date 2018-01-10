@@ -1,0 +1,74 @@
+{% extends 'registration/login_base.html' %}
+{% load static %}
+
+{% block title %}Nova conta | Congressy{% endblock %}
+{% block login_block_title %}Nova conta{% endblock %}
+
+{# @TODO Corrigir problema com o success message, talvez um if testando o contexto por mensagem de successo #}
+
+{% block form %}
+    <p> Entre com suas credenciais para acessar sua conta.</p>
+    <form id="createForm" action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form" onsubmit="submit_form(this); return false;">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="col-md-12">
+                <label for="name">Nome</label>
+                <input type="text"
+                       required
+                       name="name"
+                       class="form-control"
+                       id="name"
+                       placeholder="Nome completo"
+                >
+                {% for error in form.name.errors %}
+                    <div class="alert alert-danger
+                                    alert-dismissable">
+                        <button type="button" class="close"
+                                data-dismiss="alert"
+                                aria-hidden="true">×
+                        </button>
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <label for="email">E-mail</label>
+                <input type="text"
+                       name="email"
+                       required
+                       class="form-control"
+                       id="email"
+                       placeholder="me@you.com">
+                {% for error in form.email.errors %}
+                    <div class="alert alert-danger
+                                    alert-dismissable">
+                        <button type="button" class="close"
+                                data-dismiss="alert"
+                                aria-hidden="true">×
+                        </button>
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <button id="submitButton" class="btn btn-info btn-block">Enviar</button>
+            </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0">
+            <div class="col-md-12 secondary-links">
+                <div class="help-block float-left">
+                    <span class="info">Já possui conta?</span>
+                    <a style="font-weight: bold;"
+                       href="{% url 'public:login' %}">
+                        Entrar
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </form>
+{% endblock %}

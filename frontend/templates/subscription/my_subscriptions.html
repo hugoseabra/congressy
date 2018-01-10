@@ -1,0 +1,251 @@
+{% extends "base/base.html" %}
+{% load i18n static subscription_tags %}
+
+{% block title %} Minhas inscrições | Congressy{% endblock %}
+
+{% block page_title %}Minhas inscrições{% endblock %}
+{% block page_description %}
+    Inscrições em que você está inscrito.
+    <br />
+    Por padrão, serão exibidos
+    os eventos que ainda não fora realizados. Utilize os filtros para
+    buscar inscrições antigas.
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/icheck/css/all.css' %}">
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
+    <script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
+
+    <script>
+        var customCheckbox = function () {
+            $('input.icheck').iCheck({
+                checkboxClass: 'icheckbox_flat-green',
+                radioClass: 'iradio_flat-blue'
+            });
+        };
+
+        $(document).ready(function () {
+            customCheckbox();
+
+            $('#subscription_table').DataTable({
+                "language": {
+                    sEmptyTable: "Nenhum registro encontrado",
+                    sInfo: "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    sInfoEmpty: "Mostrando 0 até 0 de 0 registros",
+                    sInfoFiltered: "(Filtrados de _MAX_ registros)",
+                    sInfoPostFix: "",
+                    sInfoThousands: ".",
+                    sLengthMenu: "_MENU_ resultados por página",
+                    sLoadingRecords: "Carregando...",
+                    sProcessing: "Processando...",
+                    sZeroRecords: "Nenhum registro encontrado",
+                    sSearch: "Pesquisar",
+                    oPaginate: {
+                        sNext: "Próximo",
+                        sPrevious: "Anterior",
+                        sFirst: "Primeiro",
+                        sLast: "Último"
+                    },
+                    oAria: {
+                        sSortAscending: ": Ordenar colunas de forma ascendente",
+                        sSortDescending: ": Ordenar colunas de forma descendente"
+                    }
+                },
+                "columnDefs": [
+                    // Disable sort in first, last column
+                    {
+                        "searchable": false,
+                        "orderable": false,
+                        "width": "3%",
+                        "className": "text-center",
+                        "targets": [-1]
+                    },
+                    {
+                        "width": "18%",
+                        "targets": 1,
+                        "className": "text-center"
+                    }
+                ],
+                // Default order
+                "order": [[0, 'asc']]
+            });
+
+            /**
+             * filter-button: botão de ação de exibição do filtro
+             * filter-box: caixa de filtros a ser exibida.
+             * active (default: false): se a caixa de filtro é para iniciar
+             * aberta ou não.
+             */
+            window.cgsy.Filter.init(
+                '.filter-button',
+                '.filter-box',
+                {% if has_filter %}true{% else %}false{% endif %}
+            )
+        });
+    </script>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
+{% block toptitle %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+                    <button type="button" class="btn btn-default
+                    filter-button">
+                        <i class="fa fa-filter"></i>
+                    </button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row filter-box">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Filtro avançado</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form role="form">
+                                <div class="list-filters">
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label>Confirmação</label>
+                                            <div class="radio">
+                                                {% is_filter_selected 'notcheckedin' 1 as checked %}
+                                                <input class="icheck"
+                                                   {% if checked %}checked=""{% endif %}
+                                                   type="checkbox"
+                                                   name="notcheckedin"
+                                                   id="notcheckedin"
+                                                   value="1">
+                                                <label for="notcheckedin">
+                                                    Não Compareceu
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label>Eventos</label>
+                                            <div class="radio">
+                                                {% is_filter_selected 'pastevents' 1 as checked %}
+                                                <input class="icheck"
+                                                   {% if checked %}checked=""{% endif %}
+                                                   type="checkbox"
+                                                   name="pastevents"
+                                                   id="pastevents"
+                                                   value="1">
+                                                <label for="pastevents">
+                                                    Já realizados
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="clearfix"></div>
+                                </div>
+                                <button type="submit" class="btn
+                                btn-primary">Enviar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    {% if object_list %}
+                        <table id="subscription_table"
+                               class="table table-striped table-bordered dataTable no-footer nowrap"
+                               cellspacing="0"
+                               width="100%">
+                            <thead>
+                            <tr>
+                                <th>Evento</th>
+                                <th>Cód. Inscrição</th>
+                                <th>Data Inscrição</th>
+                                <th>Credenciamento</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+
+                            {% for item in object_list %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>
+                                                {{ item.event.category.name }}
+                                            </strong>
+                                            <br/><br/>
+                                            <strong>{{ item.event.name }}</strong>
+                                            <span style="font-size: medium;color:dimgray">({{ item.event.organization.name }})</span>
+                                        </div>
+                                        <br/>
+                                        <hr/>
+                                        <div>
+                                            {% if item.event.info %}
+                                                <p>
+                                                    <strong>Descrição:</strong>
+                                                    <span style="color: dimgray;text-align: justify">{{ item.event.info.description|safe|truncatechars:150 }}</span>
+                                                </p>
+                                            {% endif %}
+                                            <p>
+                                                <strong>Quando:</strong> {{ item.event.get_period }}
+                                            </p>
+                                            {% if item.event.place %}
+                                                <p>
+                                                    <strong>Local:</strong> {{ item.event.place.name }}
+                                                </p>
+                                                <p style="color:dimgray;text-indent: 20px;">{{ item.event.place.get_complete_address }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{ item.code }}
+                                    </td>
+                                    <td >
+                                        {{ item.created }}
+                                    </td>
+                                    <td>
+                                        {% if item.attended %}
+                                            {{ item.attended_on }}
+                                        {% elif item.event.status == item.event.EVENT_STATUS_FINISHED %}
+                                            <span style="font-style: italic">Não compareceu</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div style="background: #FFF;padding:10px;margin-bottom: 3px">
+                            Nenhuma inscrição
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

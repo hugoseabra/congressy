@@ -16,6 +16,11 @@ urls = [
         name='event-info'
     ),
     url(
+        r'^(?P<pk>[\d]+)/webpage/',
+        views.EventHotsiteView.as_view(),
+        name='event-hotsite'
+    ),
+    url(
         r'^(?P<pk>[\d]+)/detail/',
         views.EventDetailView.as_view(),
         name='event-detail'

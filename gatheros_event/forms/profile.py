@@ -10,23 +10,44 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
+from django.utils import six
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
-from gatheros_event.models import Person
+from gatheros_event.models import Person, Organization, Member
+from mailer.services import notify_new_user
 
 
 class ProfileCreateForm(forms.ModelForm):
     """ Formulário de criação de Perfil de pessoa no Gatheros. """
-    email = forms.EmailField(label='E-Mail')
+    email = forms.EmailField(label='E-mail', widget=forms.EmailInput(
+        attrs={'class': 'form-control'}
+    ))
 
     class Meta:
         """ Meta """
         model = Person
-        exclude = [
-            'user',
-            'synchronized',
-            'term_version',
-            'politics_version',
-        ]
+        fields = ['name', 'email']
+
+    # def __init__(self, **kwargs):
+    #
+    #     data = kwargs.get('data')
+    #
+    #     # Buscar se person existe
+    #     if data:
+    #         try:
+    #             person = Person.objects.get(
+    #                 email=data.get('email')
+    #             )
+    #
+    #             kwargs['instance'] = person
+    #
+    #         except Person.DoesNotExist:
+    #             pass
+    #
+    #     super().__init__(**kwargs)
 
     def save(self, domain_override=None, request=None,
              subject_template='registration/account_confirmation_subject.txt',
@@ -41,6 +62,10 @@ class ProfileCreateForm(forms.ModelForm):
         :return:
         """
         # Criando perfil
+        # try:
+        #     person = Person.objects.get(email=self.cleaned_data["email"])
+        #     self.instance = person
+        # except Person.DoesNotExist:
         super(ProfileCreateForm, self).save(commit=True)
 
         # Criando usuário
@@ -55,6 +80,25 @@ class ProfileCreateForm(forms.ModelForm):
         self.instance.user = user
         self.instance.save()
 
+        try:
+            self.instance.members.get(organization__internal=True)
+        except Member.DoesNotExist:
+            internal_org = Organization(
+                internal=True,
+                name=self.instance.name
+            )
+
+            for attr, value in six.iteritems(self.instance.get_profile_data()):
+                setattr(internal_org, attr, value)
+
+            internal_org.save()
+
+            Member.objects.create(
+                organization=internal_org,
+                person=self.instance,
+                group=Member.ADMIN
+            )
+
         # Criando o email de confirmação e definição de senha
         reset_form = PasswordResetForm(
             data={
@@ -62,13 +106,51 @@ class ProfileCreateForm(forms.ModelForm):
             }
         )
         reset_form.is_valid()
-        reset_form.save(
-            domain_override=domain_override,
-            subject_template_name=subject_template,
-            email_template_name=email_template,
-            request=request,
-        )
+
+        """
+        Generates a one-use only link for resetting password and sends via e-mail to the
+        user.
+        """
+
+        email = self.cleaned_data["email"]
+
+        current_site = get_current_site(request)
+        site_name = current_site.name
+        domain = current_site.domain
+
+        context = {
+            'email': email,
+            'domain': domain,
+            'site_name': site_name,
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            'token': default_token_generator.make_token(user),
+            'protocol': 'https',
+        }
+
+        notify_new_user(context)
+
+        # reset_form.save(
+        #     domain_override=domain_override,
+        #     subject_template_name=subject_template,
+        #     email_template_name=email_template,
+        #     request=request,
+        # )
+
         return self.instance
+
+    def clean(self):
+
+        cleaned_data = super(ProfileCreateForm, self).clean()
+
+        email = cleaned_data.get('email')
+
+        try:
+            User.objects.get(username=email)
+            raise forms.ValidationError("Esse email já existe em nosso sistema. Tente novamente.")
+        except User.DoesNotExist:
+            pass
+
+        return cleaned_data
 
 
 class ProfileForm(forms.ModelForm):
@@ -96,12 +178,13 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         """ Meta """
         model = Person
-        exclude = [
-            'user',
-            'synchronized',
-            'term_version',
-            'politics_version',
-        ]
+        fields = ['name', 'email', 'phone', 'new_password1', 'new_password2']
+        # exclude = [
+        #     'user',
+        #     'synchronized',
+        #     'term_version',
+        #     'politics_version',
+        # ]
 
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):

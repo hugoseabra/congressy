@@ -24,7 +24,7 @@ class EventAddViewTest(TestCase):
     ]
 
     def setUp(self):
-        self.url = reverse_lazy('event:event-add')
+        self.url = reverse('event:event-add')
         self.user = User.objects.get(username="lucianasilva@gmail.com")
 
     def _login(self):
@@ -51,8 +51,9 @@ class EventAddViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self.url, follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next='
+        redirect_url += self.url
         self.assertRedirects(response, redirect_url)
 
     def test_status_is_200_ok(self):
@@ -146,8 +147,8 @@ class EventEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url(pk=1)
         self.assertRedirects(response, redirect_url)
 
     def test_status_is_200_ok(self):
@@ -287,8 +288,8 @@ class EventDatesEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url(pk=1)
         self.assertRedirects(response, redirect_url)
 
     def test_status_is_200_ok(self):
@@ -430,8 +431,8 @@ class EventSubscriptionTypeEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url(pk=1)
         self.assertRedirects(response, redirect_url)
 
     def test_status_is_200_ok(self):
@@ -547,8 +548,8 @@ class EventPublicationEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(pk=1), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url(pk=1)
         self.assertRedirects(response, redirect_url)
 
     def test_status_is_405(self):

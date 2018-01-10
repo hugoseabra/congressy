@@ -45,11 +45,12 @@ class BaseOrganizationMixin(AccountMixin, View):
 
 class MemberListView(BaseOrganizationMixin, ListView):
     model = Member
-    template_name = 'gatheros_event/member/list.html'
+    template_name = 'member/list.html'
 
     def get_queryset(self):
         query_set = super(MemberListView, self).get_queryset()
-        organization = self.get_member_organization()
+        # organization = self.get_member_organization()
+        organization = self.organization
 
         return query_set.filter(organization=organization).exclude(
             person__user=self.request.user
@@ -80,7 +81,9 @@ class MemberListView(BaseOrganizationMixin, ListView):
 
         context.update({
             'can_manage': self._can_manage(),
-            'member_organization': self.get_member_organization(),
+            'can_manage_invitations': self._can_manage_invitations(),
+            # 'member_organization': self.get_member_organization(),
+            'member_organization': self.organization,
             'member_active_list': member_active_list,
             'member_inactive_list': member_inactive_list,
         })
@@ -91,6 +94,12 @@ class MemberListView(BaseOrganizationMixin, ListView):
         """ Checks if logged user can manage members. """
         return self.request.user.has_perm(
             'gatheros_event.can_manage_members',
+            self.get_member_organization()
+        )
+
+    def _can_manage_invitations(self):
+        return self.request.user.has_perm(
+            'gatheros_event.can_invite',
             self.get_member_organization()
         )
 

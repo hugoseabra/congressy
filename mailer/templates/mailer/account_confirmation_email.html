@@ -1,0 +1,18 @@
+{% load i18n %}{% autoescape off %}
+
+    <p style="text-align: justify;">
+        Olá,
+    </p>
+    <p style="text-align: justify;">
+        Seja bem-vindo á Congressy Plataforma de Eventos!
+    </p>
+    <p style="text-align: justify;">
+        Por favor siga o link abaixo e defina sua senha:
+        {% block reset_link %}
+            <a href="https://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}">Defina sua Senha</a>
+        {% endblock %}
+    </p>
+    <p style="text-align: justify;">
+        Equipe Congressy
+    </p>
+{% endautoescape %}

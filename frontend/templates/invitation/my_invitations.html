@@ -1,0 +1,68 @@
+{% extends "gatheros_front/base.html" %}
+
+{% block content %}
+    <h1>Meus Convites</h1>
+    <div style="margin-bottom:10px;padding: 10px;background-color: #DDDDDD;text-align: center;"></div>
+
+    {% if object_list %}
+        <table width="100%" style="background: #DDD">
+            <tr>
+                <th width="3%" style="border:1px solid #fff;padding:10px">#</th>
+                <th style="text-align: left;border:1px solid #fff;padding:10px">
+                    Organização
+                </th>
+                <th style="text-align: left;border:1px solid #fff;padding:10px">
+                    Autor
+                </th>
+                <th width="13%" style="text-align: left;border:1px solid #fff;padding:10px">
+                    Convidado em
+                </th>
+                <th width="13%" style="text-align: left;border:1px solid #fff;padding:10px">
+                    Expira em
+                </th>
+                <th width="8%" style="text-align: left;border:1px solid #fff;padding:10px"></th>
+            </tr>
+            {% for item in object_list %}
+                <tr>
+                    <td style="text-align:center;background: #FFF;padding:10px;margin-bottom: 3px">
+                        {{ forloop.counter }}
+                    </td>
+                    <td style="background: #FFF;padding:10px;margin-bottom: 3px">
+                        {% if item.author.organization.avatar %}
+                            <img  style="float:left;padding-right:4px;margin-top: -3px" width="25px" src="{{ item.author.organization.avatar.url }}" />
+                        {% endif %}
+                        {{ item.author.organization.name }}
+                    </td>
+                    <td style="background: #FFF;padding:10px;margin-bottom: 3px">
+                        {% if item.author.person and item.author.person.avatar %}
+                            <img  style="float:left;padding-right:4px;margin-top: -3px" width="25px" src="{{ item.author.person.avatar.url }}" />
+                        {% endif %}
+                        {{ item.author.person.name }}
+                    </td>
+                    <td style="background: #FFF;padding:10px;margin-bottom: 3px">
+                        {{ item.created }}
+                    </td>
+                    <td style="text-align: center; background: #FFF;padding:10px;margin-bottom: 3px">
+                        {{ item.expired }}
+                    </td>
+                    <td style="text-align: center; background: #FFF;padding:10px;margin-bottom: 3px">
+                        <form action="{% url 'public:invitation-decision' item.pk %}" method="post">{% csrf_token %}
+                            <input type="submit" name="invitation_accept" value="Aceitar"/>
+                            <input type="submit" name="invitation_decline" value="Recusar"/>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <div style="background: #FFF;padding:10px;margin-bottom: 3px">
+            Nenhum convite
+        </div>
+    {% endif %}
+    <pre>
+    - Usuário poderá excluir inscrição?
+    - Eventos não-publicados devem aparecer aqui?
+    </pre>
+
+
+{% endblock %}

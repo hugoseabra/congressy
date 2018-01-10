@@ -1,0 +1,36 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+{% load organization_tags %}
+
+{% block title %} {{ object.name }} | Congressy{% endblock %}
+
+{% block page_title %}Cancelamento de Participação{% endblock %}
+{% block page_sub_title %}{{ object.name }} {% endblock %}
+{% block page_description %}Deixar de participar da organização <strong>{{ object.name }}</strong>.{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well danger-box-message warning">
+                <h2>ATENÇÃO!</h2>
+                <p>
+                    Você tem certeza que desejar sair da organização <strong>{{ object.name }}</strong>?
+                </p>
+                <p>
+                    Isto irá excluir todos os seus dados relacionados a esta organização e você
+                    só poderá retornar à mesma se receber um convite de um dos administradores.
+                </p>
+                <br />
+                <form action="{% url 'event:member-manage' member.organization.pk member.pk %}" method="post">
+                    {% csrf_token %}
+                    <a class="btn btn-danger" href="{% url 'event:organization-panel' object.pk %}">Não, tire-me daqui!</a>
+                    <input type="submit" class="btn btn-info" value="Sim, pode prosseguir"/>
+                    <input type="hidden" name="action" value="delete" />
+                </form>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

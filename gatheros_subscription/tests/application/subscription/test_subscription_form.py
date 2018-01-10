@@ -41,6 +41,7 @@ class SubscriptionFormTest(TestCase):
         self.data = {
             'lot': self.lot.pk,
             'name': 'João das Coves',
+            'email': 'Joao@coves.com.br',
             'gender': 'M',
             'phone': '62999999999',
             'city': 5413,

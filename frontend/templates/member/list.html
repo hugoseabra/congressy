@@ -1,0 +1,201 @@
+{% extends "base/base.html" %}
+{% load static event_tags %}
+
+{% block title %} Membros | Congressy{% endblock %}
+
+{% block page_title %}Membros{% endblock %}
+
+{% block page_sub_title %}
+    {{ member_organization.name }}
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Equipe</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'event:member-list' member_organization.pk %}" title="Membros">
+                <i class="fa  fa-fw fa-rocket"></i> Membros
+            </a>
+        </li>
+        {% if can_manage_invitations %}
+        <li>
+            <a href="{% url 'event:invitation-list' member_organization.pk %}" title="Convites">
+                <i class="fa  fa-fw fa-rocket"></i> Convites
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    {% if member_active_list %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    Membros ativos
+                </div>
+                <div class="panel-body">
+                    {% for group_name, members in member_active_list.items %}
+                        <h3 style="padding: 18px 0;font-weight: bold">{{ group_name }}</h3>
+
+                        {% if members %}
+                            <table class="table table-stripped"
+                                   cellspacing="0"
+                                   width="100%">
+                                <tr>
+                                    <th>Nome (e-mail)</th>
+                                    <th>Membro desde</th>
+                                    {% if can_manage %}
+                                        <th></th>
+                                    {% endif %}
+                                </tr>
+                                {% for item in members %}
+                                    <tr>
+                                        <td>
+                                            <div>
+{#                                                {% if item.person.avatar %}#}
+{#                                                    <img  style="float:left;padding-right:4px" width="25px" src="{{ item.person.avatar.url }}" />#}
+{#                                                {% endif %}#}
+                                                {{ item.person.name }}
+                                                <span style="font-weight: normal;color: gray">({{ item.person.email }})</span>
+                                            </div>
+                                        </td>
+                                        <td width="15%">
+                                            {{ item.created|date:"d/m/Y H\hi" }}
+                                        </td>
+                                        {% if can_manage %}
+                                            <td width="5%">
+                                                <div class="btn-group">
+                                                    <button
+                                                        type="button"
+                                                        class="btn
+                                                        btn-primary btn-trans
+                                                        btn-sm dropdown-toggle"
+                                                        data-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                    >
+                                                        <span class="fa fa-gear"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                        <li style="padding: 0 10px">
+                                                            <form action="{% url 'event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
+                                                                <button type="submit" class="btn btn-sm btn-info btn-trans btn-block">
+                                                                    <i class="fa fa-id-card"></i>
+                                                                    Tornar {% if item.group == item.HELPER %}Administrador{% else %}Auxiliar{% endif %}
+                                                                </button>
+                                                                <input type="hidden" name="action" value="change_group" />
+                                                                <input type="hidden" name="group" value="{% if item.group == item.HELPER %}{{ item.ADMIN }}{% else %}{{ item.HELPER }}{% endif %}" />
+                                                            </form>
+                                                        </li>
+                                                        <li style="padding: 0 10px">
+                                                            <form action="{% url 'event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
+                                                                <button type="submit" class="btn btn-sm btn-warning btn-trans btn-block">
+                                                                    <i class="fa fa-exclamation-circle"></i>
+                                                                    Desativar
+                                                                </button>
+                                                                <input type="hidden" name="action" value="deactivate" />
+                                                            </form>
+                                                        </li>
+                                                        <li style="padding: 0 10px">
+                                                            <form action="{% url 'event:member-delete' member_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja realmente excluir?')">{% csrf_token %}
+                                                                <button type="submit" class="btn btn-sm btn-danger btn-trans btn-block">
+                                                                    <i class="fa fa-trash"></i>
+                                                                    Excluir
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
+
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if member_inactive_list %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        Membros inativos
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-stripped"
+                               cellspacing="0"
+                               width="100%">
+                            <tr>
+                                <th>Nome (e-mail)</th>
+                                <th>Membro desde</th>
+                                <th>Tipo</th>
+                                <th></th>
+                            </tr>
+                            {% for item in member_inactive_list %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            {% if item.person.avatar %}
+                                                <img  style="float:left;padding-right:4px" width="25px" src="{{ item.person.avatar.url }}" />
+                                            {% endif %}
+                                            {{ item.person.name }}
+                                            <span style="font-weight: normal;color: gray">({{ item.person.email }})</span>
+                                        </div>
+                                    </td>
+                                    <td width="15%">
+                                        {{ item.created|date:"d/m/Y H\hi" }}
+                                    </td>
+                                    <td width="15%">
+                                        {{ item.get_group_display }}
+                                    </td>
+                                    <td width="5%">
+                                        <div class="btn-group">
+                                            <button
+                                                type="button"
+                                                class="btn
+                                                btn-primary btn-trans
+                                                btn-sm dropdown-toggle"
+                                                data-toggle="dropdown"
+                                                aria-expanded="false"
+                                            >
+                                                <span class="fa fa-gear"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                <li style="padding: 0 10px">
+                                                    <form action="{% url 'event:member-manage' member_organization.pk item.pk %}" method="post">{% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-success btn-trans btn-block">
+                                                            <i class="fa fa-exclamation-circle"></i>
+                                                            Ativar
+                                                        </button>
+                                                        <input type="hidden" name="action" value="activate" />
+                                                    </form>
+                                                </li>
+                                                <li style="padding: 0 10px">
+                                                    <form action="{% url 'event:member-delete' member_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja realmente excluir?')">{% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-danger btn-trans btn-block">
+                                                            <i class="fa fa-trash"></i>
+                                                            Excluir
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base/base.html" %}
+
+{% load static %}{% load i18n static %}
+{% load event_tags %}
+{% block title %}Deletar evento| Congressy{% endblock %}
+{% block pageheader %}
+    <div class="pageheader">Deletar evento</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
+
+{% block content %}
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+
+                <div class="panel-body">
+
+                    {% if delete_message %}
+                        {{ delete_message }}
+                    {% endif %}
+                    <br/>
+                    <br/>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div>
+                            <!--suppress HtmlUnknownAttribute -->
+                            <input class="btn btn-primary" type="submit" value="{% trans "Yes, I'm sure" %}"/>
+                            {% if next_path %}
+                                <a class="btn btn-default" href="{{ next_path|urlencode }}">Não, leve-me de volta</a>
+                            {% else %}
+                                <a class="btn btn-default" href="{{ go_back_path }}">Não, leve-me de volta</a>
+                            {% endif %}
+                        </div>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

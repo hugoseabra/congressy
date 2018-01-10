@@ -45,6 +45,8 @@ class EventAdmin(admin.ModelAdmin):
                 'category',
                 'date_start',
                 'date_end',
+                'lead',
+                'image_main',
                 'published',
                 'slug',
             ),
@@ -54,6 +56,7 @@ class EventAdmin(admin.ModelAdmin):
         }),
         ('Publicação', {
             'fields': (
+                'image_main',
                 'banner_top',
                 'banner_small',
                 'banner_slide',

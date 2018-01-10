@@ -95,8 +95,9 @@ class EventDetailBannersUploadTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(1), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next='
+        redirect_url += self._get_url(1)
         self.assertRedirects(response, redirect_url)
 
     def test_200(self):
@@ -214,8 +215,9 @@ class EventDetailPlaceTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(1), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next='
+        redirect_url += self._get_url(1)
         self.assertRedirects(response, redirect_url)
 
     def test_200(self):
@@ -295,8 +297,9 @@ class EventDetailSocialMediaTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next='
+        redirect_url += self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_200(self):

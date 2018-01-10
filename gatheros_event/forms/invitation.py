@@ -4,34 +4,28 @@ Formulário relacionados a Convites de Pessoas a serem membros de organizações
 """
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
 from django.shortcuts import reverse
 
-from core.fields import MultiEmailField
 from gatheros_event.models import Invitation, Member
 from gatheros_event.models.rules import check_invite
+from mailer.services import notify_invite
 
 
 def send_invitation(invitation):
     """ Envia convite para e-mail de convidado(s) """
+
     url = reverse('public:invitation-decision', kwargs={
         'pk': invitation.pk
     })
 
-    send_mail(
-        'Novo convite para organização',
-        'Para aceitar clique no link: {0}'.format(url),
-        settings.DEFAULT_FROM_EMAIL,
-        [invitation.to.email]
-    )
+    notify_invite(invitation.author.organization.name, url, invitation.author.person.name, invitation.to.first_name, invitation.to.email)
 
 
 class InvitationCreateForm(forms.Form):
     """Formulário de criação de Convite"""
-    to = MultiEmailField(label='Emails')
+    to = forms.EmailField()
     organization = forms.HiddenInput()
 
     user = None
@@ -48,25 +42,23 @@ class InvitationCreateForm(forms.Form):
         if self.errors:
             return []
 
+        email = self.cleaned_data['to']
         organization = self.initial.get('organization')
+        invited_user, _ = User.objects.get_or_create(
+            username=email,
+            defaults={'email': email}
+        )
+        invite = Invitation(
+            author=organization.get_member(person=self.user),
+            to=invited_user,
+            group=Member.HELPER
+        )
 
-        # Cria os convites
-        for email in self.cleaned_data['to']:
-            invited_user, _ = User.objects.get_or_create(
-                username=email,
-                defaults={'email': email}
-            )
-            invite = Invitation(
-                author=organization.get_member(person=self.user),
-                to=invited_user,
-                group=Member.HELPER
-            )
+        # Submete os convites as regras
+        check_invite(invite)
 
-            # Submete os convites as regras
-            check_invite(invite)
-
-            # Adiciona na lista dos convites que estão ok
-            self._invites.append(invite)
+        # Adiciona na lista dos convites que estão ok
+        self._invites.append(invite)
 
     def send_invite(self):
         """ Notifica pessoa convidada """

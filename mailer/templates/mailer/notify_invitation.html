@@ -1,0 +1,27 @@
+{% load humanize %}
+
+<p style="text-align: justify;">
+    Prezado <strong>{{ convidado }}</strong>,
+</p>
+<p style="text-align: justify;">
+    Eu configurei a {{ organizacao }} na Congressy para nós - para que possamos gerenciar nossos eventos.
+</p>
+<hr/>
+<p style="text-align: justify;">
+<h2>Click no link abaixo para aceitar o convite</h2>
+<div style="margin-left:10px">
+    <a href="{{ link }}">Convite</a>
+</div>
+</p>
+
+
+<p style="text-align: justify;">
+
+    Coordialmente, {{ hospedeiro }}
+
+    <strong>Congressy</strong>
+    &nbsp;&ndash; Crie seu evento agora mesmo!
+
+    <br/>
+    <a target="_blank" href="congressy.com">www.congressy.com</a>
+</p>

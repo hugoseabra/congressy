@@ -13,7 +13,7 @@ from .form import EventFieldsForm
 
 
 class SubscriptionForm(EventFieldsForm):
-    """ Formulário de pré-inscrição. """
+    """ Formulário de inscrição. """
 
     def __init__(self, created_by, instance=None, hide_lot=True, *args,
                  **kwargs):
@@ -319,7 +319,7 @@ class SubscriptionForm(EventFieldsForm):
             label='Lote',
             required=True,
             choices=choices,
-            initial=self.instance.lot.pk if self.instance else None
+            initial=self.instance.lot.pk if self.instance else '2'
         )
 
         event = self.form.event
@@ -327,6 +327,7 @@ class SubscriptionForm(EventFieldsForm):
         # Event com inscrição que não seja por lote deve esconder o campo
         if event.subscription_type != event.SUBSCRIPTION_BY_LOTS or hide_lot:
             lot.widget = forms.HiddenInput()
+            lot.initial = event.lots.first().pk
 
         self.fields['lot'] = lot
 

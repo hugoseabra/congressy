@@ -41,8 +41,8 @@ class EventFormViewRenderTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_200_logged(self):
@@ -85,8 +85,8 @@ class EventFormAddTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_200_logged(self):
@@ -241,8 +241,8 @@ class EventFormEditViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_200_logged(self):
@@ -324,8 +324,8 @@ class EventFormRemoveFieldViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_405_logged(self):
@@ -384,8 +384,8 @@ class EventFormManageActivatationViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_405_logged(self):
@@ -466,8 +466,8 @@ class EventFormFieldReorderViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_405_logged(self):
@@ -547,8 +547,8 @@ class EventFormFieldRequirementViewTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next=' + self._get_url()
         self.assertRedirects(response, redirect_url)
 
     def test_405_logged(self):

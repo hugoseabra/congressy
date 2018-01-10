@@ -1,0 +1,110 @@
+/* ================== DEVICES 320px X 533px ================== */
+/* ----------- 320 ----------- */
+@media screen
+and (device-width: 320px)
+and (device-height: 533px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 74%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
+
+/* ----------- 533 ----------- */
+@media screen
+and (device-width: 533px)
+and (device-height: 320px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 84%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
+
+/* ================== DEVICES 320px X 568px ================== */
+/* ----------- 320 ----------- */
+@media screen
+and (device-width: 320px)
+and (device-height: 568px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 74%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
+
+/* ----------- 568 ----------- */
+@media screen
+and (device-width: 568px)
+and (device-height: 320px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 84%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
+
+/* ================== DEVICES 320px X 480px ================== */
+/* ----------- 320 ----------- */
+@media screen
+and (device-width: 320px)
+and (device-height: 480px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 74%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}
+
+/* ----------- 480 ----------- */
+@media screen
+and (device-width: 480px)
+and (device-height: 320px) {
+    .navbar-left {
+        width: 100%;
+    }
+
+    .navbar-logo {
+        width: 82%;
+    }
+
+    .navbar .top-title,
+    .navbar-default .top-title {
+        font-size: 14px;
+    }
+}

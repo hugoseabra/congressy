@@ -70,7 +70,7 @@ class ProfileFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertListEqual(
             sorted(list(form.errors.keys())),
-            sorted(list(['name', 'email', 'gender', 'city']))
+            sorted(list(['name', 'email']))
         )
 
     def test_save_sucess(self):
@@ -198,29 +198,37 @@ class ProfileViewTest(TestCase):
         self.assertContains(response, 'Perfil atualizado com sucesso')
 
     def test_update_fields(self):
+
+        # @TODO Reactivate full test capability.
+        # new_data = {
+        #     "name": "Luciana Silva Oliveira",
+        #     "gender": "M",
+        #     "email": "lucianasilva@gmail.com",
+        #     "city": 5413,
+        #     "zip_code": "74023045",
+        #     "street": "Rua 12 Lote 10",
+        #     "number": "3912",
+        #     "complement": "Unidade 203",
+        #     "village": "Parque Atheneu",
+        #     "phone": "62992977058",
+        #     "cpf": '01234567890',
+        #     "birth_date": "2017-04-11",
+        #     "rg": "123456",
+        #     "orgao_expedidor": "SSPGO",
+        #     "occupation": 19,
+        #     "pne": True,
+        #     "website": "http://in2web.com.br",
+        #     "facebook": "https://facebook.com/luciana.silva",
+        #     "twitter": "@LucianaSilvaOliveira",
+        #     "linkedin": "https://linkedin.com/luciana.silva",
+        #     "skype": "LucianaSilvaOliveira"
+        # }
+
         new_data = {
-            "name": "Luciana Silva Oliveira",
-            "gender": "M",
             "email": "lucianasilva@gmail.com",
-            "city": 5413,
-            "zip_code": "74023045",
-            "street": "Rua 12 Lote 10",
-            "number": "3912",
-            "complement": "Unidade 203",
-            "village": "Parque Atheneu",
-            "phone": "62992977058",
-            "cpf": '01234567890',
-            "birth_date": "2017-04-11",
-            "rg": "123456",
-            "orgao_expedidor": "SSPGO",
-            "occupation": 19,
-            "pne": True,
-            "website": "http://in2web.com.br",
-            "facebook": "https://facebook.com/luciana.silva",
-            "twitter": "@LucianaSilvaOliveira",
-            "linkedin": "https://linkedin.com/luciana.silva",
-            "skype": "LucianaSilvaOliveira"
+            "name": "Luciana Silva Oliveira",
         }
+
         response = self.client.post(self.url, new_data, follow=True)
 
         # Checando status da resposta
@@ -236,37 +244,44 @@ class ProfileViewTest(TestCase):
             assert str(person_val) == str(val), \
                 "'%s' não igual: '%s' == '%s'" % (key, person_val, val)
 
-    @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
-    def test_update_avatar(self):
-        """
-        Testando envio da foto
-        """
-
-        # Garantindo que o avatar foi apagado
-        person = Person.objects.get(email=self.data['email'])
-        person.avatar = None
-        person.save()
-        with self.assertRaises(ValueError):
-            person.avatar.path
-
-        # Enviando novo arquivo
-        DIR = os.path.dirname(__file__)
-        file_path = os.path.join(DIR, '..', 'fixtures', 'media',
-                                 'person', 'Diego.png')
-        with open(file_path, 'rb') as f:
-            avatar = SimpleUploadedFile("foto_perfil.png", f.read())
-            self.data.update({'avatar': avatar})
-            response = self.client.post(self.url, self.data, follow=True)
-
-        # Checando status da resposta
-        self.assertContains(response, 'Perfil atualizado com sucesso')
-
-        # Checando se gravou a imagem
-        try:
-            person = Person.objects.get(email=self.data['email'])
-            person.avatar.path
-        except ValueError:
-            self.fail("O avatar não foi enviado")
+    # @TODO reactivate this test.
+    """ 
+        Why is this commented you may ask?
+        Test temporally offline due to current dead line.
+        We removed the avatar from the form, so no need to test it at the moment.
+            - nsm
+    """
+    # @override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+    # def test_update_avatar(self):
+    #     """
+    #     Testando envio da foto
+    #     """
+    #
+    #     # Garantindo que o avatar foi apagado
+    #     person = Person.objects.get(email=self.data['email'])
+    #     person.avatar = None
+    #     person.save()
+    #     with self.assertRaises(ValueError):
+    #         person.avatar.path
+    #
+    #     # Enviando novo arquivo
+    #     DIR = os.path.dirname(__file__)
+    #     file_path = os.path.join(DIR, '..', 'fixtures', 'media',
+    #                              'person', 'Diego.png')
+    #     with open(file_path, 'rb') as f:
+    #         avatar = SimpleUploadedFile("foto_perfil.png", f.read())
+    #         self.data.update({'avatar': avatar})
+    #         response = self.client.post(self.url, self.data, follow=True)
+    #
+    #     # Checando status da resposta
+    #     self.assertContains(response, 'Perfil atualizado com sucesso')
+    #
+    #     # Checando se gravou a imagem
+    #     try:
+    #         person = Person.objects.get(email=self.data['email'])
+    #         person.avatar.path
+    #     except ValueError:
+    #         self.fail("O avatar não foi enviado")
 
 
 class ProfileCreateFormTest(TestCase):
@@ -305,7 +320,7 @@ class ProfileCreateFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertListEqual(
             sorted(list(form.errors.keys())),
-            sorted(list(['name', 'email', 'gender', 'city']))
+            sorted(list(['name', 'email']))
         )
 
     def test_account_success(self):
@@ -338,9 +353,7 @@ class ProfileCreateViewTest(TestCase):
     def setUp(self):
         self.data = {
             "name": "João Das Couves",
-            "gender": "M",
             "email": "joao-das-couves@gmail.com",
-            "city": 5413,
         }
 
         self.url = reverse('public:profile_create')
@@ -364,7 +377,15 @@ class ProfileCreateViewTest(TestCase):
         Verifica se post sem dados mostra campos obrigatórios
         """
         response = self.client.post(self.url, data={})
-        self.assertContains(response, 'Este campo é obrigatório', 4)
+        self.assertContains(response, 'Este campo é obrigatório', 2)
+
+    def test_duplicate_email(self):
+        """
+        Recria um perfil já existente.
+        """
+        _ = self.client.post(self.url, self.data, follow=True)
+        response = self.client.post(self.url, self.data, follow=True)
+        self.assertContains(response, 'alert-danger')
 
     def test_follow_mail_link(self):
         """

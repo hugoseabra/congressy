@@ -48,7 +48,7 @@ class CanExportViewTest(BaseExportViewTest):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<form', 1)
+        self.assertContains(response, '<form', 2)
 
     def test_filter_by_state(self):
         """
@@ -57,13 +57,13 @@ class CanExportViewTest(BaseExportViewTest):
         data = {'format': 'html'}
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 5)  # Todos os inscritos
+        self.assertContains(response, '<tr', 6)  # Todos os inscritos
         self.assertContains(response, 'Pagina 1 de 2')  # Todos os inscritos
 
         data = {'format': 'html', 'uf': ['TO']}
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 1)  # Inscritos de 'TO'
+        self.assertContains(response, '<tr', 2)  # Inscritos de 'TO'
 
     def test_filter_by_age(self):
         """
@@ -72,23 +72,23 @@ class CanExportViewTest(BaseExportViewTest):
         data = {'format': 'html'}
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 5)  # Todos os inscritos
+        self.assertContains(response, '<tr', 6)  # Todos os inscritos
         self.assertContains(response, 'Pagina 1 de 2')  # Todos os inscritos
 
         data = {'format': 'html', 'age_0': 30, 'age_1': 40}
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 3)  # Inscritos de 30 a 40 anos
+        self.assertContains(response, '<tr', 4)  # Inscritos de 30 a 40 anos
 
         data = {'format': 'html', 'age_0': 40}
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 1)  # Inscritos maiores de 40 anos
+        self.assertContains(response, '<tr', 2)  # Inscritos maiores de 40 anos
 
         data = {'format': 'html', 'age_1': 35}
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 3)  # Inscritos menores de 35 anos
+        self.assertContains(response, '<tr', 4)  # Inscritos menores de 35 anos
 
         data = {'format': 'html', 'age_0': '', 'age_1': ''}
         response = self.client.get(self.url, data)
@@ -101,18 +101,18 @@ class CanExportViewTest(BaseExportViewTest):
         data = {'format': 'html'}
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 5)  # Todos os inscritos
+        self.assertContains(response, '<tr', 6)  # Todos os inscritos
         self.assertContains(response, 'Pagina 1 de 2')  # Todos os inscritos
 
         data = {'format': 'html', 'gender': [Person.GENDER_MALE]}
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 5)  # Inscritos Homens
+        self.assertContains(response, '<tr', 6)  # Inscritos Homens
 
         data = {'format': 'html', 'gender': [Person.GENDER_FEMALE]}
         response = self.client.get(self.url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<tr', 2)  # Inscritos Mulheres
+        self.assertContains(response, '<tr', 3)  # Inscritos Mulheres
 
     def test_download(self):
         """

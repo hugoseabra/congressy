@@ -9,22 +9,28 @@ from gatheros_event.views.mixins import AccountMixin
 
 class OrganizationPanelView(AccountMixin, DetailView):
     model = Organization
-    template_name = 'gatheros_event/organization/panel.html'
+    # template_name = 'gatheros_event/organization/panel.html'
+    template_name = 'organization/panel.html'
 
     def dispatch(self, request, *args, **kwargs):
-        dispatch = super(OrganizationPanelView, self).dispatch(
-            request,
-            *args,
-            **kwargs
-        )
-        if self.organization and not self._can_view():
-            messages.warning(
-                request,
-                'Você não tem permissão de realizar esta ação.'
-            )
-            return redirect(reverse_lazy('front:start'))
 
-        return dispatch
+        return redirect(reverse('event:member-list', kwargs={
+            'organization_pk': self.organization.pk
+        }))
+
+        # dispatch = super(OrganizationPanelView, self).dispatch(
+        #     request,
+        #     *args,
+        #     **kwargs
+        # )
+        # if self.organization and not self._can_view():
+        #     messages.warning(
+        #         request,
+        #         'Você não tem permissão de realizar esta ação.'
+        #     )
+        #     return redirect(reverse_lazy('front:start'))
+        #
+        # return dispatch
 
     def get_context_data(self, **kwargs):
         context = super(OrganizationPanelView, self).get_context_data(**kwargs)
@@ -94,7 +100,7 @@ class OrganizationPanelView(AccountMixin, DetailView):
 
 
 class OrganizationCancelMembershipView(AccountMixin, DetailView):
-    template_name = 'gatheros_event/organization/cancel-membership.html'
+    template_name = 'organization/cancel-membership.html'
     model = Organization
     object = None
     member = None

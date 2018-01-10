@@ -100,8 +100,9 @@ class LotAddTest(TestCase):
         """ Redireciona para tela de login quando não logado. """
         response = self.client.get(self._get_url(1), follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next='
+        redirect_url += reverse('event:event-panel', kwargs={'pk': 1})
         self.assertRedirects(response, redirect_url)
 
     def test_200_logged(self):
@@ -272,13 +273,15 @@ class LotEditTest(TestCase):
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         lot = self._get_lot(1)
-        response = self.client.get(
-            self._get_url(lot.event.pk, lot.pk),
-            follow=True
-        )
+        url = self._get_url(lot.event.pk, lot.pk)
+        response = self.client.get(url, follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next='
+        redirect_url += reverse(
+            'event:event-panel',
+            kwargs={'pk'> lot.event.pk}
+        )
         self.assertRedirects(response, redirect_url)
 
     def test_200_logged(self):
@@ -459,13 +462,15 @@ class LotDeleteTest(TestCase):
     def test_not_logged(self):
         """ Redireciona para tela de login quando não logado. """
         lot = self._get_lot(1)
-        response = self.client.get(
-            self._get_url(lot.event.pk, lot.pk),
-            follow=True
-        )
+        url = self._get_url(lot.event.pk, lot.pk)
+        response = self.client.get(url, follow=True)
 
-        redirect_url = reverse('front:login')
-        redirect_url += '?next=/'
+        redirect_url = reverse('public:login')
+        redirect_url += '?next='
+        redirect_url += reverse(
+            'event:event-panel',
+            kwargs={'pk': lot.event.pk}
+        )
         self.assertRedirects(response, redirect_url)
 
     def test_200_logged(self):

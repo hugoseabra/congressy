@@ -56,7 +56,4 @@ class OrganizationSwitch(RedirectView):
         return super(OrganizationSwitch, self).post(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        return self.request.POST.get(
-            'next',
-            reverse_lazy('front:start')
-        )
+        return reverse_lazy('event:event-list')

@@ -10,6 +10,7 @@ class EventDeleteView(DeleteViewMixin):
     success_url = reverse_lazy('event:event-list')
     delete_message = "Tem certeza que deseja excluir o evento \"{name}\"?"
     success_message = "Evento excluído com sucesso."
+    template_name = "event/delete.html"
 
     def get_permission_denied_url(self):
         return self.success_url

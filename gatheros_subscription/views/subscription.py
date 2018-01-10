@@ -3,7 +3,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
 from django.utils.decorators import classonlymethod
@@ -56,13 +56,8 @@ class EventViewMixin(AccountMixin, generic.View):
         return self.event
 
     def get_lots(self):
-        event = self.get_event()
-        if event.subscription_type == Event.SUBSCRIPTION_DISABLED:
-            return None
-
-        return event.lots.filter(
-            date_start__lte=datetime.now(),
-            date_end__gt=datetime.now()
+        return self.get_event().lots.filter(
+            internal=False
         )
 
     def get_num_lots(self):
@@ -116,19 +111,33 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
     """ Lista de inscrições """
 
     model = Subscription
-    template_name = 'gatheros_subscription/subscription/list.html'
+    template_name = 'subscription/list.html'
+    has_filter = False
 
     def get_queryset(self):
         query_set = super(SubscriptionListView, self).get_queryset()
+
+        lots = self.request.GET.getlist('lots', [])
+        if lots:
+            query_set = query_set.filter(lot_id__in=lots)
+            self.has_filter = True
+
+        has_profile = self.request.GET.get('has_profile')
+        if has_profile:
+            query_set = query_set.filter(person__user__isnull=False)
+            self.has_filter = True
+
         event = self.get_event()
 
         return query_set.filter(event=event)
 
     def get_context_data(self, **kwargs):
         cxt = super(SubscriptionListView, self).get_context_data(**kwargs)
+
         cxt.update({
             'can_add_subscription': self.can_add_subscription(),
-            'lots': self.get_lots()
+            'lots': self.get_lots(),
+            'has_filter': self.has_filter,
         })
         return cxt
 
@@ -139,6 +148,10 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         )
 
     def can_add_subscription(self):
+        event = self.get_event()
+        if event.subscription_type == event.SUBSCRIPTION_SIMPLE:
+            return True
+
         num_lots = self.get_num_lots()
         return num_lots > 0
 
@@ -147,13 +160,14 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
     """ Formulário de inscrição """
 
     form_class = SubscriptionForm
-    template_name = 'gatheros_subscription/subscription/form.html'
-    success_message = 'Pré-inscrição criada com sucesso.'
+    # template_name = 'gatheros_subscription/subscription/form.html'
+    template_name = 'subscription/form.html'
+    success_message = 'Inscrição criada com sucesso.'
 
     def get_context_data(self, **kwargs):
         cxt = super(SubscriptionAddFormView, self).get_context_data(**kwargs)
         cxt.update({
-            'form_title': 'Pré-inscrição'
+            'form_title': 'Inscrição'
         })
 
         internal_form_fields = []
@@ -226,8 +240,16 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
     def can_access(self):
         event = self.get_event()
-        num_lots = self.get_num_lots()
+        enabled = event.subscription_type != event.SUBSCRIPTION_DISABLED
+        can_manage = self.request.user.has_perm(
+            'gatheros_event.can_manage_subscriptions',
+            event
+        ) if enabled else False
 
+        if event.subscription_type == event.SUBSCRIPTION_SIMPLE:
+            return can_manage
+
+        num_lots = self.get_num_lots()
         if num_lots == 0:
             self.permission_denied_message = \
                 'Lote(s) não disponível(is).'
@@ -237,21 +259,14 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                 kwargs={'event_pk': event.pk}
             )
 
-        enabled = event.subscription_type != event.SUBSCRIPTION_DISABLED
-        can_manage = self.request.user.has_perm(
-            'gatheros_event.can_manage_subscriptions',
-            event
-        ) if enabled else False
-
         return can_manage and num_lots > 0
 
 
 class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
     subscription_user = None
     submitted_data = None
-    template_name = \
-        'gatheros_subscription/subscription/subscription_confirmation.html'
-
+    # template_name = 'gatheros_subscription/subscription/subscription_confirmation.html'
+    template_name = 'subscription/subscription_confirmation.html'
     @classonlymethod
     def as_view(cls, user, submitted_data, **initkwargs):
 
@@ -292,7 +307,7 @@ class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
 
 class SubscriptionEditFormView(SubscriptionAddFormView):
     object = None
-    success_message = 'Pré-inscrição alterada com sucesso.'
+    success_message = 'Inscrição alterada com sucesso.'
 
     def dispatch(self, request, *args, **kwargs):
         self.object = get_object_or_404(Subscription, pk=self.kwargs.get('pk'))
@@ -335,8 +350,9 @@ class SubscriptionEditFormView(SubscriptionAddFormView):
 
 
 class SubscriptionDeleteView(EventViewMixin, DeleteViewMixin):
+    template_name = 'subscription/delete.html'
     model = Subscription
-    success_message = 'Pré-inscrição excluída com sucesso.'
+    success_message = 'Inscrição excluída com sucesso.'
     place_organization = None
 
     def get_permission_denied_url(self):
@@ -357,7 +373,7 @@ class SubscriptionDeleteView(EventViewMixin, DeleteViewMixin):
 
 
 class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
-    template_name = 'gatheros_subscription/subscription/attendance.html'
+    template_name = 'subscription/attendance.html'
     search_by = 'name'
 
     def get_permission_denied_url(self):
@@ -530,8 +546,10 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
     """ Lista de inscrições """
 
     model = Subscription
-    template_name = 'gatheros_subscription/subscription/my_subscriptions.html'
+    # template_name = 'gatheros_subscription/subscription/my_subscriptions.html'
+    template_name = 'subscription/my_subscriptions.html'
     ordering = ('event__name', 'event__date_start', 'event__date_end',)
+    has_filter = False
 
     def get_permission_denied_url(self):
         return reverse('front:start')
@@ -539,15 +557,45 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
     def get_queryset(self):
         person = self.request.user.person
         query_set = super(MySubscriptionsListView, self).get_queryset()
+
+        notcheckedin = self.request.GET.get('notcheckedin')
+        if notcheckedin:
+            query_set = query_set.filter(attended=False)
+            self.has_filter = True
+
+        pastevents = self.request.GET.get('pastevents')
+        now = datetime.now()
+        if pastevents:
+            query_set = query_set.filter(event__date_end__lt=now)
+            self.has_filter = True
+
+        else:
+            query_set = query_set.filter(event__date_start__gt=now)
+
         return query_set.filter(
             person=person,
-            event__published=True,
-            attended=True,
+            # event__published=True,
         )
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+
+        if self.get_paginate_by(self.object_list) is not None and hasattr(
+                self.object_list, 'exists'):
+            is_empty = not self.object_list.exists()
+        else:
+            is_empty = len(self.object_list) == 0
+
+        if is_empty:
+            return redirect(reverse('event:event-list'))
+
+        return response
 
     def get_context_data(self, **kwargs):
         cxt = super(MySubscriptionsListView, self).get_context_data(**kwargs)
-        cxt.update({'filter_categories': self.get_categories()})
+        cxt['has_filter'] = self.has_filter
+        cxt['filter_events'] = self.get_events()
+        # cxt['filter_categories'] = self.get_categories()
         return cxt
 
     def get_categories(self):
@@ -557,6 +605,17 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             'event__category__name',
             'event__category__id'
         ).distinct().order_by('event__category__name')
+
+    def get_events(self):
+        """ Resgata eventos dos inscrições o usuário possui inscrições. """
+        queryset = self.get_queryset()
+        return queryset \
+            .values(
+            'event__name',
+            'event__id',
+        ) \
+            .distinct() \
+            .order_by('event__name')
 
     def can_access(self):
         try:
@@ -568,11 +627,27 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
 
 class SubscriptionExportView(AccountMixin, FormListViewMixin):
-    template_name = 'gatheros_subscription/subscription_filter.html'
+    # template_name = 'gatheros_subscription/subscription/attendance.html'
+    template_name = 'subscription/export.html'
     form_class = SubscriptionFilterForm
     model = Subscription
     paginate_by = 5
     allow_empty = True
+    event = None
+
+    def get_event(self):
+        if self.event:
+            return self.event
+
+        self.event = get_object_or_404(Event, pk=self.kwargs.get('event_pk'))
+        return self.event
+
+    def get_context_data(self, **kwargs):
+        cxt = super().get_context_data(**kwargs)
+        cxt.update({
+            'event': self.get_event()
+        })
+        return cxt
 
     def get_form_kwargs(self):
         kwargs = super(SubscriptionExportView, self).get_form_kwargs()
@@ -601,7 +676,7 @@ class SubscriptionExportView(AccountMixin, FormListViewMixin):
                                     content_type="application/vnd.ms-excel")
 
             # Definindo nome do arquivo
-            event = Event.objects.get(pk=self.kwargs.get('event_pk'))
+            event = self.get_event()
             name = "%s-%s.xls" % (event.pk, event.slug)
             response['Content-Disposition'] = 'attachment; filename=%s' % name
 

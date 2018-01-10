@@ -159,7 +159,6 @@ class FieldOptionAdmin(admin.ModelAdmin):
         'name',
         'value',
         'get_field_label',
-        'get_event_form',
         'pk'
     )
     ordering = ['field', 'name', 'value']
@@ -180,11 +179,7 @@ class FieldOptionAdmin(admin.ModelAdmin):
             instance.field.get_field_type_display()
         )
 
-    def get_event_form(self, instance):
-        return instance.field.form
-
     get_field_label.__name__ = 'campo'
-    get_event_form.__name__ = 'formulário'
 
 
 class FieldInline(admin.StackedInline):

@@ -1,0 +1,106 @@
+{% extends "base/base.html" %}
+{# @TODO Change the icons in nav_aside_itens  #}
+{% load static %}
+{% load event_tags %}
+
+{% block title %} {{ object.name }} | Congressy{% endblock %}
+
+{% block page_title %}Painel{% endblock %}
+
+{% block page_sub_title %}{{ object.name }} {% endblock %}
+
+{% block nav_aside_itens %}
+    {% if can_view_members or can_manage_members %}
+        <li>
+            <a href="{% url 'event:member-list' object.pk %}" title="Membros">
+                <i class="fa  fa-fw fa-rocket"></i> Membros
+            </a>
+        </li>
+    {% endif %}
+    {% if can_manage_invitations %}
+        <li>
+            <a href="{% url 'event:invitation-list' object.pk %}" title="Convites">
+                <i class="fa  fa-fw fa-rocket"></i> Convites
+            </a>
+        </li>
+    {% endif %}
+
+{#    {% if can_manage_places %}#}
+{#        <li>#}
+{#            <a href="{% url 'event:place-list' object.pk %}" title="Locais de eventos">#}
+{#                <i class="fa  fa-fw fa-rocket"></i> Locais de eventos#}
+{#            </a>#}
+{#        </li>#}
+{#    {% endif %}#}
+
+{#    <li>#}
+{#        <a href="{% url 'subscription:fields' object.pk %}" title="Formulário Padrão">#}
+{#            <i class="fa  fa-fw fa-rocket"></i>Formulário Padrão#}
+{#        </a>#}
+{#    </li>#}
+{% endblock %}
+
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-right">
+                    <div class="btn-group">
+                        <button
+                            type="button"
+                            class="btn
+                            btn-primary
+                            btn-sm dropdown-toggle"
+                            data-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <span class="fa fa-gear"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                            <li>
+                                <a href="{% url 'event:organization-edit' object.pk %}">
+                                    <i class="fa fa-pencil"></i>
+                                    Editar
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'event:organization-cancel-membership' object.pk %}">
+                                    <i class="fa fa-sign-out"></i>
+                                    Sair da organização
+                                </a>
+                            </li>
+                            {% if object.is_deletable and user has 'gatheros_event.delete_organization' of object %}
+                            <li>
+                                <a href="{% url 'event:organization-delete' object.pk %}">
+                                    <i class="fa fa-trash"></i>
+                                    Excluir
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+{% endblock %}

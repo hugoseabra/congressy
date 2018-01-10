@@ -73,7 +73,8 @@ class BaseFormLotView(BaseLotView):
 class LotListView(BaseLotView, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
     model = Lot
-    template_name = 'gatheros_subscription/lot/list.html'
+    # template_name = 'gatheros_subscription/lot/list.html'
+    template_name = 'lot/list.html'
     ordering = ['name']
 
     def get_queryset(self):
@@ -97,7 +98,8 @@ class LotListView(BaseLotView, generic.ListView):
 
 class LotAddFormView(BaseFormLotView, generic.CreateView):
     form_class = forms.LotForm
-    template_name = 'gatheros_subscription/lot/form.html'
+    # template_name = 'gatheros_subscription/lot/form.html'
+    template_name = 'lot/form.html'
 
     def get_context_data(self, **kwargs):
         context = super(LotAddFormView, self).get_context_data(**kwargs)
@@ -134,7 +136,8 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
     show_not_allowed_message = True
     form_class = forms.LotForm
     model = forms.LotForm.Meta.model
-    template_name = 'gatheros_subscription/lot/form.html'
+    # template_name = 'gatheros_subscription/lot/form.html'
+    template_name = 'lot/form.html'
     pk_url_kwarg = 'lot_pk'
 
     def get_context_data(self, **kwargs):

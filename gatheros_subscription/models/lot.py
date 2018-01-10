@@ -35,6 +35,15 @@ class LotManager(models.Manager):
             except Lot.DoesNotExist:
                 return code
 
+    def generate_exhibition_code(self):
+        """ Gera código de exibição para o lote. """
+        while True:
+            code = str(uuid.uuid4()).split('-')[0].upper()
+            try:
+                self.get(exhibition_code=code)
+            except Lot.DoesNotExist:
+                return code
+
 
 class Lot(models.Model, GatherosModelMixin):
     """ Modelo de Lote """
@@ -84,7 +93,7 @@ class Lot(models.Model, GatherosModelMixin):
         null=True,
         blank=True,
         decimal_places=2,
-        verbose_name='preco'
+        verbose_name='preço'
     )
     tax = models.DecimalField(
         max_digits=5,
@@ -128,6 +137,13 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='interno'
     )
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
+
+    exhibition_code = models.CharField(
+        max_length=15,
+        null=True,
+        blank=True,
+        verbose_name='código de exibição'
+    )
 
     objects = LotManager()
 
@@ -206,11 +222,11 @@ class Lot(models.Model, GatherosModelMixin):
         rule.rule_2_mais_de_1_lote_evento_inscricao_simples(self)
         rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)
         rule.rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(self)
-        rule.rule_5_data_inicial_antes_data_final(self)
-        rule.rule_6_data_inicial_antes_data_inicial_evento(self)
-        rule.rule_7_data_final_antes_data_inicial_evento(self)
+        # rule.rule_5_data_inicial_antes_data_final(self)
+        # rule.rule_6_data_inicial_antes_data_inicial_evento(self)
+        # rule.rule_7_data_final_antes_data_inicial_evento(self)
         rule.rule_8_lot_interno_nao_pode_ter_preco(self)
-        rule.rule_9_lote_pago_deve_ter_limite(self)
+        # rule.rule_9_lote_pago_deve_ter_limite(self)
         rule.rule_11_evento_encerrado_nao_pode_ter_novo(
             self,
             self._state.adding
@@ -245,7 +261,8 @@ class Lot(models.Model, GatherosModelMixin):
             self.date_start = self.event.date_start - timedelta(days=1)
 
         self.date_start = self.date_start.replace(hour=8, minute=0, second=0)
-        self.date_end = self.event.date_start - timedelta(minutes=1)
+        #self.date_end = self.event.date_start - timedelta(minutes=1)
+        self.date_end = self.event.date_end - timedelta(seconds=1)
 
     def get_period(self):
         """ Recupera string formatada de periodo do lote, de acordo com suas

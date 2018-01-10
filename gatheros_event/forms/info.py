@@ -1,7 +1,6 @@
 """
 Formulários de Informação de evento
 """
-from copy import copy
 
 from django import forms
 

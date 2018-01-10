@@ -9,7 +9,7 @@ from gatheros_event.views.mixins import AccountMixin
 
 
 class BaseEventView(AccountMixin, View):
-    template_name = 'gatheros_event/event/form.html'
+    template_name = 'event/form.html'
     success_message = ''
     success_url = None
     form_title = None
@@ -18,9 +18,17 @@ class BaseEventView(AccountMixin, View):
         return reverse_lazy('event:event-list')
 
     def form_valid(self, form):
-        messages.success(self.request, self.success_message)
-        # noinspection PyUnresolvedReferences
-        return super(BaseEventView, self).form_valid(form)
+        # @TODO: Change this to a FormView
+        try:
+            response = super(BaseEventView, self).form_valid(form)
+
+        except Exception as e:
+            messages.error(self.request, str(e))
+            return self.form_invalid(form)
+
+        else:
+            messages.success(self.request, self.success_message)
+            return response
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
@@ -117,9 +125,6 @@ class EventAddFormView(BaseEventView, generic.CreateView):
             'event:event-panel',
             kwargs={'pk': event.pk}
         )
-
-    def can_access(self):
-        return self.is_manager
 
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):

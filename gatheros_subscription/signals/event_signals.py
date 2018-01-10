@@ -6,7 +6,20 @@ from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
 from gatheros_event.models import Event
-from gatheros_subscription.models import Lot
+from gatheros_subscription.models import Lot, Form
+
+
+@receiver(post_save, sender=Event)
+def create_form(instance, raw, **_):
+    # Disable when loaded by fixtures
+    if raw is True:
+        return
+
+    if instance.subscription_type != Event.SUBSCRIPTION_DISABLED:
+        try:
+            instance.form
+        except Form.DoesNotExist:
+            Form.objects.create(event=instance)
 
 
 @receiver(post_delete, sender=Event)
@@ -52,9 +65,9 @@ def manage_related_lot_when_subscription_enabled(instance, created, raw, **_):
     if raw is True:
         return
 
-    # Process only if, in edition, subscription_type is changed
-    if created is False and instance.has_changed('subscription_type') is False:
-        return
+    # # Process only if, in edition, subscription_type is changed
+    # if created is False and instance.has_changed('subscription_type') is False:
+    #     return
 
     num_lots = Lot.objects.filter(event=instance).count()
 

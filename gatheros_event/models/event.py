@@ -43,7 +43,7 @@ class Event(models.Model, GatherosModelMixin):
     SUBSCRIPTION_CHOICES = (
         (SUBSCRIPTION_DISABLED, 'Desativadas'),
         (SUBSCRIPTION_SIMPLE, 'Simples (gratuitas)'),
-        (SUBSCRIPTION_BY_LOTS, 'Gerenciar por lotes'),
+        # (SUBSCRIPTION_BY_LOTS, 'Gerenciar por lotes'),
     )
 
     EVENT_STATUS_RUNNING = 'running'
@@ -132,10 +132,30 @@ class Event(models.Model, GatherosModelMixin):
         blank=True,
         null=True,
         verbose_name='banner topo do site',
-        variations={'default': (1920, 900), 'thumbnail': (200, 94, True)},
+        variations={
+            'default': {
+                'width': 1920,
+                'height': 900
+            },
+            'thumbnail': {
+                'width': 200,
+                'height': 94,
+                'crop': True
+            }
+        },
         validators=[MinSizeValidator(1920, 900), MaxSizeValidator(4096, 1920)],
         help_text="Banner para o topo do site do evento"
                   " (tamanho: 1920px x 900px)"
+    )
+
+    image_main = StdImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
+        verbose_name='imagem principal',
+        variations={'default': (480, 638), 'thumbnail': (200, 233, True)},
+        validators=[MinSizeValidator(480, 638), MaxSizeValidator(1400, 1400)],
+        help_text="Imagem única da descrição do evento: 480px x 638px"
     )
 
     website = models.CharField(max_length=255, null=True, blank=True)
@@ -204,10 +224,10 @@ class Event(models.Model, GatherosModelMixin):
         """Status do evento de acordo com suas datas."""
         now = datetime.now()
         if now >= self.date_end:
-            return Event.LOT_STATUS_FINISHED
+            return Event.EVENT_STATUS_FINISHED
 
         if self.date_start <= now <= self.date_end:
-            return Event.LOT_STATUS_RUNNING
+            return Event.EVENT_STATUS_RUNNING
 
         return None
 

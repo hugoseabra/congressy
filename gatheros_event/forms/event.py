@@ -8,6 +8,8 @@ from django.shortcuts import get_object_or_404
 
 from gatheros_event.models import Event, Member, Organization
 
+from datetimewidget.widgets import DateTimeWidget
+
 
 class EventForm(forms.ModelForm):
     """Formulário principal de evento"""
@@ -21,10 +23,19 @@ class EventForm(forms.ModelForm):
             'date_start',
             'date_end',
             'subscription_type',
-            'subscription_offline',
-            'published'
+            # 'subscription_offline',
+            # 'published'
         ]
-        widgets = {'organization': forms.HiddenInput}
+
+        widgets = {'organization': forms.HiddenInput,
+                   'date_start': forms.DateTimeInput,
+                   'date_end': forms.DateTimeInput,
+                   }
+
+        # widgets = {'organization': forms.HiddenInput,
+        #            'date_start': DateTimeWidget,
+        #            'date_end': DateTimeWidget,
+        #            }
 
     def __init__(self, user, *args, **kwargs):
         self.user = user

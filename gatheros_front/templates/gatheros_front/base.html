@@ -29,7 +29,7 @@
                 {% if user.is_authenticated %}
                     <div style="float:right;margin-top: 3px">
                         &nbsp; | &nbsp;
-                        <a href="{% url 'front:logout' %}">Sair</a>
+                        <a href="{% url 'public:logout' %}">Sair</a>
                     </div>
                     <div style="float:right;margin-top: 3px">
                         &nbsp; | &nbsp;
@@ -43,7 +43,7 @@
                             <img  style="float:left;padding-right:4px" width="25px" height="25px" src="{{ person.avatar.url }}" />
                         {% else %}
                             <!--suppress CheckImageSize -->
-                            <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media/default_avatar.png" />
+                            <img style="float:left;padding-right:4px" width="25px" height="25px" src="/media_dev/default_avatar.png" />
                         {% endif %}
                     </div>
                 {% endif %}
@@ -77,7 +77,7 @@
                             <img style="border-radius: 50px" src="{{ organization.avatar.url }}" width="100px"/>
                         {% else %}
                             <!--suppress CheckImageSize -->
-                            <img style="border-radius: 50px" src="/media/default_avatar_organization.jpg" width="100px"/>
+                            <img style="border-radius: 50px" src="/media_dev/default_avatar_organization.jpg" width="100px"/>
                         {% endif %}
                     </div>
                     <div style="text-align: center;padding-bottom: 20px;font-weight: bold">

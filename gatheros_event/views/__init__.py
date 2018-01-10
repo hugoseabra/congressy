@@ -10,6 +10,7 @@ from .event.form import (
     EventPublicationFormView,
     EventSubscriptionTypeFormView
 )
+from .event.hotsite import EventHotsiteView
 from .event.info import EventInfoView
 from .event.list import EventListView
 from .event.panel import EventPanelView
@@ -47,4 +48,4 @@ from .place.form import (
 )
 from .place.list import PlaceListView
 # PROFILE
-from .profile import ProfileCreateView, ProfileView
+from .profile import ProfileCreateView, ProfileView, PasswordResetView

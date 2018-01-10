@@ -1,0 +1,342 @@
+{% load static %}
+{% load base_tags %}
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}Congressy{% endblock %}</title>
+    <meta name="description" content="">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
+    <!-- Fonts  -->
+    <link rel="stylesheet"
+          href="{% static "assets/css/font-awesome.min.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/css/simple-line-icons.css" %}">
+    <!-- CSS Animate -->
+    <link rel="stylesheet" href="{% static "assets/css/animate.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/switchery/switchery.min.css" %}">
+
+    <!-- Custom styles for this theme -->
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+
+    {% block styles %}{% endblock %}
+
+    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+    {% if form %}
+        {{ form.media }}
+    {% endif %}
+
+    {% block headscripts %}{% endblock %}
+
+    <!-- Feature detection -->
+    <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="{% static "assets/js/vendor/html5shiv.js"%}"></script>
+        <script src="{% static "assets/js/vendor/respond.min.js"%}"></script>
+    <![endif]-->
+</head>
+<body>
+
+
+<section id="main-wrapper" class="theme-cgsy-full">
+    <header id="header">
+
+        <!--logo start-->
+        <div class="brand">
+            <a href="{% url 'front:start' %}">
+                <img class="base_logo" src=
+                        "{% static "assets/img/header-logo.png" %}" width="70%"/>
+            </a>
+        </div>
+        <!--logo end-->
+
+        {% block navbar %}
+            {% if user %}
+                <ul class="nav navbar-nav navbar-left">
+                    {% block sidebar-bars %}
+                    <li class="toggle-navigation toggle-left">
+                        <button class="sidebar-toggle" id="toggle-left">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                    </li>
+                    {% endblock %}
+                    {% block toptitle %}
+                        {% if organization %}
+                        <li>
+                            <div class="float:left" style="margin-top: 18px;">
+                               <h2 style="color:#FFF;font-weight: bold;">
+                                   {% if not organization.internal %}
+                                   <div class="btn-group">
+                                        <button
+                                            type="button"
+                                            class="btn btn-trans
+                                            btn-default
+                                            btn-sm dropdown-toggle"
+                                            data-toggle="dropdown"
+                                            aria-expanded="false"
+                                        >
+                                            <span class="fa fa-gear"></span>
+                                        </button>
+                                        <ul class="dropdown-menu animated fadeInRight" role="menu">
+                                            <li>
+                                                <a href="{% url 'event:organization-edit' organization.pk %}">
+                                                    <i class="fa fa-pencil"></i>
+                                                    Editar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{% url 'event:organization-cancel-membership' organization.pk %}">
+                                                    <i class="fa fa-sign-out"></i>
+                                                    Sair da organização
+                                                </a>
+                                            </li>
+                                            {% if organization.is_deletable and user has 'gatheros_event.delete_organization' of organization %}
+                                            <li>
+                                                <a href="{% url 'event:organization-delete' organization.pk %}">
+                                                    <i class="fa fa-trash"></i>
+                                                    Excluir
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                    &ensp;{% endif %}
+                                    {{ organization.name|truncatechars:50 }}
+                               </h2>
+                            </div>
+                            <div class="clearfix"></div>
+                        </li>
+                        {% endif %}
+                    {% endblock %}
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if has_subscriptions %}
+                    <li class="dropdown profile hidden-xs">
+                        <a href="{% url 'front:start' %}" aria-expanded="true">
+                            <span class="meta">
+                                <span class="fa fa-list"></span>
+                                <span class="text  hidden-xs">Minhas Inscrições</span>
+                            </span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="dropdown profile hidden-xs">
+                        <a href="javascript:void(0);" class="dropdown-toggle"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="meta">
+                                    <span class="fa fa-sitemap"></span>
+                                    <span class="text  hidden-xs">Organizações</span>
+                                    <span class="caret hidden-xs"></span>
+                                </span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight" aria-labelledby="dropdownMenu1">
+                            {% if not organization.internal and member.is_admin %}
+                                <li>
+                                    <span style="font-weight: 700">
+                                        {{ organization.name|truncatechars:20 }}
+                                    </span>
+                                </li>
+                                <li style="margin-bottom: 3px">
+                                    <a href="{% url 'event:member-list' organization.pk %}"
+                                       class="btn-sm btn-link btn-block">
+                                        <i class="fa fa-users"></i>
+                                        Membros
+                                    </a>
+                                </li>
+                                <li style="margin-bottom: 3px">
+                                    <a href="{% url 'event:invitation-list' organization.pk %}"
+                                       class="btn-sm btn-link btn-block">
+                                        <i class="fa fa-envelope"></i>
+                                        Convites
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                            {% endif %}
+                            <form action="{% url 'event:organization-switch' %}"
+                                  method="post" id="organization_context">
+                                {% csrf_token %}
+
+                                {% for org in organizations %}
+                                    {% if org.internal %}
+                                        <li onclick="cgsy_submit({{ org.pk }})">
+                                            <span class="icon">
+                                                <i class="fa {% if org.pk == organization.pk %}fa-circle{% else %}fa-circle-thin{% endif %}"></i>
+                                            </span>
+                                            <a href="#">{{ org.name|truncatechars:21 }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li onclick="cgsy_submit({{ org.pk }})">
+                                            <span class="icon">
+                                                <i class="fa {% if org.pk == organization.pk %}fa-circle{% else %}fa-circle-thin{% endif %}"></i>
+                                            </span>
+                                            <a href="#">{{ org.name|truncatechars:21 }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                <input
+                                    type="hidden"
+                                    name="organization-context-pk"
+                                    id="organization-context-pk"/>
+                                    <input
+                                        type="hidden"
+                                        name="next"
+                                        value="{{ request.path }}"/>
+                            </form>
+                            <li class="divider"></li>
+                            <li>
+                                <a href="{% url 'event:organization-add' %}"
+                                   class="btn-sm btn-success btn-block">
+                                    <i class="fa fa-plus"></i>
+                                    Criar organização
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown profile hidden-xs">
+                        <a href="{% url 'event:event-list' %}" aria-expanded="true">
+                            <span class="meta">
+                                <span class="fa fa-calendar"></span>
+                                <span class="text  hidden-xs">Eventos</span>
+                            </span>
+                        </a>
+                    </li>
+
+                    <li class="dropdown profile hidden-xs">
+                        <a href="javascript:void(0);" class="dropdown-toggle"
+                           data-toggle="dropdown">
+                                <span class="meta">
+                                    <span class="fa fa-user-circle-o"></span>
+                                    <span class="text  hidden-xs">{{ user.first_name }}</span>
+                                    <span class="caret hidden-xs"></span>
+                                </span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight " role="menu">
+                            <li>
+                                <a href="{% url 'event:profile' %}">
+                                    <span class="icon">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                    Meus Dados
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'public:logout' %}">
+                                    <span class="icon">
+                                        <i class="fa fa-sign-out"></i>
+                                    </span>
+                                    Sair
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            {% endif %}
+        {% endblock %}
+    </header>
+
+    {% block sidebar %}
+        <aside class="sidebar sidebar-left">
+
+            {% if organization and not organization.internal %}
+                <div class="sidebar-profile">
+                    <div class="profile-body dropdown">
+                       {% if member.is_admin %}
+                       <a href="javascript:void(0);" class="dropdown-toggle"
+                           data-toggle="dropdown" aria-expanded="false">
+                       {% endif %}
+                            <h4>
+                                {{ organization.name|truncatechars:50 }}
+                            </h4>
+                        {% if member.is_admin %}
+                        </a>
+                        {% endif %}
+                        <small class="title">
+                            {{ member.get_group_display }}
+                        </small>
+                    </div>
+                </div>
+            {% endif %}
+            {% if organization %}
+                <nav>
+                    {% block nav_aside_itens %}{% endblock %}
+                </nav>
+            {% endif %}
+        </aside>
+    {% endblock %}
+
+    <!--main content start-->
+    <section class="main-content-wrapper" style="position: relative;">
+        <div class="pageheader">
+            <h1>{% block page_title %}{% endblock %}</h1>
+            <h2>{% block page_sub_title %}{% endblock %}</h2>
+            <p class="text-muted">
+                {% block page_description %}{% endblock %}</p>
+        </div>
+        <section id="main-content">
+            {% block messages %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissable">
+                            <button type="button" class="close"
+                                    data-dismiss="alert" aria-hidden="true">×
+                            </button>
+                            {{ message|capfirst }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endblock messages %}
+            {% block content %}{% endblock %}
+            <div>
+
+            </div>
+        </section>
+        <!-- main content end -->
+        <section class="cgsy-footer footer-wrapper">
+            {% include "base/footer.html" %}
+        </section>
+    </section>
+
+</section>
+
+<!--Global JS-->
+
+<script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+<script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
+<script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+<script src="{% static "assets/plugins/switchery/switchery.min.js" %}"></script>
+<script src="{% static "assets/js/src/app.js" %}"></script>
+<script src="{% static "assets/js/cgsy.js" %}"></script>
+
+<script type="application/javascript">
+    function cgsy_submit(value) {
+        console.log(typeof(value));
+        console.log(value);
+        var org_context = document.getElementById('organization-context-pk');
+        org_context.value = value;
+        document.getElementById("organization_context").submit();
+        console.log('SUBMITTED' + org_context.value)
+    }
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

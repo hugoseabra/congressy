@@ -19,7 +19,7 @@ private_urls = [
 
 public_account_urls = [
     url(
-        r'^create-account/$',
+        r'^register/$',
         views.ProfileCreateView.as_view(),
         name='profile_create'
     ),
@@ -45,7 +45,8 @@ public_password_urls = [
     ),
     url(
         r'^reset-password/$',
-        auth_views.PasswordResetView.as_view(),
+        #auth_views.PasswordResetView.as_view(),
+        views.PasswordResetView.as_view(),
         name='password_reset'
     ),
 ]

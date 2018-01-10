@@ -70,7 +70,7 @@ class Subscription(models.Model, GatherosModelMixin):
         Person,
         verbose_name='pessoa',
         on_delete=models.PROTECT,
-        related_name='subscriptions'
+        related_name='subscriptions',
     )
     origin = models.CharField(
         max_length=15,

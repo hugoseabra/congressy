@@ -3,13 +3,15 @@ from django.urls import reverse_lazy
 
 from gatheros_event.models import Organization
 from gatheros_event.views.mixins import DeleteViewMixin
+from gatheros_event.helpers.account import update_account
 
 
 class OrganizationDeleteView(DeleteViewMixin):
+    template_name = "organization/delete.html"
     model = Organization
     delete_message = 'Tem certeza que deseja excluir a organização "{name}"?'
     success_message = 'Organização excluída com sucesso.'
-    success_url = reverse_lazy('event:organization-list')
+    success_url = reverse_lazy('event:event-list')
 
     def dispatch(self, request, *args, **kwargs):
         can_delete = self.can_delete()
@@ -35,3 +37,7 @@ class OrganizationDeleteView(DeleteViewMixin):
             event_list.append('"{} (ID: {})"'.format(e.name, e.pk))
 
         return event_list
+
+    def post_delete(self):
+        update_account(self.request)
+
