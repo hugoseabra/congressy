@@ -20,7 +20,7 @@ def send_invitation(invitation):
         'pk': invitation.pk
     })
 
-    notify_invite(invitation.author.organization.name, url, invitation.author.person.name, invitation.to.first_name,invitation.to.email)
+    notify_invite(invitation.author.organization.name, url, invitation.author.person.name, invitation.to.first_name, invitation.to.email)
 
 
 class InvitationCreateForm(forms.Form):

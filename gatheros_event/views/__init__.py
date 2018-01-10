@@ -48,4 +48,4 @@ from .place.form import (
 )
 from .place.list import PlaceListView
 # PROFILE
-from .profile import ProfileCreateView, ProfileView
+from .profile import ProfileCreateView, ProfileView, PasswordResetView
