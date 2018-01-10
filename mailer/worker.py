@@ -16,8 +16,8 @@ task_params = {
 @app.task(**task_params)
 def send_mail(self, subject, body, to):
     try:
-        return tasks.send_mail(subject, body, tasks
-                               )
+        return tasks.send_mail(subject, body, to)
+
     except SMTPAuthenticationError as exc:
         raise self.retry(exc=exc)
 
