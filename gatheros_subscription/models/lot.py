@@ -261,8 +261,8 @@ class Lot(models.Model, GatherosModelMixin):
             self.date_start = self.event.date_start - timedelta(days=1)
 
         self.date_start = self.date_start.replace(hour=8, minute=0, second=0)
-        # self.date_end = self.event.date_start - timedelta(minutes=1)
-        self.date_end = self.event.date_end
+        #self.date_end = self.event.date_start - timedelta(minutes=1)
+        self.date_end = self.event.date_end - timedelta(seconds=1)
 
     def get_period(self):
         """ Recupera string formatada de periodo do lote, de acordo com suas

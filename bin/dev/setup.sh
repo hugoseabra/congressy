@@ -21,7 +21,7 @@ python $BASE_DIR/manage.py migrate
 
 # Importando fixtures
 # User
-python $BASE_DIR/manage.py loaddata 000_site
+python $BASE_DIR/manage.py loaddata 000_site_dev
 python $BASE_DIR/manage.py loaddata 001_user
 
 ## gatheros_event
