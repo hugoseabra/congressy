@@ -126,10 +126,10 @@
                                aria-expanded="true" style="font-weight: bold">{{ user.first_name }}<span
                                     class="caret"></span></a>
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="{% url 'event:profile' %}">Minha conta</a>
+                                <li><a href="{% url 'event:profile' %}" target="_blank">Minha conta</a>
                                 </li>
-                                <li><a href="{% url 'front:start' %}">Gerenciar</a></li>
-                                <li><a href="{% url 'public:logout' %}">Sair</a></li>
+                                <li><a href="{% url 'front:start' %}" target="_blank">Gerenciar</a></li>
+                                <li><a href="{% url 'public:logout' %}" target="_blank">Sair</a></li>
                             </ul>
                         </li>
                     {% else %}
@@ -251,13 +251,14 @@
                                     <div class="form-validation alert"></div>
 
                                     {% if not is_subscribed %}
-                                        {% if person.email == ""  or person.name == ""  or person.phone == "" %}
-                                            <p class="text-muted">Preencha os dados seguintes para realizar sua
+
+                                        {% if not person.email or not person.name or not person.phone  %}
+                                            <p class="text-muted">Preencha os dados seguintes para concluir sua
                                                 inscrição.</p>
                                         {% endif %}
 
 
-                                        {% if person and person.name != "" %}
+                                        {% if person and person.name %}
                                             <input type="hidden" name="name" value="{{ person.name }}">
                                         {% else %}
                                             <div class="form-group">
@@ -274,7 +275,7 @@
                                         {% endif %}
 
 
-                                        {% if person and  person.email != "" %}
+                                        {% if person and person.email%}
                                             <input type="hidden" name="email" value="{{ person.email }}">
                                         {% else %}
                                             <div class="form-group">
@@ -287,15 +288,11 @@
                                             </div>
                                         {% endif %}
 
-                                        {% if person and  person.phone != "" %}
+                                        {% if person and person.phone and person.phone|length == 15 %}
                                             <input type="hidden" name="phone" value="{{ person.phone }}">
                                         {% else %}
                                             <div class="form-group">
-
-
                                                 <label for="id_phone">Celular</label>
-
-
                                                 <div>
                                                     <input name="phone" class="form-control"
                                                            maxlength="14" id="id_phone"

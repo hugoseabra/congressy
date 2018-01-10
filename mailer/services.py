@@ -21,6 +21,7 @@ def notify_new_subscription(event, subscription):
     body = render_to_string('mailer/notify_subscription.html', {
         'gender_article': 'a' if person.gender == 'F' else 'o',
         'person': person,
+        'event': event,
         'period': event.date_start,
         'count': subscription.count,
         'date': subscription.created,
