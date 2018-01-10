@@ -6,11 +6,7 @@ from celery import Celery
 
 logger = logging.getLogger("Celery[Mailer]")
 
-if settings.DEBUG:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings.dev')
-else:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings.prod')
-
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings.prod')
 
 app = Celery('mailer')
 app.config_from_object('django.conf:settings', namespace='CELERY')
