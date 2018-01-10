@@ -1,7 +1,11 @@
 """ Mailer service. """
 from django.conf import settings
 from django.template.loader import render_to_string
-from .tasks import send_mail
+
+if settings.DEBUG:
+    from .tasks import send_mail
+else:
+    from .worker import send_mail
 
 
 def notify_new_subscription(event, subscription):

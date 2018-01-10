@@ -3,9 +3,9 @@ Gatheros Event template context processor
 """
 from django.core.exceptions import ObjectDoesNotExist
 
+from gatheros_subscription.models import Subscription
 from .helpers import account as _account_helper
 
-from gatheros_subscription.models import Subscription
 
 def account(request):
     """

@@ -24,7 +24,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     # THIRD PARTY
-    'celery',
     'mailer',
     'permission',
     'stdimage',
@@ -227,5 +226,5 @@ MESSAGE_TAGS = {
     message_constants.ERROR: 'danger',
 }
 
-DEFAULT_FROM_EMAIL = 'mail@congressy.net'
-CONGRESSY_REPLY_TO = 'congressy@congressy.com'
+DEFAULT_FROM_EMAIL = 'Congressy <mail@congressy.net>'
+CONGRESSY_REPLY_TO = 'Congressy <congressy@congressy.com>'

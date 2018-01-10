@@ -2,6 +2,8 @@
 
 from . import *
 
+INSTALLED_APPS.append('celery')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
