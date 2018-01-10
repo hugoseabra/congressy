@@ -1,15 +1,6 @@
 #!/usr/bin/env bash
 get_version_revision() {
-    local VERSION=''
-	local TAGS=$(git tag -l)
-
-	if [[ ! $TAGS ]]; then
-	    VERSION=$(git rev-parse HEAD)
-    else
-        VERSION=$(git describe)
-	fi
-
-	echo $VERSION
+    git describe
 }
 
 get_closest_version() {
