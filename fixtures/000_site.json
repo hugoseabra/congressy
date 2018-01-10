@@ -3,8 +3,8 @@
     "model": "sites.site",
     "pk": 1,
     "fields": {
-      "domain": "congressy.com",
-      "name": "congressy.com"
+      "domain": "ev.congressy.com",
+      "name": "ev.congressy.com"
     }
   }
 ]

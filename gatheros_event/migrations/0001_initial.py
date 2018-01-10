@@ -454,7 +454,7 @@ class Migration(migrations.Migration):
                  models.TextField(verbose_name='descrição (texto)')),
                 ('description_html', models.TextField(
                     help_text='Descreva sobre o que se trata o seu evento',
-                    verbose_name='descrição (HTML)')),
+                    verbose_name='descrição')),
                 ('event', models.OneToOneField(
                     on_delete=django.db.models.deletion.CASCADE,
                     primary_key=True, serialize=False,

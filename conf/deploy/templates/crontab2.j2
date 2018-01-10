@@ -1,0 +1,1 @@
+*/{{ CRON_SYNC_MINUTES_OUT }} * * * * /usr/local/bin/s3cmd sync --delete-removed /var/www/cgsy/media_dev/ s3://{{ BUCKET_NAME }}/ > /proc/1/fd/1 2> /proc/1/fd/2

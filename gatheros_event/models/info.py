@@ -40,7 +40,7 @@ class Info(models.Model, GatherosModelMixin):
 
     description = models.TextField(verbose_name='descrição (texto)')
     description_html = models.TextField(
-        verbose_name='descrição (HTML)',
+        verbose_name='descrição',
         help_text="Descreva sobre o que se trata o seu evento"
     )
     event = models.OneToOneField(

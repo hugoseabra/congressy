@@ -24,6 +24,8 @@ env_dict = {
     'DBPORT': dbport,
 }
 
+# @TODO Gerar hash do secret para produção.
+
 
 # function to add environment variables to file
 def add_env_variables(content):
