@@ -64,4 +64,5 @@ class HotsiteForm(BaseModelFileForm):
         return self.cleaned_data['image_main']
 
     def save(self, commit=True):
+        self.instance.event = self.event
         return super().save(commit)
