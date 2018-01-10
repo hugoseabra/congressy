@@ -84,6 +84,7 @@
                         <li>
                             <div class="float:left" style="margin-top: 18px;">
                                <h2 style="color:#FFF;font-weight: bold;">
+                                   {% if not organization.internal %}
                                    <div class="btn-group">
                                         <button
                                             type="button"
@@ -118,7 +119,7 @@
                                             {% endif %}
                                         </ul>
                                     </div>
-                                    &ensp;
+                                    &ensp;{% endif %}
                                     {{ organization.name|truncatechars:50 }}
                                </h2>
                             </div>
