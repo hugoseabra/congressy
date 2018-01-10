@@ -138,24 +138,19 @@ class ProfileCreateForm(forms.ModelForm):
 
         return self.instance
 
+    def clean(self):
 
-def clean(self):
-    cleaned_data = super(ProfileCreateForm, self).clean()
+        cleaned_data = super(ProfileCreateForm, self).clean()
 
-    email = cleaned_data.get('email')
-    found = None
+        email = cleaned_data.get('email')
 
-    try:
-        found = User.objects.get(username=email)
-    except User.DoesNotExist:
-        pass
+        try:
+            User.objects.get(username=email)
+            raise forms.ValidationError("Esse email já existe em nosso sistema. Tente novamente.")
+        except User.DoesNotExist:
+            pass
 
-    if found:
-        raise forms.ValidationError(
-            "Esse email já existe em nosso sistema. Tente novamente."
-        )
-
-    return cleaned_data
+        return cleaned_data
 
 
 class ProfileForm(forms.ModelForm):
