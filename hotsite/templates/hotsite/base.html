@@ -129,7 +129,7 @@
                                 <li><a href="{% url 'event:profile' %}" target="_blank">Minha conta</a>
                                 </li>
                                 <li><a href="{% url 'front:start' %}" target="_blank">Gerenciar</a></li>
-                                <li><a href="{% url 'public:logout' %}" target="_blank">Sair</a></li>
+                                <li><a href="{% url 'public:logout' %}?next={% url 'public:hotsite' object.slug %}">Sair</a></li>
                             </ul>
                         </li>
                     {% else %}
@@ -320,8 +320,8 @@
                                         {% endif %}
                                     {% else %}
                                         <div class="text-center">
-                                            <p style="font-size: 30px">
-                                                Você já está cadastrada neste evento!
+                                            <p style="font-size: 20px">
+                                                Você já está cadastrado(a) neste evento!
                                             </p>
 
                                             <div style="align-items: center;display: flex;justify-content: center;">
