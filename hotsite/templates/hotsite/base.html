@@ -111,7 +111,9 @@
                     <li><a href="#hero" class="anchor-link">Capa</a></li>
                     <li><a href="#about" class="anchor-link">Sobre o evento</a>
                     </li>
+                    {% if object.place %}
                     <li><a href="#map" class="anchor-link">Local</a></li>
+                    {% endif %}
                     {% if not object.organization.internal %}
                         <li><a href="#owner" class="anchor-link">Organizador</a>
                     {% endif %}
@@ -418,6 +420,7 @@
 
     </section>
 
+    {% if object.place %}
     <!-- GOOGLE MAPS
     ================================= -->
     <section id="map" class="contact-maps-section section">
@@ -534,6 +537,7 @@
 
     </section>
 
+    {% endif %}
     <!-- REALIZADOR
     ================================= -->
     <!-- REALIZADOR
