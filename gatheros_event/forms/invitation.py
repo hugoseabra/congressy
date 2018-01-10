@@ -4,47 +4,23 @@ Formulário relacionados a Convites de Pessoas a serem membros de organizações
 """
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
 from django.shortcuts import reverse
-from django.contrib.sites.models import Site
 
 from gatheros_event.models import Invitation, Member
 from gatheros_event.models.rules import check_invite
+from mailer.services import notify_invite
 
 
 def send_invitation(invitation):
     """ Envia convite para e-mail de convidado(s) """
+
     url = reverse('public:invitation-decision', kwargs={
         'pk': invitation.pk
     })
 
-    template = """
-    
-    Olá {3},
-    
-    Eu configurei "{0}" na Congressy para nós - para que possamos 
-    gerenciar nossos eventos. 
-
-    Clique no botão abaixo para se juntar ao {0}.
-    
-    https://{4}{1}
-                    
-    Sinceramente, 
-    {2}
-            
-    """.format(invitation.author.organization.name, url,
-               invitation.author.person.name, invitation.to.first_name,
-               Site.objects.get_current().domain)
-
-    send_mail(
-        "Participe de {0}, na Congressy".format(
-            invitation.author.organization.name), template,
-        settings.DEFAULT_FROM_EMAIL,
-        [invitation.to.email]
-    )
+    notify_invite(invitation.author.organization.name, url, invitation.author.person.name, invitation.to.first_name, invitation.to.email)
 
 
 class InvitationCreateForm(forms.Form):

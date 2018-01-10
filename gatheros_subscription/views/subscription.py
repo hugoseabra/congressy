@@ -265,9 +265,8 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
     subscription_user = None
     submitted_data = None
-    template_name = \
-        'gatheros_subscription/subscription/subscription_confirmation.html'
-
+    # template_name = 'gatheros_subscription/subscription/subscription_confirmation.html'
+    template_name = 'subscription/subscription_confirmation.html'
     @classonlymethod
     def as_view(cls, user, submitted_data, **initkwargs):
 

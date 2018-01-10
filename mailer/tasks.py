@@ -23,7 +23,7 @@ def send_mail(self, subject, body, to):
     if not to:
         to = []
     elif isinstance(to, six.string_types):
-        to = list(to)
+        to = [to]
 
     try:
         body_txt = html.document_fromstring(body).text_content()

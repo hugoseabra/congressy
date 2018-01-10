@@ -11,8 +11,13 @@ from django.contrib.auth import (
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.utils import six
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 
 from gatheros_event.models import Person, Organization, Member
+from mailer.services import notify_new_user
 
 
 class ProfileCreateForm(forms.ModelForm):
@@ -101,32 +106,56 @@ class ProfileCreateForm(forms.ModelForm):
             }
         )
         reset_form.is_valid()
-        reset_form.save(
-            domain_override=domain_override,
-            subject_template_name=subject_template,
-            email_template_name=email_template,
-            request=request,
-        )
+
+        """
+        Generates a one-use only link for resetting password and sends via e-mail to the
+        user.
+        """
+
+        email = self.cleaned_data["email"]
+
+        current_site = get_current_site(request)
+        site_name = current_site.name
+        domain = current_site.domain
+
+        context = {
+            'email': email,
+            'domain': domain,
+            'site_name': site_name,
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            'token': default_token_generator.make_token(user),
+            'protocol': 'https',
+        }
+
+        notify_new_user(context)
+
+        # reset_form.save(
+        #     domain_override=domain_override,
+        #     subject_template_name=subject_template,
+        #     email_template_name=email_template,
+        #     request=request,
+        # )
+
         return self.instance
 
-    def clean(self):
 
-        cleaned_data = super(ProfileCreateForm, self).clean()
+def clean(self):
+    cleaned_data = super(ProfileCreateForm, self).clean()
 
-        email = cleaned_data.get('email')
-        found = None
+    email = cleaned_data.get('email')
+    found = None
 
-        try:
-            found = User.objects.get(username=email)
-        except User.DoesNotExist:
-            pass
+    try:
+        found = User.objects.get(username=email)
+    except User.DoesNotExist:
+        pass
 
-        if found:
-            raise forms.ValidationError(
-                "Esse email já existe em nosso sistema. Tente novamente."
-            )
+    if found:
+        raise forms.ValidationError(
+            "Esse email já existe em nosso sistema. Tente novamente."
+        )
 
-        return cleaned_data
+    return cleaned_data
 
 
 class ProfileForm(forms.ModelForm):
