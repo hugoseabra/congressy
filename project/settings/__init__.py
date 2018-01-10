@@ -227,17 +227,5 @@ MESSAGE_TAGS = {
     message_constants.ERROR: 'danger',
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
-# # Congressy -> conforme configuração na conta do SparkPost
-# EMAIL_HOST = 'smtp.sparkpostmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'SMTP_Injection'
-# EMAIL_HOST_PASSWORD = '6dacd78f4c49080da7bbe942d4f36dc95d0c110a'
-# EMAIL_USE_TLS = True
-
 DEFAULT_FROM_EMAIL = 'mail@congressy.net'
-SPARKPOST_API_KEY = '6dacd78f4c49080da7bbe942d4f36dc95d0c110a'
-
 CONGRESSY_REPLY_TO = 'congressy@congressy.com'

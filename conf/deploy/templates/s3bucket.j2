@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+S3CMD='/usr/local/bin/s3cmd'
+BUCKET_NAME={{ BUCKET_NAME }}
+
+bucket_exists() {
+    ${S3CMD} ls s3://${BUCKET_NAME} > /dev/null 2>&1
+}
+
+if ! bucket_exists; then
+    ${S3CMD} mb s3://${BUCKET_NAME}
+fi
