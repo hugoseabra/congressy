@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     # THIRD PARTY
-    'mailer',
+    'absoluteuri',
     'permission',
     'stdimage',
     'ckeditor',
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'kanu_form',
 
     # GATHEROS_APPS
+    'mailer',
     'core',
     'frontend',
     'gatheros_event',
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'hotsite',
 ]
 
+ABSOLUTEURI_PROTOCOL = 'https'
 SITE_ID = 1
 
 MIDDLEWARE_CLASSES = [

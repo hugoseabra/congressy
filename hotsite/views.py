@@ -1,22 +1,25 @@
 from datetime import datetime
 from uuid import uuid4
 
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
-from django.contrib.auth.models import User
-from django.views.generic import DetailView
-from django.urls import reverse
+import absoluteuri
 from django.contrib import messages
-from django.utils import six
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
+from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.shortcuts import get_current_site
-
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils import six
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.views.generic import DetailView
+
 from gatheros_event.models import Event, Info, Person, Member, Organization
 from gatheros_subscription.models import Lot, Subscription
-from mailer.services import notify_new_subscription, notify_new_user_and_subscription
+from mailer.services import (
+    notify_new_user_and_subscription,
+    notify_new_subscription,
+)
 
 
 class HotsiteView(DetailView):
@@ -61,7 +64,8 @@ class HotsiteView(DetailView):
         if user.is_authenticated:
             try:
                 person = Person.objects.get(email=user.email)
-                found = Subscription.objects.filter(person_id=person.pk, event_id=self.object.id)
+                found = Subscription.objects.filter(person_id=person.pk,
+                                                    event_id=self.object.id)
                 if found:
                     return True
             except ObjectDoesNotExist:
@@ -150,13 +154,15 @@ class HotsiteView(DetailView):
             if not email or not name or not phone:
 
                 if not email:
-                    messages.error(self.request, "E-mail não pode estar vazio!")
+                    messages.error(self.request,
+                                   "E-mail não pode estar vazio!")
 
                 if not name:
                     messages.error(self.request, "Nome não pode estar vazio!")
 
                 if not phone:
-                    messages.error(self.request, "Celluar não pode estar vazio!")
+                    messages.error(self.request,
+                                   "Celluar não pode estar vazio!")
 
                 context = super(HotsiteView, self).get_context_data(**kwargs)
                 context['status'] = self._get_status()
@@ -218,11 +224,12 @@ class HotsiteView(DetailView):
                 user.
                 """
                 shiny_user = True
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-                token = default_token_generator.make_token(user)
-                domain = 'http://' + str(get_current_site(self.request))
-                full_reset_url = domain + '/reset-password/confirmation/' + str(
-                    uid, 'utf-8') + "/" + str(token)
+                url = '/reset-password/confirmation/{uid}/{token}/'.format(
+                    uid=urlsafe_base64_encode(force_bytes(user.pk)),
+                    token=default_token_generator.make_token(user)
+                )
+
+                full_reset_url = absoluteuri.build_absolute_uri(url)
 
                 # Criando organização interna
                 try:
@@ -233,7 +240,8 @@ class HotsiteView(DetailView):
                         name=person.name
                     )
 
-                    for attr, value in six.iteritems(person.get_profile_data()):
+                    for attr, value in six.iteritems(
+                            person.get_profile_data()):
                         setattr(internal_org, attr, value)
 
                     internal_org.save()
@@ -256,11 +264,16 @@ class HotsiteView(DetailView):
                 subscription.save()
 
                 if shiny_user:
-                    notify_new_user_and_subscription(self.object, subscription, full_reset_url)
+                    notify_new_user_and_subscription(
+                        self.object,
+                        subscription,
+                        full_reset_url
+                    )
                 else:
                     notify_new_subscription(self.object, subscription)
 
-                messages.success(self.request, 'Inscrição realizada com sucesso!')
+                messages.success(self.request,
+                                 'Inscrição realizada com sucesso!')
 
             except ValidationError as e:
                 error_message = e.messages[0]

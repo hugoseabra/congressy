@@ -80,7 +80,7 @@ def notify_new_user_and_subscription(event, subscription, link):
     )
 
 
-def notify_invite(organization, link, invitator, invitnee,email):
+def notify_invite(organization, link, invitator, invited_person, email):
     """
     Define a notificação para um novo convite
     """
@@ -88,7 +88,7 @@ def notify_invite(organization, link, invitator, invitnee,email):
     body = render_to_string('mailer/notify_invitation.html', {
         'organizacao': organization,
         'hospedeiro': invitator,
-        'convidado': invitnee,
+        'convidado': invited_person,
         'link': link,
     })
 
