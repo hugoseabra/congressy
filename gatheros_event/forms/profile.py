@@ -26,6 +26,9 @@ class ProfileCreateForm(forms.ModelForm):
         attrs={'class': 'form-control'}
     ))
 
+    user = None
+
+
     class Meta:
         """ Meta """
         model = Person
@@ -69,15 +72,18 @@ class ProfileCreateForm(forms.ModelForm):
         super(ProfileCreateForm, self).save(commit=True)
 
         # Criando usuário
-        user = User.objects.create_user(
-            username=self.cleaned_data["email"],
-            email=self.cleaned_data["email"],
-            password=str(uuid4())
-        )
-        user.save()
+        if not self.user:
+
+            self.user = User.objects.create_user(
+                username=self.cleaned_data["email"],
+                email=self.cleaned_data["email"],
+                password=str(uuid4())
+            )
+
+            self.user.save()
 
         # Vinculando usuário ao perfil
-        self.instance.user = user
+        self.instance.user = self.user
         self.instance.save()
 
         try:
@@ -122,8 +128,8 @@ class ProfileCreateForm(forms.ModelForm):
             'email': email,
             'domain': domain,
             'site_name': site_name,
-            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            'token': default_token_generator.make_token(user),
+            'uid': urlsafe_base64_encode(force_bytes(self.user.pk)),
+            'token': default_token_generator.make_token(self.user),
             'protocol': 'https',
         }
 
@@ -145,8 +151,17 @@ class ProfileCreateForm(forms.ModelForm):
         email = cleaned_data.get('email')
 
         try:
-            User.objects.get(username=email)
-            raise forms.ValidationError("Esse email já existe em nosso sistema. Tente novamente.")
+            self.user = User.objects.get(username=email)
+
+            if self.user.last_login:
+                raise forms.ValidationError("Esse email já existe em nosso sistema. Tente novamente.")
+
+            try:
+                self.instance = self.user.person
+            except AttributeError:
+                pass
+
+
         except User.DoesNotExist:
             pass
 
