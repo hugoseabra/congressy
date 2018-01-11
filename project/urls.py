@@ -39,11 +39,11 @@ public_urlpatterns = [
     url(r'^', include(urlpatterns_public_password)),
 ]
 
-if settings.DEBUG:
-    public_urlpatterns += [url(r'^', RedirectView.as_view(
-        pattern_name='front:start',
-        permanent=False
-    ))]
+# if settings.DEBUG:
+#     public_urlpatterns 0+= [url(r'^', RedirectView.as_view(
+#         pattern_name='front:start',
+#         permanent=False
+#     ))]
 
 # API
 api_urls = [
