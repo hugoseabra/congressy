@@ -261,20 +261,22 @@ class InvitationDecisionView(TemplateView):
 
         authenticated = request.user.is_authenticated()
 
-        # Se tem perfil, precisa do login login
-        if not authenticated and hasattr(invite.to, 'person'):
-            return redirect('public:login')
-
         # Se o usuário autenticado for diferente do usuário do convite
         if authenticated and not request.user == invite.to:
-            messages.error(request, "Usuário do convite é diferente do logado")
+
+            messages.error(request, "Esse convite não é seu. ")
+
             context.update({
                 'messages': messages.get_messages(request)
             })
-            return render_to_response(
-                'invitation/invitation-decision.html',
-                context
-            )
+
+            url = reverse('public:logout') + '?next=' + reverse('public:invitation-decision', kwargs={'pk': invite.pk})
+
+            return redirect(url)
+            # return render_to_response(
+            #     'invitation/invitation-decision.html',
+            #     context
+            # )
 
         # Se não estiver logado e se o usuário convidado não tem perfil
         context.update({
@@ -322,7 +324,7 @@ class InvitationDecisionView(TemplateView):
                 # Atualização contexto de organizações
                 update_account(request=self.request, force=True)
 
-                return redirect('event:organization-panel', pk=org_id)
+                return redirect('event:event-list', pk=org_id)
             except ValidationError:
                 # Se errado direciona para a criação do perfil
                 return redirect(
@@ -416,7 +418,7 @@ class InvitationProfileView(TemplateView):
             update_account(request=self.request, force=True)
 
             return redirect(reverse(
-                'event:organization-panel',
+                'event:event-list',
                 kwargs={'pk': invite.author.organization_id}
             ))
         except ValidationError:
