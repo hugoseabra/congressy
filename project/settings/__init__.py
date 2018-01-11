@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'hotsite',
 ]
 
-ABSOLUTEURI_PROTOCOL = 'https'
 SITE_ID = 1
 
 MIDDLEWARE_CLASSES = [
