@@ -2,6 +2,8 @@
 from django.conf import settings
 from django.template.loader import render_to_string
 
+import absoluteuri
+
 if settings.DEBUG:
     from .tasks import send_mail
 else:
@@ -17,12 +19,20 @@ def notify_new_subscription(event, subscription):
         event.place,
     )
 
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
     # @TODO set event.date_start to period
     body = render_to_string('mailer/notify_subscription.html', {
         # 'gender_article': 'a' if person.gender == 'F' else 'o',
         'gender_article': 'o(a)',
         'person': person,
         'event': event,
+        'event_url': event_url,
         'period': event.date_start,
         'count': subscription.count,
         'date': subscription.created,
@@ -53,9 +63,18 @@ def notify_new_user_and_subscription(event, subscription, link):
         event.place,
     )
 
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+
     # @TODO set event.date_start to period
     body = render_to_string('mailer/notify_user_and_subscription.html', {
         'event': event,
+        'event_url': event_url,
         # 'gender_article': 'a' if person.gender == 'F' else 'o',
         'gender_article': 'o(a)',
         'person': person,
