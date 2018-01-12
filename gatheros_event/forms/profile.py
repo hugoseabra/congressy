@@ -126,7 +126,7 @@ class ProfileCreateForm(forms.ModelForm):
         url = absoluteuri.reverse(
             'password_reset_confirm',
             kwargs={
-                'uid': uid,
+                'uidb64': uid,
                 'token': token,
             }
         )

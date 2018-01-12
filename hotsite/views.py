@@ -232,7 +232,7 @@ class HotsiteView(DetailView):
                 full_reset_url = absoluteuri.reverse(
                     'password_reset_confirm',
                     kwargs={
-                        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                        'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
                         'token': default_token_generator.make_token(user)
                     }
                 )
