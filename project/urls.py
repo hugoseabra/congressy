@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
-from django.views.generic import RedirectView
 
 from gatheros_event.urls.invitation import urlpatterns_public_invitation
 from gatheros_event.urls.me import (
@@ -39,12 +38,6 @@ public_urlpatterns = [
     url(r'^', include(urlpatterns_public_password)),
 ]
 
-# if settings.DEBUG:
-#     public_urlpatterns 0+= [url(r'^', RedirectView.as_view(
-#         pattern_name='front:start',
-#         permanent=False
-#     ))]
-
 # API
 api_urls = [
     url(r'^', include('kanu_locations.urls', 'city')),
@@ -71,5 +64,5 @@ if settings.DEBUG:
     import debug_toolbar
 
     urlpatterns = [
-                      url(r'^__debug__/', include(debug_toolbar.urls)),
-                  ] + urlpatterns
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
