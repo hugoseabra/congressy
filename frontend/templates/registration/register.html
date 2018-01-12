@@ -7,7 +7,7 @@
 {# @TODO Corrigir problema com o success message, talvez um if testando o contexto por mensagem de successo #}
 
 {% block form %}
-    <p> Entre com suas credenciais para acessar sua conta.</p>
+    <p class="text-center"> Entre com suas credenciais para acessar sua conta.</p>
     <form id="createForm" action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form" onsubmit="submit_form(this); return false;">
         {% csrf_token %}
         <div class="form-group">
