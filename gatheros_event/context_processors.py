@@ -3,6 +3,7 @@ Gatheros Event template context processor
 """
 from django.core.exceptions import ObjectDoesNotExist
 
+from gatheros_event.models import Member
 from gatheros_subscription.models import Subscription
 from .helpers import account as _account_helper
 
@@ -17,8 +18,10 @@ def account(request):
     configured = _account_helper.is_configured(request)
     authenticated = request.user.is_authenticated
 
-    has_subscriptions = False
+    if not configured and not authenticated:
+        return {}
 
+    has_subscriptions = False
     try:
         person = request.user.person
         subs = Subscription.objects.filter(person=person).count()
@@ -26,9 +29,6 @@ def account(request):
 
     except (AttributeError, ObjectDoesNotExist):
         pass
-
-    if not configured and not authenticated:
-        return {}
 
     if not configured and authenticated:
         _account_helper.update_account(request)
@@ -39,10 +39,15 @@ def account(request):
             'has_subscriptions': has_subscriptions,
         }
 
+    organization = _account_helper.get_organization(request)
+    admins = organization.get_members(group=Member.ADMIN).count()
+    organization_unique_admin = admins == 1
+
     return {
         'context_type': 'member',
         'organizations': _account_helper.get_organizations(request),
-        'organization': _account_helper.get_organization(request),
+        'organization': organization,
+        'organization_unique_admin': organization_unique_admin,
         'member': _account_helper.get_member(request),
         'has_subscriptions': has_subscriptions,
     }
