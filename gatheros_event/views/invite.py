@@ -270,13 +270,18 @@ class InvitationDecisionView(TemplateView):
                 'messages': messages.get_messages(request)
             })
 
-            url = reverse('public:logout') + '?next=' + reverse('public:invitation-decision', kwargs={'pk': invite.pk})
+            url = '{}?next={}'.format(
+                reverse('public:logout'),
+                reverse('public:invitation-decision', kwargs={'pk': invite.pk})
+            )
 
             return redirect(url)
             # return render_to_response(
             #     'invitation/invitation-decision.html',
             #     context
             # )
+
+        # if not authenticated and invite.user
 
         # Se não estiver logado e se o usuário convidado não tem perfil
         context.update({
@@ -301,7 +306,6 @@ class InvitationDecisionView(TemplateView):
         """
 
         invite = get_object_or_404(Invitation, pk=kwargs.get('pk'))
-        org_id = invite.author.organization_id
         form = InvitationDecisionForm(instance=invite)
         form.is_valid()
 
@@ -322,9 +326,21 @@ class InvitationDecisionView(TemplateView):
                 form.accept()
 
                 # Atualização contexto de organizações
-                update_account(request=self.request, force=True)
+                update_account(
+                    request=self.request,
+                    organization=invite.author.organization,
+                    force=True
+                )
 
-                return redirect('event:event-list', pk=org_id)
+                messages.success(
+                    request,
+                    'Agora você está na organização "{}".'.format(
+                        invite.author.organization.name
+                    )
+                )
+
+                return redirect('event:event-list')
+
             except ValidationError:
                 # Se errado direciona para a criação do perfil
                 return redirect(
@@ -414,13 +430,33 @@ class InvitationProfileView(TemplateView):
         try:
             invite_form.accept()
 
-            # Atualização contexto de organizações
-            update_account(request=self.request, force=True)
+            if request.user.is_authenticated:
 
-            return redirect(reverse(
-                'event:event-list',
-                kwargs={'pk': invite.author.organization_id}
-            ))
+                # Atualização contexto de organizações
+                update_account(
+                    request=self.request,
+                    organization=invite.author.organization,
+                    force=True
+                )
+
+                messages.success(
+                    request,
+                    'Agora você está na organização "{}".'.format(
+                        invite.author.organization.name
+                    )
+                )
+
+                return redirect('event:event-list')
+
+            else:
+                messages.success(
+                    request,
+                    'Você aceitou o convite para a organização "{}".'
+                    ' Entre no sistema para acessá-la.".'.format(
+                        invite.author.organization.name
+                    )
+                )
+
         except ValidationError:
             raise ValidationError(
                 "Algo errado ocorreu e não foi possível aceitar o "
