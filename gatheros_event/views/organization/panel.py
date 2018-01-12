@@ -125,9 +125,7 @@ class OrganizationCancelMembershipView(AccountMixin, DetailView):
             pass
 
     def get_permission_denied_url(self):
-        return reverse('event:event-panel', kwargs={
-            'pk': self.kwargs.get('pk')
-        })
+        return reverse('event:event-list')
 
     def get_context_data(self, **kwargs):
         parent = super(OrganizationCancelMembershipView, self)
@@ -139,4 +137,13 @@ class OrganizationCancelMembershipView(AccountMixin, DetailView):
 
     def can_access(self):
         org = self.get_object()
-        return org.is_member(self.request.user)
+        is_member = org.is_member(self.request.user)
+
+        if is_member and self.organizaton_only_admin:
+            self.permission_denied_message = \
+                'Você é o único administrador da organização, portanto,' \
+                ' você não pode executar esta ação.'
+            return False
+
+        return True
+

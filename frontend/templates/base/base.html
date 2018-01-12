@@ -103,12 +103,14 @@
                                                     Editar
                                                 </a>
                                             </li>
+                                            {% if not organization_unique_admin %}
                                             <li>
                                                 <a href="{% url 'event:organization-cancel-membership' organization.pk %}">
                                                     <i class="fa fa-sign-out"></i>
                                                     Sair da organização
                                                 </a>
                                             </li>
+                                            {% endif %}
                                             {% if organization.is_deletable and user has 'gatheros_event.delete_organization' of organization %}
                                             <li>
                                                 <a href="{% url 'event:organization-delete' organization.pk %}">
@@ -181,7 +183,7 @@
                                             <span class="icon">
                                                 <i class="fa {% if org.pk == organization.pk %}fa-circle{% else %}fa-circle-thin{% endif %}"></i>
                                             </span>
-                                            <a href="#">{{ org.name|truncatechars:21 }}</a>
+                                            <a href="#">{{ org.name|truncatechars:15 }}</a>
                                         </li>
                                     {% else %}
                                         <li onclick="cgsy_submit({{ org.pk }})">
