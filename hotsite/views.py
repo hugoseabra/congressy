@@ -146,7 +146,7 @@ class HotsiteView(DetailView):
         name = self.request.POST.get('name')
         phone = self.request.POST.get('phone')
 
-        if self.object.data['subscription_type'] != 'disabled':
+        if self.object.data['subscription_type'] != Event.SUBSCRIPTION_DISABLED:
 
             shiny_user = None
             full_reset_url = ''
@@ -196,6 +196,10 @@ class HotsiteView(DetailView):
 
             try:
                 person = Person.objects.get(email=email)
+
+                if phone:
+                    person.phone = phone
+                    person.save()
 
             except Person.DoesNotExist:
 
