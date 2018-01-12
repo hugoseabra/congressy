@@ -218,18 +218,20 @@ class HotsiteView(DetailView):
                 person.user = user
                 person.save()
 
-                # Criando a senha par o email de confirmação e definição de senha
+                # Criando a senha par o email de confirmação e definição de
+                # senha
                 """
                 Generates a one-use only link for resetting password and sends to the
                 user.
                 """
                 shiny_user = True
-                url = '/reset-password/confirmation/{uid}/{token}/'.format(
-                    uid=urlsafe_base64_encode(force_bytes(user.pk)),
-                    token=default_token_generator.make_token(user)
+                full_reset_url = absoluteuri.reverse(
+                    'password_reset_confirm',
+                    kwargs={
+                        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                        'token': default_token_generator.make_token(user)
+                    }
                 )
-
-                full_reset_url = absoluteuri.build_absolute_uri(url)
 
                 # Criando organização interna
                 try:
