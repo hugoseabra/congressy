@@ -4,17 +4,17 @@ Formulário relacionados a Convites de Pessoas a serem membros de organizações
 """
 from uuid import uuid4
 
+import absoluteuri
 from django import forms
 from django.contrib.auth import (
     password_validation,
 )
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
-from django.utils import six
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.http import urlsafe_base64_encode
+from django.utils import six
 from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from gatheros_event.models import Person, Organization, Member
 from mailer.services import notify_new_user
@@ -120,17 +120,17 @@ class ProfileCreateForm(forms.ModelForm):
 
         email = self.cleaned_data["email"]
 
-        current_site = get_current_site(request)
-        site_name = current_site.name
-        domain = current_site.domain
+        url = absoluteuri.reverse(
+            'password_reset_confirm',
+            kwargs={
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': default_token_generator.make_token(user)
+            }
+        )
 
         context = {
             'email': email,
-            'domain': domain,
-            'site_name': site_name,
-            'uid': urlsafe_base64_encode(force_bytes(self.user.pk)),
-            'token': default_token_generator.make_token(self.user),
-            'protocol': 'https',
+            'url': url,
         }
 
         notify_new_user(context)

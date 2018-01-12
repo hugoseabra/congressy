@@ -1,0 +1,1 @@
+docker run -tid --name awsecr -e AWS_KEY=<aws_key> -e AWS_SECRET=<aws_secret> -e AWS_ACCOUNT_ID=<aws_accouint> -v /var/run/docker.sock:/var/run/docker.sock hugoseabra19/awsecr

@@ -111,7 +111,8 @@ def notify_new_user(context):
     Define a notificação para um usuario na plataforma.
     """
 
-    body = render_to_string('mailer/account_confirmation_email.html', context=context)
+    body = render_to_string('mailer/account_confirmation_email.html',
+                            context=context)
 
     subject = 'Confirmação de cadastro na {0}'.format(context['site_name'])
 
@@ -128,12 +129,14 @@ def notify_new_user(context):
         to=context['email'],
     )
 
+
 def notify_reset_password(context):
     """
     Define a notificação para um usuario na plataforma.
     """
 
-    body = render_to_string('mailer/password_reset_email.html', context=context)
+    body = render_to_string('mailer/password_reset_email.html',
+                            context=context)
 
     subject = 'Redefina sua senha na {0}'.format(context['site_name'])
 
