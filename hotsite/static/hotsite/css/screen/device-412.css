@@ -3,34 +3,12 @@
 @media screen
 and (device-width: 412px)
 and (device-height: 732px) {
-    .navbar-left {
-        width: 100%;
-    }
 
-    .navbar-logo {
-        width: 76%;
-    }
-
-    .navbar .top-title,
-    .navbar-default .top-title {
-        font-size: 14px;
-    }
 }
 
 /* ----------- 732 ----------- */
 @media screen
 and (device-width: 732px)
 and (device-height: 412px) {
-    .navbar-left {
-        width: 100%;
-    }
 
-    .navbar-logo {
-        width: 86%;
-    }
-
-    .navbar .top-title,
-    .navbar-default .top-title {
-        font-size: 14px;
-    }
 }

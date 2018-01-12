@@ -80,7 +80,7 @@ def notify_new_user_and_subscription(event, subscription, link):
     )
 
 
-def notify_invite(organization, link, invitator, invitnee,email):
+def notify_invite(organization, link, invitator, invited_person, email):
     """
     Define a notificação para um novo convite
     """
@@ -88,7 +88,7 @@ def notify_invite(organization, link, invitator, invitnee,email):
     body = render_to_string('mailer/notify_invitation.html', {
         'organizacao': organization,
         'hospedeiro': invitator,
-        'convidado': invitnee,
+        'convidado': invited_person,
         'link': link,
     })
 
@@ -111,7 +111,8 @@ def notify_new_user(context):
     Define a notificação para um usuario na plataforma.
     """
 
-    body = render_to_string('mailer/account_confirmation_email.html', context=context)
+    body = render_to_string('mailer/account_confirmation_email.html',
+                            context=context)
 
     subject = 'Confirmação de cadastro na {0}'.format(context['site_name'])
 
@@ -128,12 +129,14 @@ def notify_new_user(context):
         to=context['email'],
     )
 
+
 def notify_reset_password(context):
     """
     Define a notificação para um usuario na plataforma.
     """
 
-    body = render_to_string('mailer/password_reset_email.html', context=context)
+    body = render_to_string('mailer/password_reset_email.html',
+                            context=context)
 
     subject = 'Redefina sua senha na {0}'.format(context['site_name'])
 

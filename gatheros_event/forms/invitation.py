@@ -2,11 +2,10 @@
 """
 Formulário relacionados a Convites de Pessoas a serem membros de organizações
 """
-
+import absoluteuri
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.shortcuts import reverse
 
 from gatheros_event.models import Invitation, Member
 from gatheros_event.models.rules import check_invite
@@ -16,11 +15,17 @@ from mailer.services import notify_invite
 def send_invitation(invitation):
     """ Envia convite para e-mail de convidado(s) """
 
-    url = reverse('public:invitation-decision', kwargs={
+    url = absoluteuri.reverse('public:invitation-decision', kwargs={
         'pk': invitation.pk
     })
 
-    notify_invite(invitation.author.organization.name, url, invitation.author.person.name, invitation.to.first_name, invitation.to.email)
+    notify_invite(
+        invitation.author.organization.name,
+        url,
+        invitation.author.person.name,
+        invitation.to.first_name,
+        invitation.to.email
+    )
 
 
 class InvitationCreateForm(forms.Form):
@@ -31,7 +36,7 @@ class InvitationCreateForm(forms.Form):
     user = None
     _invites = None
 
-    def __init__(self,  user, data=None, *args, **kwargs):
+    def __init__(self, user, data=None, *args, **kwargs):
         super(InvitationCreateForm, self).__init__(data=data, *args, **kwargs)
 
         self.user = user

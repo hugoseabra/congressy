@@ -4,17 +4,17 @@ Formulário relacionados a Convites de Pessoas a serem membros de organizações
 """
 from uuid import uuid4
 
+import absoluteuri
 from django import forms
 from django.contrib.auth import (
     password_validation,
 )
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
-from django.utils import six
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.http import urlsafe_base64_encode
+from django.utils import six
 from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from gatheros_event.models import Person, Organization, Member
 from mailer.services import notify_new_user
@@ -25,6 +25,9 @@ class ProfileCreateForm(forms.ModelForm):
     email = forms.EmailField(label='E-mail', widget=forms.EmailInput(
         attrs={'class': 'form-control'}
     ))
+
+    user = None
+
 
     class Meta:
         """ Meta """
@@ -69,15 +72,18 @@ class ProfileCreateForm(forms.ModelForm):
         super(ProfileCreateForm, self).save(commit=True)
 
         # Criando usuário
-        user = User.objects.create_user(
-            username=self.cleaned_data["email"],
-            email=self.cleaned_data["email"],
-            password=str(uuid4())
-        )
-        user.save()
+        if not self.user:
+
+            self.user = User.objects.create_user(
+                username=self.cleaned_data["email"],
+                email=self.cleaned_data["email"],
+                password=str(uuid4())
+            )
+
+            self.user.save()
 
         # Vinculando usuário ao perfil
-        self.instance.user = user
+        self.instance.user = self.user
         self.instance.save()
 
         try:
@@ -114,17 +120,17 @@ class ProfileCreateForm(forms.ModelForm):
 
         email = self.cleaned_data["email"]
 
-        current_site = get_current_site(request)
-        site_name = current_site.name
-        domain = current_site.domain
+        url = absoluteuri.reverse(
+            'password_reset_confirm',
+            kwargs={
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': default_token_generator.make_token(user)
+            }
+        )
 
         context = {
             'email': email,
-            'domain': domain,
-            'site_name': site_name,
-            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            'token': default_token_generator.make_token(user),
-            'protocol': 'https',
+            'url': url,
         }
 
         notify_new_user(context)
@@ -145,8 +151,17 @@ class ProfileCreateForm(forms.ModelForm):
         email = cleaned_data.get('email')
 
         try:
-            User.objects.get(username=email)
-            raise forms.ValidationError("Esse email já existe em nosso sistema. Tente novamente.")
+            self.user = User.objects.get(username=email)
+
+            if self.user.last_login:
+                raise forms.ValidationError("Esse email já existe em nosso sistema. Tente novamente.")
+
+            try:
+                self.instance = self.user.person
+            except AttributeError:
+                pass
+
+
         except User.DoesNotExist:
             pass
 

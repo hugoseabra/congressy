@@ -54,8 +54,8 @@ COPY ./conf/deploy/pip.conf /root/.pip/.
 
 # -----------------------------------------------------------------------------
 # Nginx
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-COPY ./conf/deploy/nginx.conf /etc/nginx/sites-available/default
+COPY ./conf/deploy/nginx.conf /etc/nginx/nginx.conf
+COPY ./conf/deploy/nginx-cgsy.conf /etc/nginx/sites-available/default
 
 # -----------------------------------------------------------------------------
 # Supervisor

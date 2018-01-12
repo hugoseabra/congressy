@@ -10,6 +10,15 @@
     convidado(a).
 {% endblock %}
 
+{% block scripts %}
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $('#id_phone').mask("(99) 99999-9999");
+        });
+    </script>
+{% endblock %}
+
 {% block sidebar %}{% endblock %}
 
 {% block content %}

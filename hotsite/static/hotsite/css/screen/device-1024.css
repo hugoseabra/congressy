@@ -3,16 +3,12 @@
 @media screen
 and (device-width: 1024px)
 and (device-height: 1366px) {
-    .navbar-left {
-        width: 72%;
-    }
+
 }
 
 /* ----------- 1366 ----------- */
 @media screen
 and (device-width: 1366px)
 and (device-height: 1024px) {
-    .navbar-left {
-        width: 79%;
-    }
+
 }

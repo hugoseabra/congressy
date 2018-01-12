@@ -3,17 +3,27 @@ set -ex
 
 export DJANGO_SETTINGS_MODULE=project.settings.prod
 
-export BASE_DIR=`python -c "
+BASE_DIR=`python -c "
 import $DJANGO_SETTINGS_MODULE as settings
 print(settings.BASE_DIR)"`
 
-export DBHOST=`python -c "
+DBUSER=`python -c "
+import $DJANGO_SETTINGS_MODULE as settings
+print (settings.DATABASES['default']['USER'])
+"`
+
+DBHOST=`python -c "
 import $DJANGO_SETTINGS_MODULE as settings
 print (settings.DATABASES['default']['HOST'])
 "`
 
+DBPORT=`python -c "
+import $DJANGO_SETTINGS_MODULE as settings
+print (settings.DATABASES['default']['PORT'])
+"`
+
 run_psql() {
-    psql -h $DBHOST -U postgres -c "$@"
+    psql -h $DBHOST -p $DBPORT -U $DBUSER -c "$@"
 }
 
 python -c "
@@ -21,7 +31,7 @@ import $DJANGO_SETTINGS_MODULE as settings
 print(settings.DATABASES['default'])
 "
 
-export DBNAME=`python -c "
+DBNAME=`python -c "
 import $DJANGO_SETTINGS_MODULE as settings
 try:
     print (settings.DATABASES['default']['NAME'])
@@ -29,7 +39,7 @@ except:
     print(settings.DATABASES['default']['TEST']['NAME'])
 "`
 
-export DBUSER=`python -c "
+DBUSER=`python -c "
 import $DJANGO_SETTINGS_MODULE as settings
 print (settings.DATABASES['default']['USER'])
 "`
