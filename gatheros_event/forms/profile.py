@@ -12,6 +12,7 @@ from django.contrib.auth import (
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
 from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -119,18 +120,21 @@ class ProfileCreateForm(forms.ModelForm):
         """
 
         email = self.cleaned_data["email"]
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        token = default_token_generator.make_token(self.user)
 
         url = absoluteuri.reverse(
             'password_reset_confirm',
             kwargs={
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user)
+                'uidb64': uid,
+                'token': token,
             }
         )
 
         context = {
             'email': email,
             'url': url,
+            'site_name': get_current_site(request)
         }
 
         notify_new_user(context)
@@ -160,7 +164,6 @@ class ProfileCreateForm(forms.ModelForm):
                 self.instance = self.user.person
             except AttributeError:
                 pass
-
 
         except User.DoesNotExist:
             pass

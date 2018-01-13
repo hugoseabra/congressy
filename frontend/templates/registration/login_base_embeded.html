@@ -1,0 +1,103 @@
+                                                                                                        {% load static %}
+{% load base_tags %}
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>
+<!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}Congressy{% endblock %}</title>
+    <meta name="description" content="">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <!-- Bootstrap core CSS -->
+
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
+    <!-- Fonts  -->
+    <link rel="stylesheet" href="{% static "assets/css/font-awesome.min.css" %}">
+    <link rel="stylesheet" href="{% static "assets/css/simple-line-icons.css" %}">
+    <!-- CSS Animate -->
+    <link rel="stylesheet" href="{% static "assets/css/animate.css" %}">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static "assets/css/main.css" %}"/>
+
+    <!-- Feature detection -->
+    <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
+
+    <style>
+
+
+    </style>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="{% static "assets/js/vendor/html5shiv.js"%}"></script>
+        <script src="{% static "assets/js/vendor/respond.min.js"%}"></script>
+    <![endif]-->
+</head>
+
+<body class="theme-cgsy-full cgsy-login-embeded">
+<section id="main-wrapper">
+    <section class="container animated fadeInDown">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            {% block login_block_title %}{% endblock %}
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        {% block messages %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissable">
+                                        <button type="button" class="close"
+                                                data-dismiss="alert" aria-hidden="true">×
+                                        </button>
+                                        {{ message|capfirst }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endblock messages %}
+
+                        {% if form.non_field_errors %}
+                            {% for error in form.non_field_errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% block form %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+
+{% block global_js %}
+    <!--Global JS-->
+    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+    <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
+    <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+    <script src="{% static "assets/js/src/app.js" %}"></script>
+    <script src="{% static "assets/js/cgsy.js" %}"></script>
+{% endblock %}
+
+</body>
+</html>

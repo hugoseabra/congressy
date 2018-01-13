@@ -40,7 +40,7 @@ function submit_form(form) {
         loader.insertAfter(button);
         button.fadeOut('fast', function() {
             loader.fadeIn(function() {
-                form.submit();
+                window.setTimeout(function() { form.submit(); } , 500);
             });
         });
     }

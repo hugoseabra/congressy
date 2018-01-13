@@ -1,4 +1,4 @@
-{% extends 'registration/login_base.html' %}
+{% extends is_embeded|yesno:"registration/login_base_embeded.html,registration/login_base.html" %}
 {% load static %}
 
 {% block title %}Nova conta | Congressy{% endblock %}
@@ -59,15 +59,16 @@
             </div>
         </div>
         <div class="form-group" style="margin-bottom: 0">
-            <div class="col-md-12 secondary-links">
-                <div class="help-block float-left">
-                    <span class="info">Já possui conta?</span>
-                    <a style="font-weight: bold;"
-                       href="{% url 'public:login' %}">
-                        Entrar
-                    </a>
+            <div class="form-group" style="margin-bottom: 0">
+                <div class="col-md-12 secondary-links">
+                    <div class="help-block">
+                        <span class="info">Já possui conta?</span>
+                        <a style="font-weight: bold;"
+                           href="{% url 'public:login' %}{% if is_embeded %}?embeded=1{% endif %}">
+                            Entrar
+                        </a>
+                    </div>
                 </div>
-                <div class="clearfix"></div>
             </div>
         </div>
     </form>

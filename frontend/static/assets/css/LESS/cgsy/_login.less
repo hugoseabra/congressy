@@ -1,27 +1,5 @@
 // @TODO Colocar o bloco de login no centro de acordo com a resolução
-// @TODO Logo está diminuída, dando aparência de cerrilhada.
-.cgsy-login {
-  color: #565656;
-  background: @cgsyDarkBlue;
-  font-family: @fontStack;
-  font-size: 100%;
-  padding: 0;
-  margin: 0;
-  min-height: 100%;
-  position: relative;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-
-  .login-header {
-    text-align: center;
-
-    .logo {
-      margin-bottom: 30px;
-      margin-top: 50px;
-      width: 210px;
-    }
-  }
-
+.cgsy-login, .cgsy-login-embeded {
   .form-group {
     .form-control.with-icon {
       padding-left: 32px;
@@ -52,23 +30,49 @@
       }
     }
   }
+  .main_logo {
+    margin-bottom: 30px;
+    margin-top: 50px;
+    width: 210px;
+    height: 105.27px;
+    .main_logo_icon {
+      fill: @cgsyLightBlue;
+    }
+
+    .main_logo_text {
+
+      fill: white;
+    }
+  }
 }
 
-.main_logo {
-  margin-bottom: 30px;
-  margin-top: 50px;
-  width: 210px;
-  height: 105.27px;
-  .main_logo_icon {
-    fill: @cgsyLightBlue;
+.cgsy-login {
+  color: #565656;
+  background: @cgsyDarkBlue;
+  font-family: @fontStack;
+  font-size: 100%;
+  padding: 0;
+  margin: 0;
+  min-height: 100%;
+  position: relative;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
+  .login-header {
+    text-align: center;
+
+    .logo {
+      margin-bottom: 30px;
+      margin-top: 50px;
+      width: 210px;
+    }
   }
 
-  .main_logo_text {
-
-    fill: white;
+  //============================== FOOTER ===================================//
+  .cgsy-version {
+    position: relative;
+    top: -17px;
+    font-size: @12px;
+    margin-right: 8px;
   }
-
 }
-
-
-

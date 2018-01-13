@@ -4,7 +4,7 @@
     Prezad{{ gender_article }} Participante:&nbsp; <strong>{{ person.name }}</strong>
 </p>
 <p style="text-align: justify;">
-    Agradecemos por fazer sua inscrição. Será uma honra
+    Agradecemos por fazer sua inscrição no evento .Será uma honra
     recebê-l{{ gender_article }} será muito bem vindo em nosso evento.
 </p>
 <hr />
@@ -20,6 +20,13 @@
 {#        <strong>Número da inscrição:</strong> {{ count|intcomma }}#}
         <br/>
         <strong>Registrado em:</strong> {{ date|date:"DATETIME_FORMAT" }}
+    </div>
+</p>
+<hr />
+<p style="text-align: justify;">
+    <h2>Dados do Evento</h2>
+    <div style="margin-left:10px">
+        <strong>Link para acessar o evento: </strong> <a href="{{ event_url }}">{{ event.name }}</a>
     </div>
 </p>
 <hr />
