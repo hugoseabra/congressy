@@ -32,3 +32,10 @@ class Start(LoginRequiredMixin, TemplateView):
 class Login(auth_views.LoginView):
     template_name = 'registration/login.html'
     redirect_authenticated_user = True
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['is_embeded'] = self.request.GET.get('embeded') == '1'
+        return ctx
+
+
