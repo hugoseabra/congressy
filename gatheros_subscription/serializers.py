@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from gatheros_event.models import Person
-from gatheros_subscription.models import Answer, Subscription
+from gatheros_subscription.models import Subscription
 
 
 class SerializerDinamicField(serializers.Field):
@@ -12,12 +12,12 @@ class SerializerDinamicField(serializers.Field):
         super(SerializerDinamicField, self).__init__(**kwargs)
 
     def to_representation(self, instance):
-        try:
-            answer = instance.answers.get(field=self.dinamic_field)
-            return answer.value.get('output')
-
-        except Answer.DoesNotExist:
-            return None
+        # try:
+        #     answer = instance.answers.get(field=self.dinamic_field)
+        #     return answer.value.get('output')
+        #
+        # except Answer.DoesNotExist:
+        return None
 
     def to_internal_value(self, data):
         pass

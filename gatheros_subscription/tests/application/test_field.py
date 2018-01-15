@@ -1,1 +1,0 @@
-# test_se_existe_resposta_apenas_desativa_ao_tentar_deletar
