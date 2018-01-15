@@ -53,7 +53,7 @@ class AccountMixin(LoginRequiredMixin, View):
             return True
 
         admins = self.organization.get_members(group=Member.ADMIN).count()
-        return admins > 0
+        return admins == 1
 
     @property
     def member(self):
