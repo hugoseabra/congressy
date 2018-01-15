@@ -228,10 +228,10 @@
                             {% for item in object_list %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">
+{#                                        <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">#}
                                             {{ item.person.name }}
-                                        </a>
-                                         <div class="text-muted">{{ item.created }}</div>
+{#                                        </a>#}
+{#                                        <div class="text-muted">{{ item.created }}</div>#}
                                     </td>
                                     <td>
                                         {{ item.code }}
@@ -250,10 +250,10 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                                 <li>
-                                                    <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">
-                                                        <i class="fa fa-pencil"></i>
-                                                        Editar
-                                                    </a>
+{#                                                    <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">#}
+{#                                                        <i class="fa fa-pencil"></i>#}
+{#                                                        Editar#}
+{#                                                    </a>#}
                                                 </li>
                                                 <li>
                                                     <a href="{% url 'subscription:subscription-delete' event.pk item.pk %}">

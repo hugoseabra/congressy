@@ -50,13 +50,26 @@
 {% block scripts %}
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script type="application/javascript">
+        function resize_status_block() {
+            if (window.innerWidth > 992) {
+                var block_profile_height = $('#block-profile').height();
+                var block_form_main_height = $('#block-form-main').height();
+
+                if (block_profile_height < block_form_main_height) {
+                    $('#block-profile').height(block_form_main_height);
+                } else {
+                    $('#block-form-main').height(block_profile_height);
+                }
+            }
+        }
 
         $(document).ready(function () {
             $('#id_phone').mask("(99) 99999-9999");
-            {#$('.phone_with_ddd').mask('(00) 0000-0000');#}
-            {#$('.phone').mask('0000-0000');#}
-            {#$('.phone_us').mask('(000) 000-0000')#}
+
+            $(window).resize(resize_status_block);
+            resize_status_block();
         });
+
 
     </script>
 {% endblock %}
@@ -66,6 +79,35 @@
     <form action="" method="post">
 
         {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger alert-dismissable">
+                <button type="button"
+                        class="close"
+                        data-dismiss="alert"
+                        aria-hidden="true">
+                    ×
+                </button>
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% for error in hidden_field.errors %}
+                    <div class="alert alert-danger alert-dismissable">
+                        <button type="button"
+                                class="close"
+                                data-dismiss="alert"
+                                aria-hidden="true">
+                            ×
+                        </button>
+                        (Hidden field {{ hidden_field.name }}) {{ error }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
 
         <div class="row">
             <div class="col-md-12">
@@ -87,67 +129,832 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-primary">
+            <div class="col-lg-3 col-md-3" style="margin-bottom: 4px;">
+                <div class="panel panel-primary" id="block-profile">
+                    <div class="panel-body profile-block">
+                        <div class="col-md-12 col-xs-4">
+                            <img src="{% static 'assets/img/user_undefined.jpg' %}" class="img-responsive">
+                        </div>
+                        <div class="col-md-12 col-xs-8">
+                            {% if object %}
+                            <div class="profile-info">
+                                <div class="profile-info-label">Criado em:</div>
+                                <div class="profile-info-value">12/06/2017 15h35</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-9">
+                <div class="panel panel-primary" id="block-form-main">
                     <div class="panel-heading">
                         <h3 class="panel-title">Campos principais</h3>
                     </div>
                     <div class="panel-body">
-
-                        {% for field in hidden_fields %}
-                            {{ field }}
-                        {% endfor %}
-                        {% for item in default_fields %}
-                            <div class="form-group">
-
-
-                                <label for="
-{{ item.form_field.id_for_label }}">
-                                     {{ item.form_field.label }}
-                                    {% if item.form_field.field.required %}
-                                        <small style="color:#C9302C">*
-                                        </small>
-                                    {% endif %}
-                                </label>
-
-
-                                <div>
-
-                                    {% if item.form_field.field.widget.input_type == "checkbox" %}
-                                        {{ item.form_field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
-
-                                    {% elif item.form_field.id_for_label == "id_phone" %}
-                                        {{ item.form_field |add_class:"form-control" |attr:"type:tel"|attr:"placeholder:(99) 99999-9999" }}
-                                    {% else %}
-                                        {{ item.form_field |add_class:"form-control" }}
-                                    {% endif %}
-
-                                    {% if item.form_field.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="alert alert-danger
-                                            alert-dismissable">
-                                                <button type="button"
-                                                        class="close"
-                                                        data-dismiss="alert"
-                                                        aria-hidden="true">×
-                                                </button>
-                                                {{ error }}
+                        <pre>Quando CPF obrigatório</pre>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="id_{{ form.cpf.name }}">
+                                        {{ form.cpf.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.cpf|add_class:"form-control"|attr:"required:required" }}
+                                        {% if form.cpf.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.cpf.help_text|safe }}</small>
                                             </div>
-                                        {% endfor %}
-                                    {% endif %}
-
-                                    {% if item.form_field.help_text %}
-                                        <div>
-                                            <small class="text-muted">{{ item.form_field.help_text|safe }}</small>
-                                        </div>
-                                    {% endif %}
-
+                                        {% endif %}
+                                        {% if form.cpf.errors %}
+                                            {% for error in form.cpf.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
                                 </div>
-
                             </div>
-                        {% endfor %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="id_{{ form.name.name }}">
+                                        {{ form.name.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.name|add_class:"form-control" }}
+                                        {% if form.name.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.name.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.name.errors %}
+                                            {% for error in form.name.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_{{ form.birth_date.name }}">
+                                        {{ form.birth_date.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.birth_date|add_class:"form-control" }}
+                                        {% if form.birth_date.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.birth_date.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.birth_date.errors %}
+                                            {% for error in form.birth_date.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_{{ form.gender.name }}">
+                                        {{ form.gender.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.gender|add_class:"form-control" }}
+                                        {% if form.gender.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.gender.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.gender.errors %}
+                                            {% for error in form.gender.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="id_{{ form.email.name }}">
+                                        {{ form.email.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.email|add_class:"form-control"|attr:"type:email" }}
+                                        {% if form.email.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.email.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.email.errors %}
+                                            {% for error in form.email.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_{{ form.phone.name }}">
+                                        {{ form.phone.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.phone|add_class:"form-control" }}
+                                        {% if form.phone.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.phone.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.gender.errors %}
+                                            {% for error in form.name.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="id_{{ form.city.name }}">
+                                        {{ form.city.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.city|add_class:"form-control" }}
+                                        {% if form.city.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.city.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.city.errors %}
+                                            {% for error in form.city.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <pre>Quando sem CPF</pre>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="id_{{ form.name.name }}">
+                                        {{ form.name.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.name|add_class:"form-control" }}
+                                        {% if form.name.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.name.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.name.errors %}
+                                            {% for error in form.name.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_{{ form.birth_date.name }}">
+                                        {{ form.birth_date.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.birth_date|add_class:"form-control" }}
+                                        {% if form.birth_date.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.birth_date.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.birth_date.errors %}
+                                            {% for error in form.birth_date.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_{{ form.gender.name }}">
+                                        {{ form.gender.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.gender|add_class:"form-control" }}
+                                        {% if form.gender.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.gender.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.gender.errors %}
+                                            {% for error in form.gender.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="id_{{ form.email.name }}">
+                                        {{ form.email.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.email|add_class:"form-control"|attr:"type:email" }}
+                                        {% if form.email.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.email.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.email.errors %}
+                                            {% for error in form.email.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_{{ form.phone.name }}">
+                                        {{ form.phone.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.phone|add_class:"form-control" }}
+                                        {% if form.phone.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.phone.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.gender.errors %}
+                                            {% for error in form.name.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="id_{{ form.city.name }}">
+                                        {{ form.city.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.city|add_class:"form-control" }}
+                                        {% if form.city.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.city.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.city.errors %}
+                                            {% for error in form.city.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <pre>Quando CPF não-obrigatório</pre>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="id_{{ form.name.name }}">
+                                        {{ form.name.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.name|add_class:"form-control" }}
+                                        {% if form.name.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.name.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.name.errors %}
+                                            {% for error in form.name.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_{{ form.cpf.name }}">
+                                        {{ form.cpf.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.cpf|add_class:"form-control" }}
+                                        {% if form.cpf.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.cpf.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.cpf.errors %}
+                                            {% for error in form.name.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_{{ form.birth_date.name }}">
+                                        {{ form.birth_date.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.birth_date|add_class:"form-control" }}
+                                        {% if form.birth_date.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.birth_date.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.birth_date.errors %}
+                                            {% for error in form.birth_date.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_{{ form.gender.name }}">
+                                        {{ form.gender.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.gender|add_class:"form-control" }}
+                                        {% if form.gender.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.gender.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.gender.errors %}
+                                            {% for error in form.gender.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="id_{{ form.email.name }}">
+                                        {{ form.email.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.email|add_class:"form-control"|attr:"type:email" }}
+                                        {% if form.email.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.email.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.email.errors %}
+                                            {% for error in form.email.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_{{ form.phone.name }}">
+                                        {{ form.phone.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.phone|add_class:"form-control" }}
+                                        {% if form.phone.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.phone.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.gender.errors %}
+                                            {% for error in form.name.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="id_{{ form.city.name }}">
+                                        {{ form.city.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.city|add_class:"form-control" }}
+                                        {% if form.city.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.city.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.city.errors %}
+                                            {% for error in form.city.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Endereço</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="id_{{ form.zip_code.name }}">
+                                        {{ form.zip_code.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.zip_code|add_class:"form-control"|attr:"required:required" }}
+                                        {% if form.zip_code.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.zip_code.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.zip_code.errors %}
+                                            {% for error in form.zip_code.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="id_{{ form.street.name }}">
+                                        {{ form.street.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.street|add_class:"form-control"|attr:"required:required" }}
+                                        {% if form.street.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.street.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.street.errors %}
+                                            {% for error in form.street.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="id_{{ form.number.name }}">
+                                        {{ form.number.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.number|add_class:"form-control"|attr:"required:required" }}
+                                        {% if form.number.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.number.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.number.errors %}
+                                            {% for error in form.number.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label for="id_{{ form.complement.name }}">
+                                        {{ form.complement.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.complement|add_class:"form-control" }}
+                                        {% if form.street.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.complement.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.complement.errors %}
+                                            {% for error in form.complement.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_{{ form.village.name }}">
+                                        {{ form.village.label_tag }}
+                                        <small style="color:#C9302C">*</small>
+                                    </label>
+                                    <div>
+                                        {{ form.village|add_class:"form-control"|attr:"required:required" }}
+                                        {% if form.village.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.village.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.village.errors %}
+                                            {% for error in form.village.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_{{ form.city.name }}">
+                                        {{ form.city.label_tag }}
+                                    </label>
+                                    <div>
+                                        {{ form.city|add_class:"form-control" }}
+                                        {% if form.city.help_text %}
+                                            <div>
+                                                <small class="text-muted">{{ form.city.help_text|safe }}</small>
+                                            </div>
+                                        {% endif %}
+                                        {% if form.city.errors %}
+                                            {% for error in form.city.errors %}
+                                                <div class="alert alert-danger alert-dismissable">
+                                                    <button type="button"
+                                                            class="close"
+                                                            data-dismiss="alert"
+                                                            aria-hidden="true">
+                                                        ×
+                                                    </button>
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Pagamento</h3>
+                    </div>
+                    <div class="panel-body">
+                        asdf
                     </div>
                 </div>
             </div>

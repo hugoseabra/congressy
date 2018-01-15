@@ -84,18 +84,28 @@
     }
   }
 
+  //============================= PROFILE ===================================//
+
+  .profile-block {
+    padding: 10px 0;
+
+    .profile-info {
+      padding: 10px 5px;
+
+      .profile-info-label {
+        font-size: @12px;
+        font-weight: bold;
+      }
+      .profile-info-value {
+        font-size: @14px;
+      }
+    }
+  }
+
   //============================= FILTERS ===================================//
   .filter-box {
     display: none;
   }
-
-  //============================ FORM / FIELDS ==============================//
-  .checkbox label, .radio label {
-    padding-left: 6px;
-    position: relative;
-    top: 2px;
-  }
-
   //============================= BUTTONS ===================================//
   .buttonbar {
     //box-shadow: 1px 0 5px #c1b7b7;
@@ -281,6 +291,12 @@
         height: 40px;
       }
     }
+  }
+
+  .checkbox label, .radio label {
+    padding-left: 6px;
+    position: relative;
+    top: 2px;
   }
 
   //============================== LOGO =====================================//

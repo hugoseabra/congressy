@@ -3403,14 +3403,21 @@ label.valid {
   font-size: 0.875em;
   margin-bottom: 0;
 }
+.theme-cgsy-full .profile-block {
+  padding: 10px 0;
+}
+.theme-cgsy-full .profile-block .profile-info {
+  padding: 10px 5px;
+}
+.theme-cgsy-full .profile-block .profile-info .profile-info-label {
+  font-size: 0.75em;
+  font-weight: bold;
+}
+.theme-cgsy-full .profile-block .profile-info .profile-info-value {
+  font-size: 0.875em;
+}
 .theme-cgsy-full .filter-box {
   display: none;
-}
-.theme-cgsy-full .checkbox label,
-.theme-cgsy-full .radio label {
-  padding-left: 6px;
-  position: relative;
-  top: 2px;
 }
 .theme-cgsy-full .buttonbar {
   padding: 0 0 10px 0;
@@ -3633,6 +3640,12 @@ label.valid {
 }
 .theme-cgsy-full .loader-block .img-block img {
   height: 40px;
+}
+.theme-cgsy-full .checkbox label,
+.theme-cgsy-full .radio label {
+  padding-left: 6px;
+  position: relative;
+  top: 2px;
 }
 .theme-cgsy-full .base_logo {
   padding-top: 10px;
