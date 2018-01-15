@@ -1,13 +1,15 @@
 """ Mailer service. """
+import absoluteuri
 from django.conf import settings
 from django.template.loader import render_to_string
-
-import absoluteuri
 
 if settings.DEBUG:
     from .tasks import send_mail
 else:
-    from .worker import send_mail
+    try:
+        from .worker import send_mail
+    except ImportError:
+        from .tasks import send_mail
 
 
 def notify_new_subscription(event, subscription):
@@ -69,7 +71,6 @@ def notify_new_user_and_subscription(event, subscription, link):
             'slug': event.slug,
         }
     )
-
 
     # @TODO set event.date_start to period
     body = render_to_string('mailer/notify_user_and_subscription.html', {
