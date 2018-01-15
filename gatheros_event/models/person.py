@@ -40,8 +40,9 @@ class Person(models.Model, GatherosModelMixin):
         max_length=1,
         choices=GENDER_CHOICES,
         verbose_name='sexo',
-        blank=True,
-        null=True,
+        blank=False,
+        null=False,
+        default=GENDER_MALE
     )
     email = models.EmailField(
         verbose_name='email'
@@ -63,7 +64,8 @@ class Person(models.Model, GatherosModelMixin):
         max_length=255,
         blank=True,
         null=True,
-        verbose_name='endereço'
+        verbose_name='logradouro',
+        help_text="Rua / Avenida / Viela / etc."
     )
     number = models.CharField(
         max_length=20,
