@@ -24,7 +24,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
     'django.contrib.humanize',
+
+    # Django added apps
     'django.contrib.sites',
+    'django.forms',
 
     # THIRD PARTY
     'absoluteuri',
@@ -41,14 +44,17 @@ INSTALLED_APPS = [
     'kanu_form',
 
     # GATHEROS_APPS
-    'mailer',
-    'core',
     'frontend',
     'gatheros_event',
     'gatheros_subscription',
     'gatheros_front',
+    'mailer',
+    'core',
     'hotsite',
 ]
+
+# Added to allow overriding django forms templates.
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 SITE_ID = 1
 
@@ -81,10 +87,10 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'gatheros_event/templates/'),
-            os.path.join(BASE_DIR, 'frontend/templates/'),
-            os.path.join(BASE_DIR, 'hotsite/templates'),
-            os.path.join(BASE_DIR, 'mailer/templates'),
+            os.path.join(BASE_DIR, 'frontend', 'templates'),
+            os.path.join(BASE_DIR, 'gatheros_event', 'templates'),
+            os.path.join(BASE_DIR, 'hotsite', 'templates'),
+            os.path.join(BASE_DIR, 'mailer', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

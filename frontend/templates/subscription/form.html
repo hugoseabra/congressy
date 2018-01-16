@@ -36,12 +36,18 @@
         </li>
     </ul>
 
-    <h5 class="sidebar-header">Página do evento</h5>
+    <h5 class="sidebar-header">Configurações</h5>
     <ul class="nav nav-pills nav-stacked">
         <li>
             <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Configurar pagina">
-                <i class="fa  fa-fw fa-rocket"></i> Configurar pagina
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
     </ul>
