@@ -3388,6 +3388,30 @@ label.valid {
 .theme-cgsy-full .main-content-wrapper {
   padding-bottom: 65px !important;
 }
+.theme-cgsy-full .well.well-info {
+  background-color: #238acc;
+  color: #fff;
+}
+.theme-cgsy-full .well.well-warning {
+  background-color: #eea237;
+  color: #fff;
+}
+.theme-cgsy-full .well.well-success {
+  background-color: #4caf4c;
+  color: #fff;
+}
+.theme-cgsy-full .well.well-primary {
+  background-color: #5f779d;
+  color: #fff;
+}
+.theme-cgsy-full .well.well-danger {
+  background-color: #d43e3b;
+  color: #fff;
+}
+.theme-cgsy-full .well.well-default {
+  background-color: #9ea7ac;
+  color: #fff;
+}
 .theme-cgsy-full .pageheader h1 {
   font-weight: bold;
   color: #556B8D;
