@@ -11,6 +11,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+X_FRAME_OPTIONS = 'ALLOWALL'
+XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
+
 INSTALLED_APPS = [
     # DJANGO_APPS
     'django.contrib.admin',
