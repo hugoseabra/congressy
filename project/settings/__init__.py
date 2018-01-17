@@ -36,12 +36,12 @@ INSTALLED_APPS = [
     'ckeditor',
     'datetimewidget',
     'widget_tweaks',
+    'django_user_agents',
     'rest_framework',
     'rest_framework.authtoken',
 
     # KANU_APPS
     'kanu_locations',
-    'kanu_form',
 
     # GATHEROS_APPS
     'frontend',
@@ -67,6 +67,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_user_agents.middleware.UserAgentMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -128,6 +129,11 @@ AUTH_PASSWORD_VALIDATORS = [
                 'UserAttributeSimilarityValidator',
     },
 ]
+
+# Name of cache backend to cache user agents. If it not specified default
+# cache alias will be used. Set to `None` to disable caching.
+# Uncomment this when cache is configured
+# USER_AGENTS_CACHE = 'default'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

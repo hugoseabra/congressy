@@ -51,64 +51,64 @@
 
 {% block scripts %}
 <script>
-// Se algum lote pago.
-var setLotPaiedStatus = function() {
-    var radios = $('input[type=radio]');
-    radios.iCheck({
-        checkboxClass: 'icheckbox_flat-grey',
-        radioClass: 'iradio_flat-grey',
-    });
-    radios.prop('disabled', 'disabled');
+    // Se algum lote pago.
+    var setLotPaiedStatus = function() {
+        var radios = $('input[type=radio]');
+        radios.iCheck({
+            checkboxClass: 'icheckbox_flat-grey',
+            radioClass: 'iradio_flat-grey',
+        });
+        radios.prop('disabled', 'disabled');
 
-    app.setSwitchery('#id_email', true);
-    app.setSwitchery('#id_city', true);
-    window.setTimeout(function() {
-        app.switcheryElements['id_email'].disable();
-        app.switcheryElements['id_city'].disable();
-    }, 200);
-};
-
-// @TODO é o que vier da edição, se houver valor
-var city_checked = {% if object.city %}true{% else %}false{% endif %};
-var enableDisableCityButton = function (enabled) {
-    // @TODO inserir constate do model
-    if (enabled === true) {
-        app.switcheryElements['id_city'].enable();
-        window.setTimeout(function() {
-            app.setSwitchery('#id_city', city_checked);
-        }, 200);
-    } else {
+        app.setSwitchery('#id_email', true);
         app.setSwitchery('#id_city', true);
         window.setTimeout(function() {
+            app.switcheryElements['id_email'].disable();
             app.switcheryElements['id_city'].disable();
         }, 200);
-    }
-};
+    };
 
-$(document).ready(function() {
-
-    $('#id_city').on('change', function() {
-        var address_required_el = $('input[value=address-show]');
-        // Seta flag somente se endereço não for obrigatório.
-        if (address_required_el.prop('checked') === false) {
-            city_checked = $(this).prop('checked');
+    // @TODO é o que vier da edição, se houver valor
+    var city_checked = {% if object.city %}true{% else %}false{% endif %};
+    var enableDisableCityButton = function (enabled) {
+        // @TODO inserir constate do model
+        if (enabled === true) {
+            app.switcheryElements['id_city'].enable();
+            window.setTimeout(function() {
+                app.setSwitchery('#id_city', city_checked);
+            }, 200);
+        } else {
+            app.setSwitchery('#id_city', true);
+            window.setTimeout(function() {
+                app.switcheryElements['id_city'].disable();
+            }, 200);
         }
+    };
+
+    $(document).ready(function() {
+
+        $('#id_city').on('change', function() {
+            var address_required_el = $('input[value=address-show]');
+            // Seta flag somente se endereço não for obrigatório.
+            if (address_required_el.prop('checked') === false) {
+                city_checked = $(this).prop('checked');
+            }
+        });
+
+        {% if object.address == object.ADDRESS_SHOW %}
+            enableDisableCityButton(false);
+        {% endif %}
+
+    {#    setLotPaiedStatus();#}
+
+        $('input[type=radio]').on('ifChecked', function() {
+            var el = $(this);
+            if (el.prop('name') == 'address') {
+                // @TODO inserir constate do model
+                enableDisableCityButton(el.val() == 'address-hide');
+            }
+        });
     });
-
-    {% if object.address == object.ADDRESS_SHOW %}
-        enableDisableCityButton(false);
-    {% endif %}
-
-{#    setLotPaiedStatus();#}
-
-    $('input[type=radio]').on('ifChecked', function() {
-        var el = $(this);
-        if (el.prop('name') == 'address') {
-            // @TODO inserir constate do model
-            enableDisableCityButton(el.val() == 'address-hide');
-        }
-    });
-});
 </script>
 {% endblock %}
 
