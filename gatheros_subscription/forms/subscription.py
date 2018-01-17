@@ -6,6 +6,7 @@ from gatheros_subscription.models import Subscription
 
 class SubscriptionForm(forms.ModelForm):
     """ Formulário de lote. """
+
     class Meta:
         """ Meta """
         model = Subscription

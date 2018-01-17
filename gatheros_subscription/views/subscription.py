@@ -36,7 +36,14 @@ class EventViewMixin(AccountMixin, generic.View):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super(EventViewMixin, self).get_context_data(**kwargs)
-        context['event'] = self.get_event()
+
+        event = self.get_event()
+        context['event'] = event
+
+        try:
+            context['config'] = event.formconfig
+        except AttributeError:
+            context['config'] = {}
 
         return context
 

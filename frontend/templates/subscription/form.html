@@ -102,14 +102,14 @@
                 $('#id_birth_date').mask("99/99/9999");
             {% endif %}
 
-            {% if config.address == config.ADDRESS_SHOW %}
+            {% if config and config.address == config.ADDRESS_SHOW %}
                 $('#id_zip_code').mask("99.999-999");
             {% endif %}
 
             $(window).resize(resize_status_block);
             resize_status_block();
 
-            {% if config.cpf != config.CPF_HIDE %}
+            {% if config and config.cpf != config.CPF_HIDE %}
                 showHideCpfLoader(false);
 
 {#                $('#id_cpf').on('keyup', function() {#}
@@ -204,12 +204,12 @@
                         <h3 class="panel-title">Campos principais</h3>
                     </div>
                     <div class="panel-body">
-                        {% if config.cpf == config.CPF_HIDE %}
+                        {% if not config or config.cpf == config.CPF_HIDE %}
                             <div class="row">
-                                <div class="{% if config.birth_date == config.BIRTH_DATE_HIDE %}col-md-12{% else %}col-xl-9 col-lg-8{% endif %}">
+                                <div class="{% if config and config.birth_date == config.BIRTH_DATE_HIDE %}col-md-12{% else %}col-xl-9 col-lg-8{% endif %}">
                                     {% render_generic_field form.name %}
                                 </div>
-                                {% if config.birth_date != config.BIRTH_DATE_HIDE %}
+                                {% if config and config.birth_date != config.BIRTH_DATE_HIDE %}
                                     <div class="col-xl-3 col-lg-4">
                                         {% if config.birth_date == config.BIRTH_DATE_REQUIRED %}
                                             {% render_generic_field form.birth_date True %}
@@ -232,7 +232,7 @@
                                 <div class="col-md-4">
                                     {% render_generic_field form.phone config.phone False %}
                                 </div>
-                                {% if config.address == config.ADDRESS_HIDE %}
+                                {% if config and config.address == config.ADDRESS_HIDE %}
                                 <div class="col-md-8">
                                     {% render_generic_field form.city config.city False %}
                                 </div>
