@@ -16,10 +16,6 @@ from gatheros_event.models import Event
 class FormConfig(models.Model):
     """ Configuração de formulário de inscrição. """
 
-    EMAIL_REQUIRED = 'email-required'
-    PHONE_REQUIRED = 'phone-required'
-    CITY_REQUIRED = 'city-required'
-
     CPF_HIDE = 'cpf-hide'
     CPF_SHOW = 'cpf-show'
     CPF_REQUIRED = 'cpf-required'
