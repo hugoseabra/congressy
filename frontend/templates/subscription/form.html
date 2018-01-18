@@ -86,9 +86,16 @@
             if (window.innerWidth > 991) {
                 var block_profile_height = $('#block-profile').height();
                 var block_form_main_height = $('#block-form-main').height();
+                var block_form_lot_height = $('#block-form-lot').height();
 
-                if (block_profile_height < block_form_main_height) {
-                    $('#block-profile').height(block_form_main_height);
+                var main_height = block_form_main_height;
+
+                {% if subscription_form %}
+                    main_height += block_form_lot_height + 19;
+                {% endif %}
+
+                if (block_profile_height < main_height) {
+                    $('#block-profile').height(main_height);
                 } else {
                     $('#block-form-main').height(block_profile_height);
                 }
@@ -140,8 +147,22 @@
                         aria-hidden="true">
                     ×
                 </button>
+                a
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        {% if subscription_form.non_field_errors %}
+            {% for error in subscription_form.non_field_errors %}
+            <div class="alert alert-danger alert-dismissable">
+                <button type="button"
+                        class="close"
+                        data-dismiss="alert"
+                        aria-hidden="true">
+                    ×
+                </button>
                 {{ error }}
             </div>
+            {% endfor %}
         {% endif %}
 
         {% for hidden_field in form.hidden_fields %}
@@ -199,6 +220,21 @@
                 </div>
             </div>
             <div class="col-xl-10 col-lg-9 col-md-9">
+                {% if subscription_form %}
+                <div class="panel panel-primary" id="block-form-lot">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Lote</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xl-2 col-lg-2 col-md-2">
+                                {% render_generic_field subscription_form.lot %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
                 <div class="panel panel-primary" id="block-form-main">
                     <div class="panel-heading">
                         <h3 class="panel-title">Campos principais</h3>
@@ -225,16 +261,24 @@
                                 </div>
 
                                 <div class="col-md-8">
-                                    {% render_generic_field form.email config.email False %}
+                                    {% if config %}
+                                        {% render_generic_field form.email config.email False %}
+                                    {% else %}
+                                        {% render_generic_field form.email %}
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-4">
-                                    {% render_generic_field form.phone config.phone False %}
+                                    {% if config %}
+                                        {% render_generic_field form.phone config.phone False %}
+                                    {% else %}
+                                        {% render_generic_field form.phone %}
+                                    {% endif %}
                                 </div>
                                 {% if config and config.address == config.ADDRESS_HIDE %}
                                 <div class="col-md-8">
-                                    {% render_generic_field form.city config.city False %}
+{#                                    {% render_generic_field form.city config.city False %}#}
                                 </div>
                                 {% endif %}
                             </div>
@@ -294,7 +338,7 @@
                 </div>
             </div>
         </div>
-        {% if config.address == config.ADDRESS_SHOW %}
+        {% if config and config.address == config.ADDRESS_SHOW %}
             <div class="row">
                 <div class="col-md-12">
                     <div class="panel panel-primary">

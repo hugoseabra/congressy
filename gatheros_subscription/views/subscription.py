@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -8,13 +10,13 @@ from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.views import generic
 
+from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
     DeleteViewMixin,
     FormListViewMixin,
 )
-from gatheros_event.forms import PersonForm
 from gatheros_subscription.forms import SubscriptionForm
 from gatheros_subscription.helpers.subscription import \
     export as subscription_export
@@ -27,6 +29,8 @@ class EventViewMixin(AccountMixin, generic.View):
     event = None
 
     def dispatch(self, request, *args, **kwargs):
+        self.event = self.get_event()
+
         self.permission_denied_url = reverse(
             'event:event-panel',
             kwargs={'pk': self.kwargs.get('event_pk')}
@@ -59,6 +63,9 @@ class EventViewMixin(AccountMixin, generic.View):
         )
         return self.event
 
+    def is_by_lots(self):
+        return self.event.subscription_type == Event.SUBSCRIPTION_BY_LOTS
+
     def get_lots(self):
         return self.get_event().lots.filter(
             internal=False
@@ -72,31 +79,43 @@ class EventViewMixin(AccountMixin, generic.View):
 
 class SubscriptionFormMixin(EventViewMixin, generic.FormView):
     success_message = None
-    template_name = 'gatheros_subscription/subscription/form.html'
+    template_name = 'subscription/form.html'
     object = None
+    subscription_form = None
 
     def get_success_url(self):
         return reverse('subscription:subscription-list', kwargs={
             'event_pk': self.kwargs.get('event_pk')
         })
 
+    def get_subscription_form(self):
+        if self.subscription_form:
+            return self.subscription_form
+
+        return SubscriptionForm(event=self.get_event())
+
+    def get_context_data(self, **kwargs):
+        cxt = super().get_context_data(**kwargs)
+
+        if self.is_by_lots():
+            cxt['subscription_form'] = self.get_subscription_form()
+
+        return cxt
+
     def form_invalid(self, form):
-        messages.error(self.request, form.errors)
-        return super(SubscriptionFormMixin, self).form_invalid(form)
+        """
+        If the form is invalid, re-render the context data with the
+        data-filled form and errors.
+        """
+        return self.render_to_response(self.get_context_data(
+            form=self.get_form()
+        ))
 
     def form_valid(self, form):
-        try:
-            self.object = form.save()
+        if self.success_message:
+            messages.success(self.request, self.success_message)
 
-        except Exception as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
-
-        else:
-            if self.success_message:
-                messages.success(self.request, self.success_message)
-
-            return super(SubscriptionFormMixin, self).form_valid(form)
+        return super(SubscriptionFormMixin, self).form_valid(form)
 
 
 class SubscriptionListView(EventViewMixin, generic.ListView):
@@ -152,8 +171,6 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
     """ Formulário de inscrição """
 
     form_class = PersonForm
-    # template_name = 'gatheros_subscription/subscription/form.html'
-    template_name = 'subscription/form.html'
     success_message = 'Inscrição criada com sucesso.'
 
     def can_access(self):
@@ -179,16 +196,112 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
         return can_manage and num_lots > 0
 
+    def post(self, request, *args, **kwargs):
+
+        request.POST = request.POST.copy()
+
+        def clear_string(field_name):
+            if field_name not in request.POST:
+                return
+
+            value = request.POST.get(field_name)
+            value = value.replace('.', '').replace('-', '').replace('/', '')
+
+            request.POST[field_name] = value
+
+        clear_string('cpf')
+        clear_string('zip_code')
+
+        confirmation_reply = request.POST.get('subscription_user_reply')
+        confirmation_yes = request.POST.get('confirmation_yes')
+
+        email = request.POST.get('email')
+        person_form_kwargs = self.get_form_kwargs()
+
+        if email:
+            try:
+                # Se há usuário que possui relacionamento com Person
+                user = User.objects.get(email=email, person__isnull=False)
+
+                if not confirmation_reply:
+                    view = SubscriptionConfirmationView.as_view(
+                        user=user,
+                        submitted_data=request.POST,
+                    )
+
+                    return view(request, *args, **kwargs)
+
+                elif confirmation_yes:
+                    person_form_kwargs['instance'] = user.person
+
+            except User.DoesNotExist:
+                pass
+
+        if self.is_by_lots():
+            lot = request.POST.get('lot')
+            del request.POST['lot']
+
+        else:
+            # Is internal lot
+            lot = self.event.lots.get(internal=True)
+            lot = lot.pk
+
+        form_class = self.get_form_class()
+        form = form_class(**person_form_kwargs)
+
+        try:
+            # 1 - Valida person form
+            if form.is_valid():
+
+                self.object = form.save()
+
+                event = self.get_event()
+                self.subscription_form = SubscriptionForm(
+                    event=event,
+                    person=self.object,
+                    data={
+                        'lot': lot,
+                        'created_by': request.user.pk,
+                    }
+                )
+
+                # 2 - Valida subscription form
+                if self.subscription_form.is_valid():
+                    self.subscription_form.save()
+                    response = self.form_valid(self.subscription_form)
+
+                else:
+                    response = self.form_invalid(self.subscription_form)
+
+                return response
+
+            else:
+                return self.form_invalid(form)
+
+        except ValidationError as e:
+            error = str(e).replace("{'__all__': ['", '').replace("']}", '')
+            messages.error(request, error)
+            return self.render_to_response(self.get_context_data(
+                form=form,
+                subscription_form=self.get_subscription_form()
+            ))
+
+        except Exception as e:
+            messages.error(request, str(e))
+            return self.render_to_response(self.get_context_data(
+                form=form
+            ))
+
 
 class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
+    """ Inscrição de pessoa que já possui perfil. """
     subscription_user = None
     submitted_data = None
     # template_name = 'gatheros_subscription/subscription/subscription_confirmation.html'
     template_name = 'subscription/subscription_confirmation.html'
+
     @classonlymethod
     def as_view(cls, user, submitted_data, **initkwargs):
-
-        del submitted_data['user']
 
         csrf = submitted_data.get('csrfmiddlewaretoken')
         if csrf:

@@ -45,7 +45,9 @@ class Person(models.Model, GatherosModelMixin):
         default=GENDER_MALE
     )
     email = models.EmailField(
-        verbose_name='email'
+        verbose_name='email',
+        null=True,
+        blank=True,
     )
     city = models.ForeignKey(
         City,

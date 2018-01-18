@@ -69,7 +69,7 @@
     };
 
     // @TODO é o que vier da edição, se houver valor
-    var city_checked = {% if object.city %}true{% else %}false{% endif %};
+    var city_checked = {% if object and object.city %}true{% else %}false{% endif %};
     var enableDisableCityButton = function (enabled) {
         // @TODO inserir constate do model
         if (enabled === true) {
@@ -95,7 +95,7 @@
             }
         });
 
-        {% if object.address == object.ADDRESS_SHOW %}
+        {% if object and object.address == object.ADDRESS_SHOW %}
             enableDisableCityButton(false);
         {% endif %}
 
