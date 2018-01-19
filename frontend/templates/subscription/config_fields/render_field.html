@@ -13,6 +13,6 @@
     {% elif field.field.widget.input_type == "checkbox" %}
         {{ field|add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
     {% else %}
-        {{ field|add_class:"form-control"|append_attr:"autofocus" }}
+        {{ field|add_class:"form-control" }}
     {% endif %}
 {% endif %}
