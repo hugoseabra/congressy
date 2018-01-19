@@ -195,10 +195,14 @@
                                 {% render_generic_field form.gender %}
                             </div>
                             <div class="col-xl-4 col-lg-4 col-md-6">
-                                {% render_generic_field form.phone config.phone False %}
+                                {% if config %}
+                                    {% render_generic_field form.phone config.phone False %}
+                                {% else %}
+                                    {% render_generic_field form.phone %}
+                                {% endif %}
                             </div>
                             <div class="col-xl-4 col-lg-4 col-md-12">
-                                {% if config.address == config.ADDRESS_HIDE %}
+                                {% if config and config.address == config.ADDRESS_HIDE %}
                                     {% if config.city == config.CITY_REQUIRED %}
                                         {% render_generic_field form.city config.city required=True %}
                                     {% else %}
