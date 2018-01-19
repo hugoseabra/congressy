@@ -3,7 +3,7 @@
 <!-- FORM -->
 <form action="" method="post"
       class="form"
-      role="form" onsubmit="submit_form()">
+      role="form" onsubmit="submit_form(this); return false;">
 
     {% csrf_token %}
 
@@ -191,8 +191,8 @@
     <div class="row">
         <div class="col-md-12">
             <div class="form-group form-group-submit">
-                <button class="btn btn-primary btn-lg btn-block"
-                        data-loading-text="Quero me inscrever">
+                <button type="button" class="btn btn-primary btn-lg btn-block"
+                        data-loading-text="Enviar" onclick="$(this).removeAttr('type').trigger('click');">
                     Enviar
                 </button>
             </div>

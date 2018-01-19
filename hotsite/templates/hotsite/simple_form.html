@@ -3,7 +3,7 @@
 <!-- FORM -->
 <form action="{% url 'public:hotsite' event.slug %}" method="post"
       class="form"
-      role="form" onsubmit="submit_form()">
+      role="form" onsubmit="submit_form_no_loader(this); return false;">
 
     {% csrf_token %}
 
@@ -63,25 +63,9 @@
             </p>
         {% endif %}
 
-        {# @TODO Remover lote daqui e mostrar nos bottons ao lado os valores #}
-        {% if has_paied_lots and lots %}
-            <select class="form-control" name="lot" id="id_lot">
-            {% for lot in lots %}
-                <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
-            {% endfor %}
-            </select>
-        {% elif lots.0.places_remaining != lots.0.LOT_LIMIT_UNLIMIED %}
-            <div>
-                 <span style="font-weight: bold;">Vagas restantes:</span>
-                {{ lots.0.display_publicly }}
-            </div>
-        {% endif %}
-
-
         {% if not person or person and not person.name %}
             {% render_generic_field form.name autofocus=True %}
         {% endif %}
-
 
         {% if not person or person and not person.email %}
             {% render_generic_field form.email required=True %}

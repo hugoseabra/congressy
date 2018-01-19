@@ -3661,16 +3661,15 @@ label.valid {
 }
 .theme-cgsy-full .loader-block {
   position: relative;
-  z-index: 10000;
-  width: 100%;
+  width: 38px;
   display: none;
-}
-.theme-cgsy-full .loader-block .img-block {
-  width: 8%;
   margin: 0 auto;
 }
-.theme-cgsy-full .loader-block .img-block img {
-  height: 40px;
+.theme-cgsy-full .loader-block .img-block {
+  width: 37px;
+  position: absolute;
+  z-index: 10000;
+  top: -42px;
 }
 .theme-cgsy-full .checkbox label,
 .theme-cgsy-full .radio label {

@@ -97,7 +97,7 @@
                 </button>
 
                 <!-- HEADER LOGO -->
-                <a class="navbar-logo navbar-brand anchor-link" href="#hero">
+                <a class="navbar-logo navbar-brand" href="{% url 'public:hotsite' event.slug %}">
                     <img src="{% static 'hotsite/images/logos/header-logo.png' %}"
                          srcset="{% static 'hotsite/images/logos/header-logo@2x.png' %}"
                          alt="Congressy">
@@ -227,35 +227,9 @@
 
             <div class="about-row row">
                 <div class="col-md-9 col-md-offset-2">
-
-                    {% block messages %}
-                        {% if messages %}
-                            <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                            {% for message in messages %}
-
-                                {% if message.tags %}
-                                    <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
-
-                                {% else %}
-                                    <div class="alert alert-warning alert-dismissible" role="alert">
-                                {% endif %}
-
-                            <button type="button" class="close" data-dismiss="alert"
-                                    aria-label="Close"><span aria-hidden="true">&times;</span>
-                            </button>
-                            {{ message|capfirst }}
-                            </div>
-
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    {% endblock messages %}
-
-
                     {% include 'hotsite/subscription_form.html' %}
-                    </div>
-
                 </div>
+            </div>
 
     </section>
 
@@ -492,6 +466,7 @@
 <!-- MAIN SCRIPT
 ================================= -->
 <script src="{% static 'hotsite/js/script.js' %}"></script>
+<script src="{% static 'assets/js/cgsy.js' %}"></script>
 </body>
 
 </html>

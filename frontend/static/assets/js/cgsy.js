@@ -38,11 +38,30 @@ function submit_form(form) {
     if (button) {
         loader = $(loader);
         loader.insertAfter(button);
-        button.fadeOut('fast', function() {
-            loader.fadeIn(function() {
+
+        button.css('visibility', 'hidden');
+        window.setTimeout(function() {
+            loader.fadeIn('fast', function() {
                 window.setTimeout(function() { form.submit(); } , 500);
             });
-        });
+        }, 160);
+    }
+}
+
+function submit_form_no_loader(form) {
+    var button;
+    button = $(form).find('button')
+        .not(':button[type=button]')
+        .not(':button[type=reset]')
+    ;
+
+    if (!button.length) {
+        button = $(form).find('input[type=submit]');
+    }
+
+    if (button) {
+        button.text('Aguarde...');
+        window.setTimeout(function() { form.submit(); } , 500);
     }
 }
 
