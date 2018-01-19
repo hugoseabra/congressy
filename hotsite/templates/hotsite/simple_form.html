@@ -64,12 +64,17 @@
         {% endif %}
 
         {# @TODO Remover lote daqui e mostrar nos bottons ao lado os valores #}
-        {% if lots %}
+        {% if has_paied_lots and lots %}
             <select class="form-control" name="lot" id="id_lot">
             {% for lot in lots %}
                 <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
             {% endfor %}
             </select>
+        {% elif lots.0.places_remaining != lots.0.LOT_LIMIT_UNLIMIED %}
+            <div>
+                 <span style="font-weight: bold;">Vagas restantes:</span>
+                {{ lots.0.display_publicly }}
+            </div>
         {% endif %}
 
 

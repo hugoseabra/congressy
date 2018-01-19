@@ -21,7 +21,7 @@ from gatheros_event.views.mixins import (
 from gatheros_subscription.forms import SubscriptionForm
 from gatheros_subscription.helpers.subscription import \
     export as subscription_export
-from gatheros_subscription.models import Subscription
+from gatheros_subscription.models import Subscription, FormConfig
 from .filters import SubscriptionFilterForm
 
 
@@ -44,11 +44,23 @@ class EventViewMixin(AccountMixin, generic.View):
 
         event = self.get_event()
         context['event'] = event
+        context['has_paied_lots'] = self.has_paied_lots()
 
         try:
-            context['config'] = event.formconfig
+            config = event.formconfig
         except AttributeError:
-            context['config'] = {}
+            config = FormConfig()
+
+        if self.has_paied_lots():
+            config.email = True
+            config.phone = True
+            config.city = True
+
+            config.cpf = config.CPF_REQUIRED
+            config.birth_date = config.BIRTH_DATE_REQUIRED
+            config.address = config.ADDRESS_SHOW
+
+        context['config'] = config
 
         return context
 
@@ -76,6 +88,18 @@ class EventViewMixin(AccountMixin, generic.View):
         """ Recupera número de lotes a serem usados nas inscrições. """
         lot_qs = self.get_lots()
         return lot_qs.count() if lot_qs else 0
+
+    def has_paied_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+            price = lot.price
+            if price is None:
+                continue
+
+            if lot.price > 0:
+                return True
+
+        return False
 
 
 class SubscriptionFormMixin(EventViewMixin, generic.FormView):
@@ -202,7 +226,7 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
 
         non_field_errors = subscription_form.non_field_errors()
 
-        if 'non_field_errors' in kwargs and errors:
+        if 'non_field_errors' in kwargs and non_field_errors:
             kwargs['non_field_errors'] += non_field_errors
 
         return cxt

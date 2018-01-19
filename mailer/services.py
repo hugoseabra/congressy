@@ -21,9 +21,10 @@ def notify_new_subscription(event, subscription):
     Define a notificação para uma nova inscrição
     """
     person = subscription.person
-    local = '{}'.format(
-        event.place,
-    )
+
+    # local = '{}'.format(
+    #     event.place,
+    # )
 
     event_url = absoluteuri.reverse(
         'public:hotsite',
@@ -40,9 +41,9 @@ def notify_new_subscription(event, subscription):
         'event': event,
         'event_url': event_url,
         'period': event.date_start,
-        'count': subscription.count,
+        # 'count': subscription.count,
         'date': subscription.created,
-        'local': local
+        # 'local': local
     })
 
     if CELERY:

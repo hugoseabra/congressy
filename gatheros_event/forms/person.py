@@ -35,17 +35,17 @@ class PersonForm(forms.ModelForm):
 
     def __init__(self, is_chrome=False, **kwargs):
 
-        if 'instance' in kwargs:
-            self.instance = kwargs.get('instance')
-        else:
-            self.instance = None
-
-        if 'data' in kwargs:
-            self.data = kwargs.get('data', {})
-        else:
-            self.data = {}
-
-        self.fill_blank_data_when_user()
+        # if 'instance' in kwargs:
+        #     self.instance = kwargs.get('instance')
+        # else:
+        #     self.instance = None
+        #
+        # if 'data' in kwargs:
+        #     self.data = kwargs.get('data', {})
+        # else:
+        #     self.data = {}
+        #
+        # self.fill_blank_data_when_user()
 
         super().__init__(**kwargs)
 
@@ -63,8 +63,6 @@ class PersonForm(forms.ModelForm):
             return None
 
         return City.objects.get(pk=self.data['city'])
-
-
 
     def clean_email(self):
         return self.data['email'].lower()
