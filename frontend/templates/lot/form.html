@@ -15,11 +15,11 @@
 {% endblock messages %}
 
 {% block title %}
-    {% if form_title %}Editar{% else %}Nova{% endif %} Lotes | Congressy
+    {% if form_title %}Editar{% else %}Nova{% endif %} Ingressos | Congressy
 {% endblock %}
 
 {% block page_title %}
-    {% if form_title %}Editar{% else %}Nova{% endif %} Lotes
+    {% if form_title %}Editar{% else %}Nova{% endif %} Ingressos
 {% endblock %}
 
 {% block page_sub_title %}
@@ -113,13 +113,13 @@
                 Inscrições
             </a>
         </li>
-        <li>
-            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
-               title="Check-in">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Check-in
-            </a>
-        </li>
+{#        <li>#}
+{#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+{#               title="Check-in">#}
+{#                <i class="fa  fa-fw fa-rocket"></i>#}
+{#                Check-in#}
+{#            </a>#}
+{#        </li>#}
     </ul>
 {% endblock %}
 
@@ -228,23 +228,23 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            Privacidade
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-xl-2 col-lg-4 col-md-4">
-                                {% render_generic_field form.private %}
-                            </div>
-                            <div class="col-xl-4 col-lg-4 col-md-4">
-                                {% render_generic_field form.exhibition_code %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+{#                <div class="panel panel-primary">#}
+{#                    <div class="panel-heading">#}
+{#                        <div class="panel-title">#}
+{#                            Privacidade#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="panel-body">#}
+{#                        <div class="row">#}
+{#                            <div class="col-xl-2 col-lg-4 col-md-4">#}
+{#                                {% render_generic_field form.private %}#}
+{#                            </div>#}
+{#                            <div class="col-xl-4 col-lg-4 col-md-4">#}
+{#                                {% render_generic_field form.exhibition_code %}#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
             </div>
         </div>
         <div class="row">

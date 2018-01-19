@@ -3,8 +3,8 @@
 {% load static %}
 {% load event_tags %}
 
-{% block title %} Lotes | Congressy{% endblock %}
-{% block page_title %}Lotes{% endblock %}
+{% block title %} Ingressos | Congressy{% endblock %}
+{% block page_title %}Ingressos{% endblock %}
 {% block page_sub_title %}
     {{ event.name }}
     {% if not event.published %}
@@ -94,13 +94,13 @@
                 Inscrições
             </a>
         </li>
-        <li>
-            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
-               title="Check-in">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Check-in
-            </a>
-        </li>
+{#        <li>#}
+{#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+{#               title="Check-in">#}
+{#                <i class="fa  fa-fw fa-rocket"></i>#}
+{#                Check-in#}
+{#            </a>#}
+{#        </li>#}
     </ul>
 {% endblock %}
 

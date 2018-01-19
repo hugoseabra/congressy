@@ -73,6 +73,7 @@
 {% block sidebar-bars %}{% endblock %}
 
 {% block content %}
+
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
@@ -87,6 +88,7 @@
             </div>
         </div>
     </div>
+
     <div class="row" >
         <div class="col-md-12">
             <div class="panel panel-primary">
@@ -110,7 +112,8 @@
                                 <tr>
                                     <td>
 {#                                        <a href="{% url 'event:event-panel' event.pk %}">#}
-                                        <a href="{% url 'subscription:subscription-list' event.pk %}">
+{#                                        <a href="{% url 'subscription:subscription-list' event.pk %}">#}
+                                        <a href="{% url 'event:event-hotsite' event.pk %}">
                                             {{ event.name }}
                                             {% if event.published == True %}
                                                 &nbsp;&nbsp;
