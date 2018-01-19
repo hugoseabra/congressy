@@ -16,12 +16,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='person',
             name='birth_date',
-            field=models.DateField(blank=True, null=True, verbose_name='data de nascimento'),
+            field=models.DateField(blank=True, null=True, verbose_name='data de nasc.'),
         ),
         migrations.AlterField(
             model_name='person',
             name='email',
-            field=models.EmailField(blank=True, max_length=254, null=True, verbose_name='email'),
+            field=models.EmailField(blank=True, max_length=254, null=True, verbose_name='e-mail'),
         ),
         migrations.AlterField(
             model_name='person',

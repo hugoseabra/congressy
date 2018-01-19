@@ -3,7 +3,7 @@ from django.utils import six
 from django import forms
 from kanu_locations.models import City
 from django.db.models.fields import NOT_PROVIDED
-from gatheros_event.models import Person
+from gatheros_event.models import Person, Occupation
 
 
 class TelephoneInput(forms.TextInput):
@@ -21,34 +21,43 @@ class PersonForm(forms.ModelForm):
         """ Meta """
         model = Person
         # fields = '__all__'
-        exclude = ('city', 'user',)
+        exclude = ('user', 'occupation')
 
         widgets = {
             # CPF como telefone para aparecer como número no mobile
             'cpf': TelephoneInput(),
             'phone': TelephoneInput(),
-            'birth_date': DateInput(),
-            'zip_code': TelephoneInput()
+            'zip_code': TelephoneInput(),
+            'city': forms.TextInput()
         }
 
-    def __init__(self, **kwargs):
+    def __init__(self, is_chrome=False, **kwargs):
 
-        # if 'instance' in kwargs:
-        #     self.instance = kwargs.get('instance')
-        # else:
-        #     self.instance = None
-        #
-        # if 'data' in kwargs:
-        #     self.data = kwargs.get('data', {})
-        # else:
-        #     self.data = {}
+        if 'instance' in kwargs:
+            self.instance = kwargs.get('instance')
+        else:
+            self.instance = None
 
+        if 'data' in kwargs:
+            self.data = kwargs.get('data', {})
+        else:
+            self.data = {}
+
+        self.fill_blank_data_when_user()
 
         super().__init__(**kwargs)
-        self.fill_blank_data_when_user()
+
+        if is_chrome:
+            self.fields['birth_date'].widget = DateInput()
 
     def clean_city(self):
         return City.objects.get(pk=self.data['city'])
+
+    def clean_email(self):
+        return self.data['email'].lower()
+
+    def clean_occupation(self):
+        return Occupation.objects.get(pk=self.data['occupation'])
 
     def fill_blank_data_when_user(self):
         """
@@ -56,6 +65,9 @@ class PersonForm(forms.ModelForm):
         data must be filled.
         """
         if not self.instance:
+            return
+
+        if self.instance.user is None:
             return
 
         fields = [field for field in six.iterkeys(self.data)]

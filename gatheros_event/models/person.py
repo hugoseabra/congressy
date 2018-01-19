@@ -45,7 +45,7 @@ class Person(models.Model, GatherosModelMixin):
         default=GENDER_MALE
     )
     email = models.EmailField(
-        verbose_name='email',
+        verbose_name='e-mail',
         null=True,
         blank=True,
     )
@@ -120,7 +120,7 @@ class Person(models.Model, GatherosModelMixin):
     birth_date = models.DateField(
         blank=True,
         null=True,
-        verbose_name='data de nascimento'
+        verbose_name='data de nasc.'
     )
     rg = models.CharField(
         max_length=255,

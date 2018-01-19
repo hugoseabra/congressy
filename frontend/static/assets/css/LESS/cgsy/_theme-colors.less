@@ -308,6 +308,14 @@
   .form-group {
     margin-left: 10px !important;
     margin-right: 10px !important;
+
+    .readonly-field {
+      &:extend(.form-control);
+      padding: 8px 10px;
+      font-size: @14px;
+      border: 1px solid #ccc;
+      background-color: #f8f8f8;
+    }
   }
   .loader-block {
     position: relative;

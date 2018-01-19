@@ -5,6 +5,7 @@ from .subscription import (
     SubscriptionAddFormView,
     SubscriptionAttendanceSearchView,
     SubscriptionDeleteView,
-    SubscriptionListView,
     SubscriptionExportView,
+    SubscriptionListView,
+    SubscriptionViewFormView,
 )

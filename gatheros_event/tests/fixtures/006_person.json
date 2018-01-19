@@ -103,7 +103,7 @@
     "fields": {
       "name": "M\u00e1rcio Gomes Filho",
       "gender": "M",
-      "email": "Mauricio@gmail.com",
+      "email": "mauricio@gmail.com",
       "city": 5413,
       "zip_code": null,
       "street": null,
@@ -169,7 +169,7 @@
     "fields": {
       "name": "Leonardo Miranda",
       "gender": "M",
-      "email": "Leonardo@gmail.com",
+      "email": "leonardo@gmail.com",
       "city": 5342,
       "zip_code": null,
       "street": null,

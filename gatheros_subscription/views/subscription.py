@@ -2,7 +2,8 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
+from django.db.models import Model
+from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -82,6 +83,100 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
     template_name = 'subscription/form.html'
     object = None
     subscription_form = None
+    has_profile = False
+    subscription_exists = False
+    person_exists = False
+    procceed = False
+
+    def _subscription_exists(self):
+
+        self.event = self.get_event()
+        email = self.request.GET.get('email')
+
+        if email:
+            email = email.lower()
+            self.procceed = True
+            self.initial.update({'email': email})
+
+            try:
+                # Pessoa que possuem perfil, já logou (possui controle sobre
+                # seus dados) e tem inscrição em algum dos eventos da
+                # organização do evento atual.
+                # @TODO PROBLEMA: Todos podem acessar os dados pelo e-mail.
+                user = User.objects.get(
+                    email=email,
+                    last_login__isnull=False,
+                )
+                self.object = user.person
+                self.has_profile = True
+                self.person_exists = True
+
+                return Subscription.objects.filter(
+                    event=self.event,
+                    person=self.object
+                ).exists()
+
+            except (User.DoesNotExist, AttributeError):
+
+                try:
+                    org_pks = [org.pk for org in self.organizations]
+                    subscriptions = Subscription.objects.filter(
+                        event__organization__in=org_pks,
+                        person__email=email,
+                    )
+
+                    # @TODO ranking de mais completo em vez de pegar o primeiro
+                    if subscriptions:
+                        for sub in subscriptions:
+                            if sub.event.pk == self.event.pk:
+                                self.object = sub.person
+                                self.person_exists = True
+                                return True
+
+                        self.object = subscriptions.first().person
+                        self.person_exists = True
+
+                except Subscription.DoesNotExist:
+                    pass
+
+        else:
+            # Force to clear cache
+            self.initial = {}
+
+        return False
+
+
+    def dispatch(self, request, *args, **kwargs):
+        self.subscription_exists = self._subscription_exists()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+
+        kwargs = super().get_form_kwargs()
+
+        if not self.person_exists:
+            return kwargs
+
+        kwargs['instance'] = self.object
+
+        if 'data' in kwargs and self.object and self.has_profile:
+            data = {}
+
+            model_data = model_to_dict(self.object)
+            for key in six.iterkeys(model_data):
+                value = model_data[key]
+
+                if not value:
+                    continue
+
+                if isinstance(value, Model):
+                    value = value.pk
+
+                data.update({key: value})
+
+            kwargs['data'].update(data)
+
+        return kwargs
 
     def get_success_url(self):
         return reverse('subscription:subscription-list', kwargs={
@@ -97,8 +192,19 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
 
-        if self.is_by_lots():
-            cxt['subscription_form'] = self.get_subscription_form()
+        cxt['has_profile'] = self.has_profile
+        cxt['subscription_exists'] = self.subscription_exists
+        cxt['procceed'] = self.procceed
+        cxt['object'] = self.object
+
+        # if self.is_by_lots():
+        subscription_form = self.get_subscription_form()
+        cxt['subscription_form'] = subscription_form
+
+        non_field_errors = subscription_form.non_field_errors()
+
+        if 'non_field_errors' in kwargs and errors:
+            kwargs['non_field_errors'] += non_field_errors
 
         return cxt
 
@@ -108,7 +214,8 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
         data-filled form and errors.
         """
         return self.render_to_response(self.get_context_data(
-            form=self.get_form()
+            form=self.get_form(),
+            non_field_errors=form.non_field_errors()
         ))
 
     def form_valid(self, form):
@@ -165,6 +272,43 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
         num_lots = self.get_num_lots()
         return num_lots > 0
+
+
+class SubscriptionViewFormView(EventViewMixin, generic.FormView):
+    template_name = 'subscription/view.html'
+    form_class = PersonForm
+    subscription = None
+    object = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.subscription = get_object_or_404(
+            Subscription,
+            pk=self.kwargs.get('pk')
+        )
+        self.object = self.subscription.person
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['object'] = self.object
+        return ctx
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'instance': self.object})
+        kwargs.update({
+            'is_chrome': 'chrome' in str(self.request.user_agent).lower()
+        })
+
+        try:
+            kwargs['initial'].update({
+                'city': '{}-{}'.format(self.object.city.name, self.object.city.uf)
+            })
+        except AttributeError:
+            pass
+
+        return kwargs
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):
@@ -258,9 +402,10 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
                 event = self.get_event()
                 self.subscription_form = SubscriptionForm(
                     event=event,
-                    person=self.object,
                     data={
                         'lot': lot,
+                        'person': self.object.pk,
+                        'origin': Subscription.DEVICE_ORIGIN_WEB,
                         'created_by': request.user.pk,
                     }
                 )
@@ -278,18 +423,11 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
             else:
                 return self.form_invalid(form)
 
-        except ValidationError as e:
-            error = str(e).replace("{'__all__': ['", '').replace("']}", '')
-            messages.error(request, error)
-            return self.render_to_response(self.get_context_data(
-                form=form,
-                subscription_form=self.get_subscription_form()
-            ))
-
         except Exception as e:
             messages.error(request, str(e))
             return self.render_to_response(self.get_context_data(
-                form=form
+                form=form,
+                non_field_errors=form.non_field_errors()
             ))
 
 

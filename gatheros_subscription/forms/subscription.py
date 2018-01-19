@@ -1,6 +1,7 @@
 """ Formulários de `Subscription` """
 from django import forms
 
+from gatheros_event.models import Person, Event
 from gatheros_subscription.models import Subscription, Lot
 
 
@@ -9,23 +10,38 @@ class SubscriptionForm(forms.ModelForm):
 
     class Meta:
         """ Meta """
+        
         model = Subscription
-        exclude = ('event', 'person', 'origin')
-
-    def __init__(self, event, person=None, **kwargs):
+        fields = (
+            'lot',
+            'person',
+            'origin',
+            'created_by',
+        )
+        
+    def __init__(self, event, **kwargs):
         self.event = event
-        self.person = person
         super().__init__(**kwargs)
-
-        self.fields['lot'].queryset = Lot.objects.filter(event=self.event)
+        
+        self.fields['lot'].queryset = event.lots.all()
+        
+    def clean_person(self):
+        return Person.objects.get(pk=self.data['person'])
 
     def clean_lot(self):
         return Lot.objects.get(pk=self.data['lot'], event=self.event)
-
-    def save(self, commit=True):
-        self.instance.person = self.person
-        self.instance.event = self.event
-        self.instance.origin = Subscription.DEVICE_ORIGIN_WEB
-
-        return super().save(commit=commit)
-
+    
+    def clean(self):
+        self.cleaned_data = super().clean()
+        
+        person = self.cleaned_data.get('person')
+        
+        qs = Subscription.objects.filter(person=person, event=self.event)
+        if qs.exists():
+            self.cleaned_data.pop('person')
+            self.add_error(
+                forms.forms.NON_FIELD_ERRORS,
+                'Esta inscrição já existe'
+            )
+        
+        return self.cleaned_data

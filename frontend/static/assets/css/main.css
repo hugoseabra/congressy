@@ -2591,7 +2591,8 @@ body.fullscreen-widget-active .panel .panel-heading .actions > .fa-times {
 .social .fa-youtube-play:hover {
   background: #DF192A;
 }
-.form-control {
+.form-control,
+.theme-cgsy-full .form-group .readonly-field {
   border: 1px solid #DDD;
   border-radius: 2px;
   box-shadow: none;
@@ -3651,6 +3652,12 @@ label.valid {
 .theme-cgsy-full .form-group {
   margin-left: 10px !important;
   margin-right: 10px !important;
+}
+.theme-cgsy-full .form-group .readonly-field {
+  padding: 8px 10px;
+  font-size: 0.875em;
+  border: 1px solid #ccc;
+  background-color: #f8f8f8;
 }
 .theme-cgsy-full .loader-block {
   position: relative;

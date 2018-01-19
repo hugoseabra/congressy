@@ -1,8 +1,8 @@
-{% load widget_tweaks %}
+{% load widget_tweaks form_config_tags %}
 
 <div class="form-group">
     <label for="id_{{ name }}">
-        {{ label_tag }}
+        {{ label_tag|capfirst }}
         {% if required %}
             <small style="color:#C9302C">*</small>
         {% endif %}
@@ -10,15 +10,31 @@
     <div>
         {% if required %}
             {% if attr %}
-                {{ field|add_class:"form-control"|append_attr:"required:required"|attr:attr }}
+                {% if autofocus %}
+                    {{ field|add_class:"form-control"|append_attr:"required:required"|append_attr:"autofocus"|attr:attr }}
+                {% else %}
+                    {{ field|add_class:"form-control"|append_attr:"required:required"|attr:attr }}
+                {% endif %}
             {% else %}
-                {{ field|add_class:"form-control"|append_attr:"required:required" }}
+                {% if autofocus %}
+                    {{ field|add_class:"form-control"|append_attr:"required:required"|append_attr:"autofocus" }}
+                {% else %}
+                    {{ field|add_class:"form-control"|append_attr:"required:required"|append_attr:"autofocus" }}
+                {% endif %}
             {% endif %}
         {% else %}
             {% if attr %}
-                {{ field|add_class:"form-control"|attr:attr }}
+                {% if autofocus %}
+                    {{ field|add_class:"form-control"|attr:attr|append_attr:"autofocus" }}
+                {% else %}
+                    {{ field|add_class:"form-control"|attr:attr }}
+                {% endif %}
             {% else %}
-                {{ field|add_class:"form-control" }}
+                {% if autofocus %}
+                    {{ field|add_class:"form-control"|append_attr:"autofocus" }}
+                {% else %}
+                    {{ field|add_class:"form-control"|append_attr:"autofocus" }}
+                {% endif %}
             {% endif %}
         {% endif %}
         {% if help_text %}
@@ -27,17 +43,7 @@
             </div>
         {% endif %}
         {% if errors %}
-            {% for error in errors %}
-                <div class="alert alert-danger alert-dismissable">
-                    <button type="button"
-                            class="close"
-                            data-dismiss="alert"
-                            aria-hidden="true">
-                        ×
-                    </button>
-                    {{ error }}
-                </div>
-            {% endfor %}
+            {% render_field_errors errors %}
         {% endif %}
     </div>
 </div>

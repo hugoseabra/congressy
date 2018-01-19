@@ -30,9 +30,7 @@ python $BASE_DIR/manage.py loaddata 010_event 011_info
 python $BASE_DIR/manage.py loaddata 012_invitation
 
 ## gatheros_subscription
-python $BASE_DIR/manage.py loaddata 006_lot
-#python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
-#python $BASE_DIR/manage.py loaddata 008_answer
+python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
 
 # Atualizando a data dos eventos
 python $BASE_DIR/bin/dev/update_data.py
