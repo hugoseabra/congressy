@@ -1,4 +1,4 @@
-{% load form_config_tags %}
+{% load static form_config_tags %}
 
 <!-- FORM -->
 <form action="" method="post"
@@ -43,7 +43,7 @@
 
     <div class="form-validation alert"></div>
 
-    {% if has_paied_lots %}
+    {% if has_paid_lots %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <div class="panel-title">Ingresso</div>
@@ -132,9 +132,32 @@
                     <div class="col-md-8">
                         {% if config and config.address == config.ADDRESS_HIDE %}
                             {% if config.city == config.CITY_REQUIRED %}
-                                {% render_generic_field form.city config.city required=True %}
+                                <div class="form-group">
+                                    <label for="id_city_search">
+                                        <label for="id_city_search">
+                                            Cidade:
+                                            <small style="color:#C9302C">*</small>
+                                        </label>
+                                    </label>
+                                    <div id="remote">
+                                        <input name="id_city_search" class="typeahead form-control" required id="id_city_search" type="text"
+                                               data-provide="typeahead">
+                                        <input name="id_city"  id="id_city" type="hidden">
+                                    </div>
+                                </div>
                             {% else %}
-                                {% render_generic_field form.city config.city %}
+                                <div class="form-group">
+                                    <label for="id_city_search">
+                                        <label for="id_city_search">
+                                            Cidade:
+                                        </label>
+                                    </label>
+                                    <div id="remote">
+                                        <input name="id_city_search" class="typeahead form-control " id="id_city_search" type="text"
+                                               data-provide="typeahead">
+                                        <input name="id_city"  id="id_city" type="hidden">
+                                    </div>
+                                </div>
                             {% endif %}
                         {% endif %}
                     </div>
@@ -151,33 +174,36 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-3">
-                        {% render_generic_field form.zip_code%}
+                        {% render_generic_field form.zip_code required=True %}
+                        <div id="cep_loader" style="width: 22px;position: absolute;top: 45px;right: 33px;">
+                            <img src="{% static 'assets/img/loader.gif' %}" />
+                        </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row address-row">
                     <div class="col-md-9">
                         {% render_generic_field form.street %}
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-3 address-row">
                         {% render_generic_field form.number %}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6 address-row">
                         {% render_generic_field form.complement %}
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 address-row">
                         {% render_generic_field form.village %}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
-                        {% render_generic_field form.city %}
+                    <div class="col-md-12 address-row">
+                        {% render_typeahead_field form.city required=True %}
                     </div>
                 </div>
             </div>
         </div>
-        {% if has_paied_lots %}
+        {% if has_paid_lots %}
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="panel-title">Pagamento</div>

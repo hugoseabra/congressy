@@ -5,6 +5,7 @@ from django import template
 
 register = template.Library()
 
+
 @register.inclusion_tag('subscription/config_fields/errors.html')
 def render_errors(errors):
     return {'errors': errors}
@@ -20,8 +21,7 @@ def render_generic_field(
         field,
         required=False,
         use_required_field=True,
-        autofocus=False,
-):
+        autofocus=False):
     if required is False and use_required_field is True:
         required = field.field.required
 
@@ -34,3 +34,17 @@ def render_generic_field(
         'required': required,
         'autofocus': autofocus,
     }
+
+
+@register.inclusion_tag('subscription/config_fields/typeahead.html')
+def render_typeahead_field(
+        field,
+        required=False,
+        use_required_field=True,
+        autofocus=False):
+    return render_generic_field(**{
+        'field': field,
+        'use_required_field': use_required_field,
+        'required': required,
+        'autofocus': autofocus,
+    })

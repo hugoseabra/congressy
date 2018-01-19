@@ -54,7 +54,7 @@ class Person(models.Model, GatherosModelMixin):
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        verbose_name='cidade'
+        verbose_name='cidade-UF'
     )
     zip_code = models.CharField(
         max_length=8,

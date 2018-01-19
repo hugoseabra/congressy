@@ -1146,7 +1146,6 @@
                     display: "none",
                     backgroundColor: "#fff",
                     border:"1px solid #ccc"
-
                 },
                 ltr: {
                     left: "0",

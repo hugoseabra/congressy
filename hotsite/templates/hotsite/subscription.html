@@ -59,6 +59,10 @@
         .form-group {
             margin: 4px 0;
         }
+
+        input#id_city, input#id_city_search {
+            text-transform: uppercase;
+        }
     </style>
     <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-320.css' %}">
     <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-360.css' %}">
@@ -267,7 +271,6 @@
 <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
 <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
 <script>
-
     var suggestionEngine = new Bloodhound({
         datumTokenizer: function (datum) {
             return Bloodhound.tokenizers.whitespace(datum.value);
@@ -287,18 +290,17 @@
         }
     });
 
-
-    $('#remote .typeahead').typeahead(null, {
-        name: 'best-pictures',
+    $('#city .typeahead').typeahead(null, {
+        name: 'cities',
         display: 'value',
-        source: suggestionEngine
+        source: suggestionEngine,
+        limit: 10
     });
 
 
-    $('#remote .typeahead').on('typeahead:selected', function (e, datum) {
-        $("input[id=id_city]").val(datum.city_id);
+    $('#city .typeahead').on('typeahead:selected', function (e, datum) {
+        $("#id_city").val(datum.city_id);
     });
-
 
     $(document).ready(function() {
         IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
@@ -312,154 +314,95 @@
         {% if config and config.address == config.ADDRESS_SHOW %}
             $('#id_zip_code').mask("99.999-999");
         {% endif %}
-    });
 
-    var button = document.querySelector('#id_button_pay');
-
-    button.addEventListener('click', function () {
-        function handleSuccess(data) {
-            console.log(data);
-        }
-
-        function handleError(data) {
-            console.log(data);
-        }
-
-        var checkout = new PagarMeCheckout.Checkout({
-            encryption_key: 'ek_test_f9cws0bU9700VqWE4UDuBlKLbvX4IO',
-            success: handleSuccess,
-            error: handleError
+        $('#id_zip_code').on('keyup', function() {
+            searchByCep();
         });
 
-        checkout.open({
-            amount: 8000,
-            createToken: 'true',
-            paymentMethods: 'credit_card,boleto',
-            customerData: false,
-            customer: {
-                external_id: '#123456789',
-                name: 'Fulano',
-                type: 'individual',
-                country: 'br',
-                email: 'fulano@email.com',
-                documents: [
-                    {
-                        type: 'cpf',
-                        number: '71404665560',
-                    },
-                ],
-                phone_numbers: ['+5511999998888', '+5511888889999'],
-                birthday: '1985-01-01',
-            },
-            billing: {
-                name: 'Ciclano de Tal',
-                address: {
-                    country: 'br',
-                    state: 'SP',
-                    city: 'São Paulo',
-                    neighborhood: 'Fulanos bairro',
-                    street: 'Rua dos fulanos',
-                    street_number: '123',
-                    zipcode: '05170060'
-                }
-            },
-            shipping: {
-                name: 'Ciclano de Tal',
-                fee: 12345,
-                delivery_date: '2017-12-25',
-                expedited: true,
-                address: {
-                    country: 'br',
-                    state: 'SP',
-                    city: 'São Paulo',
-                    neighborhood: 'Fulanos bairro',
-                    street: 'Rua dos fulanos',
-                    street_number: '123',
-                    zipcode: '05170060'
-                }
-            },
-            items: [
-                {
-                    id: '1',
-                    title: 'Bola de futebol',
-                    unit_price: 12000,
-                    quantity: 1,
-                    tangible: true
-                },
-                {
-                    id: 'a123',
-                    title: 'Caderno do Goku',
-                    unit_price: 3200,
-                    quantity: 3,
-                    tangible: true
-                }
-            ]
-        })
-      checkout.open({
-        amount: 8000,
-        createToken: 'true',
-        paymentMethods: 'credit_card',
-        customerData: false,
-        customer: {
-          external_id: '#123456789',
-          name: 'Fulano',
-          type: 'individual',
-          country: 'br',
-          email: 'fulano@email.com',
-          documents: [
-            {
-              type: 'cpf',
-              number: '71404665560',
-            },
-          ],
-          phone_numbers: ['+5511999998888', '+5511888889999'],
-          birthday: '1985-01-01',
-        },
-        billing: {
-          name: 'Ciclano de Tal',
-          address: {
-            country: 'br',
-            state: 'SP',
-            city: 'São Paulo',
-            neighborhood: 'Fulanos bairro',
-            street: 'Rua dos fulanos',
-            street_number: '123',
-            zipcode: '05170060'
-          }
-        },
-        shipping: {
-          name: 'Ciclano de Tal',
-          fee: 12345,
-          delivery_date: '2017-12-25',
-          expedited: true,
-          address: {
-            country: 'br',
-            state: 'SP',
-            city: 'São Paulo',
-            neighborhood: 'Fulanos bairro',
-            street: 'Rua dos fulanos',
-            street_number: '123',
-            zipcode: '05170060'
-          }
-        },
-        items: [
-          {
-            id: '1',
-            title: 'Bola de futebol',
-            unit_price: 12000,
-            quantity: 1,
-            tangible: true
-          },
-          {
-            id: 'a123',
-            title: 'Caderno do Goku',
-            unit_price: 3200,
-            quantity: 3,
-            tangible: true
-          }
-        ]
-      })
+        showHideCepLoader();
     });
+
+{#    var button = document.querySelector('#id_button_pay');#}
+{##}
+{#    button.addEventListener('click', function () {#}
+{#        function handleSuccess(data) {#}
+{#            console.log(data);#}
+{#        }#}
+{##}
+{#        function handleError(data) {#}
+{#            console.log(data);#}
+{#        }#}
+{##}
+{#        var checkout = new PagarMeCheckout.Checkout({#}
+{#            encryption_key: 'ek_test_f9cws0bU9700VqWE4UDuBlKLbvX4IO',#}
+{#            success: handleSuccess,#}
+{#            error: handleError#}
+{#        });#}
+{##}
+{#        checkout.open({#}
+{#            amount: 8000,#}
+{#            createToken: 'true',#}
+{#            paymentMethods: 'credit_card,boleto',#}
+{#            customerData: false,#}
+{#            customer: {#}
+{#                external_id: '#123456789',#}
+{#                name: 'Fulano',#}
+{#                type: 'individual',#}
+{#                country: 'br',#}
+{#                email: 'fulano@email.com',#}
+{#                documents: [#}
+{#                    {#}
+{#                        type: 'cpf',#}
+{#                        number: '71404665560',#}
+{#                    },#}
+{#                ],#}
+{#                phone_numbers: ['+5511999998888', '+5511888889999'],#}
+{#                birthday: '1985-01-01',#}
+{#            },#}
+{#            billing: {#}
+{#                name: 'Ciclano de Tal',#}
+{#                address: {#}
+{#                    country: 'br',#}
+{#                    state: 'SP',#}
+{#                    city: 'São Paulo',#}
+{#                    neighborhood: 'Fulanos bairro',#}
+{#                    street: 'Rua dos fulanos',#}
+{#                    street_number: '123',#}
+{#                    zipcode: '05170060'#}
+{#                }#}
+{#            },#}
+{#            shipping: {#}
+{#                name: 'Ciclano de Tal',#}
+{#                fee: 12345,#}
+{#                delivery_date: '2017-12-25',#}
+{#                expedited: true,#}
+{#                address: {#}
+{#                    country: 'br',#}
+{#                    state: 'SP',#}
+{#                    city: 'São Paulo',#}
+{#                    neighborhood: 'Fulanos bairro',#}
+{#                    street: 'Rua dos fulanos',#}
+{#                    street_number: '123',#}
+{#                    zipcode: '05170060'#}
+{#                }#}
+{#            },#}
+{#            items: [#}
+{#                {#}
+{#                    id: '1',#}
+{#                    title: 'Bola de futebol',#}
+{#                    unit_price: 12000,#}
+{#                    quantity: 1,#}
+{#                    tangible: true#}
+{#                },#}
+{#                {#}
+{#                    id: 'a123',#}
+{#                    title: 'Caderno do Goku',#}
+{#                    unit_price: 3200,#}
+{#                    quantity: 3,#}
+{#                    tangible: true#}
+{#                }#}
+{#            ]#}
+{#        });#}
 
 </script>
 

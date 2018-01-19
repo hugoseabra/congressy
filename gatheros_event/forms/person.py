@@ -30,7 +30,7 @@ class PersonForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'placeholder': 'me@you.com'}),
             'phone': TelephoneInput(attrs={'placeholder': '(00) 90000-0000'}),
             'zip_code': TelephoneInput(),
-            'city': forms.TextInput()
+            'city': forms.HiddenInput()
         }
 
     def __init__(self, is_chrome=False, **kwargs):

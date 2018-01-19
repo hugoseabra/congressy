@@ -44,14 +44,14 @@ class EventViewMixin(AccountMixin, generic.View):
 
         event = self.get_event()
         context['event'] = event
-        context['has_paied_lots'] = self.has_paied_lots()
+        context['has_paid_lots'] = self.has_paid_lots()
 
         try:
             config = event.formconfig
         except AttributeError:
             config = FormConfig()
 
-        if self.has_paied_lots():
+        if self.has_paid_lots():
             config.email = True
             config.phone = True
             config.city = True
@@ -89,7 +89,7 @@ class EventViewMixin(AccountMixin, generic.View):
         lot_qs = self.get_lots()
         return lot_qs.count() if lot_qs else 0
 
-    def has_paied_lots(self):
+    def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
         for lot in self.event.lots.all():
             price = lot.price

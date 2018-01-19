@@ -40,11 +40,11 @@ class EventMixin(generic.View):
         context['period'] = self.get_period()
         context['lots'] = self.get_lots()
         context['subscription_enaled'] = self.subscription_enabled()
-        context['has_paied_lots'] = self.has_paied_lots()
+        context['has_paid_lots'] = self.has_paid_lots()
 
         return context
 
-    def has_paied_lots(self):
+    def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
         for lot in self.event.lots.all():
             price = lot.price
@@ -315,31 +315,33 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
         try:
             config = self.event.formconfig
-
-            required_fields = ['gender']
-
-            if config.phone:
-                required_fields.append('phone')
-
-            if not config.address_show and config.city:
-                required_fields.append('city')
-            else:
-                required_fields.append('street')
-                required_fields.append('village')
-                required_fields.append('zip_code')
-                required_fields.append('city')
-
-            if config.cpf_required:
-                required_fields.append('cpf')
-
-            if config.birth_date_required:
-                required_fields.append('birth_date')
-
-            for field_name in required_fields:
-                form.setAsRequired(field_name)
-
         except AttributeError:
-            pass
+            config = FormConfig()
+
+        required_fields = ['gender']
+
+        has_paid_lots = self.has_paid_lots()
+
+        if has_paid_lots or config.phone:
+            required_fields.append('phone')
+
+        if has_paid_lots or config.address_show:
+            required_fields.append('street')
+            required_fields.append('village')
+            required_fields.append('zip_code')
+            required_fields.append('city')
+
+        if not has_paid_lots and not config.address_show:
+            required_fields.append('city')
+
+        if has_paid_lots or config.cpf_required:
+            required_fields.append('cpf')
+
+        if has_paid_lots or config.birth_date_required:
+            required_fields.append('birth_date')
+
+        for field_name in required_fields:
+            form.setAsRequired(field_name)
 
         return form
 
@@ -351,7 +353,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         except AttributeError:
             config = FormConfig()
 
-        if self.has_paied_lots():
+        if self.has_paid_lots():
             config.email = True
             config.phone = True
             config.city = True
@@ -397,7 +399,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
             person = form.save()
 
-            if self.has_paied_lots():
+            if self.has_paid_lots():
                 lot_pk = self.request.POST.get('lot')
             else:
                 lot_pk = self.event.lots.first().pk
