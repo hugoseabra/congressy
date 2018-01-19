@@ -351,7 +351,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         except AttributeError:
             config = FormConfig()
 
-        if self.has_paied_lots():
+        if self.has_paid_lots():
             config.email = True
             config.phone = True
             config.city = True
