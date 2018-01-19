@@ -39,7 +39,7 @@ class EventMixin(generic.View):
         context['info'] = get_object_or_404(Info, event=self.event)
         context['period'] = self.get_period()
         context['lots'] = self.get_lots()
-        context['subscription_enaled'] = self.subscription_enabled()
+        context['subscription_enabled'] = self.subscription_enabled()
         context['has_paid_lots'] = self.has_paid_lots()
 
         return context

@@ -2,13 +2,13 @@
 Formulários de Event
 """
 import os
+from datetime import datetime
 
+from datetimewidget.widgets import DateTimeWidget
 from django import forms
 from django.shortcuts import get_object_or_404
 
 from gatheros_event.models import Event, Member, Organization
-
-from datetimewidget.widgets import DateTimeWidget
 
 
 class EventForm(forms.ModelForm):
@@ -27,15 +27,15 @@ class EventForm(forms.ModelForm):
             # 'published'
         ]
 
-        widgets = {'organization': forms.HiddenInput,
-                   'date_start': forms.DateTimeInput,
-                   'date_end': forms.DateTimeInput,
-                   }
-
         # widgets = {'organization': forms.HiddenInput,
-        #            'date_start': DateTimeWidget,
-        #            'date_end': DateTimeWidget,
+        #            'date_start': forms.DateTimeInput,
+        #            'date_end': forms.DateTimeInput,
         #            }
+
+        widgets = {'organization': forms.HiddenInput,
+                   'date_start': DateTimeWidget,
+                   'date_end': DateTimeWidget,
+                   }
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -45,6 +45,8 @@ class EventForm(forms.ModelForm):
         instance = kwargs.get('instance')
         if instance is None:
             self._configure_organization_field()
+
+        self._set_widget_date()
 
     def _configure_organization_field(self):
         orgs = []
@@ -63,6 +65,18 @@ class EventForm(forms.ModelForm):
         self.fields['organization'].widget = forms.Select()
         self.fields['organization'].choices = orgs
         self.fields['organization'].label = 'Realizador'
+
+    def _set_widget_date(self):
+
+        self.fields['date_start'].widget = DateTimeWidget(
+            bootstrap_version=3,
+            attrs={'style': 'background-color:#FFF'},
+            options={'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now())})
+
+        self.fields['date_end'].widget = DateTimeWidget(
+            bootstrap_version=3,
+            attrs={'style': 'background-color:#FFF'},
+            options={'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now())})
 
 
 class EventEditDatesForm(forms.ModelForm):
