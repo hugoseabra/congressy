@@ -12,8 +12,8 @@
           content="width=device-width, initial-scale=1, maximum-scale=1">
 
     <!-- BASIC INFO -->
-    <title>{{ object.name }} | Congressy</title>
-    <meta name="author" content="{{ object.organization }}">
+    <title>{{ event.name }} | Congressy</title>
+    <meta name="author" content="{{ event.organization }}">
     <meta name="description"
           content="{{ info.description }}">
 
@@ -68,11 +68,12 @@
     <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-1024.css' %}">
     <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-1280.css' %}">
 </head>
-{% if remove_preloader %}
-    <body class="enable-animations">
-{% else %}
-    <body class="enable-animations enable-preloader preloader-dark">
-{% endif %}
+<body>
+{#{% if remove_preloader %}#}
+{#    <body class="enable-animations">#}
+{#{% else %}#}
+{#    <body class="enable-animations enable-preloader preloader-dark">#}
+{#{% endif %}#}
 <div id="document" class="document">
 
     <!-- HEADER
@@ -94,7 +95,7 @@
                 </button>
 
                 <!-- HEADER LOGO -->
-                <a class="navbar-logo navbar-brand anchor-link" href="#hero">
+                <a class="navbar-logo navbar-brand" href="{% url 'public:hotsite' event.slug %}">
                     <img src="{% static 'hotsite/images/logos/header-logo.png' %}"
                          srcset="{% static 'hotsite/images/logos/header-logo@2x.png' %}"
                          alt="Congressy">
@@ -110,10 +111,10 @@
                     <li><a href="#hero" class="anchor-link">Capa</a></li>
                     <li><a href="#about" class="anchor-link">Sobre o evento</a>
                     </li>
-                    {% if object.place %}
+                    {% if event.place %}
                     <li><a href="#map" class="anchor-link">Local</a></li>
                     {% endif %}
-                    {% if not object.organization.internal %}
+                    {% if not event.organization.internal %}
                         <li><a href="#owner" class="anchor-link">Organizador</a>
                     {% endif %}
                     </li>
@@ -127,12 +128,12 @@
                                 <li><a href="{% url 'event:profile' %}" target="_blank">Minha conta</a>
                                 </li>
                                 <li><a href="{% url 'front:start' %}" target="_blank">Gerenciar</a></li>
-                                <li><a href="{% url 'public:logout' %}?next={% url 'public:hotsite' object.slug %}">Sair</a></li>
+                                <li><a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}">Sair</a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="header-action-button">
-                            <a href="{% url 'public:login' %}?next={% url 'public:hotsite' object.slug %}"
+                            <a href="{% url 'public:login' %}?next={% url 'public:hotsite' event.slug %}"
                                class="external btn btn-primary">
                                 Entrar
                             </a>
@@ -173,20 +174,19 @@
                          data-animation="fadeIn">
                         <div class="col-md-10 col-md-offset-1">
 
-                            <h1 class="hero-title">{{ object.name }}</h1>
+                            <h1 class="hero-title">{{ event.name }}</h1>
 
                             <p class="hero-tagline">
-                            <div>
-                                <i class="fa fa-calendar"></i>
-                                {{ period }}
-                            </div>
-                            {% if object.place %}
-                            <div>
-                                <i class="fa fa-map-marker"></i>
-                                {{ object.place.name }}
-                            </div>
-                            {% endif %}
-
+                                <div>
+                                    <i class="fa fa-calendar"></i>
+                                    {{ period }}
+                                </div>
+                                {% if event.place %}
+                                <div>
+                                    <i class="fa fa-map-marker"></i>
+                                    {{ event.place.name }}
+                                </div>
+                                {% endif %}
                             </p>
                         </div>
                     </div>
@@ -200,138 +200,12 @@
                             {% endif %}
                         </div>
 
-                        {% if object.data.subscription_type != 'disabled' %}
+                        {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
                             <div class="hero-features-right col-md-5"
                                  data-animation="fadeIn">
 
+                                {% include 'hotsite/simple_form.html' %}
 
-                                <!-- FORM -->
-                                <form action="{% url 'public:hotsite' object.slug %}" method="post" class="form"
-                                      role="form" onsubmit="submit_form()">
-
-                                    {% csrf_token %}
-
-                                    {% if user.is_authenticated %}
-                                        <h4 class="form-heading"
-                                            style="font-weight: bold;">Olá, {{ user.first_name }}</h4>
-                                    {% else %}
-                                        <h4 class="form-heading"
-                                            style="font-weight: bold;">Inscreva-se
-                                            agora!</h4>
-                                    {% endif %}
-
-                                    {% block messages %}
-                                        {% if messages %}
-                                            <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                                            {% for message in messages %}
-
-                                                {% if message.tags %}
-                                                    <div class="alert alert-{{ message.tags }} alert-dismissible"
-                                                         role="alert">
-
-                                                {% else %}
-                                                    <div class="alert alert-warning alert-dismissible" role="alert">
-                                                {% endif %}
-
-                                            <button type="button" class="close" data-dismiss="alert"
-                                                    aria-label="Close"><span aria-hidden="true">&times;</span>
-                                            </button>
-                                            {{ message|capfirst }}
-                                            </div>
-
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    {% endblock messages %}
-
-
-
-                                    <div class="form-validation alert"></div>
-
-                                    {% if not is_subscribed %}
-
-                                        {% if not person.email or not person.name or not person.phone  %}
-                                            <p class="text-muted">Preencha os dados seguintes para concluir sua
-                                                inscrição.</p>
-                                        {% endif %}
-
-
-                                        {% if person and person.name %}
-                                            <input type="hidden" name="name" value="{{ person.name }}">
-                                        {% else %}
-                                            <div class="form-group">
-                                                <label for="id_name">
-                                                    Nome Completo
-                                                </label>
-
-                                                <div>
-                                                    <input name="name" id="id_name" class="form-control placeholder"
-                                                           maxlength="255"
-                                                           placeholder="Nome completo" required="" type="text">
-                                                </div>
-                                            </div>
-                                        {% endif %}
-
-
-                                        {% if person and person.email%}
-                                            <input type="hidden" name="email" value="{{ person.email }}">
-                                        {% else %}
-                                            <div class="form-group">
-                                                <label for="id_email">E-Mail</label>
-                                                <div>
-                                                    <input name="email" placeholder="me@email.com" required
-                                                           class="form-control"
-                                                           id="id_email" type="email">
-                                                </div>
-                                            </div>
-                                        {% endif %}
-
-                                        {% if person and person.phone and person.phone|length == 15 %}
-                                            <input type="hidden" name="phone" value="{{ person.phone }}">
-                                        {% else %}
-                                            <div class="form-group">
-                                                <label for="id_phone">Celular</label>
-                                                <div>
-                                                    <input name="phone" class="form-control"
-                                                           maxlength="14" id="id_phone"
-                                                           required="" type="tel" placeholder="(00) 0000-0000">
-                                                </div>
-
-
-                                            </div>
-                                        {% endif %}
-
-                                        {% if not person or person.email == ""  or person.name == ""  or person.phone == "" %}
-                                            <div class="form-group form-group-submit">
-                                                <button class="btn btn-primary btn-lg btn-block"
-                                                        data-loading-text="Enviar">
-                                                    Enviar
-                                                </button>
-                                            </div>
-                                        {% else %}
-                                            <div class="form-group form-group-submit">
-                                                <button class="btn btn-primary btn-lg btn-block"
-                                                        data-loading-text="Quero me inscrever">
-                                                    Quero me inscrever
-                                                </button>
-                                            </div>
-                                        {% endif %}
-                                    {% else %}
-                                        <div class="text-center">
-                                            <p style="font-size: 20px">
-                                                Você já está cadastrado(a) neste evento!
-                                            </p>
-
-                                            <div style="align-items: center;display: flex;justify-content: center;">
-                                                <i class="fa fa-check-circle fa-5x" style="color: darkgreen"
-                                                   aria-hidden="true"></i>
-
-                                            </div>
-                                        </div>
-                                    {% endif %}
-
-
-                                </form>
                             </div>
                         {% endif %}
 
@@ -415,7 +289,7 @@
 
     </section>
 
-    {% if object.place %}
+    {% if event.place %}
     <!-- GOOGLE MAPS
     ================================= -->
     <section id="map" class="contact-maps-section section">
@@ -537,7 +411,7 @@
     ================================= -->
     <!-- REALIZADOR
  ================================= -->
-    {% if not object.organization.internal %}
+    {% if not event.organization.internal %}
         <section id="owner" class="footer-section section">
             <h2 class="section-heading text-center">Organizador</h2>
             <div class="container">
@@ -545,9 +419,9 @@
                     <div class="col-md-10">
                         <div class="row">
                             <div class="col-md-12" style="text-align: left;">
-                                <h3>{{ object.organization }}</h3>
+                                <h3>{{ event.organization }}</h3>
                                 <div class="team-member-description">
-                                    {{ object.organization.description_html|safe }}
+                                    {{ event.organization.description_html|safe }}
                                 </div>
                             </div>
                         </div>

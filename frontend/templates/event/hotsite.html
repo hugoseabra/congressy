@@ -56,14 +56,16 @@
                 <i class="fa  fa-fw fa-rocket"></i> Página do evento
             </a>
         </li>
+        {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
         <li>
             <a href="{% url 'subscription:form-config' event.pk %}"
                title="Formulário">
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
+        {% endif %}
     </ul>
-
+    {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
     <h5 class="sidebar-header">Participantes</h5>
     <ul class="nav nav-pills nav-stacked">
         <li>
@@ -88,6 +90,7 @@
             </a>
         </li>
     </ul>
+    {% endif %}
 {% endblock %}
 
 {% block content %}

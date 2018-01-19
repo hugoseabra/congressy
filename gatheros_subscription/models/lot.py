@@ -5,6 +5,7 @@ os critérios de inscrições: se gratuitas, se limitadas, se privados, etc.
 """
 
 import uuid
+import locale
 from datetime import datetime, timedelta
 
 from django.db import models
@@ -179,6 +180,28 @@ class Lot(models.Model, GatherosModelMixin):
 
         attended = queryset.filter(attended=True).count()
         return round((attended * 100)/num_subs, 2)
+
+    @property
+    def display_publicly(self):
+        """ Exibição pública de infomações do lote. """
+        display = '{} - R$ {} ({}) vagas restantes'
+
+        display = display.format(
+            self.name,
+            locale.format(percent='%.2f', value=self.price, grouping=True),
+            self.places_remaing
+        )
+
+        return display
+
+    @property
+    def places_remaing(self):
+        """ Retorna a quantidade ainda restante de vagas. """
+        if not self.limit:
+            return 0
+
+        num = self.subscriptions.all().count()
+        return self.limit - num
 
     @property
     def status(self):

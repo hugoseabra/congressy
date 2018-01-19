@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<!-- Drew - A Multipurpose Landing Page Template, designed by David Rozando (http://design.davidrozando.com) -->
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html lang="en"> <!--<![endif]-->
+{% load static base_tags %}
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- BASIC INFO -->
+    <title>{{ event.name }} | Congressy</title>
+    <meta name="author" content="{{ event.organization }}">
+    <meta name="description"
+          content="{{ info.description }}">
+
+    <!-- FAVICONS -->
+    <link rel="icon" href="{% static 'hotsite/images/favicons/favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'hotsite/images/favicons/apple-touch-icon.png' %}">
+
+    <!-- CSS
+    ================================= -->
+
+    <!-- GOOGLE FONTS -->
+    <link rel="stylesheet"
+          href="http://fonts.googleapis.com/css?family=Montserrat:400,700">
+    <link rel="stylesheet"
+          href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
+
+    <!-- LIBRARIES CSS -->
+    <link rel="stylesheet" href="{% static 'hotsite/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/animate.min.css' %}">
+
+    <!-- SPECIFIC CSS -->
+    <link rel="stylesheet" href="{% static 'hotsite/css/style.css' %}">
+
+    <!-- COLORS -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/pink.css"> -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/red.css"> -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/orange.css"> -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/yellow.css"> -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/green.css"> -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/turquoise.css"> -->
+    <link id="color-css" rel="stylesheet" href="{% static 'hotsite/css/colors/blue.css' %}">
+    <style>
+        img.blurred {
+            -webkit-filter: blur(18px);
+            -moz-filter: blur(18px);
+            -o-filter: blur(18px);
+            -ms-filter: blur(18px);
+            filter: blur(18px);
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-320.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-360.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-375.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-384.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-412.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-414.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-480.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-600.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-768.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-800.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-1024.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-1280.css' %}">
+</head>
+
+<body class="enable-animations">
+
+<div id="document" class="document">
+
+    <!-- HEADER
+    ================================= -->
+    <header id="header"
+            class="header-section section section-dark navbar navbar-fixed-top">
+
+        <div class="container-fluid">
+
+            <div class="navbar-header navbar-left">
+
+                <!-- RESPONSIVE MENU BUTTON -->
+                <button type="button" class="navbar-toggle"
+                        data-toggle="collapse" data-target="#navigation">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+                <!-- HEADER LOGO -->
+                <a class="navbar-logo navbar-brand anchor-link" href="#hero">
+                    <img src="{% static 'hotsite/images/logos/header-logo.png' %}"
+                         srcset="{% static 'hotsite/images/logos/header-logo@2x.png' %}"
+                         alt="Congressy">
+                </a>
+            </div>
+
+            <nav id="navigation"
+                 class="navigation navbar-collapse collapse navbar-right">
+
+                <!-- NAVIGATION LINKS -->
+                <ul id="header-nav" class="nav navbar-nav">
+
+                    <li><a href="#hero" class="anchor-link">Capa</a></li>
+                    <li><a href="#about" class="anchor-link">Sobre o evento</a>
+                    </li>
+                    {% if event.place %}
+                    <li><a href="#map" class="anchor-link">Local</a></li>
+                    {% endif %}
+                    {% if not event.organization.internal %}
+                        <li><a href="#owner" class="anchor-link">Organizador</a>
+                    {% endif %}
+                    </li>
+
+                    <!-- HEADER ACTION BUTTON -->
+                    {% if user.is_authenticated %}
+                        <li class="header-action-button dropdown dropdown-hover ">
+                            <a href="#" class="dropdown-toggle external" data-toggle="dropdown" role="button"
+                               aria-expanded="true" style="font-weight: bold">{{ user.first_name }}<span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{% url 'event:profile' %}" target="_blank">Minha conta</a>
+                                </li>
+                                <li><a href="{% url 'front:start' %}" target="_blank">Gerenciar</a></li>
+                                <li><a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}">Sair</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="header-action-button">
+                            <a href="{% url 'public:login' %}?next={% url 'public:hotsite' event.slug %}"
+                               class="external btn btn-primary">
+                                Entrar
+                            </a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        </div>
+
+    </header>
+
+    <!-- HERO
+    ================================= -->
+    <section id="hero"
+             class="hero-section hero-layout-classic hero-layout-features-and-form section section-dark">
+
+        <div class="section-background">
+
+            <!-- IMAGE BACKGROUND -->
+            <div class="section-background-image parallax">
+                <img
+                        {% if info.image_main.default %}
+                            src="{{ info.image_main.default.url }}"
+                        {% else %}
+                            src=""
+                        {% endif %}
+                            alt="" style="opacity: 0.2;" class="blurred">
+            </div>
+        </div>
+
+        <div class="container">
+
+            <div class="hero-content">
+                <div class="hero-content-inner">
+
+                    <div class="hero-heading text-center row"
+                         data-animation="fadeIn">
+                        <div class="col-md-10 col-md-offset-1">
+
+                            <h1 class="hero-title">{{ event.name }}</h1>
+
+                            <p class="hero-tagline">
+                            <div>
+                                <i class="fa fa-calendar"></i>
+                                {{ period }}
+                            </div>
+
+                            <div>
+                                <i class="fa fa-map-marker"></i>
+                                {{ event.place.name }}
+                            </div>
+
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="hero-features row">
+
+                        {% if info.lead %}
+                            <div class="hero-features-left col-md-12">
+
+                                <p class="lead">
+                                    {{ info.lead }}
+                                </p>
+
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- DESCRIPTION
+    ================================= -->
+    <section id="about" class="about-section section">
+
+        <div class="container">
+
+            <h2 class="section-heading text-center">Inscrição</h2>
+
+            <div class="about-row row">
+                <div class="col-md-9 col-md-offset-2">
+
+                    {% block messages %}
+                        {% if messages %}
+                            <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                            {% for message in messages %}
+
+                                {% if message.tags %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+
+                                {% else %}
+                                    <div class="alert alert-warning alert-dismissible" role="alert">
+                                {% endif %}
+
+                            <button type="button" class="close" data-dismiss="alert"
+                                    aria-label="Close"><span aria-hidden="true">&times;</span>
+                            </button>
+                            {{ message|capfirst }}
+                            </div>
+
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endblock messages %}
+
+
+                    {% include 'hotsite/subscription_form.html' %}
+                </div>
+
+            </div>
+
+    </section>
+
+    <!-- CONGRESSY FOOTER
+    ================================= -->
+    <section id="about-platform" class="footer-section section section-dark">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="footer-logo">
+                        <img src="{% static 'hotsite/images/logos/header-logo.png' %}"
+                             srcset="
+                                {% static 'hotsite/images/logos/header-logo@2x.png' %}" alt="Congressy">
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- LIBRARIES JS
+================================= -->
+<script src="{% static 'hotsite/js/jquery-1.11.2.min.js' %}"></script>
+<script src="{% static 'hotsite/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'hotsite/js/respimage.min.js' %}"></script>
+<script src="{% static 'hotsite/js/jpreloader.min.js' %}"></script>
+<script src="{% static 'hotsite/js/smoothscroll.min.js' %}"></script>
+<script src="{% static 'hotsite/js/jquery.inview.min.js' %}"></script>
+<script src="{% static 'hotsite/js/jquery.counterup.min.js' %}"></script>
+<script src="{% static 'hotsite/js/jquery.stellar.min.js' %}"></script>
+<script src="{% static 'hotsite/js/responsiveslides.min.js' %}"></script>
+
+<!-- SCRIPT PAGAR.ME -->
+<script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
+
+<script>
+    var button = document.querySelector('#id_button_pay');
+
+    button.addEventListener('click', function() {
+      function handleSuccess (data) {
+        console.log(data);
+      }
+
+      function handleError (data) {
+        console.log(data);
+      }
+
+      var checkout = new PagarMeCheckout.Checkout({
+        encryption_key: 'ek_test_f9cws0bU9700VqWE4UDuBlKLbvX4IO',
+        success: handleSuccess,
+        error: handleError
+      });
+
+      checkout.open({
+        amount: 8000,
+        createToken: 'true',
+        paymentMethods: 'credit_card,boleto',
+        customerData: false,
+        customer: {
+          external_id: '#123456789',
+          name: 'Fulano',
+          type: 'individual',
+          country: 'br',
+          email: 'fulano@email.com',
+          documents: [
+            {
+              type: 'cpf',
+              number: '71404665560',
+            },
+          ],
+          phone_numbers: ['+5511999998888', '+5511888889999'],
+          birthday: '1985-01-01',
+        },
+        billing: {
+          name: 'Ciclano de Tal',
+          address: {
+            country: 'br',
+            state: 'SP',
+            city: 'São Paulo',
+            neighborhood: 'Fulanos bairro',
+            street: 'Rua dos fulanos',
+            street_number: '123',
+            zipcode: '05170060'
+          }
+        },
+        shipping: {
+          name: 'Ciclano de Tal',
+          fee: 12345,
+          delivery_date: '2017-12-25',
+          expedited: true,
+          address: {
+            country: 'br',
+            state: 'SP',
+            city: 'São Paulo',
+            neighborhood: 'Fulanos bairro',
+            street: 'Rua dos fulanos',
+            street_number: '123',
+            zipcode: '05170060'
+          }
+        },
+        items: [
+          {
+            id: '1',
+            title: 'Bola de futebol',
+            unit_price: 12000,
+            quantity: 1,
+            tangible: true
+          },
+          {
+            id: 'a123',
+            title: 'Caderno do Goku',
+            unit_price: 3200,
+            quantity: 3,
+            tangible: true
+          }
+        ]
+      })
+    });
+
+</script>
+
+<!-- MAIN SCRIPT
+================================= -->
+<script src="{% static 'hotsite/js/script.js' %}"></script>
+</body>
+
+</html>

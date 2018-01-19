@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 
 from core.model import validator
-import core.model.validator.phone_validator
 
 
 class Migration(migrations.Migration):
@@ -20,7 +19,8 @@ class Migration(migrations.Migration):
             field=models.CharField(choices=[('disabled', 'Desativadas'),
                                             ('simple', 'Simples (gratuitas)'),
                                             (
-                                            'by_lots', 'Gerenciar por lotes')],
+                                                'by_lots',
+                                                'Gerenciar por lotes')],
                                    default='simple',
                                    help_text='Como gostaria de gerenciar as inscrições de seu evento?',
                                    max_length=15, verbose_name='inscrições'),
@@ -40,9 +40,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='person',
             name='gender',
-            field=models.CharField(
-                choices=[('M', 'Masculino'), ('F', 'Feminino')], default='M',
-                max_length=1, verbose_name='sexo'),
+            field=models.CharField(blank=True, choices=[('M', 'Masculino'),
+                                                        ('F', 'Feminino')],
+                                   default='M', max_length=1, null=True,
+                                   verbose_name='sexo'),
         ),
         migrations.AlterField(
             model_name='person',
