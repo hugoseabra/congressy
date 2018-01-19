@@ -3,20 +3,25 @@ from django.conf.urls import include, url
 from gatheros_subscription import views
 
 urls = [
-    url(
-        r'^(?P<pk>[0-9A-Fa-f-]+)/attendance/$',
-        views.SubscriptionAttendanceView.as_view(),
-        name='subscription-attendance'
-    ),
+    # url(
+    #     r'^(?P<pk>[0-9A-Fa-f-]+)/attendance/$',
+    #     views.SubscriptionAttendanceView.as_view(),
+    #     name='subscription-attendance'
+    # ),
     url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/delete/$',
         views.SubscriptionDeleteView.as_view(),
         name='subscription-delete'
     ),
-    url(
-        r'^(?P<pk>[0-9A-Fa-f-]+)/edit/$',
-        views.SubscriptionEditFormView.as_view(),
-        name='subscription-edit'
+    # url(
+    #     r'^(?P<pk>[0-9A-Fa-f-]+)/edit/$',
+    #     views.SubscriptionEditFormView.as_view(),
+    #     name='subscription-edit'
+    # ),
+     url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/',
+        views.SubscriptionViewFormView.as_view(),
+        name='subscription-view'
     ),
     url(
         r'^add/$',

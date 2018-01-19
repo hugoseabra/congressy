@@ -11,6 +11,7 @@ django-js-asset==0.1.1
 django-localflavor==1.4.1
 django-permission==1.0.4
 django-stdimage==2.4.1
+django-user-agents==0.3.2
 django-widget-tweaks==1.4.1
 djangorestframework==3.7.7
 et-xmlfile==1.0.1
@@ -29,9 +30,13 @@ progressbar2==3.30.2
 psycopg2==2.7.1
 pyparsing==2.2.0
 python-utils==2.1.0
+PyYAML==3.12
 pytz==2017.3
 requests==2.18.4
+ua-parser==0.7.3
+user-agents==1.1.0
 six==1.11.0
 tolerance==0.1.2
 Unidecode==0.4.19
 urllib3==1.22
+

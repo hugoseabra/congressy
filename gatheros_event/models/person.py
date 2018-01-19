@@ -40,11 +40,14 @@ class Person(models.Model, GatherosModelMixin):
         max_length=1,
         choices=GENDER_CHOICES,
         verbose_name='sexo',
-        blank=True,
-        null=True,
+        blank=False,
+        null=False,
+        default=GENDER_MALE
     )
     email = models.EmailField(
-        verbose_name='email'
+        verbose_name='e-mail',
+        null=True,
+        blank=True,
     )
     city = models.ForeignKey(
         City,
@@ -63,7 +66,8 @@ class Person(models.Model, GatherosModelMixin):
         max_length=255,
         blank=True,
         null=True,
-        verbose_name='endereço'
+        verbose_name='logradouro',
+        help_text="Rua / Avenida / Viela / etc."
     )
     number = models.CharField(
         max_length=20,
@@ -88,7 +92,7 @@ class Person(models.Model, GatherosModelMixin):
         max_length=15,
         blank=True,
         null=True,
-        verbose_name='telefone',
+        verbose_name='celular',
         validators=[phone_validator]
     )
 
@@ -116,7 +120,7 @@ class Person(models.Model, GatherosModelMixin):
     birth_date = models.DateField(
         blank=True,
         null=True,
-        verbose_name='data nascimento'
+        verbose_name='data de nasc.'
     )
     rg = models.CharField(
         max_length=255,

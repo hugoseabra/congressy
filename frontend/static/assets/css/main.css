@@ -2591,7 +2591,8 @@ body.fullscreen-widget-active .panel .panel-heading .actions > .fa-times {
 .social .fa-youtube-play:hover {
   background: #DF192A;
 }
-.form-control {
+.form-control,
+.theme-cgsy-full .form-group .readonly-field {
   border: 1px solid #DDD;
   border-radius: 2px;
   box-shadow: none;
@@ -3388,6 +3389,30 @@ label.valid {
 .theme-cgsy-full .main-content-wrapper {
   padding-bottom: 65px !important;
 }
+.theme-cgsy-full .well.well-info {
+  background-color: #238acc;
+  color: #fff;
+}
+.theme-cgsy-full .well.well-warning {
+  background-color: #eea237;
+  color: #fff;
+}
+.theme-cgsy-full .well.well-success {
+  background-color: #4caf4c;
+  color: #fff;
+}
+.theme-cgsy-full .well.well-primary {
+  background-color: #5f779d;
+  color: #fff;
+}
+.theme-cgsy-full .well.well-danger {
+  background-color: #d43e3b;
+  color: #fff;
+}
+.theme-cgsy-full .well.well-default {
+  background-color: #9ea7ac;
+  color: #fff;
+}
 .theme-cgsy-full .pageheader h1 {
   font-weight: bold;
   color: #556B8D;
@@ -3403,14 +3428,21 @@ label.valid {
   font-size: 0.875em;
   margin-bottom: 0;
 }
+.theme-cgsy-full .profile-block {
+  padding: 10px 0;
+}
+.theme-cgsy-full .profile-block .profile-info {
+  padding: 10px 5px;
+}
+.theme-cgsy-full .profile-block .profile-info .profile-info-label {
+  font-size: 0.75em;
+  font-weight: bold;
+}
+.theme-cgsy-full .profile-block .profile-info .profile-info-value {
+  font-size: 0.875em;
+}
 .theme-cgsy-full .filter-box {
   display: none;
-}
-.theme-cgsy-full .checkbox label,
-.theme-cgsy-full .radio label {
-  padding-left: 6px;
-  position: relative;
-  top: 2px;
 }
 .theme-cgsy-full .buttonbar {
   padding: 0 0 10px 0;
@@ -3621,6 +3653,12 @@ label.valid {
   margin-left: 10px !important;
   margin-right: 10px !important;
 }
+.theme-cgsy-full .form-group .readonly-field {
+  padding: 8px 10px;
+  font-size: 0.875em;
+  border: 1px solid #ccc;
+  background-color: #f8f8f8;
+}
 .theme-cgsy-full .loader-block {
   position: relative;
   z-index: 10000;
@@ -3633,6 +3671,12 @@ label.valid {
 }
 .theme-cgsy-full .loader-block .img-block img {
   height: 40px;
+}
+.theme-cgsy-full .checkbox label,
+.theme-cgsy-full .radio label {
+  padding-left: 6px;
+  position: relative;
+  top: 2px;
 }
 .theme-cgsy-full .base_logo {
   padding-top: 10px;

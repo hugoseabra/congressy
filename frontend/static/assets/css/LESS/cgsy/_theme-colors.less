@@ -63,6 +63,38 @@
     padding-bottom: 65px !important;
   }
 
+  //================================ WELL ===================================//
+  .well.well-info {
+      background-color: lighten(@infoColor, 5%);
+      color: #fff;
+  }
+
+  .well.well-warning {
+      background-color: lighten(@warningColor, 5%);
+      color: #fff;
+  }
+
+  .well.well-success {
+      background-color: lighten(@successColor, 5%);
+      color: #fff;
+  }
+
+  .well.well-primary {
+      background-color: lighten(@primaryColor, 5%);
+      color: #fff;
+  }
+
+  .well.well-danger {
+      background-color: lighten(@dangerColor, 5%);
+      color: #fff;
+  }
+
+  .well.well-default {
+      background-color: lighten(@defaultColor, 5%);
+      color: #fff;
+  }
+
+
   //============================ PAGE HEADER ================================//
   .pageheader {
     h1 {
@@ -84,18 +116,28 @@
     }
   }
 
+  //============================= PROFILE ===================================//
+
+  .profile-block {
+    padding: 10px 0;
+
+    .profile-info {
+      padding: 10px 5px;
+
+      .profile-info-label {
+        font-size: @12px;
+        font-weight: bold;
+      }
+      .profile-info-value {
+        font-size: @14px;
+      }
+    }
+  }
+
   //============================= FILTERS ===================================//
   .filter-box {
     display: none;
   }
-
-  //============================ FORM / FIELDS ==============================//
-  .checkbox label, .radio label {
-    padding-left: 6px;
-    position: relative;
-    top: 2px;
-  }
-
   //============================= BUTTONS ===================================//
   .buttonbar {
     //box-shadow: 1px 0 5px #c1b7b7;
@@ -266,6 +308,14 @@
   .form-group {
     margin-left: 10px !important;
     margin-right: 10px !important;
+
+    .readonly-field {
+      &:extend(.form-control);
+      padding: 8px 10px;
+      font-size: @14px;
+      border: 1px solid #ccc;
+      background-color: #f8f8f8;
+    }
   }
   .loader-block {
     position: relative;
@@ -281,6 +331,12 @@
         height: 40px;
       }
     }
+  }
+
+  .checkbox label, .radio label {
+    padding-left: 6px;
+    position: relative;
+    top: 2px;
   }
 
   //============================== LOGO =====================================//

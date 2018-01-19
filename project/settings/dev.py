@@ -9,8 +9,8 @@ INSTALLED_APPS.append('debug_toolbar')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'gatheros_site_dev',
-        'USER': 'gatheros',
+        'NAME': 'cgsy_dev',
+        'USER': 'cgsy',
         'PASSWORD': 'GatherosAdmin@#qwe',
         'HOST': 'localhost',
     },

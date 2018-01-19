@@ -8,17 +8,6 @@
 {# @TODO Checkbox para "manter-me conectado" com sessão mais longa. #}
 {# @TODO Implementar Oauth2. #}
 
-{% block global_js %}
-    {{ block.super }}
-<script>
-$(document).ready(function() {
-    window.setTimeout(function() {
-        $('#email').focus();
-    }, 500);
-});
-</script>
-{% endblock %}
-
 {% block form %}
     <p class="text-center">Entre com suas credenciais para acessar sua conta.</p>
     <form action="" method="post" class="form-horizontal" role="form" onsubmit="submit_form(this); return false;">
@@ -30,6 +19,7 @@ $(document).ready(function() {
                        required
                        class="form-control with-icon"
                        id="email"
+                       autofocus
                        placeholder="E-mail">
                 <i class="fa fa-user"></i>
                 <small class="text-muted">{{ form.username.errors }}</small>

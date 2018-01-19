@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
-{% load i18n static widget_tweaks %}
+{% load i18n static widget_tweaks form_config_tags user_agents user_agent_tag %}
+
 {% block title %}
     {% if object %}Editar{% else %}Nova{% endif %} Inscrição | Congressy
 {% endblock %}
@@ -16,6 +17,19 @@
         </div>
     {% endif %}
 {% endblock %}
+
+{% block messages %}
+    {{ block.super }}
+
+    {% if subscription_exists %}
+    <div class="text-center alert alert-warning alert-dismissable">
+        Esta pessoa já está inscrita neste evento.
+        <br />
+        <br />
+        <a href="#" class="btn btn-primary">Ver inscrição</a>
+    </div>
+    {% endif %}
+{% endblock messages %}
 
 {% block nav_aside_itens %}
     <h5 class="sidebar-header">Participantes</h5>
@@ -36,12 +50,18 @@
         </li>
     </ul>
 
-    <h5 class="sidebar-header">Página do evento</h5>
+    <h5 class="sidebar-header">Configurações</h5>
     <ul class="nav nav-pills nav-stacked">
         <li>
             <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Configurar pagina">
-                <i class="fa  fa-fw fa-rocket"></i> Configurar pagina
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
     </ul>
@@ -49,23 +69,79 @@
 
 {% block scripts %}
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script src="{% static "assets/js/subscription.js" %}"></script>
     <script type="application/javascript">
+        IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
 
         $(document).ready(function () {
             $('#id_phone').mask("(99) 99999-9999");
-            {#$('.phone_with_ddd').mask('(00) 0000-0000');#}
-            {#$('.phone').mask('0000-0000');#}
-            {#$('.phone_us').mask('(000) 000-0000')#}
-        });
+            $('#id_cpf').mask("999.999.999-99");
+            {% if not request|is_chrome %}
+                $('#id_birth_date').mask("99/99/9999");
+            {% endif %}
 
+            {% if config and config.address == config.ADDRESS_SHOW %}
+                $('#id_zip_code').mask("99.999-999");
+            {% endif %}
+
+            $(window).resize(resize_status_block);
+            resize_status_block({% if subscription_form %}true{% endif %});
+
+            $('#check-email-button-block button').click(function() {
+                check_email();
+            });
+
+            window.setTimeout(function() {
+                {% if subscription_exists %}
+                    setAsReadonly(true);
+                {% elif not procceed %}
+                    disableAll(['#id_email']);
+                {% elif has_profile %}
+                    setAsReadonly();
+                {% else %}
+                    enableAll();
+                {% endif %}
+
+            }, 100);
+            showHideEmailLoader(false);
+
+            {% if config and config.cpf != config.CPF_HIDE %}
+                showHideCpfLoader(false);
+
+{#                $('#id_cpf').on('keyup', function() {#}
+{#                    var value = $(this).val();#}
+{#                    if (value.length < 14) {#}
+{#                        return;#}
+{#                    }#}
+{#                    showHideCpfLoader(true);#}
+{#                    window.setTimeout(function() {#}
+{#                        showHideCpfLoader(false);#}
+{#                    }, 200);#}
+{#                });#}
+            {% endif %}
+        });
     </script>
 {% endblock %}
 
 {% block content %}
-
-    <form action="" method="post">
+    {% if not procceed %}
+    <form action="" method="post" id="subscription-form" onsubmit="$('#check-email-button-block button').trigger('click');return false;">
+    {% else %}
+    <form action="" method="post" id="subscription-form">
+    {% endif %}
 
         {% csrf_token %}
+
+        {% if non_field_errors %}
+            {% render_errors non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
 
         <div class="row">
             <div class="col-md-12">
@@ -76,10 +152,18 @@
                             <i class="fa fa-close"></i>
                             Cancelar
                         </a>
+                        {% if not subscription_exists %}
                         <button type="submit" class="btn btn-success">
                             <i class="fa fa-save"></i>
                             Salvar
                         </button>
+                        {% else %}
+                        <a href="{% url 'subscription:subscription-add' event.pk %}"
+                           class="btn btn-primary">
+                            <i class="fa fa-plus"></i>
+                            Nova inscrição
+                        </a>
+                        {% endif %}
                     </div>
                     <div class="clearfix"></div>
                 </div>
@@ -87,71 +171,228 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-primary">
+            <div class="col-xl-2 col-lg-3 col-md-3" style="margin-bottom: 4px;">
+                <div class="panel panel-primary" id="block-profile">
+                    <div class="panel-body profile-block">
+                        <div class="col-md-12 col-xs-4">
+                            <img src="{% static 'assets/img/user_undefined.jpg' %}" class="img-responsive">
+                        </div>
+                        <div class="col-md-12 col-xs-8">
+                            {% if not object %}
+                            <div class="profile-info">
+                                <div class="profile-info-label">Criado em:</div>
+                                <div class="profile-info-value">12/06/2017 15h35</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-10 col-lg-9 col-md-9">
+                {% if subscription_form %}
+                <div class="panel panel-primary" id="block-form-lot">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Lote</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xl-2 col-lg-2 col-md-2">
+                                {% render_generic_field subscription_form.lot %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="panel panel-primary" id="block-form-main">
                     <div class="panel-heading">
                         <h3 class="panel-title">Campos principais</h3>
                     </div>
                     <div class="panel-body">
+                        {% if not config or config and config.cpf == config.CPF_HIDE %}
+                            <div class="row">
+                                <div class="col-xl-7 col-lg-7 col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            {% if config %}
+                                                {% render_generic_field form.email config.email False %}
+                                            {% else %}
+                                                {% render_generic_field form.email %}
+                                            {% endif %}
 
-                        {% for field in hidden_fields %}
-                            {{ field }}
-                        {% endfor %}
-                        {% for item in default_fields %}
-                            <div class="form-group">
-
-
-                                <label for="
-{{ item.form_field.id_for_label }}">
-                                     {{ item.form_field.label }}
-                                    {% if item.form_field.field.required %}
-                                        <small style="color:#C9302C">*
-                                        </small>
-                                    {% endif %}
-                                </label>
-
-
-                                <div>
-
-                                    {% if item.form_field.field.widget.input_type == "checkbox" %}
-                                        {{ item.form_field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
-
-                                    {% elif item.form_field.id_for_label == "id_phone" %}
-                                        {{ item.form_field |add_class:"form-control" |attr:"type:tel"|attr:"placeholder:(99) 99999-9999" }}
-                                    {% else %}
-                                        {{ item.form_field |add_class:"form-control" }}
-                                    {% endif %}
-
-                                    {% if item.form_field.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="alert alert-danger
-                                            alert-dismissable">
-                                                <button type="button"
-                                                        class="close"
-                                                        data-dismiss="alert"
-                                                        aria-hidden="true">×
-                                                </button>
-                                                {{ error }}
+                                            <div id="email_loader" style="width: 22px;position: absolute;top: 38px;right: 33px;">
+                                                <img src="{% static 'assets/img/loader.gif' %}" />
                                             </div>
-                                        {% endfor %}
-                                    {% endif %}
-
-                                    {% if item.form_field.help_text %}
-                                        <div>
-                                            <small class="text-muted">{{ item.form_field.help_text|safe }}</small>
                                         </div>
-                                    {% endif %}
-
+                                        <div id="check-email-button-block" class="col-xl-2 col-lg-2 hidden-md hidden-sm hidden-xs">
+                                            <button style="position: relative;top: 37px;left: -30px" type="button" class="btn btn-sm btn-primary">Verificar</button>
+                                        </div>
+                                        <div id="check-email-button-block" class="col-md-2 hidden-xl hidden-lg hidden-sm hidden-xs">
+                                            <button style="position: relative;top: 37px;left: -30px" type="button" class="btn btn-sm btn-primary">Verificar</button>
+                                        </div>
+                                        <div id="check-email-button-block" class="col-sm-12 hidden-xl hidden-lg hidden-md">
+                                            <div class="form-group">
+                                                <button type="button" style="position: relative;top: -12px" class="btn btn-block btn-sm btn-primary">Verificar</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-
                             </div>
-                        {% endfor %}
-
-
+                            <div class="row">
+                                <div class="col-md-{% if config.birth_date != config.BIRTH_DATE_HIDE %}9{% else %}12{% endif %}">
+                                    {% render_generic_field form.name %}
+                                </div>
+                                {% if config.birth_date != config.BIRTH_DATE_HIDE %}
+                                    <div class="col-md-3">
+                                        {% if config.birth_date == config.BIRTH_DATE_REQUIRED %}
+                                            {% render_generic_field form.birth_date True %}
+                                        {% else %}
+                                            {% render_generic_field form.birth_date %}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    {% render_generic_field form.gender %}
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-5">
+                                    {% render_generic_field form.phone config.phone False %}
+                                </div>
+{#                                {% if config.address == config.ADDRESS_HIDE %}#}
+{#                                <div class="col-md-8">#}
+{#                                    {% render_generic_field form.city config.city False %}#}
+{#                                </div>#}
+{#                                {% endif %}#}
+                            </div>
+                        {% else %}
+                            <div class="row">
+                                <div class="col-xl-7 col-lg-7 col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            {% render_generic_field form.email config.email use_required_field=False autofocus=True %}
+                                            <div id="email_loader" style="width: 22px;position: absolute;top: 38px;right: 33px;">
+                                                <img src="{% static 'assets/img/loader.gif' %}" />
+                                            </div>
+                                        </div>
+                                        <div id="check-email-button-block" class="col-xl-2 col-lg-2 hidden-md hidden-sm hidden-xs">
+                                            <button style="position: relative;top: 37px;left: -30px" type="button" class="btn btn-sm btn-primary">Verificar</button>
+                                        </div>
+                                        <div id="check-email-button-block" class="col-md-2 hidden-xl hidden-lg hidden-sm hidden-xs">
+                                            <button style="position: relative;top: 37px;left: -30px" type="button" class="btn btn-sm btn-primary">Verificar</button>
+                                        </div>
+                                        <div id="check-email-button-block" class="col-sm-12 hidden-xl hidden-lg hidden-md">
+                                            <div class="form-group">
+                                                <button type="button" style="position: relative;top: -12px" class="btn btn-block btn-sm btn-primary">Verificar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-5 col-lg-5 col-md-6">
+                                    <div class="row">
+                                        <div class="col-xl-5 col-lg-9 col-md-12">
+                                            {% if config.cpf == config.CPF_SHOW %}
+                                                {% render_generic_field form.cpf %}
+                                            {% elif config.cpf == config.CPF_REQUIRED %}
+                                                {% render_generic_field form.cpf required=True %}
+                                            {% endif %}
+                                            <div id="cpf_loader" style="width: 22px;position: absolute;top: 38px;right: 33px;">
+                                                <img src="{% static 'assets/img/loader.gif' %}" class="hidden" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-bottom:25px">
+                                        <div class="col-xl-11 col-lg-12 col-md-12">
+                                            <div class="text-muted small" style="position:absolute;top: -12px;margin-left: 15px;">
+                                                CPF de pessoas que já participaram dos seus eventos carregam automaticamente.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-{% if config.birth_date != config.BIRTH_DATE_HIDE %}9{% else %}12{% endif %}">
+                                    {% render_generic_field form.name %}
+                                </div>
+                                {% if config.birth_date != config.BIRTH_DATE_HIDE %}
+                                    <div class="col-md-3">
+                                        {% if config.birth_date == config.BIRTH_DATE_REQUIRED %}
+                                            {% render_generic_field form.birth_date True %}
+                                        {% else %}
+                                            {% render_generic_field form.birth_date %}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    {% render_generic_field form.gender %}
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-5">
+                                    {% render_generic_field form.phone config.phone False %}
+                                </div>
+{#                                {% if config.address == config.ADDRESS_HIDE %}#}
+{#                                <div class="col-md-8">#}
+{#                                    {% render_generic_field form.city config.city False %}#}
+{#                                </div>#}
+{#                                {% endif %}#}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
+        {% if config and config.address == config.ADDRESS_SHOW %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Endereço</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-xl-2 col-lg-2 col-md-2">
+                                    {% render_generic_field form.zip_code True %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {% render_generic_field form.street True %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xl-3 col-lg-3 col-md-4">
+                                    {% render_generic_field form.number %}
+                                </div>
+                                <div class="col-xl-9 col-lg-9 col-md-8">
+                                    {% render_generic_field form.complement %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {% render_generic_field form.village True %}
+                                </div>
+                                <div class="col-md-6">
+{#                                    {% render_generic_field form.city True %}#}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+{#        <div class="row">#}
+{#            <div class="col-md-12">#}
+{#                <div class="panel panel-primary">#}
+{#                    <div class="panel-heading">#}
+{#                        <h3 class="panel-title">Pagamento</h3>#}
+{#                    </div>#}
+{#                    <div class="panel-body">#}
+{#                        asdf#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
 
         <div class="row">
             <div class="col-md-12">
@@ -162,17 +403,28 @@
                             <i class="fa fa-close"></i>
                             Cancelar
                         </a>
-
+                        {% if not subscription_exists %}
                         <button type="submit" class="btn btn-success">
                             <i class="fa fa-save"></i>
                             Salvar
                         </button>
+                        {% else %}
+                        <a href="{% url 'subscription:subscription-add' event.pk %}"
+                           class="btn btn-primary">
+                            <i class="fa fa-plus"></i>
+                            Nova inscrição
+                        </a>
+                        {% endif %}
                     </div>
                     <div class="clearfix"></div>
                 </div>
             </div>
         </div>
 
+    </form>
+
+    <form id="check-email-form" method="GET" class="hidden">
+        <input type="hidden" name="email" value="" />
     </form>
 
 {% endblock %}

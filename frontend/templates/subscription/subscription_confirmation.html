@@ -10,10 +10,8 @@
 {% block sidebar-bars %}{% endblock %}
 
 {% block content %}
-
-
     <div class="row">
-        <div class="col-ms-12">
+        <div class="col-md-12">
             <div class="panel panel-primary">
 
                 <div class="panel-body">
@@ -29,11 +27,11 @@
                                 <table width="100%" border="0" cellpadding="10">
                                     <tr>
                                         <th width="25%" style="text-align: left;">Nome Informado:</th>
-                                        <td>{{ subscription_user.get_full_name }}</td>
+                                        <td>{{ submitted_data.name }}</td>
                                     </tr>
                                     <tr>
                                         <th style="text-align: left;">E-mail Informado:</th>
-                                        <td>{{ subscription_user.email }}</td>
+                                        <td>{{ submitted_data.email }}</td>
                                     </tr>
 
                                     <tr height = 20px></tr>
@@ -44,11 +42,11 @@
 
                                         <tr>
                                             <th style="text-align: left;">Nome Encontrado:</th>
-                                            <td>{{ subscription_user.person.name }}</td>
+                                            <td>{{ subscription_user.get_full_name }}</td>
                                         </tr>
                                         <tr>
                                             <th style="text-align: left;">E-mail Encontrado:</th>
-                                            <td>{{ subscription_user.person.email }}</td>
+                                            <td>{{ subscription_user.email }}</td>
                                         </tr>
                                     {% endif %}
                                 </table>
@@ -68,10 +66,14 @@
                             {% is_list value as is_list %}
                             {% if is_list %}
                                 {% for item in value %}
+                                    {% if value %}
                                     <input type="hidden" name="{{ field_name }}" value="{{ item }}">
+                                    {% endif %}
                                 {% endfor %}
                             {% else %}
+                                {% if value %}
                                 <input type="hidden" name="{{ field_name }}" value="{{ value }}">
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                     </form>
