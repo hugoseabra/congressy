@@ -32,7 +32,7 @@
             {% if can_manage_subscriptions %}
                 <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-list' object.pk %}">Inscrições</a></div>
             {% endif %}
-            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>
+            {% comment %}<div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>{% endcomment %}
             <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscriptions-export' object.pk %}">Exportação de dados</a></div>
         </div>
     {% endif %}
