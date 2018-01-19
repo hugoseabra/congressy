@@ -86,7 +86,8 @@ class Lot(models.Model, GatherosModelMixin):
     limit = models.PositiveIntegerField(
         null=True,
         blank=True,
-        verbose_name='vaga(s)'
+        verbose_name='vaga(s)',
+        help_text="Em caso de 0, as inscrições serão ilimitadas."
     )
     price = models.DecimalField(
         max_digits=8,
@@ -124,12 +125,16 @@ class Lot(models.Model, GatherosModelMixin):
     )
     transfer_tax = models.BooleanField(
         default=False,
-        verbose_name='trasferir taxa para participante'
+        verbose_name='trasferir taxa para participante',
+        help_text="Se a taxa de inscrição será assumiad pelo evento, ficando"
+                  " apenas o valor líquido para o participante, ou se o"
+                  " participante assumirá a taxa."
     )
     private = models.BooleanField(
         default=False,
         verbose_name='privado',
-        help_text="Não estará explícito para o participante no site do evento"
+        help_text="Se deseja que somente pessoas com código de exibição possam"
+                  " se inscrever nesse lote."
     )
 
     internal = models.BooleanField(
@@ -142,7 +147,9 @@ class Lot(models.Model, GatherosModelMixin):
         max_length=15,
         null=True,
         blank=True,
-        verbose_name='código de exibição'
+        verbose_name='código de exibição',
+        help_text="Código foi gerado, porém você pode personaliza-lo como"
+                  " quiser."
     )
 
     objects = LotManager()

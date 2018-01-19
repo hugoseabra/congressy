@@ -43,7 +43,7 @@ class Event(models.Model, GatherosModelMixin):
     SUBSCRIPTION_CHOICES = (
         (SUBSCRIPTION_DISABLED, 'Desativadas'),
         (SUBSCRIPTION_SIMPLE, 'Simples (gratuitas)'),
-        # (SUBSCRIPTION_BY_LOTS, 'Gerenciar por lotes'),
+        (SUBSCRIPTION_BY_LOTS, 'Gerenciar por lotes'),
     )
 
     EVENT_STATUS_RUNNING = 'running'

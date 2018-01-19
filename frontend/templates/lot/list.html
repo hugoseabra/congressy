@@ -60,46 +60,50 @@
         });
     </script>
 {% endblock %}
-{% block nav_aside_itens %}
-    <li>
-        <a href="{% url 'event:event-panel' event.pk %}" title="Voltar">
-            <i class="fa  fa-fw fa-arrow-left icon-large"></i> Voltar
-        </a>
-    </li>
-    <hr/>
 
-    <li style="font-weight: bold; color: #ffffff">Inscrições</li>
-    {% if can_change %}
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
         <li>
-            <a href="{% url 'subscription:lot-list' event.pk %}" title="Lotes">
-                <i class="fa  fa-fw fa-rocket"></i> Lotes
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
             </a>
         </li>
-    {% endif %}
-    <li>
-        <a href="{% url 'subscription:event-fields-config' event.pk %}"
-           title="Configuração de Formulário">
-            <i class="fa  fa-fw fa-rocket"></i> Configuração de Formulário
-        </a>
-    </li>
-    <li>
-        <a href="{% url 'subscription:subscription-list' event.pk %}"
-           title="Inscrições">
-            <i class="fa  fa-fw fa-rocket"></i> Inscrições
-        </a>
-    </li>
-    <li>
-        <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
-           title="Credenciamento">
-            <i class="fa  fa-fw fa-rocket"></i> Credenciamento
-        </a>
-    </li>
-    {#    <li>#}
-    {#        <a href="{% url 'subscription:subscriptions-export' event.pk %}" title="Exportação de Dados">#}
-    {#            <i class="fa  fa-fw fa-rocket"></i> Exportação de Dados#}
-    {#        </a>#}
-    {#    </li>#}
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+    </ul>
+
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'subscription:lot-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Ingressos
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+               title="Check-in">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Check-in
+            </a>
+        </li>
+    </ul>
 {% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col-md-12">

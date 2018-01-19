@@ -18,15 +18,15 @@ urls = [
     #     views.SubscriptionEditFormView.as_view(),
     #     name='subscription-edit'
     # ),
-     url(
-        r'^(?P<pk>[0-9A-Fa-f-]+)/',
-        views.SubscriptionViewFormView.as_view(),
-        name='subscription-view'
-    ),
     url(
         r'^add/$',
         views.SubscriptionAddFormView.as_view(),
         name='subscription-add'
+    ),
+    url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/',
+        views.SubscriptionViewFormView.as_view(),
+        name='subscription-view'
     ),
     url(
         r'^attendance/search/$',

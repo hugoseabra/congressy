@@ -8,35 +8,8 @@
         {% endif %}
     </label>
     <div>
-        {% if required %}
-            {% if attr %}
-                {% if autofocus %}
-                    {{ field|add_class:"form-control"|append_attr:"required:required"|append_attr:"autofocus"|attr:attr }}
-                {% else %}
-                    {{ field|add_class:"form-control"|append_attr:"required:required"|attr:attr }}
-                {% endif %}
-            {% else %}
-                {% if autofocus %}
-                    {{ field|add_class:"form-control"|append_attr:"required:required"|append_attr:"autofocus" }}
-                {% else %}
-                    {{ field|add_class:"form-control"|append_attr:"required:required"|append_attr:"autofocus" }}
-                {% endif %}
-            {% endif %}
-        {% else %}
-            {% if attr %}
-                {% if autofocus %}
-                    {{ field|add_class:"form-control"|attr:attr|append_attr:"autofocus" }}
-                {% else %}
-                    {{ field|add_class:"form-control"|attr:attr }}
-                {% endif %}
-            {% else %}
-                {% if autofocus %}
-                    {{ field|add_class:"form-control"|append_attr:"autofocus" }}
-                {% else %}
-                    {{ field|add_class:"form-control"|append_attr:"autofocus" }}
-                {% endif %}
-            {% endif %}
-        {% endif %}
+        {% include 'subscription/config_fields/render_field.html' with field=field required=required autofocus=autofocus %}
+
         {% if help_text %}
             <div>
                 <small class="text-muted">{{ help_text|safe }}</small>

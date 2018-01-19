@@ -7,7 +7,7 @@ from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot
-
+from decimal import Decimal
 
 class BaseLotView(AccountMixin, View):
     event = None
@@ -61,13 +61,31 @@ class BaseLotView(AccountMixin, View):
         return can
 
 
-class BaseFormLotView(BaseLotView):
+class BaseFormLotView(BaseLotView, generic.FormView):
     def get_initial(self):
         # noinspection PyUnresolvedReferences
         initial = super(BaseFormLotView, self).get_initial()
         initial['event'] = self.event
 
         return initial
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        if self.request.method in ('POST', 'PUT'):
+            data = self.request.POST.copy()
+
+            if 'price' in data:
+                price = data['price'].replace('.', '').replace(',', '.')
+
+                data['price'] = Decimal(price)
+
+            kwargs.update({
+                'data': data,
+            })
+
+        return kwargs
+
 
 
 class LotListView(BaseLotView, generic.ListView):

@@ -20,7 +20,7 @@ def render_generic_field(
         field,
         required=False,
         use_required_field=True,
-        autofocus=False
+        autofocus=False,
 ):
     if required is False and use_required_field is True:
         required = field.field.required
@@ -32,5 +32,5 @@ def render_generic_field(
         'help_text': field.help_text,
         'errors': field.errors,
         'required': required,
-        'autofocus': autofocus
+        'autofocus': autofocus,
     }
