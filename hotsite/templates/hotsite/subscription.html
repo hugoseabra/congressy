@@ -1,3 +1,5 @@
+{% load static base_tags user_agents user_agent_tag %}
+
 <!DOCTYPE html>
 <!-- Drew - A Multipurpose Landing Page Template, designed by David Rozando (http://design.davidrozando.com) -->
 <!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
@@ -5,7 +7,6 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!-->
 <html lang="en"> <!--<![endif]-->
-{% load static base_tags %}
 <head>
 
     <meta charset="utf-8">
@@ -54,6 +55,9 @@
             -o-filter: blur(18px);
             -ms-filter: blur(18px);
             filter: blur(18px);
+        }
+        .form-group {
+            margin: 4px 0;
         }
     </style>
     <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-320.css' %}">
@@ -283,8 +287,22 @@
 
 <!-- SCRIPT PAGAR.ME -->
 <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
-
+<script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
 <script>
+    $(document).ready(function() {
+        IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
+
+        $('#id_phone').mask("(99) 99999-9999");
+        $('#id_cpf').mask("999.999.999-99");
+        {% if not request|is_chrome %}
+            $('#id_birth_date').mask("99/99/9999");
+        {% endif %}
+
+        {% if config and config.address == config.ADDRESS_SHOW %}
+            $('#id_zip_code').mask("99.999-999");
+        {% endif %}
+    });
+
     var button = document.querySelector('#id_button_pay');
 
     button.addEventListener('click', function() {
@@ -305,7 +323,7 @@
       checkout.open({
         amount: 8000,
         createToken: 'true',
-        paymentMethods: 'credit_card,boleto',
+        paymentMethods: 'credit_card',
         customerData: false,
         customer: {
           external_id: '#123456789',

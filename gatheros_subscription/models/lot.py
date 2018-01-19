@@ -59,11 +59,15 @@ class Lot(models.Model, GatherosModelMixin):
         (DISCOUNT_TYPE_MONEY, 'R$'),
     )
 
+    LOT_LIMIT_UNLIMIED = 'unlimited'
+
+    LOT_STATUS_NOT_STARTED = 'not-started'
     LOT_STATUS_RUNNING = 'running'
     LOT_STATUS_FINISHED = 'finished'
 
     STATUSES = (
         (None, 'não-iniciado'),
+        (LOT_STATUS_NOT_STARTED, 'não-iniciado'),
         (LOT_STATUS_RUNNING, 'andamento'),
         (LOT_STATUS_FINISHED, 'finalizado'),
     )
@@ -184,21 +188,24 @@ class Lot(models.Model, GatherosModelMixin):
     @property
     def display_publicly(self):
         """ Exibição pública de infomações do lote. """
-        display = '{} - R$ {} ({}) vagas restantes'
 
-        display = display.format(
-            self.name,
-            locale.format(percent='%.2f', value=self.price, grouping=True),
-            self.places_remaing
-        )
+        if self.price is not None:
+            display = '{} - R$ {} ({} vagas restantes)'.format(
+                self.name,
+                locale.format(percent='%.2f', value=self.price, grouping=True),
+                self.places_remaining
+            )
+
+        else:
+            display = '{} vagas restantes'.format(self.places_remaining)
 
         return display
 
     @property
-    def places_remaing(self):
+    def places_remaining(self):
         """ Retorna a quantidade ainda restante de vagas. """
         if not self.limit:
-            return 0
+            return self.LOT_LIMIT_UNLIMIED
 
         num = self.subscriptions.all().count()
         return self.limit - num
@@ -209,6 +216,12 @@ class Lot(models.Model, GatherosModelMixin):
         Status do lote de acordo com suas datas.
         :return: string
         """
+        if self.limit > 0:
+            queryset = self.subscriptions
+            num_subs = queryset.count()
+
+            if num_subs >= self.limit:
+                return Lot.LOT_STATUS_FINISHED
 
         now = datetime.now()
         if now >= self.date_end:
@@ -217,7 +230,7 @@ class Lot(models.Model, GatherosModelMixin):
         if self.date_start <= now <= self.date_end:
             return Lot.LOT_STATUS_RUNNING
 
-        return None
+        return Lot.LOT_STATUS_NOT_STARTED
 
     def get_status_display(self):
         """
@@ -291,7 +304,7 @@ class Lot(models.Model, GatherosModelMixin):
             self.date_start = self.event.date_start - timedelta(days=1)
 
         self.date_start = self.date_start.replace(hour=8, minute=0, second=0)
-        #self.date_end = self.event.date_start - timedelta(minutes=1)
+        # self.date_end = self.event.date_start - timedelta(minutes=1)
         self.date_end = self.event.date_end - timedelta(seconds=1)
 
     def get_period(self):

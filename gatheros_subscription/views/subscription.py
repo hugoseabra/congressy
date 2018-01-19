@@ -46,8 +46,6 @@ class EventViewMixin(AccountMixin, generic.View):
         context['event'] = event
         context['has_paied_lots'] = self.has_paied_lots()
 
-        config = {}
-
         try:
             config = event.formconfig
         except AttributeError:

@@ -46,11 +46,13 @@ class Event(models.Model, GatherosModelMixin):
         (SUBSCRIPTION_BY_LOTS, 'Gerenciar por lotes'),
     )
 
+    EVENT_STATUS_NOT_STARTED = 'not-started'
     EVENT_STATUS_RUNNING = 'running'
     EVENT_STATUS_FINISHED = 'finished'
 
     STATUSES = (
         (None, 'não-iniciado'),
+        (EVENT_STATUS_NOT_STARTED, 'não-iniciado'),
         (EVENT_STATUS_RUNNING, 'andamento'),
         (EVENT_STATUS_FINISHED, 'finalizado'),
     )
@@ -229,7 +231,7 @@ class Event(models.Model, GatherosModelMixin):
         if self.date_start <= now <= self.date_end:
             return Event.EVENT_STATUS_RUNNING
 
-        return None
+        return Event.EVENT_STATUS_NOT_STARTED
 
     def get_status_display(self):
         """ Recupera o status do evento de acordo com a propriedade 'status'"""

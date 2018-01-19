@@ -114,6 +114,7 @@ function setAsReadonly(forceAll) {
 
         if (forceAll === true || value) {
             value = readonly_field.replace('{v}', value);
+            el.parent().find('small').hide();
             el.parent().append(value);
             el.remove();
         } else if (!forceAll && focus) {
@@ -147,7 +148,6 @@ function normalize_field_value(el) {
     if (!value) {
         return '';
     }
-    console.log(value);
 
     switch (el.prop('tagName')) {
         case 'INPUT':
