@@ -112,7 +112,7 @@
                     <li><a href="#about" class="anchor-link">Sobre o evento</a>
                     </li>
                     {% if event.place %}
-                    <li><a href="#map" class="anchor-link">Local</a></li>
+                        <li><a href="#map" class="anchor-link">Local</a></li>
                     {% endif %}
                     {% if not event.organization.internal %}
                         <li><a href="#owner" class="anchor-link">Organizador</a>
@@ -123,12 +123,15 @@
                     {% if user.is_authenticated %}
                         <li class="header-action-button dropdown dropdown-hover ">
                             <a href="#" class="dropdown-toggle external" data-toggle="dropdown" role="button"
-                               aria-expanded="true" style="font-weight: bold">{{ user.first_name }}<span class="caret"></span></a>
+                               aria-expanded="true" style="font-weight: bold">{{ user.first_name }}<span
+                                    class="caret"></span></a>
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="{% url 'event:profile' %}" target="_blank">Minha conta</a>
                                 </li>
                                 <li><a href="{% url 'front:start' %}" target="_blank">Gerenciar</a></li>
-                                <li><a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}">Sair</a></li>
+                                <li>
+                                    <a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}">Sair</a>
+                                </li>
                             </ul>
                         </li>
                     {% else %}
@@ -177,27 +180,56 @@
                             <h1 class="hero-title">{{ event.name }}</h1>
 
                             <p class="hero-tagline">
-                                <div>
-                                    <i class="fa fa-calendar"></i>
-                                    {{ period }}
-                                </div>
-                                {% if event.place %}
+                            <div>
+                                <i class="fa fa-calendar"></i>
+                                {{ event.get_period }}
+                            </div>
+                            {% if event.place %}
                                 <div>
                                     <i class="fa fa-map-marker"></i>
                                     {{ event.place.name }}
                                 </div>
-                                {% endif %}
+                            {% endif %}
                             </p>
                         </div>
                     </div>
 
                     <div class="hero-features row">
+
                         <div class="hero-features-left col-md-7">
                             {% if info.lead %}
                                 <p class="lead">
                                     {{ info.lead }}
                                 </p>
                             {% endif %}
+                            {% if subscription_enabled and has_paid_lots %}
+                                <ul class="icon-list">
+
+                                {% for lot in lots %}
+                                    <li>
+                                    <span class="icon-list-icon " data-animation="bounceIn">
+                                      <strong>{{ forloop.counter }}</strong>
+                                    </span>
+                                        <h4 class="icon-list-title">
+                                            <strong>{{ lot.name }} - R${{ lot.price }}</strong>
+                                        </h4>
+
+                                        <p>
+                                            <strong>{{ lot.places_remaining }} Vaga(s) restante(s)</strong>
+                                            <br/>
+                                            <small class="text-muted">{{ lot.get_period }}</small>
+                                        </p>
+
+                                    </li>
+
+
+                                {% endfor %}
+
+                            {% else %}
+                                <p style="font-size: 20px;font-style: italic;">Evento não permite mais inscrições.</p>
+                            {% endif %}
+                            </ul>
+
                         </div>
 
                         {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
@@ -290,121 +322,121 @@
     </section>
 
     {% if event.place %}
-    <!-- GOOGLE MAPS
-    ================================= -->
-    <section id="map" class="contact-maps-section section">
+        <!-- GOOGLE MAPS
+        ================================= -->
+        <section id="map" class="contact-maps-section section">
 
-        <div class="section-background">
+            <div class="section-background">
 
-            <!-- MAPS BACKGROUND -->
-            <div class="section-background-maps">
-                <div id="gmap"></div>
+                <!-- MAPS BACKGROUND -->
+                <div class="section-background-maps">
+                    <div id="gmap"></div>
 
-                <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
-                <!-- GOGGLE MAPS CONFIGURATION -->
-                <!-- ref: http://maplacejs.com/ -->
-                <script>
-                    var gmap_options = {
-                        generate_controls: true,
-                        locations: [{
-                            lat: -22.2198393,
-                            lon: -49.9524338,
-                            animation: google.maps.Animation.DROP,
-                            html: "Drew Headquarter",
-                            icon: "{% static 'hotsite/images/contents/map-1.png'%}",
-                            clickable: false,
-                        }],
-                        map_options: {
-                            scrollwheel: false,
-                            mapTypeControl: true,
-                            streetViewControl: true,
-                            zoomControlOptions: {
-                                style: google.maps.ZoomControlStyle.SMALL,
-                            },
-                            zoom: 16,
-                            set_center: [-22.2198393, -49.9524338], // adjust the "lon" attribute of your first location
-                        },
-                        styles: {
-                            // source: https://snazzymaps.com/style/132/light-gray
-                            'custom': [{
-                                "featureType": "water",
-                                "elementType": "geometry.fill",
-                                "stylers": [{"color": "#d3d3d3"}]
-                            }, {
-                                "featureType": "transit",
-                                "stylers": [{"color": "#808080"}, {"visibility": "off"}]
-                            }, {
-                                "featureType": "road.highway",
-                                "elementType": "geometry.stroke",
-                                "stylers": [{"visibility": "on"}, {"color": "#b3b3b3"}]
-                            }, {
-                                "featureType": "road.highway",
-                                "elementType": "geometry.fill",
-                                "stylers": [{"color": "#ffffff"}]
-                            }, {
-                                "featureType": "road.local",
-                                "elementType": "geometry.fill",
-                                "stylers": [{"visibility": "on"}, {"color": "#ffffff"}, {"weight": 1.8}]
-                            }, {
-                                "featureType": "road.local",
-                                "elementType": "geometry.stroke",
-                                "stylers": [{"color": "#d7d7d7"}]
-                            }, {
-                                "featureType": "poi",
-                                "elementType": "geometry.fill",
-                                "stylers": [{"visibility": "on"}, {"color": "#ebebeb"}]
-                            }, {
-                                "featureType": "administrative",
-                                "elementType": "geometry",
-                                "stylers": [{"color": "#a7a7a7"}]
-                            }, {
-                                "featureType": "road.arterial",
-                                "elementType": "geometry.fill",
-                                "stylers": [{"color": "#ffffff"}]
-                            }, {
-                                "featureType": "road.arterial",
-                                "elementType": "geometry.fill",
-                                "stylers": [{"color": "#ffffff"}]
-                            }, {
-                                "featureType": "landscape",
-                                "elementType": "geometry.fill",
-                                "stylers": [{"visibility": "on"}, {"color": "#efefef"}]
-                            }, {
-                                "featureType": "road",
-                                "elementType": "labels.text.fill",
-                                "stylers": [{"color": "#696969"}]
-                            }, {
-                                "featureType": "administrative",
-                                "elementType": "labels.text.fill",
-                                "stylers": [{"visibility": "on"}, {"color": "#737373"}]
-                            }, {
-                                "featureType": "poi",
-                                "elementType": "labels.icon",
-                                "stylers": [{"visibility": "off"}]
-                            }, {
-                                "featureType": "poi",
-                                "elementType": "labels",
-                                "stylers": [{"visibility": "off"}]
-                            }, {
-                                "featureType": "road.arterial",
-                                "elementType": "geometry.stroke",
-                                "stylers": [{"color": "#d6d6d6"}]
-                            }, {
-                                "featureType": "road",
-                                "elementType": "labels.icon",
-                                "stylers": [{"visibility": "off"}]
-                            }, {}, {
-                                "featureType": "poi",
-                                "elementType": "geometry.fill",
-                                "stylers": [{"color": "#dadada"}]
+                    <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+                    <!-- GOGGLE MAPS CONFIGURATION -->
+                    <!-- ref: http://maplacejs.com/ -->
+                    <script>
+                        var gmap_options = {
+                            generate_controls: true,
+                            locations: [{
+                                lat: -22.2198393,
+                                lon: -49.9524338,
+                                animation: google.maps.Animation.DROP,
+                                html: "Drew Headquarter",
+                                icon: "{% static 'hotsite/images/contents/map-1.png'%}",
+                                clickable: false,
                             }],
-                        }
-                    };
-                </script>
+                            map_options: {
+                                scrollwheel: false,
+                                mapTypeControl: true,
+                                streetViewControl: true,
+                                zoomControlOptions: {
+                                    style: google.maps.ZoomControlStyle.SMALL,
+                                },
+                                zoom: 16,
+                                set_center: [-22.2198393, -49.9524338], // adjust the "lon" attribute of your first location
+                            },
+                            styles: {
+                                // source: https://snazzymaps.com/style/132/light-gray
+                                'custom': [{
+                                    "featureType": "water",
+                                    "elementType": "geometry.fill",
+                                    "stylers": [{"color": "#d3d3d3"}]
+                                }, {
+                                    "featureType": "transit",
+                                    "stylers": [{"color": "#808080"}, {"visibility": "off"}]
+                                }, {
+                                    "featureType": "road.highway",
+                                    "elementType": "geometry.stroke",
+                                    "stylers": [{"visibility": "on"}, {"color": "#b3b3b3"}]
+                                }, {
+                                    "featureType": "road.highway",
+                                    "elementType": "geometry.fill",
+                                    "stylers": [{"color": "#ffffff"}]
+                                }, {
+                                    "featureType": "road.local",
+                                    "elementType": "geometry.fill",
+                                    "stylers": [{"visibility": "on"}, {"color": "#ffffff"}, {"weight": 1.8}]
+                                }, {
+                                    "featureType": "road.local",
+                                    "elementType": "geometry.stroke",
+                                    "stylers": [{"color": "#d7d7d7"}]
+                                }, {
+                                    "featureType": "poi",
+                                    "elementType": "geometry.fill",
+                                    "stylers": [{"visibility": "on"}, {"color": "#ebebeb"}]
+                                }, {
+                                    "featureType": "administrative",
+                                    "elementType": "geometry",
+                                    "stylers": [{"color": "#a7a7a7"}]
+                                }, {
+                                    "featureType": "road.arterial",
+                                    "elementType": "geometry.fill",
+                                    "stylers": [{"color": "#ffffff"}]
+                                }, {
+                                    "featureType": "road.arterial",
+                                    "elementType": "geometry.fill",
+                                    "stylers": [{"color": "#ffffff"}]
+                                }, {
+                                    "featureType": "landscape",
+                                    "elementType": "geometry.fill",
+                                    "stylers": [{"visibility": "on"}, {"color": "#efefef"}]
+                                }, {
+                                    "featureType": "road",
+                                    "elementType": "labels.text.fill",
+                                    "stylers": [{"color": "#696969"}]
+                                }, {
+                                    "featureType": "administrative",
+                                    "elementType": "labels.text.fill",
+                                    "stylers": [{"visibility": "on"}, {"color": "#737373"}]
+                                }, {
+                                    "featureType": "poi",
+                                    "elementType": "labels.icon",
+                                    "stylers": [{"visibility": "off"}]
+                                }, {
+                                    "featureType": "poi",
+                                    "elementType": "labels",
+                                    "stylers": [{"visibility": "off"}]
+                                }, {
+                                    "featureType": "road.arterial",
+                                    "elementType": "geometry.stroke",
+                                    "stylers": [{"color": "#d6d6d6"}]
+                                }, {
+                                    "featureType": "road",
+                                    "elementType": "labels.icon",
+                                    "stylers": [{"visibility": "off"}]
+                                }, {}, {
+                                    "featureType": "poi",
+                                    "elementType": "geometry.fill",
+                                    "stylers": [{"color": "#dadada"}]
+                                }],
+                            }
+                        };
+                    </script>
+                </div>
             </div>
-        </div>
 
-    </section>
+        </section>
 
     {% endif %}
     <!-- REALIZADOR
