@@ -75,9 +75,8 @@ class BaseFormLotView(BaseLotView, generic.FormView):
         if self.request.method in ('POST', 'PUT'):
             data = self.request.POST.copy()
 
-            if 'price' in data:
-                price = data['price'].replace('.', '').replace(',', '.')
-
+            if 'price' in data and data.get('price') is not None:
+                price = data.get('price').replace('.', '').replace(',', '.')
                 data['price'] = Decimal(price)
 
             kwargs.update({
