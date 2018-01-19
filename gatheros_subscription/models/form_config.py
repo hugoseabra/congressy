@@ -99,5 +99,37 @@ class FormConfig(models.Model):
         verbose_name_plural = 'Configurações de Formulário'
         ordering = ['event']
 
+    @property
+    def cpf_show(self):
+        return self.phone == FormConfig.CPF_SHOW
+
+    @property
+    def cpf_hide(self):
+        return self.phone == FormConfig.CPF_HIDE
+
+    @property
+    def cpf_required(self):
+        return self.birth_date == FormConfig.CPF_REQUIRED
+
+    @property
+    def birth_date_show(self):
+        return self.phone == FormConfig.BIRTH_DATE_SHOW
+
+    @property
+    def birth_date_hide(self):
+        return self.phone == FormConfig.BIRTH_DATE_HIDE
+
+    @property
+    def birth_date_required(self):
+        return self.birth_date == FormConfig.BIRTH_DATE_REQUIRED
+
+    @property
+    def address_show(self):
+        return self.address == FormConfig.ADDRESS_SHOW
+
+    @property
+    def address_hide(self):
+        return self.address == FormConfig.ADDRESS_HIDE
+
     def __str__(self):
         return self.event.name

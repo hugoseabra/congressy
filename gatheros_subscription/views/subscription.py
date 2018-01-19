@@ -145,7 +145,6 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
 
         return False
 
-
     def dispatch(self, request, *args, **kwargs):
         self.subscription_exists = self._subscription_exists()
         return super().dispatch(request, *args, **kwargs)
@@ -316,6 +315,13 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
     form_class = PersonForm
     success_message = 'Inscrição criada com sucesso.'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+
+        form.setAsRequired('email')
+
+        return form
 
     def can_access(self):
         event = self.get_event()

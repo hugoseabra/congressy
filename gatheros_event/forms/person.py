@@ -26,7 +26,9 @@ class PersonForm(forms.ModelForm):
         widgets = {
             # CPF como telefone para aparecer como número no mobile
             'cpf': TelephoneInput(),
-            'phone': TelephoneInput(),
+            'name': forms.TextInput(attrs={'placeholder': 'Nome completo'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'me@you.com'}),
+            'phone': TelephoneInput(attrs={'placeholder': '(00) 90000-0000'}),
             'zip_code': TelephoneInput(),
             'city': forms.TextInput()
         }
@@ -50,8 +52,19 @@ class PersonForm(forms.ModelForm):
         if is_chrome:
             self.fields['birth_date'].widget = DateInput()
 
+    def setAsRequired(self, field_name):
+        if field_name not in self.fields:
+            return
+
+        self.fields[field_name].required = True
+
     def clean_city(self):
+        if 'city' not in self.data:
+            return None
+
         return City.objects.get(pk=self.data['city'])
+
+
 
     def clean_email(self):
         return self.data['email'].lower()

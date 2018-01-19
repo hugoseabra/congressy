@@ -40,8 +40,8 @@ class Person(models.Model, GatherosModelMixin):
         max_length=1,
         choices=GENDER_CHOICES,
         verbose_name='sexo',
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
         default=GENDER_MALE
     )
     email = models.EmailField(
