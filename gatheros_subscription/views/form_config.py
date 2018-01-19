@@ -24,6 +24,7 @@ class EventViewMixin(AccountMixin, generic.View):
         # noinspection PyUnresolvedReferences
         context = super(EventViewMixin, self).get_context_data(**kwargs)
         context['event'] = self.get_event()
+        context['has_paied_lots'] = self.has_paied_lots()
 
         return context
 
@@ -38,6 +39,18 @@ class EventViewMixin(AccountMixin, generic.View):
             pk=self.kwargs.get('event_pk')
         )
         return self.event
+
+    def has_paied_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+            price = lot.price
+            if price is None:
+                continue
+
+            if lot.price > 0:
+                return True
+
+        return False
 
 
 class FormConfigView(EventViewMixin, generic.FormView):
@@ -60,6 +73,21 @@ class FormConfigView(EventViewMixin, generic.FormView):
         return reverse('subscription:form-config', kwargs={
             'event_pk': self.kwargs.get('event_pk')
         })
+
+    def get_initial(self):
+        initial = super().get_initial()
+
+        if self.has_paied_lots():
+            initial.update({
+                'email': True,
+                'phone': True,
+                'city': True,
+                'cpf': FormConfigForm.Meta.model.CPF_REQUIRED,
+                'birth_date': FormConfigForm.Meta.model.BIRTH_DATE_REQUIRED,
+                'address': FormConfigForm.Meta.model.ADDRESS_SHOW,
+            })
+
+        return initial
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
