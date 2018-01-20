@@ -321,15 +321,12 @@
         });
 
         if($('#id_city').val() != null){
-            console.log('city_id is not null')
             $.ajax({
-                url: "/api/cities/?q=id" + $('#id_city').val(), success: function (result) {
-                    console.log(result)
+                url: "/api/cities/" + $('#id_city').val(), success: function (result) {
+                    $('#id_city_search').val(result.name)
                     //populate the html with result here
                 }
             });
-        } else {
-            console.log('city_id is null')
         }
 
         showHideCepLoader();
