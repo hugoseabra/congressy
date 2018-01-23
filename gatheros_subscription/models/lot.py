@@ -99,7 +99,7 @@ class Lot(models.Model, GatherosModelMixin):
         null=True,
         blank=True,
         decimal_places=2,
-        verbose_name='preço'
+        verbose_name='valor'
     )
     tax = models.DecimalField(
         max_digits=5,
@@ -130,10 +130,8 @@ class Lot(models.Model, GatherosModelMixin):
     )
     transfer_tax = models.BooleanField(
         default=False,
-        verbose_name='trasferir taxa para participante',
-        help_text="Se a taxa de inscrição será assumiad pelo evento, ficando"
-                  " apenas o valor líquido para o participante, ou se o"
-                  " participante assumirá a taxa."
+        verbose_name='repassar taxa ao participante',
+        help_text="Repasse a taxa para o participante e receba o valor integral do ingresso."
     )
     private = models.BooleanField(
         default=False,
@@ -216,7 +214,7 @@ class Lot(models.Model, GatherosModelMixin):
         Status do lote de acordo com suas datas.
         :return: string
         """
-        if self.limit > 0:
+        if self.limit and self.limit > 0:
             queryset = self.subscriptions
             num_subs = queryset.count()
 

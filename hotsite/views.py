@@ -25,6 +25,9 @@ from mailer.services import (
 )
 
 
+
+
+
 class EventMixin(generic.View):
     event = None
 
@@ -412,6 +415,12 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 lot=lot,
                 created_by=user.id
             )
+
+            # Capturar transação
+
+
+            # Cria transação.
+
 
             subscription.save()
             notify_new_subscription(self.event, subscription)

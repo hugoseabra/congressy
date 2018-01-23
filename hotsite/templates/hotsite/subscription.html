@@ -267,6 +267,8 @@
 <script src="{% static 'hotsite/js/jquery.counterup.min.js' %}"></script>
 <script src="{% static 'hotsite/js/jquery.stellar.min.js' %}"></script>
 <script src="{% static 'hotsite/js/responsiveslides.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/bind.min.js' %}"></script>
+
 
 <!-- SCRIPT PAGAR.ME -->
 <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
@@ -309,7 +311,7 @@
         $('#id_phone').mask("(99) 99999-9999");
         $('#id_cpf').mask("999.999.999-99");
         {% if not request|is_chrome %}
-            $('#id_birth_date').mask("99/99/9999");
+            $('#id_birth_date').mask("9999-99-99");
         {% endif %}
 
         {% if config and config.address == config.ADDRESS_SHOW %}
@@ -320,7 +322,7 @@
             searchByCep();
         });
 
-        if($('#id_city').val() != null){
+        if ($('#id_city').val() != null) {
             $.ajax({
                 url: "/api/cities/" + $('#id_city').val(), success: function (result) {
                     $('#id_city_search').val(result.name)
@@ -332,87 +334,110 @@
         showHideCepLoader();
     });
 
-    {#    var button = document.querySelector('#id_button_pay');#}
-    {##}
-    {#    button.addEventListener('click', function () {#}
-    {#        function handleSuccess(data) {#}
-    {#            console.log(data);#}
-    {#        }#}
-    {##}
-    {#        function handleError(data) {#}
-    {#            console.log(data);#}
-    {#        }#}
-    {##}
-    {#        var checkout = new PagarMeCheckout.Checkout({#}
-    {#            encryption_key: 'ek_test_f9cws0bU9700VqWE4UDuBlKLbvX4IO',#}
-    {#            success: handleSuccess,#}
-    {#            error: handleError#}
-    {#        });#}
-    {##}
-    {#        checkout.open({#}
-    {#            amount: 8000,#}
-    {#            createToken: 'true',#}
-    {#            paymentMethods: 'credit_card,boleto',#}
-    {#            customerData: false,#}
-    {#            customer: {#}
-    {#                external_id: '#123456789',#}
-    {#                name: 'Fulano',#}
-    {#                type: 'individual',#}
-    {#                country: 'br',#}
-    {#                email: 'fulano@email.com',#}
-    {#                documents: [#}
-    {#                    {#}
-    {#                        type: 'cpf',#}
-    {#                        number: '71404665560',#}
-    {#                    },#}
-    {#                ],#}
-    {#                phone_numbers: ['+5511999998888', '+5511888889999'],#}
-    {#                birthday: '1985-01-01',#}
-    {#            },#}
-    {#            billing: {#}
-    {#                name: 'Ciclano de Tal',#}
-    {#                address: {#}
-    {#                    country: 'br',#}
-    {#                    state: 'SP',#}
-    {#                    city: 'São Paulo',#}
-    {#                    neighborhood: 'Fulanos bairro',#}
-    {#                    street: 'Rua dos fulanos',#}
-    {#                    street_number: '123',#}
-    {#                    zipcode: '05170060'#}
-    {#                }#}
-    {#            },#}
-    {#            shipping: {#}
-    {#                name: 'Ciclano de Tal',#}
-    {#                fee: 12345,#}
-    {#                delivery_date: '2017-12-25',#}
-    {#                expedited: true,#}
-    {#                address: {#}
-    {#                    country: 'br',#}
-    {#                    state: 'SP',#}
-    {#                    city: 'São Paulo',#}
-    {#                    neighborhood: 'Fulanos bairro',#}
-    {#                    street: 'Rua dos fulanos',#}
-    {#                    street_number: '123',#}
-    {#                    zipcode: '05170060'#}
-    {#                }#}
-    {#            },#}
-    {#            items: [#}
-    {#                {#}
-    {#                    id: '1',#}
-    {#                    title: 'Bola de futebol',#}
-    {#                    unit_price: 12000,#}
-    {#                    quantity: 1,#}
-    {#                    tangible: true#}
-    {#                },#}
-    {#                {#}
-    {#                    id: 'a123',#}
-    {#                    title: 'Caderno do Goku',#}
-    {#                    unit_price: 3200,#}
-    {#                    quantity: 3,#}
-    {#                    tangible: true#}
-    {#                }#}
-    {#            ]#}
-    {#        });#}
+
+    var lots = {
+        {% for lot in lots %}
+            {% if lot.price %}
+                'lot_{{ lot.pk }}': parseFloat({{ lot.price }}),
+            {% endif %}
+        {% endfor %}
+    };
+
+
+    var billing_bind = Bind({
+        billing: {
+            name: $('#id_name').val(),
+            address: {
+                country: 'br',
+                state: 'go',
+                city: '',
+                neighborhood: '',
+                street: '',
+                street_number: '',
+                zipcode: ''
+            }
+        }
+    }, {
+        'billing.name': 'input[name="name"]',
+        'billing.0.city': 'input[name="city_search"]',
+        'billing.0.neighborhood': 'input[name="village"]',
+        'billing.0.street': 'input[name="street"]',
+        'billing.0.street_number': 'input[name="number_"]',
+        'billing.0.zipcode': 'input[name="zip_code"]'
+    });
+
+    var customer_bind = Bind({
+        customer: {
+            name: $('#id_name').val(),
+            type: 'individual',
+            country: 'br',
+            email: $('#id_email').val(),
+            documents: [
+                {
+                    type: 'cpf',
+                    number: $('#id_cpf').val()
+                }
+            ],
+            phone_numbers: [$('#id_phone').val()],
+            birthday: $('#id_birth_day').val()
+        }
+    }, {
+        'customer.name': 'input[name="name"]',
+        'customer.email': 'input[name="email"]',
+        'customer.phone_numbers': 'input[name="phone"]',
+        'customer.documents.0.number': 'input[name="cpf"]',
+        'customer.birthday': 'input[name="birth_date"]'
+    });
+
+
+    var button = document.querySelector('#id_button_pay');
+
+    button.addEventListener('click', function () {
+
+        var amount_id = $('#id_lot').val().toString();
+
+        var lot = 'lot_' + amount_id;
+
+        var amount = lots[lot] * 100;
+
+        var billing_title = 'Inscrição do evento: ' + '{{ event.name }}';
+
+        function handleSuccess(data) {
+            $('#id_button_pay').removeClass('btn-default').addClass('btn-success');console.log(data);
+            console.log(data);
+            $('#token').val(data.token);
+        }
+
+        function handleError(data) {
+            $('#id_button_pay').removeClass('btn-default').addClass('btn-warning');
+            $('#pay_help').text(data);
+            console.log(data);
+        }
+
+        var checkout = new PagarMeCheckout.Checkout({
+            encryption_key: 'ek_test_f9cws0bU9700VqWE4UDuBlKLbvX4IO',
+            success: handleSuccess,
+            error: handleError
+        });
+
+        checkout.open({
+            amount: amount,
+            createToken: 'true',
+            paymentMethods: 'credit_card',
+            customerData: false,
+            billing: billing_bind.billing,
+            items: [
+                {
+                    id: '1',
+                    title: billing_title,
+                    unit_price: amount,
+                    quantity: 1,
+                    tangible: true
+                }
+            ]
+        });
+
+    });
 
 </script>
 

@@ -77,7 +77,8 @@ class BaseFormLotView(BaseLotView, generic.FormView):
 
             if 'price' in data and data.get('price') is not None:
                 price = data.get('price').replace('.', '').replace(',', '.')
-                data['price'] = Decimal(price)
+                if price:
+                    data['price'] = Decimal(price)
 
             kwargs.update({
                 'data': data,

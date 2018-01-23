@@ -44,26 +44,26 @@
     <div class="form-validation alert"></div>
 
     {% if has_paid_lots %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <div class="panel-title">Ingresso</div>
-        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="panel-title">Ingresso</div>
+            </div>
 
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-12">
-                    {% if lots %}
-                        <select class="form-control" name="lot" id="id_lot">
-                        {% for lot in lots %}
-                            <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
-                        {% endfor %}
-                        </select>
-                        <div class="text-muted small">Escolha o tipo de ingresso.</div>
-                    {% endif %}
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        {% if lots %}
+                            <select class="form-control" name="lot" id="id_lot">
+                                {% for lot in lots %}
+                                    <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="text-muted small">Escolha o tipo de ingresso.</div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     {% endif %}
 
     <div class="panel panel-default">
@@ -140,9 +140,10 @@
                                         </label>
                                     </label>
                                     <div id="remote">
-                                        <input name="id_city_search" class="typeahead form-control" required id="id_city_search" type="text"
+                                        <input name="id_city_search" class="typeahead form-control" required
+                                               id="id_city_search" type="text"
                                                data-provide="typeahead">
-                                        <input name="id_city"  id="id_city" type="hidden">
+                                        <input name="id_city" id="id_city" type="hidden">
                                     </div>
                                 </div>
                             {% else %}
@@ -153,9 +154,10 @@
                                         </label>
                                     </label>
                                     <div id="remote">
-                                        <input name="id_city_search" class="typeahead form-control " id="id_city_search" type="text"
+                                        <input name="id_city_search" class="typeahead form-control " id="id_city_search"
+                                               type="text"
                                                data-provide="typeahead">
-                                        <input name="id_city"  id="id_city" type="hidden">
+                                        <input name="id_city" id="id_city" type="hidden">
                                     </div>
                                 </div>
                             {% endif %}
@@ -176,7 +178,7 @@
                     <div class="col-md-3">
                         {% render_generic_field form.zip_code required=True %}
                         <div id="cep_loader" style="width: 22px;position: absolute;top: 45px;right: 33px;">
-                            <img src="{% static 'assets/img/loader.gif' %}" />
+                            <img src="{% static 'assets/img/loader.gif' %}"/>
                         </div>
                     </div>
                 </div>
@@ -209,7 +211,9 @@
                     <div class="panel-title">Pagamento</div>
                 </div>
                 <div class="panel-body">
-                    <button id="id_button_pay" type="button">Pagar.me</button>
+                    <button id="id_button_pay" class="btn btn-default" type="button">Pagar.me</button>
+                    <p class="text-muted" style="color:#f85252;"></p>
+                    <input type="hidden" id="token" name="token">
                 </div>
             </div>
         {% endif %}

@@ -9,6 +9,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.html import strip_tags
+from django.core.validators import RegexValidator
 from core.util import model_field_slugify
 from .member import Member
 from .mixins import GatherosModelMixin
@@ -16,6 +17,33 @@ from .person import Person
 
 
 class Organization(models.Model, GatherosModelMixin):
+
+    CONTA_CORRENTE = 'conta_corrente'
+    CONTA_POUPANCA = 'conta_poupanca'
+    CONTA_CORRENTE_CONJUNTA = 'conta_corrente_conjunta'
+    CONTA_POUPANCA_CONJUNTA = 'conta_poupanca_conjunta'
+
+    BANCO_DO_BRASIL = "001"
+    ITAU = "341"
+    BRADESCO = "237"
+    SANTANDER = "033"
+    CAIXA_ECONOMICA = "104"
+
+    ACCOUNT_TYPES = (
+        (CONTA_CORRENTE, 'Conta corrente'),
+        (CONTA_POUPANCA, 'Conta poupanca'),
+        (CONTA_CORRENTE_CONJUNTA, 'Conta corrente conjunta'),
+        (CONTA_POUPANCA_CONJUNTA, 'Conta poupanca conjunta'),
+    )
+
+    BANK_CODES = (
+        (BANCO_DO_BRASIL, 'Banco do Brasil'),
+        (ITAU, 'Itau'),
+        (BRADESCO, 'Bradesco'),
+        (SANTANDER, 'Santander'),
+        (CAIXA_ECONOMICA, 'Caixa Economica')
+    )
+
     """ Organização """
     name = models.CharField(max_length=100, verbose_name='nome')
     description = models.TextField(
@@ -70,6 +98,81 @@ class Organization(models.Model, GatherosModelMixin):
     internal = models.BooleanField(
         default=True,
         verbose_name='interno'
+    )
+
+    active_bank_account = models.BooleanField(default=False, verbose_name='desativo')
+
+    # Obrigatório - Código do banco
+    bank_code = models.CharField(
+        choices=BANK_CODES,
+        max_length=3,
+        blank=True,
+        null=True,
+        validators=[RegexValidator(r'^\d{1,10}$')],
+        verbose_name='Banco'
+    )
+
+    # Obrigatório - Agencia
+    agency = models.CharField(
+        max_length=5,
+        blank=True,
+        null=True,
+        validators=[RegexValidator(r'^\d{1,10}$')],
+        verbose_name='Agencia'
+    )
+
+    # Não obrigatório - Dígito verificador da agência
+    agencia_dv = models.CharField(
+        blank=True,
+        null=True,
+        max_length=1,
+        validators=[RegexValidator(r'^\d{1,10}$')],
+        verbose_name='Dígito verificador da agência'
+    )
+
+    # Obrigatório - Numero da conta
+    account = models.CharField(
+        blank=True,
+        null=True,
+        max_length=13,
+        validators=[RegexValidator(r'^\d{1,10}$')],
+        verbose_name='Numero da Conta'
+    )
+
+    # Não obrigatório - Dígito verificador da Conta
+    # @TODO add a validator here
+    conta_dv = models.CharField(
+        blank=True,
+        null=True,
+        max_length=2,
+        verbose_name='Dígito verificador da Conta'
+    )
+
+    # Obrigatório - CPF ou CNPJ da conta com ou sem pontuações
+    cnpj_ou_cpf = models.CharField(
+        unique=True,
+        max_length=14,
+        blank=True,
+        null=True,
+        verbose_name='CPF ou CNPJ da conta com ou sem pontuações'
+    )
+
+    # Obrigatório - Nome completo ou razão social
+    legal_name = models.CharField(
+        max_length=30,
+        blank=True,
+        null=True,
+        verbose_name='Nome completo ou razão social'
+    )
+
+    # Obrigatório - Tipo da conta
+    account_type = models.CharField(
+        choices=ACCOUNT_TYPES,
+        default=CONTA_CORRENTE,
+        blank=True,
+        null=True,
+        max_length=25,
+        verbose_name='Tipo de Conta'
     )
 
     class Meta:
