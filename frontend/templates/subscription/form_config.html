@@ -1,0 +1,294 @@
+{% extends "base/base.html" %}
+{% load i18n static widget_tweaks %}
+
+{% block title %}
+    {% if object %}Editar{% else %}Nova{% endif %} Inscrição | Congressy
+{% endblock %}
+
+{% block page_title %}
+    Configuração de Formulário
+{% endblock %}
+
+{% block page_sub_title %}
+    <div>{{ event.name }}</div>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li class="active">
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+    </ul>
+
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'subscription:lot-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Ingressos
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+{#        <li>#}
+{#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+{#               title="Check-in">#}
+{#                <i class="fa  fa-fw fa-rocket"></i>#}
+{#                Check-in#}
+{#            </a>#}
+{#        </li>#}
+    </ul>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Se algum lote pago.
+    var setLotPaiedStatus = function() {
+        var radios = $('input[type=radio]');
+        radios.iCheck({
+            checkboxClass: 'icheckbox_flat-grey',
+            radioClass: 'iradio_flat-grey',
+        });
+        radios.prop('disabled', 'disabled');
+
+        window.setTimeout(function() {
+            app.switcheryElements['id_email'].disable();
+            app.switcheryElements['id_phone'].disable();
+            app.switcheryElements['id_city'].disable();
+        }, 200);
+    };
+
+    // @TODO é o que vier da edição, se houver valor
+    var city_checked = {% if object and object.city %}true{% else %}false{% endif %};
+    var enableDisableCityButton = function (enabled) {
+        // @TODO inserir constate do model
+        if (enabled === true) {
+            app.switcheryElements['id_city'].enable();
+            window.setTimeout(function() {
+                app.setSwitchery('#id_city', city_checked);
+            }, 200);
+        } else {
+            app.setSwitchery('#id_city', true);
+            window.setTimeout(function() {
+                app.switcheryElements['id_city'].disable();
+            }, 200);
+        }
+    };
+
+    $(document).ready(function() {
+
+        $('#id_city').on('change', function() {
+            var address_required_el = $('input[value=address-show]');
+            // Seta flag somente se endereço não for obrigatório.
+            if (address_required_el.prop('checked') === false) {
+                city_checked = $(this).prop('checked');
+            }
+        });
+
+        {% if object and object.address == object.ADDRESS_SHOW %}
+            enableDisableCityButton(false);
+        {% endif %}
+
+        {% if has_paid_lots %}
+        setLotPaiedStatus();
+        {% endif %}
+
+        $('input[type=radio]').on('ifChecked', function() {
+            var el = $(this);
+            if (el.prop('name') == 'address') {
+                // @TODO inserir constate do model
+                enableDisableCityButton(el.val() == 'address-hide');
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+
+{% block content %}
+    {% if has_paid_lots %}
+    <div class="well well-info">
+        Este evento possui um de seus lotes pagos, portanto os seguintes campos
+        serão sempre obrigatórios:
+
+        <ul style="margin-top: 8px;">
+            <li>E-mail;</li>
+            <li>CPF;</li>
+            <li>Celular (contato);</li>
+            <li>Data de Nasicmento; e,</li>
+            <li>Endereço completo.</li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <form action="" method="post" class="form-horizontal form-border"
+          role="form" name="event_form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger alert-dismissable">
+                <button type="button"
+                        class="close"
+                        data-dismiss="alert"
+                        aria-hidden="true">
+                    ×
+                </button>
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% for error in hidden_field.errors %}
+                    <div class="alert alert-danger alert-dismissable">
+                        <button type="button"
+                                class="close"
+                                data-dismiss="alert"
+                                aria-hidden="true">
+                            ×
+                        </button>
+                        (Hidden field {{ hidden_field.name }}) {{ error }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <button {% if has_paid_lots %}disabled{% endif %} type="submit" class="btn btn-success {% if has_paid_lots %}disabled{% endif %}">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Campos pré-definidos
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="well text-info small">
+                            Campos que já existem no formulário e não podem ser
+                            removidos.
+                        </div>
+                        {% for field in form %}
+                            {% if field.field.widget.input_type == 'checkbox' %}
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}">
+                                        {{ field.label }}
+                                    </label>
+                                    {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="alert alert-danger
+                                        alert-dismissable">
+                                                <button type="button"
+                                                        class="close"
+                                                        data-dismiss="alert"
+                                                        aria-hidden="true">
+                                                    ×
+                                                </button>
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <div>
+                                            <small class="text-muted">{{ field.help_text|safe }}</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Campos adicionais
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="well text-info small">
+                            Campos que não fazem parte do formulário padrão
+                            e são pré-definidos pelo sistema.
+                        </div>
+                        {% for field in form %}
+                            {% if field.field.widget.input_type == 'radio' %}
+                                <div class="form-group" class="col-md-3">
+                                    <label for="{{ field.id_for_label }}">
+                                        {{ field.label }}
+                                        {% if field.field.required %}
+                                            <small style="color:#C9302C">*</small>
+                                        {% endif %}
+                                    </label>
+                                    {{ field |add_class:"icheck"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="alert alert-danger
+                                        alert-dismissable">
+                                                <button type="button"
+                                                        class="close"
+                                                        data-dismiss="alert"
+                                                        aria-hidden="true">
+                                                    ×
+                                                </button>
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <div>
+                                            <small class="text-muted">{{ field.help_text|safe }}</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+                        <button {% if has_paid_lots %}disabled{% endif %} type="submit" class="btn btn-success {% if has_paid_lots %}disabled{% endif %}">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

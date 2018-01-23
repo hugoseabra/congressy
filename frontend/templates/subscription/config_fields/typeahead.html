@@ -1,0 +1,35 @@
+{% load widget_tweaks form_config_tags %}
+
+<div class="form-group">
+    <label for="id_{{ name }}_search">
+        {{ label_tag|capfirst }}
+        {% if required %}
+            <small style="color:#C9302C">*</small>
+        {% endif %}
+    </label>
+    <div id="{{ name }}">
+
+        <input name="{{ name }}_search"
+               class="typeahead form-control"
+               id="id_{{ name }}_search"
+               type="text"
+               data-provide="typeahead"
+               {% if required %}required{% endif %}
+               {% if autofocus %}autofocus{% endif %}>
+
+        {% if help_text %}
+            <div>
+                <small class="text-muted">{{ help_text|safe }}</small>
+            </div>
+        {% endif %}
+        {% if errors %}
+            {% render_field_errors errors %}
+        {% endif %}
+
+        {% if required %}
+            {{ field|add_class:"form-control"|append_attr:"required:required" }}
+        {% else %}
+            {{ field|add_class:"form-control" }}
+        {% endif %}
+    </div>
+</div>

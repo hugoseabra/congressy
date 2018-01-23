@@ -5,9 +5,9 @@
     "fields": {
       "name": "default",
       "event": 1,
-      "date_start": "2017-04-01T00:00:00",
-      "date_end": "2017-04-18T07:59:59",
-      "limit": null,
+      "date_start": "2017-12-26T00:00:00.235",
+      "date_end": "2018-01-09T07:59:59.235",
+      "limit": 0,
       "price": null,
       "tax": null,
       "discount_type": "percent",
@@ -16,18 +16,40 @@
       "transfer_tax": false,
       "private": false,
       "internal": true,
-      "created": "2017-04-24T16:04:56.288"
+      "created": "2017-04-24T16:04:56.288",
+      "exhibition_code": null
     }
   },
   {
     "model": "gatheros_subscription.lot",
     "pk": 2,
     "fields": {
-      "name": "default",
+      "name": "Lote 1",
       "event": 8,
-      "date_start": "2017-05-01T08:00:00.046",
-      "date_end": "2017-05-13T07:59:59",
-      "limit": null,
+      "date_start": "2018-01-19T00:00:00",
+      "date_end": "2018-01-26T23:55:00",
+      "limit": 10,
+      "price": "125.00",
+      "tax": null,
+      "discount_type": "percent",
+      "discount": null,
+      "promo_code": null,
+      "transfer_tax": true,
+      "private": false,
+      "internal": false,
+      "created": "2017-04-24T16:29:25.480",
+      "exhibition_code": null
+    }
+  },
+  {
+    "model": "gatheros_subscription.lot",
+    "pk": 3,
+    "fields": {
+      "name": "default",
+      "event": 2,
+      "date_start": "2017-12-31T00:00:00.300",
+      "date_end": "2018-01-14T07:59:59.300",
+      "limit": 0,
       "price": null,
       "tax": null,
       "discount_type": "percent",
@@ -36,98 +58,61 @@
       "transfer_tax": false,
       "private": false,
       "internal": true,
-      "created": "2017-04-24T16:29:25.480"
-    }
-  },
-  {
-    "model": "gatheros_subscription.lot",
-    "pk": 3,
-    "fields": {
-      "name": "Lote 1",
-      "event": 2,
-      "date_start": "2017-04-01T08:00:00",
-      "date_end": "2017-05-01T17:59:59",
-      "limit": null,
-      "price": null,
-      "tax": null,
-      "discount_type": "percent",
-      "discount": null,
-      "promo_code": null,
-      "transfer_tax": false,
-      "private": false,
-      "internal": false,
-      "created": "2017-04-24T17:08:09.050"
+      "created": "2017-04-24T17:08:09.050",
+      "exhibition_code": null
     }
   },
   {
     "model": "gatheros_subscription.lot",
     "pk": 4,
     "fields": {
-      "name": "Lote 1",
+      "name": "default",
       "event": 11,
-      "date_start": "2017-05-01T08:00:00",
-      "date_end": "2017-05-19T23:59:59",
-      "limit": 20,
-      "price": "40.00",
+      "date_start": "2017-12-26T00:00:00.787",
+      "date_end": "2018-01-24T23:59:59.787",
+      "limit": 0,
+      "price": null,
       "tax": null,
       "discount_type": "percent",
       "discount": null,
       "promo_code": null,
       "transfer_tax": false,
       "private": false,
-      "internal": false,
-      "created": "2017-04-24T17:09:57.449"
-    }
-  },
-  {
-    "model": "gatheros_subscription.lot",
-    "pk": 5,
-    "fields": {
-      "name": "Lote 2",
-      "event": 11,
-      "date_start": "2017-05-20T00:00:00",
-      "date_end": "2017-06-02T07:59:59",
-      "limit": 20,
-      "price": "60.00",
-      "tax": null,
-      "discount_type": "percent",
-      "discount": null,
-      "promo_code": null,
-      "transfer_tax": false,
-      "private": false,
-      "internal": false,
-      "created": "2017-04-24T17:14:05.272"
+      "internal": true,
+      "created": "2017-04-24T17:09:57.449",
+      "exhibition_code": null
     }
   },
   {
     "model": "gatheros_subscription.lot",
     "pk": 6,
     "fields": {
-      "name": "Lote 1",
+      "name": "default",
       "event": 10,
-      "date_start": "2017-05-01T08:00:00.087",
-      "date_end": "2017-05-28T07:59:59",
-      "limit": 120,
-      "price": "500.00",
+      "date_start": "2017-12-31T00:00:00.717",
+      "date_end": "2018-02-18T07:59:59.717",
+      "limit": 0,
+      "price": null,
       "tax": null,
       "discount_type": "percent",
       "discount": null,
       "promo_code": null,
       "transfer_tax": false,
       "private": false,
-      "internal": false,
-      "created": "2017-04-24T17:15:15.185"
+      "internal": true,
+      "created": "2017-04-24T17:15:15.185",
+      "exhibition_code": null
     }
   },
   {
     "model": "gatheros_subscription.lot",
     "pk": 7,
     "fields": {
-      "name": "Lote 1",
+      "name": "default",
       "event": 9,
-      "date_start": "2017-04-23T17:16:06",
-      "date_end": "2017-05-23T07:59:59",
-      "limit": null,
+      "date_start": "2018-01-15T00:00:00.655",
+      "date_end": "2018-02-13T07:59:59.655",
+      "limit": 0,
       "price": null,
       "tax": null,
       "discount_type": "percent",
@@ -135,128 +120,72 @@
       "promo_code": null,
       "transfer_tax": false,
       "private": false,
-      "internal": false,
-      "created": "2017-04-24T17:16:30.449"
+      "internal": true,
+      "created": "2017-04-24T17:16:30.449",
+      "exhibition_code": null
     }
   },
   {
     "model": "gatheros_subscription.lot",
     "pk": 8,
     "fields": {
-      "name": "Lote 1",
+      "name": "default",
       "event": 6,
-      "date_start": "2017-03-10T00:00:00",
-      "date_end": "2017-03-30T23:59:59",
-      "limit": 20,
-      "price": "40.00",
-      "tax": null,
-      "discount_type": "percent",
-      "discount": null,
-      "promo_code": null,
-      "transfer_tax": false,
-      "private": false,
-      "internal": false,
-      "created": "2017-04-24T17:18:03.992"
-    }
-  },
-  {
-    "model": "gatheros_subscription.lot",
-    "pk": 9,
-    "fields": {
-      "name": "Lote 2",
-      "event": 6,
-      "date_start": "2017-04-01T00:00:00",
-      "date_end": "2017-04-19T23:59:59",
-      "limit": 10,
-      "price": "50.00",
-      "tax": null,
-      "discount_type": "percent",
-      "discount": null,
-      "promo_code": null,
-      "transfer_tax": false,
-      "private": false,
-      "internal": false,
-      "created": "2017-04-24T17:18:55.745"
-    }
-  },
-  {
-    "model": "gatheros_subscription.lot",
-    "pk": 10,
-    "fields": {
-      "name": "Lote 3",
-      "event": 6,
-      "date_start": "2017-04-20T00:00:00",
-      "date_end": "2017-05-06T07:59:59",
-      "limit": 5,
-      "price": "60.00",
-      "tax": null,
-      "discount_type": "percent",
-      "discount": null,
-      "promo_code": null,
-      "transfer_tax": false,
-      "private": false,
-      "internal": false,
-      "created": "2017-04-24T17:19:42.161"
-    }
-  },
-  {
-    "model": "gatheros_subscription.lot",
-    "pk": 11,
-    "fields": {
-      "name": "Parceiros",
-      "event": 6,
-      "date_start": "2017-03-10T00:00:00",
-      "date_end": "2017-05-06T07:59:59",
-      "limit": 5,
+      "date_start": "2017-12-14T00:00:00.463",
+      "date_end": "2017-12-28T23:59:59.463",
+      "limit": 0,
       "price": null,
       "tax": null,
       "discount_type": "percent",
       "discount": null,
       "promo_code": null,
       "transfer_tax": false,
-      "private": true,
-      "internal": false,
-      "created": "2017-04-24T17:20:37.349"
+      "private": false,
+      "internal": true,
+      "created": "2017-04-24T17:18:03.992",
+      "exhibition_code": null
     }
   },
   {
     "model": "gatheros_subscription.lot",
     "pk": 12,
     "fields": {
-      "name": "Parceiros",
+      "name": "default",
       "event": 7,
-      "date_start": "2017-04-08T08:00:00",
-      "date_end": "2017-05-08T07:59:59",
-      "limit": null,
+      "date_start": "2018-01-10T00:00:00.533",
+      "date_end": "2018-01-29T07:59:59.533",
+      "limit": 0,
       "price": null,
       "tax": null,
       "discount_type": "percent",
       "discount": null,
-      "promo_code": null,
+      "promo_code": "9773419C",
       "transfer_tax": false,
       "private": true,
-      "internal": false,
-      "created": "2017-04-24T17:22:16.594"
+      "internal": true,
+      "created": "2017-04-24T17:22:16.594",
+      "exhibition_code": null
     }
   },
   {
     "model": "gatheros_subscription.lot",
     "pk": 13,
     "fields": {
-      "name": "Lote 1",
-      "event": 7,
-      "date_start": "2017-04-08T08:00:00",
-      "date_end": "2017-05-08T07:59:59",
-      "limit": 40,
-      "price": null,
+      "name": "Lote 2",
+      "event": 8,
+      "date_start": "2018-01-27T00:00:00",
+      "date_end": "2018-02-02T07:55:00",
+      "limit": 10,
+      "price": "145.00",
       "tax": null,
       "discount_type": "percent",
       "discount": null,
       "promo_code": null,
-      "transfer_tax": false,
+      "transfer_tax": true,
       "private": false,
       "internal": false,
-      "created": "2017-04-24T17:22:40.618"
+      "created": "2018-01-19T02:29:28.044",
+      "exhibition_code": null
     }
   }
 ]

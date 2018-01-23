@@ -5,6 +5,7 @@ os critérios de inscrições: se gratuitas, se limitadas, se privados, etc.
 """
 
 import uuid
+import locale
 from datetime import datetime, timedelta
 
 from django.db import models
@@ -58,11 +59,15 @@ class Lot(models.Model, GatherosModelMixin):
         (DISCOUNT_TYPE_MONEY, 'R$'),
     )
 
+    LOT_LIMIT_UNLIMIED = 'unlimited'
+
+    LOT_STATUS_NOT_STARTED = 'not-started'
     LOT_STATUS_RUNNING = 'running'
     LOT_STATUS_FINISHED = 'finished'
 
     STATUSES = (
         (None, 'não-iniciado'),
+        (LOT_STATUS_NOT_STARTED, 'não-iniciado'),
         (LOT_STATUS_RUNNING, 'andamento'),
         (LOT_STATUS_FINISHED, 'finalizado'),
     )
@@ -86,14 +91,15 @@ class Lot(models.Model, GatherosModelMixin):
     limit = models.PositiveIntegerField(
         null=True,
         blank=True,
-        verbose_name='vaga(s)'
+        verbose_name='vaga(s)',
+        help_text="Em caso de 0, as inscrições serão ilimitadas."
     )
     price = models.DecimalField(
         max_digits=8,
         null=True,
         blank=True,
         decimal_places=2,
-        verbose_name='preço'
+        verbose_name='valor'
     )
     tax = models.DecimalField(
         max_digits=5,
@@ -124,12 +130,14 @@ class Lot(models.Model, GatherosModelMixin):
     )
     transfer_tax = models.BooleanField(
         default=False,
-        verbose_name='trasferir taxa para participante'
+        verbose_name='repassar taxa ao participante',
+        help_text="Repasse a taxa para o participante e receba o valor integral do ingresso."
     )
     private = models.BooleanField(
         default=False,
         verbose_name='privado',
-        help_text="Não estará explícito para o participante no site do evento"
+        help_text="Se deseja que somente pessoas com código de exibição possam"
+                  " se inscrever nesse lote."
     )
 
     internal = models.BooleanField(
@@ -142,7 +150,9 @@ class Lot(models.Model, GatherosModelMixin):
         max_length=15,
         null=True,
         blank=True,
-        verbose_name='código de exibição'
+        verbose_name='código de exibição',
+        help_text="Código foi gerado, porém você pode personaliza-lo como"
+                  " quiser."
     )
 
     objects = LotManager()
@@ -174,11 +184,42 @@ class Lot(models.Model, GatherosModelMixin):
         return round((attended * 100)/num_subs, 2)
 
     @property
+    def display_publicly(self):
+        """ Exibição pública de infomações do lote. """
+
+        if self.price is not None:
+            display = '{} - R$ {} ({} vagas restantes)'.format(
+                self.name,
+                locale.format(percent='%.2f', value=self.price, grouping=True),
+                self.places_remaining
+            )
+
+        else:
+            display = '{} vagas restantes'.format(self.places_remaining)
+
+        return display
+
+    @property
+    def places_remaining(self):
+        """ Retorna a quantidade ainda restante de vagas. """
+        if not self.limit:
+            return self.LOT_LIMIT_UNLIMIED
+
+        num = self.subscriptions.all().count()
+        return self.limit - num
+
+    @property
     def status(self):
         """
         Status do lote de acordo com suas datas.
         :return: string
         """
+        if self.limit and self.limit > 0:
+            queryset = self.subscriptions
+            num_subs = queryset.count()
+
+            if num_subs >= self.limit:
+                return Lot.LOT_STATUS_FINISHED
 
         now = datetime.now()
         if now >= self.date_end:
@@ -187,7 +228,7 @@ class Lot(models.Model, GatherosModelMixin):
         if self.date_start <= now <= self.date_end:
             return Lot.LOT_STATUS_RUNNING
 
-        return None
+        return Lot.LOT_STATUS_NOT_STARTED
 
     def get_status_display(self):
         """
@@ -261,7 +302,7 @@ class Lot(models.Model, GatherosModelMixin):
             self.date_start = self.event.date_start - timedelta(days=1)
 
         self.date_start = self.date_start.replace(hour=8, minute=0, second=0)
-        #self.date_end = self.event.date_start - timedelta(minutes=1)
+        # self.date_end = self.event.date_start - timedelta(minutes=1)
         self.date_end = self.event.date_end - timedelta(seconds=1)
 
     def get_period(self):

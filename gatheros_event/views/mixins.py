@@ -14,6 +14,8 @@ from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 
 from core.model.deletable import DeletableModelMixin
+
+from gatheros_event.models import Member
 from gatheros_event.helpers.account import (
     get_member,
     get_organization,
@@ -43,6 +45,15 @@ class AccountMixin(LoginRequiredMixin, View):
     def organization(self):
         """ Resgata objeto Organization do contexto do usuário. """
         return SimpleLazyObject(lambda: get_organization(self.request))
+
+    @property
+    def organizaton_only_admin(self):
+        """ Verifica se o membro é o único administrador da organização. """
+        if self.organization.internal:
+            return True
+
+        admins = self.organization.get_members(group=Member.ADMIN).count()
+        return admins == 1
 
     @property
     def member(self):

@@ -1,4 +1,5 @@
-{% extends 'registration/login_base.html' %}
+{% extends is_embeded|yesno:"registration/login_base_embeded.html,registration/login_base.html" %}
+
 {% load static %}
 
 {% block title %}Login | Congressy{% endblock %}
@@ -18,6 +19,7 @@
                        required
                        class="form-control with-icon"
                        id="email"
+                       autofocus
                        placeholder="E-mail">
                 <i class="fa fa-user"></i>
                 <small class="text-muted">{{ form.username.errors }}</small>
@@ -42,15 +44,16 @@
             </div>
         </div>
         <div class="form-group" style="margin-bottom: 0">
-            <div class="col-md-12 secondary-links">
-                <div class="help-block float-left">
-                    <a href="{% url 'password_reset' %}">Esqueceu sua senha?</a>
-                </div>
-                <div class="help-block float-right">
-                    <a href="{% url 'public:profile_create' %}"
+            <div class="col-md-6 secondary-links">
+                <div class="help-block">
+                    <a href="{% url 'public:profile_create' %}{% if is_embeded %}?embeded=1{% endif %}"
                        style="font-weight: bold;">Criar conta</a>
                 </div>
-                <div class="clearfix"></div>
+            </div>
+            <div class="col-md-6 secondary-links">
+                <div class="help-block text-right left-when-small">
+                    <a href="{% url 'password_reset' %}" {% if is_embeded %}target="_blank"{% endif %}>Esqueceu sua senha?</a>
+                </div>
             </div>
         </div>
     </form>

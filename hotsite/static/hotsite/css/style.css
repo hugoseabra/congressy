@@ -2223,3 +2223,17 @@ body.enable-preloader.preloader-dark #jpreLoader {
 	overflow: hidden;
 	text-align: center;
 }
+
+.loader-block {
+	position: relative;
+	width: 59px;
+	display: none;
+	margin: 0 auto;
+}
+
+.loader-block .img-block {
+	width: 58px;
+	position: absolute;
+	top: -59px;
+	z-index: 10000;
+}

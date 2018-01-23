@@ -1,0 +1,195 @@
+{% extends "base/base.html" %}
+{% load static event_tags  base_tags  widget_tweaks form_config_tags %}
+
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissable">
+                <button type="button" class="close"
+                        data-dismiss="alert" aria-hidden="true">×
+                </button>
+                {{ message|get_first_item }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock messages %}
+
+{% block title %}
+    {% if form_title %}Editar{% else %}Nova{% endif %} Ingressos | Congressy
+{% endblock %}
+
+{% block page_title %}
+    {% if form_title %}Editar{% else %}Nova{% endif %} Ingressos
+{% endblock %}
+
+{% block page_sub_title %}
+    {% if form_title %}
+        {{ form_title }}
+    {% endif %}
+{% endblock %}
+
+
+
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+    </ul>
+
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'subscription:lot-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Ingressos
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post" class="form-horizontal form-border"
+          role="form" name="event_form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <a href="{% url 'subscription:lot-list' event.pk %}"
+                           class="btn btn-danger">
+                            <i class="fa fa-close"></i>
+                            Cancelar
+                        </a>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Dados principais
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-8 col-md-8">
+                                {% render_generic_field form.name autofocus=True %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-3 col-lg-4 col-md-4">
+                                {% render_generic_field form.date_start %}
+                            </div>
+                            <div class="col-xl-3 col-lg-4 col-md-4">
+                                {% render_generic_field form.date_end %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Configuração de vagas
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xl-2 col-lg-3 col-md-3">
+                                <div class="form-group">
+                                    <label>Limitar vagas</label>
+                                    <div>
+                                        <input name="limit_switch"
+                                               class="js-switch"
+                                               id="limit_switch"
+                                               data-switchery="true"
+                                               style="display:none"
+                                               type="checkbox"
+                                               {% if object and object.limit > 0 %}checked{% endif %}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-5 col-md-5">
+                                {% render_generic_field form.limit %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Custos e taxas
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xl-2 col-lg-2 col-md-2">
+                                {% render_generic_field form.price %}
+                            </div>
+                            <div class="col-xl-4 col-lg-6 col-md-6">
+                                {% render_generic_field form.transfer_tax %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+                        <a href="{% url 'subscription:lot-list' event.pk %}"
+                           class="btn btn-danger">
+                            <i class="fa fa-close"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

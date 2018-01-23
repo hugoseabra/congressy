@@ -11,6 +11,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+X_FRAME_OPTIONS = 'ALLOWALL'
+XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
+
 INSTALLED_APPS = [
     # DJANGO_APPS
     'django.contrib.admin',
@@ -21,7 +24,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
     'django.contrib.humanize',
+
+    # Django added apps
     'django.contrib.sites',
+    'django.forms',
 
     # THIRD PARTY
     'absoluteuri',
@@ -30,22 +36,25 @@ INSTALLED_APPS = [
     'ckeditor',
     'datetimewidget',
     'widget_tweaks',
+    'django_user_agents',
     'rest_framework',
     'rest_framework.authtoken',
 
     # KANU_APPS
     'kanu_locations',
-    'kanu_form',
 
     # GATHEROS_APPS
-    'mailer',
-    'core',
     'frontend',
     'gatheros_event',
     'gatheros_subscription',
     'gatheros_front',
+    'mailer',
+    'core',
     'hotsite',
 ]
+
+# Added to allow overriding django forms templates.
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 SITE_ID = 1
 
@@ -58,6 +67,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_user_agents.middleware.UserAgentMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -78,10 +88,10 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'gatheros_event/templates/'),
-            os.path.join(BASE_DIR, 'frontend/templates/'),
-            os.path.join(BASE_DIR, 'hotsite/templates'),
-            os.path.join(BASE_DIR, 'mailer/templates'),
+            os.path.join(BASE_DIR, 'frontend', 'templates'),
+            os.path.join(BASE_DIR, 'gatheros_event', 'templates'),
+            os.path.join(BASE_DIR, 'hotsite', 'templates'),
+            os.path.join(BASE_DIR, 'mailer', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -119,6 +129,11 @@ AUTH_PASSWORD_VALIDATORS = [
                 'UserAttributeSimilarityValidator',
     },
 ]
+
+# Name of cache backend to cache user agents. If it not specified default
+# cache alias will be used. Set to `None` to disable caching.
+# Uncomment this when cache is configured
+# USER_AGENTS_CACHE = 'default'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

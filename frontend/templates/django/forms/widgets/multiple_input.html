@@ -1,0 +1,18 @@
+{% with id=widget.attrs.id %}
+    <div class="form-group" {% if id %} id="{{ id }}"{% endif %}>
+        {% for group, options, index in widget.optgroups %}
+            {% if group %}
+                <label class="col-sm-3 control-label">
+                    {{ group }}
+                </label>
+            {% endif %}
+        <div class="{% if group %}col-sm-9{% else %}col-sm-12{% endif %}">
+            {% for option in options %}
+                {% include option.template_name with widget=option %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+{% endwith %}
+
+

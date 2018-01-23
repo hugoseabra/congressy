@@ -1,11 +1,19 @@
 """ Mailer service. """
+import absoluteuri
 from django.conf import settings
 from django.template.loader import render_to_string
+
+CELERY = False
 
 if settings.DEBUG:
     from .tasks import send_mail
 else:
-    from .worker import send_mail
+    try:
+        from .worker import send_mail
+
+        CELERY = True
+    except ImportError:
+        from .tasks import send_mail
 
 
 def notify_new_subscription(event, subscription):
@@ -13,8 +21,16 @@ def notify_new_subscription(event, subscription):
     Define a notificação para uma nova inscrição
     """
     person = subscription.person
-    local = '{}'.format(
-        event.place,
+
+    # local = '{}'.format(
+    #     event.place,
+    # )
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
     )
 
     # @TODO set event.date_start to period
@@ -23,23 +39,24 @@ def notify_new_subscription(event, subscription):
         'gender_article': 'o(a)',
         'person': person,
         'event': event,
+        'event_url': event_url,
         'period': event.date_start,
-        'count': subscription.count,
+        # 'count': subscription.count,
         'date': subscription.created,
-        'local': local
+        # 'local': local
     })
 
-    if settings.DEBUG:
-        return send_mail(
+    if CELERY:
+        return send_mail.delay(
             subject='Inscrição: {}'.format(event.name),
             body=body,
-            to=person.email
+            to=person.email,
         )
 
-    return send_mail.delay(
+    return send_mail(
         subject='Inscrição: {}'.format(event.name),
         body=body,
-        to=person.email,
+        to=person.email
     )
 
 
@@ -53,9 +70,17 @@ def notify_new_user_and_subscription(event, subscription, link):
         event.place,
     )
 
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
     # @TODO set event.date_start to period
     body = render_to_string('mailer/notify_user_and_subscription.html', {
         'event': event,
+        'event_url': event_url,
         # 'gender_article': 'a' if person.gender == 'F' else 'o',
         'gender_article': 'o(a)',
         'person': person,
@@ -66,17 +91,17 @@ def notify_new_user_and_subscription(event, subscription, link):
         'local': local
     })
 
-    if settings.DEBUG:
-        return send_mail(
+    if CELERY:
+        return send_mail.delay(
             subject='Inscrição: {}'.format(event.name),
             body=body,
-            to=person.email
+            to=person.email,
         )
 
-    return send_mail.delay(
+    return send_mail(
         subject='Inscrição: {}'.format(event.name),
         body=body,
-        to=person.email,
+        to=person.email
     )
 
 
@@ -92,14 +117,14 @@ def notify_invite(organization, link, invitator, invited_person, email):
         'link': link,
     })
 
-    if settings.DEBUG:
-        return send_mail(
+    if CELERY:
+        return send_mail.delay(
             subject='Convite: {}'.format(organization),
             body=body,
             to=email,
         )
 
-    return send_mail.delay(
+    return send_mail(
         subject='Convite: {}'.format(organization),
         body=body,
         to=email,
@@ -116,14 +141,14 @@ def notify_new_user(context):
 
     subject = 'Confirmação de cadastro na {0}'.format(context['site_name'])
 
-    if settings.DEBUG:
-        return send_mail(
+    if CELERY:
+        return send_mail.delay(
             subject=subject,
             body=body,
             to=context['email'],
         )
 
-    return send_mail.delay(
+    return send_mail(
         subject=subject,
         body=body,
         to=context['email'],
@@ -140,14 +165,14 @@ def notify_reset_password(context):
 
     subject = 'Redefina sua senha na {0}'.format(context['site_name'])
 
-    if settings.DEBUG:
-        return send_mail(
+    if CELERY:
+        return send_mail.delay(
             subject=subject,
             body=body,
             to=context['email'],
         )
 
-    return send_mail.delay(
+    return send_mail(
         subject=subject,
         body=body,
         to=context['email'],

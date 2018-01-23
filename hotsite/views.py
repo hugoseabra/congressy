@@ -1,61 +1,141 @@
-from datetime import datetime
 from uuid import uuid4
 
 import absoluteuri
 from django.contrib import messages
+from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
+from django.http import HttpResponseNotAllowed
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.views.generic import DetailView
+from django.views import generic
 
-from gatheros_event.models import Event, Info, Person, Member, Organization
-from gatheros_subscription.models import Lot, Subscription
+from gatheros_event.forms import PersonForm
+from gatheros_event.models import Event, Info, Member, Organization
+from gatheros_subscription.models import Subscription, FormConfig, Lot
 from mailer.services import (
-    notify_new_user_and_subscription,
+    notify_new_user,
     notify_new_subscription,
 )
 
 
-class HotsiteView(DetailView):
-    model = Event
-    template_name = 'hotsite/base.html'
-    object = None
 
-    # form_template = 'hotsite/form.html'
+
+
+class EventMixin(generic.View):
+    event = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.event = get_object_or_404(Event, slug=self.kwargs.get('slug'))
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(HotsiteView, self).get_context_data(**kwargs)
-        context['status'] = self._get_status()
-        context['report'] = self._get_report()
-        context['period'] = self._get_period()
-        context['info'] = Info.objects.get(pk=self.object.pk)
-        context['person'] = self._get_person()
-        context['is_subscribed'] = self._get_subscribed_status()
+        context = super().get_context_data(**kwargs)
+
+        context['event'] = self.event
+        context['info'] = get_object_or_404(Info, event=self.event)
+        context['period'] = self.get_period()
+        context['lots'] = self.get_lots()
+        context['subscription_enabled'] = self.subscription_enabled()
+        context['has_paid_lots'] = self.has_paid_lots()
+
         return context
 
-    def _get_person(self):
-        """
-            Se usuario possuir person
-        """
-        user = self.request.user
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+            price = lot.price
+            if price is None:
+                continue
 
-        if user.is_authenticated:
-            try:
-                person = Person.objects.get(email=user.email)
-                if person:
-                    return person
-            except ObjectDoesNotExist:
-                pass
+            if lot.price > 0:
+                return True
 
         return False
 
-    def _get_subscribed_status(self):
+    def subscription_enabled(self):
+        if self.event.subscription_type == Event.SUBSCRIPTION_DISABLED:
+            return False
+
+        lots = self.get_lots()
+        if len(lots) == 0:
+            return False
+
+        return self.event.status == Event.EVENT_STATUS_NOT_STARTED
+
+    def get_period(self):
+        """ Resgata o prazo de duração do evento. """
+        return self.event.get_period()
+
+    def get_lots(self):
+        lots = self.event.lots.all()
+        return [lot for lot in lots if lot.status == lot.LOT_STATUS_RUNNING]
+
+
+class SubscriptionFormMixin(EventMixin, generic.FormView):
+    form_class = PersonForm
+    initial = {}
+    object = None
+    person = None
+
+    def get_form_kwargs(self, **kwargs):
+        """
+        Returns the keyword arguments for instantiating the form.
+        """
+        if not kwargs:
+            kwargs = {
+                'initial': self.initial,
+            }
+
+        person = self.get_person()
+        if 'instance' not in kwargs and person:
+            kwargs['instance'] = person
+
+        if self.request.method in ('POST', 'PUT'):
+            if 'data' not in kwargs:
+                kwargs.update({'data': self.request.POST})
+
+        return kwargs
+
+    def get_form(self, **kwargs):
+        return self.form_class(**self.get_form_kwargs(**kwargs))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if 'form' not in kwargs:
+            context['form'] = self.get_form()
+
+        try:
+            context['form_config'] = self.object.formconfig
+        except (ObjectDoesNotExist, AttributeError):
+            pass
+
+        context['person'] = self.get_person()
+        context['is_subscribed'] = self.is_subscribed()
+
+        return context
+
+    def get_person(self):
+        """ Se usuario possui person """
+
+        if self.person or not self.request.user.is_authenticated:
+            return self.person
+
+        try:
+            self.person = self.request.user.person
+        except (ObjectDoesNotExist, AttributeError):
+            pass
+
+        return self.person
+
+    def is_subscribed(self):
         """
             Se já estiver inscrito retornar True
         """
@@ -63,239 +143,291 @@ class HotsiteView(DetailView):
 
         if user.is_authenticated:
             try:
-                person = Person.objects.get(email=user.email)
-                found = Subscription.objects.filter(person_id=person.pk,
-                                                    event_id=self.object.id)
-                if found:
-                    return True
-            except ObjectDoesNotExist:
+                person = user.person
+                Subscription.objects.get(person=person, event=self.event)
+                return True
+
+            except (Subscription.DoesNotExist, AttributeError):
                 pass
 
         return False
 
-    def _get_status(self):
-        """ Resgata o status. """
-        now = datetime.now()
-        event = self.object
-        remaining = self._get_remaining_datetime()
-        remaining_str = self._get_remaining_days(date=remaining)
+    def subscriber_has_account(self, email):
+        if self.request.user.is_authenticated:
+            return True
 
-        result = {
-            'published': event.published,
-        }
+        try:
+            User.objects.get(email=email)
+            return True
 
-        future = event.date_start > now
-        running = event.date_start <= now <= event.date_end
-        finished = now >= event.date_end
+        except User.DoesNotExist:
+            pass
 
-        if future:
-            result.update({
-                'status': 'future',
-                'remaining': remaining_str,
-            })
+        return False
 
-        elif running:
-            result.update({
-                'status': 'running',
-            })
 
-        elif finished:
-            result.update({
-                'status': 'finished' if event.published else 'expired',
-            })
-
-        return result
-
-    def _get_remaining_datetime(self):
-        """ Resgata diferença de tempo que falta para o evento finalizar. """
-        now = datetime.now()
-        return self.object.date_start - now
-
-    def _get_remaining_days(self, date=None):
-        """ Resgata tempo que falta para o evento finalizar em dias. """
-        now = datetime.now()
-
-        if not date:
-            date = self._get_remaining_datetime()
-
-        remaining = ''
-
-        days = date.days
-        if days > 0:
-            remaining += str(date.days) + 'dias '
-
-        remaining += str(int(date.seconds / 3600)) + 'h '
-        remaining += str(60 - now.minute) + 'm'
-
-        return remaining
-
-    def _get_report(self):
-        """ Resgata informações gerais do evento. """
-        return self.object.get_report()
-
-    def _get_period(self):
-        """ Resgata o prazo de duração do evento. """
-        return self.object.get_period()
+class HotsiteView(SubscriptionFormMixin, generic.View):
+    template_name = 'hotsite/base.html'
 
     def post(self, request, *args, **kwargs):
 
-        self.object = self.get_object()
+        user = self.request.user
+
+        if user.is_authenticated:
+            email = user.email
+            name = user.person.name
+
+        else:
+            name = self.request.POST.get('name')
+            email = self.request.POST.get('email')
+
+        if not self.subscription_enabled():
+            return HttpResponseNotAllowed([])
+
+        if user.is_authenticated:
+            return redirect(
+                'public:hotsite-subscription',
+                slug=self.event.slug
+            )
+
+        context = self.get_context_data(**kwargs)
+        context['remove_preloader'] = True
+
+        if not name or not email:
+            messages.error(
+                self.request,
+                "Você deve informar todos os dados para fazer a sua inscrição."
+            )
+
+            context['name'] = name
+            context['email'] = email
+
+            return self.render_to_response(context)
+
+        if user.is_anonymous and self.subscriber_has_account(email):
+            messages.info(
+                self.request,
+                'Faça login para continuar sua inscrição.'
+            )
+
+            login_url = '{}?next={}'.format(
+                reverse('public:login'),
+                reverse('public:hotsite', kwargs={
+                    'slug': self.event.slug
+                })
+            )
+
+            return redirect(login_url)
+
+        with transaction.atomic():
+            # Criando usuário
+            password = str(uuid4())
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password
+            )
+
+            self.initial = {
+                'email': email,
+                'name': name
+            }
+
+            form = self.get_form()
+            form.setAsRequired('email')
+
+            if not form.is_valid():
+                context['form'] = form
+                return self.render_to_response(context)
+
+            person = form.save()
+            person.user = user
+            person.save()
+
+            self._configure_brand_person(person)
+            self._notify_new_account(person)
+
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user)
+
+        return redirect('public:hotsite-subscription', slug=self.event.slug)
+
+    def _configure_brand_person(self, person):
+        """ Configura nova pessoa cadastrada. """
+
+        # Criando organização interna
+        with transaction.atomic():
+            try:
+                person.members.get(organization__internal=True)
+            except Member.DoesNotExist:
+                internal_org = Organization(
+                    internal=True,
+                    name=person.name
+                )
+
+                for attr, value in six.iteritems(person.get_profile_data()):
+                    setattr(internal_org, attr, value)
+
+                internal_org.save()
+
+                Member.objects.create(
+                    organization=internal_org,
+                    person=person,
+                    group=Member.ADMIN
+                )
+
+    def _notify_new_account(self, person):
+
+        user = person.user
+
+        url = absoluteuri.reverse(
+            'password_reset_confirm',
+            kwargs={
+                'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': default_token_generator.make_token(user)
+            }
+        )
+
+        context = {
+            'email': person.email,
+            'url': url,
+            'site_name': get_current_site(self.request)
+        }
+
+        notify_new_user(context)
+
+
+class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
+    template_name = 'hotsite/subscription.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+
+        if not request.user.is_authenticated:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        subscribed = self.is_subscribed()
+        enabled = self.subscription_enabled()
+        if not enabled or subscribed:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        return response
+
+    def get_form(self, **kwargs):
+        form = super().get_form(**kwargs)
+
+        try:
+            config = self.event.formconfig
+        except AttributeError:
+            config = FormConfig()
+
+        required_fields = ['gender']
+
+        has_paid_lots = self.has_paid_lots()
+
+        if has_paid_lots or config.phone:
+            required_fields.append('phone')
+
+        if has_paid_lots or config.address_show:
+            required_fields.append('street')
+            required_fields.append('village')
+            required_fields.append('zip_code')
+            required_fields.append('city')
+
+        if not has_paid_lots and not config.address_show:
+            required_fields.append('city')
+
+        if has_paid_lots or config.cpf_required:
+            required_fields.append('cpf')
+
+        if has_paid_lots or config.birth_date_required:
+            required_fields.append('birth_date')
+
+        for field_name in required_fields:
+            form.setAsRequired(field_name)
+
+        return form
+
+    def get_context_data(self, **kwargs):
+        cxt = super().get_context_data(**kwargs)
+
+        try:
+            config = self.event.formconfig
+        except AttributeError:
+            config = FormConfig()
+
+        if self.has_paid_lots():
+            config.email = True
+            config.phone = True
+            config.city = True
+
+            config.cpf = config.CPF_REQUIRED
+            config.birth_date = config.BIRTH_DATE_REQUIRED
+            config.address = config.ADDRESS_SHOW
+
+        cxt['config'] = config
+
+        return cxt
+
+    def post(self, request, *args, **kwargs):
+
+        request.POST = request.POST.copy()
 
         user = self.request.user
-        email = self.request.POST.get('email')
-        name = self.request.POST.get('name')
-        phone = self.request.POST.get('phone')
 
-        if self.object.data['subscription_type'] != 'disabled':
+        if not user.is_authenticated or not self.subscription_enabled():
+            return HttpResponseNotAllowed([])
 
-            shiny_user = None
-            full_reset_url = ''
+        def clear_string(field_name):
+            if field_name not in request.POST:
+                return
 
-            if not email or not name or not phone:
+            value = request.POST.get(field_name)
+            value = value.replace('.', '').replace('-', '').replace('/', '')
 
-                if not email:
-                    messages.error(self.request,
-                                   "E-mail não pode estar vazio!")
+            request.POST[field_name] = value
 
-                if not name:
-                    messages.error(self.request, "Nome não pode estar vazio!")
+        clear_string('cpf')
+        clear_string('zip_code')
 
-                if not phone:
-                    messages.error(self.request,
-                                   "Celluar não pode estar vazio!")
+        context = self.get_context_data(**kwargs)
+        context['remove_preloader'] = True
 
-                context = super(HotsiteView, self).get_context_data(**kwargs)
-                context['status'] = self._get_status()
-                context['report'] = self._get_report()
-                context['period'] = self._get_period()
-                context['name'] = name
-                context['email'] = email
-                context['info'] = Info.objects.get(pk=self.object.pk)
-                context['remove_preloader'] = True
-                return render(self.request, template_name=self.template_name,
-                              context=context)
+        with transaction.atomic():
+            form = self.get_form()
 
-            try:
-                user = User.objects.get(email=email)
-                logged_in = self.request.user.is_authenticated
+            if not form.is_valid():
+                context['form'] = form
+                return self.render_to_response(context)
 
-                if user != self.request.user and not logged_in and user.last_login:
-                    messages.error(self.request, 'Faça login para continuar.')
+            person = form.save()
 
-                    full_url = '{}?next={}'.format(
-                        reverse('public:login'),
-                        reverse('public:hotsite', kwargs={
-                            'slug': self.object.slug
-                        })
-                    )
+            if self.has_paid_lots():
+                lot_pk = self.request.POST.get('lot')
+            else:
+                lot_pk = self.event.lots.first().pk
 
-                    return HttpResponseRedirect(full_url)
+            # Garante que o lote é do evento
+            lot = get_object_or_404(Lot, event=self.event, pk=lot_pk)
 
-            except User.DoesNotExist:
-                pass
-
-            try:
-                person = Person.objects.get(email=email)
-
-            except Person.DoesNotExist:
-
-                # hard post
-
-                # gender = self.request.POST.get('gender')
-
-                # Criando perfil
-                person = Person(name=name, email=email, phone=phone)
-
-                # Criando usuário
-                password = str(uuid4())
-                user = User.objects.create_user(
-                    username=email,
-                    email=email,
-                    password=password
-                )
-
-                # Vinculando usuário ao perfil
-                person.user = user
-                person.save()
-
-                # Criando a senha par o email de confirmação e definição de
-                # senha
-                """
-                Generates a one-use only link for resetting password and sends to the
-                user.
-                """
-                shiny_user = True
-                full_reset_url = absoluteuri.reverse(
-                    'password_reset_confirm',
-                    kwargs={
-                        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                        'token': default_token_generator.make_token(user)
-                    }
-                )
-
-                # Criando organização interna
-                try:
-                    person.members.get(organization__internal=True)
-                except Member.DoesNotExist:
-                    internal_org = Organization(
-                        internal=True,
-                        name=person.name
-                    )
-
-                    for attr, value in six.iteritems(
-                            person.get_profile_data()):
-                        setattr(internal_org, attr, value)
-
-                    internal_org.save()
-
-                    Member.objects.create(
-                        organization=internal_org,
-                        person=person,
-                        group=Member.ADMIN
-                    )
-
-            lot = Lot.objects.get(event=self.object)
             subscription = Subscription(
                 person=person,
                 lot=lot,
                 created_by=user.id
             )
 
-            try:
+            # Capturar transação
 
-                subscription.save()
 
-                if shiny_user:
-                    notify_new_user_and_subscription(
-                        self.object,
-                        subscription,
-                        full_reset_url
-                    )
-                else:
-                    notify_new_subscription(self.object, subscription)
+            # Cria transação.
 
-                messages.success(self.request,
-                                 'Inscrição realizada com sucesso!')
 
-            except ValidationError as e:
-                error_message = e.messages[0]
-                if error_message:
-                    messages.error(self.request, error_message)
-                else:
-                    messages.error(self.request,
-                                   'Ocorreu um erro durante a o processo de inscrição, tente novamente mais tarde.')
+            subscription.save()
+            notify_new_subscription(self.event, subscription)
 
-        context = super(HotsiteView, self).get_context_data(**kwargs)
-        context['status'] = self._get_status()
-        context['report'] = self._get_report()
-        context['period'] = self._get_period()
-        context['name'] = name
-        context['email'] = email
-        context['info'] = Info.objects.get(pk=self.object.pk)
-        context['is_subscribed'] = self._get_subscribed_status()
-        context['remove_preloader'] = True
-        return render(
-            self.request,
-            template_name=self.template_name,
-            context=context
-        )
+            messages.success(
+                self.request,
+                'Inscrição realizada com sucesso!'
+            )
+
+        return redirect('public:hotsite-subscription', slug=self.event.slug)

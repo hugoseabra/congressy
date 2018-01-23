@@ -39,6 +39,11 @@ class ProfileCreateView(TemplateView, FormView):
                    'Enviamos um email para "%s", click no link do email para ativar sua conta.'
     }
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['is_embeded'] = self.request.GET.get('embeded') == '1'
+        return ctx
+
     def get_form(self, form_class=None):
         return ProfileCreateForm(
             **self.get_form_kwargs()

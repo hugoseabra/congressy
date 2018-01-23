@@ -36,6 +36,11 @@
     <!-- Feature detection -->
     <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
 
+    <style>
+
+
+    </style>
+
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
         <script src="{% static "assets/js/vendor/html5shiv.js"%}"></script>
@@ -43,9 +48,9 @@
     <![endif]-->
 </head>
 
-<body class="cgsy-login">
-<section id="main-wrapper" class="theme-cgsy-full">
-    <section class="container animated fadeInUp">
+<body class="theme-cgsy-full cgsy-login">
+<section id="main-wrapper">
+    <section class="container animated fadeInDown">
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
                 <header class="login-header">
@@ -115,6 +120,9 @@
 
                         {% block form %}{% endblock %}
                     </div>
+                </div>
+                <div class="text-muted text-right cgsy-version">
+                    {% include "base/footer.html" %}
                 </div>
             </div>
         </div>
