@@ -37,8 +37,8 @@ class Migration(migrations.Migration):
                 ('birth_date', models.CharField(
                     choices=[('birth-date-hide', 'Ocultar'),
                              ('birth-date-show', 'Mostrar'), (
-                             'birth-date-required',
-                             'Mostrar e Tornar obrigatório')],
+                                 'birth-date-required',
+                                 'Mostrar e Tornar obrigatório')],
                     default='birth-date-hide',
                     help_text='Configuração do campo "Data de Nascimento" no formulário.',
                     max_length=25, verbose_name='Data de Nascimento')),
@@ -146,5 +146,17 @@ class Migration(migrations.Migration):
         ),
         migrations.DeleteModel(
             name='Form',
+        ),
+        migrations.AlterField(
+            model_name='lot',
+            name='price',
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=8, null=True, verbose_name='valor'),
+        ),
+        migrations.AlterField(
+            model_name='lot',
+            name='transfer_tax',
+            field=models.BooleanField(default=False,
+                                      help_text='Repasse a taxa para o participante e receba o valor integral do ingresso.',
+                                      verbose_name='repassar taxa ao participante'),
         ),
     ]
