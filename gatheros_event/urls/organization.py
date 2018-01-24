@@ -20,6 +20,11 @@ urls = [
         name='organization-edit'
     ),
     url(
+        r'^(?P<pk>[\d]+)/financial/edit/$',
+        views.OrganizationFinancialEditFormView.as_view(),
+        name='organization-financial-edit'
+    ),
+    url(
         r'^add/$',
         views.OrganizationAddFormView.as_view(),
         name='organization-add'
