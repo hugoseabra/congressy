@@ -81,24 +81,29 @@ for i, dict_dates in enumerate(lots_dates):
 
     ii = 0
     for lot in event.lots.all():
-        if not dict_dates[ii]:
-            raise Exception('Configuração errada para {}'.format(lot))
 
-        ref = dict_dates[ii]
+        try:
 
-        start = event.date_start - timedelta(
-            days=ref.get('days_before_event') - 1)
-        end = start + timedelta(days=ref.get('days') - 1)
+            if not dict_dates[ii]:
+                raise Exception('Configuração errada para {}'.format(lot))
 
-        if end >= event.date_start:
-            end = event.date_start - timedelta(seconds=1)
-        else:
-            end = end.replace(hour=23, minute=59, second=59)
+            ref = dict_dates[ii]
 
-        lot.date_start = start.replace(hour=0, minute=0, second=0)
-        lot.date_end = end
-        lot.save()
+            start = event.date_start - timedelta(
+                days=ref.get('days_before_event') - 1)
+            end = start + timedelta(days=ref.get('days') - 1)
 
-        ii += 1
+            if end >= event.date_start:
+                end = event.date_start - timedelta(seconds=1)
+            else:
+                end = end.replace(hour=23, minute=59, second=59)
+
+            lot.date_start = start.replace(hour=0, minute=0, second=0)
+            lot.date_end = end
+            lot.save()
+
+            ii += 1
+        except IndexError:
+            pass
 
 print('Ok')
