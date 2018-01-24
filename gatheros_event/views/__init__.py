@@ -33,6 +33,7 @@ from .organization.form import (
     OrganizationAddFormView,
     OrganizationAddInternalFormView,
     OrganizationEditFormView,
+    OrganizationFinancialEditFormView,
 )
 from .organization.list import OrganizationListView
 from .organization.panel import (
