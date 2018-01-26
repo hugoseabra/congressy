@@ -28,7 +28,7 @@ class PersonForm(forms.ModelForm):
             'cpf': TelephoneInput(),
             'name': forms.TextInput(attrs={'placeholder': 'Nome completo'}),
             'email': forms.EmailInput(attrs={'placeholder': 'me@you.com'}),
-            'phone': TelephoneInput(attrs={'placeholder': '(00) 90000-0000'}),
+            'phone': TelephoneInput(attrs={'placeholder': '(00) 00000-0000'}),
             'zip_code': TelephoneInput(),
             'city': forms.HiddenInput()
         }
