@@ -40,5 +40,4 @@ EMAIL_BACKEND = 'sparkpost.django.email_backend.SparkPostEmailBackend'
 
 
 PAGARME_API_KEY = 'ak_live_7Rxgr3GlxWycVDMNeeG2InzwPsoPrM'
-
 PAGARME_RECIPIENT_ID = 're_cjaskozwr01u1of5zo7kc962u'
