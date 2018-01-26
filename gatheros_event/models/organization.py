@@ -45,7 +45,7 @@ class Organization(models.Model, GatherosModelMixin):
     )
 
     """ Organização """
-    name = models.CharField(max_length=100, verbose_name='nome')
+    name = models.CharField(max_length=100, verbose_name='nome da organização')
     description = models.TextField(
         null=True,
         blank=True,
@@ -54,7 +54,8 @@ class Organization(models.Model, GatherosModelMixin):
     description_html = models.TextField(
         null=True,
         blank=True,
-        verbose_name='descrição (HTML)'
+        verbose_name='descrição (HTML)',
+        help_text='Uma descrição com mais recursos textuais para descrever a sua organização.',
     )
     slug = models.SlugField(
         max_length=128,

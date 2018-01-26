@@ -14,6 +14,30 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'subscription:lot-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Lotes/Categorias
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+        {#        <li>#}
+        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+        {#               title="Check-in">#}
+        {#                <i class="fa  fa-fw fa-rocket"></i>#}
+        {#                Check-in#}
+        {#            </a>#}
+        {#        </li>#}
+    </ul>
     <h5 class="sidebar-header">Configurações</h5>
     <ul class="nav nav-pills nav-stacked">
         <li>
@@ -29,113 +53,87 @@
             </a>
         </li>
     </ul>
-
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Ingressos
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-            </a>
-        </li>
-{#        <li>#}
-{#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-{#               title="Check-in">#}
-{#                <i class="fa  fa-fw fa-rocket"></i>#}
-{#                Check-in#}
-{#            </a>#}
-{#        </li>#}
-    </ul>
-
 {% endblock %}
 
 {% block scripts %}
-<script>
-    // Se algum lote pago.
-    var setLotPaiedStatus = function() {
-        var radios = $('input[type=radio]');
-        radios.iCheck({
-            checkboxClass: 'icheckbox_flat-grey',
-            radioClass: 'iradio_flat-grey',
-        });
-        radios.prop('disabled', 'disabled');
+    <script>
+        // Se algum lote pago.
+        var setLotPaiedStatus = function () {
+            var radios = $('input[type=radio]');
+            radios.iCheck({
+                checkboxClass: 'icheckbox_flat-grey',
+                radioClass: 'iradio_flat-grey',
+            });
+            radios.prop('disabled', 'disabled');
 
-        window.setTimeout(function() {
-            app.switcheryElements['id_email'].disable();
-            app.switcheryElements['id_phone'].disable();
-            app.switcheryElements['id_city'].disable();
-        }, 200);
-    };
-
-    // @TODO é o que vier da edição, se houver valor
-    var city_checked = {% if object and object.city %}true{% else %}false{% endif %};
-    var enableDisableCityButton = function (enabled) {
-        // @TODO inserir constate do model
-        if (enabled === true) {
-            app.switcheryElements['id_city'].enable();
-            window.setTimeout(function() {
-                app.setSwitchery('#id_city', city_checked);
-            }, 200);
-        } else {
-            app.setSwitchery('#id_city', true);
-            window.setTimeout(function() {
+            window.setTimeout(function () {
+                app.switcheryElements['id_email'].disable();
+                app.switcheryElements['id_phone'].disable();
                 app.switcheryElements['id_city'].disable();
             }, 200);
-        }
-    };
+        };
 
-    $(document).ready(function() {
-
-        $('#id_city').on('change', function() {
-            var address_required_el = $('input[value=address-show]');
-            // Seta flag somente se endereço não for obrigatório.
-            if (address_required_el.prop('checked') === false) {
-                city_checked = $(this).prop('checked');
+        // @TODO é o que vier da edição, se houver valor
+        var city_checked = {% if object and object.city %}true{% else %}false{% endif %};
+        var enableDisableCityButton = function (enabled) {
+            // @TODO inserir constate do model
+            if (enabled === true) {
+                app.switcheryElements['id_city'].enable();
+                window.setTimeout(function () {
+                    app.setSwitchery('#id_city', city_checked);
+                }, 200);
+            } else {
+                app.setSwitchery('#id_city', true);
+                window.setTimeout(function () {
+                    app.switcheryElements['id_city'].disable();
+                }, 200);
             }
+        };
+
+        $(document).ready(function () {
+
+            $('#id_city').on('change', function () {
+                var address_required_el = $('input[value=address-show]');
+                // Seta flag somente se endereço não for obrigatório.
+                if (address_required_el.prop('checked') === false) {
+                    city_checked = $(this).prop('checked');
+                }
+            });
+
+            {% if object and object.address == object.ADDRESS_SHOW %}
+                enableDisableCityButton(false);
+            {% endif %}
+
+            {% if has_paid_lots %}
+                setLotPaiedStatus();
+            {% endif %}
+
+            $('input[type=radio]').on('ifChecked', function () {
+                var el = $(this);
+                if (el.prop('name') == 'address') {
+                    // @TODO inserir constate do model
+                    enableDisableCityButton(el.val() == 'address-hide');
+                }
+            });
         });
-
-        {% if object and object.address == object.ADDRESS_SHOW %}
-            enableDisableCityButton(false);
-        {% endif %}
-
-        {% if has_paid_lots %}
-        setLotPaiedStatus();
-        {% endif %}
-
-        $('input[type=radio]').on('ifChecked', function() {
-            var el = $(this);
-            if (el.prop('name') == 'address') {
-                // @TODO inserir constate do model
-                enableDisableCityButton(el.val() == 'address-hide');
-            }
-        });
-    });
-</script>
+    </script>
 {% endblock %}
 
 
 {% block content %}
     {% if has_paid_lots %}
-    <div class="well well-info">
-        Este evento possui um de seus lotes pagos, portanto os seguintes campos
-        serão sempre obrigatórios:
+        <div class="well well-info">
+            Este evento possui um de seus lotes pagos, portanto os seguintes campos
+            serão sempre obrigatórios:
 
-        <ul style="margin-top: 8px;">
-            <li>E-mail;</li>
-            <li>CPF;</li>
-            <li>Celular (contato);</li>
-            <li>Data de Nasicmento; e,</li>
-            <li>Endereço completo.</li>
-        </ul>
-    </div>
+            <ul style="margin-top: 8px;">
+                <li>E-mail;</li>
+                <li>CPF;</li>
+                <li>Celular (contato);</li>
+                <li>Data de Nasicmento; e,</li>
+                <li>Endereço completo.</li>
+            </ul>
+        </div>
     {% endif %}
 
     <form action="" method="post" class="form-horizontal form-border"
@@ -175,7 +173,8 @@
             <div class="col-md-12">
                 <div class="buttonbar">
                     <div class="float-right">
-                        <button {% if has_paid_lots %}disabled{% endif %} type="submit" class="btn btn-success {% if has_paid_lots %}disabled{% endif %}">
+                        <button {% if has_paid_lots %}disabled{% endif %} type="submit"
+                                class="btn btn-success {% if has_paid_lots %}disabled{% endif %}">
                             <i class="fa fa-save"></i>
                             Salvar
                         </button>
@@ -280,7 +279,8 @@
             <div class="col-md-12">
                 <div class="buttonbar bottom">
                     <div class="float-right">
-                        <button {% if has_paid_lots %}disabled{% endif %} type="submit" class="btn btn-success {% if has_paid_lots %}disabled{% endif %}">
+                        <button {% if has_paid_lots %}disabled{% endif %} type="submit"
+                                class="btn btn-success {% if has_paid_lots %}disabled{% endif %}">
                             <i class="fa fa-save"></i>
                             Salvar
                         </button>
