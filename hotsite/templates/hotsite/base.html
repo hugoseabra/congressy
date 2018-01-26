@@ -285,7 +285,7 @@
 
     </section>
 
-
+    {% if subscription_enabled  %}
     <!-- CLOSING
     ================================= -->
     <section id="closing" class="closing-section section-dark section">
@@ -306,20 +306,23 @@
 
         </div>
 
-        <div class="container">
 
-            <h3 class="closing-shout">
-                Faça já a sua inscrição!
-            </h3>
+            <div class="container">
 
-            <div class="closing-buttons" data-animation="tada">
-                <a href="#hero" class="anchor-link btn btn-lg btn-primary">
-                    Realizar inscrição
-                </a>
+                <h3 class="closing-shout">
+                    Faça já a sua inscrição!
+                </h3>
+
+                <div class="closing-buttons" data-animation="tada">
+                    <a href="#hero" class="anchor-link btn btn-lg btn-primary">
+                        Realizar inscrição
+                    </a>
+                </div>
             </div>
-        </div>
 
     </section>
+ {% endif %}
+
 
     {% if event.place %}
         <!-- GOOGLE MAPS
@@ -332,7 +335,8 @@
                 <div class="section-background-maps">
                     <div id="gmap"></div>
 
-                    <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+                    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&key={{ google_maps_api_key }}">
+                    </script>
                     <!-- GOGGLE MAPS CONFIGURATION -->
                     <!-- ref: http://maplacejs.com/ -->
                     <script>

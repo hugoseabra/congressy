@@ -15,11 +15,11 @@
 {% endblock messages %}
 
 {% block title %}
-    {% if form_title %}Editar{% else %}Nova{% endif %} Ingressos | Congressy
+    {% if form_title %}Editar{% else %}Novo{% endif %} Lote | Congressy
 {% endblock %}
 
 {% block page_title %}
-    {% if form_title %}Editar{% else %}Nova{% endif %} Ingressos
+    {% if form_title %}Editar{% else %}Nova{% endif %} Lotes/Categorias
 {% endblock %}
 
 {% block page_sub_title %}
@@ -81,29 +81,13 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-    </ul>
-
     <h5 class="sidebar-header">Participantes</h5>
     <ul class="nav nav-pills nav-stacked">
         <li class="active">
             <a href="{% url 'subscription:lot-list' event.pk %}"
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
-                Ingressos
+                Lotes/Categorias
             </a>
         </li>
         <li>
@@ -120,6 +104,21 @@
         {#                Check-in#}
         {#            </a>#}
         {#        </li>#}
+    </ul>
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
     </ul>
 {% endblock %}
 

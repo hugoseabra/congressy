@@ -3,13 +3,13 @@
 {% load static %}
 {% load event_tags %}
 
-{% block title %} Ingressos | Congressy{% endblock %}
-{% block page_title %}Ingressos{% endblock %}
+{% block title %} Lotes | Congressy{% endblock %}
+{% block page_title %}Lotes/Categorias{% endblock %}
 {% block page_sub_title %}
     {{ event.name }}
-    {% if not event.published %}
-        <i style="color: darkgrey">- não publicado</i>
-    {% endif %}
+{#    {% if not event.published %}#}
+{#        <i style="color: darkgrey">- não publicado</i>#}
+{#    {% endif %}#}
 {% endblock %}
 {% block styles %}
     <link rel="stylesheet"
@@ -62,6 +62,30 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'subscription:lot-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Lotes/Categorias
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+        {#        <li>#}
+        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+        {#               title="Check-in">#}
+        {#                <i class="fa  fa-fw fa-rocket"></i>#}
+        {#                Check-in#}
+        {#            </a>#}
+        {#        </li>#}
+    </ul>
     <h5 class="sidebar-header">Configurações</h5>
     <ul class="nav nav-pills nav-stacked">
         <li>
@@ -76,31 +100,6 @@
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
-    </ul>
-
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li class="active">
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Ingressos
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-            </a>
-        </li>
-{#        <li>#}
-{#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-{#               title="Check-in">#}
-{#                <i class="fa  fa-fw fa-rocket"></i>#}
-{#                Check-in#}
-{#            </a>#}
-{#        </li>#}
     </ul>
 {% endblock %}
 

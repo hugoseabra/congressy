@@ -100,6 +100,27 @@ def member_is_admin_not_internal(user_obj, organization=None):
     return is_auth and is_admin and is_member_active
 
 
+def member_is_admin_and_internal(user_obj, organization=None):
+    """
+    Usuário é membro ativo de organização  interna e administrador.
+
+    :param user_obj: Instância de usuário
+    :param organization: Instância de organização
+    :return: bool
+    """
+    if not organization.internal:
+        return False
+
+    person = Person.objects.get(user=user_obj)
+    is_auth = user_obj.is_authenticated()
+    is_admin = organization and organization.is_admin(person)
+    is_member_active = organization and organization.is_member_active(person)
+
+    return is_auth and is_admin and is_member_active
+
+
+
+
 def member_is_member(user_obj, organization):
     """
     Usuário é membro ativo da organização.
@@ -133,6 +154,17 @@ logic = MemberPermissionLogic(
         'can_invite',
         'change_organization',
         'delete_organization',
+        'can_manage_members',
+    ],
+)
+add_permission_logic(Organization, logic)
+
+# Organização -> Admin -> Interno
+logic = MemberPermissionLogic(
+    member_is_admin_and_internal,
+    [
+        'can_invite',
+        'change_organization',
         'can_manage_members',
     ],
 )

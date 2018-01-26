@@ -20,6 +20,20 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='person',
             name='phone',
-            field=models.CharField(blank=True, max_length=16, null=True, verbose_name='celular'),
+            field=models.CharField(blank=True, max_length=50, null=True, verbose_name='celular'),
         ),
+        migrations.AlterField(
+            model_name='organization',
+            name='description_html',
+            field=models.TextField(blank=True,
+                                   help_text='Uma descrição com mais recursos textuais para descrever a sua organização.',
+                                   null=True, verbose_name='descrição (HTML)'),
+        ),
+        migrations.AlterField(
+            model_name='organization',
+            name='name',
+            field=models.CharField(max_length=100, verbose_name='nome da organização'),
+        ),
+
+
     ]

@@ -51,7 +51,7 @@ def create_credit_card_transaction(instance=None):
     }
 
     trx = pagarme.transaction.create(params)
-    print(trx)
+    # print(trx)
 
     return trx
 
@@ -101,6 +101,8 @@ def create_boleto_transaction(instance=None):
     }
 
     trx = pagarme.transaction.create(params)
+
+    #  print(trx)
 
     return trx
 
