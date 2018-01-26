@@ -4,11 +4,8 @@ Organização é a estrutura máxima da aplicação, pois nela, define-se seus
 membros, com seus devidos grupos, e como eles poderão interagir nos eventos
 vinculadas a ela.
 """
-import sys
 from datetime import datetime
 
-import pagarme
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
@@ -16,11 +13,8 @@ from django.utils.html import strip_tags
 
 from core.util import model_field_slugify
 from gatheros_event.models import Person
-from mailer.tasks import send_mail
 from .member import Member
 from .mixins import GatherosModelMixin
-
-pagarme.authentication_key(settings.PAGARME_API_KEY)
 
 
 class Organization(models.Model, GatherosModelMixin):
@@ -206,7 +200,8 @@ class Organization(models.Model, GatherosModelMixin):
 
     active_recipient = models.BooleanField(default=False)
 
-    recipient_id = models.IntegerField(
+    recipient_id = models.CharField(
+        max_length=50,
         null=True,
         blank=True,
     )
@@ -234,39 +229,6 @@ class Organization(models.Model, GatherosModelMixin):
         """ Salva entidade. """
         self._create_unique_slug()
         self.description = strip_tags(self.description_html)
-
-        if not self.bank_account_id:
-
-            required_data = ['bank_code',
-                             'agency',
-                             'account',
-                             'legal_name',
-                             'account_type',
-                             'cnpj_ou_cpf', ]
-
-            try:
-                # Tenta buscar todos os items necessarios para criar uma conta
-                for item in required_data:
-                    getattr(self, item)
-
-                bank_account = self._create_payme_back_account()
-
-                if bank_account:
-
-                    self.active_bank_account = True
-                    self.bank_account_id = bank_account['id']
-                    self.document_type = bank_account['document_type']
-                    self.charge_transfer_fees = bank_account['charge_transfer_fees']
-                    self.date_created = bank_account['date_created']
-
-                    recipient = self._create_payme_recipient(bank_account)
-
-                    if recipient:
-                        self.active_recipient = True
-                        self.recipient_id = recipient['id']
-
-            except AttributeError:
-                pass
 
         super(Organization, self).save(*args, **kwargs)
 
@@ -348,83 +310,3 @@ class Organization(models.Model, GatherosModelMixin):
                 invitations += list(invitation_qs.all())
 
         return invitations
-
-    def _create_payme_back_account(self):
-
-        params = {
-            'agencia': self.agency,
-            'bank_code': self.bank_code,
-            'conta': self.account,
-            'document_number': self.cnpj_ou_cpf,
-            'legal_name': self.legal_name,
-            'type': self.account_type,
-        }
-
-        if hasattr(self, 'agencia_dv'):
-            params['agencia_dv'] = self.agencia_dv
-
-        if hasattr(self, 'conta_dv'):
-            params['conta_dv'] = self.conta_dv
-
-
-
-        try:
-            # Cria uma "conta bancaria" no sistema pagar.me
-            bank_account = pagarme.bank_account.create(params)
-
-            if bank_account:
-                return bank_account
-        except:
-
-            subject = "ALERTA - Falha na criação de conta bancaria de Organizador"
-
-            body = """
-
-                               ALERTA - Falha na criação de conta bancaria de Organizador:
-
-                               Erro capturado foi: {0}
-
-                               Nome da Organização que estava tentando criar: {1} 
-
-
-                       """.format(sys.exc_info()[0], self.name)
-
-            send_mail(subject=subject, body=body, to=settings.ALERT_EMAILS)
-
-    def _create_payme_recipient(self, bank_account=None):
-
-        if not bank_account:
-            return
-
-        params = {
-            'anticipatable_volume_percentage': '80',
-            'automatic_anticipation_enabled': 'false',
-            'transfer_day': '5',
-            'transfer_enabled': 'true',
-            'transfer_interval': 'weekly',
-            'bank_account': bank_account,
-        }
-
-
-        try:
-            # Cria uma "recebedor" no sistema pagar.me
-            recipient = pagarme.recipient.create(params)
-
-            if recipient:
-                return recipient
-        except:
-
-            subject = "ALERTA - Falha na criação de recebedor de Organizador"
-
-            body = """
-
-                               ALERTA - Falha na criação de recebedor de Organizador:
-
-                               Erro capturado foi: {0}
-
-                               Nome da Organização que estava tentando criar: {1} 
-
-
-                       """.format(sys.exc_info()[0], self.name)
-
-            send_mail(subject=subject, body=body, to=settings.ALERT_EMAILS)
