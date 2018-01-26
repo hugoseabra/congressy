@@ -61,8 +61,6 @@ def create_boleto_transaction(instance=None):
     if not instance:
         return
 
-    congressy_id = 're_cjcupb1iq0200zl6d89r92s32'
-
     # Criar transação.
     params = {
 
@@ -85,7 +83,7 @@ def create_boleto_transaction(instance=None):
 
         "split_rules": [
             {
-                "recipient_id": congressy_id,
+                "recipient_id": settings.PAGARME_RECIPIENT_ID,
                 "percentage": 10,
                 "liable": True,
                 "charge_processing_fee": True
