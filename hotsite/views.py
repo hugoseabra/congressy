@@ -17,14 +17,14 @@ from django.utils.http import urlsafe_base64_encode
 from django.views import generic
 from django.conf import settings
 
-from gatheros_event.forms import PersonForm
+from gatheros_event.forms import PersonForm, PersonSubscribeForm
 from gatheros_event.models import Event, Info, Member, Organization
 from gatheros_subscription.models import Subscription, FormConfig, Lot
 from mailer.services import (
     notify_new_user,
     notify_new_subscription,
 )
-from payment.tasks import create_credit_card_transaction, create_boleto_transaction
+
 
 
 class EventMixin(generic.View):
@@ -299,6 +299,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
 class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
     template_name = 'hotsite/subscription.html'
+    form_class = PersonSubscribeForm
 
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
@@ -400,11 +401,8 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 context['form'] = form
                 return self.render_to_response(context)
 
-            if request.POST['payment_type'] == 'credit_card' and not request.POST['card_hash']:
-                context['form'] = form
-                return self.render_to_response(context)
-
             person = form.save()
+            # @TODO move all this logic to the form!
 
             if self.has_paid_lots():
                 lot_pk = self.request.POST.get('lot')
@@ -419,87 +417,6 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 lot=lot,
                 created_by=user.id
             )
-
-            if request.POST['payment_type'] == 'credit_card':
-                transaction_instance_data = {
-                    "price": int(lot.price * 100),
-                    "card_hash": request.POST['card_hash'],
-                    "customer": {
-                        "name": form.cleaned_data['name'],
-                        "type": "individual",
-                        "country": "br",
-                        "email": form.cleaned_data['email'],
-                        "documents": [
-                            {
-                                "type": "cpf",
-                                "number": form.cleaned_data['cpf'],
-                            }
-                        ],
-                        "phone_numbers": [
-                            "+55" + form.cleaned_data['phone'].replace(" ", "").replace('(', '').replace(')',
-                                                                                                         '').replace(
-                                '-', '')],
-                        "birthday": form.cleaned_data['birth_date'].strftime('%Y-%d-%m'),
-                    },
-                    "billing": {
-                        "name": form.cleaned_data['name'],
-                        "address": {
-                            "country": "br",
-                            "state": form.cleaned_data['city'].uf.lower(),
-                            "city": form.cleaned_data['city'].name.lower().capitalize(),
-                            "neighborhood": form.cleaned_data['village'],
-                            "street": form.cleaned_data['street'],
-                            "street_number": form.cleaned_data['number'],
-                            "zipcode": form.cleaned_data['zip_code']
-                        }
-                    },
-                    "event_name": context['event'].organization.name,
-                    'recipient_id': context['event'].organization.recipient_id,
-                }
-                create_credit_card_transaction(transaction_instance_data)
-            elif request.POST['payment_type'] == 'boleto':
-                transaction_instance_data = {
-
-                    "price": int(lot.price * 100),
-
-                    "customer": {
-                        "name": form.cleaned_data['name'],
-                        "type": "individual",
-                        "country": "br",
-                        "email": form.cleaned_data['email'],
-                        "documents": [
-                            {
-                                "type": "cpf",
-                                "number": form.cleaned_data['cpf'],
-                            }
-                        ],
-                        "phone_numbers": [
-                            "+55" + form.cleaned_data['phone'].replace(" ", "").replace('(', '').replace(')',
-                                                                                                         '').replace(
-                                '-', '')],
-                        "birthday": form.cleaned_data['birth_date'].strftime('%Y-%d-%m'),
-                    },
-
-                    "billing": {
-                        "name": form.cleaned_data['name'],
-                        "address": {
-                            "country": "br",
-                            "state": form.cleaned_data['city'].uf.lower(),
-                            "city": form.cleaned_data['city'].name.lower().capitalize(),
-                            "neighborhood": form.cleaned_data['village'],
-                            "street": form.cleaned_data['street'],
-                            "street_number": form.cleaned_data['number'],
-                            "zipcode": form.cleaned_data['zip_code']
-                        }
-                    },
-
-                    "event_name": context['event'].organization.name,
-
-                    'recipient_id': context['event'].organization.recipient_id,
-                }
-
-
-                create_boleto_transaction(transaction_instance_data)
 
             subscription.save()
             notify_new_subscription(self.event, subscription)
