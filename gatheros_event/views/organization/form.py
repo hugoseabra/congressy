@@ -154,4 +154,5 @@ class OrganizationEditFormView(BaseOrganizationView, generic.UpdateView):
 
 class OrganizationFinancialEditFormView(OrganizationEditFormView):
     success_message = 'Informações bancárias salvas com sucesso.'
+    success_url = reverse_lazy('event:event-list')
     form_class = forms.OrganizationFinancialForm
