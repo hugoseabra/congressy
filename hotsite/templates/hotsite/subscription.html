@@ -310,9 +310,7 @@
 
         $('#id_phone').mask("(99) 9 9999-9999");
         $('#id_cpf').mask("999.999.999-99");
-        {% if not request|is_chrome %}
-            $('#id_birth_date').mask("99/99/9999");
-        {% endif %}
+
 
         {% if config and config.address == config.ADDRESS_SHOW %}
             $('#id_zip_code').mask("99.999-999");
@@ -322,14 +320,14 @@
             searchByCep();
         });
 
-        if ($('#id_city').val() != null) {
-            $.ajax({
-                url: "/api/cities/" + $('#id_city').val(), success: function (result) {
-                    $('#id_city_search').val(result.name + ' - ' + result.uf)
-                    //populate the html with result here
-                }
-            });
-        }
+        //if ($('#id_city').val() != null) {
+        //    $.ajax({
+        //        url: "/api/cities/" + $('#id_city').val(), success: function (result) {
+        //            $('#id_city_search').val(result.name + ' - ' + result.uf)
+        //            //populate the html with result here
+        //        }
+        //    });
+        // }
 
         showHideCepLoader();
     });
@@ -358,10 +356,12 @@
 
         function handleSuccess(data) {
             $('#id_button_pay').removeClass('btn-default').addClass('btn-success');
+
             console.log(data);
 
-            $('#payment_type').val(data.payment_method);
-            $('#card_hash').val(data.card_hash);
+            $('#id_transaction_type').val(data.payment_method);
+            $('#id_amount').val(data.amount);
+            $('#id_card_hash').val(data.card_hash);
         }
 
         function handleError(data) {

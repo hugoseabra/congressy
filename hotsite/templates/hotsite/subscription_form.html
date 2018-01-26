@@ -79,11 +79,11 @@
                 {% endfor %}
             {% endif %}
             {% if form.errors %}
-                <ul>
-                    {% for error in form.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
+                {% for error in form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error}}
+                    </div>
+                {% endfor %}
             {% endif %}
 
             {% if is_subscribed %}
@@ -125,7 +125,10 @@
                             {% endif %}
                         {% endif %}
                     </div>
-                    <div class="col-md-3">
+
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
                         {% if config and config.birth_date != config.BIRTH_DATE_HIDE %}
                             {% if config.birth_date == config.BIRTH_DATE_REQUIRED %}
                                 {% render_generic_field form.birth_date required=True %}
@@ -135,6 +138,7 @@
                         {% endif %}
                     </div>
                 </div>
+
                 <div class="row">
                 </div>
                 <div class="row">
@@ -229,8 +233,9 @@
                 <div class="panel-body">
                     <button id="id_button_pay" class="btn btn-default" type="button">Realizar pagamento</button>
                     <p class="text-muted" style="color:#f85252;"></p>
-                     <input type="hidden" id="payment_type" name="payment_type">
-                    <input type="hidden" id="card_hash" name="card_hash">
+                    <input type="hidden" id="id_amount" name="amount">
+                    <input type="hidden" id="id_card_hash" name="card_hash">
+                    <input type="hidden" id="id_transaction_type" name="transaction_type">
                 </div>
             </div>
         {% endif %}
@@ -238,6 +243,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="form-group form-group-submit">
+                <input type="hidden" id="id_organization" name="organization" value={{ event.organization.pk }}>
                 <button type="button" class="btn btn-primary btn-lg btn-block"
                         data-loading-text="Enviar" onclick="$(this).removeAttr('type').trigger('click');">
                     Enviar
