@@ -15,6 +15,7 @@ from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views import generic
+from django.conf import settings
 
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
@@ -42,6 +43,7 @@ class EventMixin(generic.View):
         context['lots'] = self.get_lots()
         context['subscription_enabled'] = self.subscription_enabled()
         context['has_paid_lots'] = self.has_paid_lots()
+        context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
 
         return context
 
