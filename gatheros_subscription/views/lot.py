@@ -3,11 +3,12 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 
-from gatheros_event.models import Event
+from gatheros_event.models import Event, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot
 from decimal import Decimal
+
 
 class BaseLotView(AccountMixin, View):
     event = None
@@ -87,7 +88,6 @@ class BaseFormLotView(BaseLotView, generic.FormView):
         return kwargs
 
 
-
 class LotListView(BaseLotView, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
     model = Lot
@@ -122,6 +122,7 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
     def get_context_data(self, **kwargs):
         context = super(LotAddFormView, self).get_context_data(**kwargs)
         context['form_title'] = "Novo lote para '{}'".format(self.event.name)
+        context['full_banking'] = self._get_full_banking()
         return context
 
     def form_valid(self, form):
@@ -149,6 +150,24 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
 
         return can
 
+    def _get_full_banking(self):
+
+        if not self.organization:
+            return False
+
+        banking_required_fields = ['bank_code', 'agency', 'account', 'cnpj_ou_cpf', 'account_type']
+
+        for field in Organization._meta.get_fields():
+
+            for required_field in banking_required_fields:
+
+                if field.name == required_field:
+
+                    if not getattr(self.organization, field.name):
+                        return False
+
+        return True
+
 
 class LotEditFormView(BaseFormLotView, generic.UpdateView):
     show_not_allowed_message = True
@@ -161,6 +180,8 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
     def get_context_data(self, **kwargs):
         context = super(LotEditFormView, self).get_context_data(**kwargs)
         context['form_title'] = "Editar lote de '{}'".format(self.event.name)
+        context['full_banking'] = self._get_full_banking()
+
         return context
 
     def form_valid(self, form):
@@ -195,6 +216,24 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
             )
 
         return can
+
+    def _get_full_banking(self):
+
+        if not self.organization:
+            return False
+
+        banking_required_fields = ['bank_code', 'agency', 'account', 'cnpj_ou_cpf', 'account_type']
+
+        for field in Organization._meta.get_fields():
+
+            for required_field in banking_required_fields:
+
+                if field.name == required_field:
+
+                    if not getattr(self.organization, field.name):
+                        return False
+
+        return True
 
 
 class LotDeleteView(BaseLotView, DeleteViewMixin):

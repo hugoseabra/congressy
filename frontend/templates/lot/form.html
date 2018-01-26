@@ -15,11 +15,11 @@
 {% endblock messages %}
 
 {% block title %}
-    {% if form_title %}Editar{% else %}Nova{% endif %} Ingressos | Congressy
+    {% if form_title %}Editar{% else %}Novo{% endif %} Lote | Congressy
 {% endblock %}
 
 {% block page_title %}
-    {% if form_title %}Editar{% else %}Nova{% endif %} Ingressos
+    {% if form_title %}Editar{% else %}Nova{% endif %} Lotes/Categorias
 {% endblock %}
 
 {% block page_sub_title %}
@@ -81,29 +81,13 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-    </ul>
-
     <h5 class="sidebar-header">Participantes</h5>
     <ul class="nav nav-pills nav-stacked">
         <li class="active">
             <a href="{% url 'subscription:lot-list' event.pk %}"
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
-                Ingressos
+                Lotes/Categorias
             </a>
         </li>
         <li>
@@ -120,6 +104,21 @@
         {#                Check-in#}
         {#            </a>#}
         {#        </li>#}
+    </ul>
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
     </ul>
 {% endblock %}
 
@@ -219,60 +218,63 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            {% if organization.active_bank_account %}
+                            {% if organization.active_bank_account and full_banking %}
                                 <div class="col-xl-2 col-lg-2 col-md-2">
                                     {% render_generic_field form.price %}
                                 </div>
                                 <div class="col-xl-4 col-lg-6 col-md-6">
                                     {% render_generic_field form.transfer_tax %}
                                 </div>
+
                             {% else %}
-                                <div class="col-xl-4 col-lg-6 col-md-6">
-                                    <p>Para habilitar lotes pagos é necessario configurar os dados bancarios da
-                                        organização.
-                                    </p>
-                                    <p><a href="{% url 'event:organization-edit' organization.pk %}">Click para configurar estes dados.</a></p>
+                                <div class="col-xl-4 col-lg-6 col-md-8">
+                                <div class="alert alert-warning">
+                                    <strong>È necessário que complete seus dads bancários para criar lotes
+                                        pagos!</strong>
+
                                 </div>
+                                <p><a href="{% url 'event:organization-financial-edit' organization.pk %}">Click
+                                    para configurar estes dados.</a></p>
                             {% endif %}
+                            </div>
                         </div>
                     </div>
+                    {#                <div class="panel panel-primary">#}
+                    {#                    <div class="panel-heading">#}
+                    {#                        <div class="panel-title">#}
+                    {#                            Privacidade#}
+                    {#                        </div>#}
+                    {#                    </div>#}
+                    {#                    <div class="panel-body">#}
+                    {#                        <div class="row">#}
+                    {#                            <div class="col-xl-2 col-lg-4 col-md-4">#}
+                    {#                                {% render_generic_field form.private %}#}
+                    {#                            </div>#}
+                    {#                            <div class="col-xl-4 col-lg-4 col-md-4">#}
+                    {#                                {% render_generic_field form.exhibition_code %}#}
+                    {#                            </div>#}
+                    {#                        </div>#}
+                    {#                    </div>#}
+                    {#                </div>#}
                 </div>
-                {#                <div class="panel panel-primary">#}
-                {#                    <div class="panel-heading">#}
-                {#                        <div class="panel-title">#}
-                {#                            Privacidade#}
-                {#                        </div>#}
-                {#                    </div>#}
-                {#                    <div class="panel-body">#}
-                {#                        <div class="row">#}
-                {#                            <div class="col-xl-2 col-lg-4 col-md-4">#}
-                {#                                {% render_generic_field form.private %}#}
-                {#                            </div>#}
-                {#                            <div class="col-xl-4 col-lg-4 col-md-4">#}
-                {#                                {% render_generic_field form.exhibition_code %}#}
-                {#                            </div>#}
-                {#                        </div>#}
-                {#                    </div>#}
-                {#                </div>#}
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="buttonbar bottom">
-                    <div class="float-right">
-                        <a href="{% url 'subscription:lot-list' event.pk %}"
-                           class="btn btn-danger">
-                            <i class="fa fa-close"></i>Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-save"></i>
-                            Salvar
-                        </button>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="buttonbar bottom">
+                        <div class="float-right">
+                            <a href="{% url 'subscription:lot-list' event.pk %}"
+                               class="btn btn-danger">
+                                <i class="fa fa-close"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa fa-save"></i>
+                                Salvar
+                            </button>
+                        </div>
+                        <div class="clearfix"></div>
                     </div>
-                    <div class="clearfix"></div>
                 </div>
             </div>
-        </div>
     </form>
 
 {% endblock %}

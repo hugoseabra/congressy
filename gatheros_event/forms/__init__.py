@@ -20,7 +20,7 @@ from .invitation import (
     InvitationDecisionForm,
 )
 from .hotsite import HotsiteForm
-from .organization import OrganizationForm, OrganizationManageMembershipForm
-from .person import PersonForm
+from .organization import OrganizationForm, OrganizationManageMembershipForm, OrganizationFinancialForm
+from .person import PersonForm, PersonSubscribeForm
 from .place import PlaceForm
 from .profile import ProfileCreateForm, ProfileForm

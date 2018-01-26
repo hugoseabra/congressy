@@ -1,6 +1,10 @@
 # pylint: skip-file
 import os
 
+from django.utils.translation import ugettext_lazy as _
+
+
+
 from django.contrib.messages import constants as message_constants
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -49,6 +53,7 @@ INSTALLED_APPS = [
     'gatheros_subscription',
     'gatheros_front',
     'mailer',
+    'payment',
     'core',
     'hotsite',
 ]
@@ -61,6 +66,7 @@ SITE_ID = 1
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -101,6 +107,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
                 'gatheros_event.context_processors.account',
             ],
             'builtins': [
@@ -244,3 +251,15 @@ MESSAGE_TAGS = {
 
 DEFAULT_FROM_EMAIL = 'Congressy <mail@congressy.net>'
 CONGRESSY_REPLY_TO = 'Congressy <congressy@congressy.com>'
+
+# Tell Django where the project's translation files should be.
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
+
+
+LANGUAGES = (
+    ('en', _('English')),
+    ('pt-br', _('Português')),
+)
+

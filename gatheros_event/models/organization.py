@@ -7,17 +7,17 @@ vinculadas a ela.
 from datetime import datetime
 
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.html import strip_tags
-from django.core.validators import RegexValidator
+
 from core.util import model_field_slugify
+from gatheros_event.models import Person
 from .member import Member
 from .mixins import GatherosModelMixin
-from .person import Person
 
 
 class Organization(models.Model, GatherosModelMixin):
-
     CONTA_CORRENTE = 'conta_corrente'
     CONTA_POUPANCA = 'conta_poupanca'
     CONTA_CORRENTE_CONJUNTA = 'conta_corrente_conjunta'
@@ -45,7 +45,7 @@ class Organization(models.Model, GatherosModelMixin):
     )
 
     """ Organização """
-    name = models.CharField(max_length=100, verbose_name='nome')
+    name = models.CharField(max_length=100, verbose_name='nome da organização')
     description = models.TextField(
         null=True,
         blank=True,
@@ -54,7 +54,8 @@ class Organization(models.Model, GatherosModelMixin):
     description_html = models.TextField(
         null=True,
         blank=True,
-        verbose_name='descrição (HTML)'
+        verbose_name='descrição (HTML)',
+        help_text='Uma descrição com mais recursos textuais para descrever a sua organização.',
     )
     slug = models.SlugField(
         max_length=128,
@@ -100,8 +101,6 @@ class Organization(models.Model, GatherosModelMixin):
         verbose_name='interno'
     )
 
-    active_bank_account = models.BooleanField(default=False, verbose_name='desativo')
-
     # Obrigatório - Código do banco
     bank_code = models.CharField(
         choices=BANK_CODES,
@@ -140,11 +139,11 @@ class Organization(models.Model, GatherosModelMixin):
     )
 
     # Não obrigatório - Dígito verificador da Conta
-    # @TODO add a validator here
     conta_dv = models.CharField(
         blank=True,
         null=True,
         max_length=2,
+        validators=[RegexValidator(r'^\d{1,10}$')],
         verbose_name='Dígito verificador da Conta'
     )
 
@@ -175,6 +174,40 @@ class Organization(models.Model, GatherosModelMixin):
         verbose_name='Tipo de Conta'
     )
 
+    # Dados da "conta bancaria"  do Pagar.me
+
+    active_bank_account = models.BooleanField(default=False)
+
+    bank_account_id = models.IntegerField(
+        null=True,
+        blank=True,
+    )
+
+    document_type = models.CharField(
+        max_length=4,
+        blank=True,
+        null=True,
+    )
+
+    charge_transfer_fees = models.BooleanField(default=False)
+
+    date_created = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+    )
+
+    # Dados de recebedor do Pagar.me
+
+    active_recipient = models.BooleanField(default=False)
+
+    recipient_id = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+    )
+
+
     class Meta:
         verbose_name = 'organização'
         verbose_name_plural = 'organizações'
@@ -197,6 +230,7 @@ class Organization(models.Model, GatherosModelMixin):
         """ Salva entidade. """
         self._create_unique_slug()
         self.description = strip_tags(self.description_html)
+
         super(Organization, self).save(*args, **kwargs)
 
     def _create_unique_slug(self):

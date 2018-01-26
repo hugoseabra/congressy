@@ -89,11 +89,10 @@ class Person(models.Model, GatherosModelMixin):
         verbose_name='bairro'
     )
     phone = models.CharField(
-        max_length=15,
+        max_length=50,
         blank=True,
         null=True,
         verbose_name='celular',
-        validators=[phone_validator]
     )
 
     user = models.OneToOneField(

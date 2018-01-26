@@ -308,11 +308,9 @@
     $(document).ready(function () {
         IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
 
-        $('#id_phone').mask("(99) 99999-9999");
+        $('#id_phone').mask("(99) 9 9999-9999");
         $('#id_cpf').mask("999.999.999-99");
-        {% if not request|is_chrome %}
-            $('#id_birth_date').mask("9999-99-99");
-        {% endif %}
+
 
         {% if config and config.address == config.ADDRESS_SHOW %}
             $('#id_zip_code').mask("99.999-999");
@@ -322,14 +320,14 @@
             searchByCep();
         });
 
-        if ($('#id_city').val() != null) {
-            $.ajax({
-                url: "/api/cities/" + $('#id_city').val(), success: function (result) {
-                    $('#id_city_search').val(result.name)
-                    //populate the html with result here
-                }
-            });
-        }
+        //if ($('#id_city').val() != null) {
+        //    $.ajax({
+        //        url: "/api/cities/" + $('#id_city').val(), success: function (result) {
+        //            $('#id_city_search').val(result.name + ' - ' + result.uf)
+        //            //populate the html with result here
+        //        }
+        //    });
+        // }
 
         showHideCepLoader();
     });
@@ -342,52 +340,6 @@
             {% endif %}
         {% endfor %}
     };
-
-
-    var billing_bind = Bind({
-        billing: {
-            name: $('#id_name').val(),
-            address: {
-                country: 'br',
-                state: 'go',
-                city: '',
-                neighborhood: '',
-                street: '',
-                street_number: '',
-                zipcode: ''
-            }
-        }
-    }, {
-        'billing.name': 'input[name="name"]',
-        'billing.0.city': 'input[name="city_search"]',
-        'billing.0.neighborhood': 'input[name="village"]',
-        'billing.0.street': 'input[name="street"]',
-        'billing.0.street_number': 'input[name="number_"]',
-        'billing.0.zipcode': 'input[name="zip_code"]'
-    });
-
-    var customer_bind = Bind({
-        customer: {
-            name: $('#id_name').val(),
-            type: 'individual',
-            country: 'br',
-            email: $('#id_email').val(),
-            documents: [
-                {
-                    type: 'cpf',
-                    number: $('#id_cpf').val()
-                }
-            ],
-            phone_numbers: [$('#id_phone').val()],
-            birthday: $('#id_birth_day').val()
-        }
-    }, {
-        'customer.name': 'input[name="name"]',
-        'customer.email': 'input[name="email"]',
-        'customer.phone_numbers': 'input[name="phone"]',
-        'customer.documents.0.number': 'input[name="cpf"]',
-        'customer.birthday': 'input[name="birth_date"]'
-    });
 
 
     var button = document.querySelector('#id_button_pay');
@@ -403,15 +355,18 @@
         var billing_title = 'Inscrição do evento: ' + '{{ event.name }}';
 
         function handleSuccess(data) {
-            $('#id_button_pay').removeClass('btn-default').addClass('btn-success');console.log(data);
+            $('#id_button_pay').removeClass('btn-default').addClass('btn-success');
+
             console.log(data);
-            $('#token').val(data.token);
+
+            $('#id_transaction_type').val(data.payment_method);
+            $('#id_amount').val(data.amount);
+            $('#id_card_hash').val(data.card_hash);
         }
 
         function handleError(data) {
             $('#id_button_pay').removeClass('btn-default').addClass('btn-warning');
             $('#pay_help').text(data);
-            console.log(data);
         }
 
         var checkout = new PagarMeCheckout.Checkout({
@@ -422,10 +377,9 @@
 
         checkout.open({
             amount: amount,
-            createToken: 'true',
-            paymentMethods: 'credit_card',
+            createToken: 'false',
+            paymentMethods: 'credit_card, boleto',
             customerData: false,
-            billing: billing_bind.billing,
             items: [
                 {
                     id: '1',

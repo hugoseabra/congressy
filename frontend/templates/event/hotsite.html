@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load static %}
+{% load static i18n %}
 {% load widget_tweaks %}
 
 {% block title %} Página do Evento | Congressy{% endblock %}
@@ -10,22 +10,25 @@
 {% block page_description %}Configuração da página do evento.{% endblock %}
 
 {% block styles %}
-<style>
-    .event-info-status-item {
-        text-align: center;
-        padding: 10px 20px;
-    }
-    .event-info-status-item .title {
-        font-size: 14px;
-        font-weight:700;
-    }
-    .event-info-status-item .description {
-        font-size: 12px;
-    }
-    .django-ckeditor-widget{
-        display: block !important;
-    }
-</style>
+    <style>
+        .event-info-status-item {
+            text-align: center;
+            padding: 10px 20px;
+        }
+
+        .event-info-status-item .title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .event-info-status-item .description {
+            font-size: 12px;
+        }
+
+        .django-ckeditor-widget {
+            display: block !important;
+        }
+    </style>
 {% endblock %}
 
 {% block scripts %}
@@ -38,9 +41,10 @@
 
     <script>
         function resize_status_block() {
-            $('#block-status-icons').height($('#block-form').height()-23);
+            $('#block-status-icons').height($('#block-form').height() - 23);
         }
-        $(document).ready(function() {
+
+        $(document).ready(function () {
             $(window).resize(resize_status_block);
             resize_status_block();
         });
@@ -48,6 +52,32 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
+    {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
+        <h5 class="sidebar-header">Participantes</h5>
+        <ul class="nav nav-pills nav-stacked">
+            <li>
+                <a href="{% url 'subscription:lot-list' event.pk %}"
+                   title="Inscrições">
+                    <i class="fa  fa-fw fa-rocket"></i>
+                    Lotes/Categorias
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'subscription:subscription-list' event.pk %}"
+                   title="Inscrições">
+                    <i class="fa  fa-fw fa-rocket"></i>
+                    Inscrições
+                </a>
+            </li>
+            {#        <li>#}
+            {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+            {#               title="Check-in">#}
+            {#                <i class="fa  fa-fw fa-rocket"></i>#}
+            {#                Check-in#}
+            {#            </a>#}
+            {#        </li>#}
+        </ul>
+    {% endif %}
     <h5 class="sidebar-header">Configurações</h5>
     <ul class="nav nav-pills nav-stacked">
         <li class="active">
@@ -57,40 +87,14 @@
             </a>
         </li>
         {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
+            <li>
+                <a href="{% url 'subscription:form-config' event.pk %}"
+                   title="Formulário">
+                    <i class="fa  fa-fw fa-rocket"></i> Formulário
+                </a>
+            </li>
         {% endif %}
     </ul>
-    {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Ingressos
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-            </a>
-        </li>
-{#        <li>#}
-{#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-{#               title="Check-in">#}
-{#                <i class="fa  fa-fw fa-rocket"></i>#}
-{#                Check-in#}
-{#            </a>#}
-{#        </li>#}
-    </ul>
-    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -144,7 +148,7 @@
                                                                     aria-hidden="true">
                                                                 ×
                                                             </button>
-                                                            {{ error }}
+                                                            {% trans error %}
                                                         </div>
                                                     {% endfor %}
                                                 {% endif %}
@@ -189,14 +193,14 @@
                                 {% if info and info.description_html %}
                                     <a href="{% url 'public:hotsite' info.event.slug %}"
                                        target="_blank"
-                                        class="btn btn-primary btn-block">
+                                       class="btn btn-primary btn-block">
                                         <i class="fa fa-globe"></i>
                                         Visualizar página
                                     </a>
                                 {% else %}
                                     <button type="button"
-                                        class="btn btn-primary btn-trans btn-block disabled"
-                                        title="Você deve configurar pelo menos a descrição do seu evento.">
+                                            class="btn btn-primary btn-trans btn-block disabled"
+                                            title="Você deve configurar pelo menos a descrição do seu evento.">
                                         <i class="fa fa-globe"></i>
                                         Visualizar página
                                     </button>
