@@ -9,6 +9,7 @@ from gatheros_event import forms
 from gatheros_event.views.mixins import AccountMixin
 
 from gatheros_event.helpers import account
+from gatheros_event.models import Organization
 
 
 class BaseOrganizationView(AccountMixin, View):
@@ -149,3 +150,9 @@ class OrganizationEditFormView(BaseOrganizationView, generic.UpdateView):
             return next_path
 
         return super(OrganizationEditFormView, self).get_success_url()
+
+
+class OrganizationFinancialEditFormView(OrganizationEditFormView):
+    success_message = 'Informações bancárias salvas com sucesso.'
+    success_url = reverse_lazy('event:event-list')
+    form_class = forms.OrganizationFinancialForm

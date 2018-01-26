@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'gatheros_subscription',
     'gatheros_front',
     'mailer',
+    'payment',
     'core',
     'hotsite',
 ]
@@ -244,3 +245,5 @@ MESSAGE_TAGS = {
 
 DEFAULT_FROM_EMAIL = 'Congressy <mail@congressy.net>'
 CONGRESSY_REPLY_TO = 'Congressy <congressy@congressy.com>'
+
+ALERT_EMAILS = ['nathan@congressy.com', 'hugo@congressy.com']

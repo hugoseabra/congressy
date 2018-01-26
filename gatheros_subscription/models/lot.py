@@ -59,7 +59,7 @@ class Lot(models.Model, GatherosModelMixin):
         (DISCOUNT_TYPE_MONEY, 'R$'),
     )
 
-    LOT_LIMIT_UNLIMIED = 'unlimited'
+    LOT_LIMIT_UNLIMIED = 'ilimitados'
 
     LOT_STATUS_NOT_STARTED = 'not-started'
     LOT_STATUS_RUNNING = 'running'
