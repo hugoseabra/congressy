@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'gatheros_subscription',
     'gatheros_front',
     'mailer',
+    'payment',
     'core',
     'hotsite',
 ]
