@@ -1,3 +1,10 @@
+services:
+  database:
+    image: postgres:9.6-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=test
+
 pipeline:
   build:
     image: python:3.6-jessie
@@ -32,10 +39,3 @@ pipeline:
       - /tmp/result.txt
     when:
       status: [ success, failure ]
-
-  services:
-    database:
-      image: postgres:9.6-alpine
-      environment:
-        - POSTGRES_USER=postgres
-        - POSTGRES_DB=test
