@@ -191,11 +191,12 @@
                                 <i class="fa fa-calendar"></i>
                                 {{ period }}
                             </div>
-
+                            {% if event.place %}
                             <div>
                                 <i class="fa fa-map-marker"></i>
                                 {{ event.place.name }}
                             </div>
+                            {% endif %}
 
                             </p>
                         </div>
