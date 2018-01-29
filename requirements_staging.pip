@@ -1,5 +1,4 @@
 -r requirements.pip
-coverage==4.3.4
 django-extensions==1.9.9
-Werkzeug==0.14.1
 django-debug-toolbar==1.9.1
+Werkzeug==0.14.1
