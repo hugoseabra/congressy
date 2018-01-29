@@ -37,7 +37,6 @@ pipeline:
     to: -275808686 # ID chat Congressy
     format: markdown
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - build_file:/tmp/
     message: >
       {{build.status}}
