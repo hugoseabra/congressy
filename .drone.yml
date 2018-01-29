@@ -7,3 +7,28 @@ pipeline:
       - whoami >> /tmp/result.txt 2>&1
     when:
       branch: feature/deploy-drone.io
+
+  ping:
+    image: postgres:9.6-alpine
+    pull: true
+    commands:
+      - sleep 10
+      - |
+        psql -U postgres -d test -h database \
+          -c "SELECT * FROM pg_catalog.pg_tables;"
+
+  telegram:
+    image: appleboy/drone-telegram
+    pull: true
+    token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
+    to: -275808686 # ID chat Congressy via https://api.telegram.org/<token>/getUpdates
+    format: markdown
+    message: >
+      {{build.status}}
+      build {{build.number}}
+      "{{commit.message}}"
+      <{{build.link}}>
+    document:
+      - /tmp/result.txt
+    when:
+      status: [ success, failure ]
