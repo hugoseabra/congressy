@@ -1,8 +1,9 @@
 pipeline:
   clone:
-    image: plugins/git
-    depth: 50
-    tags: true
+    git:
+      image: plugins/git
+      depth: 50
+      tags: true
     when:
       branch: [ hotfix/*, release/*, master ]
 
