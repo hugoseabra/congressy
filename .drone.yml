@@ -19,5 +19,5 @@ pipeline:
         echo "Building version: `cat ./version`"
       - |
         docker build \
-          -t cgsy-staging \
+          -t cgsy-staging:`cat ./version` \
           -f ./conf/staging/Dockerfile .
