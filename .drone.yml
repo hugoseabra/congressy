@@ -6,10 +6,12 @@ services:
       - POSTGRES_USER=congressy
       - POSTGRES_PASSWORD=congressy
 
+volumes:
+  postgres_backup:
+
 pipeline:
   database-backup:
     image: postgres:9.6-alpine
-    pull: true
     volumes:
       - postgres_backup:/bkp
     commands:
@@ -21,13 +23,6 @@ pipeline:
           --port 5499 \
           --username congressy \
           cgsyplatform > /bkp/backup.sql
-
-  database-restore:
-    image: postgres:9.6-alpine
-    pull: true
-    volumes:
-      - postgres_backup:/bkp
-    commands:
-      - sleep 10
       - pg_restore -U postgres -n public -d cgsyplatform < /bkp/backup.sql
+
 
