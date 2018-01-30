@@ -4,10 +4,8 @@ clone:
     tags: true
 
 pipeline:
-  build-version:
-    image: indiehosters/git
-    pull: true
-    commands:
+  save-version:
+    script:
       - ./bin/version.sh > version
 
   build-staging:
@@ -21,3 +19,5 @@ pipeline:
         docker build \
           -t cgsy-staging:`cat ./version` \
           -f ./conf/staging/Dockerfile .
+    when:
+      branch: release/*

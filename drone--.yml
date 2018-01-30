@@ -49,3 +49,16 @@ pipeline:
     tags: 1.0.8
     when:
       branch: feature/deploy-drone.io
+
+
+  build-staging:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        echo "Building version: `cat ./version`"
+      - |
+        docker build \
+          -t cgsy-staging:`cat ./version` \
+          -f ./conf/staging/Dockerfile .
