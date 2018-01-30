@@ -5,11 +5,26 @@ clone:
     tags: true
 
 pipeline:
-  save-version:
+  save-prod-version:
     image: indiehosters/git
     pull: true
     commands:
       - ./bin/version.sh > version
+
+    when:
+      branch:
+        include: [ master ]
+
+  save-staging-version:
+    image: indiehosters/git
+    pull: true
+    commands:
+      - ./bin/version.sh > version
+
+    when:
+      branch:
+        include: [ release/* ]
+
 
   build-staging:
     image: docker
