@@ -80,7 +80,7 @@ pipeline:
     to: 245012348 # ID chat Congressy
     format: markdown
     message: >
-      *{{ build.status|uppercase }} - Ambiente de Teste*
+      *{{uppercase build.status }} - Ambiente de Teste*
 
       Repo: {{ repo.name }}
 
