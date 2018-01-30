@@ -84,12 +84,12 @@ pipeline:
 
       *Repo:* {{ repo.name }}
 
-      *Por:* {{ build.author }}
+      *Por:* {{ commit.author }}
 
-      *Quando:* {{datetme build.started }} a {{datetme build.finished }}
+      *Quando:* {{datetime build.started }} a {{datetime build.finished }}
 
       ```
-      {{ build.commit }}
+      {{ commit.message }}
       ```
     when:
       status: [ success, failure ]
