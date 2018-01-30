@@ -63,7 +63,7 @@ pipeline:
         include: [ hotfix/*, release/* ]
 
   deploy-staging-env:
-    image: docker
+    image: tmaier/docker-compose
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
