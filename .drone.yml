@@ -82,23 +82,6 @@ pipeline:
     privileged: true
     volumes:
       - build_file:/tmp/
-    commands:
-      -
-    message: >
-      <h3>Ambiente de Teste</h3>
-      <ul>
-        {{#success build.status}}
-          <li><strong>Sucesso:</strong> build #{{ build.number }}.</li>
-        {{else}}
-          <li><strong>**Falha</strong> no build #{{ build.number }}.</li>
-        {{/success}}
-        <li><strong>Repo:</strong> {{ repo.name }}</li>
-        <li><strong>Autor:</strong> {{ build.author }}</li>
-        <li><strong>Branch:</strong> {{ build.branch }}</li>
-        <li><strong>Commit:</strong> {{ commit.message }}</li>
-        <li><strong>Link:</strong> {{ build.link }}</li>
-        <li><strong>Quando:** {{ build.started }} a {{ build.finished }}</li>
-      </ul>
     when:
       branch:
         include: [ hotfix/*, release/* ]
