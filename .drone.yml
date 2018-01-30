@@ -86,11 +86,21 @@ pipeline:
 
       *Por:* {{ commit.author }}
 
-      *Quando:* {{build.started}} a {{build.finished}}
+      *Branch:* {{ commit.branch }}
 
+      *Quando:* {{datetime build.started}} a {{build.finished}}
+
+      *Mensagem:*
       ```
       {{ commit.message }}
       ```
+
+      *Commit Link:*
+      {{ commit.link }}
+
+      *Build Link:*
+      {{ build.link }}
+
     when:
       status: [ success, failure ]
       branch:
