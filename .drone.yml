@@ -22,7 +22,8 @@ pipeline:
           --port 5499 \
           --username congressy \
           cgsyplatform > /bkp/backup.sql
-      - echo Backup size: `du -h /bkp/backup.sql`
+      - |
+        echo Backup size: `du -h /bkp/backup.sql`
 
   database-ping:
     image: postgres:9.6-alpine
