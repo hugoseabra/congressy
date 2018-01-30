@@ -4,13 +4,13 @@ from django.conf import settings
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
 
+congressy_id = settings.PAGARME_RECIPIENT_ID
+
 
 def create_credit_card_transaction(instance=None):
 
     if not instance:
         return
-
-    congressy_id = 're_cjcupb1iq0200zl6d89r92s32'
 
     # Criar transação.
     params = {
@@ -50,8 +50,14 @@ def create_credit_card_transaction(instance=None):
 
     }
 
-    trx = pagarme.transaction.create(params)
-    # print(trx)
+    if settings.DEBUG:
+        trx = None
+        print('========================= CREDIT CARD TRANSACTION CREATE PARAMS =======================================')
+        print(params)
+        print('=======================================================================================================')
+    else:
+        trx = pagarme.transaction.create(params)
+        # print(trx)
 
     return trx
 
@@ -83,7 +89,7 @@ def create_boleto_transaction(instance=None):
 
         "split_rules": [
             {
-                "recipient_id": settings.PAGARME_RECIPIENT_ID,
+                "recipient_id": congressy_id,
                 "percentage": 10,
                 "liable": True,
                 "charge_processing_fee": True
@@ -98,14 +104,22 @@ def create_boleto_transaction(instance=None):
 
     }
 
-    trx = pagarme.transaction.create(params)
-
-    #  print(trx)
+    if settings.DEBUG:
+        trx = None
+        print('========================= BOLETO TRANSACTION CREATE PARAMS ============================================')
+        print(params)
+        print('=======================================================================================================')
+    else:
+        trx = pagarme.transaction.create(params)
+        # print(trx)
 
     return trx
 
 
-def create_payme_back_account(instance):
+def create_payme_back_account(instance=None):
+
+    if not instance:
+        return
 
     params = {
         'agencia': instance['agency'],
@@ -122,9 +136,14 @@ def create_payme_back_account(instance):
     if 'conta_dv' in instance:
         params['conta_dv'] = instance['conta_dv']
 
-
-    # Cria uma "conta bancaria" no sistema pagar.me
-    bank_account = pagarme.bank_account.create(params)
+    if settings.DEBUG:
+        bank_account = None
+        print('========================= BANK ACCOUNT CREATE PARAMS ==================================================')
+        print(params)
+        print('=======================================================================================================')
+    else:
+        # Cria uma "conta bancaria" no sistema pagar.me
+        bank_account = pagarme.bank_account.create(params)
 
     return bank_account
 
@@ -143,7 +162,13 @@ def create_payme_recipient(bank_account=None):
         'bank_account': bank_account,
     }
 
-    # Cria uma "recebedor" no sistema pagar.me
-    recipient = pagarme.recipient.create(params)
+    if settings.DEBUG:
+        recipient = None
+        print('========================= PAGARME RECEBEDOR CREATE PARAMS =============================================')
+        print(params)
+        print('=======================================================================================================')
+    else:
+        # Cria uma "recebedor" no sistema pagar.me
+        recipient = pagarme.recipient.create(params)
 
     return recipient

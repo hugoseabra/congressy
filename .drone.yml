@@ -21,6 +21,7 @@ pipeline:
           --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
           --port 5499 \
           --username congressy \
+          --verbose \
           cgsyplatform > /bkp/backup.sql
       - |
         echo Backup size: `du -h /bkp/backup.sql`
@@ -36,4 +37,12 @@ pipeline:
           --host database \
           --username congressy \
           --schema public \
+          --verbose \
           --dbname cgsyplatform < /bkp/backup.sql
+
+  build-staging:
+    image: plugins/docker
+    pull: true
+    when:
+      branch: feature/deploy-drone.io
+
