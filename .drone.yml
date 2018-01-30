@@ -5,72 +5,72 @@ clone:
     tags: true
 
 pipeline:
-  create-db-prod-backup:
-    image: postgres:9.6-alpine
-    volumes:
-      - /tmp/bkp:/tmp/bkp
-    commands:
-      - mkdir -p /tmp/bkp/backup
-      - |
-        PGPASSWORD=4UnADjyMjeeB7GSc pg_dump \
-          --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
-          --port 5499 \
-          --username congressy \
-          --format=c \
-          --verbose \
-          cgsyplatform > /tmp/bkp/backup/backup.sql
-      - |
-        echo Backup size: `du -h /tmp/bkp/backup/backup.sql`
-      - cp ./bin/dev/staging/db-restore.sh /tmp/bkp/.
-
-    when:
-      branch:
-        include: [ hotfix/*, release/* ]
-
-  recreate-staging-db:
-    image: tmaier/docker-compose
-    pull: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - sh ./bin/dev/staging/start-postgres.sh
-    when:
-      branch:
-        include: [ hotfix/*, release/* ]
-
-  save-staging-version:
-    image: indiehosters/git
-    pull: true
-    commands:
-      - basename ${DRONE_COMMIT_BRANCH} > version
-    when:
-      branch:
-        include: [ hotfix/*, release/* ]
-
-  build-staging-image:
-    image: docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - |
-        echo "Building version: `cat ./version`"
-      - |
-        docker build \
-          -t cgsy-staging \
-          -f ./conf/staging/Dockerfile .
-    when:
-      branch:
-        include: [ hotfix/*, release/* ]
-
-  deploy-staging-env:
-    image: tmaier/docker-compose
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - sh ./bin/dev/staging/start-cgsy-staging.sh
-    when:
-      branch:
-        include: [ hotfix/*, release/* ]
+#  create-db-prod-backup:
+#    image: postgres:9.6-alpine
+#    volumes:
+#      - /tmp/bkp:/tmp/bkp
+#    commands:
+#      - mkdir -p /tmp/bkp/backup
+#      - |
+#        PGPASSWORD=4UnADjyMjeeB7GSc pg_dump \
+#          --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
+#          --port 5499 \
+#          --username congressy \
+#          --format=c \
+#          --verbose \
+#          cgsyplatform > /tmp/bkp/backup/backup.sql
+#      - |
+#        echo Backup size: `du -h /tmp/bkp/backup/backup.sql`
+#      - cp ./bin/dev/staging/db-restore.sh /tmp/bkp/.
+#
+#    when:
+#      branch:
+#        include: [ hotfix/*, release/* ]
+#
+#  recreate-staging-db:
+#    image: tmaier/docker-compose
+#    pull: true
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    commands:
+#      - sh ./bin/dev/staging/start-postgres.sh
+#    when:
+#      branch:
+#        include: [ hotfix/*, release/* ]
+#
+#  save-staging-version:
+#    image: indiehosters/git
+#    pull: true
+#    commands:
+#      - basename ${DRONE_COMMIT_BRANCH} > version
+#    when:
+#      branch:
+#        include: [ hotfix/*, release/* ]
+#
+#  build-staging-image:
+#    image: docker
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    commands:
+#      - |
+#        echo "Building version: `cat ./version`"
+#      - |
+#        docker build \
+#          -t cgsy-staging \
+#          -f ./conf/staging/Dockerfile .
+#    when:
+#      branch:
+#        include: [ hotfix/*, release/* ]
+#
+#  deploy-staging-env:
+#    image: tmaier/docker-compose
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    commands:
+#      - sh ./bin/dev/staging/start-cgsy-staging.sh
+#    when:
+#      branch:
+#        include: [ hotfix/*, release/* ]
 
   notify-staging-on-telegram:
     image: appleboy/drone-telegram
@@ -79,7 +79,7 @@ pipeline:
     #to: -275808686 # ID chat Congressy
     to: 245012348 # ID chat Congressy
     format: html
-    message: >
+    message: |
       <h3>Ambiente de Teste</h3>
       <ul>
         {{#success build.status}}
