@@ -37,3 +37,50 @@ pipeline:
     when:
       branch:
         include: [ hotfix/*, release/* ]
+
+  save-staging-version:
+    image: indiehosters/git
+    pull: true
+    commands:
+      - basename ${DRONE_COMMIT_BRANCH} > version
+    when:
+      branch:
+        include: [ hotfix/*, release/* ]
+
+  build-staging-image:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        echo "Building version: `cat ./version`"
+      - |
+        docker build \
+          -t cgsy-staging \
+          -f ./conf/staging/Dockerfile .
+    when:
+      branch:
+        include: [ hotfix/*, release/* ]
+
+  deploy-staging-env:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - docker run --rm -tid --name cgsy \
+        --env AWS_KEY=AKIAJHS7RBNESVTWWI6Q \
+        --env AWS_SECRET=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 \
+        --env DOMAIN=test.congressy.com \
+        --env FORCE_HTTPS=False \
+        --env BUCKET_LOCATION=us-east-1 \
+        --env BUCKET_NAME=cgsyplatform \
+        --env DBHOST=postgres \
+        --env DBUSER=postgres \
+        --env DBPASS= \
+        --env DBNAME=cgsy_dev \
+        --env DBPORT=5432 \
+        -p 80:80 \
+        cgsy-staging
+    when:
+      branch:
+        include: [ hotfix/*, release/* ]
