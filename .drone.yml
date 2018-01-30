@@ -5,8 +5,4 @@ pipeline:
       - /var/run/docker.sock:/var/run/docker.sock
 
     commands:
-      - ls -la
-      - |
-        docker build \
-          -t cgsy-staging \
-          -f ./conf/staging/Dockerfile .
+      - ./bin/version.sh
