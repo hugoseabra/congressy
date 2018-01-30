@@ -2,4 +2,5 @@ pipeline:
   build-version:
     image: indiehosters/git
     pull: true
-
+    commands:
+      - ./bin/version.sh
