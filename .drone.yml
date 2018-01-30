@@ -33,7 +33,7 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - ./bin/dev/staging/start-postgres.sh
+      - bash /bin/dev/staging/start-postgres.sh
     when:
       branch:
         include: [ hotfix/*, release/* ]
