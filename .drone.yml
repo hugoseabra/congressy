@@ -5,8 +5,7 @@ pipeline:
       - /var/run/docker.sock:/var/run/docker.sock
 
     commands:
-      - export IMAGE_TAG=`./bin/version.sh`
       - |
         docker build \
-          -t cgsy-staging:${IMAGE_TAG} \
+          -t cgsy-staging \
           -f ./conf/staging/Dockerfile .
