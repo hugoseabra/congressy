@@ -1,0 +1,7 @@
+pipeline:
+  build-staging:
+    image: plugins/docker
+    repo: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy
+    auto_tag: true
+    auto_tag_suffix: RC
+    tags: 1.0.8
