@@ -1,8 +1,6 @@
 pipeline:
-  build-staging:
-    image: docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
+  build-version:
+    image: indiehosters/git
+    pull: true
     commands:
       - sh ./bin/version.sh
