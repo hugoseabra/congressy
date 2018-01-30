@@ -32,7 +32,7 @@ pipeline:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - docker-compose -f ./bin/dev/docker-compose.yml down
-      - docker-compose -f ./bin/dev/docker-compose.yml --verbose up -d
+      - docker-compose -f ./bin/dev/docker-compose.yml up -d
     when:
       branch:
         include: [ hotfix/*, release/* ]
