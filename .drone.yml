@@ -104,3 +104,6 @@ pipeline:
     when:
       status: [ success, failure ]
       branch: [ hotfix/*, release/* ]
+
+branches:
+  include: [master, release/*, hotfix/* ]
