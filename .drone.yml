@@ -16,12 +16,8 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - |
-        echo "Building version: `cat ./version`"
-      - |
-        docker build \
-          -t cgsy-staging:`cat ./version` \
-          -f ./conf/staging/Dockerfile .
+      - basename `git rev-parse --abbrev-ref HEAD`
+
     when:
       branch:
         include: [ release/* ]
