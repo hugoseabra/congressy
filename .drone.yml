@@ -5,22 +5,32 @@ clone:
     tags: true
 
 pipeline:
-  database-backup:
+  create-db-prod-backup:
     image: postgres:9.6-alpine
     volumes:
       - /tmp/bkp:/tmp/bkp
     commands:
       - |
         PGPASSWORD=4UnADjyMjeeB7GSc pg_dump \
-          --format=c \
           --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
           --port 5499 \
           --username congressy \
           --verbose \
           cgsyplatform > /tmp/bkp/backup.sql
       - |
-        echo Backup size: `du -h /bkp/backup.sql`
+        echo Backup size: `du -h /tmp/bkp/backup/backup.sql`
+      - cp ./bin/dev/staging/db-restore.sh /tmp/bkp/.
 
+    when:
+      branch:
+        include: [ hotfix/*, release/* ]
+
+  recreate-staging-db:
+    image: tmaier/docker-compose
+    pull: true
+    commands:
+      - docker-compose -f ./bin/dev/docker-compose.yml down
+      - docker-compose -f ./bin/dev/docker-compose.yml --verbose up -d
     when:
       branch:
         include: [ hotfix/*, release/* ]
