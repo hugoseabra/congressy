@@ -72,7 +72,7 @@ pipeline:
       branch:
         include: [ hotfix/*, release/* ]
 
-  notify-stagin-on-telegram:
+  notify-staging-on-telegram:
     image: appleboy/drone-telegram
     pull: true
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
@@ -89,13 +89,12 @@ pipeline:
         **Falha** no build #{{ build.number }} da versão `cat ./version`RC.
       {{/success}}
 
-      Branch: {{ build.branch }}
-
-      Commit: {{ commit.message }}
-
-      Link: {{ build.link }}
-    document:
-      - /tmp/result.txt
+      **Repo:** {{ repo.name }}
+      **Autor:** {{ build.author }}
+      **Branch:** {{ build.branch }}
+      **Commit:** {{ commit.message }}
+      **Link:** {{ build.link }}
+      **Quando:** {{ build.started }} a {{ build.finished }}
     when:
       branch:
         include: [ hotfix/*, release/* ]
