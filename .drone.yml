@@ -29,6 +29,5 @@ pipeline:
         - postgres_backup:/bkp
       commands:
         - sleep 10
-        - |
-          pg_restore -U postgres -n public -d cgsyplatform < /bkp/backup.sql
+        - pg_restore -U postgres -n public -d cgsyplatform < /bkp/backup.sql
 
