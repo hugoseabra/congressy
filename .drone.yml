@@ -86,7 +86,7 @@ pipeline:
 
       *Por:* {{ commit.author }}
 
-      *Quando:* {{datetime build.started }} a {{datetime build.finished }}
+      *Quando:* {{build.started}} a {{build.finished}}
 
       ```
       {{ commit.message }}
