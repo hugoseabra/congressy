@@ -1,3 +1,8 @@
+clone:
+  git:
+    image: plugins/git
+    tags: true
+
 pipeline:
   build-version:
     image: indiehosters/git
