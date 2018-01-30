@@ -80,7 +80,7 @@ pipeline:
     to: 245012348 # ID chat Congressy
     format: markdown
     message: >
-      # Ambiente de Teste
+      # Ambiente de Teste #
       {{#success build.Status}}
         * *Sucesso:* build #{{ build.number }}.
       {{else}}
@@ -92,6 +92,7 @@ pipeline:
         * *Commit:* {{ commit.Message }}
         * *Link:* {{ build.Link }}
         * *Quando:* {{ build.started }} a {{ build.finished }}
+
     when:
       status: [ success, failure ]
       branch:
