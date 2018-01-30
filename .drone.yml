@@ -5,7 +5,7 @@ pipeline:
       - /var/run/docker.sock:/var/run/docker.sock
 
     commands:
-      - export IMAGE_TAG=`git describe --abbrev=0`
+      - export IMAGE_TAG=`cat ./version`
       - |
         docker build \
           -t cgsy-staging:${IMAGE_TAG} \
