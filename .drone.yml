@@ -67,7 +67,8 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - docker run --rm -tid --name cgsy \
+      - docker run --rm -tid --name cgsy-staging \
+        --network dev_postgres \
         --env AWS_KEY=AKIAJHS7RBNESVTWWI6Q \
         --env AWS_SECRET=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 \
         --env DOMAIN=test.congressy.com \
@@ -75,11 +76,11 @@ pipeline:
         --env BUCKET_LOCATION=us-east-1 \
         --env BUCKET_NAME=cgsyplatform \
         --env DBHOST=postgres \
-        --env DBUSER=postgres \
-        --env DBPASS= \
-        --env DBNAME=cgsy_dev \
+        --env DBUSER=congressy \
+        --env DBPASS=congressy \
+        --env DBNAME=cgsyplatform \
         --env DBPORT=5432 \
-        -p 80:80 \
+        -p 8080:80 \
         cgsy-staging
     when:
       branch:
