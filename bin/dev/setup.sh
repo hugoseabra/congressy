@@ -15,8 +15,6 @@ sleep 2
 docker-compose -f $BASE_DIR/bin/dev/docker-compose.yml up -d
 sleep 5
 
-$BASE_DIR/bin/dev/createdb.sh
-
 python $BASE_DIR/manage.py migrate
 
 # Importando fixtures

@@ -5,9 +5,14 @@ services:
     container_name: postgres
     networks:
       - postgres
+    volumes:
+      - /tmp/bkp:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
+    environment:
+      - POSTGRES_DB=cgsyplatform
+      - POSTGRES_USER=congressy
+      - POSTGRES_PASSWORD=congressy
 
 networks:
   postgres:
-
