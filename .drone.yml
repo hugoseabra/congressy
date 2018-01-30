@@ -19,7 +19,7 @@ pipeline:
     image: indiehosters/git
     pull: true
     commands:
-      - echo ${DRONE_COMMIT_BRANCH}
+      - echo "Branch: `${DRONE_COMMIT_BRANCH}`"
 
     when:
       branch:
