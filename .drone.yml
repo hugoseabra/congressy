@@ -16,6 +16,7 @@ pipeline:
           --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
           --port 5499 \
           --username congressy \
+          --format=c \
           --verbose \
           cgsyplatform > /tmp/bkp/backup/backup.sql
       - |
@@ -32,8 +33,7 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - docker-compose -f ./bin/dev/docker-compose.yml down
-      - docker-compose -f ./bin/dev/docker-compose.yml up -d
+      - ./bin/dev/staging/start-postgres.sh
     when:
       branch:
         include: [ hotfix/*, release/* ]
