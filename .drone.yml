@@ -103,7 +103,7 @@ pipeline:
       *Commit Link:* {{ commit.link }}
 
 
-      *Ambiente:* https://test.congressy.com
+      *Ambiente:* https://test.congressy.com/login/
 
 
     when:
