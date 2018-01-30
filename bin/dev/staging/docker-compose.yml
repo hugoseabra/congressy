@@ -4,7 +4,7 @@ services:
     image: cgsy-staging
     container_name: cgsy-staging
     networks:
-      - dev_postgres
+      - postgres
     ports:
       - "8080:80"
     environment:
