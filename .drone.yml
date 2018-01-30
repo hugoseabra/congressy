@@ -1,12 +1,10 @@
 pipeline:
   clone:
-    git:
-      image: plugins/git
-      depth: 50
-      tags: true
-      when:
-        branch: [ hotfix/*, release/*, master ]
-
+    image: plugins/git
+    depth: 50
+    tags: true
+    when:
+      branch: [ hotfix/*, release/*, master ]
 
   create-db-prod-backup:
     image: postgres:9.6-alpine
@@ -103,7 +101,6 @@ pipeline:
 
 
       *Ambiente:* https://test.congressy.com/login/
-
 
     when:
       status: [ success, failure ]
