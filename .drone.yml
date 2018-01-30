@@ -18,4 +18,4 @@ pipeline:
           --port 5499 \
           --username congressy \
           cgsyplatform > /tmp/backup.sql
-      - pg_restore -U postgres -n public -d cgsyplatform < /tmp/backup.sql
+      - pg_restore -U congressy -n public -d cgsyplatform < /tmp/backup.sql
