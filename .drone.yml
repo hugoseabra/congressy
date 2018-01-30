@@ -78,10 +78,6 @@ pipeline:
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
     #to: -275808686 # ID chat Congressy
     to: 245012348 # ID chat Congressy
-    format: html
-    privileged: true
-    volumes:
-      - build_file:/tmp/
     when:
       branch:
         include: [ hotfix/*, release/* ]
