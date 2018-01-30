@@ -1,5 +1,5 @@
-clone:
-  git:
+pipeline:
+  clone:
     image: plugins/git
     depth: 50
     tags: true
@@ -7,7 +7,7 @@ clone:
       branch:
         include: [ hotfix/*, release/*, master ]
 
-pipeline:
+
   create-db-prod-backup:
     image: postgres:9.6-alpine
     volumes:
