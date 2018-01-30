@@ -22,12 +22,20 @@ pipeline:
           --port 5499 \
           --username congressy \
           cgsyplatform > /bkp/backup.sql
-      - du -h /bkp/backup.sql
+      - echo Backup size: `du -h /bkp/backup.sql`
+
+  database-ping:
+    image: postgres:9.6-alpine
+    pull: true
+    commands:
+      - sleep 10
+      - |
+        psql -U congressy -d cgsyplatform \
+          -c "SELECT * FROM pg_catalog.pg_tables;"
 
   database-restore:
     image: postgres:9.6-alpine
     volumes:
       - postgres_backup:/bkp
     commands:
-      - sleep 20
       - pg_restore -U congressy -n public -d cgsyplatform < /bkp/backup.sql
