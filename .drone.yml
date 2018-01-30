@@ -3,4 +3,4 @@ pipeline:
     image: indiehosters/git
     pull: true
     commands:
-      - git status
+      - git tag -l
