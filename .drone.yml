@@ -25,22 +25,15 @@ pipeline:
       - |
         echo Backup size: `du -h /bkp/backup.sql`
 
-  database-ping:
-    image: postgres:9.6-alpine
-    pull: true
-    commands:
-      - sleep 10
-      - |
-        psql -U congressy -d cgsyplatform -h database \
-          -c "SELECT * FROM pg_catalog.pg_tables;"
-
   database-restore:
     image: postgres:9.6-alpine
     volumes:
       - postgres_backup:/bkp
     commands:
-      - pg_restore \
-        --host database \
-        --username congressy \
-        --schema public \
-        --dbname cgsyplatform < /bkp/backup.sql
+      - sleep 10
+      - |
+        PGPASSWORD=4UnADjyMjeeB7GSc pg_restore \
+          --host database \
+          --username congressy \
+          --schema public \
+          --dbname cgsyplatform < /bkp/backup.sql
