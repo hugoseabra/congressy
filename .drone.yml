@@ -32,7 +32,7 @@ pipeline:
     commands:
       - sleep 10
       - |
-        PGPASSWORD=4UnADjyMjeeB7GSc pg_restore \
+        PGPASSWORD=congressy pg_restore \
           --host database \
           --username congressy \
           --schema public \
