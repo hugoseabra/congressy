@@ -5,3 +5,4 @@ pipeline:
     auto_tag: true
     auto_tag_suffix: RC
     tags: 1.0.8
+    dockerfile: conf/staging/Dockerfile
