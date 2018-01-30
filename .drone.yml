@@ -35,7 +35,8 @@ pipeline:
     image: appleboy/drone-telegram
     pull: true
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-    to: -275808686 # ID chat Congressy
+    #to: -275808686 # ID chat Congressy
+    to: 245012348 # ID chat Congressy
     format: markdown
     privileged: true
     volumes:
