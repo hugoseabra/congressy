@@ -1,0 +1,27 @@
+clone:
+  git:
+    image: plugins/git
+    depth: 50
+    tags: true
+
+pipeline:
+  save-version:
+    image: indiehosters/git
+    pull: true
+    commands:
+      - ./bin/version.sh > version
+
+  build-staging:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        echo "Building version: `cat ./version`"
+      - |
+        docker build \
+          -t cgsy-staging:`cat ./version` \
+          -f ./conf/staging/Dockerfile .
+    when:
+      branch:
+        include: [ release/* ]

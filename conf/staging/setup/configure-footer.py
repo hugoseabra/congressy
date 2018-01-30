@@ -31,6 +31,6 @@ def setup(origin_file_path, file_path):
 
 
 setup(
-    '/var/www/cgsy/conf/deploy/templates/footer.j2',
+    '/var/www/cgsy/conf/staging/templates/footer.j2',
     '/var/www/cgsy/frontend/templates/base/footer.html'
 )

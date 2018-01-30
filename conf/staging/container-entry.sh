@@ -14,11 +14,6 @@ chmod 777 /s3bucket.sh /in-sync.sh
 # Runs in-sync: configuration state has priority of outsite if bucket exists
 /in-sync.sh
 
-# Inject schedule configuration
-echo "" >> /crontab.txt
-crontab /crontab.txt
-
-
 # Configures database app credentials
 python /configure-db.py
 

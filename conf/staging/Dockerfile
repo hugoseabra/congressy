@@ -72,13 +72,19 @@ WORKDIR /var/www/cgsy
 COPY ./requirements.pip ./.
 RUN pip install -r requirements.pip
 
+# Staging packages
+RUN pip install django-extensions django-nose pylint-django django-debug-toolbar
+
 # -----------------------------------------------------------------------------
 # Setup configuration files
 COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
 COPY ./conf/deploy/setup/configure-db.py /configure-db.py
-COPY ./conf/deploy/setup/configure-footer.py /configure-footer.py
-COPY ./conf/deploy/setup/configure-sync.py /configure-sync.py
 COPY ./conf/deploy/container-entry.sh /entry.sh
+
+# Staging files
+COPY ./conf/staging/setup/configure-footer.py /configure-footer.py
+COPY ./conf/staging/setup/configure-sync.py /configure-sync.py
+COPY ./conf/staging/container-entry.sh /entry.sh
 
 # -----------------------------------------------------------------------------
 COPY ./. ./.

@@ -1,0 +1,64 @@
+services:
+  database:
+    image: postgres:9.6-alpine
+    environment:
+      - POSTGRES_DB=cgsyplatform
+      - POSTGRES_USER=congressy
+      - POSTGRES_PASSWORD=congressy
+
+volumes:
+  postgres_backup:
+
+pipeline:
+  database-backup:
+    image: postgres:9.6-alpine
+    volumes:
+      - postgres_backup:/bkp
+    commands:
+      - |
+        PGPASSWORD=4UnADjyMjeeB7GSc pg_dump \
+          --format=c \
+          --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
+          --port 5499 \
+          --username congressy \
+          --verbose \
+          cgsyplatform > /bkp/backup.sql
+      - |
+        echo Backup size: `du -h /bkp/backup.sql`
+
+  database-restore:
+    image: postgres:9.6-alpine
+    volumes:
+      - postgres_backup:/bkp
+    commands:
+      - sleep 10
+      - |
+        PGPASSWORD=congressy pg_restore \
+          --host database \
+          --username congressy \
+          --schema public \
+          --verbose \
+          --dbname cgsyplatform < /bkp/backup.sql
+
+  build-staging:
+    image: plugins/docker
+    pull: true
+    repo: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy
+    auto_tag: true
+    auto_tag_suffix: RC
+    tags: 1.0.8
+    when:
+      branch: feature/deploy-drone.io
+
+
+  build-staging:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        echo "Building version: `cat ./version`"
+      - |
+        docker build \
+          -t cgsy-staging:`cat ./version` \
+          -f ./conf/staging/Dockerfile .

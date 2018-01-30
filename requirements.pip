@@ -1,6 +1,6 @@
 app-version==0.2.1
 appdirs==1.4.3
-certifi==2017.11.5
+certifi==2018.1.18
 chardet==3.0.4
 Django==1.11
 django-absoluteuri==1.2.0

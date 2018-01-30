@@ -4,9 +4,7 @@ get_version_revision() {
 }
 
 get_closest_version() {
-	local CLOSEST_TAG=$(git describe --abbrev=0)
-	local VERSION=$(echo $CLOSEST_TAG | python -c "import sys; print(sys.stdin.read().partition('v')[-1])")
-	echo $VERSION
+	git describe --abbrev=0
 }
 
 git_next_major_version(){

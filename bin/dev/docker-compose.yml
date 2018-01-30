@@ -1,17 +1,12 @@
 version: '2.3'
 services:
   postgres:
-      image: postgres:10-alpine
-      container_name: postgres
-      networks:
-        - postgres
-      ports:
-          - "5432:5432"
-      volumes:
-          - "postgres:/var/lib/postgresql:rw"
-
-volumes:
-  postgres:
+    image: postgres:10-alpine
+    container_name: postgres
+    networks:
+      - postgres
+    ports:
+      - "5432:5432"
 
 networks:
   postgres:
