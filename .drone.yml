@@ -27,10 +27,6 @@ pipeline:
         psql -U postgres -d test -h database \
           -c "SELECT * FROM pg_catalog.pg_tables;"
 
-  extract-file:
-    commands:
-      - docker cp
-
   telegram:
     image: appleboy/drone-telegram
     pull: true
