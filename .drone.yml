@@ -5,4 +5,4 @@ pipeline:
       - /var/run/docker.sock:/var/run/docker.sock
 
     commands:
-      - ./bin/version.sh
+      - sh ./bin/version.sh
