@@ -4,8 +4,10 @@ from . import *
 
 DEBUG = True
 
-INSTALLED_APPS.append('debug_toolbar')
-INSTALLED_APPS.append('django_extensions')
+INSTALLED_APPS.extend([
+    'debug_toolbar',
+    'django_extensions',
+])
 
 DATABASES = {
     'default': {
