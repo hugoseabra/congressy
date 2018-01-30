@@ -16,7 +16,7 @@ pipeline:
           --port 5499 \
           --username congressy \
           --verbose \
-          cgsyplatform > /tmp/bkp/backup.sql
+          cgsyplatform > /tmp/bkp/backup/backup.sql
       - |
         echo Backup size: `du -h /tmp/bkp/backup/backup.sql`
       - cp ./bin/dev/staging/db-restore.sh /tmp/bkp/.
