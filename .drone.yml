@@ -20,7 +20,7 @@ pipeline:
     pull: true
     commands:
       - |
-        echo "Branch: ${DRONE_COMMIT_BRANCH}"
+        echo "Branch: `basename ${DRONE_COMMIT_BRANCH}`"
 
     when:
       branch:
