@@ -88,7 +88,7 @@ pipeline:
 
       *Branch:* {{ commit.branch }}
 
-      *Quando:* {{datetime build.started "3:04PM", "UTC"}} a {{build.finished}}
+      *Quando:* {{datetime build.started "3:04PM"}} a {{build.finished}}
 
       *Mensagem:*
       ```
