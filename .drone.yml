@@ -96,12 +96,13 @@ pipeline:
       {{ commit.message }}
       ```
 
-      *Build Link:*
-      {{ build.link }}
+      *Build Link:* {{ build.link }}
 
 
-      *Commit Link:*
-      {{ commit.link }}
+      *Commit Link:* {{ commit.link }}
+
+      *Ambiente:* https://test.congressy.com
+
 
     when:
       status: [ success, failure ]
