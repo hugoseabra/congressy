@@ -1,0 +1,25 @@
+version: '2.3'
+services:
+  cgsy-staging:
+    image: cgsy-staging
+    container_name: cgsy-staging
+    networks:
+      - dev_postgres
+    ports:
+      - "8080:80"
+    environment:
+      - AWS_KEY=AKIAJHS7RBNESVTWWI6Q
+      - AWS_SECRET=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
+      - DOMAIN=test.congressy.com
+      - FORCE_HTTPS=False
+      - BUCKET_LOCATION=us-east-1
+      - BUCKET_NAME=cgsyplatform
+      - DBHOST=postgres
+      - DBUSER=congressy
+      - DBPASS=congressy
+      - DBNAME=cgsyplatform
+      - DBPORT=5432
+
+networks:
+  dev_postgres:
+    external
