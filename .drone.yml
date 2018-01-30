@@ -19,7 +19,7 @@ pipeline:
     image: indiehosters/git
     pull: true
     commands:
-      - basename `git rev-parse --abbrev-ref HEAD`
+      - echo ${DRONE_BRANCH}
 
     when:
       branch:
