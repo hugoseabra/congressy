@@ -71,3 +71,32 @@ pipeline:
     when:
       branch:
         include: [ hotfix/*, release/* ]
+
+  notify-stagin-on-telegram:
+    image: appleboy/drone-telegram
+    pull: true
+    token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
+    #to: -275808686 # ID chat Congressy
+    to: 245012348 # ID chat Congressy
+    format: markdown
+    privileged: true
+    volumes:
+      - build_file:/tmp/
+    message: >
+      {{#success build.status}}
+        **Sucesso:** build #{{ build.number }}. Versão `cat ./version`RC no ar.
+      {{else}}
+        **Falha** no build #{{ build.number }} da versão `cat ./version`RC.
+      {{/success}}
+
+      Branch: {{ build.branch }}
+
+      Commit: {{ commit.message }}
+
+      Link: {{ build.link }}
+    document:
+      - /tmp/result.txt
+    when:
+      branch:
+        include: [ hotfix/*, release/* ]
+      status: [ success, failure ]
