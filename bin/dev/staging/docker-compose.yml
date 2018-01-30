@@ -11,7 +11,7 @@ services:
       - AWS_KEY=AKIAJHS7RBNESVTWWI6Q
       - AWS_SECRET=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
       - DOMAIN=test.congressy.com
-      - FORCE_HTTPS=False
+      - FORCE_HTTPS=True
       - BUCKET_LOCATION=us-east-1
       - BUCKET_NAME=cgsyplatform
       - DBHOST=postgres
