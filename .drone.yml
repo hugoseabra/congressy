@@ -1,12 +1,15 @@
+# Branches added globally
 branches:
   include: [master, release/*, hotfix/* ]
 
+# Custom definition for cloning, adding tags and depth
 clone:
   git:
     image: plugins/git
     depth: 50
     tags: true
 
+# Steps of deploy, according to configurations and conditionals
 pipeline:
   create-db-prod-backup:
     image: postgres:9.6-alpine
