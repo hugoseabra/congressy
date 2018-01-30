@@ -17,5 +17,5 @@ pipeline:
           --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
           --port 5499 \
           --username congressy \
-          cgsyplatform > /bkp/backup.sql
-      - pg_restore -U postgres -n public -d cgsyplatform < /bkp/backup.sql
+          cgsyplatform > /tmp/backup.sql
+      - pg_restore -U postgres -n public -d cgsyplatform < /tmp/backup.sql
