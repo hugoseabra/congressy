@@ -10,8 +10,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'cgsy_dev',
-        'USER': 'cgsy',
-        'PASSWORD': 'GatherosAdmin@#qwe',
+        'USER': 'postgres',
+        'PASSWORD': '',
         'HOST': 'localhost',
     },
 }

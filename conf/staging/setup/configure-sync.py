@@ -50,12 +50,6 @@ def setup(origin_file_path, file_path):
         out_file.close()
 
 
-# Crontab
-setup(
-    '/var/www/cgsy/conf/deploy/templates/crontab.j2',
-    '/crontab.txt'
-)
-
 # Configures s3
 setup(
     '/var/www/cgsy/conf/deploy/templates/s3bucket.j2',

@@ -4,11 +4,11 @@ from jinja2 import Template
 
 dbname = os.environ.get('DBNAME')
 dbuser = os.environ.get('DBUSER')
-dbpass = os.environ.get('DBPASS')
+dbpass = os.environ.get('DBPASS', '')
 dbhost = os.environ.get('DBHOST')
 dbport = os.environ.get('DBPORT', 5432)
 
-if not dbhost or not dbuser or not dbpass or not dbname:
+if not dbhost or not dbuser or dbpass is None or not dbname:
     raise Exception(
         "DB credentials not provided or misconfigured:"
         " -e DBHOST=host -e DBUSER=user -e DBPASS=password -e DBNAME=dbname"
@@ -34,7 +34,8 @@ def add_env_variables(content):
 
 
 def setup(origin_file_path, file_path):
-    copyfile(origin_file_path, file_path)
+    if origin_file_path != file_path:
+        copyfile(origin_file_path, file_path)
 
     with open(file_path) as in_file:
         text = in_file.read()
@@ -46,6 +47,6 @@ def setup(origin_file_path, file_path):
 
 
 setup(
-    '/var/www/cgsy/conf/deploy/templates/settings_prod.j2',
+    '/var/www/cgsy/project/settings/prod.py',
     '/var/www/cgsy/project/settings/prod.py'
 )

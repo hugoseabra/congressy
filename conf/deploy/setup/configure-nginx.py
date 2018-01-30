@@ -2,12 +2,16 @@ import os
 from shutil import copyfile
 from jinja2 import Template
 
-f = open('/var/www/cgsy/version')
-app_version = f.read()
-f.close()
+domain = os.environ.get('DOMAIN')
+force_https = os.environ.get('FORCE_HTTPS')
 
+if not domain:
+    raise Exception("DOMAIN not provided or misconfigured.")
+
+# create dictionary of environment variables
 env_dict = {
-    'APP_VERSION': app_version.rstrip('\r\n')
+    'DOMAIN': domain,
+    'FORCE_HTTPS': force_https is True,
 }
 
 
@@ -31,6 +35,6 @@ def setup(origin_file_path, file_path):
 
 
 setup(
-    '/var/www/cgsy/conf/deploy/templates/footer.j2',
-    '/var/www/cgsy/frontend/templates/base/footer.html'
+    '/var/www/cgsy/conf/deploy/templates/nginx-cgsy.j2',
+    '/etc/nginx/sites-available/default'
 )
