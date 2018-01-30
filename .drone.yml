@@ -22,11 +22,12 @@ pipeline:
           --port 5499 \
           --username congressy \
           cgsyplatform > /bkp/backup.sql
+      - du -h /bkp/backup.sql
 
   database-restore:
     image: postgres:9.6-alpine
     volumes:
       - postgres_backup:/bkp
     commands:
-      - sleep 10
+      - sleep 20
       - pg_restore -U congressy -n public -d cgsyplatform < /bkp/backup.sql
