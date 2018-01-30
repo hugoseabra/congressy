@@ -82,10 +82,14 @@ pipeline:
     message: >
       *{{uppercase build.status }} - Ambiente de Teste*
 
-      Repo: {{ repo.name }}
+      *Repo:* {{ repo.name }}
+
+      *Por:* {{ build.author }}
+
+      *Quando:* {{datetme build.started }} a {{datetme build.finished }}
 
       ```
-      {{ build.message }}
+      {{ build.commit }}
       ```
     when:
       status: [ success, failure ]
