@@ -3,4 +3,4 @@ pipeline:
     image: indiehosters/git
     pull: true
     commands:
-      - ./bin/version.sh
+      - git status
