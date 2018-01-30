@@ -8,6 +8,9 @@ MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
+# Production environment
+ENV ENV prod
+
 # -----------------------------------------------------------------------------
 # Basics
 RUN apt-get update -q && apt-get install -qy --no-install-recommends \
@@ -47,7 +50,7 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
 # Pypi packages
 
 # install uwsgi now because it takes a little while
-RUN pip install uwsgi celery[redis] lxml sparkpost s3cmd jinja2 flower
+RUN pip install --no-cache-dir uwsgi celery[redis] lxml sparkpost s3cmd jinja2 flower
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
@@ -70,10 +73,11 @@ WORKDIR /var/www/cgsy
 # COPY requirements.txt and RUN pip install BEFORE adding the rest of your code, this will cause Docker's caching mechanism
 # to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
 COPY ./requirements.pip ./.
-RUN pip install -r requirements.pip
+RUN pip install --no-cache-dir -r requirements.pip
 
 # -----------------------------------------------------------------------------
 # Setup configuration files
+COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
 COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
 COPY ./conf/deploy/setup/configure-db.py /configure-db.py
 COPY ./conf/deploy/setup/configure-footer.py /configure-footer.py

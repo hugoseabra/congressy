@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# configures wsgi
+python /configure-wsgi.py
+
 # configures nginx
 python /configure-nginx.py
 

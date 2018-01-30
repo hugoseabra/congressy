@@ -5,38 +5,22 @@ clone:
     tags: true
 
 pipeline:
-  save-prod-version:
-    image: indiehosters/git
-    pull: true
-    commands:
-      - ./bin/version.sh > version
-
-    when:
-      branch:
-        include: [ master ]
-
-  save-staging-version:
-    image: indiehosters/git
-    pull: true
-    commands:
-      - basename ${DRONE_COMMIT_BRANCH} > version
-
-    when:
-      branch:
-        include: [ release/* ]
-
-  build-staging:
-    image: docker
+  database-backup:
+    image: postgres:9.6-alpine
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/bkp:/tmp/bkp
     commands:
       - |
-        echo "Building version: `cat ./version`"
+        PGPASSWORD=4UnADjyMjeeB7GSc pg_dump \
+          --format=c \
+          --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
+          --port 5499 \
+          --username congressy \
+          --verbose \
+          cgsyplatform > /tmp/bkp/backup.sql
       - |
-        docker build \
-          -t cgsy-staging:`cat ./version` \
-          -f ./conf/staging/Dockerfile .
+        echo Backup size: `du -h /bkp/backup.sql`
 
     when:
       branch:
-        include: [ release/* ]
+        include: [ hotfix/*, release/* ]

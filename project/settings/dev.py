@@ -2,22 +2,22 @@
 
 from . import *
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'cgsyplatform',
+        'USER': 'congressy',
+        'PASSWORD': 'congressy',
+        'HOST': 'localhost',
+    },
+}
+
 DEBUG = True
 
 INSTALLED_APPS.extend([
     'debug_toolbar',
     'django_extensions',
 ])
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'cgsy_dev',
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-    },
-}
 
 ABSOLUTEURI_PROTOCOL = 'http'
 
