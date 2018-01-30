@@ -81,16 +81,16 @@ pipeline:
     format: markdown
     message: >
       # Ambiente de Teste
-      {{#success build.status}}
+      {{#success build.Status}}
         * *Sucesso:* build #{{ build.number }}.
       {{else}}
         * *Falha* no build #{{ build.number }}.
       {{/success}}
         * *Repo:* {{ repo.name }}
-        * *Autor:* {{ build.author }}
-        * *Branch:* {{ build.branch }}
-        * *Commit:* {{ commit.message }}
-        * *Link:* {{ build.link }}
+        * *Autor:* {{ commit.Author }}
+        * *Branch:* {{ commit.Branch }}
+        * *Commit:* {{ commit.Message }}
+        * *Link:* {{ build.Link }}
         * *Quando:* {{ build.started }} a {{ build.finished }}
     when:
       status: [ success, failure ]
