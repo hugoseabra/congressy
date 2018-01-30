@@ -6,16 +6,27 @@ services:
       - POSTGRES_USER=congressy
       - POSTGRES_PASSWORD=congressy
 
+volumes:
+  postgres_backup:
+
 pipeline:
   database-backup:
     image: postgres:9.6-alpine
+    volumes:
+      - postgres_backup:/bkp
     commands:
-      - sleep 10
       - |
         PGPASSWORD=4UnADjyMjeeB7GSc pg_dump \
           --format=c \
           --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
           --port 5499 \
           --username congressy \
-          cgsyplatform > /tmp/backup.sql
-      - pg_restore -U congressy -n public -d cgsyplatform < /tmp/backup.sql
+          cgsyplatform > /bkp/backup.sql
+
+  database-restore:
+    image: postgres:9.6-alpine
+    volumes:
+      - postgres_backup:/bkp
+    commands:
+      - sleep 10
+      - pg_restore -U congressy -n public -d cgsyplatform < /bkp/backup.sql
