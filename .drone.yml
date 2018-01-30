@@ -76,11 +76,13 @@ pipeline:
     image: appleboy/drone-telegram
     pull: true
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-    #to: -275808686 # ID chat Congressy
-    to: 245012348 # ID chat Congressy
+    to: -275808686 # ID chat Congressy
+    #to: 245012348 # ID chat Congressy
     format: markdown
     message: >
       *{{uppercase build.status }} - Ambiente de Teste*
+
+      *Quando:* {{datetime build.started "3:04PM" "UTC"}} a {{datetime build.finished "3:04PM" "UTC"}}
 
       *Repo:* {{ repo.name }}
 
@@ -88,7 +90,6 @@ pipeline:
 
       *Branch:* {{ commit.branch }}
 
-      *Quando:* {{datetime build.started "3:04PM" "UTC"}} a {{datetime build.finished "3:04PM" "UTC"}}
 
       *Mensagem:*
 
@@ -100,6 +101,7 @@ pipeline:
 
 
       *Commit Link:* {{ commit.link }}
+
 
       *Ambiente:* https://test.congressy.com
 
