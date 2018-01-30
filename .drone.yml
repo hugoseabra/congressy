@@ -19,10 +19,24 @@ pipeline:
     image: indiehosters/git
     pull: true
     commands:
-      - |
-        echo "Branch: `basename ${DRONE_COMMIT_BRANCH}`"
+      - basename ${DRONE_COMMIT_BRANCH} > version
 
     when:
       branch:
         include: [ release/* ]
 
+  build-staging:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        echo "Building version: `cat ./version`"
+      - |
+        docker build \
+          -t cgsy-staging:`cat ./version` \
+          -f ./conf/staging/Dockerfile .
+
+    when:
+      branch:
+        include: [ release/* ]
