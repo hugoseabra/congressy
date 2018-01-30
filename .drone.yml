@@ -8,4 +8,4 @@ pipeline:
     image: indiehosters/git
     pull: true
     commands:
-      - git tag -l
+      - ./bin/version.sh
