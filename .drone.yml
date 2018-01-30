@@ -28,6 +28,8 @@ pipeline:
   recreate-staging-db:
     image: tmaier/docker-compose
     pull: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - docker-compose -f ./bin/dev/docker-compose.yml down
       - docker-compose -f ./bin/dev/docker-compose.yml --verbose up -d
