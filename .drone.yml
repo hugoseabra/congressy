@@ -78,23 +78,27 @@ pipeline:
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
     #to: -275808686 # ID chat Congressy
     to: 245012348 # ID chat Congressy
-    format: markdown
+    format: html
     privileged: true
     volumes:
       - build_file:/tmp/
+    commands:
+      -
     message: >
-      {{#success build.status}}
-        **Sucesso:** build #{{ build.number }}. Versão `cat ./version`RC no ar.
-      {{else}}
-        **Falha** no build #{{ build.number }} da versão `cat ./version`RC.
-      {{/success}}
-
-      **Repo:** {{ repo.name }}
-      **Autor:** {{ build.author }}
-      **Branch:** {{ build.branch }}
-      **Commit:** {{ commit.message }}
-      **Link:** {{ build.link }}
-      **Quando:** {{ build.started }} a {{ build.finished }}
+      <h3>Ambiente de Teste</h3>
+      <ul>
+        {{#success build.status}}
+          <li><strong>Sucesso:</strong> build #{{ build.number }}.</li>
+        {{else}}
+          <li><strong>**Falha</strong> no build #{{ build.number }}.</li>
+        {{/success}}
+        <li><strong>Repo:</strong> {{ repo.name }}</li>
+        <li><strong>Autor:</strong> {{ build.author }}</li>
+        <li><strong>Branch:</strong> {{ build.branch }}</li>
+        <li><strong>Commit:</strong> {{ commit.message }}</li>
+        <li><strong>Link:</strong> {{ build.link }}</li>
+        <li><strong>Quando:** {{ build.started }} a {{ build.finished }}</li>
+      </ul>
     when:
       branch:
         include: [ hotfix/*, release/* ]
