@@ -10,6 +10,7 @@ pipeline:
     volumes:
       - /tmp/bkp:/tmp/bkp
     commands:
+      - mkdir -p /tmp/bkp/backup
       - |
         PGPASSWORD=4UnADjyMjeeB7GSc pg_dump \
           --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
