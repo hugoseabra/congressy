@@ -31,7 +31,7 @@ pipeline:
     commands:
       - sleep 10
       - |
-        psql -U congressy -d cgsyplatform \
+        psql -U congressy -d cgsyplatform -h database \
           -c "SELECT * FROM pg_catalog.pg_tables;"
 
   database-restore:
@@ -39,4 +39,8 @@ pipeline:
     volumes:
       - postgres_backup:/bkp
     commands:
-      - pg_restore -U congressy -n public -d cgsyplatform < /bkp/backup.sql
+      - pg_restore \
+        --host database \
+        --username congressy \
+        --schema public \
+        --dbname cgsyplatform < /bkp/backup.sql
