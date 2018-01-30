@@ -1,10 +1,13 @@
-pipeline:
-  clone:
+clone:
+  git:
     image: plugins/git
     depth: 50
     tags: true
-    when:
-      branch: [ hotfix/*, release/*, master ]
+  when:
+    branch: [ hotfix/*, release/*, master ]
+
+
+pipeline:
 
   create-db-prod-backup:
     image: postgres:9.6-alpine
