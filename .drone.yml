@@ -4,8 +4,7 @@ pipeline:
     depth: 50
     tags: true
     when:
-      branch:
-        include: [ hotfix/*, release/*, master ]
+      branch: [ hotfix/*, release/*, master ]
 
 
   create-db-prod-backup:
@@ -27,8 +26,7 @@ pipeline:
       - cp ./bin/dev/staging/db-restore.sh /tmp/bkp/.
 
     when:
-      branch:
-        include: [ hotfix/*, release/* ]
+      branch: [ hotfix/*, release/* ]
 
   recreate-staging-db:
     image: tmaier/docker-compose
@@ -47,8 +45,7 @@ pipeline:
     commands:
       - basename ${DRONE_COMMIT_BRANCH} > version
     when:
-      branch:
-        include: [ hotfix/*, release/* ]
+      branch: [ hotfix/*, release/* ]
 
   build-staging-image:
     image: docker
@@ -62,8 +59,7 @@ pipeline:
           -t cgsy-staging \
           -f ./conf/staging/Dockerfile .
     when:
-      branch:
-        include: [ hotfix/*, release/* ]
+      branch: [ hotfix/*, release/* ]
 
   deploy-staging-env:
     image: tmaier/docker-compose
@@ -72,8 +68,7 @@ pipeline:
     commands:
       - sh ./bin/dev/staging/start-cgsy-staging.sh
     when:
-      branch:
-        include: [ hotfix/*, release/* ]
+      branch: [ hotfix/*, release/* ]
 
   notify-staging-on-telegram:
     image: appleboy/drone-telegram
@@ -111,5 +106,4 @@ pipeline:
 
     when:
       status: [ success, failure ]
-      branch:
-        include: [ hotfix/*, release/* ]
+      branch: [ hotfix/*, release/* ]
