@@ -19,7 +19,7 @@ pipeline:
     image: indiehosters/git
     pull: true
     commands:
-      - echo "Branch: ${DRONE_REPO_BRANCH}"
+      - echo ${DRONE_REPO_BRANCH}
 
     when:
       branch:
