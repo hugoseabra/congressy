@@ -21,5 +21,6 @@ services:
       - DBPORT=5432
 
 networks:
-  dev_postgres:
+  postgres:
     external:
+      name: dev_postgres
