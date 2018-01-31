@@ -3,7 +3,6 @@ from shutil import copyfile
 from jinja2 import Template
 
 f = open('/var/www/cgsy/version')
-f = open('/var/www/cgsy/build')
 app_version = f.read()
 f.close()
 

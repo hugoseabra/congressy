@@ -48,8 +48,8 @@ pipeline:
     pull: true
     commands:
       - basename ${DRONE_COMMIT_BRANCH} > version
-      - echo ${DRONE_BUILD_NUMBER} > build_number
-      - echo "${DRONE_COMMIT_AUTHOR} ${DRONE_COMMIT_AUTHOR_AVATAR}" > build_author
+      - echo "${DRONE_BUILD_NUMBER}" > build_number
+      - echo "${DRONE_COMMIT_AUTHOR}" > build_author
     when:
       branch: [ hotfix/*, release/* ]
 
@@ -59,7 +59,8 @@ pipeline:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - |
-        echo "Building version: `cat ./version`"
+        printf "Building version: `cat ./version` - build `cat ./build_number`"
+        printf " , por `cat ./build_autor`\n\n"
       - |
         docker build \
           -t cgsy-staging \

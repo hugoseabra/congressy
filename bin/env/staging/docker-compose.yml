@@ -14,7 +14,7 @@ services:
       - FORCE_HTTPS=True
       - BUCKET_LOCATION=us-east-1
       - BUCKET_NAME=cgsyplatform
-      - DBHOST=postgres
+      - DBHOST=cgsy-postgres
       - DBUSER=congressy
       - DBPASS=congressy
       - DBNAME=cgsyplatform
@@ -23,4 +23,4 @@ services:
 networks:
   postgres:
     external:
-      name: dev_postgres
+      name: env_postgres
