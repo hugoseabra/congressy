@@ -1,5 +1,6 @@
 # pylint: skip-file
 
+import os
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
@@ -62,7 +63,8 @@ urlpatterns += static.static(
 
 if settings.DEBUG:
 
-    urlpatterns += [url(r'^logs/', include('logtailer.urls')),]
+    if os.environ.get('DJANGO_SETTINGS_MODULE') == 'project.settings.staging':
+        urlpatterns += [url(r'^logs/', include('logtailer.urls')),]
 
     import debug_toolbar
 
