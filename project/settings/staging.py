@@ -35,6 +35,7 @@ INSTALLED_APPS.extend([
     'debug_toolbar',
     'django_extensions',
     'django_nose',
+    'logtailer',
 ])
 
 MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
