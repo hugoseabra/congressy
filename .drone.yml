@@ -1,6 +1,6 @@
 # Branches added globally
 branches:
-  include: [develop, master, release/*, hotfix/*]
+  include: [master, release/*, hotfix/*]
 
 # Custom definition for cloning, adding tags and depth
 clone:
@@ -47,7 +47,7 @@ pipeline:
     image: indiehosters/git
     pull: true
     commands:
-      - basename ${DRONE_COMMIT_BRANCH} > version
+      - "`basename ${DRONE_COMMIT_BRANCH}` - build ${DRONE_BUILD_NUMBER}" > version
     when:
       branch: [ hotfix/*, release/* ]
 
@@ -84,6 +84,7 @@ pipeline:
     message: >
       *{{uppercase build.status }} - Ambiente RC*
 
+
       *Repo:* {{ repo.name }} das {{datetime build.started "3:04PM" "UTC"}} às {{datetime build.finished"3:04PM" "UTC"}}
 
       *Branch:* {{ commit.branch }}
@@ -95,18 +96,21 @@ pipeline:
       *Autor:* {{ commit.author }}
 
       *Mensagem:*
+
       ```
       {{ commit.message }}
       ```
-      -- ---
+
 
       *Ambiente:* https://test.congressy.com/login/
 
+
       *Build Link:* {{ build.link }}
+
 
       *Commit:* {{ commit.link }}
 
 
     when:
       status: [ success, failure ]
-      branch: [ develop, hotfix/*, release/* ]
+      branch: [ hotfix/*, release/* ]
