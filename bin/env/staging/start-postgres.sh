@@ -5,5 +5,5 @@
 # Esta script será executado dentro do container do postgres.
 ##############################################################################
 
-docker-compose -f ./bin/dev/docker-compose.yml down
-docker-compose -f ./bin/dev/docker-compose.yml up -d
+docker-compose -f ./bin/env/docker-compose.yml down
+docker-compose -f ./bin/env/docker-compose.yml up -d

@@ -11,10 +11,10 @@ print(settings.BASE_DIR)"`
 
 export PYTHONPATH=$BASE_DIR
 
-docker-compose -f $BASE_DIR/bin/dev/docker-compose.yml down
+docker-compose -f $BASE_DIR/bin/env/docker-compose.yml down
 sleep 2
 
-docker-compose -f $BASE_DIR/bin/dev/docker-compose.yml up -d
+docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
 sleep 5
 
 python $BASE_DIR/manage.py migrate
@@ -33,4 +33,4 @@ python $BASE_DIR/manage.py loaddata 012_invitation
 python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
 
 # Atualizando a data dos eventos
-python $BASE_DIR/bin/dev/update_data.py
+python $BASE_DIR/bin/env/update_data.py
