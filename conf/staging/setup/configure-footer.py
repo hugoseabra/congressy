@@ -3,11 +3,22 @@ from shutil import copyfile
 from jinja2 import Template
 
 f = open('/var/www/cgsy/version')
+f = open('/var/www/cgsy/build')
 app_version = f.read()
 f.close()
 
+f = open('/var/www/cgsy/build_number')
+build_number = f.read()
+f.close()
+
+f = open('/var/www/cgsy/build_author')
+build_author = f.read()
+f.close()
+
 env_dict = {
-    'APP_VERSION': app_version.rstrip('\r\n')
+    'APP_VERSION': app_version.rstrip('\r\n'),
+    'BUILD': build_number.rstrip('\r\n'),
+    'AUTHOR': build_author.rstrip('\r\n'),
 }
 
 

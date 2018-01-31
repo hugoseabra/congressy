@@ -47,7 +47,9 @@ pipeline:
     image: indiehosters/git
     pull: true
     commands:
-      - "`basename ${DRONE_COMMIT_BRANCH}` - build ${DRONE_BUILD_NUMBER}" > version
+      - basename ${DRONE_COMMIT_BRANCH} > version
+      - echo ${DRONE_BUILD_NUMBER} > build_number
+      - echo "${DRONE_COMMIT_AUTHOR} ${DRONE_COMMIT_AUTHOR_AVATAR}" > build_author
     when:
       branch: [ hotfix/*, release/* ]
 
