@@ -1,6 +1,6 @@
 # Branches added globally
 branches:
-  include: [master, release/*, hotfix/* ]
+  include: [develop, master, release/*, hotfix/*]
 
 # Custom definition for cloning, adding tags and depth
 clone:
@@ -78,35 +78,35 @@ pipeline:
     image: appleboy/drone-telegram
     pull: true
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-    to: -275808686 # ID chat Congressy
-    #to: 245012348 # ID hugoseabra
+#    to: -275808686 # ID chat Congressy
+    to: 245012348 # ID hugoseabra
     format: markdown
     message: >
-      *{{uppercase build.status }} - Ambiente de Teste*
+      *{{uppercase build.status }} - Ambiente RC*
 
-      *Quando:* {{datetime build.started "3:04PM" "UTC"}} a {{datetime build.finished "3:04PM" "UTC"}}
-
-      *Repo:* {{ repo.name }}
-
-      *Por:* {{ commit.author }}
+      *Repo:* {{ repo.name }} das {{datetime build.started "3:04PM" "UTC"}} às {{datetime build.finished"3:04PM" "UTC"}}
 
       *Branch:* {{ commit.branch }}
 
+      *Build:* {{build.number}}
+
+      *Duração:* {{duration build.started build.finished}}
+
+      *Autor:* {{ commit.author }}
 
       *Mensagem:*
-
       ```
       {{ commit.message }}
       ```
-
-      *Build Link:* {{ build.link }}
-
-
-      *Commit Link:* {{ commit.link }}
-
+      -- ---
 
       *Ambiente:* https://test.congressy.com/login/
 
+      *Build Link:* {{ build.link }}
+
+      *Commit:* {{ commit.link }}
+
+
     when:
       status: [ success, failure ]
-      branch: [ hotfix/*, release/* ]
+      branch: [ develop, hotfix/*, release/* ]
