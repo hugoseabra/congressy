@@ -8,8 +8,8 @@ MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# Production environment
-ENV ENV prod
+# Helps on collecting static
+ENV DJANGO_SETTINGS_MODULE project.settings.prod
 
 # -----------------------------------------------------------------------------
 # Basics
@@ -86,7 +86,6 @@ COPY ./conf/deploy/container-entry.sh /entry.sh
 
 # -----------------------------------------------------------------------------
 COPY ./. ./.
-RUN python manage.py collectstatic --noinput
 
 RUN chmod 775 /entry.sh
 

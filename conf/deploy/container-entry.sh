@@ -28,4 +28,7 @@ python /configure-db.py
 # Configures footer
 python /configure-footer.py
 
+# Collect all static data
+python manage.py collectstatic --noinput
+
 supervisord -n

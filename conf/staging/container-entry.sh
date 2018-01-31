@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# configures wsgi
-python /configure-wsgi.py
-
 # configures nginx
 python /configure-nginx.py
 
@@ -22,5 +19,7 @@ python /configure-db.py
 
 # Configures footer
 python /configure-footer.py
+
+python manage.py collectstatic --noinput
 
 supervisord -n

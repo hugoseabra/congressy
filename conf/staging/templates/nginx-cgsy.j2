@@ -1,0 +1,28 @@
+# nginx-app.conf
+
+server {
+    listen  80 default_server;
+    charset utf-8;
+
+    server_name {{ DOMAIN }};
+    {% if FORCE_HTTPS %}
+    if ($http_x_forwarded_proto != "https") {
+      rewrite ^(.*)$ https://$server_name$REQUEST_URI permanent;
+    }
+    {% endif %}
+
+    location /media  {
+        alias /var/www/cgsy/media_dev;
+    }
+
+    location /static  {
+        alias /var/www/cgsy/static;
+    }
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_pass http://localhost:8000;
+    }
+}

@@ -8,8 +8,8 @@ MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# Staging environment
-ENV ENV staging
+# Helps on collecting static and runserver
+ENV DJANGO_SETTINGS_MODULE project.settings.staging
 
 # -----------------------------------------------------------------------------
 # Basics
@@ -49,8 +49,8 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
 # -----------------------------------------------------------------------------
 # Pypi packages
 
-# install uwsgi now because it takes a little while
-RUN pip install --no-cache-dir uwsgi celery[redis] lxml sparkpost s3cmd jinja2 flower
+# STAGING
+RUN pip install --no-cache-dir lxml sparkpost s3cmd jinja2
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
@@ -76,15 +76,18 @@ COPY ./requirements.pip ./.
 RUN pip install --no-cache-dir -r requirements.pip
 
 # Staging packages
-RUN pip install --no-cache-dir django-extensions django-nose pylint-django django-debug-toolbar
+RUN pip install --no-cache-dir \
+        django-logtailer \
+        # Coverage
+        django-nose \
+        # Quality metrics
+        pylint-django \
+        # Toolbar for debugging
+        django-debug-toolbar
 
 # -----------------------------------------------------------------------------
-# Setup configuration files
-COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
-COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
-COPY ./conf/deploy/container-entry.sh /entry.sh
-
-# Staging files
+# Setup STAGING
+COPY ./conf/staging/setup/configure-nginx.py /configure-nginx.py
 COPY ./conf/staging/setup/configure-db.py /configure-db.py
 COPY ./conf/staging/setup/configure-footer.py /configure-footer.py
 COPY ./conf/staging/setup/configure-sync.py /configure-sync.py
@@ -92,7 +95,6 @@ COPY ./conf/staging/container-entry.sh /entry.sh
 
 # -----------------------------------------------------------------------------
 COPY ./. ./.
-RUN python manage.py collectstatic --noinput
 
 RUN chmod 775 /entry.sh
 
