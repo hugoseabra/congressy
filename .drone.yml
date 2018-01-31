@@ -44,7 +44,7 @@ pipeline:
         include: [ hotfix/*, release/* ]
 
   save-staging-version:
-    image: indiehosters/git
+    image: alpine
     pull: true
     commands:
       - basename ${DRONE_COMMIT_BRANCH} > version
