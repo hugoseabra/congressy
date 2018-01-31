@@ -33,7 +33,6 @@ DEBUG = True
 
 INSTALLED_APPS.extend([
     'debug_toolbar',
-    'django_extensions',
     'django_nose',
     'logtailer',
 ])

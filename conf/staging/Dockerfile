@@ -50,7 +50,7 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
 # Pypi packages
 
 # STAGING
-RUN pip install --no-cache-dir lxml sparkpost s3cmd jinja2
+RUN pip install --no-cache-dir uwsgi lxml sparkpost s3cmd jinja2
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
@@ -73,21 +73,15 @@ WORKDIR /var/www/cgsy
 # COPY requirements.txt and RUN pip install BEFORE adding the rest of your code, this will cause Docker's caching mechanism
 # to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
 COPY ./requirements.pip ./.
-RUN pip install --no-cache-dir -r requirements.pip
-
-# Staging packages
-RUN pip install --no-cache-dir \
-        django-logtailer \
-        # Coverage
-        django-nose \
-        # Quality metrics
-        pylint-django \
-        # Toolbar for debugging
-        django-debug-toolbar
+COPY ./requirements_dev.pip ./.
+RUN pip install --no-cache-dir -r requirements_dev.pip
 
 # -----------------------------------------------------------------------------
+# Setup
+COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
+
 # Setup STAGING
-COPY ./conf/staging/setup/configure-nginx.py /configure-nginx.py
+COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
 COPY ./conf/staging/setup/configure-db.py /configure-db.py
 COPY ./conf/staging/setup/configure-footer.py /configure-footer.py
 COPY ./conf/staging/setup/configure-sync.py /configure-sync.py

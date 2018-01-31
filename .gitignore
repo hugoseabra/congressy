@@ -4,6 +4,6 @@ db.sqlite3
 /static/
 *.pyc
 /media_dev/
-
+/.env
 .coverage
 cover

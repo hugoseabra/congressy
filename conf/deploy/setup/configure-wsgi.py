@@ -5,7 +5,7 @@ from jinja2 import Template
 
 # create dictionary of environment variables
 env_dict = {
-    'ENV': os.environ.get('ENV', 'prod'),
+    'DJANGO_SETTINGS_MODULE': os.environ.get('DJANGO_SETTINGS_MODULE', 'prod'),
 }
 
 

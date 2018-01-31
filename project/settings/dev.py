@@ -16,8 +16,6 @@ DEBUG = True
 
 INSTALLED_APPS.extend([
     'debug_toolbar',
-    'django_extensions',
-    'logtailer',
 ])
 
 ABSOLUTEURI_PROTOCOL = 'http'

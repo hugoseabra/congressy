@@ -1,0 +1,1 @@
+[{"model": "logtailer.filter", "pk": 1, "fields": {"name": "all-but-logs", "regex": "^((?!logs).)*$"}}]
