@@ -3,6 +3,7 @@
 from . import *
 from fnmatch import fnmatch
 
+
 # Allows the use of regex IP's
 class GlobList(list):
     def __contains__(self, key):
@@ -10,7 +11,6 @@ class GlobList(list):
             if fnmatch(key, elt):
                 return True
         return False
-
 
 
 #############################################################################
@@ -55,9 +55,8 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = [
     '--with-coverage',
-    '--cover-package=gatheros_event,gatheros_front, gatheros_subscription, mailer',
+    '--cover-package=gatheros_event,gatheros_front, gatheros_subscription,mailer',
 ]
 
 # Internal IP's used by DDTB
 INTERNAL_IPS = GlobList(['*.*.*.*'])
-
