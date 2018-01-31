@@ -1,61 +1,75 @@
 #!/usr/bin/env bash
 
+# Runs script checking for breaking points
+run() {
+    local RED='\033[1;31m'
+    local NC='\033[0m' # No Color
+    local RESULT=`$@`
+    if [ -z "$RESULT" ]; then
+        printf "OK"
+        echo ;
+    else
+        echo ;
+        echo ;
+        echo -e "${RED}$RESULT${NC}"
+        echo ;
+        echo ;
+        exit 1
+    fi
+}
+
+# Runs python script checking for breaking points
+run_python_script() {
+    printf " > $1: "
+    run python $2
+}
+
+# Runs bash script checking for breaking points
+run_bash_script() {
+    printf " > $1: "
+    chmod +x "$2"
+    run $2
+}
+
+# Runs python script without checking for breaking points
+run_python_script_with_output() {
+    echo ;
+    echo "========================================================================"
+    echo " > $1: "
+    python $2
+    echo ;
+    echo "========================================================================"
+    echo ;
+}
+
+# Runs bash script without checking for breaking points
+run_bash_script_with_output() {
+    echo ;
+    echo "========================================================================"
+    echo " > $1: "
+    chmod +x "$2"
+    $2
+    echo ;
+    echo "========================================================================"
+    echo ;
+}
+
+echo ;
 echo "########################################################################"
 echo "PROCESSANDO ENTRY"
 echo "########################################################################"
-
-echo " > Configurando WSGI"
-# configures wsgi
-python /configure-wsgi.py
-
-echo " > Configurando NGINX"
-# configures nginx
-python /configure-nginx.py
-
-echo " > Configurando SYNC"
-# configures sync process workflow
-python /configure-sync.py
-
-chmod 777 /s3bucket.sh /in-sync.sh
-
-# Verifies if bucket exists. If not, creates it.
-/s3bucket.sh
-
-echo ;
-echo "========================================================================"
-echo " > Puxando arquivos existentes no S3"
-echo ;
-# Runs in-sync: configuration state has priority of outsite if bucket exists
-/in-sync.sh
-echo ;
-echo "========================================================================"
 echo ;
 
-echo " > Configurando DB"
-# Configures database app credentials
-python /configure-db.py
-
-echo " > Configurando RODAPÉ"
-# Configures footer
-python /configure-footer.py
-
-echo " > Coletando arquivos estáticos"
-python manage.py collectstatic --noinput --verbosity 0
-
-echo ;
-echo "========================================================================"
-echo " > Executando migrate"
-echo ;
-python manage.py migrate
-echo ;
-echo "========================================================================"
-echo " > Populando banco de dados"
-echo ;
-# Importando fixtures de output de logs: arquivo de log e filtro
-python manage.py loaddata logtailer_filter logtailer_logfile
-echo ;
-echo "========================================================================"
-echo ;
+run_python_script "Configurando WSGI" /configure-wsgi.py
+run_python_script "Configurando NGINX" /configure-nginx.py
+run_python_script "Configurando SYNC" /configure-sync.py
+run_bash_script "Verificando existência do Bucket" /s3bucket.sh
+run_bash_script_with_output "Baixando arquivos do S3" /in-sync.sh
+run_python_script "Configurando DB" /configure-db.py
+run_python_script "Configurando RODAPÉ" /configure-footer.py
+run_python_script "Coletando arquivos estáticos" "manage.py collectstatic --noinput --verbosity 0"
+run_python_script_with_output "Executando migrate" "manage.py migrate"
+run_python_script_with_output "Populando banco de dados" "manage.py loaddata logtailer_filter logtailer_logfile"
 
 echo " > Iniciando SUPERVISOR"
 echo ;

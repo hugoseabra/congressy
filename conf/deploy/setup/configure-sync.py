@@ -1,5 +1,7 @@
 import os
+import sys
 from shutil import copyfile
+
 from jinja2 import Template
 
 aws_key = os.environ.get('AWS_KEY')
@@ -8,16 +10,16 @@ bucketname = os.environ.get('BUCKET_NAME')
 default_bucket_name = 'cgsyplatform'
 
 if not aws_key or not aws_secret:
-    raise Exception(
-        "AWS credentials not provided or misconfigured:"
-        " -e AWS_KEY=key -e AWS_SECRET=secret"
-    )
+    msg = "AWS credentials not provided or misconfigured:" \
+          " -e AWS_KEY=key -e AWS_SECRET=secret"
+    print(msg)
+    sys.exit(1)
 
 if not bucketname:
-    raise Exception(
-        "Bucket name (BUCKET_NAME) not provided or misconfigured."
-        " Assuming default: {}".format(default_bucket_name)
-    )
+    msg = "Bucket name (BUCKET_NAME) not provided or misconfigured." \
+          " Assuming default: {}".format(default_bucket_name)
+    print(msg)
+    sys.exit(1)
 
 
 # create dictionary of environment variables

@@ -1,3 +1,4 @@
+import sys
 import os
 from shutil import copyfile
 from jinja2 import Template
@@ -6,7 +7,9 @@ domain = os.environ.get('DOMAIN')
 force_https = os.environ.get('FORCE_HTTPS')
 
 if not domain:
-    raise Exception("DOMAIN not provided or misconfigured.")
+    msg = "DOMAIN not provided or misconfigured."
+    print(msg)
+    sys.exit(1)
 
 # create dictionary of environment variables
 env_dict = {

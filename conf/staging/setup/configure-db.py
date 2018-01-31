@@ -1,3 +1,4 @@
+import sys
 import os
 from shutil import copyfile
 from jinja2 import Template
@@ -9,11 +10,12 @@ dbhost = os.environ.get('DBHOST')
 dbport = os.environ.get('DBPORT', 5432)
 
 if not dbhost or not dbuser or dbpass is None or not dbname:
-    raise Exception(
+    print(
         "DB credentials not provided or misconfigured:"
         " -e DBHOST=host -e DBUSER=user -e DBPASS=password -e DBNAME=dbname"
         " -e DBPORT=5432"
     )
+    sys.exit(1)
 
 # create dictionary of environment variables
 env_dict = {

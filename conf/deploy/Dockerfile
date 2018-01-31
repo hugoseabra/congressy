@@ -50,7 +50,20 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
 # Pypi packages
 
 # install uwsgi now because it takes a little while
-RUN pip install --no-cache-dir uwsgi celery[redis] lxml sparkpost s3cmd jinja2 flower
+RUN pip install --no-cache-dir \
+        # required by celery
+        lxml \
+        celery[redis] \
+        # Celery UI
+        flower \
+        # send email
+        sparkpost \
+        uwsgi \
+        # s3 synchronization
+        s3cmd \
+        # template engine
+        jinja2
+
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
