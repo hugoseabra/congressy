@@ -14,9 +14,14 @@ f = open('/var/www/cgsy/build_author')
 build_author = f.read()
 f.close()
 
+f = open('/var/www/cgsy/build_link')
+build_link = f.read()
+f.close()
+
 env_dict = {
     'APP_VERSION': app_version.rstrip('\r\n'),
     'BUILD': build_number.rstrip('\r\n'),
+    'BUILD_LINK': build_link.rstrip('\r\n'),
     'AUTHOR': build_author.rstrip('\r\n'),
 }
 
