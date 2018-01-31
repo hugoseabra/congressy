@@ -61,6 +61,9 @@ urlpatterns += static.static(
 )
 
 if settings.DEBUG:
+
+    urlpatterns += [url(r'^logs/', include('logtailer.urls')),]
+
     import debug_toolbar
 
     urlpatterns = [
