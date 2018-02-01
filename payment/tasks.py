@@ -7,27 +7,27 @@ pagarme.authentication_key(settings.PAGARME_API_KEY)
 congressy_id = settings.PAGARME_RECIPIENT_ID
 
 
-def create_credit_card_transaction(instance=None):
+def create_credit_card_transaction(payment=None):
 
-    if not instance:
+    if not payment:
         return
 
     # Criar transação.
     params = {
 
-        "amount": instance['price'],
+        "amount": payment['price'],
 
-        "card_hash": instance['card_hash'],
+        "card_hash": payment['card_hash'],
 
-        "customer": instance['customer'],
+        "customer": payment['customer'],
 
-        "billing": instance['billing'],
+        "billing": payment['billing'],
 
         "items": [
             {
                 "id": "000",
-                "title": "Inscrição do Evento: " + instance['event_name'],
-                "unit_price": instance['price'],
+                "title": "Inscrição do Evento: " + payment['event_name'],
+                "unit_price": payment['price'],
                 "quantity": 1,
                 "tangible": False
             }
@@ -41,7 +41,7 @@ def create_credit_card_transaction(instance=None):
                 "charge_processing_fee": True
             },
             {
-                "recipient_id": instance['recipient_id'],
+                "recipient_id": payment['recipient_id'],
                 "percentage": 90,
                 "liable": True,
                 "charge_processing_fee": False
@@ -62,26 +62,26 @@ def create_credit_card_transaction(instance=None):
     return trx
 
 
-def create_boleto_transaction(instance=None):
+def create_boleto_transaction(payment=None):
 
-    if not instance:
+    if not payment:
         return
 
     # Criar transação.
     params = {
 
-        "amount": instance['price'],
+        "amount": payment['price'],
 
-        "customer": instance['customer'],
+        "customer": payment['customer'],
         'payment_method': 'boleto',
 
-        "billing": instance['billing'],
+        "billing": payment['billing'],
 
         "items": [
             {
                 "id": "000",
-                "title": "Inscrição do Evento: " + instance['event_name'],
-                "unit_price": instance['price'],
+                "title": "Inscrição do Evento: " + payment['event_name'],
+                "unit_price": payment['price'],
                 "quantity": 1,
                 "tangible": False
             }
@@ -95,7 +95,7 @@ def create_boleto_transaction(instance=None):
                 "charge_processing_fee": True
             },
             {
-                "recipient_id": instance['recipient_id'],
+                "recipient_id": payment['recipient_id'],
                 "percentage": 90,
                 "liable": True,
                 "charge_processing_fee": False
@@ -116,25 +116,25 @@ def create_boleto_transaction(instance=None):
     return trx
 
 
-def create_payme_back_account(instance=None):
+def create_payme_back_account(payment=None):
 
-    if not instance:
+    if not payment:
         return
 
     params = {
-        'agencia': instance['agency'],
-        'bank_code': instance['bank_code'],
-        'conta': instance['account'],
-        'document_number': instance['cnpj_ou_cpf'],
-        'legal_name': instance['legal_name'],
-        'type': instance['account_type'],
+        'agencia': payment['agency'],
+        'bank_code': payment['bank_code'],
+        'conta': payment['account'],
+        'document_number': payment['cnpj_ou_cpf'],
+        'legal_name': payment['legal_name'],
+        'type': payment['account_type'],
     }
 
-    if 'agencia_dv' in instance:
-        params['agencia_dv'] = instance['agencia_dv']
+    if 'agencia_dv' in payment:
+        params['agencia_dv'] = payment['agencia_dv']
 
-    if 'conta_dv' in instance:
-        params['conta_dv'] = instance['conta_dv']
+    if 'conta_dv' in payment:
+        params['conta_dv'] = payment['conta_dv']
 
     if settings.DEBUG:
         bank_account = None
