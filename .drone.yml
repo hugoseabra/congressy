@@ -16,7 +16,7 @@ pipeline:
     volumes:
       - /tmp/bkp:/tmp/bkp
     commands:
-      - cp ./bin/env/staging/db-restore.sh /tmp/bkp/.
+      - ./bin/env/staging/backup-prod-db.sh
     when:
       branch: [ hotfix/*, release/* ]
 
