@@ -6,7 +6,7 @@ set -e
 # Esta script será executado dentro do container do postgres.
 ##############################################################################
 
-BASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASE=$(dirname "$0")
 
 BKP_PATH="/tmp/bkp/backup"
 
@@ -32,4 +32,5 @@ echo "Backup size: `du -h ${BKP_FILE_PATH}`"
 
 # Assegura que o postgres irá processar o arquivo colocando o bash em um
 # local onde onde será contruído o volume do container do cgsy-postgres
-cp "${BASE}/bin/env/staging/db-restore.sh" /tmp/bkp/.
+cp "$BASE/db-restore.sh" /tmp/bkp/.
+
