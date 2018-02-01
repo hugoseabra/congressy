@@ -33,4 +33,3 @@ echo "Backup size: `du -h ${BKP_FILE_PATH}`"
 # Assegura que o postgres irá processar o arquivo colocando o bash em um
 # local onde onde será contruído o volume do container do cgsy-postgres
 cp "$BASE/db-restore.sh" /tmp/bkp/.
-
