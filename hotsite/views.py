@@ -17,14 +17,16 @@ from django.utils.http import urlsafe_base64_encode
 from django.views import generic
 from django.conf import settings
 
-from gatheros_event.forms import PersonForm, PersonSubscribeForm
+from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
 from gatheros_subscription.models import Subscription, FormConfig, Lot
 from mailer.services import (
     notify_new_user,
     notify_new_subscription,
 )
-
+from payment.exception import TransactionError
+from payment.helpers import PagarmeTransactionInstanceData
+from payment.tasks import create_pagarme_transaction
 
 
 class EventMixin(generic.View):
@@ -43,6 +45,8 @@ class EventMixin(generic.View):
         context['lots'] = self.get_lots()
         context['subscription_enabled'] = self.subscription_enabled()
         context['has_paid_lots'] = self.has_paid_lots()
+        context['has_configured_bank_account'] = self.event.organization.is_bank_account_configured()
+        context['has_active_bank_account'] = self.event.organization.active_recipient
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
 
         return context
@@ -299,7 +303,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
 class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
     template_name = 'hotsite/subscription.html'
-    form_class = PersonSubscribeForm
+    form_class = PersonForm
 
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
@@ -401,8 +405,11 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 context['form'] = form
                 return self.render_to_response(context)
 
+            if 'transaction_type' not in request.POST:
+                messages.error(request=self.request, message='Por favor escolha um tipo de pagamento.')
+                return self.render_to_response(context)
+
             person = form.save()
-            # @TODO move all this logic to the form!
 
             if self.has_paid_lots():
                 lot_pk = self.request.POST.get('lot')
@@ -418,6 +425,21 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 created_by=user.id
             )
 
+            try:
+                transaction_instance_data = PagarmeTransactionInstanceData(person=person, extra_data=request.POST)
+            except TransactionError as e:
+                error_dict = {
+                    'No transaction type': 'Por favor escolher uma forma de pagamento.',
+                    'Transaction type not allowed': 'Forma de pagamento não permitida.',
+                    'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
+                    'No organization': 'Evento não possui organizador.',
+                }
+                if e.message in error_dict:
+                    e.message = error_dict[e.message]
+                messages.error(self.request, message=e.message)
+                return self.render_to_response(context)
+
+            create_pagarme_transaction(payment=transaction_instance_data.transaction_instance_data)
             subscription.save()
             notify_new_subscription(self.event, subscription)
 

@@ -1,18 +1,26 @@
 # pylint: disable=W5101
-"""
-Inscrições de pessoas em eventos conforme registrado no pagarme.
-"""
 
 from django.db import models
+import uuid
 
 
 class Transaction(models.Model):
 
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        primary_key=True
+    )
+
     # ID da transação.
-    id = models.IntegerField(
+    transaction_id = models.IntegerField(
         primary_key=True,
         unique=True,
     )
+
+
+
 
     # A qual evento o postback se refere.
     # No caso de transações: transaction_status_changed.

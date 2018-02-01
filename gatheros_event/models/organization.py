@@ -95,7 +95,9 @@ class Organization(models.Model, GatherosModelMixin):
         null=True,
         verbose_name='dados para recebimento'
     )
+
     active = models.BooleanField(default=True, verbose_name='ativo')
+
     internal = models.BooleanField(
         default=True,
         verbose_name='interno'
@@ -175,7 +177,6 @@ class Organization(models.Model, GatherosModelMixin):
     )
 
     # Dados da "conta bancaria"  do Pagar.me
-
     active_bank_account = models.BooleanField(default=False)
 
     bank_account_id = models.IntegerField(
@@ -198,7 +199,6 @@ class Organization(models.Model, GatherosModelMixin):
     )
 
     # Dados de recebedor do Pagar.me
-
     active_recipient = models.BooleanField(default=False)
 
     recipient_id = models.CharField(
@@ -293,6 +293,13 @@ class Organization(models.Model, GatherosModelMixin):
         """ Verifica se membro está ativo na organização. """
         member = self.get_member(person)
         return member.active if member else False
+
+    def is_bank_account_configured(self):
+        """ Verifica se possui dados bancários cadastrado no sistema """
+        if self.agency and self.account and self.cnpj_ou_cpf and self.legal_name and self.account_type:
+            return True
+
+        return False
 
     def get_invitations(self, include_expired=True, limit=None):
         """

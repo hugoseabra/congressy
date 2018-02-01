@@ -9,7 +9,7 @@ from gatheros_event import forms
 from gatheros_event.views.mixins import AccountMixin
 
 from gatheros_event.helpers import account
-from gatheros_event.models import Organization
+from payment.tasks import create_pagarme_recipient
 
 
 class BaseOrganizationView(AccountMixin, View):
@@ -157,3 +157,14 @@ class OrganizationFinancialEditFormView(OrganizationEditFormView):
     success_message = 'Informações bancárias salvas com sucesso.'
     success_url = reverse_lazy('event:event-list')
     form_class = forms.OrganizationFinancialForm
+
+    def post(self, request, *args, **kwargs):
+
+        response = super(OrganizationFinancialEditFormView, self).post(request, *args, **kwargs)
+
+        create_pagarme_recipient(self.object)
+
+        return response
+
+
+
