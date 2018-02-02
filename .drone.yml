@@ -25,10 +25,10 @@ pipeline:
       - source: FORCE_HTTPS_STAGING
         target: FORCE_HTTPS
     commands:
-      - echo "AWS_KEY=${AWS_KEY}"
-      - echo "AWS_SECRET=${AWS_SECRET}"
-      - echo "DOMAIN=${DOMAIN}"
-      - echo "FORCE_HTTPS=${FORCE_HTTPS}"
+      - echo "AWS_KEY=$${AWS_KEY}"
+      - echo "AWS_SECRET=$${AWS_SECRET}"
+      - echo "DOMAIN=$${DOMAIN}"
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS}"
       - echo "BUCKET_LOCATION=${BUCKET_LOCATION}"
       - echo "BUCKET_NAME=${BUCKET_NAME}"
       - echo "CRON_SYNC_MINUTES_OUT=${CRON_SYNC_MINUTES_OUT}"
