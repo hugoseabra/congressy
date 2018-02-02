@@ -90,7 +90,6 @@ pipeline:
       - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - cat ./bin/env/staging/env-cgsy-staging
       - sh ./bin/env/staging/start-cgsy-staging.sh
 
     when:
