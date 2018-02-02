@@ -29,8 +29,6 @@ services:
       - DBPASS=4UnADjyMjeeB7GSc
       - DBNAME=cgsyplatform
       - DBPORT=5499
-    labels:
-      - io.rancher.service.external_lb.endpoint=lb-cgsy
 
 networks:
   redis:
