@@ -27,6 +27,7 @@ from mailer.services import (
 from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
+from payment.models import Transaction
 
 
 class EventMixin(generic.View):
@@ -34,7 +35,8 @@ class EventMixin(generic.View):
 
     def dispatch(self, request, *args, **kwargs):
         self.event = get_object_or_404(Event, slug=self.kwargs.get('slug'))
-        return super().dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -450,3 +452,90 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             )
 
         return redirect('public:hotsite-subscription', slug=self.event.slug)
+
+
+class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
+
+    template_name = 'hotsite/subscription_status.html'
+    person = None
+    subscription = None
+
+    def dispatch(self, request, *args, **kwargs):
+
+        response = super().dispatch(request, *args, **kwargs)
+
+        self.person = self.get_person()
+
+        if not request.user.is_authenticated or not self.person:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        self.is_subscribed()
+
+        if not self.subscription:
+            messages.error(message='Você não possui inscrição neste evento.', request=request)
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        return response
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context['person'] = self.get_person()
+        context['is_subscribed'] = self.is_subscribed()
+        context['transactions'] = self.get_transactions()
+
+        return context
+
+    def get_person(self):
+        """ Se usuario possui person """
+        if not self.request.user.is_authenticated or self.person:
+            return self.person
+        else:
+            try:
+                self.person = self.request.user.person
+            except (ObjectDoesNotExist, AttributeError):
+                pass
+
+        return self.person
+
+    def is_subscribed(self):
+        """
+            Se já estiver inscrito retornar True
+        """
+        user = self.request.user
+
+        if user.is_authenticated:
+            try:
+                person = user.person
+                subscription = Subscription.objects.get(person=person, event=self.event)
+                self.subscription = subscription
+                return True
+
+            except (Subscription.DoesNotExist, AttributeError):
+                pass
+
+        return False
+
+    def subscriber_has_account(self, email):
+        if self.request.user.is_authenticated:
+            return True
+
+        try:
+            User.objects.get(email=email)
+            return True
+
+        except User.DoesNotExist:
+            pass
+
+        return False
+
+    def get_transactions(self):
+
+        try:
+            transactions = Transaction.objects.filter(subscription=self.subscription)
+        except Transaction.DoesNotExist:
+            return False
+
+        return transactions
+

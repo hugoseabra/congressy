@@ -29,6 +29,7 @@ def create_pagarme_transaction(payment=None, subscription=None):
 
 # @TODO create a mock of the response to use during testing
 def create_pagarme_recipient(organization=None):
+
     if not organization:
         return
 

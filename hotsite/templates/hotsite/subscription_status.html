@@ -1,0 +1,346 @@
+{% load static base_tags user_agents user_agent_tag %}
+
+<!DOCTYPE html>
+<!-- Drew - A Multipurpose Landing Page Template, designed by David Rozando (http://design.davidrozando.com) -->
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html lang="en"> <!--<![endif]-->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- BASIC INFO -->
+    <title>{{ event.name }} | Congressy</title>
+    <meta name="author" content="{{ event.organization }}">
+    <meta name="description"
+          content="{{ info.description }}">
+
+    <!-- FAVICONS -->
+    <link rel="icon" href="{% static 'hotsite/images/favicons/favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'hotsite/images/favicons/apple-touch-icon.png' %}">
+
+    <!-- CSS
+    ================================= -->
+
+    <!-- GOOGLE FONTS -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
+
+    <!-- LIBRARIES CSS -->
+    <link rel="stylesheet" href="{% static 'hotsite/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/animate.min.css' %}">
+
+    <!-- SPECIFIC CSS -->
+    <link rel="stylesheet" href="{% static 'hotsite/css/style.css' %}">
+
+    <!-- COLORS -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/pink.css"> -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/red.css"> -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/orange.css"> -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/yellow.css"> -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/green.css"> -->
+    <!-- <link id="color-css" rel="stylesheet" href="css/colors/turquoise.css"> -->
+    <link id="color-css" rel="stylesheet" href="{% static 'hotsite/css/colors/blue.css' %}">
+    <style>
+        img.blurred {
+            -webkit-filter: blur(18px);
+            -moz-filter: blur(18px);
+            -o-filter: blur(18px);
+            -ms-filter: blur(18px);
+            filter: blur(18px);
+        }
+
+        .form-group {
+            margin: 4px 0;
+        }
+
+        input#id_city, input#id_city_search {
+            text-transform: uppercase;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-320.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-360.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-375.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-384.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-412.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-414.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-480.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-600.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-768.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-800.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-1024.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-1280.css' %}">
+</head>
+
+<body class="enable-animations">
+
+<div id="document" class="document">
+
+    <!-- HEADER
+    ================================= -->
+    <header id="header"
+            class="header-section section section-dark navbar navbar-fixed-top">
+
+        <div class="container-fluid">
+
+            <div class="navbar-header navbar-left">
+
+                <!-- RESPONSIVE MENU BUTTON -->
+                <button type="button" class="navbar-toggle"
+                        data-toggle="collapse" data-target="#navigation">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+                <!-- HEADER LOGO -->
+                <a class="navbar-logo navbar-brand" href="{% url 'public:hotsite' event.slug %}">
+                    <img src="{% static 'hotsite/images/logos/header-logo.png' %}"
+                         srcset="{% static 'hotsite/images/logos/header-logo@2x.png' %}"
+                         alt="Congressy">
+                </a>
+            </div>
+
+            <nav id="navigation"
+                 class="navigation navbar-collapse collapse navbar-right">
+
+                <!-- NAVIGATION LINKS -->
+                <ul id="header-nav" class="nav navbar-nav">
+
+                    <li><a href="#hero" class="anchor-link">Capa</a></li>
+                    <li><a href="#about" class="anchor-link">Sobre o evento</a>
+                    </li>
+                    {% if event.place %}
+                        <li><a href="#map" class="anchor-link">Local</a></li>
+                    {% endif %}
+                    {% if not event.organization.internal %}
+                        <li><a href="#owner" class="anchor-link">Organizador</a>
+                    {% endif %}
+                    </li>
+
+                    <!-- HEADER ACTION BUTTON -->
+                    {% if user.is_authenticated %}
+                        <li class="header-action-button dropdown dropdown-hover ">
+                            <a href="#" class="dropdown-toggle external" data-toggle="dropdown" role="button"
+                               aria-expanded="true" style="font-weight: bold">{{ user.first_name }}<span
+                                    class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{% url 'event:profile' %}" target="_blank">Minha conta</a>
+                                </li>
+                                <li><a href="{% url 'front:start' %}" target="_blank">Gerenciar</a></li>
+                                <li>
+                                    <a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}">Sair</a>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="header-action-button">
+                            <a href="{% url 'public:login' %}?next={% url 'public:hotsite' event.slug %}"
+                               class="external btn btn-primary">
+                                Entrar
+                            </a>
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+        </div>
+
+    </header>
+
+    <!-- HERO
+    ================================= -->
+    <section id="hero"
+             class="hero-section hero-layout-classic hero-layout-features-and-form section section-dark">
+
+        <div class="section-background">
+
+            <!-- IMAGE BACKGROUND -->
+            <div class="section-background-image parallax">
+                <img
+                        {% if info.image_main.default %}
+                            src="{{ info.image_main.default.url }}"
+                        {% else %}
+                            src=""
+                        {% endif %}
+                            alt="" style="opacity: 0.2;" class="blurred">
+            </div>
+        </div>
+
+        <div class="container">
+
+            <div class="hero-content">
+                <div class="hero-content-inner">
+
+                    <div class="hero-heading text-center row"
+                         data-animation="fadeIn">
+                        <div class="col-md-10 col-md-offset-1">
+
+                            <h1 class="hero-title">{{ event.name }}</h1>
+
+                            <p class="hero-tagline">
+                            <div>
+                                <i class="fa fa-calendar"></i>
+                                {{ period }}
+                            </div>
+                            {% if event.place %}
+                                <div>
+                                    <i class="fa fa-map-marker"></i>
+                                    {{ event.place.name }}
+                                </div>
+                            {% endif %}
+
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="hero-features row">
+
+                        {% if info.lead %}
+                            <div class="hero-features-left col-md-12">
+
+                                <p class="lead">
+                                    {{ info.lead }}
+                                </p>
+
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- DESCRIPTION
+    ================================= -->
+    <section id="about" class="about-section section">
+
+        <div class="container">
+
+            <h2 class="section-heading text-center">Status da sua inscrição</h2>
+
+            <div class="about-row row">
+                <div class="col-md-9 col-md-offset-2">
+
+
+                    {% if transactions %}
+                        <div class="well well-sm col-md-3" style="background-color:rgb(91,192,222); text-align: center">
+                            <p style="color: white; font-weight: bold">
+                                Aguardando pagamento
+                            </p>
+                        </div>
+
+                        <div class="progress" style="margin-top:75px">
+                            <div class="progress-bar progress-bar-success progress-bar-striped active"
+                                 role="progressbar"
+                                 style="width: 95%;background-color:#5cb85c!important;">
+                                <span class="sr-only"></span>
+                            </div>
+                        </div>
+
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th class="col-xs-1">Status</th>
+                                <th class="col-xs-2">Data</th>
+                                <th class="col-xs-3">Forma de Pagamento</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for transaction in transactions %}
+                                <tr>
+                                    {% if transaction.data.status == 'processing' or transaction.data.status == 'waiting_payment' or transaction.data.status == 'pending_refund' or transaction.data.status == 'chargedback' %}
+                                        <td><i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i></td>
+                                    {% elif transaction.data.status == 'authorized' or transaction.data.status == 'paid' or transaction.data.status == 'refunded' %}
+                                        <td><i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i></td>
+                                    {% elif transaction.data.status == 'refused' %}
+                                        <td><i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i></td>
+                                    {% else %}
+                                        <td><i class="fa fa-circle" aria-hidden="true"></i></td>
+                                    {% endif %}
+
+                                    <td>
+                                        {% to_datetime transaction.data.date_created as created_date%}
+                                        {{ created_date  }}h</td>
+                                    <td>
+                                        {% if transacton.data.payment_method == 'boleto' %}
+                                            Boleto
+                                            <a class="text-muted" href="{{ transaction.data.boleto_url }}">
+                                                Link para boleto
+                                            </a>
+                                        {% else %}
+                                            Cartão de Crédito
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                    {% else %}
+                        <div class="well well-sm col-md-4" style="background-color: rgb(92,184,92) ;">
+                            <p style="color: white; font-weight: bold">
+                                Inscrição realizada com sucesso!
+                            </p>
+                        </div>
+                    {% endif %}
+
+
+                </div>
+            </div>
+
+    </section>
+
+    <!-- CONGRESSY FOOTER
+    ================================= -->
+    <section id="about-platform" class="footer-section section section-dark">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="footer-logo">
+                        <img src="{% static 'hotsite/images/logos/header-logo.png' %}"
+                             srcset="
+                                {% static 'hotsite/images/logos/header-logo@2x.png' %}" alt="Congressy">
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- LIBRARIES JS
+================================= -->
+<script src="{% static 'hotsite/js/jquery-1.11.2.min.js' %}"></script>
+<script src="{% static 'hotsite/js/typeahead.js' %}"></script>
+<script src="{% static 'hotsite/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'hotsite/js/respimage.min.js' %}"></script>
+<script src="{% static 'hotsite/js/jpreloader.min.js' %}"></script>
+<script src="{% static 'hotsite/js/smoothscroll.min.js' %}"></script>
+<script src="{% static 'hotsite/js/jquery.inview.min.js' %}"></script>
+<script src="{% static 'hotsite/js/jquery.counterup.min.js' %}"></script>
+<script src="{% static 'hotsite/js/jquery.stellar.min.js' %}"></script>
+<script src="{% static 'hotsite/js/responsiveslides.min.js' %}"></script>
+<script src="{% static 'assets/js/vendor/bind.min.js' %}"></script>
+
+<script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+
+
+<!-- MAIN SCRIPT
+================================= -->
+<script src="{% static 'hotsite/js/script.js' %}"></script>
+<script src="{% static 'assets/js/cgsy.js' %}"></script>
+</body>
+
+</html>

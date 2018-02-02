@@ -228,25 +228,18 @@
                             {% endif %}
 
                         </div>
-
-                        {% if  subscription_enabled %}
-                            {% if has_paid_lots and has_configured_bank_account and not has_active_bank_account %}
-                                <div class="hero-features-right col-md-5"
-                                     data-animation="fadeIn">
-
+                        <div class="hero-features-right col-md-5"
+                             data-animation="fadeIn">
+                            {% if  subscription_enabled %}
+                                {% if has_paid_lots and has_configured_bank_account and not has_active_bank_account %}
                                     <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
                                         Evento está sendo configurado, volte em breve para realizar sua inscrição!</p>
-
-                                </div>
-                            {% else %}
-                                <div class="hero-features-right col-md-5"
-                                     data-animation="fadeIn">
-
+                                {% else %}
                                     {% include 'hotsite/simple_form.html' %}
-
-                                </div>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
+
+                        </div>
 
                     </div>
 
