@@ -62,9 +62,9 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - echo "AWS_KEY=${AWS_KEY}"
-      - echo "AWS_SECRET=${AWS_SECRET}"
-      - echo "DOMAIN=${DOMAIN_STAGING}"
+      - echo "AWS_KEY=$${AWS_KEY}"
+      - echo "AWS_SECRET=$${AWS_SECRET}"
+      - echo "DOMAIN=$${DOMAIN_STAGING}"
       - echo "DOMAIN=${DOMAIN_STAGING}"
       - echo "FORCE_HTTPS=${FORCE_HTTPS_STAGING}"
       - echo "BUCKET_LOCATION=${BUCKET_LOCATION}"
