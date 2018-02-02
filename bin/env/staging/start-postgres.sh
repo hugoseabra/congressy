@@ -7,7 +7,7 @@ set -e
 ##############################################################################
 
 # o docker-compose do staging pode depender de um env-file que pode não existir
-touch ./env-cgsy-staging
+touch ./bin/env/staging/env-cgsy-staging
 
 # Kill staging image because of dependency of network
 docker-compose -f ./bin/env/staging/docker-compose.yml down
