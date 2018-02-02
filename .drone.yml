@@ -61,6 +61,20 @@ pipeline:
     image: tmaier/docker-compose
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    secrets: [
+      aws_key,
+      aws_secret,
+      domain_staging,
+      force_https_staging,
+      bucket_location,
+      bucket_name,
+      cron_sync_minutes_out,
+      cron_sync_minutes_in,
+      dbhost_staging,
+      dbuser_staging,
+      dbname_staging,
+      dbport_staging
+    ]
     commands:
       - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/staging/env-cgsy-staging
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/staging/env-cgsy-staging
