@@ -15,12 +15,20 @@ pipeline:
     image: tmaier/docker-compose
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    secrets:
+      - source: AWS_KEY
+        target: AWS_KEY
+      - source: AWS_SECRET
+        target: AWS_SECRET
+      - source: DOMAIN_STAGING
+        target: DOMAIN
+      - source: FORCE_HTTPS_STAGING
+        target: FORCE_HTTPS
     commands:
-      - echo "AWS_KEY=$${AWS_KEY}"
-      - echo "AWS_SECRET=$${AWS_SECRET}"
-      - echo "DOMAIN=$${DOMAIN_STAGING}"
-      - echo "DOMAIN=${DOMAIN_STAGING}"
-      - echo "FORCE_HTTPS=${FORCE_HTTPS_STAGING}"
+      - echo "AWS_KEY=${AWS_KEY}"
+      - echo "AWS_SECRET=${AWS_SECRET}"
+      - echo "DOMAIN=${DOMAIN}"
+      - echo "FORCE_HTTPS=${FORCE_HTTPS}"
       - echo "BUCKET_LOCATION=${BUCKET_LOCATION}"
       - echo "BUCKET_NAME=${BUCKET_NAME}"
       - echo "CRON_SYNC_MINUTES_OUT=${CRON_SYNC_MINUTES_OUT}"
