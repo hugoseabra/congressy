@@ -1,7 +1,11 @@
 # pylint: disable=W5101
 
-from django.db import models
 import uuid
+
+from django.contrib.postgres.fields import JSONField
+from django.db import models
+
+from gatheros_subscription.models import Subscription
 
 
 class Transaction(models.Model):
@@ -13,60 +17,9 @@ class Transaction(models.Model):
         primary_key=True
     )
 
-    # ID da transação.
-    transaction_id = models.IntegerField(
-        primary_key=True,
-        unique=True,
+    subscription = models.ForeignKey(
+        Subscription,
+        on_delete=models.DO_NOTHING
     )
 
-
-
-
-    # A qual evento o postback se refere.
-    # No caso de transações: transaction_status_changed.
-    # Já para subscriptions: subscription_status_changed.
-    event = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-    )
-
-    # Status anterior da transação.
-    old_status = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-    )
-
-    # Status ideal para objetos deste tipo, em um fluxo normal, onde autorização e captura são feitos com sucesso,
-    # por exemplo.
-    desired_status = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-    )
-
-    # Status para o qual efetivamente mudou.
-    current_status = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-    )
-
-    # Qual o tipo do objeto referido.
-    # No caso de transações o valor é 'transaction'.
-    # No caso de assinaturas, o valor é 'subscription'
-    type_of_object = models.CharField(
-        max_length=50,
-        blank=True,
-        null=True,
-    )
-
-    # Possui todas as informações do objeto.
-    # Para acessar objetos internos basta acessar a chave transaction[objeto1][objeto2].
-    # Ex: para acessar o ddd: transaction[phone][ddd]
-    transaction = models.TextField(
-        blank=True,
-        null=True,
-    )
-
+    data = JSONField()

@@ -176,9 +176,6 @@ class Organization(models.Model, GatherosModelMixin):
         verbose_name='Tipo de Conta'
     )
 
-    # Dados da "conta bancaria"  do Pagar.me
-    active_bank_account = models.BooleanField(default=False)
-
     bank_account_id = models.IntegerField(
         null=True,
         blank=True,
@@ -189,8 +186,6 @@ class Organization(models.Model, GatherosModelMixin):
         blank=True,
         null=True,
     )
-
-    charge_transfer_fees = models.BooleanField(default=False)
 
     date_created = models.CharField(
         max_length=50,

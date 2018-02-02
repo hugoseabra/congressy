@@ -439,7 +439,8 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 messages.error(self.request, message=e.message)
                 return self.render_to_response(context)
 
-            create_pagarme_transaction(payment=transaction_instance_data.transaction_instance_data)
+            create_pagarme_transaction(payment=transaction_instance_data.transaction_instance_data,
+                                       subscription=subscription)
             subscription.save()
             notify_new_subscription(self.event, subscription)
 

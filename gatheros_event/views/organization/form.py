@@ -161,7 +161,6 @@ class OrganizationFinancialEditFormView(OrganizationEditFormView):
     def post(self, request, *args, **kwargs):
 
         response = super(OrganizationFinancialEditFormView, self).post(request, *args, **kwargs)
-
         create_pagarme_recipient(self.object)
 
         return response

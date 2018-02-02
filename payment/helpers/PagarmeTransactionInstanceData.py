@@ -1,3 +1,4 @@
+import uuid
 from django.conf import settings
 
 from gatheros_event.models import Organization
@@ -42,6 +43,8 @@ class PagarmeTransactionInstanceData:
 
     def _parametrize_instance_data(self):
 
+        transaction_id = uuid.uuid4()
+
         self.transaction_instance_data = {
 
             "customer": {
@@ -77,7 +80,7 @@ class PagarmeTransactionInstanceData:
 
             "items": [
                 {
-                    "id": "000",
+                    "id": str(transaction_id),
                     "title": "Inscrição do Evento: " + self.organization.name,
                     "unit_price": self.extra_data['amount'],
                     "quantity": 1,
