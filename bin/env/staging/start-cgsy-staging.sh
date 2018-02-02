@@ -7,4 +7,4 @@ set -e
 ##############################################################################
 
 docker-compose -f ./bin/env/staging/docker-compose.yml down
-docker-compose -f ./bin/env/staging/docker-compose.yml up -d
+docker-compose -f ./bin/env/staging/docker-compose.yml --verbose up -d
