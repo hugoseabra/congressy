@@ -11,52 +11,6 @@ clone:
 
 # Steps of deploy, according to configurations and conditionals
 pipeline:
-  create-db-prod-backup:
-    image: postgres:9.6-alpine
-    volumes:
-      - /tmp/bkp:/tmp/bkp
-    commands:
-      - ./bin/env/staging/backup-prod-db.sh
-    when:
-      branch: [ hotfix/*, release/* ]
-
-  recreate-staging-db:
-    image: tmaier/docker-compose
-    pull: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - sh ./bin/env/staging/start-postgres.sh
-    when:
-      branch:
-        include: [ hotfix/*, release/* ]
-
-  save-staging-version:
-    image: alpine
-    pull: true
-    commands:
-      - basename ${DRONE_COMMIT_BRANCH} > version
-      - echo "${DRONE_BUILD_NUMBER}" > build_number
-      - echo "${DRONE_COMMIT_AUTHOR}" > build_author
-      - echo "${DRONE_BUILD_LINK}" > build_link
-    when:
-      branch: [ hotfix/*, release/* ]
-
-  build-staging-image:
-    image: docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - |
-        printf "Building version: `cat ./version` - build `cat ./build_number`"
-        printf " , por `cat ./build_author`\n\n"
-      - |
-        docker build \
-          -t cgsy-staging \
-          -f ./conf/staging/Dockerfile .
-    when:
-      branch: [ hotfix/*, release/* ]
-
   deploy-staging-env:
     image: tmaier/docker-compose
     volumes:
@@ -78,45 +32,4 @@ pipeline:
       #- sh ./bin/env/staging/start-cgsy-staging.sh
 
     when:
-      branch: [ hotfix/*, release/* ]
-
-  notify-staging-on-telegram:
-    image: appleboy/drone-telegram
-    pull: true
-    token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-#    to: -275808686 # ID chat Congressy
-    to: 245012348 # ID hugoseabra
-    format: markdown
-    message: >
-      *{{uppercase build.status }} - Ambiente RC*
-
-
-      *Repo:* {{ repo.name }} das {{datetime build.started "3:04PM" "UTC"}} às {{datetime build.finished"3:04PM" "UTC"}}
-
-      *Branch:* {{ commit.branch }}
-
-      *Build:* {{build.number}}
-
-      *Duração:* {{duration build.started build.finished}}
-
-      *Autor:* {{ commit.author }}
-
-      *Mensagem:*
-
-      ```
-      {{ commit.message }}
-      ```
-
-
-      *Ambiente:* https://test.congressy.com/login/
-
-
-      *Build Link:* {{ build.link }}
-
-
-      *Commit:* {{ commit.link }}
-
-
-    when:
-      status: [ success, failure ]
       branch: [ hotfix/*, release/* ]
