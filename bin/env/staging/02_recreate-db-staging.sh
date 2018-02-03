@@ -65,7 +65,7 @@ if [ -z "$CONTAINER_ACTIVE" ]; then
     # Se existe, garantir que esteja ativo
     else
         echo "Container '${CONTAINER_NAME}' já existe. Ativando-o ..."
-        docker-compose start
+        docker-compose -f ./bin/env/docker-compose.yml start
     fi
 else
     echo "Container '${CONTAINER_NAME}' está ativo."
