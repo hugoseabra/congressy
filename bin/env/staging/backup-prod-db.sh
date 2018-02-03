@@ -25,6 +25,9 @@ if [ ! -f "$BKP_FILE_PATH" ]; then
           --format=c \
           --verbose \
           cgsyplatform > ${BKP_FILE_PATH}
+    echo "1" > ${BKP_PATH}/recreate.txt
+else
+    echo "0" > ${BKP_PATH}/recreate.txt
 fi
 
 # Tamanho do arquivo
