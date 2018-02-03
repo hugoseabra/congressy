@@ -17,25 +17,45 @@ pipeline:
     commands:
       - export REF_TAG=$(git for-each-ref refs/tags --sort=-taggerdate --format='%(refname)' --count=1)
       - export LAST_TAG=$(basename $${REF_TAG})
-      - echo $${LAST_TAG} > last_tag
-      - cat last_tag
+      - echo $${LAST_TAG} > version
+      - cat version
     when:
       branch: [ hotfix/*, release/* ]
 
-  build-prod-images:
+#  build-prod-images:
+#    image: docker
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    commands:
+#      - |
+#        echo "Building latest version: `cat ./version`"
+#      - |
+#        docker build --rm \
+#          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest \
+#          -f ./conf/deploy/Dockerfile .
+#      - |
+#        echo "Building tagged version: `cat ./version`"
+#      - |
+#        docker build --rm \
+#          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:`cat ./version` \
+#          -f ./conf/deploy/Dockerfile .
+#    when:
+#      branch: [ hotfix/*, release/* ]
+
+  build-create-awsecr:
     image: docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    secrets: [
+      aws_key,
+      aws_secret,
+      aws_account_id
+    ]
     commands:
-      - |
-        echo "Building latest version: `cat ./version`"
-      - |
-        docker build --rm \
-          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest \
-          -f ./conf/deploy/Dockerfile .
-      - |
-        echo "Building tagged version: `cat ./version`"
-      - |
-        docker build --rm \
-          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:`cat ./last_tag` \
-          -f ./conf/deploy/Dockerfile .
+      - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/prod/env-awsecr
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/prod/env-awsecr
+      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ./bin/env/prod/env-awsecr
+      - cat ./bin/env/prod/env-awsecr
+      - sh ./bin/env/prod/create-awsecr-container.sh
+    when:
+      branch: [ hotfix/*, release/* ]
