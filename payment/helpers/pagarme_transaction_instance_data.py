@@ -1,4 +1,6 @@
 import uuid
+
+import absoluteuri
 from django.conf import settings
 
 from gatheros_event.models import Organization
@@ -45,6 +47,10 @@ class PagarmeTransactionInstanceData:
 
         transaction_id = uuid.uuid4()
 
+        postback_url = absoluteuri.reverse('public:payment_postback_url', kwargs={
+            'uidb64': transaction_id
+        })
+
         self.transaction_instance_data = {
 
             "customer": {
@@ -64,6 +70,8 @@ class PagarmeTransactionInstanceData:
                         '-', '')],
                 "birthday": self.person.birth_date.strftime('%Y-%m-%d'),
             },
+
+            "postback_url": postback_url,
 
             "billing": {
                 "name": self.person.name,

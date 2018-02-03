@@ -192,10 +192,10 @@
                                 {{ period }}
                             </div>
                             {% if event.place %}
-                            <div>
-                                <i class="fa fa-map-marker"></i>
-                                {{ event.place.name }}
-                            </div>
+                                <div>
+                                    <i class="fa fa-map-marker"></i>
+                                    {{ event.place.name }}
+                                </div>
                             {% endif %}
 
                             </p>
@@ -376,21 +376,40 @@
             error: handleError
         });
 
-        checkout.open({
-            amount: amount,
-            createToken: 'false',
-            paymentMethods: 'credit_card, boleto',
-            customerData: false,
-            items: [
-                {
-                    id: '1',
-                    title: billing_title,
-                    unit_price: amount,
-                    quantity: 1,
-                    tangible: true
-                }
-            ]
-        });
+        if (window.location.search.substr(1) != "") {
+            checkout.open({
+                amount: amount,
+                createToken: 'false',
+                paymentMethods: window.location.search.substr(1),
+                customerData: false,
+                items: [
+                    {
+                        id: '1',
+                        title: billing_title,
+                        unit_price: amount,
+                        quantity: 1,
+                        tangible: true
+                    }
+                ]
+            });
+        } else {
+            checkout.open({
+                amount: amount,
+                createToken: 'false',
+                paymentMethods: 'credit_card, boleto',
+                customerData: false,
+                items: [
+                    {
+                        id: '1',
+                        title: billing_title,
+                        unit_price: amount,
+                        quantity: 1,
+                        tangible: true
+                    }
+                ]
+            });
+        }
+
 
     });
 

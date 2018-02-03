@@ -315,7 +315,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
         subscribed = self.is_subscribed()
         enabled = self.subscription_enabled()
-        if not enabled or subscribed:
+        if not enabled:
             return redirect('public:hotsite', slug=self.event.slug)
 
         return response
@@ -484,6 +484,8 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         context['person'] = self.get_person()
         context['is_subscribed'] = self.is_subscribed()
         context['transactions'] = self.get_transactions()
+        context['allow_transaction'] = self.get_allowed_transaction()
+
 
         return context
 
@@ -538,4 +540,30 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
             return False
 
         return transactions
+
+    def get_allowed_transaction(self):
+
+        found_boleto = False
+        found_credit_card = False
+
+        try:
+            transactions = Transaction.objects.filter(subscription=self.subscription)
+
+            for transaction in transactions:
+                if transaction.data['payment_method'] == 'boleto':
+                    found_boleto = True
+                elif transaction.data['payment_method'] == 'credit_card':
+                    found_credit_card = True
+                if found_boleto and found_credit_card:
+                    return False
+        except Transaction.DoesNotExist:
+            return False
+
+        if found_credit_card:
+            return 'boleto'
+
+        if found_boleto:
+            return 'credit_card'
+
+        return False
 

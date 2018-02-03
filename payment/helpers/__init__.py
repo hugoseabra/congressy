@@ -1,1 +1,1 @@
-from .PagarmeTransactionInstanceData import PagarmeTransactionInstanceData
+from .pagarme_transaction_instance_data import PagarmeTransactionInstanceData

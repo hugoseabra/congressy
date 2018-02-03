@@ -272,22 +272,37 @@
                                     {% endif %}
 
                                     <td>
-                                        {% to_datetime transaction.data.date_created as created_date%}
-                                        {{ created_date  }}h</td>
+                                        {% to_datetime transaction.data.date_created as created_date %}
+                                        {{ created_date }}h
+                                    </td>
                                     <td>
-                                        {% if transacton.data.payment_method == 'boleto' %}
+                                        {% if transaction.data.payment_method == 'boleto' %}
                                             Boleto
-                                            <a class="text-muted" href="{{ transaction.data.boleto_url }}">
-                                                Link para boleto
-                                            </a>
-                                        {% else %}
+                                            <br>
+                                            <small>
+                                                <a target="_blank" class="text-muted"
+                                                   href="{{ transaction.data.boleto_url }}">
+                                                    Link para boleto
+                                                </a>
+                                            </small>
+                                        {% elif transaction.data.payment_method == 'credit_card' %}
                                             Cartão de Crédito
+                                        {% else %}
+                                            Error
                                         {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
                         </table>
+
+                        {% if allow_transaction %}
+                            <a class="btn btn-success btn-xs"
+                               target="_blank"
+                               href="{% url 'public:hotsite-subscription' event.slug %}?{{ allow_transaction }}">
+                                Novo pagamento
+                            </a>
+                        {% endif %}
 
                     {% else %}
                         <div class="well well-sm col-md-4" style="background-color: rgb(92,184,92) ;">
