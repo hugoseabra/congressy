@@ -64,8 +64,8 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - docker exec -ti push cgsy:latest
-      - docker exec -ti push cgsy:`cat ./version`
+      - docker exec -ti awsecr push cgsy:latest
+      - docker exec -ti awsecr push cgsy:`cat ./version`
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     when:
       branch: [ hotfix/*, release/* ]
