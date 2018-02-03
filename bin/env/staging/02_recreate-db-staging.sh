@@ -28,21 +28,33 @@ function error_msg() {
     echo ;
 }
 
-BKP_DIR="/tmp/bkp"
-BKP_DUMP_DIR="$BKP_DIR/backup"
-
-CONTAINER_EXISTS=$(docker ps -q -f name=cgsy-postgres)
-RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
-RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
-
-# Caso container não exista OU não será recriado e não está rodando
-if [ -z "$CONTAINER_EXISTS" ] || [ "$RECREATE" == "0" ] && [ "$RUNNING" != "true" ]; then
+function update_postgres_service() {
     docker-compose -f ./bin/env/docker-compose.yml up -d
     sleep 5
 
     if [ "$RUNNING" != "true" ]; then
         error_msg "Container não subiu."
         exit 1
+    fi
+}
+
+BKP_DIR="/tmp/bkp"
+BKP_DUMP_DIR="$BKP_DIR/backup"
+
+RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
+CONTAINER_EXISTS=$(docker ps -q -f name=cgsy-postgres)
+
+# Caso container não exista
+if [ -z "$CONTAINER_EXISTS" ]; then
+    update_postgres_service
+
+# Se existir, verificar se não está rodando e não será recriado.
+else
+
+    RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
+
+    if [ "$RECREATE" == "0" ] && [ "$RUNNING" != "true" ]; then
+        update_postgres_service
     fi
 fi
 
@@ -63,14 +75,7 @@ if [ "$RECREATE" == "1" ]; then
     docker-compose -f ./bin/env/docker-compose.yml down
 
     # Recria tudo novamente
-    docker-compose -f ./bin/env/docker-compose.yml up -d
-    sleep 5
-
-    RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
-    if [ "$RUNNING" != "true" ]; then
-        error_msg "Container não subiu."
-        exit 1
-    fi
+    update_postgres_service
 else
     echo "Banco de dados não será recriado."
 fi
