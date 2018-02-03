@@ -44,7 +44,7 @@ BKP_DUMP_DIR="$BKP_DIR/backup"
 
 CONTAINER_NAME="cgsy-postgres"
 
-CONTAINER_ACTIVE=$(docker ps -f name=${CONTAINER_NAME})
+CONTAINER_ACTIVE=$(docker ps -qf name=${CONTAINER_NAME})
 RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
 
 # Se container do Banco de dados não existe e está configurado para
@@ -54,7 +54,7 @@ RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
 if [ -z "$CONTAINER_ACTIVE" ]; then
 
     # Verificar nos containers desativados.
-    CONTAINER_EXISTS=$(docker ps -a -f name=${CONTAINER_NAME})
+    CONTAINER_EXISTS=$(docker ps -aqf name=${CONTAINER_NAME})
 
     if [ -z "$CONTAINER_EXISTS" ]; then
         if [ "$RECREATE" == "0" ]; then
