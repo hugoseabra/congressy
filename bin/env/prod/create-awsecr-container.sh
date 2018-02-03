@@ -33,6 +33,7 @@ if [ -z "$CONTAINER_ACTIVE" ]; then
     if [ -z "$CONTAINER_EXISTS" ]; then
         docker pull ${IMAGE_NAME}
         docker run -tid \
+            -v /var/run/docker.sock:/var/run/docker.sock \
             --name ${CONTAINER_NAME} \
             --env-file ${ENV_FILE_NAME} \
             ${IMAGE_NAME}
