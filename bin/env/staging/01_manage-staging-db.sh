@@ -21,6 +21,17 @@ set -e
 #
 # OBS: deve-se ter certeza que o container subiu.
 ###############################################################################
+
+function error_msg() {
+    local RED='\033[1;31m'
+    local NC='\033[0m' # No Color
+    echo ;
+    echo ;
+    echo -e "${RED}$RESULT${NC}"
+    echo ;
+    echo ;
+}
+
 BASE=$(dirname "$0")
 
 BKP_DIR="/tmp/bkp"
@@ -101,10 +112,10 @@ if [ "$RECREATE" == "1" ]; then
 
     RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
     if [ "$RUNNING" != "true" ]; then
-        echo "Container não subiu."
+        error_msg "Container não subiu."
         exit 1
     fi
-else:
+else
     echo "Banco de dados não será recriado."
 fi
 echo "------------------------------------------------------------------------"

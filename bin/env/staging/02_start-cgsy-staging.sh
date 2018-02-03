@@ -9,17 +9,26 @@ set -e
 #
 # OBS: deve-se ter certeza que o container subiu.
 ###############################################################################
+function error_msg() {
+    local RED='\033[1;31m'
+    local NC='\033[0m' # No Color
+    echo ;
+    echo ;
+    echo -e "${RED}$RESULT${NC}"
+    echo ;
+    echo ;
+}
 
 docker-compose -f ./bin/env/staging/docker-compose.yml down
 docker-compose -f ./bin/env/staging/docker-compose.yml up -d
-sleep 5
+sleep 10
 
-echo ; echo ;
+echo ;
 docker logs cgsy-staging
-echo ; echo ;
+echo ;
 
 RUNNING=$(docker inspect -f {{.State.Running}} cgsy-staging)
 if [ "$RUNNING" != "true" ]; then
-    echo "Container não subiu."
+    error_msg "Container não subiu."
     exit 1
 fi
