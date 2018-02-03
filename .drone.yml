@@ -15,7 +15,7 @@ pipeline:
     image: indiehosters/git
     pull: true
     commands:
-      - git describe --abbrev=0 > ./version
+#      - git describe --abbrev=0 > ./version
       - echo ${DRONE_TAG}
     when:
       status: [ success, failure ]
