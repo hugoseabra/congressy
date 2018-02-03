@@ -11,6 +11,8 @@ ENV DEBIAN_FRONTEND noninteractive
 # Helps on collecting static
 ENV DJANGO_SETTINGS_MODULE project.settings.prod
 
+LABEL cgsy.image.name="cgsy-platform-production"
+
 # -----------------------------------------------------------------------------
 # Basics
 RUN apt-get update -q && apt-get install -qy --no-install-recommends \
