@@ -94,7 +94,6 @@ pipeline:
       - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - cat ./bin/env/staging/env-cgsy-staging
-      - sh ./bin/env/staging/03_start-cgsy-staging.sh
       #- docker system prune -f --filter 'label=cgsy_env=staging'
     when:
       branch: [ hotfix/*, release/* ]
