@@ -36,7 +36,7 @@ RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
 RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
 
 # Caso container não exista OU não será recriado e não está rodando
-if [ -z "$CONTAINER_EXISTS" == ] || [ "$RECREATE" == "0" ] && [ "$RUNNING" != "true" ]; then
+if [ -z "$CONTAINER_EXISTS" ] || [ "$RECREATE" == "0" ] && [ "$RUNNING" != "true" ]; then
     docker-compose -f ./bin/env/docker-compose.yml up -d
     sleep 5
 
