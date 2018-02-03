@@ -67,7 +67,7 @@ else
 fi
 
 # Se será recriado, tudo certo.
-if [ "$RECREATE" == "1" ]
+if [ "$RECREATE" == "1" ]; then
     echo "Recriando banco de dados."
 
     # o docker-compose do staging pode depender de um env-file que pode não
