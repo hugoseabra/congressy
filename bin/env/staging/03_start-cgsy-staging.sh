@@ -21,7 +21,7 @@ function error_msg() {
 
 docker-compose -f ./bin/env/staging/docker-compose.yml down
 docker-compose -f ./bin/env/staging/docker-compose.yml up -d
-sleep 5
+sleep 10
 
 echo ;
 docker logs cgsy-staging
