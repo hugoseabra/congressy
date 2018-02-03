@@ -22,25 +22,25 @@ pipeline:
     when:
       branch: [ hotfix/*, release/* ]
 
-#  build-prod-images:
-#    image: docker
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    commands:
-#      - |
-#        echo "Building latest version: `cat ./version`"
-#      - |
-#        docker build --rm \
-#          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest \
-#          -f ./conf/deploy/Dockerfile .
-#      - |
-#        echo "Building tagged version: `cat ./version`"
-#      - |
-#        docker build --rm \
-#          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:`cat ./version` \
-#          -f ./conf/deploy/Dockerfile .
-#    when:
-#      branch: [ hotfix/*, release/* ]
+  build-prod-images:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        echo "Building latest version: `cat ./version`"
+      - |
+        docker build --rm \
+          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest \
+          -f ./conf/deploy/Dockerfile .
+      - |
+        echo "Building tagged version: `cat ./version`"
+      - |
+        docker build --rm \
+          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:`cat ./version` \
+          -f ./conf/deploy/Dockerfile .
+    when:
+      branch: [ hotfix/*, release/* ]
 
   build-create-awsecr:
     image: docker
@@ -56,5 +56,16 @@ pipeline:
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/prod/env-awsecr
       - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ./bin/env/prod/env-awsecr
       - sh ./bin/env/prod/create-awsecr-container.sh
+    when:
+      branch: [ hotfix/*, release/* ]
+
+  publish-images:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - docker exec -ti push cgsy:latest
+      - docker exec -ti push cgsy:`cat ./version`
+      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     when:
       branch: [ hotfix/*, release/* ]
