@@ -42,7 +42,7 @@ BKP_FILE_PATH="$BKP_DUMP_DIR/$BKP_FILE_NAME.sql"
 # =============================================================================
 echo "========================================================================"
 echo "SUB-STEP 1: iniciando"
-echo "========================================================================"
+echo "------------------------------------------------------------------------"
 if [ ! -f "$BKP_FILE_PATH" ]; then
     # Dump do DB
     PGPASSWORD=4UnADjyMjeeB7GSc pg_dump \
@@ -65,7 +65,7 @@ echo "Backup size: `du -h ${BKP_FILE_PATH}`"
 # onde onde será contruído o volume do container do cgsy-postgres.
 cp ${BASE}/01_potsgres-db-restore.sh ${BKP_DIR}/db-restore.sh
 
-echo "========================================================================"
+echo "------------------------------------------------------------------------"
 echo "SUB-STEP 1: finalizado"
 echo "========================================================================"
 
@@ -74,11 +74,11 @@ echo "========================================================================"
 # - (Re)Cria banco de dados completo, caso o dump do dia seja novo.
 # - Verifica se container realmente subiu.
 # =============================================================================]
-RECREATE=$(cat ${BKP_PATH}/recreate.txt)
+RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
 
 echo "========================================================================"
 echo "SUB-STEP 2: iniciando"
-echo "========================================================================"
+echo "------------------------------------------------------------------------"
 if [ "$RECREATE" == "1" ]; then
     echo "Recriando banco de dados."
 
@@ -107,6 +107,6 @@ if [ "$RECREATE" == "1" ]; then
 else:
     echo "Banco de dados não será recriado."
 fi
-echo "========================================================================"
+echo "------------------------------------------------------------------------"
 echo "SUB-STEP 2: finalizado"
 echo "========================================================================"
