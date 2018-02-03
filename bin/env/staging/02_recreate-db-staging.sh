@@ -42,28 +42,33 @@ function update_postgres_service() {
 BKP_DIR="/tmp/bkp"
 BKP_DUMP_DIR="$BKP_DIR/backup"
 
-CONTAINER_EXISTS=$(docker ps -q -f name=cgsy-postgres)
+CONTAINER_NAME="cgsy-postgres"
+
+CONTAINER_ACTIVE=$(docker ps -f name=${CONTAINER_NAME})
 RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
 
 # Se container do Banco de dados não existe e está configurado para
 # "não recriar", temos de vamos garantir que o serviço esteja ativo.
-if [ -z "$CONTAINER_EXISTS" ]; then
-    if [ "$RECREATE" == "0" ]; then
-        echo "Container 'cgsy-postgres' não existe. Criando ..."
-        update_postgres_service
-    fi
 
-# Se existe, garantir que esteja ativo
-else
-    echo "Container 'cgsy-postgres' já existe. Verificando status..."
-    RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
+# Se não há container ativo, verificar se existe.
+if [ -z "$CONTAINER_ACTIVE" ]; then
 
-    if [ "$RUNNING" == "false" ]; then
-        echo "Container 'cgsy-postgres' não está ativo. Ativando ..."
-        docker-compose start
+    # Verificar nos containers desativados.
+    CONTAINER_EXISTS=$(docker ps -a -f name=${CONTAINER_NAME})
+
+    if [ -z "$CONTAINER_EXISTS" ]; then
+        if [ "$RECREATE" == "0" ]; then
+            echo "Container '${CONTAINER_NAME}' não existe. Criando ..."
+            update_postgres_service
+        fi
+
+    # Se existe, garantir que esteja ativo
     else
-        echo "Container 'cgsy-postgres' está ativo."
+        echo "Container '${CONTAINER_NAME}' já existe. Ativando-o ..."
+        docker-compose start
     fi
+else
+    echo "Container '${CONTAINER_NAME}' está ativo."
 fi
 
 # Se será recriado, tudo certo.
