@@ -30,7 +30,7 @@ function error_msg() {
 
 function update_postgres_service() {
     docker-compose -f ./bin/env/docker-compose.yml up -d
-    sleep 5
+    sleep 10
 
     if [ "$RUNNING" != "true" ]; then
         error_msg "Container não subiu."
@@ -42,21 +42,24 @@ BKP_DIR="/tmp/bkp"
 BKP_DUMP_DIR="$BKP_DIR/backup"
 
 RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
-CONTAINER_EXISTS=$(docker ps -q -f name=cgsy-postgres)
 
-# Caso container não exista
-if [ -z "$CONTAINER_EXISTS" ]; then
-    update_postgres_service
+if [ "$RECREATE" == "0" ]; then
+    CONTAINER_EXISTS=$(docker ps -q -f name=cgsy-postgres)
 
-# Se existir, verificar se não está rodando e não será recriado.
-else
-
-    RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
-
-    if [ "$RECREATE" == "0" ] && [ "$RUNNING" != "true" ]; then
+    # Caso container não exista
+    if [ -z "$CONTAINER_EXISTS" ]; then
         update_postgres_service
+
+    # Se existir, verificar se está rodando.
+    else
+        RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
+
+        if [ "$RUNNING" != "true" ]; then
+            docker-compose start
+        fi
     fi
 fi
+
 
 if [ "$RECREATE" == "1" ]; then
     echo "Recriando banco de dados."
