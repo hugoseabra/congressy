@@ -1,0 +1,3 @@
+Redimensionar disco sem reboot.
+
+https://devops.profitbricks.com/tutorials/increase-the-size-of-a-linux-root-partition-without-rebooting/

@@ -52,7 +52,7 @@ pipeline:
         printf "Building version: `cat ./version` - build `cat ./build_number`"
         printf " , por `cat ./build_author`\n\n"
       - |
-        docker build \
+        docker build --rm \
           -t cgsy-staging \
           -f ./conf/staging/Dockerfile .
     when:
