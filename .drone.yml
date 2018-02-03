@@ -77,7 +77,7 @@ pipeline:
       - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-#      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - sh ./bin/env/staging/02_start-cgsy-staging.sh
     when:

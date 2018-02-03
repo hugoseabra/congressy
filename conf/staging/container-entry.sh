@@ -71,6 +71,8 @@ run_python_script "Coletando arquivos estáticos" "manage.py collectstatic --noi
 run_python_script_with_output "Executando migrate" "manage.py migrate"
 run_python_script_with_output "Populando banco de dados" "manage.py loaddata logtailer_filter logtailer_logfile"
 
+echo "Configured: SUCCESS"
+
 echo " > Iniciando SUPERVISOR"
 echo ;
 echo "########################################################################"
