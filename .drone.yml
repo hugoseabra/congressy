@@ -55,7 +55,6 @@ pipeline:
       - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/prod/env-awsecr
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/prod/env-awsecr
       - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ./bin/env/prod/env-awsecr
-      - cat ./bin/env/prod/env-awsecr
       - sh ./bin/env/prod/create-awsecr-container.sh
     when:
       branch: [ hotfix/*, release/* ]

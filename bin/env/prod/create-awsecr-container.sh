@@ -32,7 +32,7 @@ if [ -z "$CONTAINER_ACTIVE" ]; then
 
     if [ -z "$CONTAINER_EXISTS" ]; then
         docker pull ${IMAGE_NAME}
-        docker run --tid \
+        docker run -tid \
             --name ${CONTAINER_NAME} \
             --env-file ${ENV_FILE_NAME} \
             ${IMAGE_NAME}
