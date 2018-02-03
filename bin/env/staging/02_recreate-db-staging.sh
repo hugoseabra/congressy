@@ -32,7 +32,8 @@ function update_postgres_service() {
     docker-compose -f ./bin/env/docker-compose.yml up -d
     sleep 10
 
-    if [ "$RUNNING" != "true" ]; then
+    local RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
+    if [ "$RUNNING" == "false" ]; then
         error_msg "Container não subiu."
         exit 1
     fi
