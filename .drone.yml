@@ -22,21 +22,20 @@ pipeline:
     when:
       branch: [ hotfix/*, release/* ]
 
-
-#  build-prod-images:
-#    image: docker
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    commands:
-#      - |
-#        echo "Building latest version: `cat ./version`"
-#      - |
-#        docker build --rm \
-#          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest \
-#          -f ./conf/deploy/Dockerfile .
-#      - |
-#        echo "Building tagged version: `cat ./version`"
-#      - |
-#        docker build --rm \
-#          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:`cat ./version` \
-#          -f ./conf/deploy/Dockerfile .
+  build-prod-images:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        echo "Building latest version: `cat ./version`"
+      - |
+        docker build --rm \
+          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest \
+          -f ./conf/deploy/Dockerfile .
+      - |
+        echo "Building tagged version: `cat ./version`"
+      - |
+        docker build --rm \
+          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:`cat ./last_tag` \
+          -f ./conf/deploy/Dockerfile .
