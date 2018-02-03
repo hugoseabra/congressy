@@ -17,6 +17,12 @@ sleep 2
 docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
 sleep 5
 
+RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
+if [ "$RUNNING" != "true" ]; then
+    echo "Container não subiu."
+    exit 1
+fi
+
 python $BASE_DIR/manage.py migrate
 
 # Importando fixtures

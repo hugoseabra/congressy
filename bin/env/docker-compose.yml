@@ -1,3 +1,25 @@
+###############################################################################
+# CUIDADO!
+# Esta script é:
+#     - executado para ./bin/env/setup.sh para criar a estrutura de dados do
+#       ambiente de desenvolvimento (local); e,
+#     - gerenciado pelo CI.
+#
+# Não altere ou mude sem saber o que está fazendo.
+###############################################################################
+# CI-STEP: Destruir e (re)criar container de versão de staging
+#
+# - IMPORTANTE manter o nome do container como "cgsy-postgres" pois outros
+# - A versão do postgres:9.6 é importante, pois o RDS da AWS suporta a versão
+#   9.* apenas.
+#   scripts utilizam esta referência.
+# - O nome do banco de dados de dev, staging (RC) e prod serão o mesmo.
+# - O volume /tmp/bkp:/docker-entrypoint-initdb.d é construído para que o
+#   container execute os arquivos que estejam lá (*.sql, *.sh)
+# - O container expõe uma porta local por causa do ambiente DEV, o que não é
+#   muito legal para o servidor do ambiente staging. DEVE-SE TER CUIDADO ao
+#   gerenciar o servidor para não expor esta porta publicamente.
+###############################################################################
 version: '2.3'
 services:
   postgres:

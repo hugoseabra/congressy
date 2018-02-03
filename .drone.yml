@@ -11,25 +11,14 @@ clone:
 
 # Steps of deploy, according to configurations and conditionals
 pipeline:
-  create-db-prod-backup:
+  manage-staging-db:
     image: postgres:9.6-alpine
     volumes:
       - /tmp/bkp:/tmp/bkp
     commands:
-      - ./bin/env/staging/backup-prod-db.sh
+      - ./bin/env/staging/01_manage-staging-db.sh
     when:
       branch: [ hotfix/*, release/* ]
-
-  recreate-staging-db:
-    image: tmaier/docker-compose
-    pull: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - sh ./bin/env/staging/start-postgres.sh
-    when:
-      branch:
-        include: [ hotfix/*, release/* ]
 
   save-staging-version:
     image: alpine
@@ -88,10 +77,9 @@ pipeline:
       - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+#      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - sh ./bin/env/staging/start-cgsy-staging.sh
-
+      - sh ./bin/env/staging/02_start-cgsy-staging.sh
     when:
       branch: [ hotfix/*, release/* ]
 
