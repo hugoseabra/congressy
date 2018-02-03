@@ -22,8 +22,6 @@ services:
     ports:
       - "8080:80"
     env_file: ./env-cgsy-staging
-    labels:
-      "cgsy_env=staging"
 
 networks:
   postgres:
