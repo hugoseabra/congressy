@@ -16,6 +16,7 @@ pipeline:
     pull: true
     commands:
 #      - git describe --abbrev=0 > ./version
+      - git tag -l
       - echo ${DRONE_TAG}
     when:
       status: [ success, failure ]
