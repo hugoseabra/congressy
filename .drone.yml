@@ -13,6 +13,7 @@ clone:
 pipeline:
   backup-db-staging:
     image: postgres:9.6-alpine
+    pull: true
     volumes:
       - /tmp/bkp:/tmp/bkp
     commands:
@@ -60,6 +61,7 @@ pipeline:
 
   deploy-staging-env:
     image: tmaier/docker-compose
+    pull: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     secrets: [
@@ -91,7 +93,7 @@ pipeline:
       - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - sh ./bin/env/staging/02_start-cgsy-staging.sh
+      - sh ./bin/env/staging/03_start-cgsy-staging.sh
     when:
       branch: [ hotfix/*, release/* ]
 
