@@ -90,4 +90,6 @@ if [ "$RECREATE" == "1" ]; then
 
     # Recria tudo novamente
     update_postgres_service
+else:
+    echo "Os dados do banco de dados não foram resetados."
 fi
