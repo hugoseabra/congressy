@@ -31,7 +31,19 @@ function error_msg() {
 BKP_DIR="/tmp/bkp"
 BKP_DUMP_DIR="$BKP_DIR/backup"
 
-if [ $(cat ${BKP_DUMP_DIR}/recreate.txt) == "1" ]; then
+RECREATE=$(cat ${BKP_DUMP_DIR}/recreate.txt)
+RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
+if [ "$RECREATE" == "0" ] && [ "$RUNNING" != "true" ]; then
+    docker-compose -f ./bin/env/docker-compose.yml up -d
+    sleep 5
+
+    if [ "$RUNNING" != "true" ]; then
+        error_msg "Container não subiu."
+        exit 1
+    fi
+fi
+
+if [ "$RECREATE" == "1" ]; then
     echo "Recriando banco de dados."
 
     # o docker-compose do staging pode depender de um env-file que pode não
