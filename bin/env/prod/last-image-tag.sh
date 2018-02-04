@@ -15,13 +15,15 @@ function version {
     echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }';
 }
 
+BASE=$(dirname "$0")
+
 LAST_IMAGE=$(docker exec awsecr last-image cgsy)
 PATTERN="Repository: cgsy"
 PATTERN2="871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:"
 LAST_VERSION=${LAST_IMAGE//"$PATTERN"/""}
 LAST_VERSION=${LAST_VERSION//"$PATTERN2"/""}
 
-VERSION=$(cat ../../../version)
+VERSION=$(cat ${BASE}/../../../version)
 
 if [ $(version $LAST_VERSION) -gt $(version $VERSION) ]; then
     echo "Construindo imagem com versão '$LAST_VERSION' ..."
