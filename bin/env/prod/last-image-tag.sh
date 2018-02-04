@@ -19,7 +19,7 @@ LAST_IMAGE=$(docker exec awsecr last-image cgsy)
 PATTERN="Repository: cgsy"
 PATTERN2="871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:"
 LAST_VERSION=${LAST_IMAGE//"$PATTERN"/""}
-LAST_VERSION=${LAST_IMAGE//"$PATTERN2"/""}
+LAST_VERSION=${LAST_VERSION//"$PATTERN2"/""}
 
 VERSION=$(cat ../../../version)
 
