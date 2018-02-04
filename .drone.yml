@@ -65,7 +65,8 @@ pipeline:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - export LAST_IMAGE=$(docker exec awsecr last-image cgsy)
-      - echo $${LASET_IMAGE//871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy/""}
+      - echo $${LAST_IMAGE}
+      - echo $${LAST_IMAGE//871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy/""}
 #      - docker exec awsecr push cgsy:latest
 #      - docker exec awsecr push cgsy:`cat ./version`
 #      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
