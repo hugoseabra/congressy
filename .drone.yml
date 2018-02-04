@@ -33,9 +33,7 @@ pipeline:
       - |
         docker build --rm -t $${REPO}:latest -f ./conf/deploy/Dockerfile .
       - |
-        echo "Building tagged version: `cat ./version`"
-      - |
-        docker tag build $${REPO}:latest $${REPO}:`cat ./version`
+        docker tag tag $${REPO}:latest $${REPO}:`cat ./version`
     when:
       branch: [ hotfix/*, release/* ]
 
