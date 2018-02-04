@@ -11,38 +11,38 @@ clone:
 
 # Steps of deploy, according to configurations and conditionals
 pipeline:
-  save-prod-version:
-    image: indiehosters/git
-    pull: true
-    commands:
-      - export REF_TAG=$(git for-each-ref refs/tags --sort=-taggerdate --format='%(refname)' --count=1)
-      - export LAST_TAG=$(basename $${REF_TAG})
-      - echo $${LAST_TAG} > version
-      - cat version
-    when:
-      branch: [ hotfix/*, release/* ]
+#  save-prod-version:
+#    image: indiehosters/git
+#    pull: true
+#    commands:
+#      - export REF_TAG=$(git for-each-ref refs/tags --sort=-taggerdate --format='%(refname)' --count=1)
+#      - export LAST_TAG=$(basename $${REF_TAG})
+#      - echo $${LAST_TAG} > version
+#      - cat version
+#    when:
+#      branch: [ hotfix/*, release/* ]
+#
+#  build-prod-images:
+#    image: docker
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    commands:
+#      - |
+#        echo "Building latest version: `cat ./version`"
+#      - |
+#        docker build --rm \
+#          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest \
+#          -f ./conf/deploy/Dockerfile .
+#      - |
+#        echo "Building tagged version: `cat ./version`"
+#      - |
+#        docker build --rm \
+#          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:`cat ./version` \
+#          -f ./conf/deploy/Dockerfile .
+#    when:
+#      branch: [ hotfix/*, release/* ]
 
-  build-prod-images:
-    image: docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - |
-        echo "Building latest version: `cat ./version`"
-      - |
-        docker build --rm \
-          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest \
-          -f ./conf/deploy/Dockerfile .
-      - |
-        echo "Building tagged version: `cat ./version`"
-      - |
-        docker build --rm \
-          -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:`cat ./version` \
-          -f ./conf/deploy/Dockerfile .
-    when:
-      branch: [ hotfix/*, release/* ]
-
-  build-create-awsecr:
+  create-awsecr:
     image: docker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -64,8 +64,10 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - docker exec -i awsecr push cgsy:latest
-      - docker exec -i awsecr push cgsy:`cat ./version`
-      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
+      - export LAST_IMAGE=$(docker exec awsecr last-image cgsy)
+      - echo $${LASET_IMAGE//871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy/""}
+#      - docker exec awsecr push cgsy:latest
+#      - docker exec awsecr push cgsy:`cat ./version`
+#      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     when:
       branch: [ hotfix/*, release/* ]
