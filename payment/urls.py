@@ -12,5 +12,5 @@ public_payment_urls = [
 ]
 
 
-urlpatterns_public_account = [url(r'^', include(public_payment_urls))]
+urlpatterns = [url(r'^', include(public_payment_urls))]
 

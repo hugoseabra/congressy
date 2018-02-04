@@ -2,7 +2,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.http import Http404
 from payment.models import Transaction, TransactionStatus
-from rest_framework import status
 
 
 @api_view(['POST'])
@@ -19,11 +18,14 @@ def postback_url_view(request, uidb64):
             data=data
         )
 
+        transaction.data['status'] = data['current_status']
+        transaction.save()
+
         transaction_status.save()
+
         print(data)
 
     except Transaction.DoesNotExist:
-        print('dsadasdas')
         raise Http404
 
     return Response(status=201)

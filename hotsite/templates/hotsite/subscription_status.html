@@ -297,11 +297,22 @@
                         </table>
 
                         {% if allow_transaction %}
-                            <a class="btn btn-success btn-xs"
-                               target="_blank"
-                               href="{% url 'public:hotsite-subscription' event.slug %}?{{ allow_transaction }}">
-                                Novo pagamento
-                            </a>
+                            <form action="{% url 'public:hotsite-subscription' event.slug %}"
+                                  name="allowed_transaction"
+                                  method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="allowed_transaction" id="id_allowed_transaction"
+                                       value="{{ allow_transaction }}"/>
+                                <input type="hidden" name="subscription" id="id_subscription"
+                                       value="{{ subscription }}"/>
+                                <button class="btn btn-success btn-xs">Novo pagamento</button>
+                            </form>
+                            <script>
+                                var button = document.querySelector('form[name="allowed_transaction"] > button');
+                                button.addEventListener(function () {
+                                    document.querySelector("form[name='allowed_transaction']").submit();
+                                });
+                            </script>
                         {% endif %}
 
                     {% else %}

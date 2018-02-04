@@ -16,7 +16,8 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views import generic
 from django.conf import settings
-
+from django.forms.models import model_to_dict
+from django.http import HttpResponseRedirect
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
 from gatheros_subscription.models import Subscription, FormConfig, Lot
@@ -400,9 +401,15 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         context = self.get_context_data(**kwargs)
         context['remove_preloader'] = True
 
+        allowed_transaction = request.POST.get('allowed_transaction', False)
+
+        if allowed_transaction:
+            request.session['allowed_transaction'] = allowed_transaction
+            slug = kwargs.get('slug')
+            return HttpResponseRedirect(reverse('public:hotsite-subscription', args={slug}))
+
         with transaction.atomic():
             form = self.get_form()
-
             if not form.is_valid():
                 context['form'] = form
                 return self.render_to_response(context)
@@ -451,7 +458,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 'Inscrição realizada com sucesso!'
             )
 
-        return redirect('public:hotsite-subscription', slug=self.event.slug)
+        return redirect('public:hotsite-subscription-status', slug=self.event.slug)
 
 
 class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
@@ -485,7 +492,7 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         context['is_subscribed'] = self.is_subscribed()
         context['transactions'] = self.get_transactions()
         context['allow_transaction'] = self.get_allowed_transaction()
-
+        context['subscription'] = self.subscription.pk
 
         return context
 

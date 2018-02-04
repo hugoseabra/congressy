@@ -47,7 +47,7 @@ class PagarmeTransactionInstanceData:
 
         transaction_id = uuid.uuid4()
 
-        postback_url = absoluteuri.reverse('public:payment_postback_url', kwargs={
+        postback_url = absoluteuri.reverse('api:payment:payment_postback_url', kwargs={
             'uidb64': transaction_id
         })
 

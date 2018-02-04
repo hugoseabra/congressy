@@ -15,7 +15,7 @@ from gatheros_front.urls import (
     urlpatterns_public as gatheros_front_public,
 )
 from hotsite.urls import urlpatterns_public_hotsite
-from payment.urls import  public_payment_urls
+from payment.urls import public_payment_urls
 
 
 admin_urlpatterns = [url(r'^admin/', admin.site.urls)]
@@ -43,7 +43,7 @@ public_urlpatterns = [
 
 # API
 api_urls = [
-    url(r'^', include(public_payment_urls, 'payment')),
+    url(r'^', include('payment.urls', 'payment')),
     url(r'^', include('kanu_locations.urls', 'city')),
 ]
 
