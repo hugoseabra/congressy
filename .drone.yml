@@ -214,10 +214,10 @@ pipeline:
     pull: true
     hosts:
       - 172.31.36.223
+    port: 22
     user: admin
-    source: ./conf/deploy
-    target: ~/cgsy/.
-    include: [ "docker-compose.yml" ]
+    source: ./conf/deploy/docker-compose.yml
+    target: ~/cgsy/docker-compose.yml
     key: $${CONGRESSY_DEPLOY}
     secrets: [
       congressy_deploy,
@@ -258,6 +258,7 @@ pipeline:
     host:
       - 172.31.36.223
     username: admin
+    port: 22
     secrets:
       - source: CONGRESSY_DEPLOY
         target: ssh_key
