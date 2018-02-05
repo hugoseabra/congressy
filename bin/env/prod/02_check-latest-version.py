@@ -35,13 +35,13 @@ REPO_NAME = 'cgsy'
 
 LATEST_IMAGE = shell_do(
     'docker exec -i awsecr last-image {}'.format(REPO_NAME)
-).rstrip('\r\n')
+)
 
-LATEST_VERSION = LATEST_IMAGE.replace(
-    "Repository: {}\n".format(REPO_NAME),
+LATEST_VERSION = str(LATEST_IMAGE).replace(
+    'Repository: {}\n'.format(REPO_NAME),
     ''
 )
-LATEST_VERSION = LATEST_VERSION.replace(
+LATEST_VERSION = str(LATEST_VERSION).replace(
     '{}/{}:'.format(REPO_LINK, REPO_NAME),
     ''
 )
@@ -49,11 +49,11 @@ LATEST_VERSION = LATEST_VERSION.replace(
 VERSION_FILE = os.path.join(BASE, '..', '..', '..', 'version')
 VERSION = shell_do('cat {}'.format(VERSION_FILE))
 
-VERSION = VERSION.rstrip('\r\n')
+VERSION = str(VERSION).rstrip('\r\n')
 LATEST_VERSION = LATEST_VERSION.rstrip('\r\n')
 
-print("VERSION: " + VERSION)
-print("LATEST VERSION: " + LATEST_VERSION)
+print("VERSION: {}".format(VERSION))
+print("LATEST VERSION: {}".format(LATEST_VERSION))
 
 higher_version = semver.compare(LATEST_VERSION, VERSION) == -1
 
@@ -61,7 +61,7 @@ tagged_version_file = os.path.join(BASE, 'tagged_version')
 
 with open(tagged_version_file, 'w+') as f:
     value = '1' if higher_version is True else '0'
-    print("Registrando valor '{}' em {}.".format(
+    print("Registrando valor '{}' em '{}'.".format(
         value,
         tagged_version_file
     ))
