@@ -94,4 +94,4 @@ class PasswordResetView(auth_views.PasswordResetView):
         except User.DoesNotExist:
             pass
 
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
