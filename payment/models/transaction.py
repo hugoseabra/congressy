@@ -10,6 +10,10 @@ from gatheros_subscription.models import Subscription
 
 class Transaction(models.Model):
 
+    class Meta:
+        verbose_name = 'Transação'
+        verbose_name_plural = 'Transações'
+
     uuid = models.UUIDField(
         default=uuid.uuid4,
         editable=False,

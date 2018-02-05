@@ -53,6 +53,8 @@ class PagarmeTransactionInstanceData:
 
         self.transaction_instance_data = {
 
+            "api_key": settings.PAGARME_API_KEY,
+
             "customer": {
                 "name": self.person.name,
                 "type": "individual",
@@ -109,16 +111,16 @@ class PagarmeTransactionInstanceData:
                     "liable": True,
                     "charge_processing_fee": False
                 }
-            ]
+            ],
 
+            "amount": self.extra_data['amount'],
+            "price": self.extra_data['amount']
         }
 
         if self.transaction_type == 'credit_card':
 
             self.transaction_instance_data['payment_method'] = 'credit_card'
-            self.transaction_instance_data['price'] = self.extra_data['amount']
             self.transaction_instance_data['card_hash'] = self.extra_data['card_hash']
 
         if self.transaction_type == 'boleto':
             self.transaction_instance_data['payment_method'] = 'boleto'
-            self.transaction_instance_data['amount'] = self.extra_data['amount']

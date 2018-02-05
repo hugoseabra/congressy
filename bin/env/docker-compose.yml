@@ -1,5 +1,6 @@
 version: '2.3'
 services:
+
   postgres:
     image: postgres:9.6-alpine
     container_name: cgsy-postgres
@@ -14,6 +15,22 @@ services:
       - POSTGRES_DB=cgsyplatform
       - POSTGRES_USER=congressy
       - POSTGRES_PASSWORD=congressy
+
+  mailhog:
+    image: blueimp/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  mailhog_frontend:
+    image: alpine:3.4
+    entrypoint: httpd -f -p 8080
+    user: nobody
+    working_dir: /srv/www
+    volumes:
+      - ./srv:/srv
+    ports:
+        - "8080:8080"
 
 networks:
   postgres:

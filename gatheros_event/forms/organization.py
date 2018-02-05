@@ -140,8 +140,8 @@ class OrganizationFinancialForm(forms.ModelForm):
             'account',
             'conta_dv',
             'legal_name',
-            'account_type',
             'cnpj_ou_cpf',
+            'account_type',
         )
 
     def __init__(self, user, internal=False, data=None, *args, **kwargs):

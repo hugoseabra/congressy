@@ -96,19 +96,7 @@
                 {% endfor %}
             {% endif %}
 
-            {% if is_subscribed %}
-                <div class="text-center">
-                    <p style="font-size: 18px">
-                        Informe os dados abaixo para finalizar a sua inscrição.
-                    </p>
 
-                    <div style="align-items: center;display: flex;justify-content: center;">
-                        <i class="fa fa-check-circle fa-5x" style="color: darkgreen"
-                           aria-hidden="true"></i>
-
-                    </div>
-                </div>
-            {% else %}
                 <div class="row">
                     <div class="col-md-9">
                         {% render_generic_field form.name autofocus=True %}
@@ -194,7 +182,6 @@
                         {% endif %}
                     </div>
                 </div>
-            {% endif %}
         </div>
     </div>
     {% if config and config.address == config.ADDRESS_SHOW %}

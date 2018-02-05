@@ -1,14 +1,16 @@
 import pagarme
+import json
 from django.conf import settings
-
+from mailer.tasks import send_mail
 from payment.models import Transaction
+from payment.exception import TransactionError
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
 
 congressy_id = settings.PAGARME_RECIPIENT_ID
 
 
-# @TODO create a mock of the response to use during testing
+# @TODO-low create a mock of the response to use during testing
 def create_pagarme_transaction(payment=None, subscription=None):
 
     if not payment or not subscription:
@@ -22,9 +24,26 @@ def create_pagarme_transaction(payment=None, subscription=None):
     trx = pagarme.transaction.create(payment)
 
     # @TODO add wrapper here to check if its a dict or a list
+    if not isinstance(trx, dict):
+        subject = "Erro ao criar transação: Unknown API error"
+        body = """
+            Erro ao criar transação:
+            
+            Transação: 
+            
+            <pre><code>{0}</code></pre>
+            
+            Erro: 
+            
+            <pre><code>{1}</code></pre>
+        """.format(json.dumps(payment), json.dumps(trx))
+
+        send_mail(subject=subject, body=body, to=settings.ALERT_EMAILS)
+        raise TransactionError(message='Unknown API error')
 
     transaction_instance.data = trx
     transaction_instance.save()
+    return
 
 
 # @TODO create a mock of the response to use during testing

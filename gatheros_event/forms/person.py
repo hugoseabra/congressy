@@ -2,6 +2,7 @@
 from django import forms
 from django.db.models.fields import NOT_PROVIDED
 from django.utils import six
+from django.utils.datastructures import MultiValueDictKeyError
 from kanu_locations.models import City
 
 from gatheros_event.models import Person, Occupation
@@ -82,7 +83,11 @@ class PersonForm(forms.ModelForm):
         return City.objects.get(pk=self.data['city'])
 
     def clean_email(self):
-        return self.data['email'].lower()
+        try:
+            email = self.data['email']
+        except MultiValueDictKeyError:
+            email = self.initial['email']
+        return email.lower()
 
     def clean_occupation(self):
         return Occupation.objects.get(pk=self.data['occupation'])

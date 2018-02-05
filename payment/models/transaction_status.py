@@ -10,6 +10,11 @@ from .transaction import Transaction
 
 class TransactionStatus(models.Model):
 
+    class Meta:
+        verbose_name = 'Status de Transação'
+        verbose_name_plural = 'Status de Transações'
+
+
     uuid = models.UUIDField(
         default=uuid.uuid4,
         editable=False,

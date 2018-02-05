@@ -321,14 +321,14 @@
             searchByCep();
         });
 
-        //if ($('#id_city').val() != null) {
-        //    $.ajax({
-        //        url: "/api/cities/" + $('#id_city').val(), success: function (result) {
-        //            $('#id_city_search').val(result.name + ' - ' + result.uf)
-        //            //populate the html with result here
-        //        }
-        //    });
-        // }
+        if ($('#id_city').val() != null) {
+            $.ajax({
+                url: "/api/cities/" + $('#id_city').val(), success: function (result) {
+                    $('#id_city_search').val(result.name + ' - ' + result.uf)
+                    //populate the html with result here
+                }
+            });
+         }
 
         showHideCepLoader();
     });
