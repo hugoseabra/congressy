@@ -205,41 +205,41 @@
                             {% if subscription_enabled and has_paid_lots %}
                                 <ul class="icon-list">
 
-                                {% for lot in lots %}
-                                    <li>
+                                    {% for lot in lots %}
+                                        <li>
                                     <span class="icon-list-icon " data-animation="bounceIn">
                                       <strong>{{ forloop.counter }}</strong>
                                     </span>
-                                        <h4 class="icon-list-title">
-                                            <strong>{{ lot.name }} - R${{ lot.price }}</strong>
-                                        </h4>
+                                            <h4 class="icon-list-title">
+                                                <strong>{{ lot.name }} - R${{ lot.price }}</strong>
+                                            </h4>
 
-                                        <p>
-                                            <strong>{{ lot.places_remaining }} Vaga(s) restante(s)</strong>
-                                            <br/>
-                                            <small class="text-muted">{{ lot.get_period }}</small>
-                                        </p>
+                                            <p>
+                                                <strong>{{ lot.places_remaining }} Vaga(s) restante(s)</strong>
+                                                <br/>
+                                                <small class="text-muted">{{ lot.get_period }}</small>
+                                            </p>
 
-                                    </li>
-
-
-                                {% endfor %}
-
-                            {% else %}
-                                <p style="font-size: 20px;font-style: italic;">Evento não permite mais inscrições.</p>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% elif  not subscription_enabled %}
+                                <p style="font-size: 20px;font-style: italic;">Evento não permite inscrições.</p>
                             {% endif %}
-                            </ul>
 
                         </div>
+                        <div class="hero-features-right col-md-5"
+                             data-animation="fadeIn">
+                            {% if  subscription_enabled %}
+                                {% if has_paid_lots and has_configured_bank_account and not has_active_bank_account %}
+                                    <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
+                                        Evento está sendo configurado, volte em breve para realizar sua inscrição!</p>
+                                {% else %}
+                                    {% include 'hotsite/simple_form.html' %}
+                                {% endif %}
+                            {% endif %}
 
-                        {% if  subscription_enabled %}
-                            <div class="hero-features-right col-md-5"
-                                 data-animation="fadeIn">
-
-                                {% include 'hotsite/simple_form.html' %}
-
-                            </div>
-                        {% endif %}
+                        </div>
 
                     </div>
 
@@ -285,26 +285,26 @@
 
     </section>
 
-    {% if subscription_enabled  %}
-    <!-- CLOSING
-    ================================= -->
-    <section id="closing" class="closing-section section-dark section">
+    {% if subscription_enabled %}
+        <!-- CLOSING
+        ================================= -->
+        <section id="closing" class="closing-section section-dark section">
 
-        <div class="section-background">
+            <div class="section-background">
 
-            <!-- IMAGE BACKGROUND -->
-            <div class="section-background-image parallax">
-                <img
-                        {% if info.image_main.default %}
-                            src="{{ info.image_main.default.url }}"
-                        {% else %}
-                            src=""
-                        {% endif %}
-                            alt="" style="opacity: 0.2;" class="blurred">
+                <!-- IMAGE BACKGROUND -->
+                <div class="section-background-image parallax">
+                    <img
+                            {% if info.image_main.default %}
+                                src="{{ info.image_main.default.url }}"
+                            {% else %}
+                                src=""
+                            {% endif %}
+                                alt="" style="opacity: 0.2;" class="blurred">
+                </div>
+
+
             </div>
-
-
-        </div>
 
 
             <div class="container">
@@ -320,8 +320,8 @@
                 </div>
             </div>
 
-    </section>
- {% endif %}
+        </section>
+    {% endif %}
 
 
     {% if event.place %}

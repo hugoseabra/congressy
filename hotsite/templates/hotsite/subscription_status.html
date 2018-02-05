@@ -229,11 +229,101 @@
 
         <div class="container">
 
-            <h2 class="section-heading text-center">Inscrição</h2>
+            <h2 class="section-heading text-center">Status da sua inscrição</h2>
 
             <div class="about-row row">
                 <div class="col-md-9 col-md-offset-2">
-                    {% include 'hotsite/subscription_form.html' %}
+
+
+                    {% if transactions %}
+                        <div class="well well-sm col-md-3" style="background-color:rgb(91,192,222); text-align: center">
+                            <p style="color: white; font-weight: bold">
+                                Aguardando pagamento
+                            </p>
+                        </div>
+
+                        <div class="progress" style="margin-top:75px">
+                            <div class="progress-bar progress-bar-success progress-bar-striped active"
+                                 role="progressbar"
+                                 style="width: 95%;background-color:#5cb85c!important;">
+                                <span class="sr-only"></span>
+                            </div>
+                        </div>
+
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th class="col-xs-1">Status</th>
+                                <th class="col-xs-2">Data</th>
+                                <th class="col-xs-3">Forma de Pagamento</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for transaction in transactions %}
+                                <tr>
+                                    {% if transaction.data.status == 'processing' or transaction.data.status == 'waiting_payment' or transaction.data.status == 'pending_refund' or transaction.data.status == 'chargedback' %}
+                                        <td><i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i></td>
+                                    {% elif transaction.data.status == 'authorized' or transaction.data.status == 'paid' or transaction.data.status == 'refunded' %}
+                                        <td><i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i></td>
+                                    {% elif transaction.data.status == 'refused' %}
+                                        <td><i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i></td>
+                                    {% else %}
+                                        <td><i class="fa fa-circle" aria-hidden="true"></i></td>
+                                    {% endif %}
+
+                                    <td>
+                                        {% to_datetime transaction.data.date_created as created_date %}
+                                        {{ created_date }}h
+                                    </td>
+                                    <td>
+                                        {% if transaction.data.payment_method == 'boleto' %}
+                                            Boleto
+                                            <br>
+                                            <small>
+                                                <a target="_blank" class="text-muted"
+                                                   href="{{ transaction.data.boleto_url }}">
+                                                    Link para boleto
+                                                </a>
+                                            </small>
+                                        {% elif transaction.data.payment_method == 'credit_card' %}
+                                            Cartão de Crédito
+                                        {% else %}
+                                            Error
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                        {% if allow_transaction %}
+                            <form action="{% url 'public:hotsite-subscription' event.slug %}"
+                                  name="allowed_transaction"
+                                  method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="allowed_transaction" id="id_allowed_transaction"
+                                       value="{{ allow_transaction }}"/>
+                                <input type="hidden" name="subscription" id="id_subscription"
+                                       value="{{ subscription }}"/>
+                                <button class="btn btn-success btn-xs">Novo pagamento</button>
+                            </form>
+                            <script>
+                                var button = document.querySelector('form[name="allowed_transaction"] > button');
+                                button.addEventListener(function () {
+                                    document.querySelector("form[name='allowed_transaction']").submit();
+                                });
+                            </script>
+                        {% endif %}
+
+                    {% else %}
+                        <div class="well well-sm col-md-4" style="background-color: rgb(92,184,92) ;">
+                            <p style="color: white; font-weight: bold">
+                                Inscrição realizada com sucesso!
+                            </p>
+                        </div>
+                    {% endif %}
+
+
                 </div>
             </div>
 
@@ -270,135 +360,8 @@
 <script src="{% static 'hotsite/js/responsiveslides.min.js' %}"></script>
 <script src="{% static 'assets/js/vendor/bind.min.js' %}"></script>
 
-
-<!-- SCRIPT PAGAR.ME -->
-<script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
 <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
-<script>
-    var suggestionEngine = new Bloodhound({
-        datumTokenizer: function (datum) {
-            return Bloodhound.tokenizers.whitespace(datum.value);
-        },
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-            url: '/api/cities/?q=%QUERY',
-            wildcard: '%QUERY',
-            filter: function (main_json) {
-                return $.map(main_json.results, function (result) {
-                    return {
-                        value: result.name + '-' + result.uf,
-                        city_id: result.id
-                    };
-                });
-            }
-        }
-    });
 
-    $('#city .typeahead').typeahead(null, {
-        name: 'cities',
-        display: 'value',
-        source: suggestionEngine,
-        limit: 10
-    });
-
-
-    $('#city .typeahead').on('typeahead:selected', function (e, datum) {
-        $("#id_city").val(datum.city_id);
-    });
-
-    $(document).ready(function () {
-        IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
-
-        $('#id_phone').mask("(99) 9 9999-9999");
-        $('#id_cpf').mask("999.999.999-99");
-
-
-        {% if config and config.address == config.ADDRESS_SHOW %}
-            $('#id_zip_code').mask("99.999-999");
-        {% endif %}
-
-        $('#id_zip_code').on('keyup', function () {
-            searchByCep();
-        });
-
-        //if ($('#id_city').val() != null) {
-        //    $.ajax({
-        //        url: "/api/cities/" + $('#id_city').val(), success: function (result) {
-        //            $('#id_city_search').val(result.name + ' - ' + result.uf)
-        //            //populate the html with result here
-        //        }
-        //    });
-        // }
-
-        showHideCepLoader();
-    });
-
-
-    var lots = {
-        {% for lot in lots %}
-            {% if lot.price %}
-                'lot_{{ lot.pk }}': parseFloat({{ lot.price }}),
-            {% endif %}
-        {% endfor %}
-    };
-
-
-    var button = document.querySelector('#id_button_pay');
-
-    button.addEventListener('click', function () {
-
-            var amount_id = $('#id_lot').val().toString();
-
-            var lot = 'lot_' + amount_id;
-
-            var amount = lots[lot] * 100;
-
-            var billing_title = 'Inscrição do evento: ' + '{{ event.name }}';
-
-            function handleSuccess(data) {
-                $('#id_button_pay').removeClass('btn-default').addClass('btn-success');
-
-                console.log(data);
-
-                $('#id_transaction_type').val(data.payment_method);
-                $('#id_amount').val(data.amount);
-                $('#id_card_hash').val(data.card_hash);
-            }
-
-            function handleError(data) {
-                $('#id_button_pay').removeClass('btn-default').addClass('btn-warning');
-                $('#pay_help').text(data);
-            }
-
-            var checkout = new PagarMeCheckout.Checkout({
-                encryption_key: 'ek_test_f9cws0bU9700VqWE4UDuBlKLbvX4IO',
-                success: handleSuccess,
-                error: handleError
-            });
-
-            checkout.open({
-                amount: amount,
-                createToken: 'false',
-                {% if request.session.allowed_transaction  %}
-                    paymentMethods: '{{ request.session.allowed_transaction }}',
-                {% else %}
-                     paymentMethods: 'credit_card, boleto',
-                {% endif %}
-                customerData: false,
-                items: [
-                    {
-                        id: '1',
-                        title: billing_title,
-                        unit_price: amount,
-                        quantity: 1,
-                        tangible: true
-                    }
-                ]
-            });
-        }
-    );
-
-</script>
 
 <!-- MAIN SCRIPT
 ================================= -->

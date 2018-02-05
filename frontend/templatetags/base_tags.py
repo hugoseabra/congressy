@@ -1,8 +1,12 @@
 """
 gatheros_subscription templatetags
 """
+import datetime
 from ast import literal_eval
+
 from django import template
+import timestring
+
 from core.util import git_util
 
 register = template.Library()
@@ -48,3 +52,14 @@ def get_first_item(dictionary):
         return str(message[0])
     except SyntaxError:
         return dictionary.message
+
+
+@register.simple_tag
+def to_datetime(date_string):
+    """
+    Return a datetime corresponding to date_string, parsed according to format.
+    """
+    datetime_obj = timestring.Date(date_string)
+    return '{0:%Y-%m-%d %H:%M:%S}'.format(datetime_obj)
+
+

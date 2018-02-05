@@ -16,15 +16,19 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views import generic
 from django.conf import settings
-
-from gatheros_event.forms import PersonForm, PersonSubscribeForm
+from django.forms.models import model_to_dict
+from django.http import HttpResponseRedirect
+from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
 from gatheros_subscription.models import Subscription, FormConfig, Lot
 from mailer.services import (
     notify_new_user,
     notify_new_subscription,
 )
-
+from payment.exception import TransactionError
+from payment.helpers import PagarmeTransactionInstanceData
+from payment.tasks import create_pagarme_transaction
+from payment.models import Transaction
 
 
 class EventMixin(generic.View):
@@ -32,7 +36,8 @@ class EventMixin(generic.View):
 
     def dispatch(self, request, *args, **kwargs):
         self.event = get_object_or_404(Event, slug=self.kwargs.get('slug'))
-        return super().dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -43,6 +48,8 @@ class EventMixin(generic.View):
         context['lots'] = self.get_lots()
         context['subscription_enabled'] = self.subscription_enabled()
         context['has_paid_lots'] = self.has_paid_lots()
+        context['has_configured_bank_account'] = self.event.organization.is_bank_account_configured()
+        context['has_active_bank_account'] = self.event.organization.active_recipient
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
 
         return context
@@ -299,7 +306,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
 class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
     template_name = 'hotsite/subscription.html'
-    form_class = PersonSubscribeForm
+    form_class = PersonForm
 
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
@@ -309,7 +316,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
         subscribed = self.is_subscribed()
         enabled = self.subscription_enabled()
-        if not enabled or subscribed:
+        if not enabled:
             return redirect('public:hotsite', slug=self.event.slug)
 
         return response
@@ -394,15 +401,24 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         context = self.get_context_data(**kwargs)
         context['remove_preloader'] = True
 
+        allowed_transaction = request.POST.get('allowed_transaction', False)
+
+        if allowed_transaction:
+            request.session['allowed_transaction'] = allowed_transaction
+            slug = kwargs.get('slug')
+            return HttpResponseRedirect(reverse('public:hotsite-subscription', args={slug}))
+
         with transaction.atomic():
             form = self.get_form()
-
             if not form.is_valid():
                 context['form'] = form
                 return self.render_to_response(context)
 
+            if 'transaction_type' not in request.POST:
+                messages.error(request=self.request, message='Por favor escolha um tipo de pagamento.')
+                return self.render_to_response(context)
+
             person = form.save()
-            # @TODO move all this logic to the form!
 
             if self.has_paid_lots():
                 lot_pk = self.request.POST.get('lot')
@@ -418,6 +434,22 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 created_by=user.id
             )
 
+            try:
+                transaction_instance_data = PagarmeTransactionInstanceData(person=person, extra_data=request.POST)
+            except TransactionError as e:
+                error_dict = {
+                    'No transaction type': 'Por favor escolher uma forma de pagamento.',
+                    'Transaction type not allowed': 'Forma de pagamento não permitida.',
+                    'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
+                    'No organization': 'Evento não possui organizador.',
+                }
+                if e.message in error_dict:
+                    e.message = error_dict[e.message]
+                messages.error(self.request, message=e.message)
+                return self.render_to_response(context)
+
+            create_pagarme_transaction(payment=transaction_instance_data.transaction_instance_data,
+                                       subscription=subscription)
             subscription.save()
             notify_new_subscription(self.event, subscription)
 
@@ -426,4 +458,119 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 'Inscrição realizada com sucesso!'
             )
 
-        return redirect('public:hotsite-subscription', slug=self.event.slug)
+        return redirect('public:hotsite-subscription-status', slug=self.event.slug)
+
+
+class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
+
+    template_name = 'hotsite/subscription_status.html'
+    person = None
+    subscription = None
+
+    def dispatch(self, request, *args, **kwargs):
+
+        response = super().dispatch(request, *args, **kwargs)
+
+        self.person = self.get_person()
+
+        if not request.user.is_authenticated or not self.person:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        self.is_subscribed()
+
+        if not self.subscription:
+            messages.error(message='Você não possui inscrição neste evento.', request=request)
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        return response
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context['person'] = self.get_person()
+        context['is_subscribed'] = self.is_subscribed()
+        context['transactions'] = self.get_transactions()
+        context['allow_transaction'] = self.get_allowed_transaction()
+        context['subscription'] = self.subscription.pk
+
+        return context
+
+    def get_person(self):
+        """ Se usuario possui person """
+        if not self.request.user.is_authenticated or self.person:
+            return self.person
+        else:
+            try:
+                self.person = self.request.user.person
+            except (ObjectDoesNotExist, AttributeError):
+                pass
+
+        return self.person
+
+    def is_subscribed(self):
+        """
+            Se já estiver inscrito retornar True
+        """
+        user = self.request.user
+
+        if user.is_authenticated:
+            try:
+                person = user.person
+                subscription = Subscription.objects.get(person=person, event=self.event)
+                self.subscription = subscription
+                return True
+
+            except (Subscription.DoesNotExist, AttributeError):
+                pass
+
+        return False
+
+    def subscriber_has_account(self, email):
+        if self.request.user.is_authenticated:
+            return True
+
+        try:
+            User.objects.get(email=email)
+            return True
+
+        except User.DoesNotExist:
+            pass
+
+        return False
+
+    def get_transactions(self):
+
+        try:
+            transactions = Transaction.objects.filter(subscription=self.subscription)
+        except Transaction.DoesNotExist:
+            return False
+
+        return transactions
+
+    def get_allowed_transaction(self):
+
+        found_boleto = False
+        found_credit_card = False
+
+        try:
+            transactions = Transaction.objects.filter(subscription=self.subscription)
+
+            for transaction in transactions:
+                if transaction.data['payment_method'] == 'boleto':
+                    found_boleto = True
+                elif transaction.data['payment_method'] == 'credit_card':
+                    found_credit_card = True
+                if found_boleto and found_credit_card:
+                    return False
+        except Transaction.DoesNotExist:
+            return False
+
+        if found_credit_card:
+            return 'boleto'
+
+        if found_boleto:
+            return 'credit_card'
+
+        return False
+

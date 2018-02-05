@@ -47,6 +47,12 @@
         <div class="text-center">
             <p style="font-size: 18px">
                 Você já está inscrito(a) neste evento.
+
+            </p>
+            <p style="font-size: 18px">
+                <a class="btn btn-success" href="{% url 'public:hotsite-subscription-status' event.slug %}">
+                    Veja sua inscrição!
+                </a>
             </p>
 
             <div style="align-items: center;display: flex;justify-content: center;">

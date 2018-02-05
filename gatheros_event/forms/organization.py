@@ -8,7 +8,6 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
 
 from gatheros_event.models import Member, Organization
-from payment.tasks import create_payme_back_account, create_payme_recipient
 
 
 class OrganizationForm(forms.ModelForm):
@@ -190,44 +189,46 @@ class OrganizationFinancialForm(forms.ModelForm):
 
         return result
 
-    def clean(self):
-
-        cleaned_data = super(OrganizationFinancialForm, self).clean()
-
-        bank_account = create_payme_back_account(cleaned_data)
-
-        try:
-            message = None
-            message = bank_account[0]['message']
-        except KeyError:
-            pass
-
-        if message:
-
-            if message == 'Invalid format':
-
-                parameter_name = bank_account[0]['parameter_name']
-
-                if parameter_name == 'document_number':
-                    parameter_name = 'cnpj_ou_cpf'
-
-                self.add_error(parameter_name, ValidationError('Formato de CPF ou CNPJ invalido'))
-        else:
-
-            organization = self.instance
-
-            organization.active_bank_account = True
-            organization.bank_account_id = bank_account['id']
-            organization.document_type = bank_account['document_type']
-            organization.charge_transfer_fees = bank_account['charge_transfer_fees']
-            organization.date_created = bank_account['date_created']
-
-            recipient = create_payme_recipient(bank_account)
-
-            organization.active_recipient = True
-            organization.recipient_id = recipient['id']
-
-        return cleaned_data
+    # def clean(self):
+    #
+    #     cleaned_data = super(OrganizationFinancialForm, self).clean()
+    #
+    #     bank_account = create_payme_back_account(cleaned_data)
+    #
+    #     message = None
+    #
+    #     try:
+    #         if bank_account:
+    #             message = bank_account[0]['message']
+    #     except KeyError:
+    #         pass
+    #
+    #     if message:
+    #
+    #         if message == 'Invalid format':
+    #
+    #             parameter_name = bank_account[0]['parameter_name']
+    #
+    #             if parameter_name == 'document_number':
+    #                 parameter_name = 'cnpj_ou_cpf'
+    #
+    #             self.add_error(parameter_name, ValidationError('Formato de CPF ou CNPJ invalido'))
+    #     else:
+    #
+    #         organization = self.instance
+    #
+    #         organization.active_bank_account = True
+    #         organization.bank_account_id = bank_account['id']
+    #         organization.document_type = bank_account['document_type']
+    #         organization.charge_transfer_fees = bank_account['charge_transfer_fees']
+    #         organization.date_created = bank_account['date_created']
+    #
+    #         recipient = create_payme_recipient(bank_account)
+    #
+    #         organization.active_recipient = True
+    #         organization.recipient_id = recipient['id']
+    #
+    #     return cleaned_data
 
 
 
