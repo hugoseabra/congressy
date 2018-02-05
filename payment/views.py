@@ -40,5 +40,5 @@ def postback_url_view(request, uidb64):
     except Transaction.DoesNotExist:
         raise Http404
 
-    return Response(status=200)
+    return Response(status=201)
 
