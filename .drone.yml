@@ -217,8 +217,10 @@ pipeline:
     port: 22
     user: admin
     source: ./conf/deploy/docker-compose.yml
-    target: ~/cgsy/docker-compose.yml
-    key: $${CONGRESSY_DEPLOY}
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
     secrets: [
       congressy_deploy,
       aws_key,
