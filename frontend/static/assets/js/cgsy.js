@@ -18,21 +18,34 @@ $(document).ready(function() {
 
 //============================ FORM SUBMIT ==================================//
 function submit_form(form) {
+    form = $(form)
+    var hidden_submitted = form.find('input#form-submitted');
+
+    if (hidden_submitted.length > 0) {
+        // Lock exceeded submits.
+        return true;
+    }
+
     var loader = '<div class="loader-block">';
-        loader += '<div class="img-block">';
-        loader += '<img src="/static/assets/img/loader.gif" />';
+        loader += '<div class="img-block fa-2x">';
+        loader += '<i class="fas info-color fa-circle-notch fa-spin"></i>';
         loader += '</div>';
         loader += '</div>';
+
+
+    hidden_submitted = '<input type="hidden" name="submitted"';
+    hidden_submitted += ' value="1" id="form-submitted" ;>';
+    form.append(hidden_submitted);
 
     var button;
 
-    button = $(form).find('button')
+    button = form.find('button')
         .not(':button[type=button]')
         .not(':button[type=reset]')
     ;
 
     if (!button.length) {
-        button = $(form).find('input[type=submit]');
+        button = form.find('input[type=submit]');
     }
 
     if (button) {
@@ -41,9 +54,7 @@ function submit_form(form) {
 
         button.css('visibility', 'hidden');
         window.setTimeout(function() {
-            loader.fadeIn('fast', function() {
-                window.setTimeout(function() { form.submit(); } , 500);
-            });
+            loader.fadeIn();
         }, 160);
     }
 }

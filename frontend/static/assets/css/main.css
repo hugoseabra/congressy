@@ -4,8 +4,8 @@
  *   Copyright 2014 Authentic Goods Co. http://authenticgoods.co
  *
 */
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700");
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800");
+@import url("http://fonts.googleapis.com/css?family=Montserrat:400,700");
+@import url("http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800");
 html {
   height: 100%;
   font-size: 100%;
@@ -3661,7 +3661,7 @@ label.valid {
 }
 .theme-cgsy-full .loader-block {
   position: relative;
-  width: 38px;
+  width: 90px;
   display: none;
   margin: 0 auto;
 }
@@ -3669,7 +3669,7 @@ label.valid {
   width: 37px;
   position: absolute;
   z-index: 10000;
-  top: -42px;
+  top: -51px;
 }
 .theme-cgsy-full .checkbox label,
 .theme-cgsy-full .radio label {

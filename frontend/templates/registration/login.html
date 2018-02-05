@@ -10,7 +10,7 @@
 
 {% block form %}
     <p class="text-center">Entre com suas credenciais para acessar sua conta.</p>
-    <form action="" method="post" class="form-horizontal" role="form" onsubmit="submit_form(this); return false;">
+    <form action="" method="post" class="form-horizontal" role="form" onsubmit="submit_form(this);">
         {% csrf_token %}
         <div class="form-group">
             <div class="col-md-12">
