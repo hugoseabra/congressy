@@ -23,9 +23,12 @@ pipeline:
       branch: [ hotfix/*, release/* ]
 
   check-latest-version:
-    image: python:3.6-alpine
+    image: docker
     pull: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     commands:
+      - apk add --no-cache python3
       - pip3 install --no-cache-dir semver clint
       - python3 ./bin/env/prod/01_check-latest-version.py
     when:
