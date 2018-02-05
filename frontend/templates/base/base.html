@@ -98,12 +98,12 @@
                                             data-toggle="dropdown"
                                             aria-expanded="false"
                                         >
-                                            <span class="fa fa-gear"></span>
+                                            <span class="fas fa-cog"></span>
                                         </button>
                                         <ul class="dropdown-menu animated fadeInRight" role="menu">
                                             <li>
                                                 <a href="{% url 'event:organization-edit' organization.pk %}">
-                                                    <i class="fa fa-pencil"></i>
+                                                    <i class="fas fa-pencil-alt"></i>
                                                     Editar
                                                 </a>
                                             </li>
@@ -118,7 +118,7 @@
                                             {% if organization.is_deletable and user has 'gatheros_event.delete_organization' of organization %}
                                             <li>
                                                 <a href="{% url 'event:organization-delete' organization.pk %}">
-                                                    <i class="fa fa-trash"></i>
+                                                    <i class="fas fa-trash-alt"></i>
                                                     Excluir
                                                 </a>
                                             </li>
@@ -247,7 +247,7 @@
                             <li>
                                 <a href="{% url 'public:logout' %}">
                                     <span class="icon">
-                                        <i class="fa fa-sign-out"></i>
+                                        <i class="fas fa-sign-out-alt"></i>
                                     </span>
                                     Sair
                                 </a>

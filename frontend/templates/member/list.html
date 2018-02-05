@@ -75,7 +75,7 @@
                                                         data-toggle="dropdown"
                                                         aria-expanded="false"
                                                     >
-                                                        <span class="fa fa-gear"></span>
+                                                        <span class="fas fa-cog"></span>
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                                         <li style="padding: 0 10px">
@@ -100,7 +100,7 @@
                                                         <li style="padding: 0 10px">
                                                             <form action="{% url 'event:member-delete' member_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja realmente excluir?')">{% csrf_token %}
                                                                 <button type="submit" class="btn btn-sm btn-danger btn-trans btn-block">
-                                                                    <i class="fa fa-trash"></i>
+                                                                    <i class="fas fa-trash-alt"></i>
                                                                     Excluir
                                                                 </button>
                                                             </form>
@@ -166,7 +166,7 @@
                                                 data-toggle="dropdown"
                                                 aria-expanded="false"
                                             >
-                                                <span class="fa fa-gear"></span>
+                                                <span class="fas fa-cog"></span>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-right" role="menu">
                                                 <li style="padding: 0 10px">
@@ -181,7 +181,7 @@
                                                 <li style="padding: 0 10px">
                                                     <form action="{% url 'event:member-delete' member_organization.pk item.pk %}" method="post" onsubmit="return confirm('Deseja realmente excluir?')">{% csrf_token %}
                                                         <button type="submit" class="btn btn-sm btn-danger btn-trans btn-block">
-                                                            <i class="fa fa-trash"></i>
+                                                            <i class="fas fa-trash-alt"></i>
                                                             Excluir
                                                         </button>
                                                     </form>
