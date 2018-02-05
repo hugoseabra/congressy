@@ -105,8 +105,8 @@ pipeline:
     image: appleboy/drone-telegram
     pull: true
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-#    to: -275808686 # ID chat Congressy
-    to: 245012348 # ID hugoseabra
+    to: -275808686 # ID chat Congressy
+#    to: 245012348 # ID hugoseabra
     format: markdown
     message: >
       *{{uppercase build.status }} - Ambiente RC*
@@ -306,6 +306,7 @@ pipeline:
     script:
       - docker exec -i awsecr pull cgsy:latest
       - docker-compose -f ~/cgsy/docker-compose.yml up -d
+      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     when:
       branch: [ master ]
 
@@ -313,8 +314,8 @@ pipeline:
     image: appleboy/drone-telegram
     pull: true
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-#    to: -275808686 # ID chat Congressy
-    to: 245012348 # ID hugoseabra
+    to: -275808686 # ID chat Congressy
+#    to: 245012348 # ID hugoseabra
     format: markdown
     message: >
       *{{uppercase build.status }} - Produção*
