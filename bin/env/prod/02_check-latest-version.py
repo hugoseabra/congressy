@@ -31,7 +31,7 @@ def shell_do(cmd, **kwargs):
 BASE = os.path.dirname(__file__)
 
 REPO_LINK = '871800672816.dkr.ecr.us-east-1.amazonaws.com'
-REPO_NAME = 'checkin'
+REPO_NAME = 'cgsy'
 
 LATEST_IMAGE = shell_do(
     'docker exec -i awsecr last-image {}'.format(REPO_NAME)

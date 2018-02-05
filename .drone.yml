@@ -11,6 +11,24 @@ clone:
 
 # Steps of deploy, according to configurations and conditionals
 pipeline:
+  create-awsecr:
+    image: docker
+    pull: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    secrets: [
+      aws_key,
+      aws_secret,
+      aws_account_id
+    ]
+    commands:
+      - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/prod/env-awsecr
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/prod/env-awsecr
+      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ./bin/env/prod/env-awsecr
+      - sh ./bin/env/prod/01_create-awsecr-container.sh
+    when:
+      branch: [ hotfix/*, release/* ]
+
   save-prod-version:
     image: indiehosters/git
     pull: true
@@ -30,7 +48,7 @@ pipeline:
     commands:
       - apk add --no-cache python3
       - pip3 install --no-cache-dir semver clint
-      - python3 ./bin/env/prod/01_check-latest-version.py
+      - python3 ./bin/env/prod/02_check-latest-version.py
     when:
       branch: [ hotfix/*, release/* ]
 
@@ -42,24 +60,6 @@ pipeline:
       - export REPO="871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy"
       - docker build --rm -t $${REPO}:latest -f ./conf/deploy/Dockerfile .
       - docker tag $${REPO}:latest $${REPO}:`cat ./version`
-    when:
-      branch: [ hotfix/*, release/* ]
-
-  create-awsecr:
-    image: docker
-    pull: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    secrets: [
-      aws_key,
-      aws_secret,
-      aws_account_id
-    ]
-    commands:
-      - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/prod/env-awsecr
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/prod/env-awsecr
-      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ./bin/env/prod/env-awsecr
-      - sh ./bin/env/prod/02_create-awsecr-container.sh
     when:
       branch: [ hotfix/*, release/* ]
 
