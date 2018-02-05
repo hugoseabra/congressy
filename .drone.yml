@@ -248,17 +248,17 @@ pipeline:
     envs: [
       aws_key,
       aws_secret,
-      domain_staging,
-      force_https_staging,
+      domain,
+      force_https,
       bucket_location,
       bucket_name,
       cron_sync_minutes_out,
       cron_sync_minutes_in,
-      dbhost_staging,
-      dbuser_staging,
-      dbpass_staging,
-      dbname_staging,
-      dbport_staging
+      dbhost,
+      dbuser,
+      dbpass,
+      dbname,
+      dbport
     ]
     script:
       - mkdir -p ~/cgsy
