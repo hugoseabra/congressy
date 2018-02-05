@@ -22,6 +22,15 @@ pipeline:
     when:
       branch: [ hotfix/*, release/* ]
 
+  check-latest-version:
+    image: python:3.6-alpine
+    pull: true
+    commands:
+      - pip3 install --no-cache-dir semver clint
+      - python3 ./bin/env/prod/01_check-latest-version.py
+    when:
+      branch: [ hotfix/*, release/* ]
+
   build-prod-images:
     image: docker
     volumes:
@@ -47,7 +56,7 @@ pipeline:
       - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/prod/env-awsecr
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/prod/env-awsecr
       - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ./bin/env/prod/env-awsecr
-      - sh ./bin/env/prod/create-awsecr-container.sh
+      - sh ./bin/env/prod/02_create-awsecr-container.sh
     when:
       branch: [ hotfix/*, release/* ]
 
@@ -57,9 +66,9 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - LAST_VERSION=$(./bin/env/prod/last-image-tag.sh)
-      - docker exec awsecr push cgsy:latest
-      - ./bin/env/prod/last-image-tag.sh
+      - BUILD=$(cat ./bin/env/prod/tagged_version)
+      - docker exec -i awsecr push cgsy:latest
+      - ./bin/env/prod/03_publish-tagged-version.sh
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     when:
       branch: [ hotfix/*, release/* ]

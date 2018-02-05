@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-set -e
+set -ex
 ###############################################################################
 # CUIDADO!
 # Esta script é gerenciado pelo CI. Não altere ou mude sem saber o que está
