@@ -250,7 +250,7 @@ pipeline:
       - echo "DBNAME=$${DBNAME}" >> env-file
       - echo "DBPORT=$${DBPORT}" >> env-file
     when:
-      branch: [ develop ]
+      branch: [ master ]
 
   deploy-latest-version:
     image: appleboy/drone-ssh
