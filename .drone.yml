@@ -216,22 +216,23 @@ pipeline:
       - 172.31.36.223
     username: admin
     port: 22
-    secrets: [
-      aws_key,
-      aws_secret,
-      domain,
-      force_https,
-      bucket_location,
-      bucket_name,
-      cron_sync_minutes_out,
-      cron_sync_minutes_in,
-      dbhost,
-      dbuser,
-      dbpass,
-      dbname,
-      dbport
-    ]
-    commands:
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+      - aws_key,
+      - aws_secret,
+      - domain,
+      - force_https,
+      - bucket_location,
+      - bucket_name,
+      - cron_sync_minutes_out,
+      - cron_sync_minutes_in,
+      - dbhost,
+      - dbuser,
+      - dbpass,
+      - dbname,
+      - dbport
+    script:
       - mkdir -p ~/cgsy
       - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
