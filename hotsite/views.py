@@ -447,7 +447,8 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             subscription.save()
 
             try:
-                transaction_instance_data = PagarmeTransactionInstanceData(person=person, extra_data=request.POST)
+                transaction_instance_data = PagarmeTransactionInstanceData(person=person, extra_data=request.POST,
+                                                                           event=self.event)
                 create_pagarme_transaction(payment=transaction_instance_data.transaction_instance_data,
                                            subscription=subscription)
                 notify_new_subscription(self.event, subscription)

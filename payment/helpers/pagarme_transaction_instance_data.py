@@ -13,10 +13,11 @@ class PagarmeTransactionInstanceData:
 
     # @TODO add international phone number capability
 
-    def __init__(self, person, extra_data):
+    def __init__(self, person, extra_data, event):
 
         self.person = person
         self.extra_data = extra_data
+        self.event = event
 
         self._get_organization()
         self._get_transaction_type()
@@ -91,7 +92,7 @@ class PagarmeTransactionInstanceData:
             "items": [
                 {
                     "id": str(transaction_id),
-                    "title": "Inscrição do Evento: " + self.organization.name,
+                    "title": "Inscrição do Evento: " + self.event.name,
                     "unit_price": self.extra_data['amount'],
                     "quantity": 1,
                     "tangible": False
