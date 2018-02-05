@@ -219,18 +219,19 @@ pipeline:
     secrets:
       - source: CONGRESSY_DEPLOY
         target: ssh_key
-      - aws_key,
-      - aws_secret,
-      - domain,
-      - force_https,
-      - bucket_location,
-      - bucket_name,
-      - cron_sync_minutes_out,
-      - cron_sync_minutes_in,
-      - dbhost,
-      - dbuser,
-      - dbpass,
-      - dbname,
+      - aws_key
+      - aws_key
+      - aws_secret
+      - domain
+      - force_https
+      - bucket_location
+      - bucket_name
+      - cron_sync_minutes_out
+      - cron_sync_minutes_in
+      - dbhost
+      - dbuser
+      - dbpass
+      - dbname
       - dbport
     script:
       - mkdir -p ~/cgsy
