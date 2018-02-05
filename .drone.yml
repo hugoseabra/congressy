@@ -210,10 +210,12 @@ pipeline:
       branch: [ master ]
 
   prepare-production-server:
-    image: tmaier/docker-compose
+    image: appleboy/drone-ssh
     pull: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    host:
+      - 172.31.36.223
+    username: admin
+    port: 22
     secrets: [
       aws_key,
       aws_secret,
