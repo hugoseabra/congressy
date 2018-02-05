@@ -96,7 +96,6 @@ pipeline:
       - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - cat ./bin/env/staging/env-cgsy-staging
       - sh ./bin/env/staging/03_start-cgsy-staging.sh
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
     when:
@@ -210,6 +209,49 @@ pipeline:
     when:
       branch: [ master ]
 
+  prepare-production-server:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.36.223
+    user: admin
+    source: ./conf/deploy
+    target: ~/cgsy/.
+    include: [ "docker-compose.yml" ]
+    key: ${CONGRESSY_DEPLOY}
+    secrets: [
+      congressy_deploy,
+      aws_key,
+      aws_secret,
+      domain,
+      force_https,
+      bucket_location,
+      bucket_name,
+      cron_sync_minutes_out,
+      cron_sync_minutes_in,
+      dbhost,
+      dbuser,
+      dbpass,
+      dbname,
+      dbport
+    ]
+    script:
+      - echo "AWS_KEY=$${AWS_KEY}" > env-file
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> env-file
+      - echo "DOMAIN=$${DOMAIN}" >> env-file
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> env-file
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> env-file
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> env-file
+      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> env-file
+      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> env-file
+      - echo "DBHOST=$${DBHOST}" >> env-file
+      - echo "DBUSER=$${DBUSER}" >> env-file
+      - echo "DBPASS=$${DBPASS}" >> env-file
+      - echo "DBNAME=$${DBNAME}" >> env-file
+      - echo "DBPORT=$${DBPORT}" >> env-file
+    when:
+      branch: [ develop ]
+
   deploy-latest-version:
     image: appleboy/drone-ssh
     pull: true
@@ -221,7 +263,7 @@ pipeline:
         target: ssh_key
     script:
       - docker exec -i awsecr pull cgsy:latest
-      - docker-compose -f stack-drone.yml up -d
+      - docker-compose -f ~/cgsy/docker-compose.yml up -d
     when:
       branch: [ master ]
 

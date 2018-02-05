@@ -1,0 +1,25 @@
+version: "2.3"
+services:
+  redis:
+    image: redis:4-alpine
+    networks:
+      - redis
+    volumes:
+      - "redis:/data"
+
+  cgsy:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    networks:
+      - redis
+    volumes:
+      - "cgsy_media:/var/www/cgsy/media_dev"
+    ports:
+      - "8000:80"
+    env-file: ~/cgsy/env-file
+
+networks:
+  redis:
+
+volumes:
+  cgsy_media:
+  redis:
