@@ -15,7 +15,7 @@ services:
       - "cgsy_media:/var/www/cgsy/media_dev"
     ports:
       - "8000:80"
-    env-file: ~/cgsy/env-file
+    env_file: ./env-file
 
 networks:
   redis:
