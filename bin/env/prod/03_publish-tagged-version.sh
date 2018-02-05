@@ -13,7 +13,9 @@ set -ex
 ###############################################################################
 
 BASE=$(dirname "$0")
+echo "${BASE}/tagged_version"
 CHECKABLE_FILE=$(cat ${BASE}/tagged_version)
+
 
 if [ "$CHECKABLE_FILE" == "1" ]; then
     VERSION=$(cat "$BASE/../../../version")
