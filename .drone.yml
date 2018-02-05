@@ -105,8 +105,8 @@ pipeline:
     image: appleboy/drone-telegram
     pull: true
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-#    to: -275808686 # ID chat Congressy
-    to: 245012348 # ID hugoseabra
+    to: -275808686 # ID chat Congressy
+#    to: 245012348 # ID hugoseabra
     format: markdown
     message: >
       *{{uppercase build.status }} - Ambiente RC*
@@ -210,17 +210,42 @@ pipeline:
       branch: [ master ]
 
   prepare-production-server:
-    image: drillster/drone-rsync
+    image: appleboy/drone-ssh
     pull: true
-    hosts:
+    host:
       - 172.31.36.223
-    user: admin
-    source: ./conf/deploy
-    target: ~/cgsy/.
-    include: [ "docker-compose.yml" ]
-    key: ${CONGRESSY_DEPLOY}
-    secrets: [
-      congressy_deploy,
+    username: admin
+    port: 22
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+      - source: AWS_KEY
+        target: AWS_KEY
+      - source: AWS_SECRET
+        target: AWS_SECRET
+      - source: DOMAIN
+        target: DOMAIN
+      - source: FORCE_HTTPS
+        target: FORCE_HTTPS
+      - source: BUCKET_LOCATION
+        target: BUCKET_LOCATION
+      - source: BUCKET_NAME
+        target: BUCKET_NAME
+      - source: CRON_SYNC_MINUTES_OUT
+        target: CRON_SYNC_MINUTES_OUT
+      - source: CRON_SYNC_MINUTES_IN
+        target: CRON_SYNC_MINUTES_IN
+      - source: DBHOST
+        target: DBHOST
+      - source: DBUSER
+        target: DBUSER
+      - source: DBPASS
+        target: DBPASS
+      - source: DBNAME
+        target: DBNAME
+      - source: DBPORT
+        target: DBPORT
+    envs: [
       aws_key,
       aws_secret,
       domain,
@@ -236,19 +261,35 @@ pipeline:
       dbport
     ]
     script:
-      - echo "AWS_KEY=$${AWS_KEY}" > env-file
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> env-file
-      - echo "DOMAIN=$${DOMAIN}" >> env-file
-      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> env-file
-      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> env-file
-      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> env-file
-      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> env-file
-      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> env-file
-      - echo "DBHOST=$${DBHOST}" >> env-file
-      - echo "DBUSER=$${DBUSER}" >> env-file
-      - echo "DBPASS=$${DBPASS}" >> env-file
-      - echo "DBNAME=$${DBNAME}" >> env-file
-      - echo "DBPORT=$${DBPORT}" >> env-file
+      - mkdir -p ~/cgsy
+      - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
+      - echo "DOMAIN=$${DOMAIN}" >> ~/cgsy/env-file
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ~/cgsy/env-file
+      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> ~/cgsy/env-file
+      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> ~/cgsy/env-file
+      - echo "DBHOST=$${DBHOST}" >> ~/cgsy/env-file
+      - echo "DBUSER=$${DBUSER}" >> ~/cgsy/env-file
+      - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
+      - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
+      - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
+    when:
+      branch: [ master ]
+
+  tranfer-stackfile-production-server:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.36.223
+    port: 22
+    user: admin
+    source: ./conf/deploy/docker-compose.yml
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
     when:
       branch: [ master ]
 
@@ -258,12 +299,14 @@ pipeline:
     host:
       - 172.31.36.223
     username: admin
+    port: 22
     secrets:
       - source: CONGRESSY_DEPLOY
         target: ssh_key
     script:
       - docker exec -i awsecr pull cgsy:latest
       - docker-compose -f ~/cgsy/docker-compose.yml up -d
+      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     when:
       branch: [ master ]
 
@@ -271,8 +314,8 @@ pipeline:
     image: appleboy/drone-telegram
     pull: true
     token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
-#    to: -275808686 # ID chat Congressy
-    to: 245012348 # ID hugoseabra
+    to: -275808686 # ID chat Congressy
+#    to: 245012348 # ID hugoseabra
     format: markdown
     message: >
       *{{uppercase build.status }} - Produção*

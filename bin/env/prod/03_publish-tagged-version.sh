@@ -19,5 +19,5 @@ CHECKABLE_FILE=$(cat ${BASE}/tagged_version)
 
 if [ "$CHECKABLE_FILE" == "1" ]; then
     VERSION=$(cat "$BASE/../../../version")
-    docker exec -i awsecr cgsy:${VERSION}
+    docker exec -i awsecr push cgsy:${VERSION}
 fi
