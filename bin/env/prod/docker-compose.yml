@@ -15,20 +15,7 @@ services:
       - "cgsy_media:/var/www/cgsy/media_dev"
     ports:
       - "8000:80"
-    environment:
-      - DOMAIN=ev.congressy.com
-      - FORCE_HTTPS=true
-      - AWS_KEY=AKIAJHS7RBNESVTWWI6Q
-      - AWS_SECRET=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
-      - BUCKET_LOCATION=us-east-1
-      - BUCKET_NAME=cgsyplatform
-      - CRON_SYNC_MINUTES_OUT=8
-      - CRON_SYNC_MINUTES_IN=5
-      - DBHOST=congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com
-      - DBUSER=congressy
-      - DBPASS=4UnADjyMjeeB7GSc
-      - DBNAME=cgsyplatform
-      - DBPORT=5499
+    env_file: ./env-file
 
 networks:
   redis:

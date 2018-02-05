@@ -221,36 +221,46 @@ pipeline:
     secrets:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
-    secrets: [
-      congressy_deploy,
-      aws_key,
-      aws_secret,
-      domain,
-      force_https,
-      bucket_location,
-      bucket_name,
-      cron_sync_minutes_out,
-      cron_sync_minutes_in,
-      dbhost,
-      dbuser,
-      dbpass,
-      dbname,
-      dbport
-    ]
-    script:
-      - echo "AWS_KEY=$${AWS_KEY}" > env-file
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> env-file
-      - echo "DOMAIN=$${DOMAIN}" >> env-file
-      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> env-file
-      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> env-file
-      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> env-file
-      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> env-file
-      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> env-file
-      - echo "DBHOST=$${DBHOST}" >> env-file
-      - echo "DBUSER=$${DBUSER}" >> env-file
-      - echo "DBPASS=$${DBPASS}" >> env-file
-      - echo "DBNAME=$${DBNAME}" >> env-file
-      - echo "DBPORT=$${DBPORT}" >> env-file
+      - source: aws_key
+        target: AWS_KEY
+      - source: aws_secret
+        target: AWS_SECRET
+      - source: domain
+        target: DOMAIN
+      - source: force_https
+        target: FORCE_HTTPS
+      - source: bucket_location
+        target: BUCKET_LOCATION
+      - source: bucket_name
+        target: BUCKET_NAME
+      - source: cron_sync_minutes_out
+        target: CRON_SYNC_MINUTES_OUT
+      - source: cron_sync_minutes_in
+        target: CRON_SYNC_MINUTES_IN
+      - source: dbhost
+        target: DBHOST
+      - source: dbuser
+        target: DBUSER
+      - source: dbpass
+        target: DBPASS
+      - source: dbname
+        target: DBNAME
+      - source: dbport
+        target: DBPORT
+    scripts:
+      - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
+      - echo "DOMAIN=$${DOMAIN}" >> ~/cgsy/env-file
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ~/cgsy/env-file
+      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> ~/cgsy/env-file
+      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> ~/cgsy/env-file
+      - echo "DBHOST=$${DBHOST}" >> ~/cgsy/env-file
+      - echo "DBUSER=$${DBUSER}" >> ~/cgsy/env-file
+      - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
+      - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
+      - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
     when:
       branch: [ master ]
 
@@ -265,6 +275,7 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: ssh_key
     script:
+
       - docker exec -i awsecr pull cgsy:latest
       - docker-compose -f ~/cgsy/docker-compose.yml up -d
     when:
