@@ -57,6 +57,14 @@ print("LATEST VERSION: " + LATEST_VERSION)
 
 higher_version = semver.compare(LATEST_VERSION, VERSION) == -1
 
-with open('tagged_version', 'w+') as f:
-    f.write('1' if higher_version is True else '0')
+tagged_version_file = os.path.join(BASE, 'tagged_version')
+
+with open(tagged_version_file, 'w+') as f:
+    value = '1' if higher_version is True else '0'
+    print("Registrando valor '{}' em {}.".format(
+        value,
+        tagged_version_file
+    ))
+
+    f.write(value)
     f.close()
