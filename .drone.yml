@@ -245,6 +245,21 @@ pipeline:
         target: DBNAME
       - source: DBPORT
         target: DBPORT
+    envs: [
+      aws_key,
+      aws_secret,
+      domain_staging,
+      force_https_staging,
+      bucket_location,
+      bucket_name,
+      cron_sync_minutes_out,
+      cron_sync_minutes_in,
+      dbhost_staging,
+      dbuser_staging,
+      dbpass_staging,
+      dbname_staging,
+      dbport_staging
+    ]
     script:
       - mkdir -p ~/cgsy
       - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
