@@ -41,7 +41,5 @@ MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 INTERNAL_IPS = ['127.0.0.1']
 
 PAGARME_API_KEY = 'ak_test_IkLKxOIdD0GVTHfmlSPA1zuGoaCQtd'
-
 PAGARME_ENCRYPT_KEY = 'ek_test_ep7xk51I1XtWg58B9xij1VFwJRLcKa'
-
 PAGARME_RECIPIENT_ID = 're_cjcupb1iq0200zl6d89r92s32'
