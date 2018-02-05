@@ -1,6 +1,6 @@
 # Branches added globally
 branches:
-  include: [master, release/*, hotfix/*]
+  include: [ master, release/* ]
 
 # Custom definition for cloning, adding tags and depth
 clone:
@@ -11,6 +11,141 @@ clone:
 
 # Steps of deploy, according to configurations and conditionals
 pipeline:
+#=============================================================================#
+# STAGING
+#=============================================================================#
+  backup-db-staging:
+    image: postgres:9.6-alpine
+    pull: true
+    volumes:
+      - /tmp/bkp:/tmp/bkp
+    commands:
+      - ./bin/env/staging/01_backup-db-staging.sh
+    when:
+      branch: [ hotfix/*, release/* ]
+
+  recreate-staging-db:
+    image: tmaier/docker-compose
+    pull: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/bkp:/tmp/bkp
+    commands:
+      - sh ./bin/env/staging/02_recreate-db-staging.sh
+    when:
+      branch:
+        include: [ hotfix/*, release/* ]
+
+  save-staging-version:
+    image: alpine
+    pull: true
+    commands:
+      - basename ${DRONE_COMMIT_BRANCH} > ./version
+      - echo "${DRONE_BUILD_NUMBER}" > ./build_number
+      - echo "${DRONE_COMMIT_AUTHOR}" > ./build_author
+      - echo "${DRONE_BUILD_LINK}" > ./build_link
+    when:
+      branch: [ hotfix/*, release/* ]
+
+  build-staging-image:
+    image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - |
+        printf "Building version: `cat ./version` - build `cat ./build_number`"
+        printf " , por `cat ./build_author`\n\n"
+      - |
+        docker build --rm \
+          -t cgsy-staging \
+          -f ./conf/staging/Dockerfile .
+    when:
+      branch: [ hotfix/*, release/* ]
+
+  deploy-staging-env:
+    image: tmaier/docker-compose
+    pull: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    secrets: [
+      aws_key,
+      aws_secret,
+      domain_staging,
+      force_https_staging,
+      bucket_location,
+      bucket_name,
+      cron_sync_minutes_out,
+      cron_sync_minutes_in,
+      dbhost_staging,
+      dbuser_staging,
+      dbpass_staging,
+      dbname_staging,
+      dbport_staging
+    ]
+    commands:
+      - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/staging/env-cgsy-staging
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "DOMAIN=$${DOMAIN_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+      - cat ./bin/env/staging/env-cgsy-staging
+      - sh ./bin/env/staging/03_start-cgsy-staging.sh
+      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
+    when:
+      branch: [ hotfix/*, release/* ]
+
+  notify-staging-on-telegram:
+    image: appleboy/drone-telegram
+    pull: true
+    token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
+#    to: -275808686 # ID chat Congressy
+    to: 245012348 # ID hugoseabra
+    format: markdown
+    message: >
+      *{{uppercase build.status }} - Ambiente RC*
+
+
+      *Repo:* {{ repo.name }} das {{datetime build.started "3:04PM" "UTC"}} às {{datetime build.finished"3:04PM" "UTC"}}
+
+      *Branch:* {{ commit.branch }}
+
+      *Build:* {{build.number}}
+
+      *Duração:* {{duration build.started build.finished}}
+
+      *Autor:* {{ commit.author }}
+
+      *Mensagem:*
+
+      ```
+      {{ commit.message }}
+      ```
+
+
+      *Ambiente:* https://test.congressy.com/login/
+
+
+      *Build Link:* {{ build.link }}
+
+
+      *Commit:* {{ commit.link }}
+
+
+    when:
+      status: [ success, failure ]
+      branch: [ hotfix/*, release/* ]
+
+#=============================================================================#
+# PRODUCTION
+#=============================================================================#
   create-awsecr:
     image: docker
     pull: true
@@ -27,7 +162,7 @@ pipeline:
       - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ./bin/env/prod/env-awsecr
       - sh ./bin/env/prod/01_create-awsecr-container.sh
     when:
-      branch: [ hotfix/*, release/* ]
+      branch: [ master ]
 
   save-prod-version:
     image: indiehosters/git
@@ -38,7 +173,7 @@ pipeline:
       - echo $${LAST_TAG} > version
       - cat version
     when:
-      branch: [ hotfix/*, release/* ]
+      branch: [ master ]
 
   check-latest-version:
     image: docker
@@ -50,7 +185,7 @@ pipeline:
       - pip3 install --no-cache-dir semver clint
       - python3 ./bin/env/prod/02_check-latest-version.py
     when:
-      branch: [ hotfix/*, release/* ]
+      branch: [ master ]
 
   build-prod-images:
     image: docker
@@ -61,7 +196,7 @@ pipeline:
       - docker build --rm -t $${REPO}:latest -f ./conf/deploy/Dockerfile .
       - docker tag $${REPO}:latest $${REPO}:`cat ./version`
     when:
-      branch: [ hotfix/*, release/* ]
+      branch: [ master ]
 
   publish-images:
     image: docker
@@ -73,4 +208,60 @@ pipeline:
       - ./bin/env/prod/03_publish-tagged-version.sh
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     when:
-      branch: [ hotfix/*, release/* ]
+      branch: [ master ]
+
+  deploy-latest-version:
+    image: appleboy/drone-ssh
+    pull: true
+    host:
+      - 172.31.36.223
+    username: admin
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: ssh_key
+    script:
+      - docker exec -i awsecr pull cgsy:latest
+      - docker-compose -f stack-drone.yml up -d
+    when:
+      branch: [ master ]
+
+  notify-production-on-telegram:
+    image: appleboy/drone-telegram
+    pull: true
+    token: 482555800:AAHSWjlo_kufu069-5N_ecp9ZqQ_r1zpep8
+#    to: -275808686 # ID chat Congressy
+    to: 245012348 # ID hugoseabra
+    format: markdown
+    message: >
+      *{{uppercase build.status }} - Produção*
+
+
+      *Repo:* {{ repo.name }} das {{datetime build.started "3:04PM" "UTC"}} às {{datetime build.finished"3:04PM" "UTC"}}
+
+      *Branch:* {{ commit.branch }}
+
+      *Build:* {{build.number}}
+
+      *Duração:* {{duration build.started build.finished}}
+
+      *Autor:* {{ commit.author }}
+
+      *Mensagem:*
+
+      ```
+      {{ commit.message }}
+      ```
+
+
+      *Ambiente:* https://ev.congressy.com/login/
+
+
+      *Build Link:* {{ build.link }}
+
+
+      *Commit:* {{ commit.link }}
+
+
+    when:
+      status: [ success, failure ]
+      branch: [ master ]
