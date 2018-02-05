@@ -69,7 +69,6 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - BUILD=$(cat ./bin/env/prod/tagged_version)
       - docker exec -i awsecr push cgsy:latest
       - ./bin/env/prod/03_publish-tagged-version.sh
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
