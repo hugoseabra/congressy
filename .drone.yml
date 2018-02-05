@@ -219,20 +219,32 @@ pipeline:
     secrets:
       - source: CONGRESSY_DEPLOY
         target: ssh_key
-      - aws_key
-      - aws_key
-      - aws_secret
-      - domain
-      - force_https
-      - bucket_location
-      - bucket_name
-      - cron_sync_minutes_out
-      - cron_sync_minutes_in
-      - dbhost
-      - dbuser
-      - dbpass
-      - dbname
-      - dbport
+      - source: aws_key
+        target: aws_key
+      - source: aws_secret
+        target: aws_secret
+      - source: domain
+        target: domain
+      - source: force_https
+        target: force_https
+      - source: bucket_location
+        target: bucket_location
+      - source: bucket_name
+        target: bucket_name
+      - source: cron_sync_minutes_out
+        target: cron_sync_minutes_out
+      - source: cron_sync_minutes_in
+        target: cron_sync_minutes_in
+      - source: dbhost
+        target: dbhost
+      - source: dbuser
+        target: dbuser
+      - source: dbpass
+        target: dbpass
+      - source: dbname
+        target: dbname
+      - source: dbport
+        target: dbport
     script:
       - mkdir -p ~/cgsy
       - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
