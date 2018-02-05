@@ -247,7 +247,7 @@ pipeline:
         target: DBNAME
       - source: dbport
         target: DBPORT
-    scripts:
+    script:
       - echo "AWS_KEY=$${AWS_KEY}" > cgsy/env-file
       - echo "AWS_SECRET=$${AWS_SECRET}" >> cgsy/env-file
       - echo "DOMAIN=$${DOMAIN}" >> cgsy/env-file
@@ -275,7 +275,6 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: ssh_key
     script:
-
       - docker exec -i awsecr pull cgsy:latest
       - docker-compose -f ~/cgsy/docker-compose.yml up -d
     when:
