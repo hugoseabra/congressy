@@ -64,12 +64,15 @@ run_python_script "Configurando WSGI" /configure-wsgi.py
 run_python_script "Configurando NGINX" /configure-nginx.py
 run_python_script "Configurando SYNC" /configure-sync.py
 run_bash_script "Verificando existência do Bucket" /s3bucket.sh
-run_bash_script_with_output "Baixando arquivos do S3" /in-sync.sh
 run_python_script "Configurando DB" /configure-db.py
 run_python_script "Configurando RODAPÉ" /configure-footer.py
 run_python_script "Coletando arquivos estáticos" "manage.py collectstatic --noinput --verbosity 0"
 run_python_script_with_output "Executando migrate" "manage.py migrate"
 run_python_script_with_output "Populando banco de dados" "manage.py loaddata logtailer_filter logtailer_logfile"
+
+run_bash_script_with_output "Baixando arquivos do S3" /in-sync.sh
+
+echo "Configured: SUCCESS"
 
 echo " > Iniciando SUPERVISOR"
 echo ;

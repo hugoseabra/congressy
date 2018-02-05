@@ -1,2 +1,7 @@
 .idea
 .git
+.drone.yml
+.drone.yml.sig
+.pylintrc
+doc
+README.md

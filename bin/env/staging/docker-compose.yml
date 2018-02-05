@@ -1,3 +1,17 @@
+###############################################################################
+# CUIDADO!
+# Esta script é gerenciado pelo CI. Não altere ou mude sem saber o que está
+# fazendo.
+###############################################################################
+# CI-STEP: Destruir e (re)criar container de versão de staging
+#
+# - o container usa o banco de dados cgsy-postgres criado externamente, que é o
+#   mesmo utilizado para o ambiente de desenvolvimento (local).
+# - IMPORTANTE manter o nome do container como "cgsy-staging" pois outros
+#   scripts utilizam esta referência.
+# - env-file "env-cgsy-staging" é construído pelo CI dinamicamente por causa
+#   das informações sensíveis.
+###############################################################################
 version: '2.3'
 services:
   cgsy-staging:
@@ -7,18 +21,7 @@ services:
       - postgres
     ports:
       - "8080:80"
-    environment:
-      - AWS_KEY=AKIAJHS7RBNESVTWWI6Q
-      - AWS_SECRET=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
-      - DOMAIN=test.congressy.com
-      - FORCE_HTTPS=True
-      - BUCKET_LOCATION=us-east-1
-      - BUCKET_NAME=cgsyplatform
-      - DBHOST=cgsy-postgres
-      - DBUSER=congressy
-      - DBPASS=congressy
-      - DBNAME=cgsyplatform
-      - DBPORT=5432
+    env_file: ./env-cgsy-staging
 
 networks:
   postgres:
