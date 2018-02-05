@@ -248,19 +248,19 @@ pipeline:
       - source: dbport
         target: DBPORT
     scripts:
-      - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
-      - echo "DOMAIN=$${DOMAIN}" >> ~/cgsy/env-file
-      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
-      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
-      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ~/cgsy/env-file
-      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> ~/cgsy/env-file
-      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> ~/cgsy/env-file
-      - echo "DBHOST=$${DBHOST}" >> ~/cgsy/env-file
-      - echo "DBUSER=$${DBUSER}" >> ~/cgsy/env-file
-      - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
-      - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
-      - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
+      - echo "AWS_KEY=$${AWS_KEY}" > cgsy/env-file
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> cgsy/env-file
+      - echo "DOMAIN=$${DOMAIN}" >> cgsy/env-file
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> cgsy/env-file
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> cgsy/env-file
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> cgsy/env-file
+      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> cgsy/env-file
+      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> cgsy/env-file
+      - echo "DBHOST=$${DBHOST}" >> cgsy/env-file
+      - echo "DBUSER=$${DBUSER}" >> cgsy/env-file
+      - echo "DBPASS=$${DBPASS}" >> cgsy/env-file
+      - echo "DBNAME=$${DBNAME}" >> cgsy/env-file
+      - echo "DBPORT=$${DBPORT}" >> cgsy/env-file
     when:
       branch: [ master ]
 
