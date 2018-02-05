@@ -218,7 +218,7 @@ pipeline:
     source: ./conf/deploy
     target: ~/cgsy/.
     include: [ "docker-compose.yml" ]
-    key: ${CONGRESSY_DEPLOY}
+    key: $${CONGRESSY_DEPLOY}
     secrets: [
       congressy_deploy,
       aws_key,
