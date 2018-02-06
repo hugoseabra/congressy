@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 import absoluteuri
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -8,16 +9,14 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views import generic
-from django.conf import settings
-from django.forms.models import model_to_dict
-from django.http import HttpResponseRedirect
+
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
 from gatheros_subscription.models import Subscription, FormConfig, Lot
@@ -27,8 +26,8 @@ from mailer.services import (
 )
 from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
-from payment.tasks import create_pagarme_transaction
 from payment.models import Transaction
+from payment.tasks import create_pagarme_transaction
 
 
 class EventMixin(generic.View):
@@ -374,6 +373,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             config.address = config.ADDRESS_SHOW
 
         cxt['config'] = config
+        cxt['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
         return cxt
 

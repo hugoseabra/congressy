@@ -371,7 +371,7 @@
             }
 
             var checkout = new PagarMeCheckout.Checkout({
-                encryption_key: 'ek_test_f9cws0bU9700VqWE4UDuBlKLbvX4IO',
+                encryption_key: '{{ pagarme_encryption_key }}',
                 success: handleSuccess,
                 error: handleError
             });

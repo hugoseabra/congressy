@@ -57,7 +57,7 @@ EMAIL_USE_TLS = False
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media_staging')
 
 PAGARME_API_KEY = 'ak_test_IkLKxOIdD0GVTHfmlSPA1zuGoaCQtd'
-PAGARME_ENCRYPT_KEY = 'ek_test_ep7xk51I1XtWg58B9xij1VFwJRLcKa'
+PAGARME_ENCRYPTION_KEY = 'ek_test_ep7xk51I1XtWg58B9xij1VFwJRLcKa'
 PAGARME_RECIPIENT_ID = 're_cjcupb1iq0200zl6d89r92s32'
 
 # Use nose to run all tests
