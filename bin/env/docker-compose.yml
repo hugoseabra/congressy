@@ -20,9 +20,8 @@
 #   muito legal para o servidor do ambiente staging. DEVE-SE TER CUIDADO ao
 #   gerenciar o servidor para não expor esta porta publicamente.
 ###############################################################################
-version: '2.3'
+version: '3'
 services:
-
   postgres:
     image: postgres:9.6-alpine
     container_name: cgsy-postgres

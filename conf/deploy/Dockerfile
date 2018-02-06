@@ -64,7 +64,8 @@ RUN pip install --no-cache-dir \
         # s3 synchronization
         s3cmd \
         # template engine
-        jinja2
+        jinja2 \
+        raven
 
 
 RUN mkdir -p /root/.pip

@@ -1,7 +1,8 @@
-version: "2.3"
+version: "3"
 services:
   redis:
     image: redis:4-alpine
+    restart: always
     networks:
       - redis
     volumes:
@@ -9,6 +10,7 @@ services:
 
   cgsy:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    restart: always
     networks:
       - redis
     volumes:

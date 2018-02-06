@@ -1,6 +1,7 @@
 # pylint: skip-file
 
 from . import *
+import raven
 
 #############################################################################
 # CUIDADO!!!
@@ -22,6 +23,7 @@ DEBUG = False
 
 INSTALLED_APPS.extend([
     'celery',
+    'raven.contrib.django.raven_compat',
 ])
 
 ABSOLUTEURI_PROTOCOL = 'https'
@@ -49,3 +51,8 @@ EMAIL_BACKEND = 'sparkpost.django.email_backend.SparkPostEmailBackend'
 
 PAGARME_API_KEY = 'ak_live_7Rxgr3GlxWycVDMNeeG2InzwPsoPrM'
 PAGARME_RECIPIENT_ID = 're_cjaskozwr01u1of5zo7kc962u'
+
+RAVEN_CONFIG = {
+    'dsn': '',
+}
+
