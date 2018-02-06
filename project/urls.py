@@ -18,7 +18,7 @@ from hotsite.urls import urlpatterns_public_hotsite
 from payment.urls import public_payment_urls
 
 
-admin_urlpatterns = [url(r'^admin/', admin.site.urls)]
+admin_urlpatterns = [url(r'^cgsy-admin18/', admin.site.urls)]
 
 private_urlpatterns = [
     url(r'^manage/', include('gatheros_subscription.urls', 'subscription')),

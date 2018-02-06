@@ -44,7 +44,7 @@ ABSOLUTEURI_PROTOCOL = 'http'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Host for sending e-mail.
-EMAIL_HOST = '0.0.0.0'
+EMAIL_HOST = 'mailhog'
 
 # Port for sending e-mail.
 EMAIL_PORT = 1025

@@ -19,6 +19,7 @@ services:
     container_name: cgsy-staging
     networks:
       - postgres
+      - mailhog
     ports:
       - "8080:80"
     env_file: ./env-cgsy-staging
@@ -27,3 +28,6 @@ networks:
   postgres:
     external:
       name: env_postgres
+  mailhog:
+    external:
+      name: env_mailhog
