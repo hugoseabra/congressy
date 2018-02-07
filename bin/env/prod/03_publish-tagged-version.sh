@@ -19,5 +19,7 @@ CHECKABLE_FILE=$(cat ${BASE}/tagged_version)
 
 if [ "$CHECKABLE_FILE" == "1" ]; then
     VERSION=$(cat "$BASE/../../../version")
+    docker exec -i awsecr push cgsy:latest
     docker exec -i awsecr push cgsy:${VERSION}
+    docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
 fi

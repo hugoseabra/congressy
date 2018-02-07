@@ -1,10 +1,14 @@
-import sys
 import os
+import sys
 from shutil import copyfile
+
 from jinja2 import Template
 
 domain = os.environ.get('DOMAIN')
 force_https = os.environ.get('FORCE_HTTPS')
+
+force_https_values = ('true', '1',)
+force_https = str(force_https).lower() in force_https_values
 
 if not domain:
     msg = "DOMAIN not provided or misconfigured."
