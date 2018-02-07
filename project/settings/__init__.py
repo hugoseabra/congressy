@@ -7,15 +7,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.messages import constants as message_constants
 
+# ========================== BASE CONFIGURATION ============================= #
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-
 DEBUG = False
-
-ALLOWED_HOSTS = ['*']
-
-X_FRAME_OPTIONS = 'ALLOWALL'
-XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
-
+ROOT_URLCONF = 'project.urls'
+# ================================= APPS ==================================== #
 INSTALLED_APPS = [
     # DJANGO_APPS
     'django.contrib.admin',
@@ -55,12 +51,23 @@ INSTALLED_APPS = [
     'core',
     'hotsite',
 ]
+# ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
+LANGUAGE_CODE = 'pt-br'
+TIME_ZONE = 'America/Sao_Paulo'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = False
 
-# Added to allow overriding django forms templates.
-FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+# Tell Django where the project's translation files should be.
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
 
-SITE_ID = 1
-
+LANGUAGES = (
+# ============================= MIDDLEWARES ================================= #
+    ('en', _('English')),
+    ('pt-br', _('Português')),
+)
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -73,13 +80,54 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
 ]
-
-ROOT_URLCONF = 'project.urls'
-
+# =========================== AUTH BACKENDS ================================= #
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # default
-    'permission.backends.PermissionBackend',  # django-permission
+    # auth
+    'django.contrib.auth.backends.ModelBackend',
+    # django-permission
+    'permission.backends.PermissionBackend',
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
+}
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/manage/'
+LOGOUT_REDIRECT_URL = '/login/'
+# ============================ VALIDATORS =================================== #
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.'
+                'UserAttributeSimilarityValidator',
+    },
+]
+# ========================= SERVER CONFIGURATION ============================ #
+WSGI_APPLICATION = 'project.wsgi.application'
+
+ALLOWED_HOSTS = ['*']
+X_FRAME_OPTIONS = 'ALLOWALL'
+XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
+
+SITE_ID = 1
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+
+# @TODO Mudar para /media em produção.
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
+MEDIA_URL = '/media/'
+
+# Name of cache backend to cache user agents. If it not specified default
+# cache alias will be used. Set to `None` to disable caching.
+# Uncomment this when cache is configured
+# USER_AGENTS_CACHE = 'default'
+
+# ============================= TEMPLATES =================================== #
+# Added to allow overriding django forms templates.
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 
 class InvalidTemplateVariable(str):
@@ -114,9 +162,7 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'project.wsgi.application'
-
+# ============================== DATABASE =================================== #
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -127,50 +173,15 @@ DATABASES = {
         'PORT': '',
     },
 }
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.'
-                'UserAttributeSimilarityValidator',
-    },
-]
-
-# Name of cache backend to cache user agents. If it not specified default
-# cache alias will be used. Set to `None` to disable caching.
-# Uncomment this when cache is configured
-# USER_AGENTS_CACHE = 'default'
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    )
-}
-
-LANGUAGE_CODE = 'pt-br'
-TIME_ZONE = 'America/Sao_Paulo'
-USE_I18N = True
-USE_L10N = True
-USE_TZ = False
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_URL = '/static/'
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
-MEDIA_URL = '/media/'
-
+# ============================== FIXTURES =================================== #
 FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'fixtures'),
     os.path.join(BASE_DIR, 'gatheros_event/tests/fixtures'),
     os.path.join(BASE_DIR, 'gatheros_subscription/tests/fixtures'),
 ]
-
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/manage/'
-LOGOUT_REDIRECT_URL = '/login/'
-
+# ============================== GOOGLE ===================================== #
 GOOGLE_MAPS_API_KEY = 'AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw'
-
+# ============================= CKEDITOR ==================================== #
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar_Full': [
@@ -238,7 +249,7 @@ CKEDITOR_CONFIGS = {
         'height': 150,
     },
 }
-
+# ============================= MESSAGES ==================================== #
 MESSAGE_TAGS = {
     message_constants.DEBUG: 'debug',
     message_constants.INFO: 'info',
@@ -246,18 +257,7 @@ MESSAGE_TAGS = {
     message_constants.WARNING: 'warning',
     message_constants.ERROR: 'danger',
 }
-
+# =============================== E-MAIL ==================================== #
 DEFAULT_FROM_EMAIL = 'Congressy <mail@congressy.net>'
 CONGRESSY_REPLY_TO = 'Congressy <congressy@congressy.com>'
 ALERT_EMAILS = ['nathan@congressy.com', 'hugo@congressy.com']
-# Tell Django where the project's translation files should be.
-LOCALE_PATHS = (
-    os.path.join(BASE_DIR, 'locale'),
-)
-
-
-LANGUAGES = (
-    ('en', _('English')),
-    ('pt-br', _('Português')),
-)
-

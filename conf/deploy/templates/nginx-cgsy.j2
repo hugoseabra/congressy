@@ -15,7 +15,6 @@ server {
       rewrite ^(.*)$ https://$server_name$REQUEST_URI permanent;
     }
     {% endif %}
-
     location /media  {
         alias /var/www/cgsy/media_dev;
     }

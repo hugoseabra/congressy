@@ -2,8 +2,15 @@
 
 from . import *
 
+# ========================== BASE CONFIGURATION ============================= #
 SECRET_KEY = '1@==vhll7d5v(%=t++oy-38+639o-4*f73^!o=v!a^z$#(6x%$'
 
+DEBUG = True
+# ================================= APPS ==================================== #
+INSTALLED_APPS.extend([
+    'debug_toolbar',
+])
+# ============================== DATABASE =================================== #
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -13,35 +20,25 @@ DATABASES = {
         'HOST': 'localhost',
     },
 }
-
-DEBUG = True
-
-INSTALLED_APPS.extend([
-    'debug_toolbar',
-])
-
+# ============================= MIDDLEWARES ================================= #
+# Django debug toolbar
+MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+# ========================= SERVER CONFIGURATION ============================ #
 ABSOLUTEURI_PROTOCOL = 'http'
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
+# ================================= E-MAIL ================================== #
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
 # Host for sending e-mail.
-EMAIL_HOST = '0.0.0.0'
-
+EMAIL_HOST = 'mailhog'
 # Port for sending e-mail.
 EMAIL_PORT = 1025
-
 # Optional SMTP authentication information for EMAIL_HOST.
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
-
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
-
-MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
-
-INTERNAL_IPS = ['127.0.0.1']
-
+# ================================ PAGAR.ME ================================= #
 PAGARME_API_KEY = 'ak_test_IkLKxOIdD0GVTHfmlSPA1zuGoaCQtd'
 PAGARME_ENCRYPTION_KEY = 'ek_test_ep7xk51I1XtWg58B9xij1VFwJRLcKa'
 PAGARME_RECIPIENT_ID = 're_cjcupb1iq0200zl6d89r92s32'
+# ============================ DEBUG TOOL BAR =============================== #
+INTERNAL_IPS = ['127.0.0.1']
