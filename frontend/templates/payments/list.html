@@ -1,0 +1,152 @@
+{% extends "base/base.html" %}
+{% load static event_tags  base_tags  widget_tweaks form_config_tags humanize%}
+
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissable">
+                <button type="button" class="close"
+                        data-dismiss="alert" aria-hidden="true">×
+                </button>
+                {{ message|get_first_item }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock messages %}
+
+{% block title %}
+    Pagamentos | Congressy
+{% endblock %}
+
+{% block page_title %}
+    Lista de pagamentos
+{% endblock %}
+
+{% block page_sub_title %}
+    {{ event.name }}
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+        <li class="active">
+            <a href="{% url 'event:event-payments' event.pk %}"
+               title="Pagamentos">
+                <i class="fa  fa-fw fa-rocket"></i> Pagamentos
+            </a>
+        </li>
+    </ul>
+
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'subscription:lot-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Ingressos
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    {% if object_list %}
+                        <table id="payments_table"
+                               class="table table-striped table-bordered dataTable no-footer nowrap"
+                               cellspacing="0"
+                               width="100%">
+                            <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo de Pagamento</th>
+                                <th>Status</th>
+                                <th>Preço</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for transaction in object_list %}
+                                <tr>
+                                    <td>
+                                        {{ transaction.subscription.person.name }}
+                                    </td>
+                                    <td>
+                                        {{ transaction.get_type_display }}
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            {% if transaction.status == transaction.AUTHORIZED or transaction.status == transaction.PAID or transaction.status == transaction.REFUNDED %}
+                                                <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
+                                            {% elif transaction.status == transaction.PROCESSING or transaction.status == transaction.WAITING_PAYMENT or transaction.status == transaction.PENDING_REFUND or transaction.status == transaction.CHARGEDBACK %}
+                                                <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>
+                                            {% elif transaction.status == transaction.REFUSED %}
+                                                <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>
+                                            {% else %}
+                                                <i class="fa fa-circle" aria-hidden="true"></i>
+                                            {% endif %}
+                                            {{ transaction.get_status_display }} - {{ transaction.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                        </strong>
+                                        {% if transaction.statuses.all %}
+                                            <hr />
+                                            {% for status in transaction.statuses.all %}
+                                                <div class="text-muted">
+                                                    {% if status.status == status.AUTHORIZED or status.status == status.PAID or status.status == status.REFUNDED %}
+                                                        <i class="fa fa-circle" aria-hidden="true"
+                                                           style="color:#5cb85c"></i>
+                                                    {% elif status.status == status.PROCESSING or status.status == status.WAITING_PAYMENT or status.status == status.PENDING_REFUND or status.status == status.CHARGEDBACK %}
+                                                        <i class="fa fa-circle" aria-hidden="true"
+                                                           style="color: #f0ad4e"></i>
+                                                    {% elif status.status == status.REFUSED %}
+                                                        <i class="fa fa-circle" aria-hidden="true"
+                                                           style="color: #d9534f"></i>
+                                                    {% else %}
+                                                        <i class="fa fa-circle" aria-hidden="true"></i>
+                                                    {% endif %}
+                                                    {{ status.get_status_display }} - {{ status.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        R$ {{ transaction.amount|money_divide|intcomma }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h3>Nenhum dado.</h3>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+

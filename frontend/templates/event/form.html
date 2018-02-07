@@ -5,6 +5,7 @@
 {% load event_tags %}
 
 {% block sidebar %}{% endblock %}
+
 {% block sidebar-bars %}{% endblock %}
 
 {% block messages %}
@@ -19,17 +20,21 @@
         {% endfor %}
     {% endif %}
 {% endblock messages %}
+
 {% block title %}
     {% if object %}Editar{% else %}Novo{% endif %} Evento | Congressy
 {% endblock %}
+
 {% block page_title %}
     {% if object %}Editar{% else %}Novo{% endif %} Evento
 {% endblock %}
+
 {% block page_sub_title %}
     {% if object %}
         {{ object.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
+
 {% block content %}
     <form action="" method="post" class="form-horizontal form-border"
           role="form" name="event_form">
@@ -145,7 +150,6 @@
         </div>
     </form>
 {% endblock %}
-
 
 {% block scripts %}
 

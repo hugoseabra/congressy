@@ -4,8 +4,9 @@ gatheros_subscription templatetags
 import datetime
 from ast import literal_eval
 
-from django import template
 import timestring
+from django import template
+from django.template.defaultfilters import stringfilter
 
 from core.util import git_util
 
@@ -63,3 +64,28 @@ def to_datetime(date_string):
     return '{0:%Y-%m-%d %H:%M:%S}'.format(datetime_obj)
 
 
+@stringfilter
+@register.filter
+def parse_date(date_string, format):
+    """
+    Return a datetime corresponding to date_string, parsed according to format.
+
+    For example, to re-display a date string in another format::
+
+        {{ "01/01/1970"|parse_date:"%m/%d/%Y"|date:"F jS, Y" }}
+
+    """
+    try:
+        return datetime.datetime.strptime(date_string, format)
+    except ValueError:
+        return None
+
+
+@register.filter
+def money_divide(value):
+    try:
+        raw_result = value / 100
+        result = format(raw_result, '.2f')
+        return result
+    except (ValueError, ZeroDivisionError):
+        return None

@@ -5,6 +5,7 @@
 {% block title %} Página do Evento | Congressy{% endblock %}
 
 {% block page_title %}Página do Evento{% endblock %}
+
 {% block page_sub_title %}{{ event.name }}{% endblock %}
 
 {% block page_description %}Configuração da página do evento.{% endblock %}
@@ -94,6 +95,12 @@
                 </a>
             </li>
         {% endif %}
+        <li>
+            <a href="{% url 'event:event-payments' event.pk %}"
+               title="Pagamentos">
+                <i class="fa  fa-fw fa-rocket"></i> Pagamentos
+            </a>
+        </li>
     </ul>
 {% endblock %}
 

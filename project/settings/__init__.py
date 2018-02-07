@@ -165,6 +165,7 @@ FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'fixtures'),
     os.path.join(BASE_DIR, 'gatheros_event/tests/fixtures'),
     os.path.join(BASE_DIR, 'gatheros_subscription/tests/fixtures'),
+    os.path.join(BASE_DIR, 'payment/tests/fixtures'),
 ]
 
 LOGIN_URL = '/login/'

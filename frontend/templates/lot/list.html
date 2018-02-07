@@ -4,17 +4,21 @@
 {% load event_tags %}
 
 {% block title %} Lotes | Congressy{% endblock %}
+
 {% block page_title %}Lotes/Categorias{% endblock %}
+
 {% block page_sub_title %}
     {{ event.name }}
-{#    {% if not event.published %}#}
-{#        <i style="color: darkgrey">- não publicado</i>#}
-{#    {% endif %}#}
+    {#    {% if not event.published %}#}
+    {#        <i style="color: darkgrey">- não publicado</i>#}
+    {#    {% endif %}#}
 {% endblock %}
+
 {% block styles %}
     <link rel="stylesheet"
           href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
 {% endblock %}
+
 {% block scripts %}
     <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
     <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
@@ -98,6 +102,12 @@
             <a href="{% url 'subscription:form-config' event.pk %}"
                title="Formulário">
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'event:event-payments' event.pk %}"
+               title="Pagamentos">
+                <i class="fa  fa-fw fa-rocket"></i> Pagamentos
             </a>
         </li>
     </ul>
