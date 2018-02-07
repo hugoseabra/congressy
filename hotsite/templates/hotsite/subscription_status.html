@@ -343,7 +343,7 @@
                                 <input type="hidden" name="allowed_transaction" id="id_allowed_transaction"
                                        value="{{ allow_transaction }}"/>
                                 <input type="hidden" name="subscription" id="id_subscription"
-                                       value="{{ subscription }}"/>
+                                       value="{{ subscription|default_if_none:"" }}"/>
                                 <button class="btn btn-success btn-xs">Novo pagamento</button>
                             </form>
                             <script>

@@ -17,6 +17,8 @@ from gatheros_front.urls import (
 from hotsite.urls import urlpatterns_public_hotsite
 from payment.urls import public_payment_urls
 
+handler404 = 'project.views.handler404'
+handler500 = 'project.views.handler500'
 
 admin_urlpatterns = [url(r'^admin/', admin.site.urls)]
 

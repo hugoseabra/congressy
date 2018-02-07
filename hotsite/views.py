@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 import absoluteuri
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -8,16 +9,14 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views import generic
-from django.conf import settings
-from django.forms.models import model_to_dict
-from django.http import HttpResponseRedirect
+
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
 from gatheros_subscription.models import Subscription, FormConfig, Lot
@@ -27,8 +26,8 @@ from mailer.services import (
 )
 from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
-from payment.tasks import create_pagarme_transaction
 from payment.models import Transaction
+from payment.tasks import create_pagarme_transaction
 
 
 class EventMixin(generic.View):
@@ -48,8 +47,11 @@ class EventMixin(generic.View):
         context['lots'] = self.get_lots()
         context['subscription_enabled'] = self.subscription_enabled()
         context['has_paid_lots'] = self.has_paid_lots()
-        context['has_configured_bank_account'] = self.event.organization.is_bank_account_configured()
-        context['has_active_bank_account'] = self.event.organization.active_recipient
+        context[
+            'has_configured_bank_account'] = \
+            self.event.organization.is_bank_account_configured()
+        context['has_active_bank_account'] = \
+            self.event.organization.active_recipient
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
 
         return context
@@ -328,6 +330,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             config = self.event.formconfig
         except AttributeError:
             config = FormConfig()
+            config.event = self.event
 
         required_fields = ['gender']
 
@@ -406,20 +409,25 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         if allowed_transaction:
             request.session['allowed_transaction'] = allowed_transaction
             slug = kwargs.get('slug')
-            return HttpResponseRedirect(reverse('public:hotsite-subscription', args={slug}))
+            return HttpResponseRedirect(
+                reverse('public:hotsite-subscription', args={slug}))
 
         with transaction.atomic():
             form = self.get_form()
             if form.initial and not form.is_valid():
                 slug = kwargs.get('slug')
-                return HttpResponseRedirect(reverse('public:hotsite-subscription', args={slug}))
+                return HttpResponseRedirect(
+                    reverse('public:hotsite-subscription', args={slug}))
 
             if not form.is_valid():
                 context['form'] = form
                 return self.render_to_response(context)
 
-            if 'transaction_type' not in request.POST:
-                messages.error(request=self.request, message='Por favor escolha um tipo de pagamento.')
+            if self.has_paid_lots() and 'transaction_type' not in request.POST:
+                messages.error(
+                    request=self.request,
+                    message='Por favor escolha um tipo de pagamento.'
+                )
                 return self.render_to_response(context)
 
             person = form.save()
@@ -433,7 +441,8 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             lot = get_object_or_404(Lot, event=self.event, pk=lot_pk)
             #
             try:
-                subscription = Subscription.objects.get(lot=lot, person=person, event=self.event)
+                subscription = Subscription.objects.get(lot=lot, person=person,
+                                                        event=self.event)
                 subscription.event = self.event
                 subscription.person = person
                 subscription.created_by = user.id
@@ -446,38 +455,44 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
             subscription.save()
 
-            try:
-                transaction_instance_data = PagarmeTransactionInstanceData(person=person, extra_data=request.POST,
-                                                                           event=self.event)
-                create_pagarme_transaction(payment=transaction_instance_data.transaction_instance_data,
-                                           subscription=subscription)
-                notify_new_subscription(self.event, subscription)
-
-                messages.success(
-                    self.request,
-                    'Inscrição realizada com sucesso!'
-                )
-            except TransactionError as e:
-                error_dict = {
-                    'No transaction type': 'Por favor escolher uma forma de pagamento.',
-                    'Transaction type not allowed': 'Forma de pagamento não permitida.',
-                    'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
-                    'No organization': 'Evento não possui organizador.',
-                    'Unknown API error': 'Houve um problema durante o processamento do pagamento.'
-                }
-
-                if e.message == 'Unknown API error':
-                    e.message = e.message = error_dict[e.message]
+            if self.has_paid_lots():
+                try:
+                    transaction_instance_data = PagarmeTransactionInstanceData(
+                        person=person,
+                        extra_data=request.POST
+                    )
+                except TransactionError as e:
+                    error_dict = {
+                        'No transaction type': 'Por favor escolher uma forma de pagamento.',
+                        'Transaction type not allowed': 'Forma de pagamento não permitida.',
+                        'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
+                        'No organization': 'Evento não possui organizador.',
+                    }
+                    if e.message in error_dict:
+                        e.message = error_dict[e.message]
                     messages.error(self.request, message=e.message)
-                    return redirect('public:hotsite-subscription-status', slug=self.event.slug)
+                    return self.render_to_response(context)
 
-                if e.message in error_dict:
-                    e.message = error_dict[e.message]
+                create_pagarme_transaction(
+                    payment=transaction_instance_data.transaction_instance_data,
+                    subscription=subscription
+                )
 
-                messages.error(self.request, message=e.message)
-                return self.render_to_response(context)
+            subscription.save()
+            notify_new_subscription(self.event, subscription)
 
-        return redirect('public:hotsite-subscription-status', slug=self.event.slug)
+            messages.success(
+                self.request,
+                'Inscrição realizada com sucesso!'
+            )
+
+        if self.has_paid_lots():
+            return redirect(
+                'public:hotsite-subscription-status',
+                slug=self.event.slug
+            )
+
+        return redirect('public:hotsite', slug=self.event.slug)
 
 
 class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
@@ -497,7 +512,8 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         self.is_subscribed()
 
         if not self.subscription:
-            messages.error(message='Você não possui inscrição neste evento.', request=request)
+            messages.error(message='Você não possui inscrição neste evento.',
+                           request=request)
             return redirect('public:hotsite', slug=self.event.slug)
 
         return response
@@ -511,10 +527,14 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         context['transactions'] = self.get_transactions()
         context['allow_transaction'] = self.get_allowed_transaction()
         context['pagarme_key'] = settings.PAGARME_ENCRYPT_KEY
+
         try:
             context['subscription'] = self.subscription.pk
         except AttributeError:
-            context['subscription'] = Subscription.objects.get(event=self.event, person=self.person)
+            context['subscription'] = Subscription.objects.get(
+                event=self.event, person=self.person)
+
+        context['subscription'] = self.subscription
 
         return context
 
@@ -539,7 +559,8 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         if user.is_authenticated:
             try:
                 person = user.person
-                subscription = Subscription.objects.get(person=person, event=self.event)
+                subscription = Subscription.objects.get(person=person,
+                                                        event=self.event)
                 self.subscription = subscription
                 return True
 
@@ -564,7 +585,8 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
     def get_transactions(self):
 
         try:
-            transactions = Transaction.objects.filter(subscription=self.subscription)
+            transactions = Transaction.objects.filter(
+                subscription=self.subscription)
         except Transaction.DoesNotExist:
             return False
 
@@ -576,7 +598,8 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         found_credit_card = False
 
         try:
-            transactions = Transaction.objects.filter(subscription=self.subscription)
+            transactions = Transaction.objects.filter(
+                subscription=self.subscription)
 
             for transaction in transactions:
                 if transaction.data['payment_method'] == 'boleto':

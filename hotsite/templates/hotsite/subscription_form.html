@@ -149,36 +149,7 @@
                     </div>
                     <div class="col-md-8">
                         {% if config and config.address == config.ADDRESS_HIDE %}
-                            {% if config.city == config.CITY_REQUIRED %}
-                                <div class="form-group">
-                                    <label for="id_city_search">
-                                        <label for="id_city_search">
-                                            Cidade:
-                                            <small style="color:#C9302C">*</small>
-                                        </label>
-                                    </label>
-                                    <div id="remote">
-                                        <input name="id_city_search" class="typeahead form-control" required
-                                               id="id_city_search" type="text"
-                                               data-provide="typeahead">
-                                        <input name="id_city" id="id_city" type="hidden">
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="form-group">
-                                    <label for="id_city_search">
-                                        <label for="id_city_search">
-                                            Cidade:
-                                        </label>
-                                    </label>
-                                    <div id="remote">
-                                        <input name="id_city_search" class="typeahead form-control " id="id_city_search"
-                                               type="text"
-                                               data-provide="typeahead">
-                                        <input name="id_city" id="id_city" type="hidden">
-                                    </div>
-                                </div>
-                            {% endif %}
+                            {% render_typeahead_field form.city required=config.city %}
                         {% endif %}
                     </div>
                 </div>
