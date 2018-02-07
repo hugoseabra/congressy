@@ -29,7 +29,7 @@
                         {% if next_path %}
                             <a href="{{ next_path|urlencode }}"
                                class="btn btn-danger">
-                                <i class="fa fa-close"></i>
+                                <i class="fas fa-times-circle"></i>
                                 Cancelar
                             </a>
                             <input type="hidden" name="next"
@@ -37,7 +37,7 @@
                         {% else %}
                             <a href="{% url 'event:organization-panel' place_organization.pk %}"
                                class="btn btn-danger">
-                                <i class="fa fa-close"></i>
+                                <i class="fas fa-times-circle"></i>
                                 Cancelar
                             </a>
                         {% endif %}
@@ -114,7 +114,7 @@
                         {% if next_path %}
                             <a href="{{ next_path|urlencode }}"
                                class="btn btn-danger">
-                                <i class="fa fa-close"></i>
+                                <i class="fas fa-times-circle"></i>
                                 Cancelar
                             </a>
                             <input type="hidden" name="next"
@@ -122,7 +122,7 @@
                         {% else %}
                             <a href="{% url 'event:organization-panel' place_organization.pk %}"
                                class="btn btn-danger">
-                                <i class="fa fa-close"></i>
+                                <i class="fas fa-times-circle"></i>
                                 Cancelar
                             </a>
                         {% endif %}

@@ -125,20 +125,20 @@
                                                         data-toggle="dropdown"
                                                         aria-expanded="false"
                                                 >
-                                                    <span class="fa fa-gear"></span>
+                                                    <span class="fas fa-cog"></span>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-right"
                                                     role="menu">
                                                     <li>
                                                         <a href="{% url 'event:organization-edit' item.pk %}">
-                                                            <i class="fa fa-pencil"></i>
+                                                            <i class="fas fa-pencil-alt"></i>
                                                             Editar
                                                         </a>
                                                     </li>
                                                     {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
                                                         <li>
                                                             <a href="{% url 'event:organization-delete' item.pk %}">
-                                                                <i class="fa fa-trash"></i>
+                                                                <i class="fas fa-trash-alt"></i>
                                                                 Excluir
                                                             </a>
                                                         </li>

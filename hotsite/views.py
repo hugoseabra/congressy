@@ -377,6 +377,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             config.address = config.ADDRESS_SHOW
 
         cxt['config'] = config
+        cxt['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
         return cxt
 

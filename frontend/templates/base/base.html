@@ -27,7 +27,7 @@
           href="{% static "assets/plugins/bootstrap/css/bootstrap-xl.css" %}">
     <!-- Fonts  -->
     <link rel="stylesheet"
-          href="{% static "assets/css/font-awesome.min.css" %}">
+          href="{% static "assets/css/fontawesome-all.min.css" %}">
     <link rel="stylesheet"
           href="{% static "assets/css/simple-line-icons.css" %}">
     <!-- CSS Animate -->
@@ -98,12 +98,12 @@
                                             data-toggle="dropdown"
                                             aria-expanded="false"
                                         >
-                                            <span class="fa fa-gear"></span>
+                                            <span class="fas fa-cog"></span>
                                         </button>
                                         <ul class="dropdown-menu animated fadeInRight" role="menu">
                                             <li>
                                                 <a href="{% url 'event:organization-edit' organization.pk %}">
-                                                    <i class="fa fa-pencil"></i>
+                                                    <i class="fas fa-pencil-alt"></i>
                                                     Editar
                                                 </a>
                                             </li>
@@ -118,7 +118,7 @@
                                             {% if organization.is_deletable and user has 'gatheros_event.delete_organization' of organization %}
                                             <li>
                                                 <a href="{% url 'event:organization-delete' organization.pk %}">
-                                                    <i class="fa fa-trash"></i>
+                                                    <i class="fas fa-trash-alt"></i>
                                                     Excluir
                                                 </a>
                                             </li>
@@ -164,7 +164,7 @@
                                 <li style="margin-bottom: 3px">
                                     <a href="{% url 'event:member-list' organization.pk %}"
                                        class="btn-sm btn-link btn-block">
-                                        <i class="fa fa-users"></i>
+                                        <i class="fas fa-users"></i>
                                         Membros
                                     </a>
                                 </li>
@@ -230,7 +230,7 @@
                         <a href="javascript:void(0);" class="dropdown-toggle"
                            data-toggle="dropdown">
                                 <span class="meta">
-                                    <span class="fa fa-user-circle-o"></span>
+                                    <span class="fas fa-user"></span>
                                     <span class="text  hidden-xs">{{ user.first_name }}</span>
                                     <span class="caret hidden-xs"></span>
                                 </span>
@@ -239,7 +239,7 @@
                             <li>
                                 <a href="{% url 'event:profile' %}">
                                     <span class="icon">
-                                        <i class="fa fa-user"></i>
+                                        <i class="fas fa-list-alt"></i>
                                     </span>
                                     Meus Dados
                                 </a>
@@ -247,7 +247,7 @@
                             <li>
                                 <a href="{% url 'public:logout' %}">
                                     <span class="icon">
-                                        <i class="fa fa-sign-out"></i>
+                                        <i class="fas fa-sign-out-alt"></i>
                                     </span>
                                     Sair
                                 </a>
