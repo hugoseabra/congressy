@@ -20,9 +20,8 @@
 #   muito legal para o servidor do ambiente staging. DEVE-SE TER CUIDADO ao
 #   gerenciar o servidor para não expor esta porta publicamente.
 ###############################################################################
-version: '2.3'
+version: '3'
 services:
-
   postgres:
     image: postgres:9.6-alpine
     container_name: cgsy-postgres
@@ -38,17 +37,10 @@ services:
       - POSTGRES_PASSWORD=congressy
 
   mailhog:
-    image: blueimp/mailhog
+    image: mailhog/mailhog
     ports:
       - "1025:1025"
       - "8025:8025"
-
-  mailhog_frontend:
-    image: alpine:3.4
-    entrypoint: httpd -f -p 8080
-    user: nobody
-    ports:
-        - "8080:8080"
 
 networks:
   postgres:

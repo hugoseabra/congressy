@@ -2,6 +2,7 @@
 
 from . import *
 from fnmatch import fnmatch
+import raven
 
 
 # Allows the use of regex IP's
@@ -35,6 +36,7 @@ INSTALLED_APPS.extend([
     'debug_toolbar',
     'django_nose',
     'logtailer',
+    'raven.contrib.django.raven_compat',
 ])
 
 MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
@@ -59,3 +61,7 @@ NOSE_ARGS = [
 
 # Internal IP's used by DDTB
 INTERNAL_IPS = GlobList(['*.*.*.*'])
+
+RAVEN_CONFIG = {
+    'dsn': '',
+}
