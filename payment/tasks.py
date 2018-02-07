@@ -42,6 +42,10 @@ def create_pagarme_transaction(payment=None, subscription=None):
         raise TransactionError(message='Unknown API error')
 
     transaction_instance.data = trx
+    transaction_instance.status = trx['status']
+    transaction_instance.type = trx['payment_method']
+    transaction_instance.date_created = trx['date_created']
+    transaction_instance.amount = trx['amount']
     transaction_instance.save()
     return
 

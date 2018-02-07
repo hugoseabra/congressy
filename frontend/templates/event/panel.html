@@ -11,27 +11,34 @@
 
 {% block nav_aside_itens %}
     <li style="font-weight: bold; color: #ffffff">Inscrições</li>
-{#    {% event_payment_type object as payment_type %}#}
-{#    {% if can_change and object.subscription_type != object.SUBSCRIPTION_DISABLED and payment_type != 'free' %}#}
-{#        <li>#}
-{#            <a href="{% url 'subscription:lot-list' object.pk %}"#}
-{#               title="Lotes">#}
-{#                <i class="fa  fa-fw fa-rocket"></i> Lotes#}
-{#            </a>#}
-{#        </li>#}
-{#    {% endif %}#}
+    {#    {% event_payment_type object as payment_type %}#}
+    {#    {% if can_change and object.subscription_type != object.SUBSCRIPTION_DISABLED and payment_type != 'free' %}#}
+    {#        <li>#}
+    {#            <a href="{% url 'subscription:lot-list' object.pk %}"#}
+    {#               title="Lotes">#}
+    {#                <i class="fa  fa-fw fa-rocket"></i> Lotes#}
+    {#            </a>#}
+    {#        </li>#}
+    {#    {% endif %}#}
     <li>
         <a href="{% url 'subscription:subscription-list' object.pk %}"
            title="Inscrições">
             <i class="fa  fa-fw fa-rocket"></i> Inscrições
         </a>
     </li>
-{#    <li>#}
-{#        <a href="{% url 'subscription:subscription-attendance-search' object.pk %}"#}
-{#           title="Credenciamento">#}
-{#            <i class="fa  fa-fw fa-rocket"></i> Credenciamento#}
-{#        </a>#}
-{#    </li>#}
+
+    <li>
+        <a href="{% url 'event:event-payments' event.pk %}"
+           title="Formulário">
+            <i class="fa  fa-fw fa-rocket"></i> Formulário
+        </a>
+    </li>
+    {#    <li>#}
+    {#        <a href="{% url 'subscription:subscription-attendance-search' object.pk %}"#}
+    {#           title="Credenciamento">#}
+    {#            <i class="fa  fa-fw fa-rocket"></i> Credenciamento#}
+    {#        </a>#}
+    {#    </li>#}
 
 
 

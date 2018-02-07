@@ -178,6 +178,7 @@ FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'fixtures'),
     os.path.join(BASE_DIR, 'gatheros_event/tests/fixtures'),
     os.path.join(BASE_DIR, 'gatheros_subscription/tests/fixtures'),
+    os.path.join(BASE_DIR, 'payment/tests/fixtures'),
 ]
 # ============================== GOOGLE ===================================== #
 GOOGLE_MAPS_API_KEY = 'AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw'

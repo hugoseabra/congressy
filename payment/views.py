@@ -31,10 +31,14 @@ def postback_url_view(request, uidb64):
             data=data
         )
 
-        transaction.data['status'] = data.get('current_status', '')
+        status = data.get('current_status', '')
+
+        transaction.data['status'] = status
         transaction.data['boleto_url'] = data.get('transaction[boleto_url]', '')
         transaction.save()
 
+        transaction_status.data['status'] = status
+        transaction_status.date_created = data.get('transaction[date_created]')
         transaction_status.save()
 
     except Transaction.DoesNotExist:

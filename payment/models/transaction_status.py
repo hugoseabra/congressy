@@ -10,21 +10,50 @@ from .transaction import Transaction
 
 class TransactionStatus(models.Model):
 
+    PROCESSING = 'processing'
+    AUTHORIZED = 'authorized'
+    PAID = 'paid'
+    WAITING_PAYMENT = 'waiting_payment'
+    REFUNDED = 'refunded'
+    PENDING_REFUND = 'pending_refund'
+    REFUSED = 'refused'
+    CHARGEDBACK = 'chargedback'
+
+    TRANSACTION_STATUS = (
+        (PROCESSING, 'Processando'),
+        (AUTHORIZED, 'Autorizado'),
+        (PAID, 'Pago'),
+        (WAITING_PAYMENT, 'Aguardando pagamento'),
+        (REFUNDED, 'Estornado'),
+        (PENDING_REFUND, 'Aguardando estorno'),
+        (REFUSED, 'Recusada'),
+        (CHARGEDBACK, 'Chargeback')
+    )
+
     class Meta:
         verbose_name = 'Status de Transação'
         verbose_name_plural = 'Status de Transações'
 
+    def __str__(self):
+        return str(self.id)
 
-    uuid = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        unique=True,
-        primary_key=True
+    status = models.CharField(
+        max_length=30,
+        choices=TRANSACTION_STATUS,
+        null=True,
+        blank=True,
+    )
+
+    date_created = models.CharField(
+        max_length=30,
+        null=True,
+        blank=True,
     )
 
     transaction = models.ForeignKey(
         Transaction,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='statuses'
     )
 
     data = JSONField()
