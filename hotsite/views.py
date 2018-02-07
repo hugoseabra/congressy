@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 import absoluteuri
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -8,16 +9,14 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views import generic
-from django.conf import settings
-from django.forms.models import model_to_dict
-from django.http import HttpResponseRedirect
+
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
 from gatheros_subscription.models import Subscription, FormConfig, Lot
@@ -27,8 +26,8 @@ from mailer.services import (
 )
 from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
-from payment.tasks import create_pagarme_transaction
 from payment.models import Transaction
+from payment.tasks import create_pagarme_transaction
 
 
 class EventMixin(generic.View):
@@ -328,6 +327,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             config = self.event.formconfig
         except AttributeError:
             config = FormConfig()
+            config.event = self.event
 
         required_fields = ['gender']
 
@@ -414,8 +414,11 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 context['form'] = form
                 return self.render_to_response(context)
 
-            if 'transaction_type' not in request.POST:
-                messages.error(request=self.request, message='Por favor escolha um tipo de pagamento.')
+            if self.has_paid_lots() and 'transaction_type' not in request.POST:
+                messages.error(
+                    request=self.request,
+                    message='Por favor escolha um tipo de pagamento.'
+                )
                 return self.render_to_response(context)
 
             person = form.save()
@@ -434,22 +437,29 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 created_by=user.id
             )
 
-            try:
-                transaction_instance_data = PagarmeTransactionInstanceData(person=person, extra_data=request.POST)
-            except TransactionError as e:
-                error_dict = {
-                    'No transaction type': 'Por favor escolher uma forma de pagamento.',
-                    'Transaction type not allowed': 'Forma de pagamento não permitida.',
-                    'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
-                    'No organization': 'Evento não possui organizador.',
-                }
-                if e.message in error_dict:
-                    e.message = error_dict[e.message]
-                messages.error(self.request, message=e.message)
-                return self.render_to_response(context)
+            if self.has_paid_lots():
+                try:
+                    transaction_instance_data = PagarmeTransactionInstanceData(
+                        person=person,
+                        extra_data=request.POST
+                    )
+                except TransactionError as e:
+                    error_dict = {
+                        'No transaction type': 'Por favor escolher uma forma de pagamento.',
+                        'Transaction type not allowed': 'Forma de pagamento não permitida.',
+                        'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
+                        'No organization': 'Evento não possui organizador.',
+                    }
+                    if e.message in error_dict:
+                        e.message = error_dict[e.message]
+                    messages.error(self.request, message=e.message)
+                    return self.render_to_response(context)
 
-            create_pagarme_transaction(payment=transaction_instance_data.transaction_instance_data,
-                                       subscription=subscription)
+                create_pagarme_transaction(
+                    payment=transaction_instance_data.transaction_instance_data,
+                    subscription=subscription
+                )
+
             subscription.save()
             notify_new_subscription(self.event, subscription)
 
@@ -492,7 +502,7 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         context['is_subscribed'] = self.is_subscribed()
         context['transactions'] = self.get_transactions()
         context['allow_transaction'] = self.get_allowed_transaction()
-        context['subscription'] = self.subscription.pk
+        context['subscription'] = self.subscription
 
         return context
 
