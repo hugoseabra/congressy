@@ -19,6 +19,8 @@ class GlobList(list):
 # A configuração de banco de dados é gerada automaticamente pelo deploy.
 # Não mude as configurações de DATABASES.
 #############################################################################
+SECRET_KEY = '{{ SECRET_KEY }}'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',

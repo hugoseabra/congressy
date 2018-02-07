@@ -1,6 +1,8 @@
-import sys
 import os
+import sys
 from shutil import copyfile
+
+from django.core.management.utils import get_random_secret_key
 from jinja2 import Template
 
 dbname = os.environ.get('DBNAME')
@@ -24,6 +26,7 @@ env_dict = {
     'DBPASS': dbpass,
     'DBHOST': dbhost,
     'DBPORT': dbport,
+    'SECRET_KEY': get_random_secret_key(),
 }
 
 # @TODO Gerar hash do secret para produção.

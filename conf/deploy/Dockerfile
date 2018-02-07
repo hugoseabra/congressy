@@ -95,7 +95,7 @@ RUN pip install --no-cache-dir -r requirements.pip
 # Setup configuration files
 COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
 COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
-COPY ./conf/deploy/setup/configure-db.py /configure-db.py
+COPY ./conf/deploy/setup/configure-settings.py /configure-settings.py
 COPY ./conf/deploy/setup/configure-footer.py /configure-footer.py
 COPY ./conf/deploy/setup/configure-sync.py /configure-sync.py
 COPY ./conf/deploy/container-entry.sh /entry.sh

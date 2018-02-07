@@ -71,7 +71,7 @@ printf "OK"
 echo;
 
 run_bash_script "Verificando existência do Bucket" /s3bucket.sh
-run_python_script "Configurando DB" /configure-db.py
+run_python_script "Configurando SETTINGS" /configure-settings.py
 run_python_script "Configurando RODAPÉ" /configure-footer.py
 run_python_script "Coletando arquivos estáticos" "manage.py collectstatic --noinput --verbosity 0"
 run_python_script_with_output "Executando migrate" "manage.py migrate"
