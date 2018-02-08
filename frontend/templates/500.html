@@ -18,8 +18,7 @@
 
     <!-- Favicon -->
     <link rel="shortcut icon"
-          href={% static "assets/img/favicon.ico" %}" type=" image
-    /x-icon">
+          href={% static "assets/img/favicon.ico" %}" type="image/x-icon">
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet"
@@ -27,7 +26,7 @@
 
     <!-- Fonts  -->
     <link rel="stylesheet"
-          href="{% static "assets/css/font-awesome.min.css" %}">
+          href="{% static "assets/css/fontawesome-all.min.css" %}">
     <link rel="stylesheet"
           href="{% static "assets/css/simple-line-icons.css" %}">
 
@@ -67,13 +66,34 @@
                     <p class="text-center">Erro Interno do Servidor.</p>
                 </header>
 
-                <p class="text-center">Algo deu errado. Tente novamente mais tarde.</p>
+                <p class="text-center">
+                    <strong>Algo deu errado.</strong>
+                </p>
+                <p class="text-center">
+                    A equipe de desenvolvimento já foi notificação verificação deste erro o mais rápido possível.
+                </p>
+                <br />
+                <p class="text-center">Tente novamente mais tarde ou fale conosco pelo chat.</p>
+                <br />
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="{% if SENTRY_PUBLIC_DSN and request.sentry.id %}col-md-6{% else %}col-md-12{% endif %}">
                         <a class="btn btn-info btn-block btn-3d"
                            href="javascript:history.back()">Voltar</a>
                     </div>
+                    {% if SENTRY_PUBLIC_DSN and request.sentry.id %}
+                    <div class="col-md-6">
+                        <a class="btn btn-primary btn-block btn-3d"
+                           href="javascript:void(0)" onclick="send_user_feedback()">Enviar feedback.</a>
+                    </div>
+                    {% endif %}
                 </div>
+                {% if SENTRY_PUBLIC_DSN and request.sentry.id %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="text-center text-muted">ID: {{ request.sentry.id }}</p>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -83,6 +103,10 @@
 <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
 <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
 <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+
+{% if SENTRY_PUBLIC_DSN and request.sentry.id %}
+{% include 'sentry_public_dsn.html' %}
+{% endif %}
 </body>
 
 </html>
