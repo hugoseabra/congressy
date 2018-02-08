@@ -1,3 +1,8 @@
+###############################################################################
+# IMPORTANTE:
+# Os secrets são cadastrados no servidor de CI (Drone) pelo repositório
+# 'cgsy-infra', através do arquivo /drone/create-secrets.py.
+###############################################################################
 # Branches added globally
 branches:
   include: [ master, release/* ]
@@ -128,7 +133,6 @@ pipeline:
       {{ commit.message }}
       ```
 
-
       *Ambiente:* https://test.congressy.com/login/
 
 
@@ -203,9 +207,7 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - docker exec -i awsecr push cgsy:latest
       - ./bin/env/prod/03_publish-tagged-version.sh
-      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
     when:
       branch: [ master ]
 
@@ -248,6 +250,7 @@ pipeline:
     envs: [
       aws_key,
       aws_secret,
+      aws_account_id,
       domain,
       force_https,
       bucket_location,
@@ -261,7 +264,16 @@ pipeline:
       dbport
     ]
     script:
-      - mkdir -p ~/cgsy
+      - mkdir -p ~/{cgsy,awsecr}
+
+      # env-file do awsecr
+      - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
+      - echo "AWS_SECRET=$${AWS_SECRET}" > ~/awsecr/env-awsecr
+      - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
+      - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
+      - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
+
+      # env-file do stack de produção
       - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
       - echo "DOMAIN=$${DOMAIN}" >> ~/cgsy/env-file
@@ -275,6 +287,25 @@ pipeline:
       - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
       - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
+
+      # Saves versions in production: nome do container no stack será sempre o mesmo
+      - docker run --rm -i 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy cat version > previous_version
+
+    when:
+      branch: [ master ]
+
+  tranfer-stackfile-awsecr:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.36.223
+    port: 22
+    user: admin
+    source: ./bin/prod/01_create-awsecr-container.sh
+    target: ~/awsecr/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
     when:
       branch: [ master ]
 
@@ -293,6 +324,21 @@ pipeline:
     when:
       branch: [ master ]
 
+  tranfer-deploy-script:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.36.223
+    port: 22
+    user: admin
+    source: ./bin/env/prod/04_deploy-latest-image.sh
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
   deploy-latest-version:
     image: appleboy/drone-ssh
     pull: true
@@ -304,9 +350,8 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: ssh_key
     script:
-      - docker exec -i awsecr pull cgsy:latest
-      - docker-compose -f ~/cgsy/docker-compose.yml up -d
-      - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
+      - ~/awsecr/01_create-awsecr-container.sh
+      - ~/cgsy/04_deploy-latest-image.sh
     when:
       branch: [ master ]
 
@@ -336,7 +381,6 @@ pipeline:
       ```
       {{ commit.message }}
       ```
-
 
       *Ambiente:* https://ev.congressy.com/login/
 
