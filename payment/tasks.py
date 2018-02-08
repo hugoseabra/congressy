@@ -38,7 +38,7 @@ def create_pagarme_transaction(payment=None, subscription=None):
             <pre><code>{1}</code></pre>
         """.format(json.dumps(payment), json.dumps(trx))
 
-        send_mail(subject=subject, body=body, to=settings.ALERT_EMAILS)
+        send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
         raise TransactionError(message='Unknown API error')
 
     transaction_instance.data = trx
