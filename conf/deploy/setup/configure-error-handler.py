@@ -1,14 +1,18 @@
 import os
+import sys
 from shutil import copyfile
 
+from django.core.management.utils import get_random_secret_key
 from jinja2 import Template
+
+SENTRY_PUBLIC_DSN = os.environ.get('SENTRY_PUBLIC_DSN')
+if not SENTRY_PUBLIC_DSN:
+    print("SENTRY_PUBLIC_DSN not provided or misconfigured.")
+    sys.exit(1)
 
 # create dictionary of environment variables
 env_dict = {
-    'DJANGO_SETTINGS_MODULE': os.getenv(
-        'DJANGO_SETTINGS_MODULE',
-        'project.settings.prod'
-    ),
+    'SENTRY_PUBLIC_DSN': SENTRY_PUBLIC_DSN,
 }
 
 
@@ -32,6 +36,6 @@ def setup(origin_file_path, file_path):
 
 
 setup(
-    '/var/www/cgsy/conf/deploy/templates/wsgi.j2',
-    '/var/www/cgsy/project/wsgi.py'
+    '/var/www/cgsy/frontend/templates/sentry_public_dsn.html',
+    '/var/www/cgsy/frontend/templates/sentry_public_dsn.html'
 )

@@ -2,27 +2,20 @@ import os
 from shutil import copyfile
 from jinja2 import Template
 
-f = open('/var/www/cgsy/version')
-app_version = f.read()
-f.close()
 
-f = open('/var/www/cgsy/build_number')
-build_number = f.read()
-f.close()
+def read_file(file_path):
+    if not os.path.exists(file_path):
+        return ''
 
-f = open('/var/www/cgsy/build_author')
-build_author = f.read()
-f.close()
+    with open('/var/www/cgsy/version') as f:
+        content = f.read()
+        f.close()
 
-f = open('/var/www/cgsy/build_link')
-build_link = f.read()
-f.close()
+        return content.rstrip('\r\n')
+
 
 env_dict = {
-    'APP_VERSION': app_version.rstrip('\r\n'),
-    'BUILD': build_number.rstrip('\r\n'),
-    'BUILD_LINK': build_link.rstrip('\r\n'),
-    'AUTHOR': build_author.rstrip('\r\n'),
+    'APP_VERSION': read_file('/var/www/cgsy/version'),
 }
 
 
@@ -46,6 +39,6 @@ def setup(origin_file_path, file_path):
 
 
 setup(
-    '/var/www/cgsy/conf/staging/templates/footer.j2',
+    '/var/www/cgsy/conf/deploy/templates/footer.j2',
     '/var/www/cgsy/frontend/templates/base/footer.html'
 )

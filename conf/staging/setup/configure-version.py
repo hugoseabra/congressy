@@ -1,23 +1,7 @@
 import os
-import sys
 from shutil import copyfile
 
-from django.core.management.utils import get_random_secret_key
 from jinja2 import Template
-
-dbname = os.environ.get('DBNAME')
-dbuser = os.environ.get('DBUSER')
-dbpass = os.environ.get('DBPASS', '')
-dbhost = os.environ.get('DBHOST')
-dbport = os.environ.get('DBPORT', 5432)
-
-if not dbhost or not dbuser or dbpass is None or not dbname:
-    print(
-        "DB credentials not provided or misconfigured:"
-        " -e DBHOST=host -e DBUSER=user -e DBPASS=password -e DBNAME=dbname"
-        " -e DBPORT=5432"
-    )
-    sys.exit(1)
 
 
 def read_file(file_path):
@@ -31,14 +15,11 @@ def read_file(file_path):
         return content.rstrip('\r\n')
 
 
-# create dictionary of environment variables
 env_dict = {
-    'DBNAME': dbname,
-    'DBUSER': dbuser,
-    'DBPASS': dbpass,
-    'DBHOST': dbhost,
-    'DBPORT': dbport,
-    'SECRET_KEY': get_random_secret_key(),
+    'APP_VERSION': read_file('/var/www/cgsy/version'),
+    'BUILD': read_file('/var/www/cgsy/build_number'),
+    'BUILD_LINK': read_file('/var/www/cgsy/build_link'),
+    'AUTHOR': read_file('/var/www/cgsy/build_author'),
 }
 
 
@@ -60,6 +41,11 @@ def setup(origin_file_path, file_path):
         out_file.write(add_env_variables(text))
         out_file.close()
 
+
+setup(
+    '/var/www/cgsy/conf/staging/templates/footer.j2',
+    '/var/www/cgsy/frontend/templates/base/footer.html'
+)
 
 setup(
     '/var/www/cgsy/project/settings/common.py',

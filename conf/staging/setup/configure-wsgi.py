@@ -1,13 +1,14 @@
 import os
 from shutil import copyfile
+
 from jinja2 import Template
 
-f = open('/var/www/cgsy/version')
-app_version = f.read()
-f.close()
-
+# create dictionary of environment variables
 env_dict = {
-    'APP_VERSION': app_version.rstrip('\r\n')
+    'DJANGO_SETTINGS_MODULE': os.getenv(
+        'DJANGO_SETTINGS_MODULE',
+        'project.settings.staging'
+    ),
 }
 
 
@@ -31,6 +32,6 @@ def setup(origin_file_path, file_path):
 
 
 setup(
-    '/var/www/cgsy/conf/deploy/templates/footer.j2',
-    '/var/www/cgsy/frontend/templates/base/footer.html'
+    '/var/www/cgsy/conf/staging/templates/wsgi.j2',
+    '/var/www/cgsy/project/wsgi.py'
 )

@@ -65,6 +65,7 @@ RUN pip install --no-cache-dir \
         s3cmd \
         # template engine
         jinja2 \
+        # Sentry
         raven
 
 
@@ -96,8 +97,9 @@ RUN pip install --no-cache-dir -r requirements.pip
 COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
 COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
 COPY ./conf/deploy/setup/configure-settings.py /configure-settings.py
-COPY ./conf/deploy/setup/configure-footer.py /configure-footer.py
+COPY ./conf/deploy/setup/configure-version.py /configure-version.py
 COPY ./conf/deploy/setup/configure-sync.py /configure-sync.py
+COPY ./conf/deploy/setup/configure-error-handler.py /configure-error-handler.py
 COPY ./conf/deploy/container-entry.sh /entry.sh
 
 # -----------------------------------------------------------------------------

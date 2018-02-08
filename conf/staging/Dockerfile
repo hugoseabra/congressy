@@ -96,9 +96,9 @@ RUN pip install --no-cache-dir -r requirements_dev.pip
 COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
 
 # Setup STAGING
-COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
+COPY ./conf/staging/setup/configure-wsgi.py /configure-wsgi.py
 COPY ./conf/staging/setup/configure-settings.py /configure-settings.py
-COPY ./conf/staging/setup/configure-footer.py /configure-footer.py
+COPY ./conf/staging/setup/configure-version.py /configure-version.py
 COPY ./conf/staging/setup/configure-sync.py /configure-sync.py
 COPY ./conf/staging/container-entry.sh /entry.sh
 

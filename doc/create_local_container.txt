@@ -1,0 +1,8 @@
+docker build --rm \
+    -t 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy \
+    -f conf/deploy/Dockerfile . ; \
+    docker run --rm -ti \
+        --name cgsy \
+        --env-file=conf/deploy/env-file \
+        --network env_postgres \
+        -p 80:80 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy
