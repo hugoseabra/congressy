@@ -200,16 +200,19 @@
                     </div>
                     <div class="panel-body">
 
-                        <div id="payment_buttons">
+                        <div id="payment_buttons" class="text-center">
                             <button id="id_boleto" type="button" style="text-align: center">
                                 Boleto
                                 <br/>
-                                <i class="fas fa-barcode fa-4x"></i>
+                                <img class="img-responsive"
+                                     style="height: 153px; height: 153px"
+                                     src="{% static 'hotsite/logos/boleto.svg' %}">
                             </button>
                             <button id="id_credit_card" type="button">
                                 Cartão de Credito
                                 <br/>
-                                <i class="far fa-credit-card fa-4x"></i>
+                                <img class="img-responsive"
+                                     src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
                             </button>
 
                             <br/>
@@ -219,14 +222,22 @@
                                 Remover
                             </a>
                         </div>
+                        <div class="text-center">
+                            <button id="id_button_pay" class="btn btn-default" type="button">
+                                Escolha meio de pagamento
+                            </button>
+                        </div>
 
 
-                        <button id="id_button_pay" class="btn btn-default" type="button">
-                            Escolha meio de pagamento
-                        </button>
                         <input type="hidden" id="id_amount" name="amount">
                         <input type="hidden" id="id_card_hash" name="card_hash">
                         <input type="hidden" id="id_transaction_type" name="transaction_type">
+
+                        <div class="text-center">
+                            <img style="width: 80%; margin-top: 20px"
+                                 src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
+                        </div>
+
                     </div>
                 </div>
             {% endif %}
