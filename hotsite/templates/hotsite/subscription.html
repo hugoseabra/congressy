@@ -34,7 +34,7 @@
 
     <!-- LIBRARIES CSS -->
     <link rel="stylesheet" href="{% static 'hotsite/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/fontawesome-all.min.css' %}">
     <link rel="stylesheet" href="{% static 'hotsite/css/animate.min.css' %}">
 
     <!-- SPECIFIC CSS -->
@@ -258,6 +258,18 @@
 
 <!-- LIBRARIES JS
 ================================= -->
+
+{% if SENTRY_PUBLIC_DSN %}
+    <script src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"></script>
+    <script>
+    var TRACKER_CAPTURE = true;
+    Raven.config('{{ SENTRY_PUBLIC_DSN }}').install();
+    </script>
+{% else %}
+    <script>var TRACKER_CAPTURE = false;</script>
+{% endif %}
+
+
 <script src="{% static 'hotsite/js/jquery-1.11.2.min.js' %}"></script>
 <script src="{% static 'hotsite/js/typeahead.js' %}"></script>
 <script src="{% static 'hotsite/js/bootstrap.min.js' %}"></script>
@@ -328,7 +340,7 @@
                     //populate the html with result here
                 }
             });
-         }
+        }
 
         showHideCepLoader();
     });
@@ -344,6 +356,24 @@
 
 
     var button = document.querySelector('#id_button_pay');
+    var remove = document.querySelector('#id_remove');
+
+
+    $(document).ready(function () {
+        console.log("ready!");
+        $('#id_boleto').hide();
+        $('#id_credit_card').hide();
+        $('#id_remove').hide();
+        $('#payment_buttons').hide();
+    });
+
+    remove.addEventListener('click', function () {
+        $('#id_boleto').hide();
+        $('#id_credit_card').hide();
+        $('#id_remove').hide();
+        $('#payment_buttons').hide();
+        $('#id_button_pay').show();
+    });
 
     button.addEventListener('click', function () {
 
@@ -356,9 +386,20 @@
             var billing_title = 'Inscrição do evento: ' + '{{ event.name }}';
 
             function handleSuccess(data) {
-                $('#id_button_pay').removeClass('btn-default').addClass('btn-success');
+                $('#id_button_pay').hide();
+                $('#id_remove').hide();
+                $('#id_boleto').hide();
+                $('#id_credit_card').hide();
+                $('#payment_buttons').show();
 
-                console.log(data);
+                if (data.payment_method === "boleto") {
+                    $('#id_boleto').show();
+                } else if (data.payment_method === "credit_card") {
+                    $('#id_credit_card').show();
+                }
+
+                $('#id_remove').show();
+
 
                 $('#id_transaction_type').val(data.payment_method);
                 $('#id_amount').val(data.amount);
@@ -366,8 +407,12 @@
             }
 
             function handleError(data) {
-                $('#id_button_pay').removeClass('btn-default').addClass('btn-warning');
-                $('#pay_help').text(data);
+                if(TRACKER_CAPTURE){
+                    Raven.showReportDialog();
+                    Raven.captureException(JSON.stringify(data));
+                } else {
+                    alert("Ocorreu um erro durante o processamento, tente novamente depois.");
+                }
             }
 
             var checkout = new PagarMeCheckout.Checkout({
@@ -382,7 +427,7 @@
                 {% if request.session.allowed_transaction  %}
                     paymentMethods: '{{ request.session.allowed_transaction }}',
                 {% else %}
-                     paymentMethods: 'credit_card, boleto',
+                    paymentMethods: 'credit_card, boleto',
                 {% endif %}
                 customerData: false,
                 items: [
