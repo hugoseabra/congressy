@@ -17,7 +17,7 @@ def postback_url_view(request, uidb64):
             <pre><code>{0}</code></pre>
     """.format(json.dumps(request.data))
 
-    send_mail(subject="Recived a postbackcall", body=body, to=settings.ALERT_EMAILS)
+    send_mail(subject="Recived a postbackcall", body=body, to=settings.DEV_ALERT_EMAILS)
 
     if not uidb64:
         raise Http404
