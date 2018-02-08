@@ -29,7 +29,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
 # ================================= E-MAIL ================================== #
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # Host for sending e-mail.
-EMAIL_HOST = 'mailhog'
+EMAIL_HOST = 'localhost'
 # Port for sending e-mail.
 EMAIL_PORT = 1025
 # Optional SMTP authentication information for EMAIL_HOST.

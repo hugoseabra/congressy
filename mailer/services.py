@@ -177,3 +177,35 @@ def notify_reset_password(context):
         body=body,
         to=context['email'],
     )
+
+
+def notify_new_event(event):
+    """ Notifica área de vendas quando se cria novo evento. """
+
+    link = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    body = render_to_string(
+        template_name='mailer/notify_new_event.html',
+        context={
+            'event': event,
+            'link': link
+        }
+    )
+
+    if CELERY:
+        send_mail.delay(
+            body=body,
+            subject="Novo evento: {}".format(event.name),
+            to=settings.SALES_ALERT_EMAILS
+        )
+
+    send_mail(
+        body=body,
+        subject="Novo evento: {}".format(event.name),
+        to=settings.SALES_ALERT_EMAILS
+    )

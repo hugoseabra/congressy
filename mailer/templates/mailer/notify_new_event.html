@@ -1,0 +1,19 @@
+{% load humanize %}
+
+<div>
+    <h2>Novo Evento</h2>
+    <table cellspacing="0" cellpadding="0" width="50%">
+        <tr>
+            <td width="20%"><strong>Nome:</strong></td>
+            <td>{{ event.name }}</td>
+        </tr>
+        <tr>
+            <td><strong>Realizador:</strong></td>
+            <td>{{ event.organization.name }}</td>
+        </tr>
+        <tr>
+            <td><strong>Link:</strong></td>
+            <td>{{ link }}</td>
+        </tr>
+    </table>
+</div>

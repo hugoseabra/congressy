@@ -21,7 +21,7 @@ print(settings.BASE_DIR)"`
 
 export PYTHONPATH=$BASE_DIR
 
-docker-compose -f $BASE_DIR/bin/env/docker-compose.yml down
+docker-compose -f $BASE_DIR/bin/env/docker-compose.yml down --remove-orphans
 sleep 2
 
 docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d

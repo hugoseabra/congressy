@@ -287,9 +287,6 @@ MESSAGE_TAGS = {
 }
 # =============================== E-MAIL ==================================== #
 DEFAULT_FROM_EMAIL = 'Congressy <mail@congressy.net>'
-
 CONGRESSY_REPLY_TO = 'Congressy <congressy@congressy.com>'
-
-DEV_ALERT_EMAILS = ['nathan@congressy.com', 'hugo@congressy.com']
-
+DEV_ALERT_EMAILS = ['infra@congressy.com']
 SALES_ALERT_EMAILS = ['wyndson@congressy.com', 'infra@congressy.com']
