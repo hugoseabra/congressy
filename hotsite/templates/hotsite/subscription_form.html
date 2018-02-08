@@ -12,89 +12,89 @@
 {% else %}
     <!-- FORM -->
     <form action="" method="post"
-      class="form"
-      role="form" onsubmit="submit_form(this); return false;">
+          class="form"
+          role="form" onsubmit="submit_form(this); return false;">
 
-    {% csrf_token %}
+        {% csrf_token %}
 
-    {% if user.is_authenticated %}
-        <h4 class="form-heading"
-            style="font-weight: bold;">Olá, {{ user.first_name }}</h4>
-    {% else %}
-        <h4 class="form-heading"
-            style="font-weight: bold;">Inscreva-se
-            agora!</h4>
-    {% endif %}
-
-    {% block messages %}
-        {% if messages %}
-            <div style="width:100%;margin-top:3px;padding-bottom:10px">
-            {% for message in messages %}
-
-                {% if message.tags %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible"
-                         role="alert">
-
-                {% else %}
-                    <div class="alert alert-warning alert-dismissible"
-                         role="alert">
-                {% endif %}
-
-            <button type="button" class="close" data-dismiss="alert"
-                    aria-label="Close"><span aria-hidden="true">&times;</span>
-            </button>
-            {{ message|capfirst }}
-            </div>
-
-            {% endfor %}
-        </div>
+        {% if user.is_authenticated %}
+            <h4 class="form-heading"
+                style="font-weight: bold;">Olá, {{ user.first_name }}</h4>
+        {% else %}
+            <h4 class="form-heading"
+                style="font-weight: bold;">Inscreva-se
+                agora!</h4>
         {% endif %}
-    {% endblock messages %}
 
-    <div class="form-validation alert"></div>
+        {% block messages %}
+            {% if messages %}
+                <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                {% for message in messages %}
 
-    {% if has_paid_lots %}
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="panel-title">Ingresso</div>
+                    {% if message.tags %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible"
+                             role="alert">
+
+                    {% else %}
+                        <div class="alert alert-warning alert-dismissible"
+                             role="alert">
+                    {% endif %}
+
+                <button type="button" class="close" data-dismiss="alert"
+                        aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                {{ message|capfirst }}
+                </div>
+
+                {% endfor %}
             </div>
+            {% endif %}
+        {% endblock messages %}
 
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        {% if lots %}
-                            <select class="form-control" name="lot" id="id_lot">
-                                {% for lot in lots %}
-                                    <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
-                                {% endfor %}
-                            </select>
-                            <div class="text-muted small">Escolha o tipo de ingresso.</div>
-                        {% endif %}
+        <div class="form-validation alert"></div>
+
+        {% if has_paid_lots %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">Ingresso</div>
+                </div>
+
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% if lots %}
+                                <select class="form-control" name="lot" id="id_lot">
+                                    {% for lot in lots %}
+                                        <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="text-muted small">Escolha o tipo de ingresso.</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <div class="panel-title">Dados pessoais</div>
-        </div>
-        <div class="panel-body">
-            {% if form.non_field_errors %}
-                {% for error in form.non_field_errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-            {% if form.errors %}
-                {% for error in form.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="panel-title">Dados pessoais</div>
+            </div>
+            <div class="panel-body">
+                {% if form.non_field_errors %}
+                    {% for error in form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                {% if form.errors %}
+                    {% for error in form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
 
                 <div class="row">
@@ -153,73 +153,96 @@
                         {% endif %}
                     </div>
                 </div>
-        </div>
-    </div>
-    {% if config and config.address == config.ADDRESS_SHOW %}
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="panel-title">Endereço</div>
             </div>
+        </div>
+        {% if config and config.address == config.ADDRESS_SHOW %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">Endereço</div>
+                </div>
 
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-3">
-                        {% render_generic_field form.zip_code required=True %}
-                        <div id="cep_loader" style="width: 22px;position: absolute;top: 45px;right: 33px;">
-                            <img src="{% static 'assets/img/loader.gif' %}"/>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            {% render_generic_field form.zip_code required=True %}
+                            <div id="cep_loader" style="width: 22px;position: absolute;top: 45px;right: 33px;">
+                                <img src="{% static 'assets/img/loader.gif' %}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row address-row">
+                        <div class="col-md-9">
+                            {% render_generic_field form.street %}
+                        </div>
+                        <div class="col-md-3 address-row">
+                            {% render_generic_field form.number %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 address-row">
+                            {% render_generic_field form.complement %}
+                        </div>
+                        <div class="col-md-6 address-row">
+                            {% render_generic_field form.village %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 address-row">
+                            {% render_typeahead_field form.city required=True %}
                         </div>
                     </div>
                 </div>
-                <div class="row address-row">
-                    <div class="col-md-9">
-                        {% render_generic_field form.street %}
-                    </div>
-                    <div class="col-md-3 address-row">
-                        {% render_generic_field form.number %}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 address-row">
-                        {% render_generic_field form.complement %}
-                    </div>
-                    <div class="col-md-6 address-row">
-                        {% render_generic_field form.village %}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 address-row">
-                        {% render_typeahead_field form.city required=True %}
-                    </div>
-                </div>
             </div>
-        </div>
-        {% if has_paid_lots %}
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="panel-title">Pagamento</div>
+            {% if has_paid_lots %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <div class="panel-title">Pagamento</div>
+                    </div>
+                    <div class="panel-body">
+
+                        <div id="payment_buttons">
+                            <button id="id_boleto" type="button" style="text-align: center">
+                                Boleto
+                                <br/>
+                                <i class="fas fa-barcode fa-4x"></i>
+                            </button>
+                            <button id="id_credit_card" type="button">
+                                Cartão de Credito
+                                <br/>
+                                <i class="far fa-credit-card fa-4x"></i>
+                            </button>
+
+                            <br/>
+
+                            <a id="id_remove"
+                               style="margin-top: 11px; margin-left: 17px;font-size: 12px;">
+                                Remover
+                            </a>
+                        </div>
+
+
+                        <button id="id_button_pay" class="btn btn-default" type="button">
+                            Escolha meio de pagamento
+                        </button>
+                        <input type="hidden" id="id_amount" name="amount">
+                        <input type="hidden" id="id_card_hash" name="card_hash">
+                        <input type="hidden" id="id_transaction_type" name="transaction_type">
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <button id="id_button_pay" class="btn btn-default" type="button">Escolha meio de pagamento</button>
-                    <p class="text-muted" style="color:#f85252;"></p>
-                    <input type="hidden" id="id_amount" name="amount">
-                    <input type="hidden" id="id_card_hash" name="card_hash">
-                    <input type="hidden" id="id_transaction_type" name="transaction_type">
-                </div>
-            </div>
+            {% endif %}
         {% endif %}
-    {% endif %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="form-group form-group-submit">
-                <input type="hidden" id="id_organization" name="organization" value={{ event.organization.pk }}>
-                <button type="button" class="btn btn-primary btn-lg btn-block"
-                        data-loading-text="Enviar" onclick="$(this).removeAttr('type').trigger('click');">
-                    Enviar
-                </button>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group form-group-submit">
+                    <input type="hidden" id="id_organization" name="organization" value={{ event.organization.pk }}>
+                    <button type="button" class="btn btn-primary btn-lg btn-block"
+                            data-loading-text="Enviar" onclick="$(this).removeAttr('type').trigger('click');">
+                        Enviar
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
 {% endif %}
 
 
