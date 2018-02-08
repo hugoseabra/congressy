@@ -5,7 +5,7 @@
 # Não mude as configurações de DATABASES.
 #############################################################################
 
-from .common import *
+from project.settings.common import *
 from fnmatch import fnmatch
 
 # ========================== BASE CONFIGURATION ============================= #
@@ -15,11 +15,12 @@ INSTALLED_APPS.extend([
     'debug_toolbar',
     'django_nose',
     'logtailer',
-    'raven.contrib.django.raven_compat',
 ])
 # ============================= MIDDLEWARES ================================= #
 # Django debug toolbar
 MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+# ========================= SERVER CONFIGURATION ============================ #
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media_staging')
 # ================================= E-MAIL ================================== #
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # Host for sending e-mail.
@@ -30,8 +31,6 @@ EMAIL_PORT = 1025
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
-# ========================= SERVER CONFIGURATION ============================ #
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media_staging')
 # ================================ PAGAR.ME ================================= #
 PAGARME_API_KEY = 'ak_test_IkLKxOIdD0GVTHfmlSPA1zuGoaCQtd'
 PAGARME_ENCRYPTION_KEY = 'ek_test_ep7xk51I1XtWg58B9xij1VFwJRLcKa'
@@ -45,11 +44,11 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 apps = 'gatheros_event,gatheros_front, gatheros_subscription,mailer'
 NOSE_ARGS = [
     '--with-coverage',
-    '--cover-package='+apps,
+    '--cover-package=' + apps,
 ]
+
+
 # ============================ DEBUG TOOL BAR =============================== #
-
-
 # Allows the use of regex IP's
 class GlobList(list):
     def __contains__(self, key):
