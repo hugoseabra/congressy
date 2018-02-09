@@ -303,7 +303,7 @@ pipeline:
       - 172.31.45.193
     port: 22
     user: admin
-    source: ./bin/prod/01_create-awsecr-container.sh
+    source: ./bin/env/prod/01_create-awsecr-container.sh
     target: ~/awsecr/.
     secrets:
       - source: CONGRESSY_DEPLOY
