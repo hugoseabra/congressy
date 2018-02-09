@@ -13,7 +13,7 @@
     <!-- FORM -->
     <form action="" method="post"
           class="form"
-          role="form" onsubmit="submit_form(this); return false;">
+          role="form" onsubmit="submit_form(this);">
 
         {% csrf_token %}
 
@@ -200,15 +200,15 @@
                     </div>
                     <div class="panel-body">
 
-                        <div id="payment_buttons" class="text-center">
-                            <button id="id_boleto" type="button" style="text-align: center">
+                        <div id="payment_buttons" class="text-center hide">
+                            <button id="id_boleto" class="hide" type="button" style="text-align: center">
                                 Boleto
                                 <br/>
                                 <img class="img-responsive"
                                      style="height: 153px; height: 153px"
                                      src="{% static 'hotsite/logos/boleto.svg' %}">
                             </button>
-                            <button id="id_credit_card" type="button">
+                            <button id="id_credit_card" class="hide" type="button">
                                 Cartão de Credito
                                 <br/>
                                 <img class="img-responsive"
@@ -217,7 +217,7 @@
 
                             <br/>
 
-                            <a id="id_remove"
+                            <a id="id_remove" class="hide"
                                style="margin-top: 11px; margin-left: 17px;font-size: 12px;">
                                 Remover
                             </a>
@@ -246,8 +246,8 @@
             <div class="col-md-12">
                 <div class="form-group form-group-submit">
                     <input type="hidden" id="id_organization" name="organization" value={{ event.organization.pk }}>
-                    <button type="button" class="btn btn-primary btn-lg btn-block"
-                            data-loading-text="Enviar" onclick="$(this).removeAttr('type').trigger('click');">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block"
+                            data-loading-text="Enviar">
                         Enviar
                     </button>
                 </div>
