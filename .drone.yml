@@ -226,6 +226,8 @@ pipeline:
         target: AWS_KEY
       - source: AWS_SECRET
         target: AWS_SECRET
+      - source: AWS_ACCOUNT_ID
+        target: AWS_ACCOUNT_ID
       - source: DOMAIN
         target: DOMAIN
       - source: FORCE_HTTPS
@@ -269,7 +271,7 @@ pipeline:
       - mkdir -p ~/awsecr
       # env-file do awsecr
       - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
-      - echo "AWS_SECRET=$${AWS_SECRET}" > ~/awsecr/env-awsecr
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/awsecr/env-awsecr
       - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
       - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
       - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
@@ -291,7 +293,7 @@ pipeline:
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
 
       # Saves versions in production: nome do container no stack será sempre o mesmo
-      - docker run --rm -i 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy cat version > ~/cgsyprevious_version
+      - docker run --rm -i 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy cat version > ~/cgsy/previous_version
 
     when:
       branch: [ master ]
