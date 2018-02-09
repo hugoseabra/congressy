@@ -29,7 +29,7 @@ fi
 
 # A versão nunca será a anterior a atual devido ao CI controlar a continuidade
 # dos releases. Sendo assim, basta comparar
-if [ "$PREVIOUS_VERSION" -ne "$VERSION" ]; then
+if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     docker exec -i awsecr pull cgsy:latest
     docker exec -i awsecr pull cgsy:${VERSION}
     docker-compose -f ~/cgsy/docker-compose.yml up -d
