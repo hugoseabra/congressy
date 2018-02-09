@@ -12,6 +12,15 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings.prod")
+BASE = os.path.dirname(os.path.dirname(os.path.join(__file__)))
+VERSION_FILE_PATH = os.path.join(BASE, 'version')
+if os.path.exists(VERSION_FILE_PATH):
+    f = open(VERSION_FILE_PATH)
+    version = f.read()
+    f.close()
+    version = version.rstrip('\r\n') if version else 'dev'
+    os.environ.setdefault("ENVIRONMENT_VERSION", version.rstrip('\r\n'))
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings.env")
 
 application = get_wsgi_application()
