@@ -311,7 +311,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  transfer-tagged-version-file:
+  transfer-previous-version-file:
     image: drillster/drone-rsync
     pull: true
     hosts:
@@ -320,6 +320,22 @@ pipeline:
     port: 22
     user: admin
     source: ./bin/env/prod/previous_version
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  transfer-build-version-file:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.36.223
+      - 172.31.45.193
+    port: 22
+    user: admin
+    source: ./version
     target: ~/cgsy/.
     secrets:
       - source: CONGRESSY_DEPLOY
