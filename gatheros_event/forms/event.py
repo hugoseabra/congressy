@@ -32,7 +32,7 @@ class EventForm(forms.ModelForm):
         #            'date_end': forms.DateTimeInput,
         #            }
         dateTimeOptions = {
-            'format': 'mm/dd/yyyy HH:ii',
+            'format': 'mm/dd/yyyy hh:ii',
             'autoclose': True,
         }
 
@@ -69,16 +69,6 @@ class EventForm(forms.ModelForm):
         self.fields['organization'].widget = forms.Select()
         self.fields['organization'].choices = orgs
         self.fields['organization'].label = 'Realizador'
-
-    def _set_widget_date(self):
-
-        self.fields['date_start'].widget = DateTimeWidget(
-            bootstrap_version=3,
-            attrs={'style': 'background-color:#FFF'})
-
-        self.fields['date_end'].widget = DateTimeWidget(
-            bootstrap_version=3,
-            attrs={'style': 'background-color:#FFF'})
 
 
 class EventEditDatesForm(forms.ModelForm):
