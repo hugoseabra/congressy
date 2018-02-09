@@ -15,7 +15,7 @@ set -ex
 
 BASE=$(dirname "$0")
 VERSION_FILE="$BASE/version"
-PREVIOUS_VERSION_FILE="$BASE/cgsy/previous_version"
+PREVIOUS_VERSION_FILE="$BASE/previous_version"
 PREVIOUS_VERSION="dev"
 VERSION="dev"
 
