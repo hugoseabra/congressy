@@ -9,7 +9,8 @@ from gatheros_event import forms
 from gatheros_event.views.mixins import AccountMixin
 
 from gatheros_event.helpers import account
-from payment.tasks import create_pagarme_recipient
+from payment.tasks import create_pagarme_organizer_recipient
+from payment.exception import OrganizerRecipientError
 
 
 class BaseOrganizationView(AccountMixin, View):
@@ -161,7 +162,14 @@ class OrganizationFinancialEditFormView(OrganizationEditFormView):
     def post(self, request, *args, **kwargs):
 
         response = super(OrganizationFinancialEditFormView, self).post(request, *args, **kwargs)
-        create_pagarme_recipient(self.object)
+
+        if hasattr(response, 'context_data'):
+            form = response.context_data['form']
+            if form.is_valid():
+                try:
+                    create_pagarme_organizer_recipient(self.object)
+                except OrganizerRecipientError:
+                    pass
 
         return response
 

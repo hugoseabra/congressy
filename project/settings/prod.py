@@ -15,28 +15,28 @@ INSTALLED_APPS.extend([
     'raven.contrib.django.raven_compat',
 ])
 # ============================== LOGGING ==================================== #
-LOGGING['root'] = {
-    'level': 'WARNING',
-    'handlers': ['sentry'],
-}
-
-LOGGING['handlers']['sentry'] = {
-    'level': 'ERROR',  # To capture more than ERROR, change to WARNING, INFO.
-    'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-    'tags': {'custom-tag': 'x'},
-}
-
-LOGGING['loggers']['raven'] = {
-    'level': 'INFO',
-    'handlers': ['console'],
-    'propagate': False,
-}
-
-LOGGING['loggers']['sentry.errors'] = {
-    'level': 'ERROR',
-    'handlers': ['console'],
-    'propagate': False,
-}
+# LOGGING['root'] = {
+#     'level': 'WARNING',
+#     'handlers': ['sentry'],
+# }
+#
+# LOGGING['handlers']['sentry'] = {
+#     'level': 'ERROR',  # To capture more than ERROR, change to WARNING, INFO.
+#     'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+#     'tags': {'custom-tag': 'x'},
+# }
+#
+# LOGGING['loggers']['raven'] = {
+#     'level': 'INFO',
+#     'handlers': ['console'],
+#     'propagate': False,
+# }
+#
+# LOGGING['loggers']['sentry.errors'] = {
+#     'level': 'ERROR',
+#     'handlers': ['console'],
+#     'propagate': False,
+# }
 # ============================= MIDDLEWARES ================================= #
 # SENTRY User Feedback
 # We recommend putting this as high in the chain as possible

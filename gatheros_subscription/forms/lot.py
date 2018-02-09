@@ -107,6 +107,18 @@ class LotForm(forms.ModelForm):
             options={'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now()),
                      'endDate': '{0:%d-%m-%Y %H:%M}'.format(self.event.date_start - timedelta(minutes=2))})
 
+    def clean(self):
+        cleaned_data = super().clean()
+        raw_data = self.data
+
+        date_start = datetime.strptime(raw_data['date_start'], '%d/%m/%Y %H:%M')
+        date_end = datetime.strptime(raw_data['date_end'], '%d/%m/%Y %H:%M')
+
+        cleaned_data['date_start'] = date_start
+        cleaned_data['date_end'] = date_end
+
+        return cleaned_data
+
 
     # def clean_date_start(self):
     #     lots = self.event.lots.order_by('date_start')
