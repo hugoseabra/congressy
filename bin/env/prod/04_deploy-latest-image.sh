@@ -19,7 +19,7 @@ PREVIOUS_VERSION_FILE="$BASE/previous_version"
 PREVIOUS_VERSION="dev"
 VERSION="dev"
 
-if [ -f "PREVIOUS_VERSION_FILE" ]; then
+if [ -f "$PREVIOUS_VERSION_FILE" ]; then
     PREVIOUS_VERSION=$(cat ${PREVIOUS_VERSION_FILE})
 fi
 
@@ -29,15 +29,15 @@ fi
 
 # A versão nunca será a anterior a atual devido ao CI controlar a continuidade
 # dos releases. Sendo assim, basta comparar
-if [ "$PREVIOUS_VERSION" -ne "$VERSION" ]; then
+if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     docker exec -i awsecr pull cgsy:latest
     docker exec -i awsecr pull cgsy:${VERSION}
     docker-compose -f ~/cgsy/docker-compose.yml up -d
     docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
 
     # Reseta configurações para o próximo release
-    echo "$VERSION" > "$BASE/previous_version"
-    rm -f "$BASE/version"
+#    rm -f "$BASE/cgsy/tagged_version"
+#    rm -f "$BASE/cgsy/version"
 
     # Sucesso
     exit 0

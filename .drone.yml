@@ -85,7 +85,9 @@ pipeline:
       dbuser_staging,
       dbpass_staging,
       dbname_staging,
-      dbport_staging
+      dbport_staging,
+      sentry_public_dsn,
+      sentry_private_dsn
     ]
     commands:
       - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/staging/env-cgsy-staging
@@ -101,6 +103,8 @@ pipeline:
       - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ./bin/env/staging/env-cgsy-staging
       - sh ./bin/env/staging/03_start-cgsy-staging.sh
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
     when:
@@ -187,6 +191,7 @@ pipeline:
       - apk add --no-cache python3
       - pip3 install --no-cache-dir semver clint
       - python3 ./bin/env/prod/02_check-latest-version.py
+      - cat ./bin/env/prod/previous_version
     when:
       branch: [ master ]
 
@@ -216,6 +221,7 @@ pipeline:
     pull: true
     host:
       - 172.31.36.223
+      - 172.31.45.193
     username: admin
     port: 22
     secrets:
@@ -225,6 +231,8 @@ pipeline:
         target: AWS_KEY
       - source: AWS_SECRET
         target: AWS_SECRET
+      - source: AWS_ACCOUNT_ID
+        target: AWS_ACCOUNT_ID
       - source: DOMAIN
         target: DOMAIN
       - source: FORCE_HTTPS
@@ -247,7 +255,12 @@ pipeline:
         target: DBNAME
       - source: DBPORT
         target: DBPORT
+      - source: SENTRY_PUBLIC_DSN
+        target: SENTRY_PUBLIC_DSN
+      - source: SENTRY_PRIVATE_DSN
+        target: SENTRY_PRIVATE_DSN
     envs: [
+      congressy_deploy,
       aws_key,
       aws_secret,
       aws_account_id,
@@ -261,18 +274,20 @@ pipeline:
       dbuser,
       dbpass,
       dbname,
-      dbport
+      dbport,
+      sentry_public_dsn,
+      sentry_private_dsn
     ]
     script:
-      - mkdir -p ~/{cgsy,awsecr}
-
+      - mkdir -p ~/awsecr
       # env-file do awsecr
       - echo "AWS_KEY=$${AWS_KEY}" > ~/awsecr/env-awsecr
-      - echo "AWS_SECRET=$${AWS_SECRET}" > ~/awsecr/env-awsecr
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/awsecr/env-awsecr
       - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ~/awsecr/env-awsecr
       - echo "AWS_REGION=us-east-1" >> ~/awsecr/env-awsecr
       - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
 
+      - mkdir -p ~/cgsy
       # env-file do stack de produção
       - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
@@ -287,10 +302,8 @@ pipeline:
       - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
       - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
-
-      # Saves versions in production: nome do container no stack será sempre o mesmo
-      - docker run --rm -i 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy cat version > previous_version
-
+      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
+      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
     when:
       branch: [ master ]
 
@@ -299,10 +312,43 @@ pipeline:
     pull: true
     hosts:
       - 172.31.36.223
+      - 172.31.45.193
     port: 22
     user: admin
-    source: ./bin/prod/01_create-awsecr-container.sh
+    source: ./bin/env/prod/01_create-awsecr-container.sh
     target: ~/awsecr/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  transfer-previous-version-file:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.36.223
+      - 172.31.45.193
+    port: 22
+    user: admin
+    source: ./bin/env/prod/previous_version
+    target: ~/cgsy/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  transfer-build-version-file:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.36.223
+      - 172.31.45.193
+    port: 22
+    user: admin
+    source: ./version
+    target: ~/cgsy/.
     secrets:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
@@ -314,6 +360,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.36.223
+      - 172.31.45.193
     port: 22
     user: admin
     source: ./conf/deploy/docker-compose.yml
@@ -329,6 +376,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.36.223
+      - 172.31.45.193
     port: 22
     user: admin
     source: ./bin/env/prod/04_deploy-latest-image.sh
@@ -344,6 +392,7 @@ pipeline:
     pull: true
     host:
       - 172.31.36.223
+      - 172.31.45.193
     username: admin
     port: 22
     secrets:
