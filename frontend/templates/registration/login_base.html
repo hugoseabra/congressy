@@ -124,9 +124,7 @@
     </section>
 </section>
 
-{% if SENTRY_PUBLIC_DSN and request.sentry.id %}
-{% include 'sentry-javscript-sdk.html' %}
-{% endif %}
+{% include 'sentry-javascript-sdk.html' %}
 
 {% if not debug %}
 <!--Start of Tawk.to Script-->

@@ -1,5 +1,7 @@
+{% load static %}
+
 <!-- Sentry JS SDK 2.1.+ required -->
-{% if SENTRY_PUBLIC_DSN and request.sentry %}
+{% if SENTRY_PUBLIC_DSN %}
 <script src="https://cdn.ravenjs.com/3.22.1/raven.min.js" crossorigin="anonymous"></script>
 <script src="{% static "assets/js/sentry-functions.js"%}"></script>
 <script>
@@ -12,6 +14,12 @@ setUserContext(
 );
 {% endif %}
 var TRACKER_CAPTURE = true;
+
+{% if request.sentry and request.sentry.id %}
+function send_user_feedback() {
+    user_feedback_report('{{ request.sentry.id }}', '{{ SENTRY_PUBLIC_DSN }}')
+}
+{% endif %}
 </script>
 {% else %}
 <script>

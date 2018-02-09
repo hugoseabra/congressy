@@ -17,9 +17,7 @@
 {% include 'hotsite/includes/7_footer.html' %}
 </div>
 
-{% if SENTRY_PUBLIC_DSN and request.sentry.id %}
-{% include 'sentry-javscript-sdk.html' %}
-{% endif %}
+{% include 'sentry-javascript-sdk.html' %}
 
 <!-- LIBRARIES JS
 ================================= -->
