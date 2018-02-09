@@ -292,9 +292,6 @@ pipeline:
       - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
 
-      # Saves versions in production: nome do container no stack será sempre o mesmo
-      - docker run --rm -i 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy cat version > ~/cgsy/previous_version
-
     when:
       branch: [ master ]
 
@@ -308,6 +305,22 @@ pipeline:
     user: admin
     source: ./bin/prod/01_create-awsecr-container.sh
     target: ~/awsecr/.
+    secrets:
+      - source: CONGRESSY_DEPLOY
+        target: RSYNC_KEY
+    when:
+      branch: [ master ]
+
+  tranfer-tagged-version-file:
+    image: drillster/drone-rsync
+    pull: true
+    hosts:
+      - 172.31.36.223
+      - 172.31.45.193
+    port: 22
+    user: admin
+    source: ./env/prod/tagged_version
+    target: ~/cgsy/.
     secrets:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
