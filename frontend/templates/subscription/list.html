@@ -92,18 +92,19 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
-        <h5 class="sidebar-header">Participantes</h5>
-        <ul class="nav nav-pills nav-stacked">
-            {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
-                <li>
-                    <a href="{% url 'subscription:lot-list' event.pk %}"
-                       title="Inscrições">
-                        <i class="fa  fa-fw fa-rocket"></i>
-                        Lotes/Categorias
-                    </a>
-                </li>
-            {% endif %}
+
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE  and event.subscription_type != event.SUBSCRIPTION_DISABLED %}
+            <li>
+                <a href="{% url 'subscription:lot-list' event.pk %}"
+                   title="Inscrições">
+                    <i class="fa  fa-fw fa-rocket"></i>
+                    Lotes/Categorias
+                </a>
+            </li>
+        {% endif %}
+        {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
             <li class="active">
                 <a href="{% url 'subscription:subscription-list' event.pk %}"
                    title="Inscrições">
@@ -111,15 +112,15 @@
                     Inscrições
                 </a>
             </li>
-            {#        <li>#}
-            {#            <a href="{% url 'subscription:\subscription-attendance-search' event.pk %}"#}
-            {#               title="Check-in">#}
-            {#                <i class="fa  fa-fw fa-rocket"></i>#}
-            {#                Check-in#}
-            {#            </a>#}
-            {#        </li>#}
-        </ul>
-    {% endif %}
+        {% endif %}
+        {#        <li>#}
+        {#            <a href="{% url 'subscription:\subscription-attendance-search' event.pk %}"#}
+        {#               title="Check-in">#}
+        {#                <i class="fa  fa-fw fa-rocket"></i>#}
+        {#                Check-in#}
+        {#            </a>#}
+        {#        </li>#}
+    </ul>
     <h5 class="sidebar-header">Configurações</h5>
     <ul class="nav nav-pills nav-stacked">
         <li>
@@ -136,7 +137,7 @@
                 </a>
             </li>
         {% endif %}
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE and event.subscription_type != event.SUBSCRIPTION_DISABLED %}
             <li>
                 <a href="{% url 'event:event-payments' event.pk %}"
                    title="Pagamentos">

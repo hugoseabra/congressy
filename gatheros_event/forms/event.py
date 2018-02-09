@@ -31,10 +31,14 @@ class EventForm(forms.ModelForm):
         #            'date_start': forms.DateTimeInput,
         #            'date_end': forms.DateTimeInput,
         #            }
+        dateTimeOptions = {
+            'format': 'mm/dd/yyyy HH:ii',
+            'autoclose': True,
+        }
 
         widgets = {'organization': forms.HiddenInput,
-                   'date_start': DateTimeWidget,
-                   'date_end': DateTimeWidget,
+                   'date_start': DateTimeWidget(options=dateTimeOptions, bootstrap_version=3, attrs={'style': 'background-color:#FFF'}),
+                   'date_end': DateTimeWidget(options=dateTimeOptions, bootstrap_version=3, attrs={'style': 'background-color:#FFF'}),
                    }
 
     def __init__(self, user, *args, **kwargs):
@@ -46,7 +50,7 @@ class EventForm(forms.ModelForm):
         if instance is None:
             self._configure_organization_field()
 
-        self._set_widget_date()
+        # self._set_widget_date()
 
     def _configure_organization_field(self):
         orgs = []
@@ -70,25 +74,16 @@ class EventForm(forms.ModelForm):
 
         self.fields['date_start'].widget = DateTimeWidget(
             bootstrap_version=3,
-            attrs={'style': 'background-color:#FFF'},
-            options={'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now())})
+            attrs={'style': 'background-color:#FFF'})
 
         self.fields['date_end'].widget = DateTimeWidget(
             bootstrap_version=3,
-            attrs={'style': 'background-color:#FFF'},
-            options={'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now())})
+            attrs={'style': 'background-color:#FFF'})
 
-    def clean(self):
-        cleaned_data = super().clean()
-        raw_data = self.data
-
-        date_start = datetime.strptime(raw_data['date_start'], '%d/%m/%Y %H:%M')
-        date_end = datetime.strptime(raw_data['date_end'], '%d/%m/%Y %H:%M')
-
-        cleaned_data['date_start'] = date_start
-        cleaned_data['date_end'] = date_end
-
-        return cleaned_data
+    def is_valid(self):
+        valid = super().is_valid()
+        print('asdsad')
+        return valid
 
 
 class EventEditDatesForm(forms.ModelForm):
