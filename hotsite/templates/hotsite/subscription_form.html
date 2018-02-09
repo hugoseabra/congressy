@@ -126,15 +126,19 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        {% if config and config.birth_date != config.BIRTH_DATE_HIDE %}
+
+                    {% if config and config.birth_date != config.BIRTH_DATE_HIDE %}
+
+                        <div class="col-md-6">
                             {% if config.birth_date == config.BIRTH_DATE_REQUIRED %}
                                 {% render_generic_field form.birth_date required=True %}
                             {% else %}
                                 {% render_generic_field form.birth_date %}
                             {% endif %}
-                        {% endif %}
-                    </div>
+
+
+                        </div>
+                    {% endif %}
                     <div class="col-md-6">
                         {% if config %}
                             {% render_generic_field form.phone config.phone False %}
@@ -152,14 +156,14 @@
                 </div>
                 <div class="row">
                     {% if config and config.institution_show %}
-                    <div class="col-md-6">
-                        {% render_generic_field form.institution required=config.institution_required %}
-                    </div>
+                        <div class="col-md-6">
+                            {% render_generic_field form.institution required=config.institution_required %}
+                        </div>
                     {% endif %}
                     {% if config and config.function_show %}
-                    <div class="col-md-6">
-                        {% render_generic_field form.function required=config.function_required %}
-                    </div>
+                        <div class="col-md-6">
+                            {% render_generic_field form.function required=config.function_required %}
+                        </div>
                     {% endif %}
                 </div>
             </div>
