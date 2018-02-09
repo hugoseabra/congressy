@@ -1,0 +1,33 @@
+<!-- DESCRIPTION
+================================= -->
+<section id="about" class="about-section section">
+
+    <div class="container">
+
+        <h2 class="section-heading text-center">Sobre o evento</h2>
+
+        <div class="about-row row">
+            {% if info.image_main.default %}
+                <!-- DESCRIPTION IMAGE -->
+                <div class="about-image col-md-6" data-animation="fadeIn">
+                    <img src="{{ info.image_main.default.url }}" alt="" class="img-responsive">
+
+                </div>
+
+                <!-- DESCRIPTION TEXT -->
+                <div class="about-text col-md-6">
+                    {{ info.description_html|safe }}
+                </div>
+            {% else %}
+                <!-- DESCRIPTION TEXT -->
+                <div class="about-text col-md-12">
+                    {{ info.description_html|safe }}
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>

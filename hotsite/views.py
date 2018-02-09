@@ -176,7 +176,7 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
 
 
 class HotsiteView(SubscriptionFormMixin, generic.View):
-    template_name = 'hotsite/base.html'
+    template_name = 'hotsite/main.html'
 
     def post(self, request, *args, **kwargs):
 
@@ -200,7 +200,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             )
 
         context = self.get_context_data(**kwargs)
-        context['remove_preloader'] = True
+        context['remove_preloader'] = False
 
         if not name or not email:
             messages.error(
@@ -377,6 +377,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             config.address = config.ADDRESS_SHOW
 
         cxt['config'] = config
+        cxt['remove_preloader'] = True
         cxt['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
         return cxt
@@ -527,7 +528,7 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         context['is_subscribed'] = self.is_subscribed()
         context['transactions'] = self.get_transactions()
         context['allow_transaction'] = self.get_allowed_transaction()
-        context['pagarme_key'] = settings.PAGARME_ENCRYPT_KEY
+        context['pagarme_key'] = settings.PAGARME_ENCRYPTION_KEY
 
         try:
             context['subscription'] = self.subscription.pk

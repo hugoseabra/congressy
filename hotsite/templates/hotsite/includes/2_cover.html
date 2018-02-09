@@ -1,0 +1,93 @@
+{% load static %}
+
+<!-- HERO
+================================= -->
+<section id="hero"
+         class="hero-section hero-layout-classic hero-layout-features-and-form section section-dark">
+
+    <div class="section-background">
+
+        <!-- IMAGE BACKGROUND -->
+        <div class="section-background-image parallax">
+            <img
+                src="{% if info.image_main.default %}{{ info.image_main.default.url }}{% endif %}"
+                alt="" style="opacity: 0.2;" class="blurred">
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="hero-content">
+            <div class="hero-content-inner">
+
+                <div class="hero-heading text-center row"
+                     data-animation="fadeIn">
+                    <div class="col-md-10 col-md-offset-1">
+
+                        <h1 class="hero-title">{{ event.name }}</h1>
+
+                        <p class="hero-tagline">
+                        <div>
+                            <i class="fa fa-calendar"></i>
+                            {{ event.get_period }}
+                        </div>
+                        {% if event.place %}
+                            <div>
+                                <i class="fa fa-map-marker"></i>
+                                {{ event.place.name }}
+                            </div>
+                        {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="hero-features row">
+
+                    <div class="hero-features-left col-md-7">
+                        {% if info.lead %}
+                            <p class="lead">
+                                {{ info.lead }}
+                            </p>
+                        {% endif %}
+                        {% if subscription_enabled and has_paid_lots %}
+                            <ul class="icon-list">
+
+                                {% for lot in lots %}
+                                    <li>
+                                <span class="icon-list-icon " data-animation="bounceIn">
+                                  <strong>{{ forloop.counter }}</strong>
+                                </span>
+                                        <h4 class="icon-list-title">
+                                            <strong>{{ lot.name }} - R${{ lot.price }}</strong>
+                                        </h4>
+
+                                        <p>
+                                            <strong>{{ lot.places_remaining }} Vaga(s) restante(s)</strong>
+                                            <br/>
+                                            <small class="text-muted">{{ lot.get_period }}</small>
+                                        </p>
+
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% elif  not subscription_enabled %}
+                            <p style="font-size: 20px;font-style: italic;">Evento não permite inscrições.</p>
+                        {% endif %}
+
+                    </div>
+                    <div class="hero-features-right col-md-5"
+                         data-animation="fadeIn">
+                        {% if  subscription_enabled %}
+                            {% if has_paid_lots and has_configured_bank_account and not has_active_bank_account %}
+                                <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
+                                    Evento está sendo configurado, volte em breve para realizar sua inscrição!</p>
+                            {% else %}
+                                {% include 'hotsite/subscription_simple_form.html' %}
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

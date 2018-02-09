@@ -1,0 +1,72 @@
+{% load static %}
+
+<!-- HEADER
+================================= -->
+<header id="header"
+        class="header-section section section-dark navbar navbar-fixed-top">
+
+    <div class="container-fluid">
+
+        <div class="navbar-header navbar-left">
+
+            <!-- RESPONSIVE MENU BUTTON -->
+            <button type="button" class="navbar-toggle"
+                    data-toggle="collapse" data-target="#navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- HEADER LOGO -->
+            <a class="navbar-logo navbar-brand" href="{% url 'public:hotsite' event.slug %}">
+                <img src="{% static 'hotsite/images/logos/header-logo.png' %}"
+                     srcset="{% static 'hotsite/images/logos/header-logo@2x.png' %}"
+                     alt="Congressy">
+            </a>
+        </div>
+
+        <nav id="navigation"
+             class="navigation navbar-collapse collapse navbar-right">
+
+            <!-- NAVIGATION LINKS -->
+            <ul id="header-nav" class="nav navbar-nav">
+
+                <li><a href="#hero" class="anchor-link">Capa</a></li>
+                <li><a href="#about" class="anchor-link">Sobre o evento</a>
+                </li>
+                {% if event.place %}
+                    <li><a href="#map" class="anchor-link">Local</a></li>
+                {% endif %}
+                {% if not event.organization.internal %}
+                    <li><a href="#owner" class="anchor-link">Organizador</a>
+                {% endif %}
+                </li>
+
+                <!-- HEADER ACTION BUTTON -->
+                {% if user.is_authenticated %}
+                    <li class="header-action-button dropdown dropdown-hover ">
+                        <a href="#" class="dropdown-toggle external" data-toggle="dropdown" role="button"
+                           aria-expanded="true" style="font-weight: bold">{{ user.first_name }}<span
+                                class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="{% url 'event:profile' %}" target="_blank">Minha conta</a>
+                            </li>
+                            <li><a href="{% url 'front:start' %}" target="_blank">Gerenciar</a></li>
+                            <li>
+                                <a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}">Sair</a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="header-action-button">
+                        <a href="{% url 'public:login' %}?next={% url 'public:hotsite' event.slug %}"
+                           class="external btn btn-primary">
+                            Entrar
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</header>

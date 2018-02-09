@@ -1,0 +1,37 @@
+{% if subscription_enabled %}
+    <!-- CLOSING
+    ================================= -->
+    <section id="closing" class="closing-section section-dark section">
+
+        <div class="section-background">
+
+            <!-- IMAGE BACKGROUND -->
+            <div class="section-background-image parallax">
+                <img
+                    {% if info.image_main.default %}
+                        src="{{ info.image_main.default.url }}"
+                    {% else %}
+                        src=""
+                    {% endif %}
+                        alt="" style="opacity: 0.2;" class="blurred">
+            </div>
+
+
+        </div>
+
+
+        <div class="container">
+
+            <h3 class="closing-shout">
+                Faça já a sua inscrição!
+            </h3>
+
+            <div class="closing-buttons" data-animation="tada">
+                <a href="#hero" class="anchor-link btn btn-lg btn-primary">
+                    Realizar inscrição
+                </a>
+            </div>
+        </div>
+
+    </section>
+{% endif %}

@@ -1,0 +1,21 @@
+<!-- REALIZADOR ================================= -->
+{% if not event.organization.internal %}
+    <section id="owner" class="footer-section section">
+        <h2 class="section-heading text-center">Organizador</h2>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-12" style="text-align: left;">
+                            <h3>{{ event.organization }}</h3>
+                            <div class="team-member-description">
+                                {{ event.organization.description_html|safe }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+{% endif %}
