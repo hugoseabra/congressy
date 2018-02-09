@@ -256,6 +256,8 @@ pipeline:
       - source: DBPORT
         target: DBPORT
       - source: SENTRY_PUBLIC_DSN
+        target: SENTRY_PUBLIC_DSN
+      - source: SENTRY_PRIVATE_DSN
         target: SENTRY_PRIVATE_DSN
     envs: [
       congressy_deploy,
