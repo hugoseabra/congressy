@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load static event_tags  base_tags  widget_tweaks form_config_tags humanize%}
+{% load static event_tags  base_tags  widget_tweaks form_config_tags humanize %}
 
 {% block messages %}
     {% if messages %}
@@ -27,6 +27,34 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
+
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+            <li>
+                <a href="{% url 'subscription:lot-list' event.pk %}"
+                   title="Inscrições">
+                    <i class="fa  fa-fw fa-rocket"></i>
+                    Lotes/Categorias
+                </a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+        {#        <li>#}
+        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+        {#               title="Check-in">#}
+        {#                <i class="fa  fa-fw fa-rocket"></i>#}
+        {#                Check-in#}
+        {#            </a>#}
+        {#        </li>#}
+    </ul>
+
     <h5 class="sidebar-header">Configurações</h5>
     <ul class="nav nav-pills nav-stacked">
         <li>
@@ -45,24 +73,6 @@
             <a href="{% url 'event:event-payments' event.pk %}"
                title="Pagamentos">
                 <i class="fa  fa-fw fa-rocket"></i> Pagamentos
-            </a>
-        </li>
-    </ul>
-
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Ingressos
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
             </a>
         </li>
     </ul>
@@ -108,10 +118,11 @@
                                             {% else %}
                                                 <i class="fa fa-circle" aria-hidden="true"></i>
                                             {% endif %}
-                                            {{ transaction.get_status_display }} - {{ transaction.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                            {{ transaction.get_status_display }}
+                                            - {{ transaction.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
                                         </strong>
                                         {% if transaction.statuses.all %}
-                                            <hr />
+                                            <hr/>
                                             {% for status in transaction.statuses.all %}
                                                 <div class="text-muted">
                                                     {% if status.status == status.AUTHORIZED or status.status == status.PAID or status.status == status.REFUNDED %}
@@ -126,7 +137,8 @@
                                                     {% else %}
                                                         <i class="fa fa-circle" aria-hidden="true"></i>
                                                     {% endif %}
-                                                    {{ status.get_status_display }} - {{ status.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                                    {{ status.get_status_display }}
+                                                    - {{ status.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
                                                 </div>
                                             {% endfor %}
                                         {% endif %}
