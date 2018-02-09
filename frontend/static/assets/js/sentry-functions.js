@@ -13,7 +13,7 @@ function setUserContext(id, username, email) {
     });
 }
 
-function send_user_feedback(sentry_id, public_dsn) {
+function user_feedback_report(sentry_id, public_dsn) {
     Raven.showReportDialog({
         eventId: sentry_id,
         dsn: public_dsn
