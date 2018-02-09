@@ -9,6 +9,8 @@
         Evento está sendo configurado. Volte em breve.
     </div>
 
+    <h4 class="form-heading"
+
 {% else %}
     <!-- FORM -->
     <form action="" method="post"
@@ -16,15 +18,14 @@
           role="form" onsubmit="submit_form(this);">
 
         {% csrf_token %}
-
-        {% if user.is_authenticated %}
-            <h4 class="form-heading"
-                style="font-weight: bold;">Olá, {{ user.first_name }}</h4>
-        {% else %}
-            <h4 class="form-heading"
-                style="font-weight: bold;">Inscreva-se
-                agora!</h4>
-        {% endif %}
+        <h4 class="form-heading"
+            style="font-weight: bold;">
+            {% if user.is_authenticated %}
+                Olá, {{ user.first_name }}
+            {% else %}
+                Inscreva-se agora!
+            {% endif %}
+        </h4>
 
         {% block messages %}
             {% if messages %}

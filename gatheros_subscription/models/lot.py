@@ -250,9 +250,6 @@ class Lot(models.Model, GatherosModelMixin):
 
     def clean(self):
         """ Limpa valores dos campos. """
-        if not self.date_end:
-            self.date_end = self.event.date_start - timedelta(seconds=1)
-
         if self.private and not self.promo_code:
             self.promo_code = Lot.objects.generate_promo_code()
 
@@ -294,16 +291,20 @@ class Lot(models.Model, GatherosModelMixin):
         not_simple = self.event.subscription_type != Event.SUBSCRIPTION_SIMPLE
         if force is False and not_simple:
             return
+        event = self.event
 
         now = datetime.now()
-        if self.event.date_start > now:
-            self.date_start = now
+        if event.date_start > now:
+            date_start = now
         else:
-            self.date_start = self.event.date_start - timedelta(days=1)
+            date_start = event.date_start
 
-        self.date_start = self.date_start.replace(hour=8, minute=0, second=0)
+        # self.date_start = self.date_start.replace(hour=8, minute=0, second=0)
         # self.date_end = self.event.date_start - timedelta(minutes=1)
-        self.date_end = self.event.date_end - timedelta(seconds=1)
+        date_end = event.date_start - timedelta(seconds=1)
+
+        self.date_start = date_start
+        self.date_end = date_end
 
     def get_period(self):
         """ Recupera string formatada de periodo do lote, de acordo com suas

@@ -78,6 +78,18 @@ class EventForm(forms.ModelForm):
             attrs={'style': 'background-color:#FFF'},
             options={'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now())})
 
+    def clean(self):
+        cleaned_data = super().clean()
+        raw_data = self.data
+
+        date_start = datetime.strptime(raw_data['date_start'], '%d/%m/%Y %H:%M')
+        date_end = datetime.strptime(raw_data['date_end'], '%d/%m/%Y %H:%M')
+
+        cleaned_data['date_start'] = date_start
+        cleaned_data['date_end'] = date_end
+
+        return cleaned_data
+
 
 class EventEditDatesForm(forms.ModelForm):
     """Formulário de edição de datas de evento"""

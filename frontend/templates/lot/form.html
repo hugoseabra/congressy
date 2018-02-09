@@ -119,6 +119,12 @@
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
+        <li>
+            <a href="{% url 'event:event-payments' event.pk %}"
+               title="Pagamentos">
+                <i class="fa  fa-fw fa-rocket"></i> Pagamentos
+            </a>
+        </li>
     </ul>
 {% endblock %}
 
@@ -223,9 +229,9 @@
                                 <div class="col-xl-2 col-lg-2 col-md-2">
                                     {% render_generic_field form.price %}
                                 </div>
-{#                                <div class="col-xl-4 col-lg-6 col-md-6">#}
-{#                                    {% render_generic_field form.transfer_tax %}#}
-{#                                </div>#}
+                                {#                                <div class="col-xl-4 col-lg-6 col-md-6">#}
+                                {#                                    {% render_generic_field form.transfer_tax %}#}
+                                {#                                </div>#}
 
                             {% else %}
                                 <div class="col-xl-4 col-lg-6 col-md-8">

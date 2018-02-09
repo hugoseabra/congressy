@@ -3,7 +3,7 @@ import json
 from django.conf import settings
 from mailer.tasks import send_mail
 from payment.models import Transaction
-from payment.exception import TransactionError
+from payment.exception import TransactionError, OrganizerRecipientError
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
 
@@ -29,11 +29,15 @@ def create_pagarme_transaction(payment=None, subscription=None):
         body = """
             Erro ao criar transação:
             
+            <br/>
+            
             Transação: 
+            <br />
             
             <pre><code>{0}</code></pre>
-            
-            Erro: 
+            <br />
+            Erro:
+            <br/> 
             
             <pre><code>{1}</code></pre>
         """.format(json.dumps(payment), json.dumps(trx))
@@ -51,7 +55,7 @@ def create_pagarme_transaction(payment=None, subscription=None):
 
 
 # @TODO create a mock of the response to use during testing
-def create_pagarme_recipient(organization=None):
+def create_pagarme_organizer_recipient(organization=None):
 
     if not organization:
         return
@@ -76,6 +80,22 @@ def create_pagarme_recipient(organization=None):
     recipient = pagarme.recipient.create(params)
 
     # @TODO add wrapper here to check if its a dict or a list
+    if not isinstance(recipient, dict):
+        subject = "Erro ao criar conta de organizador: Unknown API error"
+        body = """
+            Erro ao criar conta de organizador:
+
+            <br/>
+
+            Organização: {0} 
+            <br />
+            Erro:
+            <br/> 
+            <pre><code>{1}</code></pre>
+        """.format(organization.name, json.dumps(recipient))
+
+        send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
+        raise OrganizerRecipientError(message='Unknown API error')
 
     organization.bank_account_id = recipient['bank_account']['id']
     organization.document_type = recipient['bank_account']['document_type']
