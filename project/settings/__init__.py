@@ -154,6 +154,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
+                'gatheros_event.context_processors.account',
             ],
             'builtins': [
                 'permission.templatetags.permissionif',
