@@ -17,19 +17,14 @@
 {% include 'hotsite/includes/7_footer.html' %}
 </div>
 
-{% if SENTRY_PUBLIC_DSN %}
-    <script src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"></script>
-    <script>
-    var TRACKER_CAPTURE = true;
-    Raven.config('{{ SENTRY_PUBLIC_DSN }}').install();
-    </script>
-{% else %}
-    <script>var TRACKER_CAPTURE = false;</script>
+{% if SENTRY_PUBLIC_DSN and request.sentry.id %}
+{% include 'sentry-javscript-sdk.html' %}
 {% endif %}
 
 <!-- LIBRARIES JS
 ================================= -->
 <script src="{% static 'hotsite/js/jquery-1.11.2.min.js' %}"></script>
+<script src="{% static 'hotsite/js/typeahead.js' %}"></script>
 <script src="{% static 'hotsite/js/bootstrap.min.js' %}"></script>
 <script src="{% static 'hotsite/js/respimage.min.js' %}"></script>
 <script src="{% static 'hotsite/js/jpreloader.min.js' %}"></script>

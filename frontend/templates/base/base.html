@@ -323,14 +323,8 @@
 
 </section>
 
-{% if SENTRY_PUBLIC_DSN %}
-<script src="https://cdn.ravenjs.com/3.17.0/raven.min.js" crossorigin="anonymous"></script>
-<script>
-    var TRACKER_CAPTURE = true;
-    Raven.config('{{ SENTRY_PUBLIC_DSN }}').install();
-</script>
-{% else %}
-<script>var TRACKER_CAPTURE = false;</script>
+{% if SENTRY_PUBLIC_DSN and request.sentry.id %}
+{% include 'sentry-javscript-sdk.html' %}
 {% endif %}
 
 {% if not debug %}

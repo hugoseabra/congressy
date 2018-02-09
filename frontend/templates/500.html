@@ -105,7 +105,7 @@
 <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
 
 {% if SENTRY_PUBLIC_DSN and request.sentry.id %}
-{% include 'sentry_public_dsn.html' %}
+{% include 'sentry-javscript-sdk.html' %}
 {% endif %}
 </body>
 

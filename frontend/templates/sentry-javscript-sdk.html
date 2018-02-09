@@ -1,0 +1,20 @@
+<!-- Sentry JS SDK 2.1.+ required -->
+{% if SENTRY_PUBLIC_DSN and request.sentry %}
+<script src="https://cdn.ravenjs.com/3.22.1/raven.min.js" crossorigin="anonymous"></script>
+<script src="{% static "assets/js/sentry-functions.js"%}"></script>
+<script>
+setConfig('{{ SENTRY_PUBLIC_DSN  }}', '{{ ENVIRONMENT_VERSION }}');
+{% if not request.user.is_anonymous %}
+setUserContext(
+    '{{ request.user.pk }}',
+    '{{ request.user.username }}',
+    '{{ request.user.email }}'
+);
+{% endif %}
+var TRACKER_CAPTURE = true;
+</script>
+{% else %}
+<script>
+var TRACKER_CAPTURE = false;
+</script>
+{% endif %}
