@@ -216,6 +216,7 @@ pipeline:
     pull: true
     host:
       - 172.31.36.223
+      - 172.31.45.193
     username: admin
     port: 22
     secrets:
@@ -248,6 +249,7 @@ pipeline:
       - source: DBPORT
         target: DBPORT
     envs: [
+      congressy_deploy,
       aws_key,
       aws_secret,
       aws_account_id,
@@ -299,6 +301,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.36.223
+      - 172.31.45.193
     port: 22
     user: admin
     source: ./bin/prod/01_create-awsecr-container.sh
@@ -314,6 +317,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.36.223
+      - 172.31.45.193
     port: 22
     user: admin
     source: ./conf/deploy/docker-compose.yml
@@ -329,6 +333,7 @@ pipeline:
     pull: true
     hosts:
       - 172.31.36.223
+      - 172.31.45.193
     port: 22
     user: admin
     source: ./bin/env/prod/04_deploy-latest-image.sh
@@ -344,6 +349,7 @@ pipeline:
     pull: true
     host:
       - 172.31.36.223
+      - 172.31.45.193
     username: admin
     port: 22
     secrets:
