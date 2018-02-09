@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
-{% load static %}
-{% load event_tags %}
+
+{% load static event_tags %}
 
 {% block title %} Eventos | Congressy{% endblock %}
 
@@ -99,6 +99,7 @@
                            class="table table-striped table-bordered dataTable no-footer nowrap"
                            cellspacing="0"
                            width="100%">
+
                             <thead>
                             <tr>
                                 <th>Nome</th>
@@ -122,14 +123,14 @@
                                             {% endif %}
                                             <br/>
                                             <small class="text-muted">{{ event.get_period }}</small>
-                                            <br/>
-                                            <small class="text-muted">
-                                                {% if event.place %}
-                                                    {{ event.place.name }}
-                                                {% else %}
-                                                    Online
-                                                {% endif %}
-                                            </small>
+{#                                            <br/>#}
+{#                                            <small class="text-muted">#}
+{#                                                {% if event.place %}#}
+{#                                                    {{ event.place.name }}#}
+{#                                                {% else %}#}
+{#                                                    Online#}
+{#                                                {% endif %}#}
+{#                                            </small>#}
 
                                         </a>
                                     </td>
@@ -183,6 +184,7 @@
                                 </tr>
                             {% endfor %}
                             </tbody>
+
                             </table>
                     {% else %}
 
