@@ -311,7 +311,7 @@ pipeline:
     when:
       branch: [ master ]
 
-  tranfer-tagged-version-file:
+  transfer-tagged-version-file:
     image: drillster/drone-rsync
     pull: true
     hosts:
@@ -319,7 +319,7 @@ pipeline:
       - 172.31.45.193
     port: 22
     user: admin
-    source: ./env/prod/tagged_version
+    source: ./bin/env/prod/tagged_version
     target: ~/cgsy/.
     secrets:
       - source: CONGRESSY_DEPLOY
