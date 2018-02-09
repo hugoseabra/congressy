@@ -220,7 +220,6 @@ pipeline:
     image: appleboy/drone-ssh
     pull: true
     host:
-      - 172.31.36.223
       - 172.31.45.193
     username: admin
     port: 22
@@ -311,7 +310,6 @@ pipeline:
     image: drillster/drone-rsync
     pull: true
     hosts:
-      - 172.31.36.223
       - 172.31.45.193
     port: 22
     user: admin
@@ -327,7 +325,6 @@ pipeline:
     image: drillster/drone-rsync
     pull: true
     hosts:
-      - 172.31.36.223
       - 172.31.45.193
     port: 22
     user: admin
@@ -343,7 +340,6 @@ pipeline:
     image: drillster/drone-rsync
     pull: true
     hosts:
-      - 172.31.36.223
       - 172.31.45.193
     port: 22
     user: admin
@@ -359,7 +355,6 @@ pipeline:
     image: drillster/drone-rsync
     pull: true
     hosts:
-      - 172.31.36.223
       - 172.31.45.193
     port: 22
     user: admin
@@ -375,7 +370,6 @@ pipeline:
     image: drillster/drone-rsync
     pull: true
     hosts:
-      - 172.31.36.223
       - 172.31.45.193
     port: 22
     user: admin
@@ -391,7 +385,6 @@ pipeline:
     image: appleboy/drone-ssh
     pull: true
     host:
-      - 172.31.36.223
       - 172.31.45.193
     username: admin
     port: 22
