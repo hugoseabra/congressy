@@ -197,50 +197,6 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">
-                            Campos pré-definidos
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="well text-info small">
-                            Campos que já existem no formulário e não podem ser
-                            removidos.
-                        </div>
-                        {% for field in form %}
-                            {% if field.field.widget.input_type == 'checkbox' %}
-                                <div class="form-group">
-                                    <label for="{{ field.id_for_label }}">
-                                        {{ field.label }}
-                                    </label>
-                                    {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
-                                    {% if field.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="alert alert-danger
-                                        alert-dismissable">
-                                                <button type="button"
-                                                        class="close"
-                                                        data-dismiss="alert"
-                                                        aria-hidden="true">
-                                                    ×
-                                                </button>
-                                                {{ error }}
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                    {% if field.help_text %}
-                                        <div>
-                                            <small class="text-muted">{{ field.help_text|safe }}</small>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">
                             Campos adicionais
                         </div>
                     </div>
@@ -282,6 +238,50 @@
                             {% endif %}
                         {% endfor %}
 
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Campos pré-definidos
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="well text-info small">
+                            Campos que já existem no formulário e não podem ser
+                            removidos.
+                        </div>
+                        {% for field in form %}
+                            {% if field.field.widget.input_type == 'checkbox' %}
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}">
+                                        {{ field.label }}
+                                    </label>
+                                    {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="alert alert-danger
+                                        alert-dismissable">
+                                                <button type="button"
+                                                        class="close"
+                                                        data-dismiss="alert"
+                                                        aria-hidden="true">
+                                                    ×
+                                                </button>
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <div>
+                                            <small class="text-muted">{{ field.help_text|safe }}</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>

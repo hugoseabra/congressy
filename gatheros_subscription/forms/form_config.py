@@ -17,12 +17,16 @@ class FormConfigForm(forms.ModelForm):
             'cpf',
             'birth_date',
             'address',
+            'institution',
+            'function',
         ]
 
         widgets = {
             'cpf': forms.RadioSelect(),
             'birth_date': forms.RadioSelect(),
             'address': forms.RadioSelect(),
+            'institution': forms.RadioSelect(),
+            'function': forms.RadioSelect(),
         }
 
     def __init__(self, event, **kwargs):

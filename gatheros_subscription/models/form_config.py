@@ -27,6 +27,14 @@ class FormConfig(models.Model):
     ADDRESS_HIDE = 'address-hide'
     ADDRESS_SHOW = 'address-show'
 
+    INSTITUTION_HIDE = 'institution-hide'
+    INSTITUTION_SHOW = 'institution-show'
+    INSTITUTION_REQUIRED = 'institution-required'
+
+    FUNCTION_HIDE = 'function-hide'
+    FUNCTION_SHOW = 'function-show'
+    FUNCTION_REQUIRED = 'function-required'
+
     CPF_OPTIONS=(
         (CPF_HIDE, 'Ocultar'),
         (CPF_SHOW, 'Mostrar'),
@@ -42,6 +50,18 @@ class FormConfig(models.Model):
     ADDRESS_OPTIONS = (
         (ADDRESS_HIDE, 'Ocultar'),
         (ADDRESS_SHOW, 'Mostrar'),
+    )
+
+    INSTITUTION_OPTIONS = (
+        (INSTITUTION_HIDE, 'Ocultar'),
+        (INSTITUTION_SHOW, 'Mostrar'),
+        (INSTITUTION_REQUIRED, 'Mostrar e Tornar obrigatório'),
+    )
+
+    FUNCTION_OPTIONS = (
+        (FUNCTION_HIDE, 'Ocultar'),
+        (FUNCTION_SHOW, 'Mostrar'),
+        (FUNCTION_REQUIRED, 'Mostrar e Tornar obrigatório'),
     )
 
     event = models.OneToOneField(
@@ -94,6 +114,22 @@ class FormConfig(models.Model):
                   ' Isto exigirá que alguns campos sejam obrigatórios.'
     )
 
+    institution = models.CharField(
+        choices=INSTITUTION_OPTIONS,
+        default=INSTITUTION_HIDE,
+        max_length=25,
+        verbose_name='Empresa/Instituição',
+        help_text='Empresa, Igreja, Fundação, etc.'
+    )
+
+    function = models.CharField(
+        choices=FUNCTION_OPTIONS,
+        default=FUNCTION_HIDE,
+        max_length=25,
+        verbose_name='Cargo/Função',
+        help_text='Cargo ou função que exerce profissialmente.'
+    )
+
     class Meta:
         verbose_name = 'Configuração de formulário'
         verbose_name_plural = 'Configurações de Formulário'
@@ -101,7 +137,7 @@ class FormConfig(models.Model):
 
     @property
     def cpf_show(self):
-        return self.phone == FormConfig.CPF_SHOW
+        return self.phone == FormConfig.CPF_SHOW or FormConfig.CPF_REQUIRED
 
     @property
     def cpf_hide(self):
@@ -113,7 +149,8 @@ class FormConfig(models.Model):
 
     @property
     def birth_date_show(self):
-        return self.phone == FormConfig.BIRTH_DATE_SHOW
+        return self.phone == \
+               FormConfig.BIRTH_DATE_SHOW or FormConfig.BIRTH_DATE_REQUIRED
 
     @property
     def birth_date_hide(self):
@@ -130,6 +167,32 @@ class FormConfig(models.Model):
     @property
     def address_hide(self):
         return self.address == FormConfig.ADDRESS_HIDE
+
+    @property
+    def institution_show(self):
+        return self.institution == \
+               FormConfig.INSTITUTION_SHOW or FormConfig.INSTITUTION_REQUIRED
+
+    @property
+    def institution_hide(self):
+        return self.institution == FormConfig.INSTITUTION_HIDE
+
+    @property
+    def institution_required(self):
+        return self.institution == FormConfig.INSTITUTION_REQUIRED
+
+    @property
+    def function_show(self):
+        return self.function == \
+               FormConfig.FUNCTION_SHOW or FormConfig.FUNCTION_REQUIRED
+
+    @property
+    def function_hide(self):
+        return self.function == FormConfig.FUNCTION_HIDE
+
+    @property
+    def function_required(self):
+        return self.function == FormConfig.FUNCTION_REQUIRED
 
     def __str__(self):
         return self.event.name

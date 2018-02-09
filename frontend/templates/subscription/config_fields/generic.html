@@ -3,9 +3,7 @@
 <div class="form-group">
     <label for="id_{{ name }}">
         {{ label_tag|capfirst }}
-        {% if required %}
-            <small style="color:#C9302C">*</small>
-        {% endif %}
+        <small style="color:#C9302C" {% if not required %}class="hidden"{% endif %}>*</small>
     </label>
     <div>
         {% include 'subscription/config_fields/render_field.html' with field=field required=required autofocus=autofocus %}

@@ -158,6 +158,21 @@ class Person(models.Model, GatherosModelMixin):
         verbose_name='portador de necessidades especiais',
         default=False
     )
+    institution = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='Empresa/Instituição',
+        help_text='Empresa, Igreja, Fundação, etc.',
+    )
+
+    function = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='Cargo/Função',
+        help_text='Cargo ou função que exerce profissialmente.',
+    )
 
     website = models.CharField(max_length=255, null=True, blank=True)
     facebook = models.CharField(max_length=255, null=True, blank=True)
