@@ -85,7 +85,9 @@ pipeline:
       dbuser_staging,
       dbpass_staging,
       dbname_staging,
-      dbport_staging
+      dbport_staging,
+      sentry_public_dsn,
+      sentry_private_dsn
     ]
     commands:
       - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/staging/env-cgsy-staging
@@ -101,6 +103,8 @@ pipeline:
       - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ./bin/env/staging/env-cgsy-staging
       - sh ./bin/env/staging/03_start-cgsy-staging.sh
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
     when:
@@ -251,6 +255,8 @@ pipeline:
         target: DBNAME
       - source: DBPORT
         target: DBPORT
+      - source: SENTRY_PUBLIC_DSN
+        target: SENTRY_PRIVATE_DSN
     envs: [
       congressy_deploy,
       aws_key,
@@ -266,7 +272,9 @@ pipeline:
       dbuser,
       dbpass,
       dbname,
-      dbport
+      dbport,
+      sentry_public_dsn,
+      sentry_private_dsn
     ]
     script:
       - mkdir -p ~/awsecr
@@ -292,6 +300,8 @@ pipeline:
       - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
       - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
+      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
+      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
     when:
       branch: [ master ]
 
