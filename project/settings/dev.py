@@ -25,7 +25,7 @@ DATABASES = {
 MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 # ========================= SERVER CONFIGURATION ============================ #
 ABSOLUTEURI_PROTOCOL = 'http'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
 # ================================= E-MAIL ================================== #
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # Host for sending e-mail.
