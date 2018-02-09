@@ -19,7 +19,7 @@ PREVIOUS_VERSION_FILE="$BASE/cgsy/previous_version"
 PREVIOUS_VERSION="dev"
 VERSION="dev"
 
-if [ -f "PREVIOUS_VERSION_FILE" ]; then
+if [ -f "$PREVIOUS_VERSION_FILE" ]; then
     PREVIOUS_VERSION=$(cat ${PREVIOUS_VERSION_FILE})
 fi
 
