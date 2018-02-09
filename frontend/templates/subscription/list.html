@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
-{% load i18n static %}
-{% load subscription_tags %}
+
+{% load i18n static  subscription_tags %}
 
 {% block title %} Inscrições | Congressy{% endblock %}
 
@@ -95,13 +95,15 @@
     {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
         <h5 class="sidebar-header">Participantes</h5>
         <ul class="nav nav-pills nav-stacked">
-            <li>
-                <a href="{% url 'subscription:lot-list' event.pk %}"
-                   title="Inscrições">
-                    <i class="fa  fa-fw fa-rocket"></i>
-                    Lotes/Categorias
-                </a>
-            </li>
+            {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+                <li>
+                    <a href="{% url 'subscription:lot-list' event.pk %}"
+                       title="Inscrições">
+                        <i class="fa  fa-fw fa-rocket"></i>
+                        Lotes/Categorias
+                    </a>
+                </li>
+            {% endif %}
             <li class="active">
                 <a href="{% url 'subscription:subscription-list' event.pk %}"
                    title="Inscrições">
@@ -131,6 +133,14 @@
                 <a href="{% url 'subscription:form-config' event.pk %}"
                    title="Formulário">
                     <i class="fa  fa-fw fa-rocket"></i> Formulário
+                </a>
+            </li>
+        {% endif %}
+        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+            <li>
+                <a href="{% url 'event:event-payments' event.pk %}"
+                   title="Pagamentos">
+                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
                 </a>
             </li>
         {% endif %}
