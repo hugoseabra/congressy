@@ -68,3 +68,13 @@ with open(tagged_version_file, 'w+') as f:
 
     f.write(value)
     f.close()
+
+previous_version_file = os.path.join(BASE, 'previous_version')
+
+with open(previous_version_file, 'w+') as f:
+    f.write(value)
+    f.close()
+    print("Registrando versão anterior '{}' em '{}'.".format(
+        LATEST_VERSION,
+        previous_version_file
+    ))

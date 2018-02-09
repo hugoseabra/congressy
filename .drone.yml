@@ -187,6 +187,7 @@ pipeline:
       - apk add --no-cache python3
       - pip3 install --no-cache-dir semver clint
       - python3 ./bin/env/prod/02_check-latest-version.py
+      - cat ./bin/env/prod/previous_version
     when:
       branch: [ master ]
 
@@ -291,7 +292,6 @@ pipeline:
       - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
       - echo "DBNAME=$${DBNAME}" >> ~/cgsy/env-file
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
-
     when:
       branch: [ master ]
 
@@ -319,7 +319,7 @@ pipeline:
       - 172.31.45.193
     port: 22
     user: admin
-    source: ./bin/env/prod/tagged_version
+    source: ./bin/env/prod/previous_version
     target: ~/cgsy/.
     secrets:
       - source: CONGRESSY_DEPLOY
