@@ -121,10 +121,18 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     def get_success_url(self):
         form = self.get_form()
         event = form.instance
-        return reverse(
-            'event:event-panel',
-            kwargs={'pk': event.pk}
-        )
+        if event.subscription_type == event.SUBSCRIPTION_DISABLED:
+            url = reverse(
+                'event:event-hotsite',
+                kwargs={'pk': event.pk}
+            )
+        else:
+            url = reverse(
+                'event:event-panel',
+                kwargs={'pk': event.pk}
+            )
+
+        return url
 
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
