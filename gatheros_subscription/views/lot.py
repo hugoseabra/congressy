@@ -222,7 +222,14 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         if not self.organization:
             return False
 
-        banking_required_fields = ['bank_code', 'agency', 'account', 'cnpj_ou_cpf', 'account_type']
+        banking_required_fields = [
+            'bank_code',
+            'agency',
+            'account',
+            'cnpj_ou_cpf',
+            'account_type',
+            'bank_account_id'
+        ]
 
         for field in Organization._meta.get_fields():
 

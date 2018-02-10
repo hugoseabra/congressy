@@ -53,9 +53,9 @@ class LotForm(forms.ModelForm):
         #     event = kwargs.get('initial').get('event')
         #     kwargs['initial']['date_end'] = event.date_start - timedelta(minutes=1)
 
-        super(LotForm, self).__init__(**kwargs)
-
         self.event = kwargs.get('initial').get('event')
+
+        super(LotForm, self).__init__(**kwargs)
 
         # self._set_dates_help_texts()
         #
@@ -98,7 +98,7 @@ class LotForm(forms.ModelForm):
         self.fields['date_start'].widget = DateTimeWidget(
             bootstrap_version=3,
             attrs={'style': 'background-color:#FFF'},
-            options={'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now()),
+            options={'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now() - timedelta(minutes=10)),
                      'endDate': '{0:%d-%m-%Y %H:%M}'.format(self.event.date_start - timedelta(minutes=2))})
 
         self.fields['date_end'].widget = DateTimeWidget(
@@ -112,10 +112,19 @@ class LotForm(forms.ModelForm):
         raw_data = self.data
 
         date_start = datetime.strptime(raw_data['date_start'], '%d/%m/%Y %H:%M')
-        date_end = datetime.strptime(raw_data['date_end'], '%d/%m/%Y %H:%M')
-
         cleaned_data['date_start'] = date_start
-        cleaned_data['date_end'] = date_end
+
+        if 'date_end' in raw_data and raw_data['date_end']:
+            date_end = datetime.strptime(
+                raw_data['date_end'],
+                '%d/%m/%Y %H:%M'
+            )
+            cleaned_data['date_end'] = date_end
+        else:
+            # self.date_start = self.date_start.replace(hour=8, minute=0, second=0)
+            # self.date_end = self.event.date_start - timedelta(minutes=1)
+            cleaned_data['date_end'] = \
+                self.event.date_end - timedelta(minutes=1)
 
         return cleaned_data
 

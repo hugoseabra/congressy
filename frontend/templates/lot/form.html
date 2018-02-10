@@ -234,14 +234,14 @@
                                 {#                                </div>#}
 
                             {% else %}
-                                <div class="col-xl-4 col-lg-6 col-md-8">
+                                <div class="col-md-12">
                                 <div class="alert alert-warning">
                                     <strong>È necessário que complete seus dads bancários para criar lotes
                                         pagos!</strong>
 
                                 </div>
-                                <p><a href="{% url 'event:organization-financial-edit' organization.pk %}">Click
-                                    para configurar estes dados.</a></p>
+                                <p><a href="{% url 'event:organization-financial-edit' organization.pk %}">
+                                    Clique aqui para configurar estes dados.</a></p>
                             {% endif %}
                             </div>
                         </div>

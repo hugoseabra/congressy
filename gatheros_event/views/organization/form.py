@@ -163,13 +163,12 @@ class OrganizationFinancialEditFormView(OrganizationEditFormView):
 
         response = super(OrganizationFinancialEditFormView, self).post(request, *args, **kwargs)
 
-        if hasattr(response, 'context_data'):
-            form = response.context_data['form']
-            if form.is_valid():
-                try:
-                    create_pagarme_organizer_recipient(self.object)
-                except OrganizerRecipientError:
-                    pass
+        form = self.get_form()
+        if form.is_valid():
+            try:
+                create_pagarme_organizer_recipient(self.object)
+            except OrganizerRecipientError:
+                pass
 
         return response
 
