@@ -215,15 +215,15 @@
                 </div>
                 <div class="panel-body">
 
-                    <div id="payment_buttons" class="text-center hide">
-                        <button id="id_boleto" class="hide" type="button" style="text-align: center">
+                    <div id="payment_buttons" class="text-center" style="display: none">
+                        <button id="id_boleto" type="button" style="text-align: center;display: none">
                             Boleto
                             <br/>
                             <img class="img-responsive"
                                  style="height: 153px; height: 153px"
                                  src="{% static 'hotsite/logos/boleto.svg' %}">
                         </button>
-                        <button id="id_credit_card" class="hide" type="button">
+                        <button id="id_credit_card" type="button" style="display: none">
                             Cartão de Credito
                             <br/>
                             <img class="img-responsive"
@@ -232,8 +232,8 @@
 
                         <br/>
 
-                        <a id="id_remove" class="hide"
-                           style="margin-top: 11px; margin-left: 17px;font-size: 12px;">
+                        <a id="id_remove"
+                           style="margin-top: 11px; font-size: 12px;display: none">
                             Remover
                         </a>
                     </div>

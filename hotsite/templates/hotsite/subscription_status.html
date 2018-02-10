@@ -6,7 +6,7 @@
 {% include 'hotsite/includes/2_cover_no_form.html' %}
 
 
-<!-- DESCRIPTION
+<!-- FORM
 ================================= -->
 <section id="about" class="about-section section">
 
@@ -127,14 +127,8 @@
                                    value="{{ allow_transaction }}"/>
                             <input type="hidden" name="subscription" id="id_subscription"
                                    value="{{ subscription|default_if_none:"" }}"/>
-                            <button class="btn btn-success btn-xs">Novo pagamento</button>
+                            <button type="submit" class="btn btn-success btn-xs">Novo pagamento</button>
                         </form>
-                        <script>
-                            var button = document.querySelector('form[name="allowed_transaction"] > button');
-                            button.addEventListener(function () {
-                                document.querySelector("form[name='allowed_transaction']").submit();
-                            });
-                        </script>
                     {% endif %}
                 </div>
             </div>

@@ -8,10 +8,9 @@ function hide_payment_elements() {
 
 function process_payment(encryption_key, event_name, lots, transactions) {
     var amount_id = $('#id_lot').val().toString();
-    var lot = 'lot_' + amount_id;
-    var amount = lots[lot] * 100;
+    var amount = lots[amount_id] * 100;
     var billing_title = 'Inscrição do evento: ' + event_name;
-
+    console.log(amount);
     transactions = transactions || 'credit_card,boleto';
 
     function handleSuccess(data) {
@@ -27,7 +26,9 @@ function process_payment(encryption_key, event_name, lots, transactions) {
             default:
                 console.error('Unsupported payment type: ' + data.payment_method);
         }
-
+        console.log(data);
+        $('#payment_buttons').show();
+        $('#id_button_pay').hide();
         $('#id_remove').show();
         $('#id_transaction_type').val(data.payment_method);
         $('#id_amount').val(data.amount);

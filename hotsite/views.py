@@ -538,6 +538,7 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         context['transactions'] = self.get_transactions()
         context['allow_transaction'] = self.get_allowed_transaction()
         context['pagarme_key'] = settings.PAGARME_ENCRYPTION_KEY
+        context['remove_preloader'] = True
 
         try:
             context['subscription'] = self.subscription.pk
