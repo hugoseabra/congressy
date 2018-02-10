@@ -160,7 +160,7 @@ class Organization(models.Model, GatherosModelMixin):
 
     # Obrigatório - Nome completo ou razão social
     legal_name = models.CharField(
-        max_length=30,
+        max_length=255,
         blank=True,
         null=True,
         verbose_name='Nome completo ou razão social'
