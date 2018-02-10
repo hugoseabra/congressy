@@ -13,9 +13,12 @@ from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
+from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views import generic
+from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
 
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
@@ -178,6 +181,8 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
 class HotsiteView(SubscriptionFormMixin, generic.View):
     template_name = 'hotsite/main.html'
 
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(never_cache)
     def post(self, request, *args, **kwargs):
 
         user = self.request.user
@@ -254,10 +259,14 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             person.save()
 
             self._configure_brand_person(person)
-            self._notify_new_account(person)
+            self._notify_new_account(user)
 
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             login(request, user)
+
+            # Remove last login para funcionar o reset da senha posteriormente.
+            user.last_login = None
+            user.save()
 
         return redirect('public:hotsite-subscription', slug=self.event.slug)
 
@@ -285,9 +294,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                     group=Member.ADMIN
                 )
 
-    def _notify_new_account(self, person):
-
-        user = person.user
+    def _notify_new_account(self, user):
 
         url = absoluteuri.reverse(
             'password_reset_confirm',
@@ -298,7 +305,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         )
 
         context = {
-            'email': person.email,
+            'email': user.email,
             'url': url,
             'site_name': get_current_site(self.request)
         }
@@ -480,8 +487,6 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                         e.message = error_dict[e.message]
                     messages.error(self.request, message=e.message)
                     return self.render_to_response(context)
-
-
 
             subscription.save()
             notify_new_subscription(self.event, subscription)
