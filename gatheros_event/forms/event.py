@@ -32,7 +32,7 @@ class EventForm(forms.ModelForm):
         #            'date_end': forms.DateTimeInput,
         #            }
         dateTimeOptions = {
-            'format': 'mm/dd/yyyy hh:ii',
+            'format': 'dd/mm/yyyy hh:ii',
             'autoclose': True,
         }
 

@@ -155,36 +155,6 @@
 
     <script src="
 {% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.full.min.js" %}"></script>
-{#    <script type="application/javascript">#}
-{##}
-{#    jQuery.datetimepicker.setLocale('pt');#}
-{##}
-{##}
-{#        var logic = function (currentDateTime) {#}
-{#            delete $('#id_date_end');#}
-{#            $('#id_date_end').datetimepicker({#}
-{#                format: 'd/m/y H:m',#}
-{#                minDate: currentDateTime#}
-{#            })#}
-{#        };#}
-{##}
-{##}
-{#        $('#id_date_start').datetimepicker({#}
-{#            format: 'd/m/y H:m',#}
-{#            minDate: Date.now(),#}
-{#            maxDate: Date.parse("{{ object.date_end|date:"c" }}"),#}
-{#        });#}
-{##}
-{##}
-{#        $('#id_date_end').datetimepicker({#}
-{#            format: 'd/m/y H:m',#}
-{#            minDate: Date.now(),#}
-{#            maxDate: Date.parse("{{ object.date_end|date:"c" }}")#}
-{#        });#}
-{##}
-{#        console.log(Date.parse("{{ object.date_end|date:"c" }}"))#}
-{##}
-{#    </script>#}
 
 {% endblock %}
 
