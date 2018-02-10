@@ -1,1 +1,10 @@
-[{"model": "logtailer.logfile", "pk": 1, "fields": {"name": "app.log", "path": "/tmp/app.log"}}]
+[
+  {
+    "model": "logtailer.logfile",
+    "pk": 1,
+    "fields": {
+      "name": "app.log",
+      "path": "/tmp/app.log"
+    }
+  }
+]
