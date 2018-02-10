@@ -241,7 +241,9 @@ class Event(models.Model, GatherosModelMixin):
         )
 
     def save(self, *args, **kwargs):
-        self._create_unique_slug()
+        if not self.slug:
+            self._create_unique_slug()
+
         self.check_rules()
         super(Event, self).save(*args, **kwargs)
 

@@ -8,117 +8,109 @@
 
 <!-- FORM
 ================================= -->
-<section id="about" class="about-section section">
-
+ <section id="owner" class="footer-section section">
+    <h2 class="section-heading text-center">Organizador</h2>
     <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <div class="row">
+                    <div class="col-md-12" style="text-align: left;">
+                    {% block messages %}
+                        {% if messages %}
+                            <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                            {% for message in messages %}
 
-        <h2 class="section-heading text-center">Status da sua inscrição</h2>
+                                {% if message.tags %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissible"
+                                         role="alert">
 
-        <div class="about-row row">
-            <div class="col-md-9 col-md-offset-2">
-
-                {% block messages %}
-                    {% if messages %}
-                        <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                        {% for message in messages %}
-
-                            {% if message.tags %}
-                                <div class="alert alert-{{ message.tags }} alert-dismissible"
-                                     role="alert">
-
-                            {% else %}
-                                <div class="alert alert-warning alert-dismissible"
-                                     role="alert">
-                            {% endif %}
-
-                        <button type="button" class="close" data-dismiss="alert"
-                                aria-label="Close"><span aria-hidden="true">&times;</span>
-                        </button>
-                        {{ message|capfirst }}
-                        </div>
-
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                {% endblock messages %}
-
-
-                {% if transactions %}
-                    {#                        <div class="well well-sm col-md-3" style="background-color:rgb(91,192,222); text-align: center">#}
-                    {#                            <p style="color: white; font-weight: bold">#}
-                    {#                                Aguardando pagamento#}
-                    {#                            </p>#}
-                    {#                        </div>#}
-
-                    {#                        <div class="progress" style="margin-top:75px">#}
-                    {#                            <div class="progress-bar progress-bar-success progress-bar-striped active"#}
-                    {#                                 role="progressbar"#}
-                    {#                                 style="width: 95%;background-color:#5cb85c!important;">#}
-                    {#                                <span class="sr-only"></span>#}
-                    {#                            </div>#}
-                    {#                        </div>#}
-
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th class="col-xs-1">Status</th>
-                            <th class="col-xs-2">Data</th>
-                            <th class="col-xs-3">Forma de Pagamento</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for transaction in transactions %}
-                            <tr>
-                                {% if transaction.data.status == 'processing' or transaction.data.status == 'waiting_payment' or transaction.data.status == 'pending_refund' or transaction.data.status == 'chargedback' %}
-                                    <td><i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i></td>
-                                {% elif transaction.data.status == 'authorized' or transaction.data.status == 'paid' or transaction.data.status == 'refunded' %}
-                                    <td><i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i></td>
-                                {% elif transaction.data.status == 'refused' %}
-                                    <td><i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i></td>
                                 {% else %}
-                                    <td><i class="fa fa-circle" aria-hidden="true"></i></td>
+                                    <div class="alert alert-warning alert-dismissible"
+                                         role="alert">
                                 {% endif %}
 
-                                <td>
-                                    {% to_datetime transaction.data.date_created as created_date %}
-                                    {{ created_date }}h
-                                </td>
-                                <td>
-                                    {% if transaction.data.payment_method == 'boleto' %}
-                                        Boleto
-                                        <br>
-                                        <small>
-                                            {% if "None" not in  transaction.data.boleto_url %}
-                                                <a target="_blank" class="text-muted"
-                                                   href="{{ transaction.data.boleto_url }}">
-                                                    Link para boleto
-                                                </a>
-                                            {% else %}
-                                                Seu link para o boleto estará pronto em breve.
-                                            {% endif %}
-                                        </small>
-                                    {% elif transaction.data.payment_method == 'credit_card' %}
-                                        Cartão de Crédito
-                                    {% else %}
-                                        Error
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            <button type="button" class="close" data-dismiss="alert"
+                                    aria-label="Close"><span aria-hidden="true">&times;</span>
+                            </button>
+                            {{ message|capfirst }}
+                            </div>
 
-
-
-{#                    {% else %}#}
-{#                        <div class="well well-sm col-md-4" style="background-color: rgb(92,184,92) ;">#}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endblock messages %}
+                    {% if transactions %}
+{#                        <div class="well well-sm col-md-3" style="background-color:rgb(91,192,222); text-align: center">#}
 {#                            <p style="color: white; font-weight: bold">#}
-{#                                Inscrição realizada com sucesso!#}
+{#                                Aguardando pagamento#}
 {#                            </p>#}
 {#                        </div>#}
-                {% endif %}
+{##}
+{#                        <div class="progress" style="margin-top:75px">#}
+{#                            <div class="progress-bar progress-bar-success progress-bar-striped active"#}
+{#                                 role="progressbar"#}
+{#                                 style="width: 95%;background-color:#5cb85c!important;">#}
+{#                                <span class="sr-only"></span>#}
+{#                            </div>#}
+{#                        </div>#}
 
-                {% if allow_transaction %}
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th class="col-xs-1">Status</th>
+                                <th class="col-xs-2">Data</th>
+                                <th class="col-xs-3">Forma de Pagamento</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for transaction in transactions %}
+                                <tr>
+                                    {% if transaction.data.status == 'processing' or transaction.data.status == 'waiting_payment' or transaction.data.status == 'pending_refund' or transaction.data.status == 'chargedback' %}
+                                        <td><i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i></td>
+                                    {% elif transaction.data.status == 'authorized' or transaction.data.status == 'paid' or transaction.data.status == 'refunded' %}
+                                        <td><i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i></td>
+                                    {% elif transaction.data.status == 'refused' %}
+                                        <td><i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i></td>
+                                    {% else %}
+                                        <td><i class="fa fa-circle" aria-hidden="true"></i></td>
+                                    {% endif %}
+
+                                    <td>
+                                        {% to_datetime transaction.data.date_created as created_date %}
+                                        {{ created_date }}h
+                                    </td>
+                                    <td>
+                                        {% if transaction.data.payment_method == 'boleto' %}
+                                            Boleto
+                                            <br>
+                                            <small>
+                                                {% if "None" not in  transaction.data.boleto_url %}
+                                                    <a target="_blank" class="text-muted"
+                                                       href="{{ transaction.data.boleto_url }}">
+                                                        Link para boleto
+                                                    </a>
+                                                {% else %}
+                                                    Seu link para o boleto estará pronto em breve.
+                                                {% endif %}
+                                            </small>
+                                        {% elif transaction.data.payment_method == 'credit_card' %}
+                                            Cartão de Crédito
+                                        {% else %}
+                                            Error
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+    {#                    {% else %}#}
+    {#                        <div class="well well-sm col-md-4" style="background-color: rgb(92,184,92) ;">#}
+    {#                            <p style="color: white; font-weight: bold">#}
+    {#                                Inscrição realizada com sucesso!#}
+    {#                            </p>#}
+    {#                        </div>#}
+                    {% endif %}
+                    {% if allow_transaction %}
                         <form action="{% url 'public:hotsite-subscription' event.slug %}"
                               name="allowed_transaction"
                               method="post">
@@ -130,9 +122,13 @@
                             <button type="submit" class="btn btn-success btn-xs">Novo pagamento</button>
                         </form>
                     {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
 </section>
+
+
 {% endblock %}

@@ -13,9 +13,10 @@ class PagarmeTransactionInstanceData:
 
     # @TODO add international phone number capability
 
-    def __init__(self, person, extra_data, event):
+    def __init__(self, subscription, extra_data, event):
 
-        self.person = person
+        self.subscription = subscription
+        self.person = subscription.person
         self.extra_data = extra_data
         self.event = event
 
@@ -57,6 +58,7 @@ class PagarmeTransactionInstanceData:
             "api_key": settings.PAGARME_API_KEY,
 
             "customer": {
+                "external_id": str(self.subscription.pk),
                 "name": self.person.name,
                 "type": "individual",
                 "country": "br",
@@ -92,7 +94,7 @@ class PagarmeTransactionInstanceData:
             "items": [
                 {
                     "id": str(transaction_id),
-                    "title": "Inscrição do Evento: " + self.event.name,
+                    "title": self.event.name,
                     "unit_price": self.extra_data['amount'],
                     "quantity": 1,
                     "tangible": False
@@ -113,6 +115,11 @@ class PagarmeTransactionInstanceData:
                     "charge_processing_fee": False
                 }
             ],
+            "metadata": {
+                "evento": self.event.name,
+                "inscricao": str(self.subscription.pk),
+                "participante": self.subscription.person.name
+            },
 
             "amount": self.extra_data['amount'],
             "price": self.extra_data['amount']
