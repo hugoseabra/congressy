@@ -160,10 +160,13 @@ class Organization(models.Model, GatherosModelMixin):
 
     # Obrigatório - Nome completo ou razão social
     legal_name = models.CharField(
-        max_length=255,
         blank=True,
+        max_length=30,
         null=True,
-        verbose_name='Nome completo ou razão social'
+        verbose_name='Nome completo ou razão social',
+        help_text='IMPORTANTE: este campo não pode ser muito diferente do'
+                  ' titular da conta. Se o titular tiver mais de 30 caracteres,'
+                  ' informe até onde os caracteres.'
     )
 
     # Obrigatório - Tipo da conta

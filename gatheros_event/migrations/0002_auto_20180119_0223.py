@@ -76,7 +76,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='organization',
             name='legal_name',
-            field=models.CharField(blank=True, max_length=30, null=True),
+            field=models.CharField(
+                max_length=30,
+                blank=True,
+                null=True,
+                verbose_name='Nome completo ou razão social',
+                help_text='IMPORTANTE: este campo não pode ser muito'
+                          ' diferente do titular da conta. Se o titular tiver'
+                          ' mais de 30 caracteres, informe até onde os'
+                          ' caracteres.'
+            ),
         ),
         migrations.AlterField(
             model_name='person',
@@ -127,11 +136,6 @@ class Migration(migrations.Migration):
             model_name='organization',
             name='conta_dv',
             field=models.CharField(blank=True, max_length=2, null=True, verbose_name='Dígito verificador da Conta'),
-        ),
-        migrations.AlterField(
-            model_name='organization',
-            name='legal_name',
-            field=models.CharField(blank=True, max_length=30, null=True, verbose_name='Nome completo ou razão social'),
         ),
         migrations.AlterField(
             model_name='event',
