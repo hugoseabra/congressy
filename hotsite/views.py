@@ -468,7 +468,8 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 try:
                     transaction_instance_data = PagarmeTransactionInstanceData(
                         person=person,
-                        extra_data=request.POST
+                        extra_data=request.POST,
+                        event=self.event
                     )
 
                     create_pagarme_transaction(
