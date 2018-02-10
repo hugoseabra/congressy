@@ -9,12 +9,11 @@ setConfig('{{ SENTRY_PUBLIC_DSN  }}', '{{ ENVIRONMENT_VERSION }}');
 {% if not request.user.is_anonymous %}
 setUserContext(
     '{{ request.user.pk }}',
-    '{{ request.user.username }}',
+    '{{ request.user.first_name }}',
     '{{ request.user.email }}'
 );
 {% endif %}
 var TRACKER_CAPTURE = true;
-
 {% if request.sentry and request.sentry.id %}
 function send_user_feedback() {
     user_feedback_report('{{ request.sentry.id }}', '{{ SENTRY_PUBLIC_DSN }}')
