@@ -463,6 +463,8 @@ class InvitationProfileView(TemplateView):
                 "convite, apos salvar o perfil. Contate o suporte técnico"
             )
 
+        return redirect('public:login')
+
 
 class InvitationDeleteView(DeleteViewMixin):
     model = Invitation
