@@ -20,6 +20,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='formconfig',
             name='institution',
-            field=models.CharField(choices=[('institution-hide', 'Ocultar'), ('institution-show', 'Mostrar'), ('institution-required', 'Mostrar e Tornar obrigatório')], default='institution-hide', help_text='Empresa, Igreja, Fudanção, etc.', max_length=25, verbose_name='Empresa/Instituição'),
+            field=models.CharField(choices=[('institution-hide', 'Ocultar'), ('institution-show', 'Mostrar'), ('institution-required', 'Mostrar e Tornar obrigatório')], default='institution-hide', help_text='Empresa, Igreja, Fundação, etc.', max_length=25, verbose_name='Empresa/Instituição'),
         ),
     ]
