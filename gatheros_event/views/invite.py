@@ -255,7 +255,15 @@ class InvitationDecisionView(TemplateView):
         :param kwargs:
         :return:
         """
-        invite = get_object_or_404(Invitation, pk=kwargs.get('pk'))
+        try:
+            invite = Invitation.objects.get(pk=kwargs.get('pk'))
+        except Invitation.DoesNotExist:
+            messages.error(
+                request,
+                "Esse convite não existe ou já foi utilizado."
+            )
+            return redirect('public:login')
+
         context = self.get_context_data(**kwargs)
         context.update({'request': request})
 
