@@ -99,7 +99,6 @@ COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
 COPY ./conf/deploy/setup/configure-settings.py /configure-settings.py
 COPY ./conf/deploy/setup/configure-version.py /configure-version.py
 COPY ./conf/deploy/setup/configure-sync.py /configure-sync.py
-COPY ./conf/deploy/setup/configure-error-handler.py /configure-error-handler.py
 COPY ./conf/deploy/container-entry.sh /entry.sh
 
 # -----------------------------------------------------------------------------

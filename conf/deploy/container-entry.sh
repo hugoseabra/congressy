@@ -73,7 +73,6 @@ echo;
 run_bash_script "Verificando existência do Bucket" /s3bucket.sh
 run_python_script "Configurando SETTINGS" /configure-settings.py
 run_python_script "Configurando VERSÃO" /configure-version.py
-run_python_script "Configurando ERROR HANDLER" /configure-error-handler.py
 run_python_script "Coletando arquivos estáticos" "manage.py collectstatic --noinput --verbosity 0"
 run_python_script_with_output "Executando migrate" "manage.py migrate"
 run_python_script_with_output "Atualizando Site ID" "manage.py loaddata 000_site"
