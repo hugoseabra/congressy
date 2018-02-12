@@ -24,7 +24,7 @@ def postback_url_view(request, uidb64):
     try:
         transaction = Transaction.objects.get(uuid=uidb64)
 
-        data = request.data
+        data = request.data.copy()
 
         transaction_status = TransactionStatus(
             transaction=transaction,
