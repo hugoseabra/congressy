@@ -5,7 +5,7 @@
 ###############################################################################
 # Branches added globally
 branches:
-  include: [ master, release/* ]
+  include: [ master, hotfix/*, release/* ]
 
 # Custom definition for cloning, adding tags and depth
 clone:
