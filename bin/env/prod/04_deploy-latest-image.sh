@@ -33,6 +33,11 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     docker exec -i awsecr pull cgsy:latest
     docker exec -i awsecr pull cgsy:${VERSION}
     docker-compose -f ~/cgsy/docker-compose.yml up -d
+    sleep 10
+
+    echo ;
+    docker-compose -f ~/cgsy/docker-compose.yml logs cgsy
+    echo ;
     docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
 
     # Reseta configurações para o próximo release
