@@ -84,6 +84,7 @@ def postback_url_view(request, uidb64):
 
         transaction_status.data['status'] = status
         transaction_status.date_created = data.get('transaction[date_created]')
+        transaction_status.status = status
         transaction_status.save()
 
     except Transaction.DoesNotExist:

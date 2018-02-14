@@ -249,6 +249,9 @@
                             <tr>
                                 <th>Nome do Participante</th>
                                 <th>Cód. Inscrição</th>
+                                {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+                                    <th>Status</th>
+                                {% endif %}
                                 <th></th>
                             </tr>
                             </thead>
@@ -265,6 +268,15 @@
                                     <td>
                                         {{ item.code }}
                                     </td>
+                                    {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+                                        <td>
+                                            {% for transaction in paid_transactions %}
+                                                {% if transaction.subscription.pk == item.pk %}
+                                                    {{ transaction.get_status_display }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    {% endif %}
                                     <td>
                                         <div class="btn-group">
                                             <button

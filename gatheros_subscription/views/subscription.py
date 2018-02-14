@@ -22,6 +22,7 @@ from gatheros_subscription.forms import SubscriptionForm
 from gatheros_subscription.helpers.subscription import \
     export as subscription_export
 from gatheros_subscription.models import Subscription, FormConfig
+from payment.models import Transaction
 from .filters import SubscriptionFilterForm
 
 
@@ -279,6 +280,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
             'can_add_subscription': self.can_add_subscription(),
             'lots': self.get_lots(),
             'has_filter': self.has_filter,
+            'paid_transactions': self._get_transactions(),
         })
         return cxt
 
@@ -295,6 +297,15 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
         num_lots = self.get_num_lots()
         return num_lots > 0
+
+    def _get_transactions(self):
+
+        if self.event.subscription_type != self.event.SUBSCRIPTION_BY_LOTS:
+            return False
+
+        all_transactions = Transaction.objects.filter(subscription__event=self.event)
+
+        return all_transactions
 
 
 class SubscriptionViewFormView(EventViewMixin, generic.FormView):

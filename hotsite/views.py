@@ -531,7 +531,6 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
                            request=request)
             return redirect('public:hotsite', slug=self.event.slug)
 
-
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
@@ -607,3 +606,21 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
             return 'credit_card'
 
         return True
+
+    def is_subscribed(self):
+        """
+            Se já estiver inscrito retornar True
+        """
+        user = self.request.user
+
+        if user.is_authenticated:
+            try:
+                person = user.person
+                subscription = Subscription.objects.get(person=person, event=self.event)
+                self.subscription = subscription
+                return True
+
+            except (Subscription.DoesNotExist, AttributeError):
+                return HttpResponseRedirect(reverse('public:hotsite'))
+
+        return False
