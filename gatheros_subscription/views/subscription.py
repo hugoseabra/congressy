@@ -280,6 +280,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
             'can_add_subscription': self.can_add_subscription(),
             'lots': self.get_lots(),
             'has_filter': self.has_filter,
+            'has_paid_lots': self.has_paid_lots(),
             'paid_transactions': self._get_transactions(),
         })
         return cxt
@@ -299,9 +300,6 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         return num_lots > 0
 
     def _get_transactions(self):
-
-        if self.event.subscription_type != self.event.SUBSCRIPTION_BY_LOTS:
-            return False
 
         all_transactions = Transaction.objects.filter(subscription__event=self.event)
 

@@ -240,6 +240,7 @@
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-body">
+
                     {% if object_list %}
                         <table id="subscription_table"
                                class="table table-striped table-bordered dataTable no-footer nowrap"
@@ -249,7 +250,7 @@
                             <tr>
                                 <th>Nome do Participante</th>
                                 <th>Cód. Inscrição</th>
-                                {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+                                {% if has_paid_lots %}
                                     <th>Status</th>
                                 {% endif %}
                                 <th></th>
@@ -260,6 +261,26 @@
                             {% for item in object_list %}
                                 <tr>
                                     <td>
+
+                                        {% for transaction in paid_transactions %}
+                                            {% if transaction.subscription.pk == item.pk %}
+                                                {% if transaction.status == transaction.AUTHORIZED or transaction.status == transaction.PAID or transaction.status == transaction.REFUNDED %}
+                                                    <i class="fa fa-circle" aria-hidden="true"
+                                                       style="color:#5cb85c"></i>
+                                                {% elif transaction.status == transaction.PROCESSING or transaction.status == transaction.WAITING_PAYMENT or transaction.status == transaction.PENDING_REFUND or transaction.status == transaction.CHARGEDBACK %}
+                                                    <i class="fa fa-circle" aria-hidden="true"
+                                                       style="color: #f0ad4e"></i>
+                                                {% elif transaction.status == transaction.REFUSED %}
+                                                    <i class="fa fa-circle" aria-hidden="true"
+                                                       style="color: #d9534f"></i>
+                                                {% else %}
+                                                    <i class="fa fa-circle" aria-hidden="true"></i>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+
+
+
                                         <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
                                             {{ item.person.name }}
                                         </a>
@@ -268,7 +289,7 @@
                                     <td>
                                         {{ item.code }}
                                     </td>
-                                    {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+                                    {% if has_paid_lots %}
                                         <td>
                                             {% for transaction in paid_transactions %}
                                                 {% if transaction.subscription.pk == item.pk %}
@@ -313,13 +334,25 @@
                                     </td>
                                 </tr>
                             {% endfor %}
+
                             </tbody>
+
+
                         </table>
                     {% else %}
                         <div style="background: #FFF;padding:10px;margin-bottom: 3px">
                             Nenhuma inscrição realizada até o momento.
                         </div>
                     {% endif %}
+                    <small><strong>
+                        <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i> = Confirmado<br/>
+                        <i class="fa fa-circle" aria-hidden="true" style="color:#f0ad4e"></i> = Aguardando<br/>
+                        <i class="fa fa-circle" aria-hidden="true" style="color:#d9534f"></i> = Pagamento recusado
+                    </strong>
+
+                    </small>
+
+
                 </div>
             </div>
         </div>
