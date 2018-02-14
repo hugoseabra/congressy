@@ -15,7 +15,7 @@ from gatheros_front.urls import (
     urlpatterns_public as gatheros_front_public,
 )
 from hotsite.urls import urlpatterns_public_hotsite
-from payment.urls import public_payment_urls
+from payment.urls import urlpatterns_public_payments_api, private_payment_urls
 
 handler500 = 'project.views.handler500'
 
@@ -25,6 +25,8 @@ private_urlpatterns = [
     url(r'^manage/', include('gatheros_subscription.urls', 'subscription')),
     url(r'^manage/', include('gatheros_event.urls', 'event')),
     url(r'^manage/', include(gatheros_front_private, 'front')),
+    url(r'^manage/', include(private_payment_urls, 'payment')),
+
 ]
 
 public_urls = gatheros_front_public
@@ -44,7 +46,7 @@ public_urlpatterns = [
 
 # API
 api_urls = [
-    url(r'^', include('payment.urls', 'payment')),
+    url(r'^', include(urlpatterns_public_payments_api, 'payment')),
     url(r'^', include('kanu_locations.urls', 'city')),
 ]
 

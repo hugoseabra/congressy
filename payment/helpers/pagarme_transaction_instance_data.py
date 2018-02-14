@@ -1,3 +1,4 @@
+import os
 import uuid
 
 import absoluteuri
@@ -117,13 +118,21 @@ class PagarmeTransactionInstanceData:
             ],
             "metadata": {
                 "evento": self.event.name,
-                "inscricao": str(self.subscription.pk),
-                "participante": self.subscription.person.name
+                "inscricao": str(self.subscription.pk)
             },
 
             "amount": self.extra_data['amount'],
             "price": self.extra_data['amount']
         }
+
+        # Estabelecer uma referência de qual o estado sistema hovue a transação
+        environment_version = os.getenv('ENVIRONMENT_VERSION')
+        if environment_version:
+            self.transaction_instance_data['metadata']['system'] = {
+                'version': environment_version,
+                'enviroment': 'production'
+            }
+
 
         if self.transaction_type == 'credit_card':
 

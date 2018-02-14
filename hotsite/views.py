@@ -517,17 +517,19 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
 
         self.person = self.get_person()
 
-        if not request.user.is_authenticated or not self.person:
-            return redirect('public:hotsite', slug=self.event.slug)
+        try:
+            self.subscription = Subscription.objects.get(
+                event=self.event, person=self.person)
 
-        self.is_subscribed()
+            if not request.user.is_authenticated or not self.person:
+                return redirect('public:hotsite', slug=self.event.slug)
 
-        if not self.subscription:
+            return response
+
+        except Subscription.DoesNotExist:
             messages.error(message='Você não possui inscrição neste evento.',
                            request=request)
             return redirect('public:hotsite', slug=self.event.slug)
-
-        return response
 
     def get_context_data(self, **kwargs):
 
@@ -539,13 +541,6 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         context['allow_transaction'] = self.get_allowed_transaction()
         context['pagarme_key'] = settings.PAGARME_ENCRYPTION_KEY
         context['remove_preloader'] = True
-
-        try:
-            context['subscription'] = self.subscription.pk
-        except AttributeError:
-            context['subscription'] = Subscription.objects.get(
-                event=self.event, person=self.person)
-
         context['subscription'] = self.subscription
 
         return context
@@ -561,25 +556,6 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
                 pass
 
         return self.person
-
-    def is_subscribed(self):
-        """
-            Se já estiver inscrito retornar True
-        """
-        user = self.request.user
-
-        if user.is_authenticated:
-            try:
-                person = user.person
-                subscription = Subscription.objects.get(person=person,
-                                                        event=self.event)
-                self.subscription = subscription
-                return True
-
-            except (Subscription.DoesNotExist, AttributeError):
-                pass
-
-        return False
 
     def subscriber_has_account(self, email):
         if self.request.user.is_authenticated:
@@ -630,3 +606,21 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
             return 'credit_card'
 
         return True
+
+    def is_subscribed(self):
+        """
+            Se já estiver inscrito retornar True
+        """
+        user = self.request.user
+
+        if user.is_authenticated:
+            try:
+                person = user.person
+                subscription = Subscription.objects.get(person=person, event=self.event)
+                self.subscription = subscription
+                return True
+
+            except (Subscription.DoesNotExist, AttributeError):
+                return HttpResponseRedirect(reverse('public:hotsite'))
+
+        return False

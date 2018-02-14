@@ -1,8 +1,8 @@
 from django.conf.urls import include, url
 
-from .views import postback_url_view
+from .views import postback_url_view, EventPaymentView
 
-public_payment_urls = [
+public_payment_api_urls = [
     url(
         r'pagarme/postback/'
         '(?P<uidb64>[0-9A-Za-z_\-]+)/$',
@@ -11,6 +11,14 @@ public_payment_urls = [
     ),
 ]
 
+private_payment_urls = [
+    url(
+        r'^(?P<pk>[\d]+)/payments/$',
+        EventPaymentView.as_view(),
+        name='event-payments'
+    ),
+]
 
-urlpatterns = [url(r'^', include(public_payment_urls))]
+urlpatterns_private_payments = [url(r'^', include(private_payment_urls))]
 
+urlpatterns_public_payments_api = [url(r'^', include(public_payment_api_urls))]

@@ -120,7 +120,7 @@
         </li>
         {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
             <li>
-                <a href="{% url 'event:event-payments' event.pk %}"
+                <a href="{% url 'payment:event-payments' event.pk %}"
                    title="Pagamentos">
                     <i class="fa  fa-fw fa-rocket"></i> Pagamentos
                 </a>
