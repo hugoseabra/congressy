@@ -2,7 +2,7 @@ import pagarme
 import json
 from django.conf import settings
 from mailer.tasks import send_mail
-from payment.models import Transaction
+from payment.models import Transaction, TransactionStatus
 from payment.exception import TransactionError, OrganizerRecipientError
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
@@ -51,7 +51,16 @@ def create_pagarme_transaction(payment=None, subscription=None):
     transaction_instance.date_created = trx['date_created']
     transaction_instance.amount = trx['amount']
     transaction_instance.save()
-    return
+
+    transaction_status = TransactionStatus(
+        transaction=transaction_instance,
+        data=trx
+    )
+
+    transaction_status.data['status'] = trx['status']
+    transaction_status.date_created = trx['date_created']
+    transaction_status.status = trx['status']
+    transaction_status.save()
 
 
 # @TODO create a mock of the response to use during testing
