@@ -281,7 +281,6 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
             'lots': self.get_lots(),
             'has_filter': self.has_filter,
             'has_paid_lots': self.has_paid_lots(),
-            'paid_transactions': self._get_transactions(),
         })
         return cxt
 
@@ -298,12 +297,6 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
         num_lots = self.get_num_lots()
         return num_lots > 0
-
-    def _get_transactions(self):
-
-        all_transactions = Transaction.objects.filter(subscription__event=self.event)
-
-        return all_transactions
 
 
 class SubscriptionViewFormView(EventViewMixin, generic.FormView):

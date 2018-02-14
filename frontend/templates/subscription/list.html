@@ -261,25 +261,20 @@
                             {% for item in object_list %}
                                 <tr>
                                     <td>
-
-                                        {% for transaction in paid_transactions %}
-                                            {% if transaction.subscription.pk == item.pk %}
-                                                {% if transaction.status == transaction.AUTHORIZED or transaction.status == transaction.PAID or transaction.status == transaction.REFUNDED %}
-                                                    <i class="fa fa-circle" aria-hidden="true"
-                                                       style="color:#5cb85c"></i>
-                                                {% elif transaction.status == transaction.PROCESSING or transaction.status == transaction.WAITING_PAYMENT or transaction.status == transaction.PENDING_REFUND or transaction.status == transaction.CHARGEDBACK %}
-                                                    <i class="fa fa-circle" aria-hidden="true"
-                                                       style="color: #f0ad4e"></i>
-                                                {% elif transaction.status == transaction.REFUSED %}
-                                                    <i class="fa fa-circle" aria-hidden="true"
-                                                       style="color: #d9534f"></i>
-                                                {% else %}
-                                                    <i class="fa fa-circle" aria-hidden="true"></i>
-                                                {% endif %}
+                                        {% if item.transactions.last %}
+                                            {% if item.transactions.last == transaction.AUTHORIZED or item.transactions.last == transaction.PAID or item.transactions.last == transaction.REFUNDED %}
+                                                <i class="fa fa-circle" aria-hidden="true"
+                                                   style="color:#5cb85c"></i>
+                                            {% elif item.transactions.last == transaction.PROCESSING or item.transactions.last == transaction.WAITING_PAYMENT or item.transactions.last == transaction.PENDING_REFUND or item.transactions.last == transaction.CHARGEDBACK %}
+                                                <i class="fa fa-circle" aria-hidden="true"
+                                                   style="color: #f0ad4e"></i>
+                                            {% elif item.transactions.last == transaction.REFUSED %}
+                                                <i class="fa fa-circle" aria-hidden="true"
+                                                   style="color: #d9534f"></i>
+                                            {% else %}
+                                                <i class="fa fa-circle" aria-hidden="true"></i>
                                             {% endif %}
-                                        {% endfor %}
-
-
+                                        {% endif %}
 
                                         <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
                                             {{ item.person.name }}
@@ -289,15 +284,14 @@
                                     <td>
                                         {{ item.code }}
                                     </td>
-                                    {% if has_paid_lots %}
-                                        <td>
-                                            {% for transaction in paid_transactions %}
-                                                {% if transaction.subscription.pk == item.pk %}
-                                                    {{ transaction.get_status_display }}
-                                                {% endif %}
-                                            {% endfor %}
-                                        </td>
-                                    {% endif %}
+                                    <td>
+                                        {% if item.transactions.last %}
+                                            {{ item.transactions.last.get_status_display }}
+                                        {% else %}
+                                            &nbsp;&nbsp;&nbsp;&nbsp;---
+                                        {% endif %}
+                                    </td>
+
                                     <td>
                                         <div class="btn-group">
                                             <button
@@ -339,18 +333,26 @@
 
 
                         </table>
+
+                        {% if has_paid_lots %}
+                            <small>
+                                <strong>
+                                    <i class="fa fa-circle" aria-hidden="true"></i> Processando<br/>
+                                    <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
+                                    Confirmado<br/>
+                                    <i class="fa fa-circle" aria-hidden="true" style="color:#f0ad4e"></i>
+                                    Aguardando<br/>
+                                    <i class="fa fa-circle" aria-hidden="true" style="color:#d9534f"></i> Pagamento
+                                    recusado
+                                </strong>
+                            </small>
+                        {% endif %}
+
                     {% else %}
                         <div style="background: #FFF;padding:10px;margin-bottom: 3px">
                             Nenhuma inscrição realizada até o momento.
                         </div>
                     {% endif %}
-                    <small><strong>
-                        <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i> = Confirmado<br/>
-                        <i class="fa fa-circle" aria-hidden="true" style="color:#f0ad4e"></i> = Aguardando<br/>
-                        <i class="fa fa-circle" aria-hidden="true" style="color:#d9534f"></i> = Pagamento recusado
-                    </strong>
-
-                    </small>
 
 
                 </div>
