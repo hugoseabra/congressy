@@ -31,6 +31,7 @@ python $BASE_DIR/manage.py loaddata 002_workflow_organization
 python $BASE_DIR/manage.py loaddata 003_workflow_member
 python $BASE_DIR/manage.py loaddata 004_workflow_event
 python $BASE_DIR/manage.py loaddata 005_workflow_info
+python $BASE_DIR/manage.py loaddata 006_workflow_lot
 
 # Removes previous media files
 rm -rf $BASE_DIR/media_dev/*
