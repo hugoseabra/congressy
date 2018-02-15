@@ -262,13 +262,13 @@
                                 <tr>
                                     <td>
                                         {% if item.transactions.last %}
-                                            {% if item.transactions.last == transaction.AUTHORIZED or item.transactions.last == transaction.PAID or item.transactions.last == transaction.REFUNDED %}
+                                            {% if item.transactions.last == item.transactions.AUTHORIZED or item.transactions.last == item.transactions.PAID or item.transactions.last == item.transactions.REFUNDED %}
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color:#5cb85c"></i>
-                                            {% elif item.transactions.last == transaction.PROCESSING or item.transactions.last == transaction.WAITING_PAYMENT or item.transactions.last == transaction.PENDING_REFUND or item.transactions.last == transaction.CHARGEDBACK %}
+                                            {% elif item.transactions.last == item.transactions.PROCESSING or item.transactions.last == item.transactions.WAITING_PAYMENT or item.transactions.last == item.transactions.PENDING_REFUND or item.transactions.last == item.transactions.CHARGEDBACK %}
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color: #f0ad4e"></i>
-                                            {% elif item.transactions.last == transaction.REFUSED %}
+                                            {% elif item.transactions.last == item.transactions.REFUSED %}
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color: #d9534f"></i>
                                             {% else %}
