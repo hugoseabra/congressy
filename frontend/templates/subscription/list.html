@@ -272,8 +272,6 @@
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color: #d9534f"></i>
                                             {% endif %}
-                                            {{ item.transactions.last.status }}
-                                            {{ item.transactions.last.WAITING_PAYMENT }}
                                         {% endif %}
 
                                         <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
