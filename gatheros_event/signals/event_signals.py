@@ -7,7 +7,9 @@ from mailer.services import notify_new_event
 
 @receiver(post_save, sender=Event)
 def send_email_on_new_event(instance, raw, created, **_):
-    if raw is True or not instance or not created:
+
+    if raw is True:
         return
 
-    notify_new_event(instance)
+    if created:
+        notify_new_event(instance)
