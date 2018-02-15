@@ -46,6 +46,7 @@ class EventHotsiteView(AccountMixin, FormView):
 
         context = super(EventHotsiteView, self).get_context_data(**kwargs)
         context['event'] = event
+        context['has_paid_lots'] = self.has_paid_lots()
 
         try:
             context['info'] = event.info
@@ -53,6 +54,18 @@ class EventHotsiteView(AccountMixin, FormView):
             pass
 
         return context
+
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+            price = lot.price
+            if price is None:
+                continue
+
+            if lot.price > 0:
+                return True
+
+        return False
 
     def get_success_url(self):
         return reverse('event:event-hotsite', kwargs={
