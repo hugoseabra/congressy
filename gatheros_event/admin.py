@@ -163,6 +163,7 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'description_html',
                 'avatar',
                 'active',
+                'internal',
             ),
         }),
         ('Site e Redes Sociais', {

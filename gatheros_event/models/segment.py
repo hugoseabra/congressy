@@ -20,8 +20,8 @@ class Segment(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Cadeia Produtiva'
-        verbose_name_plural = 'Cadeias Produtivas'
+        verbose_name = 'Segmento'
+        verbose_name_plural = 'Segmentos'
         ordering = ['name']
 
     def __str__(self):

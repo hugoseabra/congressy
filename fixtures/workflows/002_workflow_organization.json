@@ -1,0 +1,37 @@
+[
+  {
+    "model": "gatheros_event.organization",
+    "pk": 1,
+    "fields": {
+      "name": "Parceiros do Esporte",
+      "description": "",
+      "description_html": "",
+      "slug": "parceiros-do-esporte",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": false,
+      "bank_code": null,
+      "agency": null,
+      "agencia_dv": null,
+      "account": null,
+      "conta_dv": null,
+      "cnpj_ou_cpf": null,
+      "legal_name": null,
+      "account_type": "conta_corrente",
+      "bank_account_id": null,
+      "document_type": null,
+      "date_created": null,
+      "active_recipient": false,
+      "recipient_id": null
+    }
+  }
+]

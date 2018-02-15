@@ -424,9 +424,9 @@ class Migration(migrations.Migration):
                                                  verbose_name='descrição')),
             ],
             options={
-                'verbose_name': 'Cadeia Produtiva',
+                'verbose_name': 'Segmento',
                 'ordering': ['name'],
-                'verbose_name_plural': 'Cadeias Produtivas',
+                'verbose_name_plural': 'Segmentos',
             },
         ),
         migrations.CreateModel(

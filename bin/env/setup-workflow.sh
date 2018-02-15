@@ -24,13 +24,8 @@ python $BASE_DIR/manage.py migrate
 python $BASE_DIR/manage.py loaddata 000_site_dev
 python $BASE_DIR/manage.py loaddata 001_user
 
-## gatheros_event
-python $BASE_DIR/manage.py loaddata 005_user 006_person 007_organization 008_member 009_place
-python $BASE_DIR/manage.py loaddata 010_event 011_info
-python $BASE_DIR/manage.py loaddata 012_invitation
+python $BASE_DIR/manage.py loaddata 000_workflow_user
+python $BASE_DIR/manage.py loaddata 001_workflow_person
+python $BASE_DIR/manage.py loaddata 002_workflow_organization
+python $BASE_DIR/manage.py loaddata 003_workflow_member
 
-## gatheros_subscription
-python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
-
-# Atualizando a data dos eventos
-python $BASE_DIR/bin/env/update_data.py
