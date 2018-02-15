@@ -36,5 +36,5 @@ python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
 rm -rf $BASE_DIR/media_dev/*
 
 # Atualizando a data dos eventos
-python $BASE_DIR/bin/env/update_data.py
+python $BASE_DIR/bin/env/dev/update_data.py
 
