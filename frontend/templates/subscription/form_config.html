@@ -118,7 +118,7 @@
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+        {% if has_paid_lots %}
             <li>
                 <a href="{% url 'payment:event-payments' event.pk %}"
                    title="Pagamentos">

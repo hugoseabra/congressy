@@ -137,7 +137,7 @@
                 </a>
             </li>
         {% endif %}
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE and event.subscription_type != event.SUBSCRIPTION_DISABLED %}
+        {% if has_paid_lots %}
             <li>
                 <a href="{% url 'payment:event-payments' event.pk %}"
                    title="Pagamentos">
@@ -261,7 +261,7 @@
                             {% for item in object_list %}
                                 <tr>
                                     <td>
-                                        {% if item.transactions %}
+                                        {% if item.transactions.last %}
                                             {% if item.transactions.last.status == item.transactions.last.AUTHORIZED or item.transactions.last.status == item.transactions.last.PAID or item.transactions.last.status == item.transactions.last.REFUNDED %}
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color:#5cb85c"></i>
@@ -283,7 +283,7 @@
                                         {{ item.code }}
                                     </td>
                                     <td>
-                                        {% if item.transactions %}
+                                        {% if item.transactions.last %}
                                             {{ item.transactions.last.get_status_display }}
                                         {% else %}
                                             &nbsp;&nbsp;&nbsp;&nbsp;---

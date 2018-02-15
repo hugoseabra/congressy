@@ -97,7 +97,7 @@
                 </a>
             </li>
         {% endif %}
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE and event.subscription_type != event.SUBSCRIPTION_DISABLED%}
+        {% if has_paid_lots %}
             <li>
                 <a href="{% url 'payment:event-payments' event.pk %}"
                    title="Pagamentos">

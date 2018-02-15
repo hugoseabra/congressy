@@ -36,10 +36,23 @@ class BaseLotView(AccountMixin, View):
         # noinspection PyUnresolvedReferences
         context = super(BaseLotView, self).get_context_data(**kwargs)
         context['event'] = self.event
+        context['has_paid_lots'] = self.has_paid_lots()
         return context
 
     def _set_event(self):
         self.event = Event.objects.get(pk=self.kwargs.get('event_pk'))
+
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+            price = lot.price
+            if price is None:
+                continue
+
+            if lot.price > 0:
+                return True
+
+        return False
 
     def can_view(self, show_message=True):
         if not self.event:
