@@ -262,19 +262,20 @@
                                 <tr>
                                     <td>
                                         {% if item.transactions.last %}
-                                            {% if item.transactions.last.status == item.transactions.AUTHORIZED or item.transactions.last.status == item.transactions.PAID or item.transactions.last.status == item.transactions.REFUNDED %}
+                                            {% if item.transactions.last.status == item.transactions.last.AUTHORIZED or item.transactions.last.last.status == item.transactions.last.PAID or item.transactions.last.last.status == item.transactions.last.REFUNDED %}
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color:#5cb85c"></i>
-                                            {% elif item.transactions.last.status == item.transactions.PROCESSING or item.transactions.last.status == item.transactions.WAITING_PAYMENT or item.transactions.last.status == item.transactions.PENDING_REFUND or item.transactions.last.status == item.transactions.CHARGEDBACK %}
+                                            {% elif item.transactions.last.status == item.transactions.last.PROCESSING or item.transactions.last.last.status == item.transactions.last.WAITING_PAYMENT or item.transactions.last.last.status == item.transactions.last.PENDING_REFUND or item.transactions.last.last.status == item.transactions.last.CHARGEDBACK %}
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color: #f0ad4e"></i>
-                                            {% elif item.transactions.last.status == item.transactions.REFUSED %}
+                                            {% elif item.transactions.last.status == item.transactions.last.REFUSED %}
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color: #d9534f"></i>
                                             {% else %}
                                                 <i class="fa fa-circle" aria-hidden="true"></i>
                                             {% endif %}
                                             {{ item.transactions.last.status }}
+                                            {{ item.transactions.last.WAITING_PAYMENT }}
                                         {% endif %}
 
                                         <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
