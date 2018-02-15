@@ -24,12 +24,12 @@ python $BASE_DIR/manage.py migrate
 python $BASE_DIR/manage.py loaddata 000_site_dev
 python $BASE_DIR/manage.py loaddata 001_user
 
-## gatheros_event
+# gatheros_event
 python $BASE_DIR/manage.py loaddata 005_user 006_person 007_organization 008_member 009_place
 python $BASE_DIR/manage.py loaddata 010_event 011_info
 python $BASE_DIR/manage.py loaddata 012_invitation
 
-## gatheros_subscription
+# gatheros_subscription
 python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
 
 # Atualizando a data dos eventos

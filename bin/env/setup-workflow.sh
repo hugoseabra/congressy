@@ -29,4 +29,3 @@ python $BASE_DIR/manage.py loaddata 001_workflow_person
 python $BASE_DIR/manage.py loaddata 002_workflow_organization
 python $BASE_DIR/manage.py loaddata 003_workflow_member
 python $BASE_DIR/manage.py loaddata 004_workflow_event
-
