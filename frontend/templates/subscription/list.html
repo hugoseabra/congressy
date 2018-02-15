@@ -274,6 +274,7 @@
                                             {% else %}
                                                 <i class="fa fa-circle" aria-hidden="true"></i>
                                             {% endif %}
+                                            {{ item.transactions.last.status }}
                                         {% endif %}
 
                                         <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
