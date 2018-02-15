@@ -261,18 +261,16 @@
                             {% for item in object_list %}
                                 <tr>
                                     <td>
-                                        {% if item.transactions.last %}
-                                            {% if item.transactions.last == item.transactions.AUTHORIZED or item.transactions.last == item.transactions.PAID or item.transactions.last == item.transactions.REFUNDED %}
+                                        {% if item.transactions %}
+                                            {% if item.transactions.last.status == item.transactions.last.AUTHORIZED or item.transactions.last.status == item.transactions.last.PAID or item.transactions.last.status == item.transactions.last.REFUNDED %}
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color:#5cb85c"></i>
-                                            {% elif item.transactions.last == item.transactions.PROCESSING or item.transactions.last == item.transactions.WAITING_PAYMENT or item.transactions.last == item.transactions.PENDING_REFUND or item.transactions.last == item.transactions.CHARGEDBACK %}
+                                            {% elif item.transactions.last.status == item.transactions.last.PROCESSING or item.transactions.last.status == item.transactions.last.WAITING_PAYMENT or item.transactions.last.status == item.transactions.last.PENDING_REFUND or item.transactions.last.status == item.transactions.last.CHARGEDBACK %}
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color: #f0ad4e"></i>
-                                            {% elif item.transactions.last == item.transactions.REFUSED %}
+                                            {% elif item.transactions.last.status == item.transactions.last.REFUSED %}
                                                 <i class="fa fa-circle" aria-hidden="true"
                                                    style="color: #d9534f"></i>
-                                            {% else %}
-                                                <i class="fa fa-circle" aria-hidden="true"></i>
                                             {% endif %}
                                         {% endif %}
 
@@ -285,7 +283,7 @@
                                         {{ item.code }}
                                     </td>
                                     <td>
-                                        {% if item.transactions.last %}
+                                        {% if item.transactions %}
                                             {{ item.transactions.last.get_status_display }}
                                         {% else %}
                                             &nbsp;&nbsp;&nbsp;&nbsp;---
@@ -337,7 +335,6 @@
                         {% if has_paid_lots %}
                             <small>
                                 <strong>
-                                    <i class="fa fa-circle" aria-hidden="true"></i> Processando<br/>
                                     <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
                                     Confirmado<br/>
                                     <i class="fa fa-circle" aria-hidden="true" style="color:#f0ad4e"></i>
