@@ -32,5 +32,9 @@ python $BASE_DIR/manage.py loaddata 012_invitation
 # gatheros_subscription
 python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
 
+# Removes previous media files
+rm -rf $BASE_DIR/media_dev/*
+
 # Atualizando a data dos eventos
 python $BASE_DIR/bin/env/update_data.py
+
