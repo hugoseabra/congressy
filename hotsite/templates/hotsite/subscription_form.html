@@ -18,6 +18,19 @@
           role="form" onsubmit="submit_form(this);">
 
         {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+
         <h4 class="form-heading"
             style="font-weight: bold;">
             {% if user.is_authenticated %}
@@ -200,8 +213,11 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12 address-row">
-                            {% render_typeahead_field form.city required=True %}
+                        <div class="col-md-3 address-row">
+                            {% render_generic_field form.state required=config.city %}
+                        </div>
+                        <div class="col-md-6 address-row">
+                            {% render_generic_field form.city_name required=config.city %}
                         </div>
                     </div>
                 </div>
@@ -268,6 +284,20 @@
             </div>
         </div>
     </form>
+
+    <script>
+        var city_id = $("#id_city").val();
+        var city_el = $('#id_city_name');
+        var uf_el = $("#id_state");
+
+        if (city_id !== undefined && city_id !== null) {
+            uf_el.val('{{form.initial.state}}');
+            fetch_cities(uf_el);
+
+        } else {
+            city_el.prop('disabled', true);
+        }
+    </script>
 {% endif %}
 
 
