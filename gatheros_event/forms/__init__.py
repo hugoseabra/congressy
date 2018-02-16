@@ -4,7 +4,6 @@ from .event import (
     EventEditDatesForm,
     EventEditSubscriptionTypeForm,
     EventForm,
-    EventPlaceForm,
     EventPublicationForm,
     EventSocialMediaForm,
     EventTransferForm,

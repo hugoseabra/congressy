@@ -2,7 +2,6 @@
 Formulários de Event
 """
 import os
-from datetime import datetime
 
 from datetimewidget.widgets import DateTimeWidget
 from django import forms
@@ -36,10 +35,20 @@ class EventForm(forms.ModelForm):
             'autoclose': True,
         }
 
-        widgets = {'organization': forms.HiddenInput,
-                   'date_start': DateTimeWidget(options=dateTimeOptions, bootstrap_version=3, attrs={'style': 'background-color:#FFF'}),
-                   'date_end': DateTimeWidget(options=dateTimeOptions, bootstrap_version=3, attrs={'style': 'background-color:#FFF'}),
-                   }
+        widgets = {
+            'organization': forms.HiddenInput,
+            'date_start': DateTimeWidget(
+                options=dateTimeOptions,
+                bootstrap_version=3,
+                attrs={'style': 'background-color:#FFF'}
+            ),
+            'date_end': DateTimeWidget(
+                options=dateTimeOptions,
+                bootstrap_version=3,
+                attrs={'style': 'background-color:#FFF'}
+            ),
+            'subscription_type': forms.RadioSelect,
+        }
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
@@ -50,7 +59,7 @@ class EventForm(forms.ModelForm):
         if instance is None:
             self._configure_organization_field()
 
-        # self._set_widget_date()
+            # self._set_widget_date()
 
     def _configure_organization_field(self):
         orgs = []
@@ -155,31 +164,6 @@ class EventBannerForm(forms.ModelForm):
         # Remove diretórios vazios
         if not os.listdir(path):
             os.rmdir(path)
-
-
-class EventPlaceForm(forms.ModelForm):
-    """Formulário de edição de local de evento."""
-
-    class Meta:
-        """ Meta """
-        model = Event
-        fields = [
-            'place',
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super(EventPlaceForm, self).__init__(*args, **kwargs)
-        self._filter_places()
-
-    def _filter_places(self):
-        organization = self.instance.organization
-        place_qs = organization.places
-
-        self.fields['place'].widget = forms.Select(
-            attrs={'onclick': 'submit()'},
-            choices=place_qs.all()
-        )
-        self.fields['place'].queryset = place_qs.all()
 
 
 class EventSocialMediaForm(forms.ModelForm):

@@ -15,11 +15,9 @@ def update_user_related_name(instance, raw, **_):
 
     split_name = instance.name.strip().split(' ')
     first = split_name[0]
+    last = split_name[-1]
 
-    last = ' '
-    for surename in split_name[1:]:
-        last += surename + ' '
-
+    first = first.strip()
     last = last.strip()
 
     instance.user.first_name = first
