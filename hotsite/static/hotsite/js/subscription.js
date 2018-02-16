@@ -1,38 +1,67 @@
-var suggestionEngine = new Bloodhound({
-    datumTokenizer: function (datum) {
-        return Bloodhound.tokenizers.whitespace(datum.value);
-    },
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    remote: {
-        url: '/api/cities/?q=%QUERY',
-        wildcard: '%QUERY',
-        filter: function (main_json) {
-            return $.map(main_json.results, function (result) {
-                return {
-                    value: result.name + '-' + result.uf,
-                    city_id: result.id
-                };
-            });
-        }
-    }
-});
-
-$('#city .typeahead').typeahead(null, {
-    name: 'cities',
-    display: 'value',
-    source: suggestionEngine,
-    limit: 10
-});
-
-$('#city .typeahead').on('typeahead:selected', function (e, datum) {
-    $("#id_city").val(datum.city_id);
-});
-
 $(document).ready(function () {
     $('#id_phone').mask("(99) 9 9999-9999");
     $('#id_cpf').mask("999.999.999-99");
+
+
+    var city_id = $("#id_city").val();
+    var city_el = $('#id_city_name');
+    var uf_el = $("#id_state");
+
+
+
+
+
+    $('#id_state').change(function () {
+        city_el.empty();
+
+        var that = $(this);
+        window.setTimeout(function () {
+            city_el.append($('<option>').text('Carregando...'));
+            fetch_cities($(that));
+        }, 500);
+    });
+
+
+    $('#id_city_name').change(function () {
+        $("#id_city").val($(this).val());
+    });
 
     $('#id_zip_code').on('keyup', function () {
         searchByCep();
     });
 });
+
+
+function fetch_cities(uf_el, selected_value) {
+    uf_el = $(uf_el);
+    selected_value = selected_value || '';
+
+    var city_el = $('#id_city_name');
+    $.ajax({
+        url: "/api/cities/?uf=" + $(uf_el).val() + '&length=1000', success: function (result) {
+
+            var listitems = [];
+            var ids = [];
+
+            $.each(result.results, function (key, value) {
+                listitems.push('<option value=' + value.id + '>' + value.name + '</option>');
+                ids.push(value.id)
+            });
+
+            if (selected_value) {
+                window.setTimeout(function() {
+                    city_el.val(selected_value);
+                    $("#id_city").val(selected_value);
+                }, 500);
+            } else {
+                $("#id_city").val(ids[0]);
+            }
+
+            city_el.html(listitems.join(''));
+            city_el.prop('disabled', false);
+
+        }
+    });
+
+
+}

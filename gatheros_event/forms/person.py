@@ -17,6 +17,10 @@ def create_years_list():
 
     return years
 
+class AjaxChoiceField(forms.ChoiceField):
+    def valid_value(self, value):
+        return True
+
 
 class TelephoneInput(forms.TextInput):
     input_type = 'tel'
@@ -28,6 +32,42 @@ class DateInput(forms.TextInput):
 
 class PersonForm(forms.ModelForm):
     """ Formulário de Person. """
+    states = (
+        ('', '----'),  # replace the value '----' with whatever you want, it won't matter
+        ("AC", u"Acre"),
+        ("AL", u"Alagoas"),
+        ("AP", u"Amapá"),
+        ("AM", u"Manaus"),
+        ("BA", u"Bahia"),
+        ("CE", u"Ceará"),
+        ("DF", u"Distrito Federal"),
+        ("ES", u"Espírito Santo"),
+        ("GO", u"Goiás"),
+        ("MA", u"Maranhão"),
+        ("MT", u"Mato Grosso"),
+        ("MS", u"Mato Grosso do Sul"),
+        ("MG", u"Minas Gerais"),
+        ("PA", u"Pará"),
+        ("PB", u"Paraíba"),
+        ("PR", u"Paraná"),
+        ("PE", u"Pernambuco"),
+        ("PI", u"Piauí"),
+        ("RJ", u"Rio de Janeiro"),
+        ("RN", u"Rio Grande do Norte"),
+        ("RS", u"Rio Grande do Sul"),
+        ("RO", u"Rondônia"),
+        ("RR", u"Roraima"),
+        ("SC", u"Santa Catarina"),
+        ("SP", u"São Paulo"),
+        ("SE", u"Sergipe"),
+        ("TO", u"Tocantins"),
+    )
+    empty = (
+        ('', '----'),
+    )
+
+    state = forms.ChoiceField(label='Estado', choices=states)
+    city_name = AjaxChoiceField(label='Cidade', choices=empty)
 
     class Meta:
         """ Meta """
@@ -58,6 +98,17 @@ class PersonForm(forms.ModelForm):
         #     self.data = {}
         #
         # self.fill_blank_data_when_user()
+
+        uf = None
+        if 'instance' in kwargs:
+            instance = kwargs.get('instance')
+            if instance.city:
+                uf = instance.city.uf
+
+        if 'initial' in kwargs and uf:
+            initial = kwargs.get('initial')
+            initial.update({'state': uf})
+            kwargs.update({'initial': initial})
 
         super().__init__(**kwargs)
 

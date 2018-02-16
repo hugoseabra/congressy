@@ -18,6 +18,19 @@
           role="form" onsubmit="submit_form(this);">
 
         {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+
         <h4 class="form-heading"
             style="font-weight: bold;">
             {% if user.is_authenticated %}
@@ -150,8 +163,16 @@
                 <div class="row">
                     <div class="col-md-6">
                         {% if config and config.address == config.ADDRESS_HIDE %}
-                            {% render_typeahead_field form.city required=config.city %}
+                        <div class="row">
+                            <div class="col-md-3 address-row">
+                                {% render_generic_field form.state required=config.city %}
+                            </div>
+                            <div class="col-md-6 address-row">
+                                {% render_generic_field form.city_name required=config.city %}
+                            </div>
+                        </div>
                         {% endif %}
+                    </div>
                     </div>
                 </div>
                 <div class="row">
@@ -200,8 +221,11 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12 address-row">
-                            {% render_typeahead_field form.city required=True %}
+                        <div class="col-md-3 address-row">
+                            {% render_generic_field form.state required=True %}
+                        </div>
+                        <div class="col-md-6 address-row">
+                            {% render_generic_field form.city_name required=True %}
                         </div>
                     </div>
                 </div>
@@ -268,6 +292,8 @@
             </div>
         </div>
     </form>
+
+
 {% endif %}
 
 
