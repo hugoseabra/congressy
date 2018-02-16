@@ -8,7 +8,7 @@ import os
 from django.db import models
 
 from kanu_locations.models import City
-from . import Organization
+from . import Event
 from .mixins import GatherosModelMixin
 
 
@@ -20,19 +20,35 @@ def get_image_path(_, filename):
 class Place(models.Model, GatherosModelMixin):
     """Local de evento."""
 
-    name = models.CharField(max_length=255, verbose_name='nome')
-    organization = models.ForeignKey(
-        Organization,
+    event = models.OneToOneField(
+        Event,
         on_delete=models.CASCADE,
-        verbose_name='organização',
-        related_name='places'
+        verbose_name='evento',
+        related_name='place'
+    )
+    show_location = models.BooleanField(
+        default=False,
+        verbose_name='mostrar localização',
+        help_text='Exibir mapa do local onde o evento irá acontecer.'
+    )
+    show_address = models.BooleanField(
+        default=False,
+        verbose_name='mostrar endereço',
+        help_text='Exibir informações do local evento.'
+    )
+    name = models.CharField(
+        max_length=255,
+        verbose_name='nome',
+        blank=True,
+        null=True,
     )
     city = models.ForeignKey(
         City,
-        on_delete=models.PROTECT,
-        verbose_name='cidade'
+        on_delete=models.DO_NOTHING,
+        verbose_name='cidade',
+        blank=True,
+        null=True,
     )
-
     phone = models.CharField(
         max_length=12,
         blank=True,
@@ -40,15 +56,15 @@ class Place(models.Model, GatherosModelMixin):
         verbose_name='telefone'
     )
     long = models.DecimalField(
-        max_digits=8,
-        decimal_places=3,
+        max_digits=15,
+        decimal_places=6,
         blank=True,
         null=True,
         verbose_name='longitude'
     )
     lat = models.DecimalField(
-        max_digits=8,
-        decimal_places=3,
+        max_digits=15,
+        decimal_places=6,
         blank=True,
         null=True,
         verbose_name='latitude'
@@ -129,7 +145,7 @@ class Place(models.Model, GatherosModelMixin):
         ordering = ['name']
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.organization.name)
+        return '{} ({})'.format(self.name, self.event.name)
 
     # noinspection PyMethodMayBeStatic
     def _add_prefix(self, *args, **kwargs):

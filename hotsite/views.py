@@ -425,8 +425,9 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             form = self.get_form()
             if form.initial and not form.is_valid():
                 slug = kwargs.get('slug')
-                return HttpResponseRedirect(
-                    reverse('public:hotsite-subscription', args={slug}))
+                context['form'] = form
+                context['slug'] = slug
+                return self.render_to_response(context)
 
             if not form.is_valid():
                 context['form'] = form

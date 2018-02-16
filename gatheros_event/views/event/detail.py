@@ -27,21 +27,6 @@ def update_banners(request, event):
     }))
 
 
-def update_place(request, event):
-    form = forms.EventPlaceForm(instance=event, data=request.POST)
-    if form.is_valid():
-        form.save()
-        messages.success(request, "Local atualizado com sucesso.")
-    else:
-        messages.error(request, "Dados não atualizados.")
-        messages.error(request, form.errors)
-        messages.error(request, form.non_field_errors())
-
-    return redirect(reverse('event:event-detail', kwargs={
-        'pk': event.pk
-    }))
-
-
 def update_social_media(request, event):
     form = forms.EventSocialMediaForm(instance=event, data=request.POST)
     if form.is_valid():
@@ -93,7 +78,6 @@ class EventDetailView(AccountMixin, DetailView):
         submit_type = data.get('submit_type')
         supported_types = (
             'update_banners',
-            'update_place',
             'update_social_media',
         )
 

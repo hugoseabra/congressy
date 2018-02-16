@@ -189,12 +189,12 @@ class PlaceAdmin(admin.ModelAdmin):
     """
     Admin para Place
     """
-    list_display = ('name', 'organization', 'pk')
+    list_display = ('name', 'event', 'pk')
     fieldsets = (
         (None, {
             'fields': (
                 'name',
-                'organization',
+                'event',
             ),
         }),
         ('Endereço', {
