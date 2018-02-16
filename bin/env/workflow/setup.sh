@@ -15,7 +15,7 @@ docker-compose -f $BASE_DIR/bin/env/docker-compose.yml down --remove-orphans
 sleep 2
 
 docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
-sleep 5
+sleep 10
 
 python $BASE_DIR/manage.py migrate
 
