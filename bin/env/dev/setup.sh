@@ -17,6 +17,9 @@ sleep 2
 docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
 sleep 5
 
+# Removes previous media files
+rm -rf $BASE_DIR/media_dev/*
+
 python $BASE_DIR/manage.py migrate
 
 # Importando fixtures
@@ -32,9 +35,5 @@ python $BASE_DIR/manage.py loaddata 012_invitation
 # gatheros_subscription
 python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
 
-# Removes previous media files
-rm -rf $BASE_DIR/media_dev/*
-
 # Atualizando a data dos eventos
 python $BASE_DIR/bin/env/dev/update_data.py
-

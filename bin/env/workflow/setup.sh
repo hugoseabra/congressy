@@ -17,6 +17,9 @@ sleep 2
 docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
 sleep 10
 
+# Removes previous media files
+rm -rf $BASE_DIR/media_dev/*
+
 python $BASE_DIR/manage.py migrate
 
 # Importando fixtures
@@ -29,13 +32,7 @@ python $BASE_DIR/manage.py loaddata 000_workflow_user
 python $BASE_DIR/manage.py loaddata 001_workflow_person
 python $BASE_DIR/manage.py loaddata 002_workflow_organization
 python $BASE_DIR/manage.py loaddata 003_workflow_member
-python $BASE_DIR/manage.py loaddata 004_workflow_event
-python $BASE_DIR/manage.py loaddata 005_workflow_info
-python $BASE_DIR/manage.py loaddata 006_workflow_lot
-
-# Removes previous media files
-rm -rf $BASE_DIR/media_dev/*
 
 # Atualizando a data dos eventos
-python $BASE_DIR/bin/env/workflow/update_data.py
-
+python $BASE_DIR/bin/env/workflow/01_create_event_fixtures.py
+python $BASE_DIR/bin/env/workflow/02_update_data.py
