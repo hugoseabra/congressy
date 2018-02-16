@@ -144,7 +144,7 @@ class Migration(migrations.Migration):
                                             ('simple', 'Simples (gratuitas)'),
                                             (
                                                 'by_lots',
-                                                'Gerenciar por lotes')],
+                                                'Gerenciar por lotes (gratuitas e/ou pagas)')],
                                    default='simple',
                                    help_text='Como gostaria de gerenciar as inscrições de seu evento?',
                                    max_length=15, verbose_name='inscrições'),

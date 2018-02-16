@@ -16,7 +16,7 @@ from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
 from core.model import track_data
 from core.util import model_field_slugify
-from . import Category, Organization, Place
+from . import Category, Organization
 from .mixins import GatherosModelMixin
 from .rules import event as rule
 
@@ -43,7 +43,7 @@ class Event(models.Model, GatherosModelMixin):
     SUBSCRIPTION_CHOICES = (
         (SUBSCRIPTION_DISABLED, 'Desativadas'),
         (SUBSCRIPTION_SIMPLE, 'Simples (gratuitas)'),
-        (SUBSCRIPTION_BY_LOTS, 'Gerenciar por lotes'),
+        (SUBSCRIPTION_BY_LOTS, 'Gerenciar por lotes (gratuitas e/ou pagas)'),
     )
 
     EVENT_STATUS_NOT_STARTED = 'not-started'
@@ -97,16 +97,6 @@ class Event(models.Model, GatherosModelMixin):
 
     date_start = models.DateTimeField(verbose_name='data inicial')
     date_end = models.DateTimeField(verbose_name='data final')
-
-    place = models.ForeignKey(
-        Place,
-        on_delete=models.PROTECT,
-        verbose_name='local',
-        related_name='events',
-        blank=True,
-        null=True,
-        help_text="Deixar em branco se o evento é apenas on-line.",
-    )
 
     banner_small = StdImageField(
         upload_to=get_image_path,
@@ -250,7 +240,6 @@ class Event(models.Model, GatherosModelMixin):
     def check_rules(self):
         """Verifica regras do evento"""
         rule.rule_1_data_inicial_antes_da_data_final(self)
-        rule.rule_2_local_deve_ser_da_mesma_organizacao_do_evento(self)
         rule.rule_3_evento_data_final_posterior_atual(self, self._state.adding)
         rule.rule_4_running_published_event_cannot_change_date_start(self)
 

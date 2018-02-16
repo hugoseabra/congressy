@@ -1,119 +1,51 @@
-{#    {% if event.place %}#}
-{#        <!-- GOOGLE MAPS#}
-{#        ================================= -->#}
-{#        <section id="map" class="contact-maps-section section">#}
+{% load static %}
+
+{% if event.place and event.place.show_location and event.place.lat and event.place.long %}
+    <!-- GOOGLE MAPS
+    ================================= -->
+    <section id="maps" class="maps-section section">
+
+        <div class="maps-row">
+{#        <div class="container-fluid maps-row">#}
+
+            <!-- MAPS IMAGE -->
+            <div class="maps-image fadeIn animated done-animation" data-animation="fadeIn">
+                <div id="gmap"></div>
+            </div>
+
+{#            <!-- MAPS TEXT -->#}
+{#            <div class="maps-text fadeIn animated done-animation" data-animation="fadeIn">#}
 {##}
-{#            <div class="section-background">#}
+{#                <div class="maps-text-inner">#}
 {##}
-{#                <!-- MAPS BACKGROUND -->#}
-{#                <div class="section-background-maps">#}
-{#                    <div id="gmap"></div>#}
+{#                    <h2 class="section-heading text-left">Made with <span class="fa fa-heart text-primary"></span> in Kuta, Bali</h2>#}
 {##}
-{#                    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&key={{ google_maps_api_key }}">#}
-{#                    </script>#}
-{#                    <!-- GOGGLE MAPS CONFIGURATION -->#}
-{#                    <!-- ref: http://maplacejs.com/ -->#}
-{#                    <script>#}
-{#                        var gmap_options = {#}
-{#                            generate_controls: true,#}
-{#                            locations: [{#}
-{#                                lat: -22.2198393,#}
-{#                                lon: -49.9524338,#}
-{#                                animation: google.maps.Animation.DROP,#}
-{#                                html: "Drew Headquarter",#}
-{#                                icon: "{% static 'hotsite/images/contents/map-1.png'%}",#}
-{#                                clickable: false,#}
-{#                            }],#}
-{#                            map_options: {#}
-{#                                scrollwheel: false,#}
-{#                                mapTypeControl: true,#}
-{#                                streetViewControl: true,#}
-{#                                zoomControlOptions: {#}
-{#                                    style: google.maps.ZoomControlStyle.SMALL,#}
-{#                                },#}
-{#                                zoom: 16,#}
-{#                                set_center: [-22.2198393, -49.9524338], // adjust the "lon" attribute of your first location#}
-{#                            },#}
-{#                            styles: {#}
-{#                                // source: https://snazzymaps.com/style/132/light-gray#}
-{#                                'custom': [{#}
-{#                                    "featureType": "water",#}
-{#                                    "elementType": "geometry.fill",#}
-{#                                    "stylers": [{"color": "#d3d3d3"}]#}
-{#                                }, {#}
-{#                                    "featureType": "transit",#}
-{#                                    "stylers": [{"color": "#808080"}, {"visibility": "off"}]#}
-{#                                }, {#}
-{#                                    "featureType": "road.highway",#}
-{#                                    "elementType": "geometry.stroke",#}
-{#                                    "stylers": [{"visibility": "on"}, {"color": "#b3b3b3"}]#}
-{#                                }, {#}
-{#                                    "featureType": "road.highway",#}
-{#                                    "elementType": "geometry.fill",#}
-{#                                    "stylers": [{"color": "#ffffff"}]#}
-{#                                }, {#}
-{#                                    "featureType": "road.local",#}
-{#                                    "elementType": "geometry.fill",#}
-{#                                    "stylers": [{"visibility": "on"}, {"color": "#ffffff"}, {"weight": 1.8}]#}
-{#                                }, {#}
-{#                                    "featureType": "road.local",#}
-{#                                    "elementType": "geometry.stroke",#}
-{#                                    "stylers": [{"color": "#d7d7d7"}]#}
-{#                                }, {#}
-{#                                    "featureType": "poi",#}
-{#                                    "elementType": "geometry.fill",#}
-{#                                    "stylers": [{"visibility": "on"}, {"color": "#ebebeb"}]#}
-{#                                }, {#}
-{#                                    "featureType": "administrative",#}
-{#                                    "elementType": "geometry",#}
-{#                                    "stylers": [{"color": "#a7a7a7"}]#}
-{#                                }, {#}
-{#                                    "featureType": "road.arterial",#}
-{#                                    "elementType": "geometry.fill",#}
-{#                                    "stylers": [{"color": "#ffffff"}]#}
-{#                                }, {#}
-{#                                    "featureType": "road.arterial",#}
-{#                                    "elementType": "geometry.fill",#}
-{#                                    "stylers": [{"color": "#ffffff"}]#}
-{#                                }, {#}
-{#                                    "featureType": "landscape",#}
-{#                                    "elementType": "geometry.fill",#}
-{#                                    "stylers": [{"visibility": "on"}, {"color": "#efefef"}]#}
-{#                                }, {#}
-{#                                    "featureType": "road",#}
-{#                                    "elementType": "labels.text.fill",#}
-{#                                    "stylers": [{"color": "#696969"}]#}
-{#                                }, {#}
-{#                                    "featureType": "administrative",#}
-{#                                    "elementType": "labels.text.fill",#}
-{#                                    "stylers": [{"visibility": "on"}, {"color": "#737373"}]#}
-{#                                }, {#}
-{#                                    "featureType": "poi",#}
-{#                                    "elementType": "labels.icon",#}
-{#                                    "stylers": [{"visibility": "off"}]#}
-{#                                }, {#}
-{#                                    "featureType": "poi",#}
-{#                                    "elementType": "labels",#}
-{#                                    "stylers": [{"visibility": "off"}]#}
-{#                                }, {#}
-{#                                    "featureType": "road.arterial",#}
-{#                                    "elementType": "geometry.stroke",#}
-{#                                    "stylers": [{"color": "#d6d6d6"}]#}
-{#                                }, {#}
-{#                                    "featureType": "road",#}
-{#                                    "elementType": "labels.icon",#}
-{#                                    "stylers": [{"visibility": "off"}]#}
-{#                                }, {}, {#}
-{#                                    "featureType": "poi",#}
-{#                                    "elementType": "geometry.fill",#}
-{#                                    "stylers": [{"color": "#dadada"}]#}
-{#                                }],#}
-{#                            }#}
-{#                        };#}
-{#                    </script>#}
+{#                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed feugiat arcu ut orci porta, eget porttitor felis suscipit. Sed a nisl ullamcorper, tempus augue at, rutrum lacus. Duis et turpis eros.</p>#}
+{##}
+{#                    <div class="row">#}
+{#                        <address class="col-sm-6">#}
+{#                            <strong>Drew Headquarter</strong>#}
+{#                            <ul class="fa-ul">#}
+{#                                <li><i class="fa-li fa fa-home"></i>Jalan Pantai Kuta, Kuta<br>Bali, Indonesia</li>#}
+{#                                <li><i class="fa-li fa fa-phone"></i>Phone: +62 109 876543</li>#}
+{#                                <li><i class="fa-li fa fa-fax"></i>Fax: +62 109 876543</li>#}
+{#                            </ul>#}
+{#                        </address>#}
+{#                        <address class="col-sm-6">#}
+{#                            <strong>Workshop &amp; Store</strong>#}
+{#                            <ul class="fa-ul">#}
+{#                                <li><i class="fa-li fa fa-home"></i>Jalan Legian, Kuta<br>Bali, Indonesia</li>#}
+{#                                <li><i class="fa-li fa fa-phone"></i>Phone: +62 109 876543</li>#}
+{#                                <li><i class="fa-li fa fa-fax"></i>Fax: +62 109 876543</li>#}
+{#                            </ul>#}
+{#                        </address>#}
+{#                    </div>#}
+{##}
 {#                </div>#}
+{##}
 {#            </div>#}
-{##}
-{#        </section>#}
-{##}
-{#    {% endif %}#}
+
+        </div>
+
+    </section>
+{% endif %}

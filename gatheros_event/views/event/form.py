@@ -1,10 +1,12 @@
 from django.contrib import messages
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
+from django.shortcuts import get_object_or_404
 
 from gatheros_event import forms
-from gatheros_event.models import Organization
+from gatheros_event.models import Organization, Event
 from gatheros_event.views.mixins import AccountMixin
 
 
@@ -13,9 +15,27 @@ class BaseEventView(AccountMixin, View):
     success_message = ''
     success_url = None
     form_title = None
+    event = None
 
     def get_permission_denied_url(self):
         return reverse_lazy('event:event-list')
+
+    def get_event(self):
+        if not self.event and self.kwargs.get('pk'):
+            self.event = get_object_or_404(Event, pk=self.kwargs.get('pk'))
+
+        return self.event
+
+    def get_place_form(self, **kwargs):
+        event = self.get_event()
+        if event:
+            kwargs.update({'event': event})
+            try:
+                kwargs.update({'instance': event.place})
+            except AttributeError:
+                pass
+
+        return forms.PlaceForm(**kwargs)
 
     def form_valid(self, form):
         # @TODO: Change this to a FormView
@@ -36,6 +56,8 @@ class BaseEventView(AccountMixin, View):
         context['next_path'] = self._get_referer_url()
         context['form_title'] = self.get_form_title()
         context['is_manager'] = self.has_internal_organization
+        context['place_form'] = self.get_place_form()
+        context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
 
         return context
 
@@ -110,7 +132,27 @@ class EventAddFormView(BaseEventView, generic.CreateView):
                 'Você não pode inserir um evento nesta organização.'
             )
         else:
-            return super(EventAddFormView, self).post(request, *args, **kwargs)
+            self.object = None
+
+            form = self.get_form()
+            if form.is_valid():
+                self.event = form.save()
+                place_form = self.get_place_form(**self.get_form_kwargs())
+
+                if not place_form.is_valid():
+                    return self.render_to_response(self.get_context_data(
+                        form=form,
+                        place_form=place_form
+                    ))
+
+                place_form.save()
+                return self.form_valid(form)
+
+            else:
+                return self.render_to_response(self.get_context_data(
+                    form=form,
+                    place_form=self.get_place_form(**self.get_form_kwargs())
+                ))
 
     def get_initial(self):
         initial = super(EventAddFormView, self).get_initial()
@@ -161,6 +203,27 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
             return next_path
 
         return super(EventEditFormView, self).get_success_url()
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            self.event = form.save()
+            place_form = self.get_place_form(**self.get_form_kwargs())
+
+            if not place_form.is_valid():
+                return self.render_to_response(self.get_context_data(
+                    form=form,
+                    place_form=place_form
+                ))
+
+            place_form.save()
+            return self.form_valid(form)
+
+        else:
+            return self.render_to_response(self.get_context_data(
+                form=form,
+                place_form=self.get_place_form(**self.get_form_kwargs())
+            ))
 
 
 class EventPublicationFormView(BaseSimpleEditlView, generic.UpdateView):

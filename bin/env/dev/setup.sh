@@ -28,8 +28,9 @@ python $BASE_DIR/manage.py loaddata 000_site_dev
 python $BASE_DIR/manage.py loaddata 001_user
 
 # gatheros_event
-python $BASE_DIR/manage.py loaddata 005_user 006_person 007_organization 008_member 009_place
-python $BASE_DIR/manage.py loaddata 010_event 011_info
+python $BASE_DIR/manage.py loaddata 005_user 006_person 007_organization 008_member
+python $BASE_DIR/manage.py loaddata 009_event
+python $BASE_DIR/manage.py loaddata 010_place 011_info
 python $BASE_DIR/manage.py loaddata 012_invitation
 
 # gatheros_subscription
