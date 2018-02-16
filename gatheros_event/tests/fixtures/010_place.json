@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
       "name": "Modul Coworking",
-      "organization": 1,
+      "event_id": 1,
       "city": 5413,
       "phone": null,
       "long": null,
@@ -22,7 +22,7 @@
     "pk": 2,
     "fields": {
       "name": "Senac Cora Coralina",
-      "organization": 2,
+      "event_id": 2,
       "city": 5413,
       "phone": null,
       "long": null,
@@ -40,7 +40,7 @@
     "pk": 3,
     "fields": {
       "name": "CPDF - Centro Pastoral Dom Fernando",
-      "organization": 3,
+      "event_id": 3,
       "city": 5413,
       "phone": null,
       "long": null,
@@ -58,7 +58,7 @@
     "pk": 4,
     "fields": {
       "name": "Faculdade ALFA",
-      "organization": 2,
+      "event_id": 4,
       "city": 5413,
       "phone": null,
       "long": null,
@@ -76,7 +76,7 @@
     "pk": 5,
     "fields": {
       "name": "UNIP- Universidade Paulista - Goi\u00e2nia",
-      "organization": 5,
+      "event_id": 5,
       "city": 5413,
       "phone": null,
       "long": null,
@@ -94,7 +94,7 @@
     "pk": 6,
     "fields": {
       "name": "Senac Cora Coralina",
-      "organization": 6,
+      "event_id": 6,
       "city": 5413,
       "phone": null,
       "long": null,
@@ -112,7 +112,7 @@
     "pk": 7,
     "fields": {
       "name": "EVV / UEG - Programa Educando e Valorizando a Vida",
-      "organization": 6,
+      "event_id": 7,
       "city": 5413,
       "phone": null,
       "long": null,
@@ -130,7 +130,7 @@
     "pk": 8,
     "fields": {
       "name": "CPDF - Centro Pastoral Dom Fernando",
-      "organization": 7,
+      "event_id": 8,
       "city": 5413,
       "phone": null,
       "long": null,
@@ -148,7 +148,7 @@
     "pk": 9,
     "fields": {
       "name": "Ch\u00e1cara Recanto do Sossego",
-      "organization": 7,
+      "event_id": 9,
       "city": 5414,
       "phone": null,
       "long": null,

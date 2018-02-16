@@ -15,17 +15,6 @@ def rule_1_data_inicial_antes_da_data_final(event):
             'Data inicial deve ser anterior a data final.'
         ]})
 
-
-def rule_2_local_deve_ser_da_mesma_organizacao_do_evento(event):
-    """
-    Um evento não pode ter um local que seja de outra organização.
-    """
-    if event.place and event.place.organization != event.organization:
-        raise ValidationError({'place': [
-            'Evento e Local não são da mesma organização.'
-        ]})
-
-
 def rule_3_evento_data_final_posterior_atual(event, adding=True):
     """
     Data final deve ser posterior a data atual.
