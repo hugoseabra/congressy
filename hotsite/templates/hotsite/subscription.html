@@ -2,82 +2,96 @@
 {% load static user_agents user_agent_tag %}
 
 {% block styles %}
-<style>
-    .form-group {
-        margin: 4px 0;
-    }
-    input#id_city, input#id_city_search {
-        text-transform: uppercase;
-    }
-</style>
+    <style>
+        .form-group {
+            margin: 4px 0;
+        }
+
+        input#id_city, input#id_city_search {
+            text-transform: uppercase;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
 
-{% include 'hotsite/includes/2_cover_no_form.html' %}
+    {% include 'hotsite/includes/2_cover_no_form.html' %}
 
-<!-- FORM
-================================= -->
-<section id="about" class="about-section section">
-    <div class="container">
-        <h2 class="section-heading text-center">Inscrição</h2>
-        <div class="about-row row">
-            <div class="col-md-9 col-md-offset-2">
-                {% include 'hotsite/subscription_form.html' %}
+    <!-- FORM
+    ================================= -->
+    <section id="about" class="about-section section">
+        <div class="container">
+            <h2 class="section-heading text-center">Inscrição</h2>
+            <div class="about-row row">
+                <div class="col-md-9 col-md-offset-2">
+                    {% include 'hotsite/subscription_form.html' %}
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 {% endblock %}
 
 {% block scripts %}
 
-<!-- SCRIPT Subscription -->
-<script src="{% static "hotsite/js/subscription.js" %}"></script>
-<script>
-    $(document).ready(function () {
-        IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
-        {% if config and config.address == config.ADDRESS_SHOW %}
-            $('#id_zip_code').mask("99.999-999");
+    <!-- SCRIPT Subscription -->
+    <script src="{% static "hotsite/js/subscription.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+            IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
+            {% if config and config.address == config.ADDRESS_SHOW %}
+                $('#id_zip_code').mask("99.999-999");
+            {% endif %}
+            if ($('#id_city').val()) {
+                $.ajax({
+                    url: "/api/cities/" + $('#id_city').val(), success: function (result) {
+                        $('#id_city_search').val(result.name + ' - ' + result.uf)
+                        //populate the html with result here
+                    }
+                });
+            }
+            showHideCepLoader();
+        });
+    </script>
+
+    <!-- SCRIPT Payment -->
+    <!-- SCRIPT PAGAR.ME -->
+    <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
+    <script src="{% static "hotsite/js/payment.js" %}"></script>
+    <script>
+        var lots = {};
+        {% for lot in lots %}
+            {% if lot.price %}
+                lots['{{ lot.pk }}'] = parseFloat({{ lot.price }});
+            {% endif %}
+        {% endfor %}
+
+        var allowed_transactions;
+        {% if request.session.allowed_transaction %}
+            allowed_transactions = '{{ request.session.allowed_transaction }}';
+        {% else %}
+            allowed_transactions = null;
         {% endif %}
-        if ($('#id_city').val()) {
-            $.ajax({
-                url: "/api/cities/" + $('#id_city').val(), success: function (result) {
-                    $('#id_city_search').val(result.name + ' - ' + result.uf)
-                    //populate the html with result here
-                }
-            });
-        }
-        showHideCepLoader();
-    });
-</script>
+        $('#id_button_pay').on('click', function () {
+            process_payment(
+                '{{ pagarme_encryption_key }}',
+                '{{ event.name }}',
+                lots,
+                allowed_transactions
+            );
+        });
 
-<!-- SCRIPT Payment -->
-<!-- SCRIPT PAGAR.ME -->
-<script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
-<script src="{% static "hotsite/js/payment.js" %}"></script>
-<script>
-    var lots = {};
-    {% for lot in lots %}
-    {% if lot.price %}
-        lots['{{ lot.pk }}'] = parseFloat({{ lot.price }});
-    {% endif %}
-    {% endfor %}
+        $(document).ready(function() {
+            var city_id = $("#id_city").val();
+            var city_el = $('#id_city_name');
+            var uf_el = $("#id_state");
 
-    var allowed_transactions;
-    {% if request.session.allowed_transaction %}
-        allowed_transactions = '{{ request.session.allowed_transaction }}';
-    {% else %}
-        allowed_transactions = null;
-    {% endif %}
-    $('#id_button_pay').on('click', function () {
-        process_payment(
-            '{{ pagarme_encryption_key }}',
-            '{{ event.name }}',
-            lots,
-            allowed_transactions
-        );
-    });
+            if (city_id !== undefined && city_id !== null) {
+                uf_el.val('{{form.initial.state}}');
+                fetch_cities(uf_el, city_id);
 
-</script>
+            } else {
+                city_el.prop('disabled', true);
+            }
+        });
+    </script>
 {% endblock %}

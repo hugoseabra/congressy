@@ -163,8 +163,16 @@
                 <div class="row">
                     <div class="col-md-6">
                         {% if config and config.address == config.ADDRESS_HIDE %}
-                            {% render_typeahead_field form.city required=config.city %}
+                        <div class="row">
+                            <div class="col-md-3 address-row">
+                                {% render_generic_field form.state required=config.city %}
+                            </div>
+                            <div class="col-md-6 address-row">
+                                {% render_generic_field form.city_name required=config.city %}
+                            </div>
+                        </div>
                         {% endif %}
+                    </div>
                     </div>
                 </div>
                 <div class="row">
@@ -214,10 +222,10 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3 address-row">
-                            {% render_generic_field form.state required=config.city %}
+                            {% render_generic_field form.state required=True %}
                         </div>
                         <div class="col-md-6 address-row">
-                            {% render_generic_field form.city_name required=config.city %}
+                            {% render_generic_field form.city_name required=True %}
                         </div>
                     </div>
                 </div>
@@ -285,19 +293,7 @@
         </div>
     </form>
 
-    <script>
-        var city_id = $("#id_city").val();
-        var city_el = $('#id_city_name');
-        var uf_el = $("#id_state");
 
-        if (city_id !== undefined && city_id !== null) {
-            uf_el.val('{{form.initial.state}}');
-            fetch_cities(uf_el);
-
-        } else {
-            city_el.prop('disabled', true);
-        }
-    </script>
 {% endif %}
 
 

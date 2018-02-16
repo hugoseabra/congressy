@@ -32,8 +32,10 @@ $(document).ready(function () {
 });
 
 
-function fetch_cities(uf_el) {
+function fetch_cities(uf_el, selected_value) {
     uf_el = $(uf_el);
+    selected_value = selected_value || '';
+
     var city_el = $('#id_city_name');
     $.ajax({
         url: "/api/cities/?uf=" + $(uf_el).val() + '&length=1000', success: function (result) {
@@ -46,7 +48,14 @@ function fetch_cities(uf_el) {
                 ids.push(value.id)
             });
 
-            $("#id_city").val(ids[0]);
+            if (selected_value) {
+                window.setTimeout(function() {
+                    city_el.val(selected_value);
+                    $("#id_city").val(selected_value);
+                }, 500);
+            } else {
+                $("#id_city").val(ids[0]);
+            }
 
             city_el.html(listitems.join(''));
             city_el.prop('disabled', false);
