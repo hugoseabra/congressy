@@ -222,17 +222,6 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         name = self.request.POST.get('name')
         email = self.request.POST.get('email')
 
-        # CONDIÇÃO 2
-        if not name or not email:
-            messages.error(
-                self.request,
-                "Você deve informar todos os dados para fazer a sua inscrição."
-            )
-
-            context['name'] = name
-            context['email'] = email
-            return self.render_to_response(context)
-
         # Pode acontecer caso que há usuário e não há pessoa.
         def save_person(user=None):
             self.initial = {
@@ -272,6 +261,17 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                 'public:hotsite-subscription',
                 slug=self.event.slug
             )
+
+        # CONDIÇÃO 2
+        if not name or not email:
+            messages.error(
+                self.request,
+                "Você deve informar todos os dados para fazer a sua inscrição."
+            )
+
+            context['name'] = name
+            context['email'] = email
+            return self.render_to_response(context)
 
         # CONDIÇÃO 3
         has_account = self.subscriber_has_account(email)
