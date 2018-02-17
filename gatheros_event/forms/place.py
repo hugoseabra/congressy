@@ -34,14 +34,39 @@ FIELD_NAME_MAPPING = {
 class PlaceForm(forms.ModelForm):
     """ Formulário de local de evento. """
 
+    class Meta:
+        """ Meta """
+        model = Place
+        fields = (
+            'show_location',
+            'lat',
+            'long',
+            # 'show_address',
+            # 'name',
+            # 'phone',
+            # 'zip_code',
+            # 'street',
+            # 'complement',
+            # 'number',
+            # 'village',
+            # 'city',
+            # 'reference',
+
+        )
+        widgets = {
+            'organization': forms.HiddenInput(),
+            'google_maps_img': GooglePictureWidget(),
+            'google_streetview_img': GooglePictureWidget(),
+        }
+
     def __init__(self, event=None, **kwargs):
         self.event = event
         super().__init__(**kwargs)
 
-    def add_prefix(self, field_name):
-        # look up field name; return original if not found
-        field_name = FIELD_NAME_MAPPING.get(field_name, field_name)
-        return super().add_prefix(field_name)
+    # def add_prefix(self, field_name):
+    #     # look up field name; return original if not found
+    #     field_name = FIELD_NAME_MAPPING.get(field_name, field_name)
+    #     return super().add_prefix(field_name)
 
     def clean_google_streetview_link(self):
         """ Validando o link do Google StreetViuew """
@@ -144,29 +169,4 @@ class PlaceForm(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance.event = self.event
-        return super(PlaceForm, self).save(commit)
-
-    class Meta:
-        """ Meta """
-        model = Place
-        fields = (
-            'show_location',
-            'lat',
-            'long',
-            # 'show_address',
-            # 'name',
-            # 'phone',
-            # 'zip_code',
-            # 'street',
-            # 'complement',
-            # 'number',
-            # 'village',
-            # 'city',
-            # 'reference',
-
-        )
-        widgets = {
-            'organization': forms.HiddenInput(),
-            'google_maps_img': GooglePictureWidget(),
-            'google_streetview_img': GooglePictureWidget(),
-        }
+        return super().save(commit)

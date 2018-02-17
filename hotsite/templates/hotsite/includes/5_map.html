@@ -1,6 +1,6 @@
 {% load static %}
 
-{% if event.place and event.place.show_location and event.place.lat and event.place.long %}
+{% if event.place and event.place.show_location is True and event.place.lat and event.place.long %}
     <!-- GOOGLE MAPS
     ================================= -->
     <section id="maps" class="maps-section section">

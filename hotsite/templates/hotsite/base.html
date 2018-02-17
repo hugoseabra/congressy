@@ -40,7 +40,7 @@
 
 {% block scripts %}{% endblock %}
 
-{% if event.place and event.place.show_location and event.place.lat and event.place.long %}
+{% if event.place and event.place.show_location is True and event.place.lat and event.place.long %}
 <script src="https://maps.googleapis.com/maps/api/js?sensor=false&key={{ google_maps_api_key }}"></script>
 <script src="{% static 'hotsite/js/maplace-0.1.3.min.js' %}"></script>
 <script>

@@ -351,11 +351,10 @@ class SubscriptionAddFormView(SubscriptionFormMixin):
 
     def can_access(self):
         event = self.get_event()
-        enabled = event.subscription_type != event.SUBSCRIPTION_DISABLED
         can_manage = self.request.user.has_perm(
             'gatheros_event.can_manage_subscriptions',
             event
-        ) if enabled else False
+        )
 
         if event.subscription_type == event.SUBSCRIPTION_SIMPLE:
             return can_manage

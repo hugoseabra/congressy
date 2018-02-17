@@ -33,7 +33,10 @@ class BaseEventView(AccountMixin, View):
             try:
                 kwargs.update({'instance': event.place})
             except AttributeError:
-                pass
+                del kwargs['instance']
+
+        elif 'instance' in kwargs:
+            del kwargs['instance']
 
         return forms.PlaceForm(**kwargs)
 
@@ -163,18 +166,10 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     def get_success_url(self):
         form = self.get_form()
         event = form.instance
-        if event.subscription_type == event.SUBSCRIPTION_DISABLED:
-            url = reverse(
-                'event:event-hotsite',
-                kwargs={'pk': event.pk}
-            )
-        else:
-            url = reverse(
-                'event:event-panel',
-                kwargs={'pk': event.pk}
-            )
-
-        return url
+        return reverse(
+            'event:event-panel',
+            kwargs={'pk': event.pk}
+        )
 
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):

@@ -139,7 +139,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         {% render_generic_field form.subscription_type %}
                                     </div>
                                 </div>
@@ -167,7 +167,7 @@
                                         {% render_generic_field place_form.long %}
                                     </div>
                                 </div>
-                                <div class="row map-field" {% if not object.place or not object.place.lat or not object.place.long %}style="display:none"{% endif %}>
+                                <div class="row map-field" style="display: none">
                                     <div class="col-md-12">
                                         <div id="gmap"></div>
                                     </div>
@@ -269,7 +269,7 @@
     <script src="{% static 'hotsite/js/maplace-0.1.3.min.js' %}"></script>
     <script>
     $(document).ready(function() {
-        {% if object.place and object.place.lat and object.place.long %}
+        {% if object.place and object.place.show_location is True %}
             show_location(true);
         {% endif %}
     });
