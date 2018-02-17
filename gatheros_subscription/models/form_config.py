@@ -170,6 +170,7 @@ class FormConfig(models.Model):
 
     @property
     def institution_show(self):
+        print(self.institution);
         return self.institution == \
                FormConfig.INSTITUTION_SHOW or FormConfig.INSTITUTION_REQUIRED
 

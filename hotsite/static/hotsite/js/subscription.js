@@ -7,10 +7,6 @@ $(document).ready(function () {
     var city_el = $('#id_city_name');
     var uf_el = $("#id_state");
 
-
-
-
-
     $('#id_state').change(function () {
         city_el.empty();
 
@@ -32,9 +28,10 @@ $(document).ready(function () {
 });
 
 
-function fetch_cities(uf_el, selected_value) {
+function fetch_cities(uf_el, selected_value, callback) {
     uf_el = $(uf_el);
     selected_value = selected_value || '';
+    callback = callback || null;
 
     var city_el = $('#id_city_name');
     $.ajax({
@@ -60,6 +57,10 @@ function fetch_cities(uf_el, selected_value) {
             city_el.html(listitems.join(''));
             city_el.prop('disabled', false);
 
+            if (callback) {
+                console.log(result.results);
+                callback(result.results)
+            }
         }
     });
 

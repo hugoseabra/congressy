@@ -20,7 +20,7 @@
             var radios = $('input[type=radio]');
             radios.iCheck({
                 checkboxClass: 'icheckbox_flat-grey',
-                radioClass: 'iradio_flat-grey',
+                radioClass: 'iradio_flat-grey'
             });
             radios.prop('disabled', 'disabled');
 
@@ -29,6 +29,25 @@
                 app.switcheryElements['id_phone'].disable();
                 app.switcheryElements['id_city'].disable();
             }, 200);
+
+            // Fields which are not influenced by paied lotes.
+            var fields_not_required = [
+                'institution',
+                'function'
+            ];
+
+            $.each(fields_not_required, function(i, f_name) {
+                for (var ii = 0; ii < 3; ii++) {
+                    var el = $('#id_'+f_name+'_'+ii);
+                    if (el.length) {
+                        el.removeAttr('disabled');
+                        el.iCheck({
+                            checkboxClass: 'icheckbox_flat-grey',
+                            radioClass: 'iradio_flat-blue'
+                        });
+                    }
+                }
+            });
         };
 
         // @TODO é o que vier da edição, se houver valor

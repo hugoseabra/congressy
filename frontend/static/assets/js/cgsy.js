@@ -2,7 +2,7 @@
 $(document).ready(function() {
     $('#mobile-top-menu-button').click(function() {
         var block = $("#mobile-top-menu");
-        console.log(block);
+
         var right = 0;
 
         if ($(this).hasClass('active')) {
@@ -82,6 +82,58 @@ function showHideCepLoader(show) {
     }
 }
 
+/**
+ * Remove acentos de strings
+ * @param  {String} string acentuada
+ * @return {String} string sem acento
+ */
+
+var map = {
+    "â":"a",
+    "Â":"A",
+    "à":"a",
+    "À":"A",
+    "á":"a",
+    "Á":"A",
+    "ã":"a",
+    "Ã":"A",
+    "ê":"e",
+    "Ê":"E",
+    "è":"e",
+    "È":"E",
+    "é":"e",
+    "É":"E",
+    "î":"i",
+    "Î":"I",
+    "ì":"i",
+    "Ì":"I",
+    "í":"i",
+    "Í":"I",
+    "õ":"o",
+    "Õ":"O",
+    "ô":"o",
+    "Ô":"O",
+    "ò":"o",
+    "Ò":"O",
+    "ó":"o",
+    "Ó":"O",
+    "ü":"u",
+    "Ü":"U",
+    "û":"u",
+    "Û":"U",
+    "ú":"u",
+    "Ú":"U",
+    "ù":"u",
+    "Ù":"U",
+    "ç":"c",
+    "Ç":"C"
+};
+
+function removerAcentos(s){
+    return s.replace(/[\W\[\] ]/g,function(a){return map[a]||a})
+};
+
+
 var zip_code_el = $('#id_zip_code');
 var zip_code_initial_value = zip_code_el.val();
 function searchByCep() {
@@ -113,7 +165,8 @@ function searchByCep() {
     var number = $('#id_number');
     var complement = $('#id_complement');
     var village = $('#id_village');
-    // var city = $('#id_city');
+    var state = $('#id_state');
+    var city = $('#id_city');
 
     street.val('');
     number.val('');
@@ -136,7 +189,19 @@ function searchByCep() {
 
         street.val(response.logradouro);
         village.val(response.bairro);
-        // city.val('');
+        state.val(response.uf);
+
+        var cep_city = removerAcentos(response.localidade).toUpperCase();
+        console.log(cep_city);
+
+        fetch_cities(state, null, function(cities) {
+            $.each(cities, function(i, city) {
+               if (cep_city === removerAcentos(city.name)) {
+                   $('#id_city_name').val(city.id);
+                   $('#id_city').val(city.id);
+               }
+            });
+        });
 
         showHideCepLoader(false);
         window.setTimeout(function() { $('#id_street').focus(); }, 100);
