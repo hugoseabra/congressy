@@ -204,14 +204,15 @@ class Place(models.Model, GatherosModelMixin):
                 prefix=', '
             ) + 'CEP: ' + self.get_formatted_zip_code()
 
-        address += self._add_prefix(
-            self.street,
-            self.number,
-            self.complement,
-            self.village,
-            self.zip_code,
-            prefix=' - '
-        ) + self.city.name + '-' + self.city.uf + '.'
+            if self.city:
+                address += self._add_prefix(
+                    self.street,
+                    self.number,
+                    self.complement,
+                    self.village,
+                    self.zip_code,
+                    prefix=' - '
+                ) + self.city.name + '-' + self.city.uf + '.'
 
         if self.reference:
             address += ' Referência: ' + self.reference
