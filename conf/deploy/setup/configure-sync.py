@@ -22,13 +22,20 @@ if not bucketname:
     sys.exit(1)
 
 
+CRON_IN = os.getenv('CRON_SYNC_MINUTES_IN')
+CRON_SYNC_MINUTES_IN = CRON_IN if len(CRON_IN) > 0 else 5
+
+CRON_OUT = os.getenv('CRON_SYNC_MINUTES_OUT')
+CRON_SYNC_MINUTES_OUT = CRON_OUT if len(CRON_OUT) > 0 else 8
+
+
 # create dictionary of environment variables
 env_dict = {
     'AWS_KEY': aws_key,
     'AWS_SECRET': aws_secret,
     'BUCKET_LOCATION': os.environ.get('BUCKET_LOCATION', 'us-east-1'),
-    'CRON_SYNC_MINUTES_IN': os.environ.get('CRON_SYNC_MINUTES_IN', 5),
-    'CRON_SYNC_MINUTES_OUT': os.environ.get('CRON_SYNC_MINUTES_OUT', 8),
+    'CRON_SYNC_MINUTES_IN': CRON_SYNC_MINUTES_IN,
+    'CRON_SYNC_MINUTES_OUT': CRON_SYNC_MINUTES_OUT,
     'BUCKET_NAME': os.environ.get('BUCKET_NAME', default_bucket_name),
 }
 
