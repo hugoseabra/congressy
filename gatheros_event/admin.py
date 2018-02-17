@@ -93,6 +93,7 @@ class PersonAdmin(admin.ModelAdmin):
     """
     Admin para Person
     """
+    search_fields = ('name', 'email',)
     list_display = ('name', 'gender', 'user', 'created')
     ordering = ('created', 'name')
     readonly_fields = [
@@ -232,6 +233,7 @@ class MemberAdmin(admin.ModelAdmin):
     """
     Admin para Member
     """
+    search_fields = ('persno__name', 'person__email', 'organization__name',)
     list_display = ('organization', 'person', 'group', 'pk')
     ordering = ('organization', 'person')
 

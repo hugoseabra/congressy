@@ -224,6 +224,37 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         context = self.get_context_data(**kwargs)
         context['remove_preloader'] = False
 
+        # Pode acontecer caso que há usuário e não há pessoa.
+        def save_person(user=None):
+            self.initial = {
+                'email': email,
+                'name': name
+            }
+
+            form = self.get_form()
+            form.setAsRequired('email')
+
+            if not form.is_valid():
+                context['form'] = form
+                return self.render_to_response(context)
+
+            with transaction.atomic():
+                person = form.save()
+
+                if not user:
+                    # Criando usuário
+                    user = User.objects.create_user(
+                        username=email,
+                        email=email
+                    )
+                    person.user = user
+                    person.save()
+
+                self._configure_brand_person(person)
+
+                return person
+
+
         # CONDIÇÃO 1
         user = self.request.user
 
@@ -268,41 +299,26 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
         # Condição 4
         elif has_account:
+            # Override anonymous user
             user = User.objects.get(email=email)
-            person = user.person
+
+            try:
+                person = user.person
+            except AttributeError:
+                # Garante que usuário sempre terá pessoa.
+                person = save_person(user)
 
         # Condição 5
         else:
-            self.initial = {
-                'email': email,
-                'name': name
-            }
-
-            form = self.get_form()
-            form.setAsRequired('email')
-
-            if not form.is_valid():
-                context['form'] = form
-                return self.render_to_response(context)
-
-
-            with transaction.atomic():
-                person = form.save()
-
-                # Criando usuário
-                user = User.objects.create_user(username=email, email=email)
-                person.user = user
-                person.save()
-
-                self._configure_brand_person(person)
+            # Nova pessoa.
+            person = save_person()
 
         # Inscrição realizada com participante autenticado.
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, user)
 
         if not has_logged:
-            # Remove last login para funcionar o reset da senha
-            # posteriormente.
+            # Remove last login para funcionar o reset da senha posteriormente.
             user.last_login = None
             user.save()
 
