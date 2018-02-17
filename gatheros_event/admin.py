@@ -195,6 +195,9 @@ class PlaceAdmin(admin.ModelAdmin):
             'fields': (
                 'name',
                 'event',
+                'show_location',
+                'lat',
+                'long',
             ),
         }),
         ('Endereço', {
@@ -207,11 +210,11 @@ class PlaceAdmin(admin.ModelAdmin):
                 'city',
             ),
         }),
-        ('Google Maps (Street View)', {
-            'fields': (
-                'google_street_view_link',
-            ),
-        }),
+        # ('Google Maps (Street View)', {
+        #     'fields': (
+        #         'google_street_view_link',
+        #     ),
+        # }),
     )
 
 

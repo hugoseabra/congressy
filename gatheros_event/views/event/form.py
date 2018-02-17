@@ -27,18 +27,18 @@ class BaseEventView(AccountMixin, View):
         return self.event
 
     def get_place_form(self, **kwargs):
+        if 'instance' in kwargs:
+            del kwargs['instance']
+
         event = self.get_event()
 
-        if 'instance' in kwargs:
-            if event:
-                kwargs.update({'event': event})
-                try:
-                    kwargs.update({'instance': event.place})
-                except AttributeError:
-                    del kwargs['instance']
+        if event:
+            kwargs.update({'event': event})
 
-            else:
-                del kwargs['instance']
+            try:
+                kwargs.update({'instance': event.place})
+            except AttributeError:
+                pass
 
         return forms.PlaceForm(**kwargs)
 
