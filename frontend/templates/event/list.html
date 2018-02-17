@@ -136,15 +136,9 @@
                                     </td>
                                     <td>{{ event.category.name }}</td>
                                     <td>
-                                        {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
-
-                                            {{ event.subscriptions.all|length }}
-                                            {% if event.limit %} /
-                                                {{ event.limit }}
-                                            {% endif %}
-
-                                        {% else %}
-                                            -----
+                                        {{ event.subscriptions.all|length }}
+                                        {% if event.limit %} /
+                                            {{ event.limit }}
                                         {% endif %}
                                     </td>
                                     <td>

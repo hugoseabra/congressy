@@ -73,9 +73,6 @@ class EventMixin(generic.View):
         return False
 
     def subscription_enabled(self):
-        if self.event.subscription_type == Event.SUBSCRIPTION_DISABLED:
-            return False
-
         lots = self.get_lots()
         if len(lots) == 0:
             return False

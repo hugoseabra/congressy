@@ -19,23 +19,21 @@
         </div>
     {% endif %}
 
-    {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
-        <br/>
-        <div style="background-color: whitesmoke;border: 1px solid #DDD;">
-            <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
-                Inscrições
-            </div>
-            {% if can_view_lots %}
-                <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:lot-list' object.pk %}">Lotes</a></div>
-            {% endif %}
-            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:event-fields-config' object.pk %}">Configuração de Formulário</a></div>
-            {% if can_manage_subscriptions %}
-                <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-list' object.pk %}">Inscrições</a></div>
-            {% endif %}
-            {% comment %}<div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>{% endcomment %}
-            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscriptions-export' object.pk %}">Exportação de dados</a></div>
+    <br/>
+    <div style="background-color: whitesmoke;border: 1px solid #DDD;">
+        <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
+            Inscrições
         </div>
-    {% endif %}
+        {% if can_view_lots %}
+            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:lot-list' object.pk %}">Lotes</a></div>
+        {% endif %}
+        <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:event-fields-config' object.pk %}">Configuração de Formulário</a></div>
+        {% if can_manage_subscriptions %}
+            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-list' object.pk %}">Inscrições</a></div>
+        {% endif %}
+        {% comment %}<div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>{% endcomment %}
+        <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscriptions-export' object.pk %}">Exportação de dados</a></div>
+    </div>
 {% endblock %}
 
 {% block content %}
@@ -266,62 +264,62 @@
                         {% endif %}
                     {% endif %}
                 </form>
-                {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
-                    {% event_payment_type object as payment_type %}
-                    {% if payment_type == 'free' %}
-                        <div style="padding: 10px 0 0;text-align: center">
-                            <div style="text-align: left;"><strong>Tipo de
-                                inscrição:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                Gratuitas
+
+                {% event_payment_type object as payment_type %}
+                {% if payment_type == 'free' %}
+                    <div style="padding: 10px 0 0;text-align: center">
+                        <div style="text-align: left;"><strong>Tipo de
+                            inscrição:</strong></div>
+                        <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                            Gratuitas
+                        </div>
+                        {% if object.subscription_offline %}
+                            <div style="color: dimgray;padding:10px">
+                                <strong>Inscrições off-line ativas</strong>
                             </div>
-                            {% if object.subscription_offline %}
-                                <div style="color: dimgray;padding:10px">
-                                    <strong>Inscrições off-line ativas</strong>
-                                </div>
+                        {% endif %}
+                        <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                            {% if can_change %}
+                                <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
                             {% endif %}
-                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                {% if can_change %}
-                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
-                                {% endif %}
-                            </div>
                         </div>
-                    {% elif payment_type == 'mixed' %}
-                        <div style="padding: 10px 0 30px;text-align: center">
-                            <div style="text-align: left;"><strong>Tipo de
-                                inscrição:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                Mistas
+                    </div>
+                {% elif payment_type == 'mixed' %}
+                    <div style="padding: 10px 0 30px;text-align: center">
+                        <div style="text-align: left;"><strong>Tipo de
+                            inscrição:</strong></div>
+                        <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                            Mistas
+                        </div>
+                        <div style="color: dimgray;padding:10px">Gratuitas e
+                            pagas
+                        </div>
+                        {% if object.subscription_offline %}
+                            <div style="color: dimgray;padding:10px">
+                                <strong>Inscrições off-line ativas</strong>
                             </div>
-                            <div style="color: dimgray;padding:10px">Gratuitas e
-                                pagas
-                            </div>
-                            {% if object.subscription_offline %}
-                                <div style="color: dimgray;padding:10px">
-                                    <strong>Inscrições off-line ativas</strong>
-                                </div>
+                        {% endif %}
+                        <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                            {% if can_change %}
+                                <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
                             {% endif %}
-                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                {% if can_change %}
-                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
-                                {% endif %}
-                            </div>
                         </div>
-                    {% elif payment_type == 'paied' %}
-                        <div style="padding: 10px 0 0;text-align: center">
-                            <div style="text-align: left;"><strong>Tipo de
-                                inscrição:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                Pagas
-                            </div>
-                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                {% if can_change %}
-                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
-                                {% endif %}
-                            </div>
+                    </div>
+                {% elif payment_type == 'paied' %}
+                    <div style="padding: 10px 0 0;text-align: center">
+                        <div style="text-align: left;"><strong>Tipo de
+                            inscrição:</strong></div>
+                        <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                            Pagas
                         </div>
-                    {% endif %}
+                        <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                            {% if can_change %}
+                                <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                            {% endif %}
+                        </div>
+                    </div>
                 {% endif %}
+
                 {% if object.subscription_type == object.SUBSCRIPTION_BY_LOTS %}
                     <div style="padding: 10px 0 0;border-bottom: 1px solid #DDDDDD">
                         <div style="text-align: left">

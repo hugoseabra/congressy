@@ -270,58 +270,56 @@
             <div class="panel panel-primary">
                 <div class="panel-body">
 
-                    {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
-                        <div style="padding: 10px 0 0;text-align: center;">
+                    <div style="padding: 10px 0 0;text-align: center;">
 
-                        </div>
+                    </div>
 
-                        {% event_payment_type object as payment_type %}
-                        {% if payment_type == 'free' %}
-                            <div style="padding: 10px 0 0;text-align: center">
-                                <div style="text-align: left;"><strong>Tipo de
-                                    inscrição:</strong></div>
-                                <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                    Gratuitas
-                                </div>
-                                {% if object.subscription_offline %}
-                                    <div style="color: dimgray;padding:10px">
-                                        <strong>Inscrições off-line
-                                            ativas</strong>
-                                    </div>
-                                {% endif %}
-                                <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                    {% if can_change %}
-                                        <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
-                                    {% endif %}
-                                </div>
+                    {% event_payment_type object as payment_type %}
+                    {% if payment_type == 'free' %}
+                        <div style="padding: 10px 0 0;text-align: center">
+                            <div style="text-align: left;"><strong>Tipo de
+                                inscrição:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                Gratuitas
                             </div>
-                        {% elif payment_type == 'mixed' %}
-                            <div style="padding: 10px 0 30px;text-align: center">
-                                <div style="text-align: left;"><strong>Tipo de
-                                    inscrição:</strong></div>
-                                <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                    Mistas
-                                </div>
+                            {% if object.subscription_offline %}
                                 <div style="color: dimgray;padding:10px">
-                                    Gratuitas e
-                                    pagas
+                                    <strong>Inscrições off-line
+                                        ativas</strong>
                                 </div>
-                                {% if object.subscription_offline %}
-                                    <div style="color: dimgray;padding:10px">
-                                        <strong>Inscrições off-line
-                                            ativas</strong>
-                                    </div>
+                            {% endif %}
+                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                {% if can_change %}
+                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
                                 {% endif %}
                             </div>
-                        {% elif payment_type == 'paied' %}
-                            <div style="padding: 10px 0 0;text-align: center">
-                                <div style="text-align: left;"><strong>Tipo de
-                                    inscrição:</strong></div>
-                                <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                    Pagas
-                                </div>
+                        </div>
+                    {% elif payment_type == 'mixed' %}
+                        <div style="padding: 10px 0 30px;text-align: center">
+                            <div style="text-align: left;"><strong>Tipo de
+                                inscrição:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                Mistas
                             </div>
-                        {% endif %}
+                            <div style="color: dimgray;padding:10px">
+                                Gratuitas e
+                                pagas
+                            </div>
+                            {% if object.subscription_offline %}
+                                <div style="color: dimgray;padding:10px">
+                                    <strong>Inscrições off-line
+                                        ativas</strong>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% elif payment_type == 'paied' %}
+                        <div style="padding: 10px 0 0;text-align: center">
+                            <div style="text-align: left;"><strong>Tipo de
+                                inscrição:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                Pagas
+                            </div>
+                        </div>
                     {% endif %}
 
 

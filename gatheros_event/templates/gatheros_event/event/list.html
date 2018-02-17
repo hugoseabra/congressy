@@ -52,12 +52,10 @@
                                         )
                                     {% endif %}
                                 </p>
-                                {% if event.subscription_type != event.SUBSCRIPTION_DISABLED %}
-                                    <p>
-                                        <strong>Inscrições:</strong>
-                                        {{ event.subscriptions.all|length }}{% if event.limit %} / {{ event.limit }}{% endif %}
-                                    </p>
-                                {% endif %}
+                                <p>
+                                    <strong>Inscrições:</strong>
+                                    {{ event.subscriptions.all|length }}{% if event.limit %} / {{ event.limit }}{% endif %}
+                                </p>
                             </div>
                         </td>
                         <td width="5%"

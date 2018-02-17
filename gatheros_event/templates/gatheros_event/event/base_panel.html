@@ -22,23 +22,22 @@
             {# <div style="padding:15px">&rightarrow; <a href="#">Seções</a></div>#}
         </div>
     {% endif %}
-    {% if object.subscription_type != object.SUBSCRIPTION_DISABLED %}
-        <br/>
-        <div style="background-color: whitesmoke;border: 1px solid #DDD;">
-            <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
-                Inscrições
-            </div>
-            {% if can_view_lots %}
-                <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:lot-list' object.pk %}">Lotes</a></div>
-            {% endif %}
-{#            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:event-fields-config' object.pk %}">Configuração de Formulário</a></div>#}
-            {% if can_manage_subscriptions %}
-                <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-list' object.pk %}">Inscrições</a></div>
-            {% endif %}
-{#            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>#}
-            <div style="padding:15px">&rightarrow; <a href="#">Exportação de dados</a></div>
+
+    <br/>
+    <div style="background-color: whitesmoke;border: 1px solid #DDD;">
+        <div style="background-color: #666666;color:#fff;padding:10px;text-transform: uppercase;">
+            Inscrições
         </div>
-    {% endif %}
+        {% if can_view_lots %}
+            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:lot-list' object.pk %}">Lotes</a></div>
+        {% endif %}
+        {#            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:event-fields-config' object.pk %}">Configuração de Formulário</a></div>#}
+        {% if can_manage_subscriptions %}
+            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-list' object.pk %}">Inscrições</a></div>
+        {% endif %}
+        {#            <div style="padding:15px">&rightarrow; <a href="{% url 'subscription:subscription-attendance-search' object.pk %}">Credenciamento</a></div>#}
+        <div style="padding:15px">&rightarrow; <a href="#">Exportação de dados</a></div>
+    </div>
 {% endblock %}
 
 {% block content %}{% endblock %}
