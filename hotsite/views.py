@@ -313,6 +313,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         else:
             # Nova pessoa.
             person = save_person()
+            user = person.user
 
         # Inscrição realizada com participante autenticado.
         user.backend = 'django.contrib.auth.backends.ModelBackend'
