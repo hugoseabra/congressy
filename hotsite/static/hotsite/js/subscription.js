@@ -1,11 +1,9 @@
 $(document).ready(function () {
-    $('#id_phone').mask("(99) 9 9999-9999");
+    $('#id_phone').mask("(99) 99999-9999");
     $('#id_cpf').mask("999.999.999-99");
 
 
-    var city_id = $("#id_city").val();
     var city_el = $('#id_city_name');
-    var uf_el = $("#id_state");
 
     $('#id_state').change(function () {
         city_el.empty();
@@ -17,8 +15,7 @@ $(document).ready(function () {
         }, 500);
     });
 
-
-    $('#id_city_name').change(function () {
+    city_el.change(function () {
         $("#id_city").val($(this).val());
     });
 

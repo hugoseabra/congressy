@@ -71,27 +71,27 @@
         {% else %}
             allowed_transactions = null;
         {% endif %}
-        $('#id_button_pay').on('click', function () {
-            process_payment(
-                '{{ pagarme_encryption_key }}',
-                '{{ event.name }}',
-                lots,
-                allowed_transactions
-            );
-        });
 
         $(document).ready(function() {
-            {% if person.city %}
+            $('#id_button_pay').on('click', function () {
+                process_payment(
+                    '{{ pagarme_encryption_key }}',
+                    '{{ event.name }}',
+                    lots,
+                    allowed_transactions
+                );
+            });
+
             var city_id = $("#id_city").val();
             var city_el = $('#id_city_name');
             var uf_el = $("#id_state");
 
-            if (city_id !== undefined && city_id !== null) {
+            {% if person.city %}
                 uf_el.val('{{ person.city.uf }}');
+            if (city_id !== undefined && city_id !== null) {
                 fetch_cities(uf_el, city_id);
-
             } else {
-                city_el.prop('disabled', true);
+                fetch_cities(uf_el, city_id);
             }
             {% else %}
                 city_el.prop('disabled', true);
