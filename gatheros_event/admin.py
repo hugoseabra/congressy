@@ -156,7 +156,7 @@ class OrganizationAdmin(admin.ModelAdmin):
     Admin para Organization
     """
     search_fields = ('name',)
-    list_display = ('name', 'active', 'internal')
+    list_display = ('name', 'legal_name', 'active', 'internal')
     fieldsets = (
         (None, {
             'fields': (
