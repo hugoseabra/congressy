@@ -247,8 +247,9 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                         username=email,
                         email=email
                     )
-                    person.user = user
-                    person.save()
+
+                person.user = user
+                person.save()
 
                 self._configure_brand_person(person)
 
