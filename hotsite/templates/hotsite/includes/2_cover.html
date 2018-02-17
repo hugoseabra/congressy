@@ -31,7 +31,7 @@
                             <i class="fa fa-calendar"></i>
                             {{ event.get_period }}
                         </div>
-                        {% if event.place %}
+                        {% if event.place and event.place.name %}
                             <div>
                                 <i class="fa fa-map-marker"></i>
                                 {{ event.place.name }}
