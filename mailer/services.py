@@ -1,7 +1,10 @@
 """ Mailer service. """
 import absoluteuri
 from django.conf import settings
+from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 CELERY = False
 
@@ -60,15 +63,11 @@ def notify_new_subscription(event, subscription):
     )
 
 
-def notify_new_user_and_subscription(event, subscription, link):
+def notify_new_user_and_subscription(event, subscription):
     """
     Define a notificação para uma nova inscrição com novo user
     """
     person = subscription.person
-
-    local = '{}'.format(
-        event.place,
-    )
 
     event_url = absoluteuri.reverse(
         'public:hotsite',
@@ -77,18 +76,28 @@ def notify_new_user_and_subscription(event, subscription, link):
         }
     )
 
+    user = person.user
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+
+    password_reset_url = absoluteuri.reverse(
+        'password_reset_confirm',
+        kwargs={
+            'uidb64': uid,
+            'token': token,
+        }
+    )
+
     # @TODO set event.date_start to period
     body = render_to_string('mailer/notify_user_and_subscription.html', {
+        'password_reset_url': password_reset_url,
         'event': event,
         'event_url': event_url,
         # 'gender_article': 'a' if person.gender == 'F' else 'o',
-        'gender_article': 'o(a)',
         'person': person,
         'period': event.date_start,
         'count': subscription.count,
-        'complete_sign_up_link': link,
         'date': subscription.created,
-        'local': local
     })
 
     if CELERY:

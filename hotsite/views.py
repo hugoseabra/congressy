@@ -22,11 +22,12 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 
 from gatheros_event.forms import PersonForm
-from gatheros_event.models import Event, Info, Member, Organization
+from gatheros_event.models import Event, Person, Info, Member, Organization
 from gatheros_subscription.models import Subscription, FormConfig, Lot
 from mailer.services import (
     notify_new_user,
     notify_new_subscription,
+    notify_new_user_and_subscription,
 )
 from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
@@ -73,6 +74,7 @@ class EventMixin(generic.View):
         return False
 
     def subscription_enabled(self):
+
         lots = self.get_lots()
         if len(lots) == 0:
             return False
@@ -175,6 +177,16 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
 
         return False
 
+    def subscriber_has_logged(self, email):
+        try:
+            user = User.objects.get(email=email)
+            return user.last_login is not None
+
+        except User.DoesNotExist:
+            pass
+
+        return False
+
 
 class HotsiteView(SubscriptionFormMixin, generic.View):
     template_name = 'hotsite/main.html'
@@ -182,19 +194,38 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)
     def post(self, request, *args, **kwargs):
+        """
+        CONDIÇÃO 1 - Usuário logado:
+            - redireciona para página de formulário de inscrição.
 
-        user = self.request.user
+        CONDIÇÃO 2 - Nome e/ou e-mail não informado:
+            - retorna a página com mensagem de erro
 
-        if user.is_authenticated:
-            email = user.email
-            name = user.person.name
+        CONDIÇÃO 3 - Usuário não logado, possui conta e já logou:
+            - Caso já tenha logado, pedir para entrar com suas credenciais;
 
-        else:
-            name = self.request.POST.get('name')
-            email = self.request.POST.get('email')
+        CONDIÇÃO 4 - Usuário não logado, possui conta e nunca logou:
+            - Caso nunca tenha logado, o sistema deve se comportar como um
+              usuário novo;
+            - redireciona para página de inscrição;
 
+        CONDIÇÃO 5 - Usuário não logado, não possui conta:
+            - Cria pesssoa;
+            - Se dados válidos, cria pessoa;
+            - Se dados não válidos, retorna para formulário com mensagem de
+              erro;
+            - Cria configurar pessoa (organização interna);
+            - Cria usuário;
+            - redireciona para página de inscrição;
+        """
         if not self.subscription_enabled():
             return HttpResponseNotAllowed([])
+
+        context = self.get_context_data(**kwargs)
+        context['remove_preloader'] = False
+
+        # CONDIÇÃO 1
+        user = self.request.user
 
         if user.is_authenticated:
             return redirect(
@@ -202,9 +233,10 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                 slug=self.event.slug
             )
 
-        context = self.get_context_data(**kwargs)
-        context['remove_preloader'] = False
+        name = self.request.POST.get('name')
+        email = self.request.POST.get('email')
 
+        # CONDIÇÃO 2
         if not name or not email:
             messages.error(
                 self.request,
@@ -213,10 +245,13 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
             context['name'] = name
             context['email'] = email
-
             return self.render_to_response(context)
 
-        if user.is_anonymous and self.subscriber_has_account(email):
+        # CONDIÇÃO 3
+        has_account = self.subscriber_has_account(email)
+        has_logged = self.subscriber_has_logged(email)
+
+        if has_account and has_logged:
             messages.info(
                 self.request,
                 'Faça login para continuar sua inscrição.'
@@ -231,15 +266,13 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
             return redirect(login_url)
 
-        with transaction.atomic():
-            # Criando usuário
-            password = str(uuid4())
-            user = User.objects.create_user(
-                username=email,
-                email=email,
-                password=password
-            )
+        # Condição 4
+        elif has_account:
+            user = User.objects.get(email=email)
+            person = user.person
 
+        # Condição 5
+        else:
             self.initial = {
                 'email': email,
                 'name': name
@@ -252,17 +285,24 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                 context['form'] = form
                 return self.render_to_response(context)
 
-            person = form.save()
-            person.user = user
-            person.save()
 
-            self._configure_brand_person(person)
-            self._notify_new_account(user)
+            with transaction.atomic():
+                person = form.save()
 
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
-            login(request, user)
+                # Criando usuário
+                user = User.objects.create_user(username=email, email=email)
+                person.user = user
+                person.save()
 
-            # Remove last login para funcionar o reset da senha posteriormente.
+                self._configure_brand_person(person)
+
+        # Inscrição realizada com participante autenticado.
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(request, user)
+
+        if not has_logged:
+            # Remove last login para funcionar o reset da senha
+            # posteriormente.
             user.last_login = None
             user.save()
 
@@ -291,24 +331,6 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                     person=person,
                     group=Member.ADMIN
                 )
-
-    def _notify_new_account(self, user):
-
-        url = absoluteuri.reverse(
-            'password_reset_confirm',
-            kwargs={
-                'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user)
-            }
-        )
-
-        context = {
-            'email': user.email,
-            'url': url,
-            'site_name': get_current_site(self.request)
-        }
-
-        notify_new_user(context)
 
 
 class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
@@ -388,13 +410,60 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         return cxt
 
     def post(self, request, *args, **kwargs):
+        """
+        CONDIÇÃO 1: usuário não autenticado ou inscrições não disponíveis
+            - retorna a página inicial
 
-        request.POST = request.POST.copy()
+        CONDIÇÃO 2: dados inválidos
+            - retorna a página de inscrição com devidas mensagens de erro(s)
+
+        CONDIÇÃO 3: verificação de conta (nova ou usuáro ativo [já logou])
+            - seta uma 'flag' da verficação para futuras condicionais
+
+        CONDIÇÃO 4: usuário já inscrito
+            - seta uma 'flag' da verficação para futuras condicionais
+
+        CONDIÇÃO 5: inscrição gratuita
+            - se inscrição não existe, cria inscrição
+            - se inscrição já existe, edit inscrição
+            - notifica usuário;
+            - redireciona para página inicial;
+
+        CONDIÇÃO 6: lote pago, ação proibido
+            - verificação: não há lotes pagos e transação não permitida
+            - redireciona usuário para página de inscrição com mensagem e erro
+
+        CONDIÇÃO 7: lote pago, transação permitida
+            - se inscrição não existe, cria inscrição
+            - se inscrição já existe, edit inscrição
+            - processa pagamento;
+            - notifica usuário;
+            - redireciona para página de status
+        """
+        context = self.get_context_data(**kwargs)
+        context['remove_preloader'] = True
 
         user = self.request.user
 
+        # CONDIÇÃO 7
+        if self.has_paid_lots():
+            allowed_transaction = request.POST.get(
+                'allowed_transaction',
+                False
+            )
+
+            # CONDIÇÃO 6
+            if allowed_transaction:
+                request.session['allowed_transaction'] = allowed_transaction
+                slug = kwargs.get('slug')
+                return redirect('public:hotsite-subscription', slug=slug)
+
+        # CONDIÇÃO 1
         if not user.is_authenticated or not self.subscription_enabled():
             return HttpResponseNotAllowed([])
+
+        # CONDIÇÃO 2
+        request.POST = request.POST.copy()
 
         def clear_string(field_name):
             if field_name not in request.POST:
@@ -408,59 +477,70 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         clear_string('cpf')
         clear_string('zip_code')
 
-        context = self.get_context_data(**kwargs)
-        context['remove_preloader'] = True
+        form = self.get_form()
 
-        allowed_transaction = request.POST.get('allowed_transaction', False)
+        if not form.is_valid():
+            context['slug'] = kwargs.get('slug')
+            context['form'] = form
+            return self.render_to_response(context)
 
-        if allowed_transaction:
-            request.session['allowed_transaction'] = allowed_transaction
-            slug = kwargs.get('slug')
-            return HttpResponseRedirect(
-                reverse('public:hotsite-subscription', args={slug}))
+        person = form.save()
 
-        with transaction.atomic():
-            form = self.get_form()
-            if form.initial and not form.is_valid():
-                slug = kwargs.get('slug')
-                context['form'] = form
-                context['slug'] = slug
+        # CONDIÇÃO 3
+        new_account = user.last_login is None
+
+        # CONDIÇÃO 4
+        new_subscription = False
+
+        try:
+            subscription = Subscription.objects.get(
+                person=person,
+                event=self.event
+            )
+        except Subscription.DoesNotExist:
+            subscription = Subscription(
+                person=person,
+                event=self.event,
+                created_by=user.id
+            )
+            new_subscription = True
+
+        # Resgata e verifica lote se houver
+        if 'lot' in request.POST:
+            lot_pk = self.request.POST.get('lot')
+
+            # Garante que o lote é do evento
+            try:
+                lot = self.event.lots.get(pk=lot_pk)
+            except Lot.DoesNotExist:
+                messages.error(
+                    self.request,
+                    "Este lote não pertence a este evento."
+                )
                 return self.render_to_response(context)
 
-            if not form.is_valid():
-                context['form'] = form
-                return self.render_to_response(context)
+        else:
+            # Inscrição simples
+            lot = self.event.lots.first()
 
-            if self.has_paid_lots() and 'transaction_type' not in request.POST:
+        # Insere ou edita lote
+        subscription.lot = lot
+
+
+        # CONDIÇÃO 7
+        if self.has_paid_lots():
+            if 'transaction_type' not in request.POST:
                 messages.error(
                     request=self.request,
                     message='Por favor escolha um tipo de pagamento.'
                 )
                 return self.render_to_response(context)
 
-            person = form.save()
 
-            if self.has_paid_lots():
-                lot_pk = self.request.POST.get('lot')
-            else:
-                lot_pk = self.event.lots.first().pk
+        # CONDIÇÃO 6
+        with transaction.atomic():
 
-            # Garante que o lote é do evento
-            lot = get_object_or_404(Lot, event=self.event, pk=lot_pk)
-            #
-            try:
-                subscription = Subscription.objects.get(lot=lot, person=person,
-                                                        event=self.event)
-                subscription.event = self.event
-                subscription.person = person
-                subscription.created_by = user.id
-            except Subscription.DoesNotExist:
-                subscription = Subscription(
-                    person=person,
-                    lot=lot,
-                    created_by=user.id
-                )
-
+            # Garante rollback da inscrição
             subscription.save()
 
             if self.has_paid_lots():
@@ -485,23 +565,30 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                     }
                     if e.message in error_dict:
                         e.message = error_dict[e.message]
+
                     messages.error(self.request, message=e.message)
                     return self.render_to_response(context)
 
-            subscription.save()
-            notify_new_subscription(self.event, subscription)
+
+            # CONDIÇÃO 5 e 7
+            if new_subscription:
+                notify_new_user_and_subscription(self.event, subscription)
+            else:
+                notify_new_subscription(self.event, subscription)
 
             messages.success(
                 self.request,
                 'Inscrição realizada com sucesso!'
             )
 
+        # CONDIÇÃO 7
         if self.has_paid_lots():
             return redirect(
                 'public:hotsite-subscription-status',
                 slug=self.event.slug
             )
 
+        # CONDIÇÃO 5
         return redirect('public:hotsite', slug=self.event.slug)
 
 

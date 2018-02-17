@@ -205,7 +205,6 @@ class Organization(models.Model, GatherosModelMixin):
         blank=True,
     )
 
-
     class Meta:
         verbose_name = 'organização'
         verbose_name_plural = 'organizações'
@@ -294,7 +293,8 @@ class Organization(models.Model, GatherosModelMixin):
 
     def is_bank_account_configured(self):
         """ Verifica se possui dados bancários cadastrado no sistema """
-        if self.agency and self.account and self.cnpj_ou_cpf and self.legal_name and self.account_type:
+        if self.agency and self.account and self.cnpj_ou_cpf \
+                and self.legal_name and self.account_type:
             return True
 
         return False
