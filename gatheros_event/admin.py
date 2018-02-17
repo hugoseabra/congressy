@@ -155,6 +155,7 @@ class OrganizationAdmin(admin.ModelAdmin):
     """
     Admin para Organization
     """
+    search_fields = ('name',)
     list_display = ('name', 'active', 'internal')
     fieldsets = (
         (None, {
@@ -174,6 +175,22 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'twitter',
                 'linkedin',
                 'skype',
+            ),
+        }),
+        ('Dados Bancários', {
+            'fields': (
+                'bank_code',
+                'agency',
+                'agencia_dv',
+                'account',
+                'conta_dv',
+                'document_type',
+                'cnpj_ou_cpf',
+                'legal_name',
+                'account_type',
+                'bank_account_id',
+                'active_recipient',
+                'recipient_id',
             ),
         }),
         ('Provedor de recebimento', {
