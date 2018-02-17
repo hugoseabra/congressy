@@ -1,13 +1,7 @@
-from uuid import uuid4
-
-import absoluteuri
-from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.http import HttpResponseNotAllowed, HttpResponseRedirect
@@ -15,17 +9,14 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
 from django.views import generic
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 
 from gatheros_event.forms import PersonForm
-from gatheros_event.models import Event, Person, Info, Member, Organization
-from gatheros_subscription.models import Subscription, FormConfig, Lot
+from gatheros_event.models import Event, Info, Member, Organization
+from gatheros_subscription.models import FormConfig, Lot, Subscription
 from mailer.services import (
-    notify_new_user,
     notify_new_subscription,
     notify_new_user_and_subscription,
 )
@@ -195,6 +186,9 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
     @method_decorator(never_cache)
     def post(self, request, *args, **kwargs):
         """
+        CONDIÇÃO 0 - Inscrições não disponíveis:
+            - redireciona para página inical.
+
         CONDIÇÃO 1 - Usuário logado:
             - redireciona para página de formulário de inscrição.
 
@@ -218,11 +212,26 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             - Cria usuário;
             - redireciona para página de inscrição;
         """
+        # CONDIÇÃO 0
         if not self.subscription_enabled():
             return HttpResponseNotAllowed([])
 
         context = self.get_context_data(**kwargs)
         context['remove_preloader'] = False
+
+        name = self.request.POST.get('name')
+        email = self.request.POST.get('email')
+
+        # CONDIÇÃO 2
+        if not name or not email:
+            messages.error(
+                self.request,
+                "Você deve informar todos os dados para fazer a sua inscrição."
+            )
+
+            context['name'] = name
+            context['email'] = email
+            return self.render_to_response(context)
 
         # Pode acontecer caso que há usuário e não há pessoa.
         def save_person(user=None):
@@ -255,7 +264,6 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
                 return person
 
-
         # CONDIÇÃO 1
         user = self.request.user
 
@@ -264,20 +272,6 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                 'public:hotsite-subscription',
                 slug=self.event.slug
             )
-
-        name = self.request.POST.get('name')
-        email = self.request.POST.get('email')
-
-        # CONDIÇÃO 2
-        if not name or not email:
-            messages.error(
-                self.request,
-                "Você deve informar todos os dados para fazer a sua inscrição."
-            )
-
-            context['name'] = name
-            context['email'] = email
-            return self.render_to_response(context)
 
         # CONDIÇÃO 3
         has_account = self.subscriber_has_account(email)
@@ -488,12 +482,19 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 return
 
             value = request.POST.get(field_name)
-            value = value.replace('.', '').replace('-', '').replace('/', '')
+            value = value \
+                .replace('.', '') \
+                .replace('-', '') \
+                .replace('/', '') \
+                .replace('(', '') \
+                .replace(')', '') \
+                .replace(' ', '')
 
             request.POST[field_name] = value
 
         clear_string('cpf')
         clear_string('zip_code')
+        clear_string('phone')
 
         form = self.get_form()
 
@@ -544,7 +545,6 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         # Insere ou edita lote
         subscription.lot = lot
 
-
         # CONDIÇÃO 7
         if self.has_paid_lots():
             if 'transaction_type' not in request.POST:
@@ -553,7 +553,6 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                     message='Por favor escolha um tipo de pagamento.'
                 )
                 return self.render_to_response(context)
-
 
         # CONDIÇÃO 6
         with transaction.atomic():
@@ -586,7 +585,6 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
                     messages.error(self.request, message=e.message)
                     return self.render_to_response(context)
-
 
             # CONDIÇÃO 5 e 7
             if new_account and new_subscription:
@@ -721,7 +719,8 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         if user.is_authenticated:
             try:
                 person = user.person
-                subscription = Subscription.objects.get(person=person, event=self.event)
+                subscription = Subscription.objects.get(person=person,
+                                                        event=self.event)
                 self.subscription = subscription
                 return True
 
