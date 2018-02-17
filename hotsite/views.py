@@ -571,9 +571,10 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
 
             # CONDIÇÃO 5 e 7
-            if new_subscription:
+            if new_account and new_subscription:
                 notify_new_user_and_subscription(self.event, subscription)
-            else:
+
+            elif new_subscription:
                 notify_new_subscription(self.event, subscription)
 
             messages.success(
