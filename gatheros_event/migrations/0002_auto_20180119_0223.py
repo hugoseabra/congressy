@@ -140,8 +140,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='event',
             name='subscription_type',
-            field=models.CharField(choices=[('disabled', 'Desativadas'),
-                                            ('simple', 'Simples (gratuitas)'),
+            field=models.CharField(choices=[('simple', 'Simples (gratuitas)'),
                                             (
                                                 'by_lots',
                                                 'Gerenciar por lotes (gratuitas e/ou pagas)')],

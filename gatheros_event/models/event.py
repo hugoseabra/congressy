@@ -38,10 +38,8 @@ class Event(models.Model, GatherosModelMixin):
 
     SUBSCRIPTION_BY_LOTS = 'by_lots'
     SUBSCRIPTION_SIMPLE = 'simple'
-    SUBSCRIPTION_DISABLED = 'disabled'
 
     SUBSCRIPTION_CHOICES = (
-        (SUBSCRIPTION_DISABLED, 'Desativadas'),
         (SUBSCRIPTION_SIMPLE, 'Simples (gratuitas)'),
         (SUBSCRIPTION_BY_LOTS, 'Gerenciar por lotes (gratuitas e/ou pagas)'),
     )

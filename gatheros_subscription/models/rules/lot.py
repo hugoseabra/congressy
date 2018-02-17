@@ -9,17 +9,6 @@ from django.db import IntegrityError
 from gatheros_event.models import Event
 
 
-def rule_1_event_inscricao_desativada(lot):
-    """
-    Evento com inscrição desativada não possui lote.
-    """
-
-    if lot.event.subscription_type == Event.SUBSCRIPTION_DISABLED:
-        raise ValidationError(
-            {'event': ['O evento selecionado possui inscrições desativadas']}
-        )
-
-
 def rule_2_mais_de_1_lote_evento_inscricao_simples(lot):
     """
     Não permite mais de um lote em eventos de inscrições simples.

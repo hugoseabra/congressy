@@ -63,8 +63,7 @@ class Migration(migrations.Migration):
                 (
                 'name', models.CharField(max_length=255, verbose_name='nome')),
                 ('subscription_type', models.CharField(
-                    choices=[('disabled', 'Desativadas'),
-                             ('simple', 'Simples (gratuitas)')],
+                    choices=[('simple', 'Simples (gratuitas)')],
                     default='simple',
                     help_text='Como gostaria de gerenciar as inscrições de seu evento?',
                     max_length=15, verbose_name='inscrições')),

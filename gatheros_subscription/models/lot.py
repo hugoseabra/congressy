@@ -256,7 +256,6 @@ class Lot(models.Model, GatherosModelMixin):
     def check_rules(self):
         """ Verifica regras de negócio. """
 
-        rule.rule_1_event_inscricao_desativada(self)
         rule.rule_2_mais_de_1_lote_evento_inscricao_simples(self)
         rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)
         rule.rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(self)

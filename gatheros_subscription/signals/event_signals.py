@@ -40,10 +40,6 @@ def clean_related_lots_when_subscription_disabled(instance, raw, **_):
     if raw is True:
         return
 
-    if instance.subscription_type == Event.SUBSCRIPTION_DISABLED:
-        _remove_lots(event=instance)
-        return
-
 
 @receiver(post_save, sender=Event)
 def manage_related_lot_when_subscription_enabled(instance, created, raw, **_):
