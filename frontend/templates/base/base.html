@@ -185,14 +185,14 @@
                                     {% if org.internal %}
                                         <li onclick="cgsy_submit({{ org.pk }})">
                                             <span class="icon">
-                                                <i class="fa {% if org.pk == organization.pk %}fas-circle{% else %}far-circle{% endif %}"></i>
+                                                <i class="{% if org.pk == organization.pk %}fas fa-circle{% else %}far fa-circle{% endif %}"></i>
                                             </span>
                                             <a href="#">{{ org.name|truncatechars:18 }}</a>
                                         </li>
                                     {% else %}
                                         <li onclick="cgsy_submit({{ org.pk }})">
                                             <span class="icon">
-                                                <i class="fa {% if org.pk == organization.pk %}fas-circle{% else %}far-circle{% endif %}"></i>
+                                                <i class="{% if org.pk == organization.pk %}fas fa-circle{% else %}far fa-circle{% endif %}"></i>
                                             </span>
                                             <a href="#">{{ org.name|truncatechars:18 }}</a>
                                         </li>
