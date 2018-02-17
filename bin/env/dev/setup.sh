@@ -12,10 +12,10 @@ print(settings.BASE_DIR)"`
 export PYTHONPATH=$BASE_DIR
 
 docker-compose -f $BASE_DIR/bin/env/docker-compose.yml down --remove-orphans
-sleep 2
+sleep 1
 
 docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
-sleep 5
+sleep 8
 
 # Removes previous media files
 rm -rf $BASE_DIR/media_dev/*
