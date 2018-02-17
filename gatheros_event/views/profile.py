@@ -3,15 +3,55 @@ from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.shortcuts import redirect
+from django.contrib.sites.models import Site
+from django.shortcuts import redirect, render_to_response
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views.generic import FormView, TemplateView
-from django.contrib.sites.models import Site
 
 from gatheros_event.forms import ProfileCreateForm, ProfileForm
 from gatheros_event.views.mixins import AccountMixin
 from mailer.services import notify_reset_password
+
+
+class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    @auth_views.method_decorator(auth_views.sensitive_post_parameters())
+    @auth_views.method_decorator(auth_views.never_cache)
+    def dispatch(self, *args, **kwargs):
+        assert 'uidb64' in kwargs and 'token' in kwargs
+
+        self.validlink = False
+        self.user = self.get_user(kwargs['uidb64'])
+
+        INTERNAL_RESET_URL_TOKEN = auth_views.INTERNAL_RESET_URL_TOKEN
+        INTERNAL_RESET_SESSION_TOKEN = auth_views.INTERNAL_RESET_SESSION_TOKEN
+
+        # if self.user is not None:
+        #     token = kwargs['token']
+        #     if token == INTERNAL_RESET_URL_TOKEN:
+        #         session_token = self.request.session.get(
+        #             INTERNAL_RESET_SESSION_TOKEN
+        #         )
+        #         if self.token_generator.check_token(self.user, session_token):
+        #             # If the token is valid, display the password reset form.
+        #             self.validlink = True
+        #             return super().dispatch(*args, **kwargs)
+        #     else:
+        #         if self.token_generator.check_token(self.user, token):
+        #             # Store the token in the session and redirect to the
+        #             # password reset form at a URL without the token. That
+        #             # avoids the possibility of leaking the token in the
+        #             # HTTP Referer header.
+        #             self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
+        #             redirect_url = self.request.path.replace(token,
+        #                                                      INTERNAL_RESET_URL_TOKEN)
+        #             return HttpResponseRedirect(redirect_url)
+
+        # Display the "Password reset unsuccessful" page.
+        return render_to_response(
+            template_name='registration/password_reset_fail.html',
+            context=self.get_context_data()
+        )
 
 
 class ProfileView(AccountMixin, FormView):

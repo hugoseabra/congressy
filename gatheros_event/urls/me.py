@@ -30,7 +30,7 @@ public_password_urls = [
         r'^reset-password/confirmation/'
         '(?P<uidb64>[0-9A-Za-z_\-]+)/'
         '(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-        auth_views.PasswordResetConfirmView.as_view(),
+        views.PasswordResetConfirmView.as_view(),
         name='password_reset_confirm'
     ),
     url(

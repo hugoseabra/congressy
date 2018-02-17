@@ -32,6 +32,7 @@ class DateInput(forms.TextInput):
 
 class PersonForm(forms.ModelForm):
     """ Formulário de Person. """
+
     states = (
         ('', '----'),  # replace the value '----' with whatever you want, it won't matter
         ("AC", u"Acre"),
@@ -66,8 +67,8 @@ class PersonForm(forms.ModelForm):
         ('', '----'),
     )
 
-    state = forms.ChoiceField(label='Estado', choices=states)
-    city_name = AjaxChoiceField(label='Cidade', choices=empty)
+    state = forms.ChoiceField(label='Estado', choices=states, required=False)
+    city_name = AjaxChoiceField(label='Cidade', choices=empty, required=False)
 
     class Meta:
         """ Meta """
