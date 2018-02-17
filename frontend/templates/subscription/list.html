@@ -145,16 +145,16 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="buttonbar">
-                <div class="float-left">
-                    <button type="button" class="btn btn-default
-                    filter-button">
-                        <i class="fa fa-filter"></i>
-                        Filtros
-                    </button>
-                </div>
+{#    <div class="row">#}
+{#        <div class="col-md-12">#}
+{#            <div class="buttonbar">#}
+{#                <div class="float-left">#}
+{#                    <button type="button" class="btn btn-default#}
+{#                    filter-button">#}
+{#                        <i class="fa fa-filter"></i>#}
+{#                        Filtros#}
+{#                    </button>#}
+{#                </div>#}
                 {#                <div class="float-right">#}
                 {#                    {% if can_add_subscription %}#}
                 {#                        <a href="{% url 'subscription:subscription-add' event.pk %}" class="btn#}
@@ -164,73 +164,73 @@
                 {#                        </a>#}
                 {#                    {% endif %}#}
                 {#                </div>#}
-                <div class="clearfix"></div>
-            </div>
-        </div>
-    </div>
+{#                <div class="clearfix"></div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
-    <div class="row filter-box">
-        <div class="col-md-12">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Filtro avançado</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <form role="form">
-                                <div class="list-filters">
-                                    {% if lots and lots|length > 1 %}
-                                        <div class="col-md-4">
-                                            <div class="form-group float-left">
-                                                <label>Lotes</label>
-                                                {% for lot in lots %}
-                                                    <div class="radio">
-                                                        {% is_filter_selected 'lots' lot.pk as checked %}
-                                                        <input class="icheck"
-                                                               {% if checked %}checked=""{% endif %}
-                                                               type="checkbox"
-                                                               name="lots"
-                                                               id="lot{{ forloop.counter0 }}"
-                                                               value="{{ lot.id }}">
-                                                        <label for="lot{{ forloop.counter0 }}">
-                                                            {{ lot.name }}
-                                                        </label>
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Tipo de participante</label>
-                                            <div class="radio">
-                                                {% is_filter_selected 'has_profile' 1 as checked %}
-                                                <input class="icheck"
-                                                       {% if checked %}checked=""{% endif %}
-                                                       type="checkbox"
-                                                       name="has_profile"
-                                                       id="has_profile"
-                                                       value="1">
-                                                <label for="has_profile">
-                                                    Possui perfil
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="clearfix"></div>
-                                </div>
-                                <button type="submit" class="btn
-                                btn-primary">Enviar
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+{#    <div class="row filter-box">#}
+{#        <div class="col-md-12">#}
+{#            <div class="panel panel-primary">#}
+{#                <div class="panel-heading">#}
+{#                    <h3 class="panel-title">Filtro avançado</h3>#}
+{#                </div>#}
+{#                <div class="panel-body">#}
+{#                    <div class="row">#}
+{#                        <div class="col-md-12">#}
+{#                            <form role="form">#}
+{#                                <div class="list-filters">#}
+{#                                    {% if lots and lots|length > 1 %}#}
+{#                                        <div class="col-md-4">#}
+{#                                            <div class="form-group float-left">#}
+{#                                                <label>Lotes</label>#}
+{#                                                {% for lot in lots %}#}
+{#                                                    <div class="radio">#}
+{#                                                        {% is_filter_selected 'lots' lot.pk as checked %}#}
+{#                                                        <input class="icheck"#}
+{#                                                               {% if checked %}checked=""{% endif %}#}
+{#                                                               type="checkbox"#}
+{#                                                               name="lots"#}
+{#                                                               id="lot{{ forloop.counter0 }}"#}
+{#                                                               value="{{ lot.id }}">#}
+{#                                                        <label for="lot{{ forloop.counter0 }}">#}
+{#                                                            {{ lot.name }}#}
+{#                                                        </label>#}
+{#                                                    </div>#}
+{#                                                {% endfor %}#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    {% endif %}#}
+{#                                    <div class="col-md-4">#}
+{#                                        <div class="form-group">#}
+{#                                            <label>Tipo de participante</label>#}
+{#                                            <div class="radio">#}
+{#                                                {% is_filter_selected 'has_profile' 1 as checked %}#}
+{#                                                <input class="icheck"#}
+{#                                                       {% if checked %}checked=""{% endif %}#}
+{#                                                       type="checkbox"#}
+{#                                                       name="has_profile"#}
+{#                                                       id="has_profile"#}
+{#                                                       value="1">#}
+{#                                                <label for="has_profile">#}
+{#                                                    Possui perfil#}
+{#                                                </label>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{##}
+{#                                    <div class="clearfix"></div>#}
+{#                                </div>#}
+{#                                <button type="submit" class="btn#}
+{#                                btn-primary">Enviar#}
+{#                                </button>#}
+{#                            </form>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
     <div class="row">
         <div class="col-md-12">
@@ -278,6 +278,7 @@
                                     <td>
                                         {{ item.code }}
                                     </td>
+                                    {% if has_paid_lots %}
                                     <td>
                                         {% if item.transactions.last %}
                                             {{ item.transactions.last.get_status_display }}
@@ -285,7 +286,7 @@
                                             &nbsp;&nbsp;&nbsp;&nbsp;---
                                         {% endif %}
                                     </td>
-
+                                    {% endif %}
                                     <td>
                                         <div class="btn-group">
                                             <button
