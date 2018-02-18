@@ -81,21 +81,20 @@
                     allowed_transactions
                 );
             });
-
-            var city_id = $("#id_city").val();
+            
+            var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
-            var uf_el = $("#id_state");
-
+            
+            window.setTimeout(function() {
             {% if person.city %}
                 uf_el.val('{{ person.city.uf }}');
-            if (city_id !== undefined && city_id !== null) {
-                fetch_cities(uf_el, city_id);
-            } else {
-                fetch_cities(uf_el, city_id);
-            }
+                fetch_cities(uf_el, '{{ person.city.pk }}');
             {% else %}
+                uf_el.val('');
+                city_el.val('');
                 city_el.prop('disabled', true);
             {% endif %}
+            }, 300);
         });
     </script>
 {% endblock %}
