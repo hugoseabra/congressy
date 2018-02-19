@@ -42,6 +42,7 @@ def account(request):
     organization = _account_helper.get_organization(request)
     admins = organization.get_members(group=Member.ADMIN).count()
     organization_unique_admin = admins == 1
+    member_unique_organization = request.user.person.members.count() == 1
 
     return {
         'context_type': 'member',
@@ -49,5 +50,6 @@ def account(request):
         'organization': organization,
         'organization_unique_admin': organization_unique_admin,
         'member': _account_helper.get_member(request),
+        'member_unique_organization': member_unique_organization,
         'has_subscriptions': has_subscriptions,
     }

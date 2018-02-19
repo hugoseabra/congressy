@@ -104,7 +104,7 @@
                                             <li>
                                                 <a href="{% url 'event:organization-edit' organization.pk %}">
                                                     <i class="fas fa-pencil-alt"></i>
-                                                    Editar
+                                                    Editar organização
                                                 </a>
                                             </li>
                                             {% if not organization_unique_admin %}
@@ -115,11 +115,11 @@
                                                 </a>
                                             </li>
                                             {% endif %}
-                                            {% if organization.is_deletable and user has 'gatheros_event.delete_organization' of organization %}
+                                            {% if not member_unique_organization and organization.is_deletable and user has 'gatheros_event.delete_organization' of organization %}
                                             <li>
                                                 <a href="{% url 'event:organization-delete' organization.pk %}">
                                                     <i class="fas fa-trash-alt"></i>
-                                                    Excluir
+                                                    Excluir organização
                                                 </a>
                                             </li>
                                             {% endif %}
