@@ -1,9 +1,10 @@
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
 from django.views.generic import TemplateView
-from gatheros_front.forms import AuthenticationForm, AuthenticationWithCaptchaForm
+
+from gatheros_front.forms import AuthenticationForm, \
+    AuthenticationWithCaptchaForm
 from gatheros_subscription.views.subscription import MySubscriptionsListView
 
 
