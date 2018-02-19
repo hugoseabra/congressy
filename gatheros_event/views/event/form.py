@@ -44,7 +44,6 @@ class BaseEventView(AccountMixin, View):
         return forms.PlaceForm(**kwargs)
 
     def form_valid(self, form):
-        # @TODO: Change this to a FormView
         try:
             response = super(BaseEventView, self).form_valid(form)
             update_account(
@@ -124,6 +123,11 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     success_message = 'Evento criado com sucesso.'
     form_title = 'Novo evento'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['lang'] = self.request.LANGUAGE_CODE
+        return kwargs
+
     def get_form(self, form_class=None):
         if not form_class:
             form_class = self.form_class
@@ -185,6 +189,11 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
     model = forms.EventForm.Meta.model
     success_url = reverse_lazy('event:event-list')
     success_message = 'Evento alterado com sucesso.'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['lang'] = self.request.LANGUAGE_CODE
+        return kwargs
 
     def get_form(self, form_class=None):
         if not form_class:

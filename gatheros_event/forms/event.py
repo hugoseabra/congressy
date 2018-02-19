@@ -64,10 +64,8 @@ class EventForm(forms.ModelForm):
             self._configure_organization_field()
 
         if lang == 'en' or lang == 'en-us':
-
             self.fields['date_start'].widget.options = self.dateTimeUsOptions
             self.fields['date_end'].widget.options = self.dateTimeUsOptions
-
         else:
             self.fields['date_start'].widget.options = self.dateTimePtBROptions
             self.fields['date_end'].widget.options = self.dateTimePtBROptions
