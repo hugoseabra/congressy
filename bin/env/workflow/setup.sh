@@ -34,5 +34,5 @@ python $BASE_DIR/manage.py loaddata 002_workflow_organization
 python $BASE_DIR/manage.py loaddata 003_workflow_member
 
 # Atualizando a data dos eventos
-#python $BASE_DIR/bin/env/workflow/01_create_event.py
-#python $BASE_DIR/bin/env/workflow/02_update_data.py
+python $BASE_DIR/bin/env/workflow/01_create_event.py
+python $BASE_DIR/bin/env/workflow/02_create_subscriptions.py

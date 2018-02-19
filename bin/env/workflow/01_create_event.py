@@ -7,6 +7,8 @@ from gatheros_event.models import Event, Info, Organization, Category
 from gatheros_subscription.models import Lot
 from datetime import datetime, timedelta
 
+
+# Static elements used in event creation.
 info = {
     "description": "Descri&ccedil;&atilde;o Aqui\r\n\r\nAo contr&aacute;rio do"
                    " que se acredita, Lorem Ipsum n&atilde;o &eacute;"
@@ -67,11 +69,13 @@ info = {
                         " 1914.</p>",
     "config_type": "text_only",
     "lead": "Evento Teste",
+    "image_main": 'nego_borel_amnesia.jpg',
 }
-
 organization = Organization.objects.first()
 category = Category.objects.first()
 
+
+# Event configurations.
 event_by_complex_lots_configs = {
     "2 Lotes Expirados": {
         'lots': [
@@ -87,140 +91,140 @@ event_by_complex_lots_configs = {
             },
         ],
     },
-    # "1 Lote Não Disponível (data futura)": {
-    #     'lots': [
-    #         {
-    #             'name': 'Lote Não Disponível',
-    #             'date_start': datetime.now() + timedelta(hours=1),
-    #             'date_end': datetime.now() + timedelta(hours=2),
-    #         },
-    #     ],
-    # },
-    # "1 Lote Disponível Limitado Lotado": {
-    #     'lots': [
-    #         {
-    #             'name': 'Lote Disponível Limitado Lotado',
-    #             'date_start': datetime.now() - timedelta(hours=1),
-    #             'date_end': datetime.now() + timedelta(hours=2),
-    #             'limit': 5,
-    #         },
-    #     ],
-    # },
-    # "1 Lote Disponível Ilimitado": {
-    #     'lots': [
-    #         {
-    #             'name': 'Lote Disponível Ilimitado',
-    #             'date_start': datetime.now() - timedelta(hours=1),
-    #             'date_end': datetime.now() + timedelta(hours=2),
-    #         },
-    #     ],
-    # },
-    # "1 Lote Disponível Limitado (5 vagas)": {
-    #     'lots': [
-    #         {
-    #             'name': 'Lote Disponível Limitado (5 vagas)',
-    #             'date_start': datetime.now() - timedelta(hours=1),
-    #             'date_end': datetime.now() + timedelta(hours=2),
-    #             'limit': 5,
-    #         },
-    #
-    #     ],
-    # },
-    # "1 Lote Disponível e 1 Não-iniciado": {
-    #     'lots': [
-    #         {
-    #             'name': 'Lote Disponível',
-    #             'date_start': datetime.now() - timedelta(hours=1),
-    #             'date_end': datetime.now() + timedelta(hours=2),
-    #         },
-    #         {
-    #             'name': 'Lote Não-iniciado',
-    #             'date_start': datetime.now() + timedelta(hours=3),
-    #             'date_end': datetime.now() + timedelta(hours=4),
-    #         },
-    #     ],
-    # },
-    # "1 Lote Disponível Limitado Lotado e 1 Disponível Limitado (5 vagas)": {
-    #     'lots': [
-    #         {
-    #             'name': 'Lote Disponível Limitado Lotado (5 vagas)',
-    #             'date_start': datetime.now() - timedelta(hours=2),
-    #             'date_end': datetime.now() + timedelta(hours=3),
-    #             'limit': 5,
-    #         },
-    #         {
-    #             'name': 'Lote Disponível Limitado (5 vagas)',
-    #             'date_start': datetime.now() - timedelta(hours=4),
-    #             'date_end': datetime.now() + timedelta(hours=5),
-    #             'limit': 5,
-    #         },
-    #     ],
-    # },
-    # "1 Lote Disponível Limitado Lotado e 1 Não-iniciado": {
-    #     'lots': [
-    #         {
-    #             'name': 'Lote Disponível Limitado Lotado (5 vagas)',
-    #             'date_start': datetime.now() - timedelta(hours=2),
-    #             'date_end': datetime.now() + timedelta(hours=3),
-    #             'limit': 5,
-    #         },
-    #         {
-    #             'name': 'Lote Não-iniciado',
-    #             'date_start': datetime.now() + timedelta(hours=2),
-    #             'date_end': datetime.now() + timedelta(hours=3),
-    #         },
-    #     ],
-    # },
-    # "1 Lote Expirado e 1 Disponível Ilimitado": {
-    #     'lots': [
-    #         {
-    #             'name': 'Lote Expirado',
-    #             'date_start': datetime.now() - timedelta(hours=2),
-    #             'date_end': datetime.now() - timedelta(hours=1),
-    #
-    #         },
-    #         {
-    #             'name': 'Lote Disponivel Ilimitado',
-    #             'date_start': datetime.now() - timedelta(hours=2),
-    #             'date_end': datetime.now() + timedelta(hours=1),
-    #
-    #         },
-    #     ],
-    # },
-    # "1 Lote Expirado e 1 Disponível Limitado (5 vagas)": {
-    #     'lots': [
-    #         {
-    #             'name': 'Lote Expirado',
-    #             'date_start': datetime.now() - timedelta(hours=2),
-    #             'date_end': datetime.now() - timedelta(hours=1),
-    #
-    #         },
-    #         {
-    #             'name': 'Lote Disponivel Limitado (5 Vagas)',
-    #             'date_start': datetime.now() - timedelta(hours=2),
-    #             'date_end': datetime.now() + timedelta(hours=1),
-    #             'limit': 5,
-    #
-    #         },
-    #     ],
-    # },
-    # "1 Lote Expirado e 1 Disponível Limitado Lotado": {
-    #     'lots': [
-    #         {
-    #             'name': 'Lote Expirado',
-    #             'date_start': datetime.now() - timedelta(hours=2),
-    #             'date_end': datetime.now() - timedelta(hours=1),
-    #
-    #         },
-    #         {
-    #             'name': 'Lote Disponivel Limitado Lotado (5 Vagas) ',
-    #             'date_start': datetime.now() - timedelta(hours=2),
-    #             'date_end': datetime.now() + timedelta(hours=1),
-    #             'limit': 5,
-    #
-    #         },
-    #     ],
-    # }
+    "1 Lote Não Disponível (data futura)": {
+        'lots': [
+            {
+                'name': 'Lote Não Disponível',
+                'date_start': datetime.now() + timedelta(hours=1),
+                'date_end': datetime.now() + timedelta(hours=2),
+            },
+        ],
+    },
+    "1 Lote Disponível Limitado Lotado": {
+        'lots': [
+            {
+                'name': 'Lote Disponível Limitado Lotado',
+                'date_start': datetime.now() - timedelta(hours=1),
+                'date_end': datetime.now() + timedelta(hours=2),
+                'limit': 5,
+            },
+        ],
+    },
+    "1 Lote Disponível Ilimitado": {
+        'lots': [
+            {
+                'name': 'Lote Disponível Ilimitado',
+                'date_start': datetime.now() - timedelta(hours=1),
+                'date_end': datetime.now() + timedelta(hours=2),
+            },
+        ],
+    },
+    "1 Lote Disponível Limitado (5 vagas)": {
+        'lots': [
+            {
+                'name': 'Lote Disponível Limitado (5 vagas)',
+                'date_start': datetime.now() - timedelta(hours=1),
+                'date_end': datetime.now() + timedelta(hours=2),
+                'limit': 5,
+            },
+
+        ],
+    },
+    "1 Lote Disponível e 1 Não-iniciado": {
+        'lots': [
+            {
+                'name': 'Lote Disponível',
+                'date_start': datetime.now() - timedelta(hours=1),
+                'date_end': datetime.now() + timedelta(hours=2),
+            },
+            {
+                'name': 'Lote Não-iniciado',
+                'date_start': datetime.now() + timedelta(hours=3),
+                'date_end': datetime.now() + timedelta(hours=4),
+            },
+        ],
+    },
+    "1 Lote Disponível Limitado Lotado e 1 Disponível Limitado (5 vagas)": {
+        'lots': [
+            {
+                'name': 'Lote Disponível Limitado Lotado (5 vagas)',
+                'date_start': datetime.now() - timedelta(hours=2),
+                'date_end': datetime.now() + timedelta(hours=3),
+                'limit': 5,
+            },
+            {
+                'name': 'Lote Disponível Limitado (5 vagas)',
+                'date_start': datetime.now() - timedelta(hours=4),
+                'date_end': datetime.now() + timedelta(hours=5),
+                'limit': 5,
+            },
+        ],
+    },
+    "1 Lote Disponível Limitado Lotado e 1 Não-iniciado": {
+        'lots': [
+            {
+                'name': 'Lote Disponível Limitado Lotado (5 vagas)',
+                'date_start': datetime.now() - timedelta(hours=2),
+                'date_end': datetime.now() + timedelta(hours=3),
+                'limit': 5,
+            },
+            {
+                'name': 'Lote Não-iniciado',
+                'date_start': datetime.now() + timedelta(hours=2),
+                'date_end': datetime.now() + timedelta(hours=3),
+            },
+        ],
+    },
+    "1 Lote Expirado e 1 Disponível Ilimitado": {
+        'lots': [
+            {
+                'name': 'Lote Expirado',
+                'date_start': datetime.now() - timedelta(hours=2),
+                'date_end': datetime.now() - timedelta(hours=1),
+
+            },
+            {
+                'name': 'Lote Disponivel Ilimitado',
+                'date_start': datetime.now() - timedelta(hours=2),
+                'date_end': datetime.now() + timedelta(hours=1),
+
+            },
+        ],
+    },
+    "1 Lote Expirado e 1 Disponível Limitado (5 vagas)": {
+        'lots': [
+            {
+                'name': 'Lote Expirado',
+                'date_start': datetime.now() - timedelta(hours=2),
+                'date_end': datetime.now() - timedelta(hours=1),
+
+            },
+            {
+                'name': 'Lote Disponivel Limitado (5 Vagas)',
+                'date_start': datetime.now() - timedelta(hours=2),
+                'date_end': datetime.now() + timedelta(hours=1),
+                'limit': 5,
+
+            },
+        ],
+    },
+    "1 Lote Expirado e 1 Disponível Limitado Lotado": {
+        'lots': [
+            {
+                'name': 'Lote Expirado',
+                'date_start': datetime.now() - timedelta(hours=2),
+                'date_end': datetime.now() - timedelta(hours=1),
+
+            },
+            {
+                'name': 'Lote Disponivel Limitado Lotado (5 Vagas) ',
+                'date_start': datetime.now() - timedelta(hours=2),
+                'date_end': datetime.now() + timedelta(hours=1),
+                'limit': 5,
+
+            },
+        ],
+    }
 }
 event_by_simple_lots_configs = {
     "lotes disponível (c/ transferencia de taxas)": {
@@ -266,6 +270,7 @@ event_config = {
 }
 
 
+# Function responsible for creating events.
 def create_event(event_prefix, event_data):
     event_dict = {
         "name": '{0} - {1}'.format(event_prefix, event_name),
@@ -284,6 +289,7 @@ def create_event(event_prefix, event_data):
     return event_object
 
 
+# Function responsible for creating the lotes.
 def create_lot(lot, event, event_type):
     lot_dict = {
         'name': lot.get('name'),
@@ -303,6 +309,7 @@ def create_lot(lot, event, event_type):
     Lot.objects.create(**lot_dict)
 
 
+# Types of events.
 types_of_events = [
     "Não-publicado",
     "Disponivel",
@@ -310,22 +317,21 @@ types_of_events = [
     "Futuro Publicado Insc. Desativadas"
     "Futuro Publicado Insc. Simples"
 ]
-
 types_of_complex_lots_events = [
     "Futuro, Publicado e Gratuito c/ 'Lotes'",
-    # "Futuro e Pago c/ 'Lotes' sem Transferência de Taxas",
-    # "Futuro e Pago c/ 'Lotes' com Transferência de Taxas",
+    "Futuro e Pago c/ 'Lotes' sem Transferência de Taxas",
+    "Futuro e Pago c/ 'Lotes' com Transferência de Taxas",
 ]
-
 types_of_simple_lots_events = [
     "Futuro e Pago c/ 'Lotes' sem Transferência de Taxas",
     "Futuro e Pago c/ 'Lotes' com Transferência de Taxas",
 ]
 
+
+# For-loops responsible for actually creating events and lotes.
 for event_name in event_config.keys():
     data = event_config[event_name]
     event = create_event(event_name, data)
-
 for event_type in types_of_complex_lots_events:
     for event_name in event_by_complex_lots_configs.keys():
 
@@ -335,51 +341,13 @@ for event_type in types_of_complex_lots_events:
         for existing_lot in event.lots.all():
             existing_lot.delete()
 
-        # print('Event has ' + str(event.lots.all().count()))
-        #
         for lot in data.get('lots'):
             create_lot(lot, event, event_type)
+for event_name in event_by_simple_lots_configs.keys():
 
-        for existing_lot in event.lots.all():
-            if existing_lot.name == "Lote 1":
-                existing_lot.delete()
-                raise RuntimeError
+    data = event_by_simple_lots_configs[event_name]
 
-        # print('Processed Event has ' + str(event.lots.all().count()))
-        # for lot in event.lots.all():
-        #     if lot.name == 'Lote 1':
-        #         raise Exception('idk dude')
+    event = create_event(event_name, data)
 
-
-
-# for event_name in event_by_simple_lots_configs.keys():
-#
-#     data = event_by_simple_lots_configs[event_name]
-#
-#     event = create_event(event_name, data)
-#
-#     # print('Event ' + event_name + 'has ' + str(event.lots.all().count()) + ' lots')
-#     must_create = len(data.get('lots'))
-#     # print('Must create ' + str(len(data.get('lots'))) + ' lots')
-#
-#     for lot in data.get('lots'):
-#         create_lot(lot, event, event_name)
-#
-#     # print('Event' + event_name + 'has created' + str(event.lots.all().count()) + ' lots')
-#
-#     if must_create == event.lots.all().count():
-#         for lot in event.lots.all():
-#             if lot.name not in data.get('lots'):
-#                 print('-------------------------------------\n')
-#                 print('ERROR ON EVENT LOT: ' + event.name)
-#                 print('HAD TO CREATE:')
-#                 for lot in data.get('lots'):
-#                     print(lot['name'])
-#                 print('CREATED: ')
-#                 for lot in event.lots.all():
-#                     print(lot.name)
-#                 print('-------------------------------------\n')
-#                 break
-#     else:
-#         print('ERROR ON EVENT' + event.name)
-#         break
+    for lot in data.get('lots'):
+        create_lot(lot, event, event_name)
