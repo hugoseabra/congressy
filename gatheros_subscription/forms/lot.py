@@ -11,6 +11,16 @@ class LotForm(forms.ModelForm):
     """ Formulário de lote. """
     event = None
 
+    dateTimeUsOptions = {
+        'format': 'mm/dd/yyyy hh:ii',
+        'autoclose': True,
+    }
+
+    dateTimePtBROptions = {
+        'format': 'dd/mm/yyyy hh:ii',
+        'autoclose': True,
+    }
+
     class Meta:
         """ Meta """
         model = Lot

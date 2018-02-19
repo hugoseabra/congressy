@@ -123,16 +123,14 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     success_message = 'Evento criado com sucesso.'
     form_title = 'Novo evento'
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['lang'] = self.request.LANGUAGE_CODE
-        return kwargs
-
     def get_form(self, form_class=None):
         if not form_class:
             form_class = self.form_class
 
-        return form_class(user=self.request.user, **self.get_form_kwargs())
+        kwargs = self.get_form_kwargs()
+        kwargs['lang'] = self.request.LANGUAGE_CODE
+
+        return form_class(user=self.request.user, **kwargs)
 
     def post(self, request, *args, **kwargs):
         org_pk = request.POST.get('organization')
@@ -190,16 +188,14 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
     success_url = reverse_lazy('event:event-list')
     success_message = 'Evento alterado com sucesso.'
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['lang'] = self.request.LANGUAGE_CODE
-        return kwargs
-
     def get_form(self, form_class=None):
         if not form_class:
             form_class = self.form_class
 
-        return form_class(user=self.request.user, **self.get_form_kwargs())
+        kwargs = self.get_form_kwargs()
+        kwargs['lang'] = self.request.LANGUAGE_CODE
+
+        return form_class(user=self.request.user, **kwargs)
 
     def get_initial(self):
         initial = super(EventEditFormView, self).get_initial()
