@@ -122,7 +122,7 @@ class LotListView(BaseLotView, generic.ListView):
 
     def _can_add(self):
         return self.request.user.has_perm(
-            'gatheros_event.add_lot',
+            'gatheros_event.can_add_lot',
             self.event
         )
 
