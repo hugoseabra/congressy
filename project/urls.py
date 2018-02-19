@@ -67,6 +67,10 @@ urlpatterns += static.static(
     document_root=settings.MEDIA_ROOT
 )
 
+urlpatterns += [
+    url(r'^captcha/', include('captcha.urls')),
+]
+
 if settings.DEBUG:
 
     if os.environ.get('DJANGO_SETTINGS_MODULE') == 'project.settings.staging':

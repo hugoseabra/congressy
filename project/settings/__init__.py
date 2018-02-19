@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django_user_agents',
     'rest_framework',
     'rest_framework.authtoken',
+    'captcha',
 
     # KANU_APPS
     'kanu_locations',
