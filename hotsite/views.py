@@ -323,7 +323,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
     def _configure_brand_person(self, person):
         """ Configura nova pessoa cadastrada. """
 
-        if not person.members.count() > 0:
+        if not person.members.count():
             org = Organization(internal=False, name=person.name)
 
             for attr, value in six.iteritems(person.get_profile_data()):
