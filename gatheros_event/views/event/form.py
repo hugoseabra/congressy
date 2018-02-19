@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from gatheros_event import forms
 from gatheros_event.models import Organization, Event
 from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.helpers.account import update_account
 
 
 class BaseEventView(AccountMixin, View):
@@ -46,6 +47,11 @@ class BaseEventView(AccountMixin, View):
         # @TODO: Change this to a FormView
         try:
             response = super(BaseEventView, self).form_valid(form)
+            update_account(
+                request=self.request,
+                organization=form.instance.organization,
+                force=True
+            )
 
         except Exception as e:
             messages.error(self.request, str(e))
