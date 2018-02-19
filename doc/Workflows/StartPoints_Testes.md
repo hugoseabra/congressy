@@ -64,5 +64,5 @@
         
 ### Futuro e Evento Pagos com "Inscrições por Lotes" com Transferência de Taxas:
 
-- [ ] 1 lotes disponível (c/ repasse de taxas)
-- [ ] 1 lotes disponível (s/ repasse de taxas)        
+- [ ] 1 lotes disponível (c/ transferencia de taxas)
+- [ ] 1 lotes disponível (s/ transferencia de taxas)        
