@@ -94,7 +94,7 @@ class LotAdmin(admin.ModelAdmin):
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    search_fields = ('person__name', 'person__email', 'event__name',)
+    search_fields = ('person__name', 'person__email', 'created', 'event__name',)
     list_display = ('person', 'count', 'lot', 'code', 'attended',)
     readonly_fields = [
         'event',

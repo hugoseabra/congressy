@@ -250,7 +250,7 @@ class MemberAdmin(admin.ModelAdmin):
     """
     Admin para Member
     """
-    search_fields = ('persno__name', 'person__email', 'organization__name',)
+    search_fields = ('person__name', 'person__email', 'organization__name',)
     list_display = ('organization', 'person', 'group', 'pk')
     ordering = ('organization', 'person')
 
