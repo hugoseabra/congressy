@@ -2,6 +2,11 @@ $(document).ready(function () {
     $('#id_phone').mask("(99) 99999-9999");
     $('#id_cpf').mask("999.999.999-99");
 
+    var institution_cnpj = $('#id_institution_cnpj');
+    if (institution_cnpj.length) {
+        console.log('a');
+        institution_cnpj.mask("99.999.999/9999-99");
+    }
 
     var city_el = $('#id_city_name');
 

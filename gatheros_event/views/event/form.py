@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from gatheros_event import forms
 from gatheros_event.models import Organization, Event
 from gatheros_event.views.mixins import AccountMixin
+from gatheros_event.helpers.account import update_account
 
 
 class BaseEventView(AccountMixin, View):
@@ -43,9 +44,13 @@ class BaseEventView(AccountMixin, View):
         return forms.PlaceForm(**kwargs)
 
     def form_valid(self, form):
-        # @TODO: Change this to a FormView
         try:
             response = super(BaseEventView, self).form_valid(form)
+            update_account(
+                request=self.request,
+                organization=form.instance.organization,
+                force=True
+            )
 
         except Exception as e:
             messages.error(self.request, str(e))
@@ -122,7 +127,10 @@ class EventAddFormView(BaseEventView, generic.CreateView):
         if not form_class:
             form_class = self.form_class
 
-        return form_class(user=self.request.user, **self.get_form_kwargs())
+        kwargs = self.get_form_kwargs()
+        kwargs['lang'] = self.request.LANGUAGE_CODE
+
+        return form_class(user=self.request.user, **kwargs)
 
     def post(self, request, *args, **kwargs):
         org_pk = request.POST.get('organization')
@@ -136,6 +144,7 @@ class EventAddFormView(BaseEventView, generic.CreateView):
             raise PermissionDenied(
                 'Você não pode inserir um evento nesta organização.'
             )
+
         else:
             self.object = None
 
@@ -184,7 +193,10 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
         if not form_class:
             form_class = self.form_class
 
-        return form_class(user=self.request.user, **self.get_form_kwargs())
+        kwargs = self.get_form_kwargs()
+        kwargs['lang'] = self.request.LANGUAGE_CODE
+
+        return form_class(user=self.request.user, **kwargs)
 
     def get_initial(self):
         initial = super(EventEditFormView, self).get_initial()

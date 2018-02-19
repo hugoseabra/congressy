@@ -66,14 +66,12 @@
                                             <br/>
                                             <small class="text-muted">{{ lot.get_period }}</small>
                                         </p>
-
                                     </li>
                                 {% endfor %}
                             </ul>
-                        {% elif  not subscription_enabled %}
+                        {% elif not subscription_enabled %}
                             <p style="font-size: 20px;font-style: italic;">Evento não permite inscrições.</p>
                         {% endif %}
-
                     </div>
                     <div class="hero-features-right col-md-5"
                          data-animation="fadeIn">

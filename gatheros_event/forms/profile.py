@@ -87,24 +87,20 @@ class ProfileCreateForm(forms.ModelForm):
         self.instance.user = self.user
         self.instance.save()
 
-        try:
-            self.instance.members.get(organization__internal=True)
-        except Member.DoesNotExist:
-            internal_org = Organization(
-                internal=True,
-                name=self.instance.name
-            )
+        if not self.instance.members.count():
+            org = Organization(internal=False, name=self.instance.name)
 
             for attr, value in six.iteritems(self.instance.get_profile_data()):
-                setattr(internal_org, attr, value)
+                setattr(org, attr, value)
 
-            internal_org.save()
+            org.save()
 
             Member.objects.create(
-                organization=internal_org,
+                organization=org,
                 person=self.instance,
                 group=Member.ADMIN
             )
+
 
         # Criando o email de confirmação e definição de senha
         reset_form = PasswordResetForm(

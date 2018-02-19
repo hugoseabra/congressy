@@ -195,15 +195,18 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         CONDIÇÃO 2 - Nome e/ou e-mail não informado:
             - retorna a página com mensagem de erro
 
-        CONDIÇÃO 3 - Usuário não logado, possui conta e já logou:
+        CONDIÇÃO 3 - Sobrenome não informado:
+            - retorna a página com mensagem de erro
+
+        CONDIÇÃO 4 - Usuário não logado, possui conta e já logou:
             - Caso já tenha logado, pedir para entrar com suas credenciais;
 
-        CONDIÇÃO 4 - Usuário não logado, possui conta e nunca logou:
+        CONDIÇÃO 5 - Usuário não logado, possui conta e nunca logou:
             - Caso nunca tenha logado, o sistema deve se comportar como um
               usuário novo;
             - redireciona para página de inscrição;
 
-        CONDIÇÃO 5 - Usuário não logado, não possui conta:
+        CONDIÇÃO 6 - Usuário não logado, não possui conta:
             - Cria pesssoa;
             - Se dados válidos, cria pessoa;
             - Se dados não válidos, retorna para formulário com mensagem de
@@ -274,6 +277,17 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             return self.render_to_response(context)
 
         # CONDIÇÃO 3
+        if len(name.split(' ')) < 2:
+            messages.error(
+                self.request,
+                "Você deve informar seu sobrenome para fazer a sua inscrição."
+            )
+
+            context['name'] = name
+            context['email'] = email
+            return self.render_to_response(context)
+
+        # CONDIÇÃO 4
         has_account = self.subscriber_has_account(email)
         has_logged = self.subscriber_has_logged(email)
 
@@ -292,7 +306,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
             return redirect(login_url)
 
-        # Condição 4
+        # Condição 5
         elif has_account:
             # Override anonymous user
             user = User.objects.get(email=email)
@@ -303,7 +317,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                 # Garante que usuário sempre terá pessoa.
                 person = save_person(user)
 
-        # Condição 5
+        # Condição 6
         else:
             # Nova pessoa.
             person = save_person()
@@ -348,7 +362,6 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         if not request.user.is_authenticated:
             return redirect('public:hotsite', slug=self.event.slug)
 
-        subscribed = self.is_subscribed()
         enabled = self.subscription_enabled()
         if not enabled:
             return redirect('public:hotsite', slug=self.event.slug)
@@ -488,6 +501,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         clear_string('cpf')
         clear_string('zip_code')
         clear_string('phone')
+        clear_string('institution_cnpj')
 
         form = self.get_form()
 

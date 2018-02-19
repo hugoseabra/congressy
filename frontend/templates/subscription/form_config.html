@@ -2,7 +2,7 @@
 {% load i18n static widget_tweaks %}
 
 {% block title %}
-    {% if object %}Editar{% else %}Nova{% endif %} Inscrição | Congressy
+    Formulário de Inscrição | Congressy
 {% endblock %}
 
 {% block page_title %}
@@ -33,6 +33,7 @@
             // Fields which are not influenced by paied lotes.
             var fields_not_required = [
                 'institution',
+                'institution_cnpj',
                 'function'
             ];
 
@@ -201,8 +202,8 @@
             <div class="col-md-12">
                 <div class="buttonbar">
                     <div class="float-right">
-                        <button {% if has_paid_lots %}disabled{% endif %} type="submit"
-                                class="btn btn-success {% if has_paid_lots %}disabled{% endif %}">
+                        <button type="submit"
+                                class="btn btn-success">
                             <i class="fa fa-save"></i>
                             Salvar
                         </button>

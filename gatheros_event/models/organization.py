@@ -225,7 +225,9 @@ class Organization(models.Model, GatherosModelMixin):
 
     def save(self, *args, **kwargs):
         """ Salva entidade. """
-        self._create_unique_slug()
+        if not self.slug:
+            self._create_unique_slug()
+
         self.description = strip_tags(self.description_html)
 
         super(Organization, self).save(*args, **kwargs)
@@ -316,3 +318,4 @@ class Organization(models.Model, GatherosModelMixin):
                 invitations += list(invitation_qs.all())
 
         return invitations
+

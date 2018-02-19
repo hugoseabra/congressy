@@ -12,16 +12,21 @@ from gatheros_event.models import Event
 11 eventos com datas reajustadas com referência a data de hoje
 """
 ref_days = [
-    {'days_before_today': -10, 'days_of_event': 1},
+    # Arte e Agricultura Urbana
     {'days_before_today': -5, 'days_of_event': 1},
+    # Django, muito al\u00e9m do Python
     {'days_before_today': 0, 'days_of_event': 1},
-    {'days_before_today': 3, 'days_of_event': 1},
+    # SEO e Resultados
     {'days_before_today': 5, 'days_of_event': 1},
+    # Streaming de Sucesso
     {'days_before_today': 8, 'days_of_event': 1},
-    {'days_before_today': 10, 'days_of_event': 1},
+    # Eu Mando Nudes - By lots
     {'days_before_today': 15, 'days_of_event': 1},
+    # Mulheres de Sucesso
     {'days_before_today': 25, 'days_of_event': 1},
+    # Encontro de L\u00edderes 2017
     {'days_before_today': 30, 'days_of_event': 1},
+    # Encontro de Casais 2017
     {'days_before_today': 35, 'days_of_event': 3},
 ]
 
@@ -49,28 +54,27 @@ Datas dos lotes devem começar e terminar antes da data inicial do evento.
 São 11 eventos com seus respectivos lotes organizados nos fixtures.
 """
 lots_dates = [
+    # Arte e Agricultura Urbana
     [{'days_before_event': 15, 'days': 15}],
+    # Django, muito al\u00e9m do Python
     [{'days_before_event': 15, 'days': 15}],
-    None,
-    None,
-    None,
+    # SEO e Resultados
+    [{'days_before_event': 15, 'days': 15}],
+    # Streaming de Sucesso
+    [{'days_before_event': 15, 'days': 15}],
+    # Eu Mando Nudes - By lots
     [
         {'days_before_event': 45, 'days': 15},  # Lote 1
         {'days_before_event': 30, 'days': 15},  # Lote 2
         {'days_before_event': 15, 'days': 15},  # Lote 3
         {'days_before_event': 45, 'days': 45},  # Parceiros
     ],
-    [
-        {'days_before_event': 20, 'days': 20},  # Parceiros
-        {'days_before_event': 20, 'days': 30},  # Lote 1
-    ],
+    # Mulheres de Sucesso
     [{'days_before_event': 5, 'days': 5}],
+    # Encontro de L\u00edderes 2017
     [{'days_before_event': 30, 'days': 30}],
+    # Encontro de Casais 2017
     [{'days_before_event': 50, 'days': 50}],
-    [
-        {'days_before_event': 60, 'days': 30},  # Lote 1
-        {'days_before_event': 30, 'days': 30},  # Lote 2
-    ],
 ]
 
 for i, dict_dates in enumerate(lots_dates):

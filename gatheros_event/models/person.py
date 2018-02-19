@@ -165,13 +165,19 @@ class Person(models.Model, GatherosModelMixin):
         verbose_name='Empresa/Instituição',
         help_text='Empresa, Igreja, Fundação, etc.',
     )
-
+    institution_cnpj = models.CharField(
+        max_length=14,
+        blank=True,
+        null=True,
+        verbose_name='CNPJ',
+        help_text='CNPJ da empresa com a qual você está vinculado(a)',
+    )
     function = models.CharField(
         max_length=255,
         blank=True,
         null=True,
         verbose_name='Cargo/Função',
-        help_text='Cargo ou função que exerce profissialmente.',
+        help_text='Cargo ou função que você exerce profissionalmente.',
     )
 
     website = models.CharField(max_length=255, null=True, blank=True)

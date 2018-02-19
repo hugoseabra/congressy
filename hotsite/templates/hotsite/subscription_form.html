@@ -176,12 +176,17 @@
                 </div>
                 <div class="row">
                     {% if config and config.institution_show is True %}
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             {% render_generic_field form.institution required=config.institution_required %}
                         </div>
                     {% endif %}
+                    {% if config and config.institution_cnpj_show is True %}
+                        <div class="col-md-4">
+                            {% render_generic_field form.institution_cnpj required=config.institution_cnpj_required %}
+                        </div>
+                    {% endif %}
                     {% if config and config.function_show is True %}
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             {% render_generic_field form.function required=config.function_required %}
                         </div>
                     {% endif %}

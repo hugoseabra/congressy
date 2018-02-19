@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.urls import reverse_lazy
 
-from gatheros_event.models import Organization
+from gatheros_event.models import Organization, Member
 from gatheros_event.views.mixins import DeleteViewMixin
 from gatheros_event.helpers.account import update_account
 
@@ -38,6 +38,11 @@ class OrganizationDeleteView(DeleteViewMixin):
 
         return event_list
 
+    def pre_delete(self):
+        if self.request.user.person.members.count() == 1:
+            raise Exception(
+                "Você não pode excuir a única organização que você possui."
+            )
+
     def post_delete(self):
         update_account(self.request)
-

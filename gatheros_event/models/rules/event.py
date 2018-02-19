@@ -6,40 +6,11 @@ from datetime import datetime
 from django.core.exceptions import ValidationError
 
 
-def rule_1_data_inicial_antes_da_data_final(event):
+def rule_1_data_inicial_antes_da_data_final(date_start, date_end):
     """
     Data inicial deve ser antes da data final.
     """
-    if event.date_end < event.date_start:
+    if date_end < date_start:
         raise ValidationError({'date_start': [
             'Data inicial deve ser anterior a data final.'
-        ]})
-
-def rule_3_evento_data_final_posterior_atual(event, adding=True):
-    """
-    Data final deve ser posterior a data atual.
-    """
-    if adding is True and event.date_end < datetime.now():
-        raise ValidationError({'date_end': [
-            'Não é possível cadastrar evento que já tenha se encerrado.'
-        ]})
-
-
-def rule_4_running_published_event_cannot_change_date_start(event):
-    """
-    Se evento está publicado e em andamento, não é possível mudar a
-    data inicial.
-
-    :param event: Event model
-    :return: None
-    :raise ValidationError
-    """
-    now = datetime.now()
-    published = event.published
-    running = event.date_start <= now <= event.date_end
-
-    if published and running and event.has_changed('date_start'):
-        raise ValidationError({'date_start': [
-            'Não é possível alterar a data inicial de um evento em andamento.'
-            ' Despublique o evento e altere a data inicial.'
         ]})

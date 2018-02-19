@@ -11,6 +11,16 @@ class LotForm(forms.ModelForm):
     """ Formulário de lote. """
     event = None
 
+    dateTimeUsOptions = {
+        'format': 'mm/dd/yyyy hh:ii',
+        'autoclose': True,
+    }
+
+    dateTimePtBROptions = {
+        'format': 'dd/mm/yyyy hh:ii',
+        'autoclose': True,
+    }
+
     class Meta:
         """ Meta """
         model = Lot
@@ -41,7 +51,8 @@ class LotForm(forms.ModelForm):
             ),
         }
 
-    def __init__(self, **kwargs):
+    def __init__(self, lang='pt-br', **kwargs):
+        self.lang = lang
 
         # if 'instance' in kwargs and kwargs['instance'] is not None:
         #     self.instance = kwargs.get('instance')
@@ -98,14 +109,33 @@ class LotForm(forms.ModelForm):
         self.fields['date_start'].widget = DateTimeWidget(
             bootstrap_version=3,
             attrs={'style': 'background-color:#FFF'},
-            options={'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now() - timedelta(minutes=10)),
-                     'endDate': '{0:%d-%m-%Y %H:%M}'.format(self.event.date_start - timedelta(minutes=2))})
+            options={
+                'startDate': '{0:%d-%m-%Y %H:%M}'.format(
+                    datetime.now() - timedelta(minutes=10)
+                ),
+                'endDate': '{0:%d-%m-%Y %H:%M}'.format(
+                     self.event.date_start - timedelta(minutes=2)
+                 )
+            }
+        )
 
         self.fields['date_end'].widget = DateTimeWidget(
             bootstrap_version=3,
             attrs={'style': 'background-color:#FFF'},
-            options={'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now()),
-                     'endDate': '{0:%d-%m-%Y %H:%M}'.format(self.event.date_start - timedelta(minutes=2))})
+            options={
+                'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now()),
+                'endDate': '{0:%d-%m-%Y %H:%M}'.format(
+                    self.event.date_start - timedelta(minutes=2)
+                )
+            }
+        )
+
+        if self.lang == 'en' or self.lang == 'en-us':
+            self.fields['date_start'].widget.options = self.dateTimeUsOptions
+            self.fields['date_end'].widget.options = self.dateTimeUsOptions
+        else:
+            self.fields['date_start'].widget.options = self.dateTimePtBROptions
+            self.fields['date_end'].widget.options = self.dateTimePtBROptions
 
     def clean(self):
         cleaned_data = super().clean()
