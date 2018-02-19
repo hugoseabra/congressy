@@ -92,6 +92,9 @@ class EventForm(forms.ModelForm):
     def full_clean(self):
         super().full_clean()
 
+        if not self.is_bound:  # Stop further processing.
+            return
+
         try:
             rule.rule_1_data_inicial_antes_da_data_final(
                 self.cleaned_data['date_start'],
