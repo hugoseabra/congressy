@@ -26,26 +26,28 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
         INTERNAL_RESET_URL_TOKEN = auth_views.INTERNAL_RESET_URL_TOKEN
         INTERNAL_RESET_SESSION_TOKEN = auth_views.INTERNAL_RESET_SESSION_TOKEN
 
-        # if self.user is not None:
-        #     token = kwargs['token']
-        #     if token == INTERNAL_RESET_URL_TOKEN:
-        #         session_token = self.request.session.get(
-        #             INTERNAL_RESET_SESSION_TOKEN
-        #         )
-        #         if self.token_generator.check_token(self.user, session_token):
-        #             # If the token is valid, display the password reset form.
-        #             self.validlink = True
-        #             return super().dispatch(*args, **kwargs)
-        #     else:
-        #         if self.token_generator.check_token(self.user, token):
-        #             # Store the token in the session and redirect to the
-        #             # password reset form at a URL without the token. That
-        #             # avoids the possibility of leaking the token in the
-        #             # HTTP Referer header.
-        #             self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
-        #             redirect_url = self.request.path.replace(token,
-        #                                                      INTERNAL_RESET_URL_TOKEN)
-        #             return HttpResponseRedirect(redirect_url)
+        if self.user is not None:
+            token = kwargs['token']
+            if token == INTERNAL_RESET_URL_TOKEN:
+                session_token = self.request.session.get(
+                    INTERNAL_RESET_SESSION_TOKEN
+                )
+                if self.token_generator.check_token(self.user, session_token):
+                    # If the token is valid, display the password reset form.
+                    self.validlink = True
+                    return super().dispatch(*args, **kwargs)
+            else:
+                if self.token_generator.check_token(self.user, token):
+                    # Store the token in the session and redirect to the
+                    # password reset form at a URL without the token. That
+                    # avoids the possibility of leaking the token in the
+                    # HTTP Referer header.
+                    self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
+                    redirect_url = self.request.path.replace(
+                        token,
+                        INTERNAL_RESET_URL_TOKEN
+                    )
+                    return redirect(redirect_url)
 
         # Display the "Password reset unsuccessful" page.
         return render_to_response(
