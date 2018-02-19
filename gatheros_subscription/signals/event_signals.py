@@ -50,6 +50,14 @@ def manage_related_lot_when_subscription_enabled(instance, created, raw, **_):
 
     # # Process only if, in edition, subscription_type is changed
     if created is False and instance.has_changed('subscription_type') is False:
+        if instance.subscription_type == Event.SUBSCRIPTION_SIMPLE:
+
+            lot = Lot.objects.get(event=instance)
+
+            if lot:
+                lot.adjust_unique_lot_date(force=True)
+                lot.save()
+
         return
 
     num_lots = Lot.objects.filter(event=instance).count()
