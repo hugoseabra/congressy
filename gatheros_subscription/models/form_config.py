@@ -31,11 +31,15 @@ class FormConfig(models.Model):
     INSTITUTION_SHOW = 'institution-show'
     INSTITUTION_REQUIRED = 'institution-required'
 
+    INSTITUTION_CNPJ_HIDE = 'institution-cnpj-hide'
+    INSTITUTION_CNPJ_SHOW = 'institution-cnpj-show'
+    INSTITUTION_CNPJ_REQUIRED = 'institution-cnpj-required'
+
     FUNCTION_HIDE = 'function-hide'
     FUNCTION_SHOW = 'function-show'
     FUNCTION_REQUIRED = 'function-required'
 
-    CPF_OPTIONS=(
+    CPF_OPTIONS = (
         (CPF_HIDE, 'Ocultar'),
         (CPF_SHOW, 'Mostrar'),
         (CPF_REQUIRED, 'Mostrar e Tornar obrigatório'),
@@ -56,6 +60,12 @@ class FormConfig(models.Model):
         (INSTITUTION_HIDE, 'Ocultar'),
         (INSTITUTION_SHOW, 'Mostrar'),
         (INSTITUTION_REQUIRED, 'Mostrar e Tornar obrigatório'),
+    )
+
+    INSTITUTION_CNPJ_OPTIONS = (
+        (INSTITUTION_CNPJ_HIDE, 'Ocultar'),
+        (INSTITUTION_CNPJ_SHOW, 'Mostrar'),
+        (INSTITUTION_CNPJ_REQUIRED, 'Mostrar e Tornar obrigatório'),
     )
 
     FUNCTION_OPTIONS = (
@@ -92,7 +102,7 @@ class FormConfig(models.Model):
     cpf = models.CharField(
         choices=CPF_OPTIONS,
         default=CPF_HIDE,
-        max_length=25,
+        max_length=35,
         verbose_name='CPF',
         help_text='Configuração do campo "CPF" no formulário.'
     )
@@ -100,7 +110,7 @@ class FormConfig(models.Model):
     birth_date = models.CharField(
         choices=BIRTH_DATE_OPTIONS,
         default=BIRTH_DATE_HIDE,
-        max_length=25,
+        max_length=35,
         verbose_name='Data de Nascimento',
         help_text='Configuração do campo "Data de Nascimento" no formulário.'
     )
@@ -108,7 +118,7 @@ class FormConfig(models.Model):
     address = models.CharField(
         choices=ADDRESS_OPTIONS,
         default=ADDRESS_HIDE,
-        max_length=25,
+        max_length=35,
         verbose_name='Endereço',
         help_text='Configuração do campo "Endereço" no formulário.'
                   ' Isto exigirá que alguns campos sejam obrigatórios.'
@@ -117,15 +127,24 @@ class FormConfig(models.Model):
     institution = models.CharField(
         choices=INSTITUTION_OPTIONS,
         default=INSTITUTION_HIDE,
-        max_length=25,
+        max_length=35,
         verbose_name='Empresa/Instituição',
         help_text='Empresa, Igreja, Fundação, etc.'
+    )
+
+    institution_cnpj = models.CharField(
+        choices=INSTITUTION_CNPJ_OPTIONS,
+        default=INSTITUTION_CNPJ_HIDE,
+        max_length=35,
+        verbose_name='CNPJ',
+        help_text='CNPJ da empresa com a qual você o(a) partcipante'
+                  ' vinculado(a).'
     )
 
     function = models.CharField(
         choices=FUNCTION_OPTIONS,
         default=FUNCTION_HIDE,
-        max_length=25,
+        max_length=35,
         verbose_name='Cargo/Função',
         help_text='Cargo ou função que exerce profissialmente.'
     )
@@ -137,7 +156,9 @@ class FormConfig(models.Model):
 
     @property
     def cpf_show(self):
-        return self.phone == FormConfig.CPF_SHOW or FormConfig.CPF_REQUIRED
+        show = FormConfig.CPF_SHOW
+        required = FormConfig.CPF_REQUIRED
+        return self.cpf == show or self.cpf == required
 
     @property
     def cpf_hide(self):
@@ -149,8 +170,9 @@ class FormConfig(models.Model):
 
     @property
     def birth_date_show(self):
-        return self.phone == \
-               FormConfig.BIRTH_DATE_SHOW or FormConfig.BIRTH_DATE_REQUIRED
+        show = FormConfig.CPF_SHOW
+        required = FormConfig.CPF_REQUIRED
+        return self.birth_date == show or self.birth_date == required
 
     @property
     def birth_date_hide(self):
@@ -170,9 +192,9 @@ class FormConfig(models.Model):
 
     @property
     def institution_show(self):
-        print(self.institution);
-        return self.institution == \
-               FormConfig.INSTITUTION_SHOW or FormConfig.INSTITUTION_REQUIRED
+        show = FormConfig.INSTITUTION_SHOW
+        required = FormConfig.INSTITUTION_REQUIRED
+        return self.institution == show or self.institution == required
 
     @property
     def institution_hide(self):
@@ -183,9 +205,25 @@ class FormConfig(models.Model):
         return self.institution == FormConfig.INSTITUTION_REQUIRED
 
     @property
+    def institution_cnpj_show(self):
+        show = FormConfig.INSTITUTION_CNPJ_SHOW
+        required = FormConfig.INSTITUTION_CNPJ_REQUIRED
+        show_cnpj = self.institution_cnpj
+        return show_cnpj == show or show_cnpj == required
+
+    @property
+    def institution_cnpj_hide(self):
+        return self.institution_cnpj == FormConfig.INSTITUTION_CNPJ_HIDE
+
+    @property
+    def institution_cnpj_required(self):
+        return self.institution_cnpj == FormConfig.INSTITUTION_CNPJ_REQUIRED
+
+    @property
     def function_show(self):
-        return self.function == \
-               FormConfig.FUNCTION_SHOW or FormConfig.FUNCTION_REQUIRED
+        show = FormConfig.FUNCTION_SHOW
+        required = FormConfig.FUNCTION_REQUIRED
+        return self.function == show or self.function == required
 
     @property
     def function_hide(self):

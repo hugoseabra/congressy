@@ -362,7 +362,6 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         if not request.user.is_authenticated:
             return redirect('public:hotsite', slug=self.event.slug)
 
-        subscribed = self.is_subscribed()
         enabled = self.subscription_enabled()
         if not enabled:
             return redirect('public:hotsite', slug=self.event.slug)
@@ -502,6 +501,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         clear_string('cpf')
         clear_string('zip_code')
         clear_string('phone')
+        clear_string('institution_cnpj')
 
         form = self.get_form()
 
