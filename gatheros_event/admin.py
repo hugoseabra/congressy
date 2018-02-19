@@ -22,6 +22,7 @@ class EventAdmin(admin.ModelAdmin):
     """
     Admin para Event
     """
+    search_fields = ('name',)
     list_display = (
         'name',
         'organization',
@@ -272,7 +273,12 @@ class InvitationAdmin(admin.ModelAdmin):
     Admin para Invitation
     """
     list_display = (
-        'author', 'get_user', 'get_organization', 'created', 'expired')
+        'author',
+        'get_user',
+        'get_organization',
+        'created',
+        'expired'
+    )
     readonly_fields = ['created', 'expired']
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
