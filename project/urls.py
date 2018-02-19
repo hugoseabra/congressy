@@ -1,6 +1,7 @@
 # pylint: skip-file
 
 import os
+
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
@@ -16,7 +17,6 @@ from gatheros_front.urls import (
 )
 from hotsite.urls import urlpatterns_public_hotsite
 from payment.urls import urlpatterns_public_payments_api, private_payment_urls
-from project.views import mylang
 
 handler500 = 'project.views.handler500'
 
@@ -77,10 +77,10 @@ urlpatterns += static.static(
 if settings.DEBUG:
 
     if os.environ.get('DJANGO_SETTINGS_MODULE') == 'project.settings.staging':
-        urlpatterns += [url(r'^logs/', include('logtailer.urls')),]
+        urlpatterns += [url(r'^logs/', include('logtailer.urls')), ]
 
     import debug_toolbar
 
     urlpatterns = [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns
+                      url(r'^__debug__/', include(debug_toolbar.urls)),
+                  ] + urlpatterns
