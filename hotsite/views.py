@@ -323,26 +323,19 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
     def _configure_brand_person(self, person):
         """ Configura nova pessoa cadastrada. """
 
-        # Criando organização interna
-        with transaction.atomic():
-            try:
-                person.members.get(organization__internal=True)
-            except Member.DoesNotExist:
-                internal_org = Organization(
-                    internal=True,
-                    name=person.name
-                )
+        if not person.members.count():
+            org = Organization(internal=False, name=person.name)
 
-                for attr, value in six.iteritems(person.get_profile_data()):
-                    setattr(internal_org, attr, value)
+            for attr, value in six.iteritems(person.get_profile_data()):
+                setattr(org, attr, value)
 
-                internal_org.save()
+            org.save()
 
-                Member.objects.create(
-                    organization=internal_org,
-                    person=person,
-                    group=Member.ADMIN
-                )
+            Member.objects.create(
+                organization=org,
+                person=person,
+                group=Member.ADMIN
+            )
 
 
 class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):

@@ -22,6 +22,7 @@ class EventAdmin(admin.ModelAdmin):
     """
     Admin para Event
     """
+    search_fields = ('name',)
     list_display = (
         'name',
         'organization',
@@ -250,7 +251,7 @@ class MemberAdmin(admin.ModelAdmin):
     """
     Admin para Member
     """
-    search_fields = ('persno__name', 'person__email', 'organization__name',)
+    search_fields = ('person__name', 'person__email', 'organization__name',)
     list_display = ('organization', 'person', 'group', 'pk')
     ordering = ('organization', 'person')
 
@@ -272,7 +273,12 @@ class InvitationAdmin(admin.ModelAdmin):
     Admin para Invitation
     """
     list_display = (
-        'author', 'get_user', 'get_organization', 'created', 'expired')
+        'author',
+        'get_user',
+        'get_organization',
+        'created',
+        'expired'
+    )
     readonly_fields = ['created', 'expired']
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
