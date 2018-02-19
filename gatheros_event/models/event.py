@@ -232,14 +232,7 @@ class Event(models.Model, GatherosModelMixin):
         if not self.slug:
             self._create_unique_slug()
 
-        self.check_rules()
         super(Event, self).save(*args, **kwargs)
-
-    def check_rules(self):
-        """Verifica regras do evento"""
-        rule.rule_1_data_inicial_antes_da_data_final(self)
-        rule.rule_3_evento_data_final_posterior_atual(self, self._state.adding)
-        rule.rule_4_running_published_event_cannot_change_date_start(self)
 
     def __str__(self):
         return str(self.name)

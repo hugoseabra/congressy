@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 from django.shortcuts import get_object_or_404
+from django.forms import ValidationError
 
 from gatheros_event import forms
 from gatheros_event.models import Organization, Event
@@ -144,6 +145,12 @@ class EventAddFormView(BaseEventView, generic.CreateView):
             raise PermissionDenied(
                 'Você não pode inserir um evento nesta organização.'
             )
+
+        except ValidationError:
+            raise PermissionDenied(
+                '.'
+            )
+
         else:
             self.object = None
 

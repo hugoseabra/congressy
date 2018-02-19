@@ -6,6 +6,7 @@ import os
 from datetimewidget.widgets import DateTimeWidget
 from django import forms
 from django.shortcuts import get_object_or_404
+from gatheros_event.models.rules import event as rule
 
 from gatheros_event.models import Event, Member, Organization
 
@@ -87,6 +88,18 @@ class EventForm(forms.ModelForm):
         self.fields['organization'].widget = forms.Select()
         self.fields['organization'].choices = orgs
         self.fields['organization'].label = 'Realizador'
+
+    def full_clean(self):
+        super().full_clean()
+
+        try:
+            rule.rule_1_data_inicial_antes_da_data_final(
+                self.cleaned_data['date_start'],
+                self.cleaned_data['date_end']
+            )
+
+        except forms.ValidationError as e:
+            self.add_error(None, e)
 
 
 class EventEditDatesForm(forms.ModelForm):
