@@ -13,6 +13,16 @@ from gatheros_event.models import Event, Member, Organization
 class EventForm(forms.ModelForm):
     """Formulário principal de evento"""
 
+    dateTimeUsOptions = {
+        'format': 'mm/dd/yyyy hh:ii',
+        'autoclose': True,
+    }
+
+    dateTimePtBROptions = {
+        'format': 'dd/mm/yyyy hh:ii',
+        'autoclose': True,
+    }
+
     class Meta:
         model = Event
         fields = [
@@ -30,27 +40,21 @@ class EventForm(forms.ModelForm):
         #            'date_start': forms.DateTimeInput,
         #            'date_end': forms.DateTimeInput,
         #            }
-        dateTimeOptions = {
-            'format': 'dd/mm/yyyy hh:ii',
-            'autoclose': True,
-        }
 
         widgets = {
             'organization': forms.HiddenInput,
             'date_start': DateTimeWidget(
-                options=dateTimeOptions,
                 bootstrap_version=3,
                 attrs={'style': 'background-color:#FFF'}
             ),
             'date_end': DateTimeWidget(
-                options=dateTimeOptions,
                 bootstrap_version=3,
                 attrs={'style': 'background-color:#FFF'}
             ),
             'subscription_type': forms.RadioSelect,
         }
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user, lang='pt-br', *args, **kwargs):
         self.user = user
 
         super(EventForm, self).__init__(*args, **kwargs)
@@ -59,7 +63,14 @@ class EventForm(forms.ModelForm):
         if instance is None:
             self._configure_organization_field()
 
-            # self._set_widget_date()
+        if lang == 'en' or lang == 'en-us':
+
+            self.fields['date_start'].widget.options = self.dateTimeUsOptions
+            self.fields['date_end'].widget.options = self.dateTimeUsOptions
+
+        else:
+            self.fields['date_start'].widget.options = self.dateTimePtBROptions
+            self.fields['date_end'].widget.options = self.dateTimePtBROptions
 
     def _configure_organization_field(self):
         orgs = []

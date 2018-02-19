@@ -16,6 +16,7 @@ from gatheros_front.urls import (
 )
 from hotsite.urls import urlpatterns_public_hotsite
 from payment.urls import urlpatterns_public_payments_api, private_payment_urls
+from project.views import mylang
 
 handler500 = 'project.views.handler500'
 
@@ -57,6 +58,11 @@ urlpatterns += private_urlpatterns
 urlpatterns += public_urlpatterns
 urlpatterns += api_urlpatterns
 
+urlpatterns += [
+    url(r'^captcha/', include('captcha.urls')),
+]
+
+# ============================ STATIC CONFIG ================================ #
 urlpatterns += static.static(
     settings.STATIC_URL,
     document_root=settings.STATIC_ROOT
@@ -67,10 +73,7 @@ urlpatterns += static.static(
     document_root=settings.MEDIA_ROOT
 )
 
-urlpatterns += [
-    url(r'^captcha/', include('captcha.urls')),
-]
-
+# ========================== DEBUG ENVIRONMENT ============================== #
 if settings.DEBUG:
 
     if os.environ.get('DJANGO_SETTINGS_MODULE') == 'project.settings.staging':

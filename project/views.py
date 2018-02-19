@@ -1,4 +1,5 @@
 from django.template.response import TemplateResponse
+from django.template.response import HttpResponse
 
 
 def handler500(request):
