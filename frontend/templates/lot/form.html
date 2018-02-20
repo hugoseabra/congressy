@@ -28,64 +28,12 @@
     {% endif %}
 {% endblock %}
 
-{% block scripts %}
-    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
-    <script type="application/javascript">
-        function show(el) {
-            el = $(el);
-            el.removeAttr('style').hide();
-            el.fadeIn();
-        }
-
-        function hide(el) {
-            el = $(el);
-            el.fadeOut(function () {
-                el.removeAttr('style');
-                el.css('visibility', 'hidden');
-            });
-        }
-
-        function showHideLimit() {
-            var limitCheckbox = $('#id_limit').parent().parent();
-            if ($('#limit_switch').prop('checked')) {
-                show(limitCheckbox);
-            } else {
-                hide(limitCheckbox);
-            }
-        }
-
-        function showHideExihibitionCode() {
-            var exhibition_code = $('#id_exhibition_code').parent().parent();
-            if ($('#id_private').prop('checked')) {
-                show(exhibition_code);
-            } else {
-                hide(exhibition_code);
-            }
-        }
-
-        $(document).ready(function () {
-            $('#id_price').mask('#.##0,00', {reverse: true});
-
-            showHideLimit();
-            showHideExihibitionCode();
-
-            $('#limit_switch').on('change', function () {
-                showHideLimit();
-            });
-
-            $('#id_private').on('change', function () {
-                showHideExihibitionCode();
-            });
-        });
-    </script>
-{% endblock %}
-
 {% block nav_aside_itens %}
     <h5 class="sidebar-header">Participantes</h5>
     <ul class="nav nav-pills nav-stacked">
         <li class="active">
             <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
+            title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Lotes/Categorias
             </a>
@@ -240,8 +188,8 @@
                                 <div class="col-xl-2 col-lg-2 col-md-2">
                                     {% render_generic_field form.allow_installments %}
                                 </div>
-                                <div class="col-xl-1 col-lg-1 col-md-1">
-                                    {% render_generic_field form.installments %}
+                                <div class="col-xl-4 col-lg-3 col-md-3">
+                                    {% render_generic_field form.free_installments %}
                                 </div>
 
                             </div>
@@ -306,3 +254,75 @@
     </form>
 
 {% endblock %}
+
+{% block scripts %}
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script type="application/javascript">
+        function show(el) {
+            el = $(el);
+            el.removeAttr('style').hide();
+            el.fadeIn();
+        }
+
+        function hide(el) {
+            el = $(el);
+            el.fadeOut(function () {
+                el.removeAttr('style');
+                el.css('visibility', 'hidden');
+            });
+        }
+
+        function showHideLimit() {
+            var limitCheckbox = $('#id_limit').parent().parent();
+            if ($('#limit_switch').prop('checked')) {
+                show(limitCheckbox);
+            } else {
+                hide(limitCheckbox);
+            }
+        }
+
+        function showHideExihibitionCode() {
+            var exhibition_code = $('#id_exhibition_code').parent().parent();
+            if ($('#id_private').prop('checked')) {
+                show(exhibition_code);
+            } else {
+                hide(exhibition_code);
+            }
+        }
+
+
+        function showHideInstallments() {
+            var free_installments = $('#id_free_installments').parent().parent();
+            if ($('#id_allow_installments').prop('checked')) {
+                show(free_installments);
+            } else {
+                hide(free_installments);
+            }
+        }
+
+
+
+        $(document).ready(function () {
+            $('#id_price').mask('#.##0,00', {reverse: true});
+
+            showHideLimit();
+            showHideExihibitionCode();
+            showHideInstallments();
+            //TODO Finish implementing show and
+            $('#limit_switch').on('change', function () {
+                showHideLimit();
+            });
+
+            $('#id_private').on('change', function () {
+                showHideExihibitionCode();
+            });
+
+            $('#id_allow_installments').on('change', function () {
+                showHideInstallments();
+            });
+
+        });
+    </script>
+{% endblock %}
+
+

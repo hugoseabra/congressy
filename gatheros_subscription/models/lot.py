@@ -144,14 +144,15 @@ class Lot(models.Model, GatherosModelMixin):
 
     transfer_interest_rate = models.BooleanField(
         default=False,
-        verbose_name='repassar juros de parcelamento ao participante',
+        verbose_name='repassar juros ao participante',
         help_text="Repasse os juros das parcelas para o participante e receba o valor integral da parcela."
     )
 
-    installments = models.CharField(
+    free_installments = models.CharField(
         max_length=15,
         choices=INSTALLMENTS,
-        verbose_name='parcelas',
+        verbose_name='parcelas isentas de juros',
+        help_text="Número de parcelas que irá assumir juros de parcelamento do participante.",
         null=True,
         blank=True
     )
