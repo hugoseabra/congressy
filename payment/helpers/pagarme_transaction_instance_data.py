@@ -5,6 +5,7 @@ import absoluteuri
 from django.conf import settings
 
 from gatheros_event.models import Organization
+from gatheros_subscription.models import Lot
 from payment.exception import TransactionError
 
 congressy_id = settings.PAGARME_RECIPIENT_ID
@@ -20,6 +21,8 @@ class PagarmeTransactionInstanceData:
         self.person = subscription.person
         self.extra_data = extra_data
         self.event = event
+        self.lot_id = self.extra_data.get('lot')
+        self.lot = Lot.objects.get(pk=self.lot_id)
 
         self._get_organization()
         self._get_transaction_type()
@@ -126,14 +129,14 @@ class PagarmeTransactionInstanceData:
             "price": self.extra_data['amount']
         }
 
-        # Estabelecer uma referência de qual o estado sistema hovue a transação
+        # Estabelecer uma referência de qual o estado sistema houve a transação
         environment_version = os.getenv('ENVIRONMENT_VERSION')
+
         if environment_version:
             self.transaction_instance_data['metadata']['system'] = {
                 'version': environment_version,
                 'enviroment': 'production'
             }
-
 
         if self.transaction_type == 'credit_card':
 

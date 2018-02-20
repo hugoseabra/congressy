@@ -226,64 +226,83 @@
                         </div>
                     </div>
                     <div class="panel-body">
-                        <div class="row">
-                            {% if full_banking %}
+
+                        {% if full_banking %}
+                            <div class="row">
                                 <div class="col-xl-2 col-lg-2 col-md-2">
                                     {% render_generic_field form.price %}
                                 </div>
-                                {#                                <div class="col-xl-4 col-lg-6 col-md-6">#}
-                                {#                                    {% render_generic_field form.transfer_tax %}#}
-                                {#                                </div>#}
-
-                            {% else %}
-                                <div class="col-md-12">
-                                <div class="alert alert-warning">
-                                    <strong>È necessário que complete seus dads bancários para criar lotes
-                                        pagos!</strong>
-
+                                <div class="col-xl-4 col-lg-6 col-md-6">
+                                    {% render_generic_field form.transfer_tax %}
                                 </div>
-                                <p><a href="{% url 'event:organization-financial-edit' organization.pk %}">
-                                    Clique aqui para configurar estes dados.</a></p>
-                            {% endif %}
                             </div>
-                        </div>
-                    </div>
-                    {#                <div class="panel panel-primary">#}
-                    {#                    <div class="panel-heading">#}
-                    {#                        <div class="panel-title">#}
-                    {#                            Privacidade#}
-                    {#                        </div>#}
-                    {#                    </div>#}
-                    {#                    <div class="panel-body">#}
-                    {#                        <div class="row">#}
-                    {#                            <div class="col-xl-2 col-lg-4 col-md-4">#}
-                    {#                                {% render_generic_field form.private %}#}
-                    {#                            </div>#}
-                    {#                            <div class="col-xl-4 col-lg-4 col-md-4">#}
-                    {#                                {% render_generic_field form.exhibition_code %}#}
-                    {#                            </div>#}
-                    {#                        </div>#}
-                    {#                    </div>#}
-                    {#                </div>#}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="buttonbar bottom">
-                        <div class="float-right">
-                            <a href="{% url 'subscription:lot-list' event.pk %}"
-                               class="btn btn-danger">
-                                <i class="fas fa-times-circle"></i>Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="fa fa-save"></i>
-                                Salvar
-                            </button>
-                        </div>
-                        <div class="clearfix"></div>
+                            <div class="row">
+                                <div class="col-xl-2 col-lg-2 col-md-2">
+                                    {% render_generic_field form.allow_installments %}
+                                </div>
+                                <div class="col-xl-1 col-lg-1 col-md-1">
+                                    {% render_generic_field form.installments %}
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-xl-4 col-lg-3 col-md-3">
+                                    {% render_generic_field form.transfer_interest_rate %}
+                                </div>
+                            </div>
+
+                        {% else %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="alert alert-warning">
+                                        <strong>È necessário que complete seus dads bancários para criar lotes
+                                            pagos!</strong>
+
+                                    </div>
+                                    <p><a href="{% url 'event:organization-financial-edit' organization.pk %}">
+                                        Clique aqui para configurar estes dados.</a></p>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
+            {#                <div class="panel panel-primary">#}
+            {#                    <div class="panel-heading">#}
+            {#                        <div class="panel-title">#}
+            {#                            Privacidade#}
+            {#                        </div>#}
+            {#                    </div>#}
+            {#                    <div class="panel-body">#}
+            {#                        <div class="row">#}
+            {#                            <div class="col-xl-2 col-lg-4 col-md-4">#}
+            {#                                {% render_generic_field form.private %}#}
+            {#                            </div>#}
+            {#                            <div class="col-xl-4 col-lg-4 col-md-4">#}
+            {#                                {% render_generic_field form.exhibition_code %}#}
+            {#                            </div>#}
+            {#                        </div>#}
+            {#                    </div>#}
+            {#                </div>#}
+        </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+                        <a href="{% url 'subscription:lot-list' event.pk %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
     </form>
 
 {% endblock %}

@@ -54,6 +54,8 @@ class Lot(models.Model, GatherosModelMixin):
     DISCOUNT_TYPE_PERCENT = 'percent'
     DISCOUNT_TYPE_MONEY = 'money'
 
+    INSTALLMENTS = [('INSTALLMENT_' + str(i), str(i)) for i in range(2,10)]
+
     DISCOUNT_TYPE = (
         (DISCOUNT_TYPE_PERCENT, '%'),
         (DISCOUNT_TYPE_MONEY, 'R$'),
@@ -133,6 +135,27 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='repassar taxa ao participante',
         help_text="Repasse a taxa para o participante e receba o valor integral do ingresso."
     )
+
+    allow_installments = models.BooleanField(
+        default=False,
+        verbose_name='parcelamento',
+        help_text="Permitir parcelamento do valor do ingresso."
+    )
+
+    transfer_interest_rate = models.BooleanField(
+        default=False,
+        verbose_name='repassar juros de parcelamento ao participante',
+        help_text="Repasse os juros das parcelas para o participante e receba o valor integral da parcela."
+    )
+
+    installments = models.CharField(
+        max_length=15,
+        choices=INSTALLMENTS,
+        verbose_name='parcelas',
+        null=True,
+        blank=True
+    )
+
     private = models.BooleanField(
         default=False,
         verbose_name='privado',

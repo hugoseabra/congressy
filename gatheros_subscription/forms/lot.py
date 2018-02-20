@@ -33,9 +33,13 @@ class LotForm(forms.ModelForm):
             'price',
             'private',
             'exhibition_code',
+            'transfer_tax',
+            'allow_installments',
+            'installments',
+            'transfer_interest_rate'
             # 'discount_type',
             # 'discount',
-            'transfer_tax',
+
 
         ]
         widgets = {

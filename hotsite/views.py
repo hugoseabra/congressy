@@ -569,14 +569,16 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
             if self.has_paid_lots():
                 try:
-                    transaction_instance_data = PagarmeTransactionInstanceData(
+
+                    transaction_instance = PagarmeTransactionInstanceData(
                         subscription=subscription,
                         extra_data=request.POST.copy(),
                         event=self.event
+
                     )
 
                     create_pagarme_transaction(
-                        payment=transaction_instance_data.transaction_instance_data,
+                        payment=transaction_instance.transaction_instance_data,
                         subscription=subscription
                     )
 
