@@ -111,7 +111,7 @@ class ProfileCreateView(TemplateView, FormView):
         if len(name.split(' ')) < 2:
             messages.error(
                 self.request,
-                "Você deve informar seu sobrenome para fazer a sua inscrição."
+                "Você deve informar seu sobrenome para criar sua conta."
             )
 
             return self.render_to_response(context)
