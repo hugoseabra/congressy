@@ -2,12 +2,12 @@
 gatheros_subscription templatetags
 """
 import datetime
-from decimal import Decimal
 from ast import literal_eval
-from django.conf import settings
+from decimal import Decimal
 
 import timestring
 from django import template
+from django.conf import settings
 from django.template.defaultfilters import stringfilter
 
 from core.util import git_util
@@ -96,10 +96,13 @@ def money_divide(value):
 @register.filter
 def money_divide_with_percentage(amount):
     if not amount:
-        return '0.00'
+        return ' --- '
 
     congressy_percent = Decimal(settings.CONGRESSY_PLAN_PERCENT_10)
-    deductible = (congressy_percent * amount) / 100
+    congressy_amount = amount * (congressy_percent / 100)
 
-    amount = amount - deductible
-    return amount
+    minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+    if congressy_amount < minimum:
+        congressy_amount = minimum
+
+    return round(amount - congressy_amount, 2)
