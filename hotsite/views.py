@@ -569,39 +569,35 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 return self.render_to_response(context)
 
         # CONDIÇÃO 6
-        with transaction.atomic():
-
-            # Garante rollback da inscrição
-            subscription.save()
-
-            if self.has_paid_lots():
-                try:
-                    transaction_instance_data = PagarmeTransactionInstanceData(
+        if self.has_paid_lots():
+            try:
+                transaction_instance_data = \
+                    PagarmeTransactionInstanceData(
                         subscription=subscription,
                         extra_data=request.POST.copy(),
                         event=self.event
                     )
 
-                    create_pagarme_transaction(
-                        payment=transaction_instance_data.transaction_instance_data,
-                        subscription=subscription
-                    )
+                data = \
+                    transaction_instance_data.transaction_instance_data
+                create_pagarme_transaction(
+                    payment=data,
+                    subscription=subscription
+                )
+            except TransactionError as e:
+                error_dict = {
+                    'No transaction type': 'Por favor escolher uma forma de pagamento.',
+                    'Transaction type not allowed': 'Forma de pagamento não permitida.',
+                    'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
+                    'No organization': 'Evento não possui organizador.',
+                }
+                if e.message in error_dict:
+                    e.message = error_dict[e.message]
 
-                except TransactionError as e:
-                    transaction.rollback()
+                messages.error(self.request, message=e.message)
+                return self.render_to_response(context)
 
-                    error_dict = {
-                        'No transaction type': 'Por favor escolher uma forma de pagamento.',
-                        'Transaction type not allowed': 'Forma de pagamento não permitida.',
-                        'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
-                        'No organization': 'Evento não possui organizador.',
-                    }
-                    if e.message in error_dict:
-                        e.message = error_dict[e.message]
-
-                    messages.error(self.request, message=e.message)
-                    transaction.rollback()
-                    return self.render_to_response(context)
+            subscription.save()
 
             # CONDIÇÃO 5 e 7
             if new_account and new_subscription:
