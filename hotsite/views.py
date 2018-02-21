@@ -4,7 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseNotAllowed, HttpResponseRedirect
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
@@ -78,7 +78,6 @@ class EventMixin(generic.View):
                 return True
 
         return False
-
 
     def get_period(self):
         """ Resgata o prazo de duração do evento. """
@@ -570,26 +569,26 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 return self.render_to_response(context)
 
         # CONDIÇÃO 6
+        with transaction.atomic():
+
+            # Garante rollback da inscrição
+            subscription.save()
 
             if self.has_paid_lots():
                 try:
-                    with transaction.atomic():
+                    transaction_instance_data = PagarmeTransactionInstanceData(
+                        subscription=subscription,
+                        extra_data=request.POST.copy(),
+                        event=self.event
+                    )
 
-                        # Garante rollback da inscrição
-                        subscription.save()
-
-                        transaction_instance_data = PagarmeTransactionInstanceData(
-                            subscription=subscription,
-                            extra_data=request.POST.copy(),
-                            event=self.event
-                        )
-
-                        create_pagarme_transaction(
-                            payment=transaction_instance_data.transaction_instance_data,
-                            subscription=subscription
-                        )
+                    create_pagarme_transaction(
+                        payment=transaction_instance_data.transaction_instance_data,
+                        subscription=subscription
+                    )
 
                 except TransactionError as e:
+                    transaction.rollback()
 
                     error_dict = {
                         'No transaction type': 'Por favor escolher uma forma de pagamento.',
@@ -601,7 +600,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                         e.message = error_dict[e.message]
 
                     messages.error(self.request, message=e.message)
-
+                    transaction.rollback()
                     return self.render_to_response(context)
 
             # CONDIÇÃO 5 e 7
@@ -640,9 +639,7 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
 
         try:
             self.subscription = Subscription.objects.get(
-                event=self.event,
-                person=self.person
-            )
+                event=self.event, person=self.person)
 
             if not request.user.is_authenticated or not self.person:
                 return redirect('public:hotsite', slug=self.event.slug)
