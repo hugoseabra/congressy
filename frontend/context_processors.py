@@ -4,7 +4,7 @@ Sentry public DSN para suporte a erros do javascript
 import os
 
 
-def sentry_public_dsn():
+def sentry_public_dsn(request):
     """
     Adicionar SENTRY_PUBLIC_DSN ao contexto de templates.
     """
