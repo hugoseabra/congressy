@@ -43,7 +43,8 @@ class EventPaymentView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         all_transactions = Transaction.objects.filter(
-            subscription__event=self.event)
+            subscription__event=self.event
+        )
 
         return all_transactions
 
@@ -67,7 +68,10 @@ class EventPaymentView(LoginRequiredMixin, ListView):
         total = 0
 
         for transaction in all_transactions:
-            total += transaction.amount
+            cgsy_tax = (settings.PAGARME_CONGRESSY_PERCENTAGE *
+                        transaction.amount) / 100.0
+            calculated_total = transaction.amount - cgsy_tax
+            total += calculated_total
 
         return total
 
@@ -80,8 +84,11 @@ def postback_url_view(request, uidb64):
             <pre><code>{0}</code></pre>
     """.format(json.dumps(request.data))
 
-    send_mail(subject="Recived a postbackcall", body=body,
-              to=settings.DEV_ALERT_EMAILS)
+    send_mail(
+        subject="Recived a postbackcall",
+        body=body,
+        to=settings.DEV_ALERT_EMAILS
+    )
 
     if not uidb64:
         raise Http404
@@ -98,8 +105,10 @@ def postback_url_view(request, uidb64):
         status = data.get('current_status', '')
 
         transaction.data['status'] = status
-        transaction.data['boleto_url'] = data.get('transaction[boleto_url]',
-                                                  '')
+        transaction.data['boleto_url'] = data.get(
+            'transaction[boleto_url]',
+            ''
+        )
         transaction.save()
 
         transaction_status.data['status'] = status
