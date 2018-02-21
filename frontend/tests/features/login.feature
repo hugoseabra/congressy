@@ -1,6 +1,7 @@
-Feature: Testando o Login
+Feature: Testando o login
 
-  Scenario: Usuario digita o email
-    Given pagina de login
-    When ele digitar o seu email no campo
-    Then A tela de login deve aparecer o campo email preenchido com o "email"
+  Scenario: Usuario loga no sistema
+
+    Given um usuario
+    When Eu logo
+    Then Eu vejo a pagina de minhas inscricoes
