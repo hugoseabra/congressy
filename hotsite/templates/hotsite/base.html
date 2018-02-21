@@ -17,8 +17,6 @@
 {% include 'hotsite/includes/7_footer.html' %}
 </div>
 
-{% include 'sentry-javascript-sdk.html' %}
-
 <!-- LIBRARIES JS
 ================================= -->
 <script src="{% static 'hotsite/js/jquery-1.11.2.min.js' %}"></script>
@@ -57,20 +55,8 @@ $(document).ready(function() {
 </script>
 {% endif %}
 
-{% if not debug %}
-<!-- Hotjar Tracking Code -->
-<script>
-    (function(h,o,t,j,a,r){
-        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-        h._hjSettings={hjid:774264,hjsv:6};
-        a=o.getElementsByTagName('head')[0];
-        r=o.createElement('script');r.async=1;
-        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-        a.appendChild(r);
-    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-</script>
-{% endif %}
-
+{% include 'sentry-javascript-sdk.html' %}
+{% include 'hotjar.html' %}
 
 </body>
 
