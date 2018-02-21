@@ -86,7 +86,7 @@ def parse_date(date_string, format):
 @register.filter
 def money_divide(value):
     try:
-        raw_result = value / 100
+        raw_result = value
         result = format(raw_result, '.2f')
         return result
     except (ValueError, ZeroDivisionError):
@@ -99,5 +99,7 @@ def money_divide_with_percentage(amount):
         return '0.00'
 
     congressy_percent = Decimal(settings.CONGRESSY_PLAN_PERCENT_10)
-    congressy_amount = amount * (congressy_percent / 100)
-    return format(congressy_amount, '.2f')
+    deductible = (congressy_percent * amount) / 100
+
+    amount = amount - deductible
+    return amount

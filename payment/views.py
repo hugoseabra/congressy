@@ -44,7 +44,7 @@ class EventPaymentView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         all_transactions = Transaction.objects.filter(
             subscription__event=self.event
-        )
+        ).order_by('subscription__person__name')
 
         return all_transactions
 
@@ -69,8 +69,9 @@ class EventPaymentView(LoginRequiredMixin, ListView):
 
         congressy_percent = Decimal(settings.CONGRESSY_PLAN_PERCENT_10)
         for transaction in all_transactions:
-            cgsy_tax = (congressy_percent * transaction.amount) / 100
-            calculated_total = transaction.amount - cgsy_tax
+            amount = transaction.amount
+            deductible = (congressy_percent * amount) / 100
+            calculated_total = transaction.amount - deductible
             total += calculated_total
 
         return total
