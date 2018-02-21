@@ -39,6 +39,7 @@ ua-parser==0.7.3
 user-agents==1.1.0
 six==1.11.0
 timestring==1.6.2
+WeasyPrint==0.42.2
 tolerance==0.1.2
 Unidecode==0.4.19
 urllib3==1.22
