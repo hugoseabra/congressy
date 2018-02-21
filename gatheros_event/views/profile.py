@@ -102,6 +102,22 @@ class ProfileCreateView(TemplateView, FormView):
 
         return redirect('front:start')
 
+    def post(self, request, *args, **kwargs):
+
+        context = self.get_context_data(**kwargs)
+
+        name = self.request.POST.get('name')
+
+        if len(name.split(' ')) < 2:
+            messages.error(
+                self.request,
+                "Você deve informar seu sobrenome para criar sua conta."
+            )
+
+            return self.render_to_response(context)
+
+        return super().post(request, *args, **kwargs)
+
 
 class PasswordResetView(auth_views.PasswordResetView):
     def form_valid(self, form):

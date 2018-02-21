@@ -107,7 +107,8 @@ class PagarmeTransactionInstanceData:
                     "recipient_id": congressy_id,
                     "percentage": 10,
                     "liable": True,
-                    "charge_processing_fee": True
+                    "charge_processing_fee": True,
+                    "charge_remainder_fee": True
                 },
                 {
                     "recipient_id": self.organization.recipient_id,

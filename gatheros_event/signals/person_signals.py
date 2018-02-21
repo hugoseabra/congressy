@@ -21,5 +21,5 @@ def update_user_related_name(instance, raw, **_):
     last = last.strip()
 
     instance.user.first_name = first
-    instance.user.last_name = last if not last == first else None
+    instance.user.last_name = last if not last == first else first
     instance.user.save()
