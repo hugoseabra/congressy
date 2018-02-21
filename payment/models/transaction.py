@@ -73,7 +73,9 @@ class Transaction(models.Model):
         blank=True,
     )
 
-    amount = models.IntegerField(
+    amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
         null=True,
         blank=True,
     )

@@ -1,5 +1,5 @@
 import json
-
+from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
@@ -67,9 +67,9 @@ class EventPaymentView(LoginRequiredMixin, ListView):
 
         total = 0
 
+        congressy_percent = Decimal(settings.CONGRESSY_PLAN_PERCENT_10)
         for transaction in all_transactions:
-            cgsy_tax = (settings.PAGARME_CONGRESSY_PERCENTAGE *
-                        transaction.amount) / 100.0
+            cgsy_tax = (congressy_percent * transaction.amount) / 100
             calculated_total = transaction.amount - cgsy_tax
             total += calculated_total
 

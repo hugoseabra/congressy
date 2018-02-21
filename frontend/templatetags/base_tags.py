@@ -2,7 +2,9 @@
 gatheros_subscription templatetags
 """
 import datetime
+from decimal import Decimal
 from ast import literal_eval
+from django.conf import settings
 
 import timestring
 from django import template
@@ -90,17 +92,12 @@ def money_divide(value):
     except (ValueError, ZeroDivisionError):
         return None
 
+
 @register.filter
-def money_divide_with_percentage(value, percentage=10):
-    try:
-        deductible = (percentage * value) / 100.0
+def money_divide_with_percentage(amount):
+    if not amount:
+        return '0.00'
 
-        value = value - deductible
-
-        raw_result = value / 100
-
-        result = format(raw_result, '.2f')
-
-        return result
-    except (ValueError, ZeroDivisionError):
-        return None
+    congressy_percent = Decimal(settings.CONGRESSY_PLAN_PERCENT_10)
+    congressy_amount = amount * (congressy_percent / 100)
+    return format(congressy_amount, '.2f')

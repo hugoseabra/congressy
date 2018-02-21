@@ -1,6 +1,6 @@
 import os
 import uuid
-from decimal import Decimal, getcontext as decimal_context
+from decimal import Decimal
 
 import absoluteuri
 from django.conf import settings

@@ -570,25 +570,27 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 return self.render_to_response(context)
 
         # CONDIÇÃO 6
-        with transaction.atomic():
-
-            # Garante rollback da inscrição
-            subscription.save()
 
             if self.has_paid_lots():
                 try:
-                    transaction_instance_data = PagarmeTransactionInstanceData(
-                        subscription=subscription,
-                        extra_data=request.POST.copy(),
-                        event=self.event
-                    )
+                    with transaction.atomic():
 
-                    create_pagarme_transaction(
-                        payment=transaction_instance_data.transaction_instance_data,
-                        subscription=subscription
-                    )
+                        # Garante rollback da inscrição
+                        subscription.save()
+
+                        transaction_instance_data = PagarmeTransactionInstanceData(
+                            subscription=subscription,
+                            extra_data=request.POST.copy(),
+                            event=self.event
+                        )
+
+                        create_pagarme_transaction(
+                            payment=transaction_instance_data.transaction_instance_data,
+                            subscription=subscription
+                        )
 
                 except TransactionError as e:
+
                     error_dict = {
                         'No transaction type': 'Por favor escolher uma forma de pagamento.',
                         'Transaction type not allowed': 'Forma de pagamento não permitida.',
@@ -599,6 +601,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                         e.message = error_dict[e.message]
 
                     messages.error(self.request, message=e.message)
+
                     return self.render_to_response(context)
 
             # CONDIÇÃO 5 e 7
@@ -637,7 +640,9 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
 
         try:
             self.subscription = Subscription.objects.get(
-                event=self.event, person=self.person)
+                event=self.event,
+                person=self.person
+            )
 
             if not request.user.is_authenticated or not self.person:
                 return redirect('public:hotsite', slug=self.event.slug)
@@ -645,8 +650,10 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
             return response
 
         except Subscription.DoesNotExist:
-            messages.error(message='Você não possui inscrição neste evento.',
-                           request=request)
+            messages.error(
+                message='Você não possui inscrição neste evento.',
+                request=request
+            )
             return redirect('public:hotsite', slug=self.event.slug)
 
     def get_context_data(self, **kwargs):
@@ -740,6 +747,6 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
                 return True
 
             except (Subscription.DoesNotExist, AttributeError):
-                return HttpResponseRedirect(reverse('public:hotsite'))
+                pass
 
         return False

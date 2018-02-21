@@ -300,7 +300,7 @@ SALES_ALERT_EMAILS = [
 # transações
 
 # Informar o valor em percentual, sem o símbolo
-CONGRESSY_PLAN_PERCENT_10 = '10'
+CONGRESSY_PLAN_PERCENT_10 = 10
 
 # Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
 # devido for menor do que este, o valor da transaçaõ da parte da congressy será
