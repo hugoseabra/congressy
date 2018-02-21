@@ -1,5 +1,6 @@
 from django.urls import reverse_lazy
 
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import DeleteViewMixin
 
@@ -11,6 +12,18 @@ class EventDeleteView(DeleteViewMixin):
     delete_message = "Tem certeza que deseja excluir o evento \"{name}\"?"
     success_message = "Evento excluído com sucesso."
     template_name = "event/delete.html"
+
+    def pre_dispatch(self, request):
+        self.object = self.get_object()
+
+        if self.object:
+            update_account(
+                request=self.request,
+                organization=self.object.organization,
+                force=True
+            )
+
+        return super().pre_dispatch(request)
 
     def get_permission_denied_url(self):
         return self.success_url

@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView
 
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 
@@ -13,6 +14,19 @@ class EventPanelView(AccountMixin, DetailView):
     # template_name = 'gatheros_event/event/panel.html'
     template_name = 'event/panel.html'
     permission_denied_url = reverse_lazy('event:event-list')
+    object = None
+
+    def pre_dispatch(self, request):
+        self.object = self.get_object()
+
+        if self.object:
+            update_account(
+                request=self.request,
+                organization=self.object.organization,
+                force=True
+            )
+
+        return super().pre_dispatch(request)
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()

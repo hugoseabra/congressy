@@ -12,6 +12,7 @@ from django.utils.decorators import classonlymethod
 from django.views import generic
 
 from gatheros_event.forms import PersonForm
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
@@ -22,7 +23,6 @@ from gatheros_subscription.forms import SubscriptionForm
 from gatheros_subscription.helpers.subscription import \
     export as subscription_export
 from gatheros_subscription.models import Subscription, FormConfig
-from payment.models import Transaction
 from .filters import SubscriptionFilterForm
 
 
@@ -32,6 +32,12 @@ class EventViewMixin(AccountMixin, generic.View):
 
     def dispatch(self, request, *args, **kwargs):
         self.event = self.get_event()
+
+        update_account(
+            request=self.request,
+            organization=self.event.organization,
+            force=True
+        )
 
         self.permission_denied_url = reverse(
             'event:event-panel',

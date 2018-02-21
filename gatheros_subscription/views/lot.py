@@ -1,13 +1,15 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot
-from decimal import Decimal
 
 
 class BaseLotView(AccountMixin, View):
@@ -24,6 +26,12 @@ class BaseLotView(AccountMixin, View):
             return redirect(reverse_lazy('event:event-list'))
 
         else:
+            update_account(
+                request=self.request,
+                organization=self.event.organization,
+                force=True
+            )
+
             if not self.can_view():
                 return redirect(reverse(
                     'event:event-panel',
@@ -168,7 +176,8 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
         if not self.organization:
             return False
 
-        banking_required_fields = ['bank_code', 'agency', 'account', 'cnpj_ou_cpf', 'account_type']
+        banking_required_fields = ['bank_code', 'agency', 'account',
+                                   'cnpj_ou_cpf', 'account_type']
 
         for field in Organization._meta.get_fields():
 

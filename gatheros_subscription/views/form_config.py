@@ -1,7 +1,9 @@
+from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
-from django.contrib import messages
+
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import (
     AccountMixin,
@@ -14,6 +16,14 @@ class EventViewMixin(AccountMixin, generic.View):
     event = None
 
     def dispatch(self, request, *args, **kwargs):
+        event = self.get_event()
+
+        update_account(
+            request=self.request,
+            organization=event.organization,
+            force=True
+        )
+
         self.permission_denied_url = reverse(
             'event:event-panel',
             kwargs={'pk': self.kwargs.get('event_pk')}
