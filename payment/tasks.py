@@ -1,9 +1,12 @@
-import pagarme
 import json
+from decimal import Decimal
+
+import pagarme
 from django.conf import settings
+
 from mailer.tasks import send_mail
-from payment.models import Transaction, TransactionStatus
 from payment.exception import TransactionError, OrganizerRecipientError
+from payment.models import Transaction, TransactionStatus
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
 
@@ -12,7 +15,6 @@ congressy_id = settings.PAGARME_RECIPIENT_ID
 
 # @TODO-low create a mock of the response to use during testing
 def create_pagarme_transaction(payment=None, subscription=None):
-
     if not payment or not subscription:
         return
 
@@ -45,11 +47,21 @@ def create_pagarme_transaction(payment=None, subscription=None):
         send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
         raise TransactionError(message='Unknown API error')
 
+    # Separar centavos
+    amount = str(trx['amount'])
+    size = len(amount)
+    cents = amount[-2] + amount[-1]
+    amount = '{}.{}'.format(amount[0:size - 2], cents)
+    amount = Decimal(amount)
+
     transaction_instance.data = trx
     transaction_instance.status = trx['status']
     transaction_instance.type = trx['payment_method']
     transaction_instance.date_created = trx['date_created']
-    transaction_instance.amount = trx['amount']
+    transaction_instance.amount = amount
+
+    # Caso a inscrição seja uma nova inscrição.
+    subscription.save()
     transaction_instance.save()
 
     transaction_status = TransactionStatus(
@@ -65,7 +77,6 @@ def create_pagarme_transaction(payment=None, subscription=None):
 
 # @TODO create a mock of the response to use during testing
 def create_pagarme_organizer_recipient(organization=None):
-
     if not organization:
         return
 

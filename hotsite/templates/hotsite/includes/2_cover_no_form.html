@@ -70,10 +70,11 @@
                                     </li>
                                 {% endfor %}
                             </ul>
-                        {% elif  not subscription_enabled %}
+                        {% elif subsciption_finished %}
+                            <p style="font-size: 20px;font-style: italic;">Inscrições encerradas.</p>
+                        {% else %}
                             <p style="font-size: 20px;font-style: italic;">Evento não permite inscrições.</p>
                         {% endif %}
-
                     </div>
                     <div class="hero-features-right col-md-5" data-animation="fadeIn">
                     </div>

@@ -1,17 +1,17 @@
 import json
-
+from decimal import Decimal
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from mailer.tasks import send_mail
-from payment.models import Transaction
-from payment.models import TransactionStatus
+from payment.models import Transaction, TransactionStatus
 
 
 class EventPaymentView(LoginRequiredMixin, ListView):
@@ -19,20 +19,32 @@ class EventPaymentView(LoginRequiredMixin, ListView):
     event = None
 
     def dispatch(self, request, *args, **kwargs):
+
         self.event = get_object_or_404(Event, pk=self.kwargs.get('pk'))
-        response = super().dispatch(request, *args, **kwargs)
-        return response
+        update_account(
+            request=self.request,
+            organization=self.event.organization,
+            force=True
+        )
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(EventPaymentView, self).get_context_data(**kwargs)
         context['event'] = self.event
-        context['total_paid_payables'] = self._get_payables(transaction_type='paid')
-        context['total_payables'] = self._get_payables(transaction_type='total')
+        context['total_paid_payables'] = self._get_payables(
+            transaction_type='paid'
+        )
+        context['total_payables'] = self._get_payables(
+            transaction_type='total'
+        )
 
         return context
 
     def get_queryset(self):
-        all_transactions = Transaction.objects.filter(subscription__event=self.event)
+        all_transactions = Transaction.objects.filter(
+            subscription__event=self.event
+        ).order_by('subscription__person__name')
 
         return all_transactions
 
@@ -41,15 +53,26 @@ class EventPaymentView(LoginRequiredMixin, ListView):
         if not transaction_type:
             return 0
 
+        all_transactions = []
+
         if transaction_type == 'paid':
-            all_transactions = Transaction.objects.filter(subscription__event=self.event, status=Transaction.PAID)
+            all_transactions = Transaction.objects.filter(
+                subscription__event=self.event,
+                status=Transaction.PAID
+            )
         elif transaction_type == 'total':
-            all_transactions = Transaction.objects.filter(subscription__event=self.event)
+            all_transactions = Transaction.objects.filter(
+                subscription__event=self.event
+            )
 
         total = 0
 
+        congressy_percent = Decimal(settings.CONGRESSY_PLAN_PERCENT_10)
         for transaction in all_transactions:
-            total += transaction.amount
+            amount = transaction.amount
+            deductible = (congressy_percent * amount) / 100
+            calculated_total = transaction.amount - deductible
+            total += calculated_total
 
         return total
 
@@ -62,7 +85,11 @@ def postback_url_view(request, uidb64):
             <pre><code>{0}</code></pre>
     """.format(json.dumps(request.data))
 
-    send_mail(subject="Recived a postbackcall", body=body, to=settings.DEV_ALERT_EMAILS)
+    send_mail(
+        subject="Recived a postbackcall",
+        body=body,
+        to=settings.DEV_ALERT_EMAILS
+    )
 
     if not uidb64:
         raise Http404
@@ -79,7 +106,10 @@ def postback_url_view(request, uidb64):
         status = data.get('current_status', '')
 
         transaction.data['status'] = status
-        transaction.data['boleto_url'] = data.get('transaction[boleto_url]', '')
+        transaction.data['boleto_url'] = data.get(
+            'transaction[boleto_url]',
+            ''
+        )
         transaction.save()
 
         transaction_status.data['status'] = status

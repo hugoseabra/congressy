@@ -4,7 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseNotAllowed, HttpResponseRedirect
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
@@ -42,9 +42,9 @@ class EventMixin(generic.View):
         context['period'] = self.get_period()
         context['lots'] = self.get_lots()
         context['subscription_enabled'] = self.subscription_enabled()
+        context['subsciption_finished'] = self.subsciption_finished()
         context['has_paid_lots'] = self.has_paid_lots()
-        context[
-            'has_configured_bank_account'] = \
+        context['has_configured_bank_account'] = \
             self.event.organization.is_bank_account_configured()
         context['has_active_bank_account'] = \
             self.event.organization.active_recipient
@@ -72,13 +72,20 @@ class EventMixin(generic.View):
 
         return self.event.status == Event.EVENT_STATUS_NOT_STARTED
 
+    def subsciption_finished(self):
+        for lot in self.event.lots.all():
+            if lot.status == Lot.LOT_STATUS_FINISHED:
+                return True
+
+        return False
+
     def get_period(self):
         """ Resgata o prazo de duração do evento. """
         return self.event.get_period()
 
-    def get_lots(self):
+    def get_lots(self, status=Lot.LOT_STATUS_RUNNING):
         lots = self.event.lots.all()
-        return [lot for lot in lots if lot.status == lot.LOT_STATUS_RUNNING]
+        return [lot for lot in lots if lot.status == status]
 
 
 class SubscriptionFormMixin(EventMixin, generic.FormView):
@@ -562,36 +569,35 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 return self.render_to_response(context)
 
         # CONDIÇÃO 6
-        with transaction.atomic():
-
-            # Garante rollback da inscrição
-            subscription.save()
-
-            if self.has_paid_lots():
-                try:
-                    transaction_instance_data = PagarmeTransactionInstanceData(
+        if self.has_paid_lots():
+            try:
+                transaction_instance_data = \
+                    PagarmeTransactionInstanceData(
                         subscription=subscription,
                         extra_data=request.POST.copy(),
                         event=self.event
                     )
 
-                    create_pagarme_transaction(
-                        payment=transaction_instance_data.transaction_instance_data,
-                        subscription=subscription
-                    )
+                data = \
+                    transaction_instance_data.transaction_instance_data
+                create_pagarme_transaction(
+                    payment=data,
+                    subscription=subscription
+                )
+            except TransactionError as e:
+                error_dict = {
+                    'No transaction type': 'Por favor escolher uma forma de pagamento.',
+                    'Transaction type not allowed': 'Forma de pagamento não permitida.',
+                    'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
+                    'No organization': 'Evento não possui organizador.',
+                }
+                if e.message in error_dict:
+                    e.message = error_dict[e.message]
 
-                except TransactionError as e:
-                    error_dict = {
-                        'No transaction type': 'Por favor escolher uma forma de pagamento.',
-                        'Transaction type not allowed': 'Forma de pagamento não permitida.',
-                        'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
-                        'No organization': 'Evento não possui organizador.',
-                    }
-                    if e.message in error_dict:
-                        e.message = error_dict[e.message]
+                messages.error(self.request, message=e.message)
+                return self.render_to_response(context)
 
-                    messages.error(self.request, message=e.message)
-                    return self.render_to_response(context)
+            subscription.save()
 
             # CONDIÇÃO 5 e 7
             if new_account and new_subscription:
@@ -637,8 +643,10 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
             return response
 
         except Subscription.DoesNotExist:
-            messages.error(message='Você não possui inscrição neste evento.',
-                           request=request)
+            messages.error(
+                message='Você não possui inscrição neste evento.',
+                request=request
+            )
             return redirect('public:hotsite', slug=self.event.slug)
 
     def get_context_data(self, **kwargs):
@@ -732,6 +740,6 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
                 return True
 
             except (Subscription.DoesNotExist, AttributeError):
-                return HttpResponseRedirect(reverse('public:hotsite'))
+                pass
 
         return False

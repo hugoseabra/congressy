@@ -65,36 +65,15 @@ class LotAdmin(admin.ModelAdmin):
     get_percent_completed.__name__ = 'Vagas restantes'
     get_percent_attended.__name__ = 'Credenciados'
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "event":
-            events = Event.objects.annotate(num_lots=Count('lots')).filter(
-                Q(
-                    subscription_type=Event.SUBSCRIPTION_SIMPLE,
-                    num_lots__exact=0
-                ) | Q(
-                    subscription_type=Event.SUBSCRIPTION_BY_LOTS
-                )
-            )
-
-            for event in events:
-                is_simple = \
-                    event.subscription_type == Event.SUBSCRIPTION_SIMPLE
-                has_lots = event.lots.count() > 0
-                if is_simple and has_lots:
-                    continue
-
-            kwargs["queryset"] = events
-
-        return super(LotAdmin, self).formfield_for_foreignkey(
-            db_field,
-            request,
-            **kwargs
-        )
-
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    search_fields = ('person__name', 'person__email', 'created', 'event__name',)
+    search_fields = (
+        'person__name',
+        'person__email',
+        'created',
+        'event__name',
+    )
     list_display = ('person', 'count', 'lot', 'code', 'attended',)
     readonly_fields = [
         'event',

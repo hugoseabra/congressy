@@ -9,7 +9,6 @@ from .transaction import Transaction
 
 
 class TransactionStatus(models.Model):
-
     PROCESSING = 'processing'
     AUTHORIZED = 'authorized'
     PAID = 'paid'
@@ -35,7 +34,9 @@ class TransactionStatus(models.Model):
         verbose_name_plural = 'Status de Transações'
 
     def __str__(self):
-        return str(self.id)
+        return self.transaction.subscription.person.name + ' - ' \
+               + self.transaction.subscription.event.name + ' -- ' \
+               + self.transaction.type
 
     status = models.CharField(
         max_length=30,
