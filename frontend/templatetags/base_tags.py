@@ -89,3 +89,18 @@ def money_divide(value):
         return result
     except (ValueError, ZeroDivisionError):
         return None
+
+@register.filter
+def money_divide_with_percentage(value, percentage=10):
+    try:
+        deductible = (percentage * value) / 100.0
+
+        value = value - deductible
+
+        raw_result = value / 100
+
+        result = format(raw_result, '.2f')
+
+        return result
+    except (ValueError, ZeroDivisionError):
+        return None

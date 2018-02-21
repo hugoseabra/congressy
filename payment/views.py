@@ -26,13 +26,16 @@ class EventPaymentView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(EventPaymentView, self).get_context_data(**kwargs)
         context['event'] = self.event
-        context['total_paid_payables'] = self._get_payables(transaction_type='paid')
-        context['total_payables'] = self._get_payables(transaction_type='total')
+        context['total_paid_payables'] = self._get_payables(
+            transaction_type='paid')
+        context['total_payables'] = self._get_payables(
+            transaction_type='total')
 
         return context
 
     def get_queryset(self):
-        all_transactions = Transaction.objects.filter(subscription__event=self.event)
+        all_transactions = Transaction.objects.filter(
+            subscription__event=self.event)
 
         return all_transactions
 
@@ -42,14 +45,19 @@ class EventPaymentView(LoginRequiredMixin, ListView):
             return 0
 
         if transaction_type == 'paid':
-            all_transactions = Transaction.objects.filter(subscription__event=self.event, status=Transaction.PAID)
+            all_transactions = Transaction.objects.filter(
+                subscription__event=self.event, status=Transaction.PAID)
         elif transaction_type == 'total':
-            all_transactions = Transaction.objects.filter(subscription__event=self.event)
+            all_transactions = Transaction.objects.filter(
+                subscription__event=self.event)
 
         total = 0
 
         for transaction in all_transactions:
-            total += transaction.amount
+            cgsy_tax = (settings.PAGARME_CONGRESSY_PERCENTAGE *
+                        transaction.amount) / 100.0
+            calculated_total = transaction.amount - cgsy_tax
+            total += calculated_total
 
         return total
 
@@ -62,7 +70,8 @@ def postback_url_view(request, uidb64):
             <pre><code>{0}</code></pre>
     """.format(json.dumps(request.data))
 
-    send_mail(subject="Recived a postbackcall", body=body, to=settings.DEV_ALERT_EMAILS)
+    send_mail(subject="Recived a postbackcall", body=body,
+              to=settings.DEV_ALERT_EMAILS)
 
     if not uidb64:
         raise Http404
@@ -79,7 +88,9 @@ def postback_url_view(request, uidb64):
         status = data.get('current_status', '')
 
         transaction.data['status'] = status
-        transaction.data['boleto_url'] = data.get('transaction[boleto_url]', '')
+        transaction.status = status
+        transaction.data['boleto_url'] = data.get('transaction[boleto_url]',
+                                                  '')
         transaction.save()
 
         transaction_status.data['status'] = status

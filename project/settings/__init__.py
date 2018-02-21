@@ -294,3 +294,5 @@ DEFAULT_FROM_EMAIL = 'Congressy <mail@congressy.net>'
 CONGRESSY_REPLY_TO = 'Congressy <congressy@congressy.com>'
 DEV_ALERT_EMAILS = ['infra@congressy.com']
 SALES_ALERT_EMAILS = ['congressy@congressy.com', 'infra@congressy.com']
+# ============================= PAGAR.ME ==================================== #
+PAGARME_CONGRESSY_PERCENTAGE = 10
