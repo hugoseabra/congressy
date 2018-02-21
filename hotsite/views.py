@@ -42,9 +42,9 @@ class EventMixin(generic.View):
         context['period'] = self.get_period()
         context['lots'] = self.get_lots()
         context['subscription_enabled'] = self.subscription_enabled()
+        context['subsciption_finished'] = self.subsciption_finished()
         context['has_paid_lots'] = self.has_paid_lots()
-        context[
-            'has_configured_bank_account'] = \
+        context['has_configured_bank_account'] = \
             self.event.organization.is_bank_account_configured()
         context['has_active_bank_account'] = \
             self.event.organization.active_recipient
@@ -72,13 +72,21 @@ class EventMixin(generic.View):
 
         return self.event.status == Event.EVENT_STATUS_NOT_STARTED
 
+    def subsciption_finished(self):
+        for lot in self.event.lots.all():
+            if lot.status == Lot.LOT_STATUS_FINISHED:
+                return True
+
+        return False
+
+
     def get_period(self):
         """ Resgata o prazo de duração do evento. """
         return self.event.get_period()
 
-    def get_lots(self):
+    def get_lots(self, status=Lot.LOT_STATUS_RUNNING):
         lots = self.event.lots.all()
-        return [lot for lot in lots if lot.status == lot.LOT_STATUS_RUNNING]
+        return [lot for lot in lots if lot.status == status]
 
 
 class SubscriptionFormMixin(EventMixin, generic.FormView):
