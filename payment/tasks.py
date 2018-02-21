@@ -59,6 +59,7 @@ def create_pagarme_transaction(payment=None, subscription=None):
     transaction_instance.type = trx['payment_method']
     transaction_instance.date_created = trx['date_created']
     transaction_instance.amount = amount
+    transaction_instance.save()
 
     transaction_status = TransactionStatus(
         transaction=transaction_instance,
