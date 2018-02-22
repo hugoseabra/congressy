@@ -464,6 +464,9 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             - processa pagamento;
             - notifica usuário;
             - redireciona para página de status
+
+        CONDIÇÂO 8: status da inscrição
+            - verifica o tipo de lotes, caso não tenha lotes pagos, então a inscrição é confirmada
         """
         context = self.get_context_data(**kwargs)
         context['remove_preloader'] = True
@@ -568,7 +571,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 )
                 return self.render_to_response(context)
 
-        # CONDIÇÃO 6
+        # CONDIÇÃO 6 e 8
         if self.has_paid_lots():
             try:
                 transaction_instance_data = \

@@ -5,11 +5,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
+from gatheros_subscription.models import Subscription
 from mailer.tasks import send_mail
 from payment.models import Transaction, TransactionStatus
 
@@ -117,7 +119,19 @@ def postback_url_view(request, uidb64):
         transaction_status.status = status
         transaction_status.save()
 
-    except Transaction.DoesNotExist:
+        subscription = Subscription.objects.get(pk=transaction.subscription.pk)
+
+        if status == 'processing' or status == 'waiting_payment':
+            subscription.status = subscription.AWAITING_STATUS
+        elif status == 'paid' or status == 'authorized':
+            subscription.status = subscription.CONFIRMED_STATUS
+        else:
+            # status == refunded or pending_refund or refused or chargedback
+            subscription.status = subscription.CANCELED_STATUS
+
+        subscription.save()
+
+    except ObjectDoesNotExist:
         raise Http404
 
     return Response(status=201)

@@ -145,92 +145,6 @@
 {% endblock %}
 
 {% block content %}
-{#    <div class="row">#}
-{#        <div class="col-md-12">#}
-{#            <div class="buttonbar">#}
-{#                <div class="float-left">#}
-{#                    <button type="button" class="btn btn-default#}
-{#                    filter-button">#}
-{#                        <i class="fa fa-filter"></i>#}
-{#                        Filtros#}
-{#                    </button>#}
-{#                </div>#}
-                {#                <div class="float-right">#}
-                {#                    {% if can_add_subscription %}#}
-                {#                        <a href="{% url 'subscription:subscription-add' event.pk %}" class="btn#}
-                {#                        btn-success">#}
-                {#                            <i class="fa fa-plus"></i>#}
-                {#                            Adicionar#}
-                {#                        </a>#}
-                {#                    {% endif %}#}
-                {#                </div>#}
-{#                <div class="clearfix"></div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-
-{#    <div class="row filter-box">#}
-{#        <div class="col-md-12">#}
-{#            <div class="panel panel-primary">#}
-{#                <div class="panel-heading">#}
-{#                    <h3 class="panel-title">Filtro avançado</h3>#}
-{#                </div>#}
-{#                <div class="panel-body">#}
-{#                    <div class="row">#}
-{#                        <div class="col-md-12">#}
-{#                            <form role="form">#}
-{#                                <div class="list-filters">#}
-{#                                    {% if lots and lots|length > 1 %}#}
-{#                                        <div class="col-md-4">#}
-{#                                            <div class="form-group float-left">#}
-{#                                                <label>Lotes</label>#}
-{#                                                {% for lot in lots %}#}
-{#                                                    <div class="radio">#}
-{#                                                        {% is_filter_selected 'lots' lot.pk as checked %}#}
-{#                                                        <input class="icheck"#}
-{#                                                               {% if checked %}checked=""{% endif %}#}
-{#                                                               type="checkbox"#}
-{#                                                               name="lots"#}
-{#                                                               id="lot{{ forloop.counter0 }}"#}
-{#                                                               value="{{ lot.id }}">#}
-{#                                                        <label for="lot{{ forloop.counter0 }}">#}
-{#                                                            {{ lot.name }}#}
-{#                                                        </label>#}
-{#                                                    </div>#}
-{#                                                {% endfor %}#}
-{#                                            </div>#}
-{#                                        </div>#}
-{#                                    {% endif %}#}
-{#                                    <div class="col-md-4">#}
-{#                                        <div class="form-group">#}
-{#                                            <label>Tipo de participante</label>#}
-{#                                            <div class="radio">#}
-{#                                                {% is_filter_selected 'has_profile' 1 as checked %}#}
-{#                                                <input class="icheck"#}
-{#                                                       {% if checked %}checked=""{% endif %}#}
-{#                                                       type="checkbox"#}
-{#                                                       name="has_profile"#}
-{#                                                       id="has_profile"#}
-{#                                                       value="1">#}
-{#                                                <label for="has_profile">#}
-{#                                                    Possui perfil#}
-{#                                                </label>#}
-{#                                            </div>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{##}
-{#                                    <div class="clearfix"></div>#}
-{#                                </div>#}
-{#                                <button type="submit" class="btn#}
-{#                                btn-primary">Enviar#}
-{#                                </button>#}
-{#                            </form>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
 
     <div class="row">
         <div class="col-md-12">
@@ -246,9 +160,7 @@
                             <tr>
                                 <th>Nome do Participante</th>
                                 <th>Cód. Inscrição</th>
-                                {% if has_paid_lots %}
-                                    <th>Status</th>
-                                {% endif %}
+                                <th>Status</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -257,18 +169,21 @@
                             {% for item in object_list %}
                                 <tr>
                                     <td>
-                                        {% if item.transactions.last %}
-                                            {% if item.transactions.last.status == item.transactions.last.AUTHORIZED or item.transactions.last.status == item.transactions.last.PAID or item.transactions.last.status == item.transactions.last.REFUNDED %}
-                                                <i class="fa fa-circle" aria-hidden="true"
-                                                   style="color:#5cb85c"></i>
-                                            {% elif item.transactions.last.status == item.transactions.last.PROCESSING or item.transactions.last.status == item.transactions.last.WAITING_PAYMENT or item.transactions.last.status == item.transactions.last.PENDING_REFUND or item.transactions.last.status == item.transactions.last.CHARGEDBACK %}
-                                                <i class="fa fa-circle" aria-hidden="true"
-                                                   style="color: #f0ad4e"></i>
-                                            {% elif item.transactions.last.status == item.transactions.last.REFUSED %}
-                                                <i class="fa fa-circle" aria-hidden="true"
-                                                   style="color: #d9534f"></i>
-                                            {% endif %}
+
+                                        {% if item.status == item.CONFIRMED_STATUS %}
+                                            <i class="fa fa-circle"
+                                               aria-hidden="true"
+                                               style="color:#5cb85c"></i>
+                                        {% elif item.status == item.AWAITING_STATUS %}
+                                            <i class="fa fa-circle"
+                                               aria-hidden="true"
+                                               style="color: #f0ad4e"></i>
+                                        {% elif item.status == item.CANCELED_STATUS %}
+                                            <i class="fa fa-circle"
+                                               aria-hidden="true"
+                                               style="color: #d9534f"></i>
                                         {% endif %}
+
 
                                         <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
                                             {{ item.person.name }}
@@ -278,15 +193,11 @@
                                     <td>
                                         {{ item.code }}
                                     </td>
-                                    {% if has_paid_lots %}
+
                                     <td>
-                                        {% if item.transactions.last %}
-                                            {{ item.transactions.last.get_status_display }}
-                                        {% else %}
-                                            &nbsp;&nbsp;&nbsp;&nbsp;---
-                                        {% endif %}
+                                        {{ item.get_status_display }}
                                     </td>
-                                    {% endif %}
+
                                     <td>
                                         <div class="btn-group">
                                             <button
@@ -299,13 +210,8 @@
                                             >
                                                 <span class="fas fa-cog"></span>
                                             </button>
-                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                                                {#                                                <li>#}
-                                                {#                                                    <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">#}
-                                                {#                                                        <i class="fas fa-pencil-alt"></i>#}
-                                                {#                                                        Editar#}
-                                                {#                                                    </a>#}
-                                                {#                                                </li>#}
+                                            <ul class="dropdown-menu dropdown-menu-right"
+                                                role="menu">
                                                 <li>
                                                     <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
                                                         <i class="fa fa-eye"></i>
@@ -315,7 +221,7 @@
                                                 <li>
                                                     <a href="{% url 'subscription:subscription-delete' event.pk item.pk %}">
                                                         <i class="fas fa-trash-alt"></i>
-                                                        Excluir
+                                                        Cancelar
                                                     </a>
                                                 </li>
                                             </ul>
@@ -332,11 +238,14 @@
                         {% if has_paid_lots %}
                             <small>
                                 <strong>
-                                    <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
+                                    <i class="fa fa-circle" aria-hidden="true"
+                                       style="color:#5cb85c"></i>
                                     Confirmado<br/>
-                                    <i class="fa fa-circle" aria-hidden="true" style="color:#f0ad4e"></i>
+                                    <i class="fa fa-circle" aria-hidden="true"
+                                       style="color:#f0ad4e"></i>
                                     Aguardando<br/>
-                                    <i class="fa fa-circle" aria-hidden="true" style="color:#d9534f"></i> Pagamento
+                                    <i class="fa fa-circle" aria-hidden="true"
+                                       style="color:#d9534f"></i> Pagamento
                                     recusado
                                 </strong>
                             </small>
@@ -353,6 +262,5 @@
             </div>
         </div>
     </div>
-    </div>
-    </div>
+
 {% endblock %}
