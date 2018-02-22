@@ -47,12 +47,30 @@ class Subscription(models.Model, GatherosModelMixin):
         (DEVICE_ORIGIN_OFFLINE, 'Sincronização Off-line'),
     )
 
+    CONFIRMED_STATUS = 'confirmed'
+    CANCELED_STATUS = 'canceled'
+    AWAITING_STATUS = 'awaiting'
+
+    STATUSES = (
+        (CONFIRMED_STATUS, 'Confirmado'),
+        (CANCELED_STATUS, 'Cancelado'),
+        (AWAITING_STATUS,  'Pendente'),
+    )
+
     uuid = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
         unique=True,
         primary_key=True
     )
+
+    status = models.CharField(
+        max_length=15,
+        choices=STATUSES,
+        default=AWAITING_STATUS,
+        verbose_name='status',
+    )
+
     lot = models.ForeignKey(
         Lot,
         verbose_name='lote',
