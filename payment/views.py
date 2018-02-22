@@ -105,7 +105,7 @@ def postback_url_view(request, uidb64):
 
         status = data.get('current_status', '')
 
-        transaction.data['status'] = status
+        transaction.status = status
         transaction.data['boleto_url'] = data.get(
             'transaction[boleto_url]',
             ''
