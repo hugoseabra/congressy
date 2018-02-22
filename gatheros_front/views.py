@@ -1,6 +1,7 @@
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from wkhtmltopdf.views import PDFTemplateView
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.utils import six
@@ -70,36 +71,51 @@ class Login(auth_views.LoginView):
         ))
 
 
-def pdf(request):
+# def pdf(request):
+#
+#     html_template = get_template('pdf/test.html')
+#
 
-    html_template = get_template('pdf/test.html')
-
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=5,
-        border=4,
-    )
-
-    qr.add_data('Some data')
-
-    qr.make(fit=True)
-
-    img = qr.make_image()
-
-    buffer = six.BytesIO()
-    img.save(buffer)
-
-    qrcode_image = base64.b64encode(buffer.getvalue())
-
-    rendered = html_template.render({'qrcode': qrcode_image})
-
-    pdf_file = HTML(string=rendered).write_pdf()
-    response = HttpResponse(pdf_file, content_type='application/pdf')
-    response['Content-Disposition'] = 'filename="voucher.pdf"'
-
-    return response
+#
+#     rendered = html_template.render({'qrcode': qrcode_image})
+#
+#     pdf_file = HTML(string=rendered).write_pdf()
+#     response = HttpResponse(pdf_file, content_type='application/pdf')
+#     response['Content-Disposition'] = 'filename="voucher.pdf"'
+#
+#     return response
 
 
+class MyPDF(PDFTemplateView):
+    filename = 'my_pdf.pdf'
+    template_name = 'pdf/test.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(MyPDF, self).get_context_data(**kwargs)
+        context['qrcode'] = self.generate_qr_code('data')
+        return context
+
+    def generate_qr_code(self, data):
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=5,
+            border=4,
+        )
+
+        qr.add_data(data)
+
+        qr.make(fit=True)
+
+        img = qr.make_image()
+
+        buffer = six.BytesIO()
+        img.save(buffer)
+
+        return base64.b64encode(buffer.getvalue())
+
+    cmd_options = {
+        'margin-top': 3,
+    }
 

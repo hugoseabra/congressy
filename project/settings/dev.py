@@ -43,3 +43,7 @@ PAGARME_ENCRYPTION_KEY = 'ek_test_ep7xk51I1XtWg58B9xij1VFwJRLcKa'
 PAGARME_RECIPIENT_ID = 're_cjcupb1iq0200zl6d89r92s32'
 # ============================ DEBUG TOOL BAR =============================== #
 INTERNAL_IPS = ['127.0.0.1']
+# ============================ WKHTML PDF =================================== #
+WKHTMLTOPDF_CMD = os.path.join(BASE_DIR, "bin", "wkhtmltox",
+                               "bin") + '/wkhtmltopdf'
+
