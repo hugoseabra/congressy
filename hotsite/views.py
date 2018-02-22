@@ -602,6 +602,10 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 messages.error(self.request, message=e.message)
                 return self.render_to_response(context)
 
+        else:
+            # CONDIÇÃO 8
+            subscription.status = subscription.CONFIRMED_STATUS
+
         subscription.save()
 
         # CONDIÇÃO 5 e 7

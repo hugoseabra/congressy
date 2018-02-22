@@ -67,7 +67,7 @@
 
         <div class="form-validation alert"></div>
 
-        {% if lots %}
+        {% if lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="panel-title">Ingresso</div>
