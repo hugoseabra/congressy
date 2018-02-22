@@ -6,18 +6,7 @@ var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 {% if request.user.is_authenticated %}
     Tawk_API.visitor = {
         name: '{{ request.user.get_full_name }}',
-        email: '{{ request.user.email }}',
-        version: '{{ ENVIRONMENT_VERSION }}'
-    };
-    function add_tawto_visitor_param(key, value) {
-        if (!Tawk_API.visitor.hasOwnProperty(key)) {
-            Tawk_API.visitor[key] = value;
-        }
-    }
-    Tawk_API.visitor = {
-        name: '{{ request.user.get_full_name }}',
-        email: '{{ request.user.email }}',
-        version: '{{ ENVIRONMENT_VERSION }}'
+        email: '{{ request.user.email }}'
     };
 {% endif %}
 (function(){
