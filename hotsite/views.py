@@ -597,26 +597,28 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 messages.error(self.request, message=e.message)
                 return self.render_to_response(context)
 
-            subscription.save()
+            else:
+                subscription.save()
 
-            # CONDIÇÃO 5 e 7
-            if new_account and new_subscription:
-                notify_new_user_and_subscription(self.event, subscription)
+                # CONDIÇÃO 5 e 7
+                if new_account and new_subscription:
+                    notify_new_user_and_subscription(self.event, subscription)
 
-            elif new_subscription:
-                notify_new_subscription(self.event, subscription)
+                elif new_subscription:
+                    notify_new_subscription(self.event, subscription)
 
-            messages.success(
-                self.request,
-                'Inscrição realizada com sucesso!'
-            )
+                messages.success(
+                    self.request,
+                    'Inscrição realizada com sucesso!'
+                )
 
-        # CONDIÇÃO 7
-        if self.has_paid_lots():
-            return redirect(
-                'public:hotsite-subscription-status',
-                slug=self.event.slug
-            )
+                # CONDIÇÃO 7
+                return redirect(
+                    'public:hotsite-subscription-status',
+                    slug=self.event.slug
+                )
+
+        subscription.save()
 
         # CONDIÇÃO 5
         return redirect('public:hotsite', slug=self.event.slug)

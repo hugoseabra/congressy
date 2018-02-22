@@ -196,7 +196,7 @@ class Lot(models.Model, GatherosModelMixin):
             )
         else:
             # display = '{} vagas restantes'.format(self.places_remaining)
-            display = ''
+            display = self.name
 
         return display
 

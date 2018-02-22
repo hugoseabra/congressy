@@ -1,7 +1,5 @@
 from django.contrib import admin
-from django.db.models import Count, Q
 
-from gatheros_event.models import Event
 from .models import (
     Lot,
     Subscription,
@@ -10,6 +8,10 @@ from .models import (
 
 @admin.register(Lot)
 class LotAdmin(admin.ModelAdmin):
+    search_fields = (
+        'event__name',
+        'name',
+    )
     list_display = (
         'name',
         'event',
