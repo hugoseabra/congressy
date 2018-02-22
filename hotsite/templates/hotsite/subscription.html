@@ -73,6 +73,7 @@
         {% endif %}
 
         $(document).ready(function() {
+            $('#id_email').attr('readonly', 'readonly');
             $('#id_button_pay').on('click', function () {
                 process_payment(
                     '{{ pagarme_encryption_key }}',
