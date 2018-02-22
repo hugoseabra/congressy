@@ -12,17 +12,16 @@ from django.utils.decorators import classonlymethod
 from django.views import generic
 
 from gatheros_event.forms import PersonForm
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
-    DeleteViewMixin,
     FormListViewMixin,
 )
 from gatheros_subscription.forms import SubscriptionForm
 from gatheros_subscription.helpers.subscription import \
     export as subscription_export
 from gatheros_subscription.models import Subscription, FormConfig
-from payment.models import Transaction
 from .filters import SubscriptionFilterForm
 
 
@@ -32,6 +31,12 @@ class EventViewMixin(AccountMixin, generic.View):
 
     def dispatch(self, request, *args, **kwargs):
         self.event = self.get_event()
+
+        update_account(
+            request=self.request,
+            organization=self.event.organization,
+            force=True
+        )
 
         self.permission_denied_url = reverse(
             'event:event-panel',
@@ -549,27 +554,71 @@ class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
 #         ) if enabled else False
 
 
-class SubscriptionDeleteView(EventViewMixin, DeleteViewMixin):
+class SubscriptionCancelView(EventViewMixin, generic.DetailView):
     template_name = 'subscription/delete.html'
     model = Subscription
-    success_message = 'Inscrição excluída com sucesso.'
+    success_message = 'Inscrição cancelada com sucesso.'
+    cancel_message = 'Tem certeza que deseja cancelar?'
+    model_protected_message = 'A entidade não pode ser cancelada.'
     place_organization = None
+    object = None
+
+    def get_object(self, queryset=None):
+        """ Resgata objeto principal da view. """
+        if not self.object:
+            self.object = super(SubscriptionCancelView, self).get_object(queryset)
+
+        return self.object
+
+    def pre_dispatch(self, request):
+        super(SubscriptionCancelView, self).pre_dispatch(request)
+
+        self.object = self.get_object()
 
     def get_permission_denied_url(self):
-        return reverse('subscription:subscription-list', kwargs={
-            'event_pk': self.kwargs.get('event_pk')
-        })
+        url = self.get_success_url()
+        return url.format(**model_to_dict(self.object)) if self.object else url
+
+    def get_context_data(self, **kwargs):
+        context = super(SubscriptionCancelView, self).get_context_data(**kwargs)
+        context['organization'] = self.organization
+        context['go_back_path'] = self.get_success_url()
+
+        # noinspection PyProtectedMember
+        verbose_name = self.object._meta.verbose_name
+        context['title'] = 'Cancelar {}'.format(verbose_name)
+
+        data = model_to_dict(self.get_object())
+        cancel_message = self.get_cancel_message()
+        context['cancel_message'] = cancel_message.format(**data)
+        return context
+
+    def get_cancel_message(self):
+        """
+        Recupera mensagem de remoção a ser perguntada ao usuário antes da
+        remoção.
+        """
+        return self.cancel_message
+
+    def post(self, request, *args, **kwargs):
+        try:
+
+            pk = kwargs.get('pk')
+
+            self.object = Subscription.objects.get(pk=pk)
+            self.object.status = self.object.CANCELED_STATUS
+            self.object.save()
+
+        except Exception as e:
+            messages.error(request, str(e))
+        else:
+            messages.success(request, self.success_message)
+            return redirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('subscription:subscription-list', kwargs={
             'event_pk': self.kwargs.get('event_pk')
         })
-
-    def can_delete(self):
-        return self.request.user.has_perm(
-            'gatheros_event.can_manage_subscriptions',
-            self.get_event()
-        )
 
 
 class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):

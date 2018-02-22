@@ -6,10 +6,10 @@
 <script src="{% static "assets/js/sentry-functions.js"%}"></script>
 <script>
 setConfig('{{ SENTRY_PUBLIC_DSN  }}', '{{ ENVIRONMENT_VERSION }}');
-{% if not request.user.is_anonymous %}
+{% if request.user.is_authenticated %}
 setUserContext(
     '{{ request.user.pk }}',
-    '{{ request.user.first_name }}',
+    '{{ request.user.get_full_name }}',
     '{{ request.user.email }}'
 );
 {% endif %}

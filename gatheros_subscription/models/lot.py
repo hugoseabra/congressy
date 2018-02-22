@@ -188,14 +188,15 @@ class Lot(models.Model, GatherosModelMixin):
         """ Exibição pública de infomações do lote. """
 
         if self.price is not None:
-            display = '{} - R$ {} ({} vagas restantes)'.format(
+            # display = '{} - R$ {} ({} vagas restantes)'.format(
+            display = '{} - R$ {}'.format(
                 self.name,
                 locale.format(percent='%.2f', value=self.price, grouping=True),
                 self.places_remaining
             )
-
         else:
-            display = '{} vagas restantes'.format(self.places_remaining)
+            # display = '{} vagas restantes'.format(self.places_remaining)
+            display = self.name
 
         return display
 
