@@ -1,24 +1,35 @@
 import json
 from decimal import Decimal
+
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.views.generic import ListView
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
+from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.models import Subscription
 from mailer.tasks import send_mail
 from payment.models import Transaction, TransactionStatus
 
 
-class EventPaymentView(LoginRequiredMixin, ListView):
+class EventPaymentView(AccountMixin, ListView):
     template_name = 'payments/list.html'
     event = None
+
+    def can_access(self):
+        if not self.event:
+            return False
+
+        return self.event.organization == self.organization
+
+    def get_permission_denied_url(self):
+        return reverse('event:event-list')
 
     def dispatch(self, request, *args, **kwargs):
 

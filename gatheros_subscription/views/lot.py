@@ -32,11 +32,8 @@ class BaseLotView(AccountMixin, View):
                 force=True
             )
 
-            if not self.can_view():
-                return redirect(reverse(
-                    'event:event-panel',
-                    kwargs={'pk': self.event.pk}
-                ))
+        if not self.can_view():
+            return redirect('event:event-list')
 
         return super(BaseLotView, self).dispatch(request, *args, **kwargs)
 
