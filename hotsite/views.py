@@ -562,8 +562,8 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         # Insere ou edita lote
         subscription.lot = lot
 
-        # CONDIÇÃO 7
         if self.has_paid_lots():
+            # CONDIÇÃO 7
             if 'transaction_type' not in request.POST:
                 messages.error(
                     request=self.request,
@@ -571,8 +571,6 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 )
                 return self.render_to_response(context)
 
-        # CONDIÇÃO 6 e 8
-        if self.has_paid_lots():
             try:
                 transaction_instance_data = \
                     PagarmeTransactionInstanceData(
@@ -581,17 +579,21 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                         event=self.event
                     )
 
-                data = \
-                    transaction_instance_data.transaction_instance_data
+                data = transaction_instance_data.transaction_instance_data
                 create_pagarme_transaction(
                     payment=data,
                     subscription=subscription
                 )
+
             except TransactionError as e:
                 error_dict = {
-                    'No transaction type': 'Por favor escolher uma forma de pagamento.',
-                    'Transaction type not allowed': 'Forma de pagamento não permitida.',
-                    'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
+                    'No transaction type': \
+                        'Por favor escolher uma forma de pagamento.',
+                    'Transaction type not allowed': \
+                        'Forma de pagamento não permitida.',
+                    'Organization has no bank account': \
+                        'Organização não está podendo receber pagamentos no'
+                        ' momento.',
                     'No organization': 'Evento não possui organizador.',
                 }
                 if e.message in error_dict:
@@ -600,28 +602,26 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 messages.error(self.request, message=e.message)
                 return self.render_to_response(context)
 
-            else:
-                subscription.save()
-
-                # CONDIÇÃO 5 e 7
-                if new_account and new_subscription:
-                    notify_new_user_and_subscription(self.event, subscription)
-
-                elif new_subscription:
-                    notify_new_subscription(self.event, subscription)
-
-                messages.success(
-                    self.request,
-                    'Inscrição realizada com sucesso!'
-                )
-
-                # CONDIÇÃO 7
-                return redirect(
-                    'public:hotsite-subscription-status',
-                    slug=self.event.slug
-                )
-
         subscription.save()
+
+        # CONDIÇÃO 5 e 7
+        if new_account and new_subscription:
+            notify_new_user_and_subscription(self.event, subscription)
+
+        elif new_subscription:
+            notify_new_subscription(self.event, subscription)
+
+        messages.success(
+            self.request,
+            'Inscrição realizada com sucesso!'
+        )
+
+        if self.has_paid_lots():
+            # CONDIÇÃO 7
+            return redirect(
+                'public:hotsite-subscription-status',
+                slug=self.event.slug
+            )
 
         # CONDIÇÃO 5
         return redirect('public:hotsite', slug=self.event.slug)
