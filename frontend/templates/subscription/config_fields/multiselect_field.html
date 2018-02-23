@@ -1,0 +1,23 @@
+{% load widget_tweaks form_config_tags %}
+
+<div class="form-group">
+    {{ label_tag }}
+    {{ field }}
+    {% if help_text %}
+        <div>
+            <small class="text-muted">{{ help_text|safe }}</small>
+        </div>
+    {% endif %}
+    {% if errors %}
+        {% render_field_errors errors %}
+    {% endif %}
+    <script>
+        $(document).ready(function () {
+            $('#id_{{ name }}').iCheck({
+                checkboxClass: 'icheckbox_flat-blue',
+                radioClass: 'iradio_flat-blue'
+            });
+        });
+    </script>
+    <div class="clearfix"></div>
+</div>

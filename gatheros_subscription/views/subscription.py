@@ -23,14 +23,8 @@ from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
-    FormListViewMixin,
 )
-from gatheros_subscription.forms import SubscriptionForm
-from gatheros_subscription.helpers.subscription import \
-    export as subscription_export
-from gatheros_subscription.models import FormConfig
-from gatheros_subscription.models import Subscription
-from .filters import SubscriptionFilterForm
+from gatheros_subscription.models import Subscription, FormConfig
 
 
 class EventViewMixin(AccountMixin, generic.View):
@@ -885,8 +879,8 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             return True
 
 
-class SubscriptionExportView(AccountMixin, FormListViewMixin):
-    # template_name = 'gatheros_subscription/subscription/attendance.html'
+class SubscriptionExportView(EventViewMixin, generic.View):
+    http_method_names = ['post']
     template_name = 'subscription/export.html'
     form_class = SubscriptionFilterForm
     model = Subscription
@@ -901,48 +895,25 @@ class SubscriptionExportView(AccountMixin, FormListViewMixin):
         self.event = get_object_or_404(Event, pk=self.kwargs.get('event_pk'))
         return self.event
 
-    def get_context_data(self, **kwargs):
-        cxt = super().get_context_data(**kwargs)
-        cxt.update({
-            'event': self.get_event()
-        })
-        return cxt
+    def post(self, request, *args, **kwargs):
+        # Chamando exportação
+        output = export_event_data(self.get_event())
 
-    def get_form_kwargs(self):
-        kwargs = super(SubscriptionExportView, self).get_form_kwargs()
-        kwargs.update({
-            'event': self.kwargs.get('event_pk')
-        })
-        return kwargs
+        # Criando resposta http com arquivo de download
+        response = HttpResponse(
+            output,
+            content_type="application/vnd.ms-excel"
+        )
 
-    def get_queryset(self):
-        queryset = Subscription.objects \
-            .filter(event__pk=self.kwargs.get('event_pk'))
+        # Definindo nome do arquivo
+        event = self.get_event()
+        name = "%s_%s.xlsx" % (
+            event.slug,
+            datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        )
+        response['Content-Disposition'] = 'attachment; filename=%s' % name
 
-        form = self.get_form()
-        if form.is_valid():
-            queryset = form.filter(queryset)
-
-        return queryset
-
-    def get(self, request, *args, **kwargs):
-        if request.GET.get('format') == 'xls':
-            # Chamando exportação
-            output = subscription_export(self.get_queryset())
-
-            # Criando resposta http com arquivo de download
-            response = HttpResponse(output,
-                                    content_type="application/vnd.ms-excel")
-
-            # Definindo nome do arquivo
-            event = self.get_event()
-            name = "%s-%s.xls" % (event.pk, event.slug)
-            response['Content-Disposition'] = 'attachment; filename=%s' % name
-
-            return response
-
-        return super(SubscriptionExportView, self).get(request, *args,
-                                                       **kwargs)
+        return response
 
     def can_access(self):
         return self.request.user.has_perm(
