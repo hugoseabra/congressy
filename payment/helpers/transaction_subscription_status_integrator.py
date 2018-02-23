@@ -1,6 +1,6 @@
 """
-    Main implementation of a class for integrating/translating transaction states
-    to subscription status
+    Main implementation of a class for integrating/translating transaction
+    states to subscription status
 
     See: doc/Diagramas/StateMachine/CONGRESSY_GDS-LPS-Transacao_v01.jpg
 
