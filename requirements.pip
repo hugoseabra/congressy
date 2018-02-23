@@ -34,6 +34,7 @@ psycopg2==2.7.3.2
 pyparsing==2.2.0
 python-utils==2.1.0
 PyYAML==3.12
+python-statemachine==0.6.2
 pytz==2017.3
 requests==2.18.4
 ua-parser==0.7.3
