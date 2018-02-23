@@ -44,3 +44,7 @@ PAGARME_RECIPIENT_ID = 're_cjcupb1iq0200zl6d89r92s32'
 PAGARME_TEST_RECIPIENT_ID = 're_cjdagxm5q00fqok6eeuukmmtp'
 # ============================ DEBUG TOOL BAR =============================== #
 INTERNAL_IPS = ['127.0.0.1']
+# ============================ WKHTML PDF =================================== #
+WKHTMLTOPDF_CMD = os.path.join(BASE_DIR, "bin", "wkhtmltox",
+                               "bin") + '/wkhtmltopdf'
+

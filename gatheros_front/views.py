@@ -33,7 +33,8 @@ class Login(auth_views.LoginView):
     form_class = AuthenticationForm
 
     def get_form_class(self):
-        if 'show_captcha' in self.request.session and self.request.session['show_captcha'] is True:
+        if 'show_captcha' in self.request.session and self.request.session[
+            'show_captcha'] is True:
             return AuthenticationWithCaptchaForm
 
         return super().get_form_class()
@@ -59,7 +60,3 @@ class Login(auth_views.LoginView):
         return self.render_to_response(self.get_context_data(
             form=captcha_form
         ))
-
-
-
-

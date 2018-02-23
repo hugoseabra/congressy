@@ -7,7 +7,7 @@
 
 {% block page_description %}
     Inscrições em que você está inscrito.
-    <br />
+    <br/>
     Por padrão, serão exibidos
     os eventos que ainda não fora realizados. Utilize os filtros para
     buscar inscrições antigas.
@@ -70,10 +70,16 @@
                         "targets": [-1]
                     },
                     {
-                        "width": "18%",
+                        "width": "10%",
                         "targets": 1,
                         "className": "text-center"
-                    }
+                    },
+                    {
+                        "width": "13%",
+                        "targets": 2,
+                        "className": "text-center"
+                    },
+
                 ],
                 // Default order
                 "order": [[0, 'asc']]
@@ -133,11 +139,11 @@
                                             <div class="radio">
                                                 {% is_filter_selected 'notcheckedin' 1 as checked %}
                                                 <input class="icheck"
-                                                   {% if checked %}checked=""{% endif %}
-                                                   type="checkbox"
-                                                   name="notcheckedin"
-                                                   id="notcheckedin"
-                                                   value="1">
+                                                       {% if checked %}checked=""{% endif %}
+                                                       type="checkbox"
+                                                       name="notcheckedin"
+                                                       id="notcheckedin"
+                                                       value="1">
                                                 <label for="notcheckedin">
                                                     Não Compareceu
                                                 </label>
@@ -150,11 +156,11 @@
                                             <div class="radio">
                                                 {% is_filter_selected 'pastevents' 1 as checked %}
                                                 <input class="icheck"
-                                                   {% if checked %}checked=""{% endif %}
-                                                   type="checkbox"
-                                                   name="pastevents"
-                                                   id="pastevents"
-                                                   value="1">
+                                                       {% if checked %}checked=""{% endif %}
+                                                       type="checkbox"
+                                                       name="pastevents"
+                                                       id="pastevents"
+                                                       value="1">
                                                 <label for="pastevents">
                                                     Já realizados
                                                 </label>
@@ -165,7 +171,8 @@
                                     <div class="clearfix"></div>
                                 </div>
                                 <button type="submit" class="btn
-                                btn-primary">Enviar</button>
+                                btn-primary">Enviar
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -186,9 +193,9 @@
                             <thead>
                             <tr>
                                 <th>Evento</th>
-                                <th>Cód. Inscrição</th>
-                                <th>Data Inscrição</th>
-                                <th>Credenciamento</th>
+                                <th>Código</th>
+                                <th class="hidden-xs hidden-sm">Data Inscrição</th>
+                                <th>Voucher</th>
                             </tr>
                             </thead>
 
@@ -197,46 +204,30 @@
                             {% for item in object_list %}
                                 <tr>
                                     <td>
-                                        <div>
-                                            <strong>
-                                                {{ item.event.category.name }}
-                                            </strong>
-                                            <br/><br/>
-                                            <strong>{{ item.event.name }}</strong>
-                                            <span style="font-size: medium;color:dimgray">({{ item.event.organization.name }})</span>
-                                        </div>
-                                        <br/>
-                                        <hr/>
-                                        <div>
-                                            {% if item.event.info %}
-                                                <p>
-                                                    <strong>Descrição:</strong>
-                                                    <span style="color: dimgray;text-align: justify">{{ item.event.info.description|safe|truncatechars:150 }}</span>
-                                                </p>
-                                            {% endif %}
-                                            <p>
-                                                <strong>Quando:</strong> {{ item.event.get_period }}
-                                            </p>
-                                            {% if item.event.place %}
-                                                <p>
-                                                    <strong>Local:</strong> {{ item.event.place.name }}
-                                                </p>
-                                                <p style="color:dimgray;text-indent: 20px;">{{ item.event.place.get_complete_address }}</p>
-                                            {% endif %}
-                                        </div>
+                                        <a href="{% url 'public:hotsite' item.event.slug %}">
+                                            <div>
+                                                <strong>{{ item.event.name }}</strong>
+                                                <span style="font-size: medium;color:dimgray">({{ item.event.organization.name }})</span>
+                                            </div>
+                                        </a>
                                     </td>
                                     <td>
                                         {{ item.code }}
                                     </td>
-                                    <td >
-                                        {{ item.created }}
+                                    <td class="hidden-xs hidden-sm">
+                                        {{ item.created|date:"d/m/Y H\hi" }}
                                     </td>
                                     <td>
-                                        {% if item.attended %}
-                                            {{ item.attended_on }}
-                                        {% elif item.event.status == item.event.EVENT_STATUS_FINISHED %}
-                                            <span style="font-style: italic">Não compareceu</span>
+
+                                        {% if item.status == item.CONFIRMED_STATUS %}
+
+                                            <a href="{% url 'subscription:subscription-voucher' item.event.pk item.pk %}">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                        {% else %}
+                                            ---
                                         {% endif %}
+
                                     </td>
                                 </tr>
                             {% endfor %}
