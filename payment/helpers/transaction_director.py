@@ -1,16 +1,47 @@
+"""
+    Main implantation of a director responsible for changing the Transaction
+    State Machine Status
+"""
 from payment.helpers import TransactionStateMachine
 from payment.exception import StateNotAllowedError
 
 
 class TransactionDirector:
+    """
+        Class implementation of the Transaction State Machine Director
+    """
 
     def __init__(self, old_status, status):
+        """
+
+        :param old_status (string): the old status of the machine, used as the
+                                    initial starting value for the directors
+                                    instance of the Transaction State Machine.
+                                    Typically retrieved from a database.
+        :param status (string): the new desired state for the State Machine.
+                                Typically is received from a third-party like
+                                Pagar.me
+        """
         self.status = status
         self.old_status = old_status
         self.transaction_state_machine = TransactionStateMachine(
             start_value=old_status)
 
     def direct(self):
+        """
+
+        :return: status (string): the current state of the transaction machine
+                                  after applying the desired change of state
+
+        :raises:
+
+            StateNotAllowedError: when attempts to apply an unallowed
+                                  business rule change of state
+
+            TransitionNotAllowed: when attempts to apply an unallowed state
+                                  machine change of state
+
+        """
 
         if self.old_status == "processing":
 

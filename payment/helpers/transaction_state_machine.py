@@ -5,7 +5,19 @@ from statemachine import StateMachine, State
 
 
 class TransactionStateMachine(StateMachine):
-    """Class responsible for implementing the State Machine.
+    """
+        Class responsible for implementing the State Machine.
+
+        Attributes:
+            processing (State): Default initial starting state. Represents the
+                                 processing state.
+            paid (State): Represents the paid state.
+            waiting_payment (State): Represents the waiting for payment state.
+            pending_refund (State): Represents the waiting for refund  state.
+            refused (State): Represents the refused state.
+            chargeback (State): Represents the chargedback state.
+        Todo:
+            * Finish documenting the attributes/functions.
     """
 
     processing = State('processing', initial=True)
