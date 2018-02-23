@@ -296,6 +296,11 @@ SALES_ALERT_EMAILS = [
     'Congressy SAC <congressy@congressy.com>',
     'Infra Congressy <infra@congressy.com>'
 ]
+# ============================ WKHTML PDF =================================== #
+WKHTMLTOPDF_CMD = os.path.join(
+    BASE_DIR, "bin", "wkhtmltox", "bin", 'wkhtmltopdf'
+)
+
 # ============================= PAYMENT ===================================== #
 # Planos da congress, contemplam percentuais de recebimento em cima das
 # transações

@@ -87,3 +87,7 @@ class Transaction(models.Model):
     )
 
     data = JSONField()
+
+    @property
+    def paid(self):
+        return self.status == self.PAID

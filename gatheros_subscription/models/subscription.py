@@ -144,17 +144,8 @@ class Subscription(models.Model, GatherosModelMixin):
         return '{} - {}'.format(self.person.name, self.event.name)
 
     @property
-    def form_data(self):
-        """ Resgata dados vinculados ao formulário de inscrição. """
-        form = self.event.form
-        answers = {}
-
-        for field in form.fields.all():
-            answer = field.answer(subscription=self)
-            if answer:
-                answers[field.name] = answer
-
-        return answers
+    def confirmed(self):
+        return self.status == Subscription.CONFIRMED_STATUS
 
     def save(self, *args, **kwargs):
         """ Salva entidade. """

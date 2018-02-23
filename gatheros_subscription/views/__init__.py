@@ -8,4 +8,5 @@ from .subscription import (
     SubscriptionExportView,
     SubscriptionListView,
     SubscriptionViewFormView,
+    VoucherSubscriptionPDFView,
 )

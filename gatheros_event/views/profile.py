@@ -82,6 +82,13 @@ class ProfileCreateView(TemplateView, FormView):
                    'Enviamos um email para "%s", click no link do email para ativar sua conta.'
     }
 
+    def dispatch(self, request, *args, **kwargs):
+
+        if request.user.is_authenticated:
+            return redirect('front:start')
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['is_embeded'] = self.request.GET.get('embeded') == '1'
@@ -120,6 +127,13 @@ class ProfileCreateView(TemplateView, FormView):
 
 
 class PasswordResetView(auth_views.PasswordResetView):
+    def dispatch(self, request, *args, **kwargs):
+
+        if request.user.is_authenticated:
+            return redirect('front:start')
+
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         """
            Generates a one-use only link for resetting password and sends to the
