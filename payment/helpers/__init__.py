@@ -1,1 +1,4 @@
 from .pagarme_transaction_instance_data import PagarmeTransactionInstanceData
+from .price_calculator import PriceCalculator
+
+

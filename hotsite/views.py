@@ -4,7 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
@@ -80,7 +80,7 @@ class EventMixin(generic.View):
     def subsciption_finished(self):
         for lot in self.event.lots.all():
             if lot.status == Lot.LOT_STATUS_RUNNING:
-                return True
+                return False
 
         return True
 
@@ -576,18 +576,22 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 return self.render_to_response(context)
 
             try:
-                transaction_instance_data = \
-                    PagarmeTransactionInstanceData(
-                        subscription=subscription,
-                        extra_data=request.POST.copy(),
-                        event=self.event
-                    )
+                with transaction.atomic():
 
-                data = transaction_instance_data.transaction_instance_data
-                create_pagarme_transaction(
-                    payment=data,
-                    subscription=subscription
-                )
+                    subscription.save()
+
+                    transaction_instance_data = \
+                        PagarmeTransactionInstanceData(
+                            subscription=subscription,
+                            extra_data=request.POST.copy(),
+                            event=self.event
+                        )
+
+                    data = transaction_instance_data.transaction_instance_data
+                    create_pagarme_transaction(
+                        payment=data,
+                        subscription=subscription
+                    )
 
             except TransactionError as e:
                 error_dict = {

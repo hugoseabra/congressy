@@ -93,22 +93,6 @@
                 <div class="panel-title">Dados pessoais</div>
             </div>
             <div class="panel-body">
-                {% if form.non_field_errors %}
-                    {% for error in form.non_field_errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                {% if form.errors %}
-                    {% for error in form.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
-
                 <div class="row">
                     <div class="col-md-9">
                         {% render_generic_field form.name autofocus=True %}

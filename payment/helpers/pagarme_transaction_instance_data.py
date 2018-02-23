@@ -6,6 +6,7 @@ import absoluteuri
 from django.conf import settings
 
 from gatheros_event.models import Organization
+from gatheros_subscription.models import Lot
 from payment.exception import TransactionError
 
 CONGRESSY_RECIPIENT_ID = settings.PAGARME_RECIPIENT_ID
@@ -20,6 +21,13 @@ class PagarmeTransactionInstanceData:
         self.person = subscription.person
         self.extra_data = extra_data
         self.event = event
+
+        self.lot = subscription.lot
+
+        if int(self.lot.pk) != int(self.extra_data.get('lot')):
+            raise TransactionError(
+                message="Inscrição não pertence ao lote informado."
+            )
 
         self._get_organization()
         self._get_transaction_type()
@@ -107,24 +115,27 @@ class PagarmeTransactionInstanceData:
                 {
                     "id": str(transaction_id),
                     "title": self.event.name,
-                    "unit_price": self.extra_data['amount'],
+                    "unit_price": self.as_payment_format(
+                        self.lot.get_calculated_price()
+                    ),
                     "quantity": 1,
                     "tangible": False
                 }
             ],
 
-            "split_rules": self._create_split_rules(self.extra_data['amount']),
+            "split_rules": self._create_split_rules(),
             "metadata": {
                 "evento": self.event.name,
                 "inscricao": str(self.subscription.pk)
             },
 
-            "amount": self.extra_data['amount'],
-            "price": self.extra_data['amount']
+            "amount": self.as_payment_format(self.lot.get_calculated_price()),
+            "price": self.as_payment_format(self.lot.get_calculated_price())
         }
 
-        # Estabelecer uma referência de qual o estado sistema hovue a transação
+        # Estabelecer uma referência de qual o estado sistema houve a transação
         environment_version = os.getenv('ENVIRONMENT_VERSION')
+
         if environment_version:
             self.transaction_instance_data['metadata']['system'] = {
                 'version': environment_version,
@@ -139,7 +150,7 @@ class PagarmeTransactionInstanceData:
         if self.transaction_type == 'boleto':
             self.transaction_instance_data['payment_method'] = 'boleto'
 
-    def _create_split_rules(self, amount):
+    def _create_split_rules(self):
         """
         Contsroi as regras de split da transação.
         :param amount:
@@ -147,46 +158,61 @@ class PagarmeTransactionInstanceData:
             centavos são junto com o valor principal, sem separação de vingula.
         :return:
         """
-        def as_decimal(value):
-            # Contexto de contrução de números decimais
-            return round(Decimal(value), 2)
 
-        def as_payment_format(value):
-            return str(value).replace('.', '')
+        # Preço padrão, sem cálculos de transferências de taxas.
+        amount = self.lot.price
 
-        # Separar centavos
-        size = len(str(amount))
-        cents = str(amount)[-2] + str(amount)[-1]
-        amount = '{}.{}'.format(amount[0:size - 2], cents)
-        amount = as_decimal(amount)
-
-        congressy_percent_as_decimal = as_decimal(
-            settings.CONGRESSY_PLAN_PERCENT_10
-        )
-        congressy_amount = as_decimal(
-            amount * (congressy_percent_as_decimal / 100)
-        )
+        # O cálculo do montante da congressy será sempre em cima do preço
+        # padrão.
+        congressy_percent = settings.CONGRESSY_PLAN_PERCENT_10
+        congressy_amount = \
+            self.lot.price * (self.as_decimal(congressy_percent) / 100)
 
         # Se o valor é menor do que o mínimo configurado, o mínimo assume.
-        minimum = as_decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        minimum = self.as_decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         if congressy_amount < minimum:
             congressy_amount = minimum
 
-        organization_amount = as_decimal(amount - congressy_amount)
+        # Com transferência, o organizador sempre receberá o valor padrão
+        # o valor das taxas já está inserido no valor do lote a ser processado
+        # na transação.
+        if self.subscription.lot.transfer_tax is True:
+            organization_amount = amount
+
+        # Caso contrário, o organizador receberá o valor padrão subtraído das
+        # taxas da Congressy, já que não há taxas no valor do lote a ser
+        # processado na transação.
+        else:
+            organization_amount = self.as_decimal(amount - congressy_amount)
 
         congressy_rule = {
             "recipient_id": CONGRESSY_RECIPIENT_ID,
-            "amount": as_payment_format(congressy_amount),
+            "amount": self.as_payment_format(congressy_amount),
             "liable": True,
             "charge_processing_fee": True,
             "charge_remainder_fee": True
         }
 
+        if settings.DEBUG is True and \
+                hasattr(settings, 'PAGARME_TEST_RECIPIENT_ID'):
+            org_recipient_id = settings.PAGARME_TEST_RECIPIENT_ID
+        else:
+            org_recipient_id = self.organization.recipient_id
+
         organization_rule = {
-            "recipient_id": self.organization.recipient_id,
-            "amount": as_payment_format(organization_amount),
+            "recipient_id": org_recipient_id,
+            "amount": self.as_payment_format(organization_amount),
             "liable": True,
             "charge_processing_fee": False
         }
 
         return [congressy_rule, organization_rule]
+
+    @staticmethod
+    def as_decimal(value):
+        # Contexto de contrução de números decimais
+        return round(Decimal(value), 2)
+
+    @staticmethod
+    def as_payment_format(value):
+        return str(value).replace('.', '')

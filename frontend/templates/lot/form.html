@@ -30,23 +30,18 @@
 
 {% block scripts %}
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script type="application/javascript">
         function show(el) {
-            el = $(el);
-            el.removeAttr('style').hide();
-            el.fadeIn();
+            $(el).fadeIn();
         }
 
         function hide(el) {
-            el = $(el);
-            el.fadeOut(function () {
-                el.removeAttr('style');
-                el.css('visibility', 'hidden');
-            });
+            $(el).fadeOut();
         }
 
         function showHideLimit() {
-            var limitCheckbox = $('#id_limit').parent().parent();
+            var limitCheckbox = $('#id_limit').parent().parent().parent();
             if ($('#limit_switch').prop('checked')) {
                 show(limitCheckbox);
             } else {
@@ -56,11 +51,85 @@
         }
 
         function showHideExihibitionCode() {
-            var exhibition_code = $('#id_exhibition_code').parent().parent();
+            var exhibition_code = $('#id_exhibition_code').parent().parent().parent();
             if ($('#id_private').prop('checked')) {
                 show(exhibition_code);
             } else {
                 hide(exhibition_code);
+            }
+        }
+
+        function showHideTransferTax() {
+            var transfer_tax = $('#id_transfer_tax').parent().parent().parent();
+            if (parseFloat($('#id_price').val()) > 0) {
+                show(transfer_tax);
+            } else {
+                hide(transfer_tax);
+            }
+        }
+
+        function showPrices(action) {
+            action = action === true;
+            var price_box = $('.price-box');
+            if (action) {
+                price_box.fadeIn();
+            } else {
+                price_box.fadeOut();
+            }
+        }
+
+        function calculatePrices() {
+            var minimum = parseFloat(
+                '{{ congressy_minimum_price }}'
+                    .replace('.', '')
+                    .replace(',', '.')
+            );
+            var percent = parseFloat(
+                '{{ congressy_plan_percent_10 }}'
+                    .replace('.', '')
+                    .replace(',', '.')
+            );
+            percent = percent/100;
+
+            var price = $('#id_price').val().replace('.', '').replace(',', '.');
+
+            if (!price) {
+                showPrices(false);
+                return;
+            }
+
+            price = parseFloat(price);
+
+            var congressy_price = price * percent;
+            if (congressy_price < minimum) {
+                congressy_price = minimum;
+            }
+
+            var subscription_price = $('.subscription_price');
+            var price_to_recieve = $('.price_to_recieve');
+            var transfer_tax = $('#id_transfer_tax').prop('checked');
+
+            var hide_tax = function(tax_el) {
+                var parent = tax_el.parent().parent().find('.congressy_tax').parent();
+                parent.css('visibility', 'hidden');
+            };
+            var show_tax = function(tax_el) {
+                var parent = tax_el.parent().parent().find('.congressy_tax').parent();
+                parent.css('visibility', 'visible');
+            };
+
+            $('.congressy_tax').text(as_currency(congressy_price));
+
+            if (transfer_tax) {
+                show_tax(subscription_price);
+                hide_tax(price_to_recieve);
+                subscription_price.text(as_currency(price + congressy_price));
+                price_to_recieve.text(as_currency(price));
+            } else {
+                show_tax(price_to_recieve);
+                hide_tax(subscription_price);
+                subscription_price.text(as_currency(price));
+                price_to_recieve.text(as_currency(price - congressy_price));
             }
         }
 
@@ -69,6 +138,8 @@
 
             showHideLimit();
             showHideExihibitionCode();
+            showHideTransferTax();
+            calculatePrices();
 
             $('#limit_switch').on('change', function () {
                 showHideLimit();
@@ -76,6 +147,23 @@
 
             $('#id_private').on('change', function () {
                 showHideExihibitionCode();
+            });
+
+            $('#id_transfer_tax').on('change', function () {
+                calculatePrices();
+            });
+
+            $('#id_price').on('keyup', function () {
+                var transfer_tax = $('#id_transfer_tax').parent().parent().parent();
+                var val = parseFloat($(this).val());
+                if (val > 0) {
+                    show(transfer_tax);
+                    showPrices(true);
+                } else {
+                    hide(transfer_tax);
+                    showPrices(false);
+                }
+                calculatePrices();
             });
         });
     </script>
@@ -86,7 +174,7 @@
     <ul class="nav nav-pills nav-stacked">
         <li class="active">
             <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
+            title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Lotes/Categorias
             </a>
@@ -149,7 +237,7 @@
         {% endfor %}
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar">
                     <div class="float-right">
                         <a href="{% url 'subscription:lot-list' event.pk %}"
@@ -168,7 +256,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">
@@ -177,15 +265,15 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-xl-6 col-lg-8 col-md-8">
+                            <div class="col-xl-9 col-lg-11 col-md-11">
                                 {% render_generic_field form.name autofocus=True %}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-xl-3 col-lg-4 col-md-4">
+                            <div class="col-xl-5 col-lg-6 col-md-6">
                                 {% render_generic_field form.date_start %}
                             </div>
-                            <div class="col-xl-3 col-lg-4 col-md-4">
+                            <div class="col-xl-4 col-lg-5 col-md-5">
                                 {% render_generic_field form.date_end %}
                             </div>
                         </div>
@@ -199,7 +287,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-xl-2 col-lg-3 col-md-3">
+                            <div class="col-xl-4 col-lg-5 col-md-5">
                                 <div class="form-group">
                                     <label>Limitar vagas</label>
                                     <div>
@@ -214,8 +302,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xl-2 col-lg-5 col-md-5">
-                                {% render_generic_field form.limit %}
+                            <div class="col-xl-4 col-lg-7 col-md-7">
+                                <div style="display: none">
+                                    {% render_generic_field form.limit %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -227,64 +317,93 @@
                         </div>
                     </div>
                     <div class="panel-body">
+                        {% if full_banking %}
                         <div class="row">
-                            {% if full_banking %}
-                                <div class="col-xl-2 col-lg-2 col-md-2">
-                                    {% render_generic_field form.price %}
+                            <div class="col-md-3">
+                                {% render_generic_field form.price %}
+                            </div>
+                            <div class="col-md-5 col-xl-6 col-lg-5">
+                                <div style="display: none">
+                                    {% render_generic_field form.transfer_tax %}
                                 </div>
-                                {#                                <div class="col-xl-4 col-lg-6 col-md-6">#}
-                                {#                                    {% render_generic_field form.transfer_tax %}#}
-                                {#                                </div>#}
-
-                            {% else %}
-                                <div class="col-md-12">
-                                <div class="alert alert-warning">
-                                    <strong>È necessário que complete seus dads bancários para criar lotes
-                                        pagos!</strong>
+                            </div>
+                        </div>
+                        <div class="row price-box">
+                            <div class="col-md-4">
+                                <div class="well">
+                                    <div style="text-align: center;font-weight: bold">Valor da inscrição:</div>
+                                    <div style="text-align: center;font-weight: bold;font-size: 24px;color: blue;">
+                                        R$ <span class="subscription_price"></span>
+                                    </div>
+                                    <div class="text-muted" style="visibility:hidden;text-align: center;font-weight: bold;padding-top: 4px;font-size: 12px">
+                                        <strong>Taxa:</strong> R$ <span class="congressy_tax"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="well">
+                                    <div style="text-align: center;font-weight: bold">Você receberá:</div>
+                                    <div style="text-align: center;font-weight: bold;font-size: 24px;color: green;">
+                                        R$ <span class="price_to_recieve"></span>
+                                    </div>
+                                    <div class="text-muted" style="visibility:hidden;text-align: center;font-weight: bold;padding-top: 4px;font-size: 12px">
+                                        <strong>Taxa:</strong> R$ <span class="congressy_tax"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="row">
+                            <div class="col-md-12">
+                            <div class="alert alert-warning">
+                                <strong>È necessário que complete seus dados bancários para criar lotes
+                                    pagos!</strong>
 
                                 </div>
                                 <p><a href="{% url 'event:organization-financial-edit' organization.pk %}">
                                     Clique aqui para configurar estes dados.</a></p>
-                            {% endif %}
                             </div>
                         </div>
-                    </div>
-                    {#                <div class="panel panel-primary">#}
-                    {#                    <div class="panel-heading">#}
-                    {#                        <div class="panel-title">#}
-                    {#                            Privacidade#}
-                    {#                        </div>#}
-                    {#                    </div>#}
-                    {#                    <div class="panel-body">#}
-                    {#                        <div class="row">#}
-                    {#                            <div class="col-xl-2 col-lg-4 col-md-4">#}
-                    {#                                {% render_generic_field form.private %}#}
-                    {#                            </div>#}
-                    {#                            <div class="col-xl-4 col-lg-4 col-md-4">#}
-                    {#                                {% render_generic_field form.exhibition_code %}#}
-                    {#                            </div>#}
-                    {#                        </div>#}
-                    {#                    </div>#}
-                    {#                </div>#}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="buttonbar bottom">
-                        <div class="float-right">
-                            <a href="{% url 'subscription:lot-list' event.pk %}"
-                               class="btn btn-danger">
-                                <i class="fas fa-times-circle"></i>Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="fa fa-save"></i>
-                                Salvar
-                            </button>
-                        </div>
-                        <div class="clearfix"></div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
+            {#                <div class="panel panel-primary">#}
+            {#                    <div class="panel-heading">#}
+            {#                        <div class="panel-title">#}
+            {#                            Privacidade#}
+            {#                        </div>#}
+            {#                    </div>#}
+            {#                    <div class="panel-body">#}
+            {#                        <div class="row">#}
+            {#                            <div class="col-xl-2 col-lg-4 col-md-4">#}
+            {#                                {% render_generic_field form.private %}#}
+            {#                            </div>#}
+            {#                            <div class="col-xl-4 col-lg-4 col-md-4">#}
+            {#                                {% render_generic_field form.exhibition_code %}#}
+            {#                            </div>#}
+            {#                        </div>#}
+            {#                    </div>#}
+            {#                </div>#}
+        </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+                        <a href="{% url 'subscription:lot-list' event.pk %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
     </form>
 
 {% endblock %}

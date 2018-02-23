@@ -61,7 +61,7 @@
         var lots = {};
         {% for lot in paid_lots %}
             {% if lot.price %}
-                lots['{{ lot.pk }}'] = parseFloat({{ lot.price }});
+                lots['{{ lot.pk }}'] = parseFloat({{ lot.get_calculated_price }});
             {% endif %}
         {% endfor %}
 
