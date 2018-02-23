@@ -1,0 +1,135 @@
+{% load static %}
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Voucher</title>
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
+
+    <style>
+        .table.no-border tr td, .table.no-border tr th {
+            border-width: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="data:image/png;base64,{{ logo }}"
+                 style="margin-top: 15px" alt="Congressy">
+        </div>
+    </div>
+    <div class="row" align="center">
+        <h2>Comprovate do Pedido | Ingresso</h2>
+    </div>
+    <hr/>
+    <br>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h3>{{ event.name|upper }}</h3>
+            <br/>
+            <p style="font-size: 20px">
+                <strong>
+                    {{ organization.name|upper }}
+                </strong>
+                agradece o seu interesse em participar
+                do <strong>{{ event.name|upper }}</strong>
+            </p>
+
+            <p style="margin-top: 20px;font-size: 20px">Confirmamos o seu
+                pedido conforme dados
+                abaixo:</p>
+            <br/>
+
+
+            <p style="margin-top: 5px; font-size: 25px">{{ person.name|upper }}</p>
+
+            <table class="table no-border"
+                   style="border-width: 0;margin-top: 50px">
+                <tbody style="border-width: 0;">
+                <tr style="border-width: 0;">
+                    <td class="col-sm-2" style="border-width: 0;"><strong>Data
+                        / Horário</strong></td>
+                    <td class="col-sm-2">{{ event.get_period }}</td>
+                    <td><img src="data:image/png;base64,{{ qrcode }}"></td>
+                </tr>
+                {% if event.place.name %}
+                    <tr style="border-width: 0;">
+                        <td class="col-sm-2" style="border-width: 0;"><strong>Local</strong>
+                        </td>
+                        <td class="col-sm-2"
+                            style="border-width: 0;">{{ event.place.name|upper }}</td>
+                    </tr>
+                {% endif %}
+                <tr style="border-width: 0;">
+                    <td class="col-sm-2" style="border-width: 0;"><strong>Tipo
+                        de Ingresso</strong></td>
+                    <td class="col-sm-2"
+                        style="border-width: 0;"> {{ lot.name }} |
+                        R$ {{ lot.get_calculated_price }}</td>
+                </tr>
+                </tbody>
+            </table>
+
+
+            {#            <p style="margin-top: 5px; font-size: 25px">{{ person.name|upper }}</p>#}
+            {#            <p style="font-size: 20px;margin-top: 30px">Data / horário</p>#}
+            {#            <p style="font-size: 20px">{{ event.get_period }}</p>#}
+            {#            {% if event.place.name %}#}
+            {#                <p style="font-size: 18px;margin-top: 20px">Local:</p>#}
+            {#                <p style="font-size: 18px">{{ event.place.name|upper }}</p>#}
+            {#            {% endif %}#}
+            {#            <p style="font-size: 20px; margin-top: 20px">#}
+            {#                {{ lot.name }} | R$ {{ lot.get_calculated_price }}#}
+            {#            </p>#}
+            {#            <img src="data:image/png;base64,{{ qrcode }}"#}
+            {#                 style="margin-top: 25px">#}
+
+
+            {#            <table class="table" style="border: none;">#}
+            {#                <tbody>#}
+            {#                <thread>#}
+            {#                    <tr>#}
+            {#                        <th>#}
+            {#                            Organizador:#}
+            {#                        </th>#}
+            {#                        <th>#}
+            {#                            Nome do Participante:#}
+            {#                        </th>#}
+            {#                        <th>#}
+            {#                            Localização:#}
+            {#                        </th>#}
+            {#                        <th>#}
+            {#                            Lote:#}
+            {#                        </th>#}
+            {#                        <th></th>#}
+            {##}
+            {#                    </tr>#}
+            {#                </thread>#}
+            {#                <tr>#}
+            {#                    <td>{{ organization.name }}</td>#}
+            {#                    <td>{{ person.name }}</td>#}
+            {#                    <td>{{ event.place.name }}</td>#}
+            {#                    <td>{{ lot.name }} |#}
+            {#                        R$ {{ lot.get_calculated_price }}</td>#}
+            {#                    <td>#}
+            {#                        <img src="data:image/png;base64,{{ qrcode }}">#}
+            {#                    </td>#}
+            {#                </tr>#}
+            {#                </tbody>#}
+            {#            </table>#}
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
+
+
