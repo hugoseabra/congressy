@@ -38,10 +38,7 @@ class EventViewMixin(AccountMixin, generic.View):
             force=True
         )
 
-        self.permission_denied_url = reverse(
-            'event:event-panel',
-            kwargs={'pk': self.kwargs.get('event_pk')}
-        )
+        self.permission_denied_url = reverse('event:event-list')
         return super(EventViewMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -106,6 +103,12 @@ class EventViewMixin(AccountMixin, generic.View):
                 return True
 
         return False
+
+    def can_access(self):
+        if not self.event:
+            return False
+
+        return self.event.organization == self.organization
 
 
 class SubscriptionFormMixin(EventViewMixin, generic.FormView):
@@ -333,7 +336,8 @@ class SubscriptionViewFormView(EventViewMixin, generic.FormView):
 
         try:
             kwargs['initial'].update({
-                'city': '{}-{}'.format(self.object.city.name, self.object.city.uf)
+                'city': '{}-{}'.format(self.object.city.name,
+                                       self.object.city.uf)
             })
         except AttributeError:
             pass
@@ -566,7 +570,8 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
     def get_object(self, queryset=None):
         """ Resgata objeto principal da view. """
         if not self.object:
-            self.object = super(SubscriptionCancelView, self).get_object(queryset)
+            self.object = super(SubscriptionCancelView, self).get_object(
+                queryset)
 
         return self.object
 
@@ -580,7 +585,8 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
         return url.format(**model_to_dict(self.object)) if self.object else url
 
     def get_context_data(self, **kwargs):
-        context = super(SubscriptionCancelView, self).get_context_data(**kwargs)
+        context = super(SubscriptionCancelView, self).get_context_data(
+            **kwargs)
         context['organization'] = self.organization
         context['go_back_path'] = self.get_success_url()
 
@@ -626,10 +632,7 @@ class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
     search_by = 'name'
 
     def get_permission_denied_url(self):
-        return reverse(
-            'event:event-panel',
-            kwargs={'pk': self.kwargs.get('event_pk')},
-        )
+        return reverse('event:event-list')
 
     def get(self, request, *args, **kwargs):
         self.search_by = request.GET.get('search_by', 'name')

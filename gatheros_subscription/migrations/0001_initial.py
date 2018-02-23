@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
                 ('discount_type', models.CharField(blank=True, choices=[('percent', '%'), ('money', 'R$')], default='percent', max_length=15, null=True, verbose_name='tipo de desconto')),
                 ('discount', models.DecimalField(blank=True, decimal_places=2, max_digits=8, null=True, verbose_name='desconto')),
                 ('promo_code', models.CharField(blank=True, max_length=15, null=True, verbose_name='código promocional')),
-                ('transfer_tax', models.BooleanField(default=False, verbose_name='trasferir taxa para participante')),
+                ('transfer_tax', models.BooleanField(default=False, verbose_name='repassar taxa')),
                 ('private', models.BooleanField(default=False, help_text='Não estará explícito para o participante no site do evento', verbose_name='privado')),
                 ('internal', models.BooleanField(default=False, verbose_name='interno')),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='criado em')),

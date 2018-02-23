@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-26 10:44-0200\n"
+"POT-Creation-Date: 2018-02-20 10:55-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: frontend/templates/event/delete.html:31
+#: frontend/templates/event/delete.html:33
 #: frontend/templates/generic/delete.html:29
 #: frontend/templates/subscription/delete.html:70
 #: gatheros_subscription/templates/generic/delete.html:14
 msgid "Yes, I'm sure"
-msgstr ""
-
-#: frontend/templates/event/hotsite.html:157
-msgid "i like potatos"
 msgstr ""
 
 #: frontend/templates/registration/password_reset_complete.html:12
@@ -39,6 +35,21 @@ msgstr ""
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr ""
 
+#: gatheros_front/forms.py:21 gatheros_front/forms.py:101
+msgid "Password"
+msgstr ""
+
+#: gatheros_front/forms.py:28 gatheros_front/forms.py:110
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+
+#: gatheros_front/forms.py:31 gatheros_front/forms.py:113
+msgid "This account is inactive."
+msgstr ""
+
 #: gatheros_subscription/views/filters.py:30
 msgid "Enter a valid start value."
 msgstr ""
@@ -47,10 +58,10 @@ msgstr ""
 msgid "Enter a valid end value."
 msgstr ""
 
-#: project/settings/__init__.py:262
+#: project/settings/__init__.py:69
 msgid "English"
 msgstr ""
 
-#: project/settings/__init__.py:263
+#: project/settings/__init__.py:70
 msgid "Português"
 msgstr ""

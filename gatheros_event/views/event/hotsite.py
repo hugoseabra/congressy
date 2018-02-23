@@ -14,6 +14,15 @@ class EventHotsiteView(AccountMixin, FormView):
     event = None
     object = None
 
+    def can_access(self):
+        if not self.event:
+            return False
+
+        return self.event.organization == self.organization
+
+    def get_permission_denied_url(self):
+        return reverse('event:event-list')
+
     def pre_dispatch(self, request):
         event = self._get_event()
 
