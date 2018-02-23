@@ -26,3 +26,9 @@ def step_impl(context):
     driver = context.browser
     mensagem_erro = driver.find_element_by_css_selector('.alert').text
     eq_(mensagem_erro,'Esse email já existe em nosso sistema. Tente novamente.')
+
+@then('Nao aceita o cadastro pois o input tem o tipo email')
+def step_impl(context):
+    driver = context.browser
+    campo_email = driver.find_element_by_css_selector('#email').get_attribute('type')
+    eq_(campo_email,'email')
