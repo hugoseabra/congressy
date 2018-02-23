@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-""" Transaction State Machine implementation."""
+"""
+    Transaction State Machine implementation.
+
+    See: doc/Diagramas/StateMachine/CONGRESSY_GDS-LPS-Transacao_v01.jpg
+"""
 
 from statemachine import StateMachine, State
 
