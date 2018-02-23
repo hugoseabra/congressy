@@ -1,8 +1,9 @@
 from django.contrib import messages
-from django.shortcuts import redirect, reverse, get_object_or_404
+from django.shortcuts import reverse, get_object_or_404
 from django.views.generic import FormView
 
 from gatheros_event import forms
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Info
 from gatheros_event.views.mixins import AccountMixin
 
@@ -12,6 +13,26 @@ class EventHotsiteView(AccountMixin, FormView):
     template_name = 'event/hotsite.html'
     event = None
     object = None
+
+    def can_access(self):
+        if not self.event:
+            return False
+
+        return self.event.organization == self.organization
+
+    def get_permission_denied_url(self):
+        return reverse('event:event-list')
+
+    def pre_dispatch(self, request):
+        event = self._get_event()
+
+        update_account(
+            request=self.request,
+            organization=event.organization,
+            force=True
+        )
+
+        return super().pre_dispatch(request)
 
     def _get_event(self):
         if self.event:

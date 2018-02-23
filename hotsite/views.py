@@ -41,10 +41,15 @@ class EventMixin(generic.View):
         context['info'] = get_object_or_404(Info, event=self.event)
         context['period'] = self.get_period()
         context['lots'] = self.get_lots()
+        context['paid_lots'] = [
+            lot
+            for lot in self.get_lots()
+            if  lot.status == lot.LOT_STATUS_RUNNING
+        ]
         context['subscription_enabled'] = self.subscription_enabled()
+        context['subsciption_finished'] = self.subsciption_finished()
         context['has_paid_lots'] = self.has_paid_lots()
-        context[
-            'has_configured_bank_account'] = \
+        context['has_configured_bank_account'] = \
             self.event.organization.is_bank_account_configured()
         context['has_active_bank_account'] = \
             self.event.organization.active_recipient
@@ -72,13 +77,19 @@ class EventMixin(generic.View):
 
         return self.event.status == Event.EVENT_STATUS_NOT_STARTED
 
+    def subsciption_finished(self):
+        for lot in self.event.lots.all():
+            if lot.status == Lot.LOT_STATUS_RUNNING:
+                return True
+
+        return True
+
     def get_period(self):
         """ Resgata o prazo de duração do evento. """
         return self.event.get_period()
 
     def get_lots(self):
-        lots = self.event.lots.all()
-        return [lot for lot in lots if lot.status == lot.LOT_STATUS_RUNNING]
+        return self.event.lots.all()
 
 
 class SubscriptionFormMixin(EventMixin, generic.FormView):
@@ -457,6 +468,9 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             - processa pagamento;
             - notifica usuário;
             - redireciona para página de status
+
+        CONDIÇÂO 8: status da inscrição
+            - verifica o tipo de lotes, caso não tenha lotes pagos, então a inscrição é confirmada
         """
         context = self.get_context_data(**kwargs)
         context['remove_preloader'] = True
@@ -552,8 +566,8 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         # Insere ou edita lote
         subscription.lot = lot
 
-        # CONDIÇÃO 7
         if self.has_paid_lots():
+            # CONDIÇÃO 7
             if 'transaction_type' not in request.POST:
                 messages.error(
                     request=self.request,
@@ -561,54 +575,57 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 )
                 return self.render_to_response(context)
 
-        # CONDIÇÃO 6
-        with transaction.atomic():
-
-            # Garante rollback da inscrição
-            subscription.save()
-
-            if self.has_paid_lots():
-                try:
-
-                    transaction_instance = PagarmeTransactionInstanceData(
+            try:
+                transaction_instance_data = \
+                    PagarmeTransactionInstanceData(
                         subscription=subscription,
                         extra_data=request.POST.copy(),
                         event=self.event
-
                     )
 
-                    create_pagarme_transaction(
-                        payment=transaction_instance.transaction_instance_data,
-                        subscription=subscription
-                    )
+                data = transaction_instance_data.transaction_instance_data
+                create_pagarme_transaction(
+                    payment=data,
+                    subscription=subscription
+                )
 
-                except TransactionError as e:
-                    error_dict = {
-                        'No transaction type': 'Por favor escolher uma forma de pagamento.',
-                        'Transaction type not allowed': 'Forma de pagamento não permitida.',
-                        'Organization has no bank account': 'Organização não está podendo receber pagamentos no momento.',
-                        'No organization': 'Evento não possui organizador.',
-                    }
-                    if e.message in error_dict:
-                        e.message = error_dict[e.message]
+            except TransactionError as e:
+                error_dict = {
+                    'No transaction type': \
+                        'Por favor escolher uma forma de pagamento.',
+                    'Transaction type not allowed': \
+                        'Forma de pagamento não permitida.',
+                    'Organization has no bank account': \
+                        'Organização não está podendo receber pagamentos no'
+                        ' momento.',
+                    'No organization': 'Evento não possui organizador.',
+                }
+                if e.message in error_dict:
+                    e.message = error_dict[e.message]
 
-                    messages.error(self.request, message=e.message)
-                    return self.render_to_response(context)
+                messages.error(self.request, message=e.message)
+                return self.render_to_response(context)
 
-            # CONDIÇÃO 5 e 7
-            if new_account and new_subscription:
-                notify_new_user_and_subscription(self.event, subscription)
+        else:
+            # CONDIÇÃO 8
+            subscription.status = subscription.CONFIRMED_STATUS
 
-            elif new_subscription:
-                notify_new_subscription(self.event, subscription)
+        subscription.save()
 
-            messages.success(
-                self.request,
-                'Inscrição realizada com sucesso!'
-            )
+        # CONDIÇÃO 5 e 7
+        if new_account and new_subscription:
+            notify_new_user_and_subscription(self.event, subscription)
 
-        # CONDIÇÃO 7
+        elif new_subscription:
+            notify_new_subscription(self.event, subscription)
+
+        messages.success(
+            self.request,
+            'Inscrição realizada com sucesso!'
+        )
+
         if self.has_paid_lots():
+            # CONDIÇÃO 7
             return redirect(
                 'public:hotsite-subscription-status',
                 slug=self.event.slug
@@ -639,8 +656,10 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
             return response
 
         except Subscription.DoesNotExist:
-            messages.error(message='Você não possui inscrição neste evento.',
-                           request=request)
+            messages.error(
+                message='Você não possui inscrição neste evento.',
+                request=request
+            )
             return redirect('public:hotsite', slug=self.event.slug)
 
     def get_context_data(self, **kwargs):
@@ -734,6 +753,6 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
                 return True
 
             except (Subscription.DoesNotExist, AttributeError):
-                return HttpResponseRedirect(reverse('public:hotsite'))
+                pass
 
         return False

@@ -49,31 +49,34 @@
                                 {{ info.lead }}
                             </p>
                         {% endif %}
-                        {% if subscription_enabled and has_paid_lots %}
+                        {% if subscription_enabled and lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
                             <ul class="icon-list">
-
                                 {% for lot in lots %}
+                                    {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
                                     <li>
-                                <span class="icon-list-icon " data-animation="bounceIn">
-                                  <strong>{{ forloop.counter }}</strong>
-                                </span>
+                                        <span class="icon-list-icon " data-animation="bounceIn" {% if lot.status == lot.LOT_STATUS_FINISHED %}style="background-color:#515050"{% endif %}>
+                                            <strong>{{ forloop.counter }}</strong>
+                                        </span>
                                         <h4 class="icon-list-title">
-                                            <strong>{{ lot.name }} - R${{ lot.price }}</strong>
+                                            <strong {% if lot.status == lot.LOT_STATUS_FINISHED %}style="text-decoration: line-through"{% endif %}>
+                                                {{ lot.name }} - R${{ lot.price }}
+                                            </strong>
                                         </h4>
 
                                         <p>
-                                            <strong>{{ lot.places_remaining }} Vaga(s) restante(s)</strong>
-                                            <br/>
+{#                                            <strong>{{ lot.places_remaining }} Vaga(s) restante(s)</strong>#}
+{#                                            <br/>#}
                                             <small class="text-muted">{{ lot.get_period }}</small>
                                         </p>
-
                                     </li>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
-                        {% elif  not subscription_enabled %}
+                        {% elif subsciption_finished %}
+                            <p style="font-size: 20px;font-style: italic;">Inscrições encerradas.</p>
+                        {% elif not subscription_enabled %}
                             <p style="font-size: 20px;font-style: italic;">Evento não permite inscrições.</p>
                         {% endif %}
-
                     </div>
                     <div class="hero-features-right col-md-5" data-animation="fadeIn">
                     </div>

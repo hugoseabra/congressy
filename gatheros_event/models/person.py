@@ -203,7 +203,11 @@ class Person(models.Model, GatherosModelMixin):
         ordering = ['name']
 
     def __str__(self):
-        return str(self.name)
+        string = self.name
+        if self.email:
+            string += ' ({})'.format(self.email)
+
+        return string
 
     def save(self, *args, **kwargs):
         if not self.email:

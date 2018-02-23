@@ -59,7 +59,7 @@
     <script src="{% static "hotsite/js/payment.js" %}"></script>
     <script>
         var lots = {};
-        {% for lot in lots %}
+        {% for lot in paid_lots %}
             {% if lot.price %}
                 lots['{{ lot.pk }}'] = parseFloat({{ lot.price }});
             {% endif %}
