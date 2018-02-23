@@ -6,6 +6,7 @@ from . import views
 urlpatterns_public = [
     url(r'^login/$', views.Login.as_view(), name='login'),
     url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
+    # url(r'^pdf/$', views.MyPDF.as_view(), name='pdf'),
 ]
 
 urlpatterns_private = [

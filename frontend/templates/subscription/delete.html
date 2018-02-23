@@ -2,7 +2,7 @@
 {% load i18n static %}
 
 {% block title %}Congressy{% endblock %}
-{% block page_title %}Confirmar exclusão da inscrição{% endblock %}
+{% block page_title %}Confirmar cancelamento da inscrição{% endblock %}
 
 {% block nav_aside_itens %}
     <h5 class="sidebar-header">Configurações</h5>
@@ -67,7 +67,7 @@
                         <a href="{{ go_back_path }}" class="btn btn-danger">Não,
                             leve-me de volta</a>
                     {% endif %}
-                    <input type="submit" value="{% trans "Yes, I'm sure" %}"
+                    <input type="submit" value="Sim, tenho certeza"
                            class="btn btn-info"/>
                 </div>
             </form>

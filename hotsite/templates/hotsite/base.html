@@ -51,6 +51,9 @@ $(document).ready(function() {
         '{{ event.place.lat }}'.replace(',', '.'),
         '{{ event.place.long }}'.replace(',', '.')
     );
+    $('input[type=email]').on('keyup', function() {
+        $(this).val($(this).val().toLowerCase());
+    })
 });
 </script>
 {% endif %}

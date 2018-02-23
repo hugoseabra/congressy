@@ -10,20 +10,17 @@ from django.urls import reverse
 from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.views import generic
+from gatheros_subscription.helpers.export import export_event_data
 
 from gatheros_event.forms import PersonForm
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
-    DeleteViewMixin,
-    FormListViewMixin,
 )
-from gatheros_subscription.forms import SubscriptionForm
-from gatheros_subscription.helpers.subscription import \
-    export as subscription_export
+from gatheros_subscription.forms import SubscriptionForm, \
+    SubscriptionFilterForm
 from gatheros_subscription.models import Subscription, FormConfig
-from .filters import SubscriptionFilterForm
 
 
 class EventViewMixin(AccountMixin, generic.View):
@@ -39,10 +36,7 @@ class EventViewMixin(AccountMixin, generic.View):
             force=True
         )
 
-        self.permission_denied_url = reverse(
-            'event:event-panel',
-            kwargs={'pk': self.kwargs.get('event_pk')}
-        )
+        self.permission_denied_url = reverse('event:event-list')
         return super(EventViewMixin, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -107,6 +101,12 @@ class EventViewMixin(AccountMixin, generic.View):
                 return True
 
         return False
+
+    def can_access(self):
+        if not self.event:
+            return False
+
+        return self.event.organization == self.organization
 
 
 class SubscriptionFormMixin(EventViewMixin, generic.FormView):
@@ -334,7 +334,8 @@ class SubscriptionViewFormView(EventViewMixin, generic.FormView):
 
         try:
             kwargs['initial'].update({
-                'city': '{}-{}'.format(self.object.city.name, self.object.city.uf)
+                'city': '{}-{}'.format(self.object.city.name,
+                                       self.object.city.uf)
             })
         except AttributeError:
             pass
@@ -555,27 +556,73 @@ class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
 #         ) if enabled else False
 
 
-class SubscriptionDeleteView(EventViewMixin, DeleteViewMixin):
+class SubscriptionCancelView(EventViewMixin, generic.DetailView):
     template_name = 'subscription/delete.html'
     model = Subscription
-    success_message = 'Inscrição excluída com sucesso.'
+    success_message = 'Inscrição cancelada com sucesso.'
+    cancel_message = 'Tem certeza que deseja cancelar?'
+    model_protected_message = 'A entidade não pode ser cancelada.'
     place_organization = None
+    object = None
+
+    def get_object(self, queryset=None):
+        """ Resgata objeto principal da view. """
+        if not self.object:
+            self.object = super(SubscriptionCancelView, self).get_object(
+                queryset)
+
+        return self.object
+
+    def pre_dispatch(self, request):
+        super(SubscriptionCancelView, self).pre_dispatch(request)
+
+        self.object = self.get_object()
 
     def get_permission_denied_url(self):
-        return reverse('subscription:subscription-list', kwargs={
-            'event_pk': self.kwargs.get('event_pk')
-        })
+        url = self.get_success_url()
+        return url.format(**model_to_dict(self.object)) if self.object else url
+
+    def get_context_data(self, **kwargs):
+        context = super(SubscriptionCancelView, self).get_context_data(
+            **kwargs)
+        context['organization'] = self.organization
+        context['go_back_path'] = self.get_success_url()
+
+        # noinspection PyProtectedMember
+        verbose_name = self.object._meta.verbose_name
+        context['title'] = 'Cancelar {}'.format(verbose_name)
+
+        data = model_to_dict(self.get_object())
+        cancel_message = self.get_cancel_message()
+        context['cancel_message'] = cancel_message.format(**data)
+        return context
+
+    def get_cancel_message(self):
+        """
+        Recupera mensagem de remoção a ser perguntada ao usuário antes da
+        remoção.
+        """
+        return self.cancel_message
+
+    def post(self, request, *args, **kwargs):
+        try:
+
+            pk = kwargs.get('pk')
+
+            self.object = Subscription.objects.get(pk=pk)
+            self.object.status = self.object.CANCELED_STATUS
+            self.object.save()
+
+        except Exception as e:
+            messages.error(request, str(e))
+        else:
+            messages.success(request, self.success_message)
+            return redirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('subscription:subscription-list', kwargs={
             'event_pk': self.kwargs.get('event_pk')
         })
-
-    def can_delete(self):
-        return self.request.user.has_perm(
-            'gatheros_event.can_manage_subscriptions',
-            self.get_event()
-        )
 
 
 class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
@@ -583,10 +630,7 @@ class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
     search_by = 'name'
 
     def get_permission_denied_url(self):
-        return reverse(
-            'event:event-panel',
-            kwargs={'pk': self.kwargs.get('event_pk')},
-        )
+        return reverse('event:event-list')
 
     def get(self, request, *args, **kwargs):
         self.search_by = request.GET.get('search_by', 'name')
@@ -832,8 +876,8 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             return True
 
 
-class SubscriptionExportView(AccountMixin, FormListViewMixin):
-    # template_name = 'gatheros_subscription/subscription/attendance.html'
+class SubscriptionExportView(EventViewMixin, generic.View):
+    http_method_names = ['post']
     template_name = 'subscription/export.html'
     form_class = SubscriptionFilterForm
     model = Subscription
@@ -848,48 +892,25 @@ class SubscriptionExportView(AccountMixin, FormListViewMixin):
         self.event = get_object_or_404(Event, pk=self.kwargs.get('event_pk'))
         return self.event
 
-    def get_context_data(self, **kwargs):
-        cxt = super().get_context_data(**kwargs)
-        cxt.update({
-            'event': self.get_event()
-        })
-        return cxt
+    def post(self, request, *args, **kwargs):
+        # Chamando exportação
+        output = export_event_data(self.get_event())
 
-    def get_form_kwargs(self):
-        kwargs = super(SubscriptionExportView, self).get_form_kwargs()
-        kwargs.update({
-            'event': self.kwargs.get('event_pk')
-        })
-        return kwargs
+        # Criando resposta http com arquivo de download
+        response = HttpResponse(
+            output,
+            content_type="application/vnd.ms-excel"
+        )
 
-    def get_queryset(self):
-        queryset = Subscription.objects \
-            .filter(event__pk=self.kwargs.get('event_pk'))
+        # Definindo nome do arquivo
+        event = self.get_event()
+        name = "%s_%s.xlsx" % (
+            event.slug,
+            datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        )
+        response['Content-Disposition'] = 'attachment; filename=%s' % name
 
-        form = self.get_form()
-        if form.is_valid():
-            queryset = form.filter(queryset)
-
-        return queryset
-
-    def get(self, request, *args, **kwargs):
-        if request.GET.get('format') == 'xls':
-            # Chamando exportação
-            output = subscription_export(self.get_queryset())
-
-            # Criando resposta http com arquivo de download
-            response = HttpResponse(output,
-                                    content_type="application/vnd.ms-excel")
-
-            # Definindo nome do arquivo
-            event = self.get_event()
-            name = "%s-%s.xls" % (event.pk, event.slug)
-            response['Content-Disposition'] = 'attachment; filename=%s' % name
-
-            return response
-
-        return super(SubscriptionExportView, self).get(request, *args,
-                                                       **kwargs)
+        return response
 
     def can_access(self):
         return self.request.user.has_perm(

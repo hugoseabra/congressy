@@ -192,7 +192,7 @@
 
                             <td>
                                 {% if lot.price and lot.price > 0 %}
-                                    R$ {{ lot.price }}
+                                    R$ {{ lot.get_calculated_price }}
                                 {% else %}
                                     ----
                                 {% endif %}

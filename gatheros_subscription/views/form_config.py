@@ -61,6 +61,12 @@ class EventViewMixin(AccountMixin, generic.View):
 
         return False
 
+    def can_access(self):
+        return self.get_event().organization == self.organization
+
+    def get_permission_denied_url(self):
+        return reverse('event:event-list')
+
 
 class FormConfigView(EventViewMixin, generic.FormView):
     """ Formulário de configuração de inscrição."""
