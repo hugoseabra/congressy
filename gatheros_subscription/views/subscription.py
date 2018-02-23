@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.views import generic
-from gatheros_subscription.helpers.export import export_event_data
 
 from gatheros_event.forms import PersonForm
 from gatheros_event.helpers.account import update_account
@@ -18,8 +17,11 @@ from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
 )
-from gatheros_subscription.forms import SubscriptionForm, \
+from gatheros_subscription.forms import (
+    SubscriptionForm,
     SubscriptionFilterForm
+)
+from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.models import Subscription, FormConfig
 
 

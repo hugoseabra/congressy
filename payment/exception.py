@@ -15,7 +15,9 @@ class TransactionError(Error):
 
 
 class OrganizerRecipientError(Error):
-    """Raised when an operation attempts something the Organizer recipient and something goes wrong.
+    """
+    Raised when an operation attempts something the Organizer recipient and
+    something goes wrong.
 
     Attributes:
         message -- explanation of why the specific transaction is not allowed
