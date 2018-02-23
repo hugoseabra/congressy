@@ -16,6 +16,8 @@ from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.models import Subscription
 from mailer.tasks import send_mail
 from payment.models import Transaction, TransactionStatus
+from payment.helpers import TransactionDirector, \
+    TransactionSubscriptionStatusIntegrator
 
 
 class EventPaymentView(AccountMixin, ListView):
@@ -109,6 +111,8 @@ def postback_url_view(request, uidb64):
     try:
         transaction = Transaction.objects.get(uuid=uidb64)
 
+        old_status = transaction.status
+
         data = request.data.copy()
 
         transaction_status = TransactionStatus(
@@ -132,13 +136,22 @@ def postback_url_view(request, uidb64):
 
         subscription = Subscription.objects.get(pk=transaction.subscription.pk)
 
-        if status == 'processing' or status == 'waiting_payment':
-            subscription.status = subscription.AWAITING_STATUS
-        elif status == 'paid' or status == 'authorized':
-            subscription.status = subscription.CONFIRMED_STATUS
-        else:
-            # status == refunded or pending_refund or refused or chargedback
-            subscription.status = subscription.CANCELED_STATUS
+        # Create a state machine using the old transaction status as it's
+        # initial value.
+
+        transaction_director = TransactionDirector(status=status,
+                                                   old_status=old_status)
+        transaction_director_status = transaction_director.direct()
+
+        # Translate/integrate the status returned from the director to a
+        #   subscription status.
+        trans_sub_status_integrator = TransactionSubscriptionStatusIntegrator(
+            transaction_director_status)
+
+        subscription_status = trans_sub_status_integrator.integrate()
+
+        if subscription_status:
+            subscription.status = subscription_status
 
         subscription.save()
 
