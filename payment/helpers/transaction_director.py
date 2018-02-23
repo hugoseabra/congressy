@@ -41,7 +41,7 @@ class TransactionDirector:
             elif self.status == "pending_refund":
                 self.transaction_state_machine.paid_pending_refund()
             elif self.status == "refunded":
-                self.transaction_state_machine.pending_refund()
+                self.transaction_state_machine.paid_refund()
             else:
                 raise StateNotAllowedError(
                     message='State not allowed for paid')
