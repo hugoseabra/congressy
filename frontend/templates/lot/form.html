@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
-{% load static event_tags  base_tags  widget_tweaks form_config_tags %}
+{% load l10n static event_tags  base_tags  widget_tweaks form_config_tags %}
+{% load humanize %}
 
 {% block messages %}
     {% if messages %}
@@ -80,13 +81,11 @@
 
         function calculatePrices() {
             var minimum = parseFloat(
-                '{{ congressy_minimum_price }}'
-                    .replace('.', '')
+                '{{ congressy_minimum_price|unlocalize|intcomma }}'
                     .replace(',', '.')
             );
             var percent = parseFloat(
-                '{{ congressy_plan_percent_10 }}'
-                    .replace('.', '')
+                '{{ congressy_plan_percent_10|unlocalize|intcomma }}'
                     .replace(',', '.')
             );
             percent = percent/100;
@@ -99,6 +98,11 @@
             }
 
             price = parseFloat(price);
+
+            console.log('{{ congressy_minimum_price }}');
+            console.log(minimum);
+            console.log(percent);
+            console.log(price);
 
             var congressy_price = price * percent;
             if (congressy_price < minimum) {
