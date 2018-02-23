@@ -186,8 +186,14 @@ class PagarmeTransactionInstanceData:
             "charge_remainder_fee": True
         }
 
+        if settings.DEBUG is True and \
+                hasattr(settings, 'PAGARME_TEST_RECIPIENT_ID'):
+            org_recipient_id = settings.PAGARME_TEST_RECIPIENT_ID
+        else:
+            org_recipient_id = self.organization.recipient_id
+
         organization_rule = {
-            "recipient_id": self.organization.recipient_id,
+            "recipient_id": org_recipient_id,
             "amount": as_payment_format(organization_amount),
             "liable": True,
             "charge_processing_fee": False
