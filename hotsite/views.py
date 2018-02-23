@@ -4,7 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
@@ -41,6 +41,11 @@ class EventMixin(generic.View):
         context['info'] = get_object_or_404(Info, event=self.event)
         context['period'] = self.get_period()
         context['lots'] = self.get_lots()
+        context['paid_lots'] = [
+            lot
+            for lot in self.get_lots()
+            if  lot.status == lot.LOT_STATUS_RUNNING
+        ]
         context['subscription_enabled'] = self.subscription_enabled()
         context['subsciption_finished'] = self.subsciption_finished()
         context['has_paid_lots'] = self.has_paid_lots()
@@ -74,18 +79,17 @@ class EventMixin(generic.View):
 
     def subsciption_finished(self):
         for lot in self.event.lots.all():
-            if lot.status == Lot.LOT_STATUS_FINISHED:
-                return True
+            if lot.status == Lot.LOT_STATUS_RUNNING:
+                return False
 
-        return False
+        return True
 
     def get_period(self):
         """ Resgata o prazo de duração do evento. """
         return self.event.get_period()
 
-    def get_lots(self, status=Lot.LOT_STATUS_RUNNING):
-        lots = self.event.lots.all()
-        return [lot for lot in lots if lot.status == status]
+    def get_lots(self):
+        return self.event.lots.all()
 
 
 class SubscriptionFormMixin(EventMixin, generic.FormView):
@@ -587,18 +591,22 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 return self.render_to_response(context)
 
             try:
-                transaction_instance_data = \
-                    PagarmeTransactionInstanceData(
-                        subscription=subscription,
-                        extra_data=request.POST.copy(),
-                        event=self.event
-                    )
+                with transaction.atomic():
 
-                data = transaction_instance_data.transaction_instance_data
-                create_pagarme_transaction(
-                    payment=data,
-                    subscription=subscription
-                )
+                    subscription.save()
+
+                    transaction_instance_data = \
+                        PagarmeTransactionInstanceData(
+                            subscription=subscription,
+                            extra_data=request.POST.copy(),
+                            event=self.event
+                        )
+
+                    data = transaction_instance_data.transaction_instance_data
+                    create_pagarme_transaction(
+                        payment=data,
+                        subscription=subscription
+                    )
 
             except TransactionError as e:
                 error_dict = {

@@ -41,5 +41,6 @@ EMAIL_USE_TLS = False
 PAGARME_API_KEY = 'ak_test_IkLKxOIdD0GVTHfmlSPA1zuGoaCQtd'
 PAGARME_ENCRYPTION_KEY = 'ek_test_ep7xk51I1XtWg58B9xij1VFwJRLcKa'
 PAGARME_RECIPIENT_ID = 're_cjcupb1iq0200zl6d89r92s32'
+PAGARME_TEST_RECIPIENT_ID = 're_cjdagxm5q00fqok6eeuukmmtp'
 # ============================ DEBUG TOOL BAR =============================== #
 INTERNAL_IPS = ['127.0.0.1']
