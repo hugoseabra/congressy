@@ -1,20 +1,34 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
-from django.urls import reverse, resolve
-from uuid import uuid4
-from .views import PostBackView
+from payment.helpers import TransactionStateMachine
+from payment.models import Transaction
+from statemachine.exceptions import TransitionNotAllowed
 
 
-class TaskTest(TestCase):
+class TransactionStateMachineTest(TestCase):
 
-    def test_GET_request(self):
-        response = self.client.get('/api/payments/pagarme/postback/' + str(uuid4()), follow=True)
-        self.assertEqual(response.status_code, 405)
+    def setUp(self):
+        self.tsm = TransactionStateMachine()
 
-    def test_POST_request(self):
+    def test_default_starting_value(self):
+        self.assertEqual(self.tsm.current_state.value, Transaction.PROCESSING)
 
-        #response_match = resolve('/api/payments/pagarme/postback/' + str(uuid4()))
+    def test_skipping_a_state(self):
+        with self.assertRaises(TransitionNotAllowed):
+            self.tsm.refund_from_pending()
 
-        response = self.client.post('/api/payments/pagarme/postback/' + str(uuid4()), follow=True)
-        self.assertEqual(response.resolver_match.func.__name__, PostBackView.as_view().__name__)
-        self.assertEqual(response.status_code, 200)
+    def test_moving_state(self):
+        self.tsm.awaiting_payment()
+        self.assertEqual(self.tsm.current_state.value,
+                         Transaction.WAITING_PAYMENT)
+
+
+class TransactionDirectorTest(TestCase):
+
+
+    def setUp(self):
+        self.transaction = Transaction.objects.first()
+        self.tsm = TransactionStateMachine()
+        self.possible_status = [s.identifier for s in self.tsm.states]
+
+    def test_fail(self):
+        self.fail('adasda')

@@ -14,6 +14,8 @@ from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from mailer.tasks import send_mail
 from payment.models import Transaction, TransactionStatus
+from payment.helpers import TransactionDirector
+from payment.exception import StateNotAllowedError
 
 
 class EventPaymentView(LoginRequiredMixin, ListView):
@@ -98,6 +100,8 @@ def postback_url_view(request, uidb64):
     try:
         transaction = Transaction.objects.get(uuid=uidb64)
 
+        old_status = transaction.status
+
         data = request.data.copy()
 
         transaction_status = TransactionStatus(
@@ -121,13 +125,20 @@ def postback_url_view(request, uidb64):
 
         subscription = Subscription.objects.get(pk=transaction.subscription.pk)
 
-        if status == 'processing' or status == 'waiting_payment':
-            subscription.status = subscription.AWAITING_STATUS
-        elif status == 'paid' or status == 'authorized':
-            subscription.status = subscription.CONFIRMED_STATUS
-        else:
-            # status == refunded or pending_refund or refused or chargedback
-            subscription.status = subscription.CANCELED_STATUS
+        # Create a state machine using the old transaction status as it's
+        # initial value.
+
+        transaction_director = TransactionDirector(status=status,
+                                                   old_status=old_status)
+        subscription_status = transaction_director.direct()
+
+        # if status == 'processing' or status == 'waiting_payment':
+        #     subscription.status = subscription.AWAITING_STATUS
+        # elif status == 'paid' or status == 'authorized':
+        #     subscription.status = subscription.CONFIRMED_STATUS
+        # else:
+        #     # status == refunded or pending_refund or refused or chargedback
+        #     subscription.status = subscription.CANCELED_STATUS
 
         subscription.save()
 
