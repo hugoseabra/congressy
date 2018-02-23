@@ -204,7 +204,7 @@
                             {% for item in object_list %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'public:hotsite' item.event.slug %}">
+                                        <a href="{% url 'public:hotsite' item.event.slug %}" target="_blank">
                                             <div>
                                                 <strong>{{ item.event.name }}</strong>
                                                 <span style="font-size: medium;color:dimgray">({{ item.event.organization.name }})</span>

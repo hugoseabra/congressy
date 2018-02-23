@@ -237,13 +237,7 @@
                                                         Visualizar
                                                     </a>
                                                 </li>
-                                                <li>
-                                                    <a href="{% url 'subscription:subscription-delete' event.pk item.pk %}">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                        Cancelar
-                                                    </a>
-                                                </li>
-                                                {% if item.status == item.CONFIRMED_STATUS %}
+                                                {% if item.confirmed %}
                                                     <li>
                                                         <a href="{% url 'subscription:subscription-voucher' event.pk item.pk %}">
                                                             <i class="fas fa-file-pdf"></i>
@@ -251,6 +245,12 @@
                                                         </a>
                                                     </li>
                                                 {% endif %}
+                                                <li>
+                                                    <a href="{% url 'subscription:subscription-delete' event.pk item.pk %}">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                        Cancelar
+                                                    </a>
+                                                </li>
 
                                             </ul>
                                         </div>

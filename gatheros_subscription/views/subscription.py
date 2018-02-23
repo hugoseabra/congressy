@@ -10,8 +10,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.models import Model
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import six
 from django.utils.decorators import classonlymethod
@@ -870,8 +869,4 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
         self.lot = self.subscription.lot
 
     def can_access(self):
-        for transaction in self.subscription.transactions.all():
-            if transaction.paid:
-                return True
-
-        return False
+        return self.subscription.confirmed is True
