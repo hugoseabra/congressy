@@ -59,6 +59,7 @@ def _export_subscriptions(worksheet, subscriptions):
         'CIDADE',
         'UF',
         'INSTITUICAO/EMPRESA',
+        'CNPJ',
         'FUNÇÃO/CARGO',
         'CRIADO EM',
     ])
@@ -86,7 +87,8 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(sub.person.city.name)
         collector[row_idx].append(sub.person.city.uf)
         collector[row_idx].append(sub.person.institution)
-        collector[row_idx].append(sub.person.institution_function)
+        collector[row_idx].append(sub.person.institution_cnpj)
+        collector[row_idx].append(sub.person.function)
         collector[row_idx].append(sub.created.strftime('%d/%m/%Y %H:%M:%S'))
 
     for row in collector.keys():
