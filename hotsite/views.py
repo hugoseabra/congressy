@@ -288,7 +288,22 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             return self.render_to_response(context)
 
         # CONDIÇÃO 3
-        if len(name.split(' ')) < 2:
+        email = email.lower()
+
+        try:
+            split_name = name.strip().split(' ')
+            # array clean
+            split_name = list(filter(None, split_name))
+
+            if not split_name or len(split_name) == 1:
+                raise Exception()
+
+            first = split_name[0].strip()
+            surnames = [n.strip() for n in split_name[1:]]
+
+            name = '{} {}'.format(first, ' '.join(surnames))
+
+        except Exception:
             messages.error(
                 self.request,
                 "Você deve informar seu sobrenome para fazer a sua inscrição."
