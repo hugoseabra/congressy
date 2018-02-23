@@ -67,7 +67,7 @@
 
         <div class="form-validation alert"></div>
 
-        {% if lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+        {% if paid_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="panel-title">Ingresso</div>
@@ -77,7 +77,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <select class="form-control" name="lot" id="id_lot">
-                                {% for lot in lots %}
+                                {% for lot in paid_lots %}
                                     <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
                                 {% endfor %}
                             </select>
@@ -93,22 +93,6 @@
                 <div class="panel-title">Dados pessoais</div>
             </div>
             <div class="panel-body">
-                {% if form.non_field_errors %}
-                    {% for error in form.non_field_errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                {% if form.errors %}
-                    {% for error in form.errors %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
-
                 <div class="row">
                     <div class="col-md-9">
                         {% render_generic_field form.name autofocus=True %}

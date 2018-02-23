@@ -29,7 +29,6 @@ class ProfileCreateForm(forms.ModelForm):
 
     user = None
 
-
     class Meta:
         """ Meta """
         model = Person
@@ -74,7 +73,6 @@ class ProfileCreateForm(forms.ModelForm):
 
         # Criando usuário
         if not self.user:
-
             self.user = User.objects.create_user(
                 username=self.cleaned_data["email"],
                 email=self.cleaned_data["email"],
@@ -101,7 +99,6 @@ class ProfileCreateForm(forms.ModelForm):
                 group=Member.ADMIN
             )
 
-
         # Criando o email de confirmação e definição de senha
         reset_form = PasswordResetForm(
             data={
@@ -111,7 +108,8 @@ class ProfileCreateForm(forms.ModelForm):
         reset_form.is_valid()
 
         """
-        Generates a one-use only link for resetting password and sends via e-mail to the
+        Generates a one-use only link for resetting password and sends via
+        e-mail to the
         user.
         """
 
@@ -144,6 +142,28 @@ class ProfileCreateForm(forms.ModelForm):
 
         return self.instance
 
+    def clean_name(self):
+        try:
+            split_name = self.data.get('name').strip().split(' ')
+            # array clean
+            split_name = list(filter(None, split_name))
+
+            if not split_name or len(split_name) == 1:
+                raise Exception()
+
+            first = split_name[0].strip()
+            surnames = [n.strip() for n in split_name[1:]]
+
+            return '{} {}'.format(first, ' '.join(surnames))
+
+        except Exception:
+            raise forms.ValidationError(
+                'Você precisa informar o seu nome e sobrenome.'
+            )
+
+    def clean_email(self):
+        return self.data.get('email').lower()
+
     def clean(self):
 
         cleaned_data = super(ProfileCreateForm, self).clean()
@@ -154,7 +174,8 @@ class ProfileCreateForm(forms.ModelForm):
             self.user = User.objects.get(username=email)
 
             if self.user.last_login:
-                raise forms.ValidationError("Esse email já existe em nosso sistema. Tente novamente.")
+                raise forms.ValidationError(
+                    "Esse email já existe em nosso sistema. Tente novamente.")
 
             try:
                 self.instance = self.user.person
