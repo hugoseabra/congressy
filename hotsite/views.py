@@ -576,18 +576,22 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 return self.render_to_response(context)
 
             try:
-                transaction_instance_data = \
-                    PagarmeTransactionInstanceData(
-                        subscription=subscription,
-                        extra_data=request.POST.copy(),
-                        event=self.event
-                    )
+                with transaction.atomic():
 
-                data = transaction_instance_data.transaction_instance_data
-                create_pagarme_transaction(
-                    payment=data,
-                    subscription=subscription
-                )
+                    subscription.save()
+
+                    transaction_instance_data = \
+                        PagarmeTransactionInstanceData(
+                            subscription=subscription,
+                            extra_data=request.POST.copy(),
+                            event=self.event
+                        )
+
+                    data = transaction_instance_data.transaction_instance_data
+                    create_pagarme_transaction(
+                        payment=data,
+                        subscription=subscription
+                    )
 
             except TransactionError as e:
                 error_dict = {

@@ -59,7 +59,7 @@
                                         </span>
                                         <h4 class="icon-list-title">
                                             <strong {% if lot.status == lot.LOT_STATUS_FINISHED %}style="text-decoration: line-through"{% endif %}>
-                                                {{ lot.name }} - R${{ lot.price }}
+                                                {{ lot.name }} - R$ {{ lot.get_calculated_price }}
                                             </strong>
                                         </h4>
 

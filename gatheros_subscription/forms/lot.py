@@ -7,6 +7,10 @@ from django import forms
 from gatheros_subscription.models import Lot
 
 
+class TelephoneInput(forms.TextInput):
+    input_type = 'tel'
+
+
 class LotForm(forms.ModelForm):
     """ Formulário de lote. """
     event = None
@@ -44,7 +48,7 @@ class LotForm(forms.ModelForm):
         ]
         widgets = {
             'event': forms.HiddenInput(),
-            'price': forms.TextInput(),
+            'price': TelephoneInput(),
             'date_start':  DateTimeWidget(
                 bootstrap_version=3,
                 attrs={'style': 'background-color:#FFF'},
