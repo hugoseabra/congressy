@@ -158,6 +158,13 @@
                 if (val > 0) {
                     show(transfer_tax);
                     showPrices(true);
+
+                    window.setTimeout(function() {
+                        if (parseFloat(val) < 10) {
+                            alert('a');
+                        }
+                    },200);
+
                 } else {
                     hide(transfer_tax);
                     showPrices(false);
@@ -328,9 +335,9 @@
                             </div>
                         </div>
                         <div class="row price-box">
-                            <div class="col-md-4">
+                            <div class="col-sm-6 col-md-6">
                                 <div class="well">
-                                    <div style="text-align: center;font-weight: bold">Valor da inscrição:</div>
+                                    <div style="font-size:14px;text-align: center;font-weight: bold">Preço da Inscrição:</div>
                                     <div style="text-align: center;font-weight: bold;font-size: 24px;color: blue;">
                                         R$ <span class="subscription_price"></span>
                                     </div>
@@ -339,9 +346,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-sm-6 col-md-6">
                                 <div class="well">
-                                    <div style="text-align: center;font-weight: bold">Você receberá:</div>
+                                    <div style="font-size:14px;text-align: center;font-weight: bold">Você receberá:</div>
                                     <div style="text-align: center;font-weight: bold;font-size: 24px;color: green;">
                                         R$ <span class="price_to_recieve"></span>
                                     </div>
