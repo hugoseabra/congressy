@@ -29,8 +29,10 @@
                                                  role="alert">
                                         {% endif %}
 
-                                    <button type="button" class="close" data-dismiss="alert"
-                                            aria-label="Close"><span aria-hidden="true">&times;</span>
+                                    <button type="button" class="close"
+                                            data-dismiss="alert"
+                                            aria-label="Close"><span
+                                            aria-hidden="true">&times;</span>
                                     </button>
                                     {{ message|capfirst }}
                                     </div>
@@ -59,7 +61,10 @@
                                     <tr>
                                         <th class="col-xs-1">Status</th>
                                         <th class="col-xs-2">Data</th>
-                                        <th class="col-xs-3">Forma de Pagamento</th>
+                                        <th class="col-xs-3">Forma de
+                                            Pagamento
+                                        </th>
+                                        <th class="col-xs-1">Voucher</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -68,20 +73,23 @@
                                             <td>
 
                                                 {% if transaction.status == 'processing' or transaction.status == 'waiting_payment' or transaction.status == 'pending_refund' or transaction.status == 'chargedback' %}
-                                                    <i class="fa fa-circle" aria-hidden="true"
+                                                    <i class="fa fa-circle"
+                                                       aria-hidden="true"
                                                        style="color: #f0ad4e"></i>
                                                 {% elif transaction.status == 'authorized' or transaction.status == 'paid' or transaction.status == 'refunded' %}
-                                                    <i class="fa fa-circle" aria-hidden="true"
-                                                           style="color:#5cb85c"></i>
+                                                    <i class="fa fa-circle"
+                                                       aria-hidden="true"
+                                                       style="color:#5cb85c"></i>
                                                 {% elif transaction.status == 'refused' %}
-                                                    <i class="fa fa-circle" aria-hidden="true"
-                                                           style="color: #d9534f"></i>
+                                                    <i class="fa fa-circle"
+                                                       aria-hidden="true"
+                                                       style="color: #d9534f"></i>
                                                 {% else %}
-                                                    <i class="fa fa-circle" aria-hidden="true"></i>
+                                                    <i class="fa fa-circle"
+                                                       aria-hidden="true"></i>
                                                 {% endif %}
                                                 {{ transaction.get_status_display }}
                                             </td>
-
 
 
                                             <td>
@@ -94,12 +102,16 @@
                                                     <br>
                                                     <small>
                                                         {% if "None" not in  transaction.data.boleto_url %}
-                                                            <a target="_blank" class="text-muted"
+                                                            <a target="_blank"
+                                                               class="text-muted"
                                                                href="{{ transaction.data.boleto_url }}">
-                                                                Link para boleto
+                                                                Link para
+                                                                boleto
                                                             </a>
                                                         {% else %}
-                                                            Seu link para o boleto estará pronto em breve.
+                                                            Seu link para o
+                                                            boleto estará
+                                                            pronto em breve.
                                                         {% endif %}
                                                     </small>
                                                 {% elif transaction.data.payment_method == 'credit_card' %}
@@ -107,6 +119,17 @@
                                                 {% else %}
                                                     Error
                                                 {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if transaction.status == transaction.PAID %}
+
+                                                    <a href="{% url 'subscription:subscription-voucher' transaction.subscription.event.pk transaction.subscription.pk %}">
+                                                        <i class="fas fa-file-pdf"></i>
+                                                    </a>
+                                                {% else %}
+                                                    ---
+                                                {% endif %}
+
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -124,11 +147,17 @@
                                       name="allowed_transaction"
                                       method="post">
                                     {% csrf_token %}
-                                    <input type="hidden" name="allowed_transaction" id="id_allowed_transaction"
+                                    <input type="hidden"
+                                           name="allowed_transaction"
+                                           id="id_allowed_transaction"
                                            value="{{ allow_transaction }}"/>
-                                    <input type="hidden" name="subscription" id="id_subscription"
+                                    <input type="hidden" name="subscription"
+                                           id="id_subscription"
                                            value="{{ subscription.pk }}"/>
-                                    <button type="submit" class="btn btn-success btn-xs">Novo pagamento</button>
+                                    <button type="submit"
+                                            class="btn btn-success btn-xs">Novo
+                                        pagamento
+                                    </button>
                                 </form>
                             {% endif %}
                             </div>

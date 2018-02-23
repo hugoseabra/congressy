@@ -214,6 +214,7 @@
 
                                     <td>
                                         {{ item.get_status_display }}
+
                                     </td>
 
                                     <td>
@@ -242,6 +243,15 @@
                                                         Cancelar
                                                     </a>
                                                 </li>
+                                                {% if item.status == item.CONFIRMED_STATUS %}
+                                                    <li>
+                                                        <a href="{% url 'subscription:subscription-voucher' event.pk item.pk %}">
+                                                            <i class="fas fa-file-pdf"></i>
+                                                           Voucher
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
                                             </ul>
                                         </div>
                                     </td>
