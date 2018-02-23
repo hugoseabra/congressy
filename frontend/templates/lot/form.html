@@ -99,11 +99,6 @@
 
             price = parseFloat(price);
 
-            console.log('{{ congressy_minimum_price }}');
-            console.log(minimum);
-            console.log(percent);
-            console.log(price);
-
             var congressy_price = price * percent;
             if (congressy_price < minimum) {
                 congressy_price = minimum;
