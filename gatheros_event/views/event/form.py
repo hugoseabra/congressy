@@ -18,6 +18,18 @@ class BaseEventView(AccountMixin, View):
     form_title = None
     event = None
 
+    def pre_dispatch(self, request):
+        event = self.get_event()
+
+        if event:
+            update_account(
+                request=self.request,
+                organization=event.organization,
+                force=True
+            )
+
+        return super().pre_dispatch(request)
+
     def get_permission_denied_url(self):
         return reverse_lazy('event:event-list')
 

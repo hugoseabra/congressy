@@ -18,7 +18,7 @@
                        name="name"
                        class="form-control"
                        id="name"
-                       placeholder="Nome completo"
+                       placeholder="Nome e sobrenome"
                 >
                 {% for error in form.name.errors %}
                     <div class="alert alert-danger
@@ -35,7 +35,7 @@
         <div class="form-group">
             <div class="col-md-12">
                 <label for="email">E-mail</label>
-                <input type="text"
+                <input type="email"
                        name="email"
                        required
                        class="form-control"

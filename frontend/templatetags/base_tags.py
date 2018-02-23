@@ -3,9 +3,11 @@ gatheros_subscription templatetags
 """
 import datetime
 from ast import literal_eval
+from decimal import Decimal
 
 import timestring
 from django import template
+from django.conf import settings
 from django.template.defaultfilters import stringfilter
 
 from core.util import git_util
@@ -84,8 +86,23 @@ def parse_date(date_string, format):
 @register.filter
 def money_divide(value):
     try:
-        raw_result = value / 100
+        raw_result = value
         result = format(raw_result, '.2f')
         return result
     except (ValueError, ZeroDivisionError):
         return None
+
+
+@register.filter
+def money_divide_with_percentage(amount):
+    if not amount:
+        return ' --- '
+
+    congressy_percent = Decimal(settings.CONGRESSY_PLAN_PERCENT_10)
+    congressy_amount = amount * (congressy_percent / 100)
+
+    minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+    if congressy_amount < minimum:
+        congressy_amount = minimum
+
+    return round(amount - congressy_amount, 2)

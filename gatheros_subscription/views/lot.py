@@ -1,13 +1,16 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
+from django.conf import settings
 
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot
-from decimal import Decimal
 
 
 class BaseLotView(AccountMixin, View):
@@ -24,11 +27,14 @@ class BaseLotView(AccountMixin, View):
             return redirect(reverse_lazy('event:event-list'))
 
         else:
-            if not self.can_view():
-                return redirect(reverse(
-                    'event:event-panel',
-                    kwargs={'pk': self.event.pk}
-                ))
+            update_account(
+                request=self.request,
+                organization=self.event.organization,
+                force=True
+            )
+
+        if not self.can_view():
+            return redirect('event:event-list')
 
         return super(BaseLotView, self).dispatch(request, *args, **kwargs)
 
@@ -45,8 +51,7 @@ class BaseLotView(AccountMixin, View):
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
         for lot in self.event.lots.all():
-            price = lot.price
-            if price is None:
+            if lot.price is None:
                 continue
 
             if lot.price > 0:
@@ -82,6 +87,13 @@ class BaseFormLotView(BaseLotView, generic.FormView):
         initial['event'] = self.event
 
         return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['congressy_minimum_price'] = settings.CONGRESSY_MINIMUM_AMOUNT
+        context['congressy_plan_percent_10'] = \
+            settings.CONGRESSY_PLAN_PERCENT_10
+        return context
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -168,7 +180,8 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
         if not self.organization:
             return False
 
-        banking_required_fields = ['bank_code', 'agency', 'account', 'cnpj_ou_cpf', 'account_type']
+        banking_required_fields = ['bank_code', 'agency', 'account',
+                                   'cnpj_ou_cpf', 'account_type']
 
         for field in Organization._meta.get_fields():
 

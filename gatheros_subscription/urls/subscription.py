@@ -10,7 +10,7 @@ urls = [
     # ),
     url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/delete/$',
-        views.SubscriptionDeleteView.as_view(),
+        views.SubscriptionCancelView.as_view(),
         name='subscription-delete'
     ),
     # url(

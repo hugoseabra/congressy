@@ -3,8 +3,6 @@ import os
 
 from django.utils.translation import ugettext_lazy as _
 
-
-
 from django.contrib.messages import constants as message_constants
 
 # ========================== BASE CONFIGURATION ============================= #
@@ -292,5 +290,19 @@ MESSAGE_TAGS = {
 # =============================== E-MAIL ==================================== #
 DEFAULT_FROM_EMAIL = 'Congressy <mail@congressy.net>'
 CONGRESSY_REPLY_TO = 'Congressy <congressy@congressy.com>'
-DEV_ALERT_EMAILS = ['infra@congressy.com']
-SALES_ALERT_EMAILS = ['congressy@congressy.com', 'infra@congressy.com']
+DEV_ALERT_EMAILS = ['Infra Congressy <infra@congressy.com>']
+SALES_ALERT_EMAILS = [
+    'Congressy SAC <congressy@congressy.com>',
+    'Infra Congressy <infra@congressy.com>'
+]
+# ============================= PAYMENT ===================================== #
+# Planos da congress, contemplam percentuais de recebimento em cima das
+# transações
+
+# Informar o valor em percentual, sem o símbolo
+CONGRESSY_PLAN_PERCENT_10 = 10
+
+# Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
+# devido for menor do que este, o valor da transaçaõ da parte da congressy será
+# este valor.
+CONGRESSY_MINIMUM_AMOUNT = 4.99

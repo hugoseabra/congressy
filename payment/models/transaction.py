@@ -44,7 +44,7 @@ class Transaction(models.Model):
         verbose_name_plural = 'Transações'
 
     def __str__(self):
-        return str(self.uuid)
+        return self.subscription.person.name + ' - ' + self.subscription.event.name
 
     uuid = models.UUIDField(
         default=uuid.uuid4,
@@ -73,7 +73,9 @@ class Transaction(models.Model):
         blank=True,
     )
 
-    amount = models.IntegerField(
+    amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
         null=True,
         blank=True,
     )

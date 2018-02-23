@@ -4,10 +4,12 @@ Lotes são importantes para agrupar as inscrições de um evento, para separar
 os critérios de inscrições: se gratuitas, se limitadas, se privados, etc.
 """
 
-import uuid
 import locale
+import uuid
 from datetime import datetime, timedelta
+from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 from django.utils.encoding import force_text
 
@@ -53,6 +55,8 @@ class Lot(models.Model, GatherosModelMixin):
 
     DISCOUNT_TYPE_PERCENT = 'percent'
     DISCOUNT_TYPE_MONEY = 'money'
+
+    INSTALLMENTS = [('INSTALLMENT_' + str(i), str(i)) for i in range(2, 10)]
 
     DISCOUNT_TYPE = (
         (DISCOUNT_TYPE_PERCENT, '%'),
@@ -130,9 +134,31 @@ class Lot(models.Model, GatherosModelMixin):
     )
     transfer_tax = models.BooleanField(
         default=False,
-        verbose_name='repassar taxa ao participante',
+        verbose_name='repassar taxa',
         help_text="Repasse a taxa para o participante e receba o valor integral do ingresso."
     )
+
+    allow_installments = models.BooleanField(
+        default=False,
+        verbose_name='parcelamento',
+        help_text="Permitir parcelamento do valor do ingresso."
+    )
+
+    transfer_interest_rate = models.BooleanField(
+        default=False,
+        verbose_name='repassar juros ao participante',
+        help_text="Repasse os juros das parcelas para o participante e receba o valor integral da parcela."
+    )
+
+    free_installments = models.CharField(
+        max_length=15,
+        choices=INSTALLMENTS,
+        verbose_name='parcelas isentas de juros',
+        help_text="Número de parcelas que irá assumir juros de parcelamento do participante.",
+        null=True,
+        blank=True
+    )
+
     private = models.BooleanField(
         default=False,
         verbose_name='privado',
@@ -163,6 +189,7 @@ class Lot(models.Model, GatherosModelMixin):
         ordering = ['date_start', 'date_end', 'pk', 'name']
         unique_together = (("name", "event"),)
 
+
     @property
     def percent_completed(self):
         """ Resgata percentual de vagas preenchidas no lote. """
@@ -181,21 +208,26 @@ class Lot(models.Model, GatherosModelMixin):
             return 0
 
         attended = queryset.filter(attended=True).count()
-        return round((attended * 100)/num_subs, 2)
+        return round((attended * 100) / num_subs, 2)
 
     @property
     def display_publicly(self):
         """ Exibição pública de infomações do lote. """
 
-        if self.price is not None:
-            display = '{} - R$ {} ({} vagas restantes)'.format(
+        if self.price > 0:
+            # display = '{} - R$ {} ({} vagas restantes)'.format(
+            display = '{} - R$ {}'.format(
                 self.name,
-                locale.format(percent='%.2f', value=self.price, grouping=True),
+                locale.format(
+                    percent='%.2f',
+                    value=self.get_calculated_price(),
+                    grouping=True
+                ),
                 self.places_remaining
             )
-
         else:
-            display = '{} vagas restantes'.format(self.places_remaining)
+            # display = '{} vagas restantes'.format(self.places_remaining)
+            display = self.name
 
         return display
 
@@ -324,3 +356,24 @@ class Lot(models.Model, GatherosModelMixin):
             period += end_time.strftime('%Hh%M')
 
         return period
+
+    def get_calculated_price(self):
+        """
+        Resgata o valor calculado do preço do lote de acordo com as regras
+        da Congressy.
+        """
+        if not self.price:
+            return self.price
+
+        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent_10 = \
+            Decimal(settings.CONGRESSY_PLAN_PERCENT_10) / 100
+
+        congressy_amount = self.price * congressy_plan_percent_10
+        if congressy_amount < minimum:
+            congressy_amount = minimum
+
+        if self.transfer_tax is True:
+            return round(self.price + congressy_amount, 2)
+
+        return round(self.price, 2)
