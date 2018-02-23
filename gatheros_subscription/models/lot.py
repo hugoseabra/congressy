@@ -216,7 +216,7 @@ class Lot(models.Model, GatherosModelMixin):
 
         if self.price > 0:
             # display = '{} - R$ {} ({} vagas restantes)'.format(
-            display = '{} - R$ {}'.format(
+            display = '{} - aR$ {}'.format(
                 self.name,
                 locale.format(
                     percent='%.2f',
@@ -362,8 +362,8 @@ class Lot(models.Model, GatherosModelMixin):
         Resgata o valor calculado do preço do lote de acordo com as regras
         da Congressy.
         """
-        if not self.price:
-            return self.price
+        if self.price is None:
+            return 0
 
         minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         congressy_plan_percent_10 = \

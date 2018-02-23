@@ -9,8 +9,8 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from weasyprint import HTML
 import base64
-import qrcode
-import qrcode.image.svg
+# import qrcode
+# import qrcode.image.svg
 
 
 from gatheros_front.forms import AuthenticationForm, \
@@ -86,36 +86,36 @@ class Login(auth_views.LoginView):
 #     return response
 
 
-class MyPDF(PDFTemplateView):
-    filename = 'my_pdf.pdf'
-    template_name = 'pdf/test.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(MyPDF, self).get_context_data(**kwargs)
-        context['qrcode'] = self.generate_qr_code('data')
-        return context
-
-    def generate_qr_code(self, data):
-
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=5,
-            border=4,
-        )
-
-        qr.add_data(data)
-
-        qr.make(fit=True)
-
-        img = qr.make_image()
-
-        buffer = six.BytesIO()
-        img.save(buffer)
-
-        return base64.b64encode(buffer.getvalue())
-
-    cmd_options = {
-        'margin-top': 3,
-    }
+# class MyPDF(PDFTemplateView):
+#     filename = 'my_pdf.pdf'
+#     template_name = 'pdf/test.html'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super(MyPDF, self).get_context_data(**kwargs)
+#         context['qrcode'] = self.generate_qr_code('data')
+#         return context
+#
+#     def generate_qr_code(self, data):
+#
+#         qr = qrcode.QRCode(
+#             version=1,
+#             error_correction=qrcode.constants.ERROR_CORRECT_L,
+#             box_size=5,
+#             border=4,
+#         )
+#
+#         qr.add_data(data)
+#
+#         qr.make(fit=True)
+#
+#         img = qr.make_image()
+#
+#         buffer = six.BytesIO()
+#         img.save(buffer)
+#
+#         return base64.b64encode(buffer.getvalue())
+#
+#     cmd_options = {
+#         'margin-top': 3,
+#     }
 
