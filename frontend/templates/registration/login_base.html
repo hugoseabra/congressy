@@ -137,5 +137,12 @@
 <script src="{% static "assets/js/src/app.js" %}"></script>
 <script src="{% static "assets/js/cgsy.js" %}"></script>
 {% endblock %}
+<script>
+    $(document).ready(function() {
+        $('input[type=email]').on('keyup', function() {
+            $(this).val($(this).val().toLowerCase());
+        });
+    });
+</script>
 </body>
 </html>
