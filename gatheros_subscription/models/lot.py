@@ -211,7 +211,7 @@ class Lot(models.Model, GatherosModelMixin):
     def display_publicly(self):
         """ Exibição pública de infomações do lote. """
 
-        if self.price is not None:
+        if self.price > 0:
             # display = '{} - R$ {} ({} vagas restantes)'.format(
             display = '{} - R$ {}'.format(
                 self.name,

@@ -80,7 +80,7 @@ class EventMixin(generic.View):
     def subsciption_finished(self):
         for lot in self.event.lots.all():
             if lot.status == Lot.LOT_STATUS_RUNNING:
-                return True
+                return False
 
         return True
 
