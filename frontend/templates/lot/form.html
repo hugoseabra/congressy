@@ -158,13 +158,6 @@
                 if (val > 0) {
                     show(transfer_tax);
                     showPrices(true);
-
-                    window.setTimeout(function() {
-                        if (parseFloat(val) < 10) {
-                            alert('a');
-                        }
-                    },200);
-
                 } else {
                     hide(transfer_tax);
                     showPrices(false);

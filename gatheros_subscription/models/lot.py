@@ -216,7 +216,7 @@ class Lot(models.Model, GatherosModelMixin):
 
         if self.price and self.price > 0:
             # display = '{} - R$ {} ({} vagas restantes)'.format(
-            display = '{} - aR$ {}'.format(
+            display = '{} - R$ {}'.format(
                 self.name,
                 locale.format(
                     percent='%.2f',
