@@ -29,7 +29,6 @@ from gatheros_subscription.forms import (
 )
 from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.models import Subscription, FormConfig
-from gatheros_subscription.forms import SubscriptionFilterForm
 
 
 class EventViewMixin(AccountMixin, generic.View):
