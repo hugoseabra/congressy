@@ -148,6 +148,8 @@ class PagarmeTransactionInstanceData:
         if self.transaction_type == 'boleto':
             transaction_data['payment_method'] = 'boleto'
 
+        return transaction_data
+
     def _create_split_rules(self):
         """
         Contsroi as regras de split da transação.
