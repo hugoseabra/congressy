@@ -10,8 +10,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.models import Model
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import six
 from django.utils.decorators import classonlymethod
@@ -24,6 +23,11 @@ from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
 )
+from gatheros_subscription.forms import (
+    SubscriptionForm,
+    SubscriptionFilterForm
+)
+from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.models import Subscription, FormConfig
 from gatheros_subscription.forms import SubscriptionFilterForm
 
@@ -478,7 +482,6 @@ class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
     """ Inscrição de pessoa que já possui perfil. """
     subscription_user = None
     submitted_data = None
-    # template_name = 'gatheros_subscription/subscription/subscription_confirmation.html'
     template_name = 'subscription/subscription_confirmation.html'
 
     @classonlymethod
@@ -515,50 +518,6 @@ class SubscriptionConfirmationView(EventViewMixin, generic.TemplateView):
 
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)
-
-
-# class SubscriptionEditFormView(SubscriptionAddFormView):
-#     object = None
-#     success_message = 'Inscrição alterada com sucesso.'
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         self.object = get_object_or_404(Subscription, pk=self.kwargs.get('pk'))
-#
-#         return super(SubscriptionEditFormView, self).dispatch(
-#             request,
-#             *args,
-#             **kwargs
-#         )
-#
-#     def post(self, request, *args, **kwargs):
-#         # Pula confirmação
-#         return super(SubscriptionAddFormView, self).post(
-#             request,
-#             *args,
-#             **kwargs
-#         )
-#
-#     def get_form_kwargs(self):
-#         kwargs = super(SubscriptionEditFormView, self).get_form_kwargs()
-#         kwargs.update({'instance': self.object})
-#
-#         return kwargs
-#
-#     def get_context_data(self, **kwargs):
-#         cxt = super(SubscriptionEditFormView, self).get_context_data(**kwargs)
-#         cxt.update({
-#             'object': self.object
-#         })
-#
-#         return cxt
-#
-#     def can_access(self):
-#         event = self.get_event()
-#         enabled = event.subscription_type != event.SUBSCRIPTION_DISABLED
-#         return self.request.user.has_perm(
-#             'gatheros_event.can_manage_subscriptions',
-#             event
-#         ) if enabled else False
 
 
 class SubscriptionCancelView(EventViewMixin, generic.DetailView):
@@ -713,90 +672,6 @@ class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
             return None
 
 
-# class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
-#     form_class = SubscriptionAttendanceForm
-#     http_method_names = ['post']
-#     search_by = 'name'
-#     register_type = None
-#     object = None
-#
-#     def get_object(self):
-#         if self.object:
-#             return self.object
-#
-#         try:
-#             self.object = Subscription.objects.get(pk=self.kwargs.get('pk'))
-#
-#         except Subscription.DoesNotExist:
-#             return None
-#
-#         else:
-#             return self.object
-#
-#     def get_success_url(self):
-#         url = reverse(
-#             'subscription:subscription-attendance-search',
-#             kwargs={'event_pk': self.kwargs.get('event_pk')}
-#         )
-#         if self.search_by is not None and self.search_by != 'name':
-#             url += '?search_by=' + str(self.search_by)
-#
-#         return url
-#
-#     def get_permission_denied_url(self):
-#         return self.get_success_url()
-#
-#     def get_form_kwargs(self):
-#         kwargs = super(SubscriptionAttendanceView, self).get_form_kwargs()
-#         kwargs.update({'instance': self.get_object()})
-#         return kwargs
-#
-#     def form_invalid(self, form):
-#         messages.error(self.request, form.errors)
-#         return super(SubscriptionAttendanceView, self).form_invalid(form)
-#
-#     def form_valid(self, form):
-#         sub = self.get_object()
-#
-#         try:
-#             if self.register_type is None:
-#                 raise Exception('Nenhuma ação foi informada.')
-#
-#             register_name = 'Credenciamento' \
-#                 if self.register_type == 'register' \
-#                 else 'Cancelamento de credenciamento'
-#
-#         except Exception as e:
-#             form.add_error(None, str(e))
-#             return self.form_invalid(form)
-#
-#         else:
-#             messages.success(
-#                 self.request,
-#                 '{} de `{}` registrado com sucesso.'.format(
-#                     register_name,
-#                     sub.person.name
-#                 )
-#             )
-#             form.attended(self.register_type == 'register')
-#             return super(SubscriptionAttendanceView, self).form_valid(form)
-#
-#     def post(self, request, *args, **kwargs):
-#         self.search_by = request.POST.get('search_by')
-#         self.register_type = request.POST.get('action')
-#
-#         return super(SubscriptionAttendanceView, self).post(
-#             request,
-#             *args,
-#             **kwargs
-#         )
-#
-#     def can_access(self):
-#         event = self.get_event()
-#         sub = self.get_object()
-#         return sub.event.pk == event.pk
-
-
 class MySubscriptionsListView(AccountMixin, generic.ListView):
     """ Lista de inscrições """
 
@@ -924,7 +799,6 @@ class SubscriptionExportView(EventViewMixin, generic.View):
 
 
 class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
-
     template_name = 'pdf/voucher.html'
     subscription = None
     event = None
@@ -996,8 +870,4 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
         self.lot = self.subscription.lot
 
     def can_access(self):
-        for transaction in self.subscription.transactions.all():
-            if transaction.paid:
-                return True
-
-        return False
+        return self.subscription.confirmed is True
