@@ -25,6 +25,7 @@ from gatheros_event.views.mixins import (
     AccountMixin,
 )
 from gatheros_subscription.models import Subscription, FormConfig
+from gatheros_subscription.forms import SubscriptionFilterForm
 
 
 class EventViewMixin(AccountMixin, generic.View):
