@@ -595,16 +595,14 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
                     subscription.save()
 
-                    transaction_instance_data = \
-                        PagarmeTransactionInstanceData(
-                            subscription=subscription,
-                            extra_data=request.POST.copy(),
-                            event=self.event
-                        )
+                    transaction_data = PagarmeTransactionInstanceData(
+                        subscription=subscription,
+                        extra_data=request.POST.copy(),
+                        event=self.event
+                    )
 
-                    data = transaction_instance_data.transaction_instance_data
                     create_pagarme_transaction(
-                        payment=data,
+                        payment=transaction_data.get_data(),
                         subscription=subscription
                     )
 

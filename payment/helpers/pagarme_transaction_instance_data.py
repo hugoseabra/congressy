@@ -31,7 +31,6 @@ class PagarmeTransactionInstanceData:
 
         self._get_organization()
         self._get_transaction_type()
-        self._parametrize_instance_data()
 
     def _get_organization(self):
 
@@ -55,7 +54,7 @@ class PagarmeTransactionInstanceData:
 
         self.transaction_type = self.extra_data['transaction_type']
 
-    def _parametrize_instance_data(self):
+    def get_data(self):
 
         # Chave única da transação.
         transaction_id = uuid.uuid4()
@@ -76,7 +75,7 @@ class PagarmeTransactionInstanceData:
 
             return string
 
-        self.transaction_instance_data = {
+        transaction_data = {
 
             "api_key": settings.PAGARME_API_KEY,
 
@@ -137,18 +136,17 @@ class PagarmeTransactionInstanceData:
         environment_version = os.getenv('ENVIRONMENT_VERSION')
 
         if environment_version:
-            self.transaction_instance_data['metadata']['system'] = {
+            transaction_data['metadata']['system'] = {
                 'version': environment_version,
                 'enviroment': 'production'
             }
 
         if self.transaction_type == 'credit_card':
-            self.transaction_instance_data['payment_method'] = 'credit_card'
-            self.transaction_instance_data['card_hash'] = \
-                self.extra_data['card_hash']
+            transaction_data['payment_method'] = 'credit_card'
+            transaction_data['card_hash'] = self.extra_data['card_hash']
 
         if self.transaction_type == 'boleto':
-            self.transaction_instance_data['payment_method'] = 'boleto'
+            transaction_data['payment_method'] = 'boleto'
 
     def _create_split_rules(self):
         """
@@ -165,8 +163,10 @@ class PagarmeTransactionInstanceData:
         # O cálculo do montante da congressy será sempre em cima do preço
         # padrão.
         congressy_percent = settings.CONGRESSY_PLAN_PERCENT_10
-        congressy_amount = \
-            self.lot.price * (self.as_decimal(congressy_percent) / 100)
+        congressy_amount = round(
+            self.lot.price * (self.as_decimal(congressy_percent) / 100),
+            2
+        )
 
         # Se o valor é menor do que o mínimo configurado, o mínimo assume.
         minimum = self.as_decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
@@ -215,4 +215,4 @@ class PagarmeTransactionInstanceData:
 
     @staticmethod
     def as_payment_format(value):
-        return str(value).replace('.', '')
+        return str(round(value, 2)).replace('.', '')
