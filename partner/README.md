@@ -59,5 +59,8 @@ pela interface de Administração da plataforma.
     3. id_parceiro
     
 
+# Dependencias
 
+1. gatheros_event:
+    1. models/person
 
