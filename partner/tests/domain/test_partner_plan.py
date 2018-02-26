@@ -3,24 +3,21 @@
 """
 
 from django.test import TestCase
-from faker import Faker
 
-from gatheros_event.models import Person
-from partner.models import PartnerPlan, Partner
+from partner.models import PartnerPlan
+from partner.tests.mocks import MockFactory
 
 
 class PartnerPlanModelTest(TestCase):
     """ Main test implementation """
 
-    def _create_fake_person(self):
-        person = Person(name=self.fake_factory.name())
-        person.save()
-        return person
-
     def setUp(self):
-        self.fake_factory = Faker()
-        self.person = self._create_fake_person()
-        self.partner = Partner(person=self.person).save()
+        self.fake_factory = MockFactory()
+        self.person = self.fake_factory._create_fake_person()
+        self.assertIsNotNone(self.person)
+        self.partner = self.fake_factory._create_fake_partner(
+            person=self.person)
+        self.assertIsNotNone(self.partner)
 
     def test_partner_plan_creation(self):
         partner_plan = PartnerPlan(name='Plano #1', percent=5.2)
