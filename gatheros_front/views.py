@@ -3,8 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
-from gatheros_front.forms import AuthenticationForm, \
-    AuthenticationWithCaptchaForm
+from gatheros_front.forms import AuthenticationForm
 from gatheros_subscription.views.subscription import MySubscriptionsListView
 
 
@@ -32,12 +31,14 @@ class Login(auth_views.LoginView):
     redirect_authenticated_user = True
     form_class = AuthenticationForm
 
-    def get_form_class(self):
-        if 'show_captcha' in self.request.session and self.request.session[
-            'show_captcha'] is True:
-            return AuthenticationWithCaptchaForm
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if 'show_captcha' in self.request.session \
+                and self.request.session['show_captcha'] is True:
+            form.add_captcha()
 
-        return super().get_form_class()
+        return form
+
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -54,9 +55,4 @@ class Login(auth_views.LoginView):
         data-filled form and errors.
         """
         self.request.session['show_captcha'] = True
-
-        captcha_form = AuthenticationWithCaptchaForm()
-        captcha_form._errors = form._errors
-        return self.render_to_response(self.get_context_data(
-            form=captcha_form
-        ))
+        return super().form_invalid(form)

@@ -64,7 +64,7 @@ function process_payment(encryption_key, event_name, lots, transactions) {
                 title: billing_title,
                 unit_price: amount,
                 quantity: 1,
-                tangible: true
+                tangible: false
             }
         ]
     });

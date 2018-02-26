@@ -237,7 +237,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         email = self.request.POST.get('email')
 
         # Pode acontecer caso que há usuário e não há pessoa.
-        def save_person(user=None):
+        def get_person_form(user=None):
             self.initial = {
                 'email': email,
                 'name': name
@@ -246,11 +246,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             form = self.get_form()
             form.setAsRequired('email')
 
-            if not form.is_valid():
-                context['form'] = form
-                return self.render_to_response(context)
-
-            with transaction.atomic():
+            if form.is_valid():
                 person = form.save()
 
                 if not user:
@@ -265,7 +261,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
                 self._configure_brand_person(person)
 
-                return person
+            return form
 
         # CONDIÇÃO 1
         user = self.request.user
@@ -341,12 +337,21 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                 person = user.person
             except AttributeError:
                 # Garante que usuário sempre terá pessoa.
-                person = save_person(user)
+                form = get_person_form(user)
+                if not form.is_valid():
+                    context['form'] = form
+                    return self.render_to_response(context)
+                person = form.save()
 
         # Condição 6
         else:
             # Nova pessoa.
-            person = save_person()
+            form = get_person_form()
+            if not form.is_valid():
+                context['form'] = form
+                return self.render_to_response(context)
+
+            person = form.save()
             user = person.user
 
         # Inscrição realizada com participante autenticado.
@@ -517,6 +522,10 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 return
 
             value = request.POST.get(field_name)
+
+            if not value:
+                return ''
+
             value = value \
                 .replace('.', '') \
                 .replace('-', '') \
@@ -595,16 +604,14 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
                     subscription.save()
 
-                    transaction_instance_data = \
-                        PagarmeTransactionInstanceData(
-                            subscription=subscription,
-                            extra_data=request.POST.copy(),
-                            event=self.event
-                        )
+                    transaction_data = PagarmeTransactionInstanceData(
+                        subscription=subscription,
+                        extra_data=request.POST.copy(),
+                        event=self.event
+                    )
 
-                    data = transaction_instance_data.transaction_instance_data
                     create_pagarme_transaction(
-                        payment=data,
+                        payment=transaction_data.get_data(),
                         subscription=subscription
                     )
 
