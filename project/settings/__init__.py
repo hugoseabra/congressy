@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     # KANU_APPS
     'kanu_locations',
 
-    # GATHEROS_APPS
+    # CONGRESSY APPS
     'frontend',
     'gatheros_event',
     'gatheros_subscription',
@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'payment',
     'core',
     'hotsite',
+    'partner',
+
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
