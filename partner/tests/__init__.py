@@ -1,0 +1,1 @@
+""" Partner test module"""
