@@ -14,10 +14,8 @@ class PartnerPlanModelTest(TestCase):
     def setUp(self):
         self.fake_factory = MockFactory()
         self.person = self.fake_factory._create_fake_person()
-        self.assertIsNotNone(self.person)
         self.partner = self.fake_factory._create_fake_partner(
             person=self.person)
-        self.assertIsNotNone(self.partner)
 
     def test_partner_plan_creation(self):
         partner_plan = PartnerPlan(name='Plano #1', percent=5.2)

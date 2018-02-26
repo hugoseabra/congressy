@@ -14,7 +14,6 @@ class PartnerModelTest(TestCase):
     def setUp(self):
         self.fake_factory = MockFactory()
         self.person = self.fake_factory._create_fake_person()
-        self.assertIsNotNone(self.person)
 
     def test_partner_creation(self):
         partner = Partner(person=self.person)

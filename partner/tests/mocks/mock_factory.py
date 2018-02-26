@@ -26,11 +26,17 @@ class MockFactory:
     def _create_fake_person(self):
         person = Person(name=self.fake_factory.name())
         person.save()
+
+        assert person is not None
+
         return person
 
     def _create_fake_organization(self):
         organization = Organization(name=self.fake_factory.company())
         organization.save()
+
+        assert organization is not None
+
         return organization
 
     def _create_fake_partner(self, person=None):
@@ -40,12 +46,18 @@ class MockFactory:
 
         partner = Partner(person=person)
         partner.save()
+
+        assert partner is not None
+
         return partner
 
     def _create_fake_partner_plan(self):
         name = 'Partner Plan: ' + ' '.join(self.fake_factory.words(nb=2))
         partner_plan = PartnerPlan(name=name, percent=5.5)
         partner_plan.save()
+
+        assert partner_plan is not None
+
         return partner_plan
 
     def _create_fake_event(self, organization=None):
@@ -61,4 +73,7 @@ class MockFactory:
             category=Category.objects.first(),
         )
         event.save()
+
+        assert event is not None
+
         return event
