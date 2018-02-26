@@ -26,35 +26,3 @@ class PartnerModelTest(TestCase):
         self.assertIsNotNone(partner)
         self.assertEqual(partner.status, constants.NON_ACTIVE)
         self.assertFalse(partner.approved)
-
-    def test_person_is_partner_only_once(self):
-
-        partner = Partner(person=self.person)
-        partner2 = Partner(person=self.person)
-
-        partner.save()
-        partner2.save()
-
-        self.assertEqual(partner.pk, partner2.pk)
-
-    def test_partner_activation_and_deactivation(self):
-        partner = Partner(person=self.person)
-        partner.active = True
-        partner.save()
-        self.assertTrue(partner.active)
-        partner.active = False
-        partner.save()
-        self.assertFalse(partner.active)
-
-    def test_partner_change_status(self):
-        partner = Partner(person=self.person)
-        partner.save()
-        self.assertEqual(partner.status, constants.NON_ACTIVE)
-
-        partner.status = constants.ACTIVE
-        partner.save()
-        self.assertEqual(partner.status, constants.ACTIVE)
-
-        partner.status = constants.SUSPENDED
-        partner.save()
-        self.assertEqual(partner.status, constants.SUSPENDED)
