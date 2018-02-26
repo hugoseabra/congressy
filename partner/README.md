@@ -62,5 +62,12 @@ pela interface de Administração da plataforma.
 # Dependencias
 
 1. gatheros_event:
-    1. models/person
+    1. models/Person
+    2. models/Event
+    
+# Dependencias adicionais de tests
+
+1. gatheros_event:
+    1. models/Organization
+    2. models/Category
 
