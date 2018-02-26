@@ -90,6 +90,11 @@
             );
             percent = percent/100;
 
+            var id_price = $('#id_price');
+            if (!id_price.length) {
+                return;
+            }
+
             var price = $('#id_price').val().replace('.', '').replace(',', '.');
 
             if (!price) {
@@ -152,18 +157,21 @@
                 calculatePrices();
             });
 
-            $('#id_price').on('keyup', function () {
-                var transfer_tax = $('#id_transfer_tax').parent().parent().parent();
-                var val = parseFloat($(this).val());
-                if (val > 0) {
-                    show(transfer_tax);
-                    showPrices(true);
-                } else {
-                    hide(transfer_tax);
-                    showPrices(false);
-                }
-                calculatePrices();
-            });
+            var id_price = $('#id_price');
+            if (id_price.length) {
+                $('#id_price').on('keyup', function () {
+                    var transfer_tax = $('#id_transfer_tax').parent().parent().parent();
+                    var val = parseFloat($(this).val());
+                    if (val > 0) {
+                        show(transfer_tax);
+                        showPrices(true);
+                    } else {
+                        hide(transfer_tax);
+                        showPrices(false);
+                    }
+                    calculatePrices();
+                });
+            }
         });
     </script>
 {% endblock %}
