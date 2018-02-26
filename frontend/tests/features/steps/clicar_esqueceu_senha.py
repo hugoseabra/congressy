@@ -7,7 +7,7 @@ def step_impl (context):
     driver = context.browser
     reset_button = driver.find_element_by_css_selector('div.text-right:nth-child(1) > a:nth-child(1)')
     reset_button.click()
-    time.sleep(4)
+    time.sleep(1)
 
 @then ('Ele entra na pagina de resetar senha')
 def step_impl (context):

@@ -7,7 +7,7 @@ def step_impl(context):
     driver = context.browser
     reset_button = driver.find_element_by_css_selector('.help-block > a:nth-child(2)')
     reset_button.click()
-    time.sleep(4)
+    time.sleep(1)
 @then('Usuario entra na pagina de login')
 def step_impl(context):
     driver = context.browser

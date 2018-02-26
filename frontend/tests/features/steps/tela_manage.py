@@ -35,5 +35,5 @@ def step_impl(context):
 @then('Deve descer um menu')
 def step_impl(context):
     driver = context.browser
-    menu = driver.find_elemes   nt_by_css_selector('li.dropdown:nth-child(4) > ul:nth-child(2)').is_displayed()
+    menu = driver.find_element_by_css_selector('li.dropdown:nth-child(4) > ul:nth-child(2)').is_displayed()
     eq_(menu,True)

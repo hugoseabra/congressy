@@ -1,7 +1,6 @@
 from behave import given, when, then
 from nose.tools import eq_
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+
 
 @then('Ele nao ira conseguir logar e ira aparecer a mensagem \'{text}\'')
 def step_impl (context, text):
@@ -13,8 +12,9 @@ def step_impl (context, text):
 @then('Deve aparecer um captcha')
 def step_impl(context):
     driver = context.browser
-    driver.find_element_by_id('id_captcha_0')
-    wait = WebDriverWait(driver, 60)
-    wait.until(EC.presence_of_element_located(driver.find_element_by_id('id_captcha_0')))
-
+    teste = driver.find_element_by_id('id_captcha_1').is_displayed()
+    eq_(teste, True)
+    if driver.find_element_by_id('id_captcha_0'):
+        return True
+    return False
 

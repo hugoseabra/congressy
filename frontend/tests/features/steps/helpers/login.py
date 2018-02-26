@@ -10,4 +10,4 @@ def logar (context, email, senha):
 
     login_button = driver.find_element_by_tag_name('button')
     login_button.click()
-    time.sleep(4)
+    time.sleep(1)

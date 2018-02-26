@@ -13,13 +13,13 @@ def step_impl (context):
     driver = context.browser
     login_button = driver.find_element_by_css_selector('#submitButton')
     login_button.click()
-    time.sleep(4)
+    time.sleep(1)
 
 @then ('Aparece a mensagem de erro para alertar de colocar o sobrenome')
 def step_impl(context):
     driver = context.browser
     mensagem_erro = driver.find_element_by_css_selector('.alert').text
-    eq_(mensagem_erro, 'Você deve informar seu sobrenome para criar sua conta.')
+    eq_(mensagem_erro, '×\nVocê deve informar seu sobrenome para criar sua conta.')
 
 @then ('Aparece a mensagem de erro para alertar que o email esta em uso')
 def step_impl(context):

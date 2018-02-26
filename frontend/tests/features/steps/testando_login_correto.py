@@ -8,6 +8,9 @@ def step_impl (context,text):
     driver = context.browser
     email = driver.find_element_by_id('email')
     email.send_keys(text)
+    text_low = text.lower()
+    eq_(email.get_attribute('value'), text_low)
+
 
 
 @when('Preenche o campo de senha com \'{text}\'')
@@ -21,7 +24,7 @@ def step_impl (context):
     driver = context.browser
     login_button = driver.find_element_by_tag_name('button')
     login_button.click()
-    time.sleep(4)
+    time.sleep(1)
 
 @then ('Ele entra na pagina de minhas inscricoes')
 def step_impl (context):
