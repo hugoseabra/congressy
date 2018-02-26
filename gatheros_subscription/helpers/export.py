@@ -28,7 +28,7 @@ def export_event_data(event):
 
     has_paid_lots = False
     for lot in event.lots.all():
-        if lot.price > 0:
+        if lot.price and lot.price > 0:
             has_paid_lots = True
             break
 
