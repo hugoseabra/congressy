@@ -54,10 +54,6 @@ def before_all(context):
         r.seek(0)
         return BeautifulSoup(html)
 
-    context.parse_soup = parse_soup
-
-
-def before_scenario(context, scenario):
     # Set up the scenario test environment
     context.runner.setup_test_environment()
     # We must set up and tear down the entire database between
@@ -67,6 +63,10 @@ def before_scenario(context, scenario):
     # response.
     context.old_db_config = context.runner.setup_databases()
 
+    context.parse_soup = parse_soup
+
+
+def before_scenario(context, scenario):
     ### Set up the Mechanize browser.
     # MAGIC: All requests made by this monkeypatched browser to the magic
     # host and port will be intercepted by wsgi_intercept via a
@@ -75,7 +75,7 @@ def before_scenario(context, scenario):
     context.browser.implicitly_wait(5)
 
 
-def after_scenario(context, scenario):
+def after_all(context):
     # Tear down the scenario test environment.
     context.runner.teardown_databases(context.old_db_config)
     context.runner.teardown_test_environment()
