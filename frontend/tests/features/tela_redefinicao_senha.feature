@@ -8,7 +8,7 @@ Feature: Testando tela de redefinicao de senha
     And O texto 'Por favor, solicite outro link para redefinir sua senha.' em 'p.text-center:nth-child(2)'
     And Um botao com texto 'Nova solicitação'
 
-@select
+    @select
   Scenario: Link de redefinicao nao expirou
     Given Usuario entra na pagina de redefinicao de senha pelo link 'http://0.0.0.0:8001/reset-password/confirmation/Mg/4u1-435d18fa85e80acd7296/' 'não expirado'
     When Usuario vizualiza a tela

@@ -13,12 +13,13 @@ Feature: Testando o login
     And Clica em entrar
     Then Ele entra na pagina de minhas inscricoes
 
+
   Scenario: Usuario digita o email errado
     Given Usuario entra na pagina de login
     When Preenche o campo de email com 'hugoseabra19@gmail.com'
     And Preenche o campo de senha com '1234'
     And Clica em entrar
-    Then Ele nao ira conseguir logar e ira aparecer a mensagem 'Por favor, entre com um usuário e senha corretos. Note que ambos os campos diferenciam maiúsculas e minúsculas.'
+    Then Ele nao ira conseguir logar e ira aparecer a mensagem de erro
     Then Deve aparecer um captcha
 
   Scenario: Usuario clica em criar conta

@@ -2,12 +2,12 @@ from behave import given, when, then
 from nose.tools import eq_
 
 
-@then('Ele nao ira conseguir logar e ira aparecer a mensagem \'{text}\'')
-def step_impl (context, text):
+@then('Ele nao ira conseguir logar e ira aparecer a mensagem erro')
+def step_impl (context):
     driver = context.browser
-    alert_message = driver.find_element_by_css_selector('div.alert.alert-danger').text
+    alert_message = driver.find_element_by_css_selector('div.alert.alert-danger').is_displayed()
 
-    eq_(alert_message, text)
+    eq_(alert_message, True)
 
 @then('Deve aparecer um captcha')
 def step_impl(context):

@@ -29,7 +29,7 @@ Feature: Testando a tela de registro
     And Preenche o campo nome com 'Hugo Seabra'
     And Clica em registrar
     Then Nao aceita o cadastro pois o input tem o tipo email
-
+@select
   Scenario: Usuario consegue criar uma conta com sucesso
     Given Usuario entra na pagina de registro
     When Preenche o campo de email com 'teste3@gmail.com'
