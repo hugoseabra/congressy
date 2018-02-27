@@ -4,7 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseNotAllowed, HttpResponseRedirect
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
@@ -149,18 +149,23 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
 
         return self.person
 
-    def is_subscribed(self):
+    def is_subscribed(self, email=None):
         """
             Se já estiver inscrito retornar True
         """
-        user = self.request.user
+        if email:
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return False
+        else:
+            user = self.request.user
 
         if user.is_authenticated:
             try:
                 person = user.person
                 Subscription.objects.get(person=person, event=self.event)
                 return True
-
             except (Subscription.DoesNotExist, AttributeError):
                 pass
 
@@ -215,7 +220,9 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         CONDIÇÃO 5 - Usuário não logado, possui conta e nunca logou:
             - Caso nunca tenha logado, o sistema deve se comportar como um
               usuário novo;
-            - redireciona para página de inscrição;
+            - Caso usuario já tenha logado,redireciona para página de inscrição;
+            - Caso usuario tenha conta, nunca logou e já está inscrito,
+            redirectiona para definir senha.
 
         CONDIÇÃO 6 - Usuário não logado, não possui conta:
             - Cria pesssoa;
@@ -330,6 +337,15 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
         # Condição 5
         elif has_account:
+
+            is_subscribed = self.is_subscribed(email=email)
+
+            if is_subscribed:
+                context['remove_preloader'] = True
+                context['is_subscribed_and_never_logged_in'] = True
+                context['email'] = email
+                return self.render_to_response(context)
+
             # Override anonymous user
             user = User.objects.get(email=email)
 
