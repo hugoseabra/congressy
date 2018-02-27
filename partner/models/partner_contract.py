@@ -7,7 +7,6 @@ from gatheros_event.models import Event
 
 
 class PartnerContract(models.Model):
-
     partner = models.ForeignKey(
         Partner,
         on_delete=models.CASCADE,
@@ -26,4 +25,7 @@ class PartnerContract(models.Model):
         related_name='partner_contract',
     )
 
-
+    def __str__(self):
+        return '{} -- {} - {}'.format(self.event.name,
+                                      self.partner.person.name,
+                                      self.partner_plan.name)
