@@ -19,5 +19,7 @@ class PartnerPlan(models.Model):
         verbose_name='porcentagem'
     )
 
+    def __str__(self):
+        return self.name
 
 
