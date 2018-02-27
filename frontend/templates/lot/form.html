@@ -33,6 +33,9 @@
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script type="application/javascript">
+        $('#id_date_start').mask("99/99/9999 99:99");
+        $('#id_date_end').mask("99/99/9999 99:99");
+
         function show(el) {
             $(el).fadeIn();
         }

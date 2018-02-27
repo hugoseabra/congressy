@@ -75,7 +75,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script src="{% static "assets/js/subscription.js" %}"></script>
     <script type="application/javascript">
         IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
