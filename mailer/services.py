@@ -188,6 +188,30 @@ def notify_reset_password(context):
     )
 
 
+def notify_set_password(context):
+    """
+    Define a notificação para um usuario na plataforma.
+    """
+
+    body = render_to_string('mailer/password_set_email.html',
+                            context=context)
+
+    subject = 'Defina sua senha na {0}'.format(context['site_name'])
+
+    if CELERY:
+        return send_mail.delay(
+            subject=subject,
+            body=body,
+            to=context['email'],
+        )
+
+    return send_mail(
+        subject=subject,
+        body=body,
+        to=context['email'],
+    )
+
+
 def notify_new_event(event):
     """ Notifica área de vendas quando se cria novo evento. """
 
