@@ -44,6 +44,9 @@ class MockFactory:
         if not person:
             person = self.person
 
+        if not person:
+            raise Exception('No person provided for fake partner')
+
         partner = Partner(person=person)
         partner.save()
 
@@ -64,6 +67,9 @@ class MockFactory:
 
         if not organization:
             organization = self.organization
+
+        if not organization:
+            raise Exception('No organization provided for fake event')
 
         event = Event(
             organization=organization,
