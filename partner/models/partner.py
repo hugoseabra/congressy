@@ -31,4 +31,6 @@ class Partner(models.Model):
         verbose_name="aprovado"
     )
 
+    def __str__(self):
+        return self.person.name + ' - ' + self.get_status_display()
 
