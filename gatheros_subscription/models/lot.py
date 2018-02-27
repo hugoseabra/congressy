@@ -292,10 +292,6 @@ class Lot(models.Model, GatherosModelMixin):
         rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)
         rule.rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(self)
         rule.rule_8_lot_interno_nao_pode_ter_preco(self)
-        rule.rule_11_evento_encerrado_nao_pode_ter_novo(
-            self,
-            self._state.adding
-        )
 
     def __str__(self):
         return '{} - {}'.format(self.event.name, self.name)
