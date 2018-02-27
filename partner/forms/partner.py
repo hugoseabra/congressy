@@ -1,5 +1,5 @@
 """
-    Partner Form used to validate domain and apply rules
+    Partner Form used to validate domain and business rules
 """
 from django import forms
 from partner.models import Partner
