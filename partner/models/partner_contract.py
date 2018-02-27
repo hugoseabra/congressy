@@ -29,3 +29,7 @@ class PartnerContract(models.Model):
         return '{} -- {} - {}'.format(self.event.name,
                                       self.partner.person.name,
                                       self.partner_plan.name)
+
+    class Meta:
+        verbose_name = 'Contrato de Parceiro'
+        verbose_name_plural = 'Contratos de Parceiros'

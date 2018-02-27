@@ -34,3 +34,7 @@ class Partner(models.Model):
     def __str__(self):
         return self.person.name + ' - ' + self.get_status_display()
 
+    class Meta:
+        verbose_name = 'Parceiro'
+        verbose_name_plural = 'Parceiros'
+

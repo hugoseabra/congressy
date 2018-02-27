@@ -1,12 +1,22 @@
-# pylint: disable=W0222
 """
-Django Admin para Partners
+Django Admin for Partners
 """
 from django.contrib import admin
 
 from .models import Partner, PartnerPlan, PartnerContract
 
-admin.site.register(Partner)
-admin.site.register(PartnerPlan)
-admin.site.register(PartnerContract)
+
+@admin.register(Partner)
+class PartnerAdmin(admin.ModelAdmin):
+    list_display = ('person', 'status')
+
+
+@admin.register(PartnerPlan)
+class PartnerPlanAdmin(admin.ModelAdmin):
+    list_display = ('name', 'percent')
+
+
+@admin.register(PartnerContract)
+class PartnerContractAdmin(admin.ModelAdmin):
+    list_display = ('event', 'partner')
 

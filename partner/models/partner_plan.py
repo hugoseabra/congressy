@@ -22,4 +22,6 @@ class PartnerPlan(models.Model):
     def __str__(self):
         return self.name
 
-
+    class Meta:
+        verbose_name = 'Plano de Parceiro'
+        verbose_name_plural = 'Planos de Parceiros'
