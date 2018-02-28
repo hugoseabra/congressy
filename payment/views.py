@@ -137,7 +137,6 @@ def postback_url_view(request, uidb64):
                 'transaction[boleto_url]',
                 ''
             )
-            transaction.date_created
 
             transaction.save()
 
