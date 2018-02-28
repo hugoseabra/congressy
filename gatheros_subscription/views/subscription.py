@@ -537,9 +537,8 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
         return self.object
 
     def pre_dispatch(self, request):
-        super(SubscriptionCancelView, self).pre_dispatch(request)
-
         self.object = self.get_object()
+        super(SubscriptionCancelView, self).pre_dispatch(request)
 
     def get_permission_denied_url(self):
         url = self.get_success_url()
@@ -576,11 +575,12 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
             self.object.status = self.object.CANCELED_STATUS
             self.object.save()
 
+            messages.success(request, self.success_message)
+
         except Exception as e:
             messages.error(request, str(e))
-        else:
-            messages.success(request, self.success_message)
-            return redirect(self.get_success_url())
+
+        return redirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('subscription:subscription-list', kwargs={
