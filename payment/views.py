@@ -1,5 +1,6 @@
 import json
 from decimal import Decimal
+from datetime import datetime
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -86,7 +87,7 @@ class EventPaymentView(AccountMixin, ListView):
         for transaction in all_transactions:
 
             if transaction.status == transaction.REFUNDED or \
-                            transaction.status == transaction.REFUSED:
+                    transaction.status == transaction.REFUSED:
                 continue
 
             amount = transaction.amount
@@ -101,7 +102,7 @@ class EventPaymentView(AccountMixin, ListView):
 def postback_url_view(request, uidb64):
     body = """
             We have received a postback call, here is the data:
-            
+
             <pre><code>{0}</code></pre>
     """.format(json.dumps(request.data))
 
@@ -125,42 +126,53 @@ def postback_url_view(request, uidb64):
             data=data
         )
 
-        status = data.get('current_status', '')
+        new_desired_status = data.get('current_status', '')
 
-        transaction.status = status
-        transaction.data['boleto_url'] = data.get(
-            'transaction[boleto_url]',
-            ''
-        )
-        transaction.save()
+        # Only continue the postback workflow if the new_desired_status and
+        # old_stats are different.
+        if old_status != new_desired_status:
 
-        transaction_status.data['status'] = status
-        transaction_status.date_created = data.get('transaction[date_created]')
-        transaction_status.status = status
-        transaction_status.save()
+            transaction.status = new_desired_status
+            transaction.data['boleto_url'] = data.get(
+                'transaction[boleto_url]',
+                ''
+            )
+            transaction.date_created
 
-        subscription = Subscription.objects.get(pk=transaction.subscription.pk)
+            transaction.save()
 
-        # Create a state machine using the old transaction status as it's
-        # initial value.
+            transaction_status.data['status'] = new_desired_status
+            transaction_status.date_created = datetime.now().strftime(
+                "%Y-%m-%dT%H:%M:%S.%fZ")
+            transaction_status.status = new_desired_status
+            transaction_status.save()
 
-        transaction_director = TransactionDirector(status=status,
-                                                   old_status=old_status)
-        transaction_director_status = transaction_director.direct()
+            subscription = Subscription.objects.get(
+                pk=transaction.subscription.pk)
 
-        # Translate/integrate the status returned from the director to a
-        #   subscription status.
-        trans_sub_status_integrator = TransactionSubscriptionStatusIntegrator(
-            transaction_director_status)
+            # Create a state machine using the old transaction status as it's
+            # initial value.
 
-        subscription_status = trans_sub_status_integrator.integrate()
+            transaction_director = TransactionDirector(
+                status=new_desired_status,
+                old_status=old_status)
+            transaction_director_status = transaction_director.direct()
 
-        if subscription_status:
-            subscription.status = subscription_status
+            # Translate/integrate the status returned from the director to a
+            #   subscription status.
+            trans_sub_status_integrator = TransactionSubscriptionStatusIntegrator(
+                transaction_director_status)
 
-        subscription.save()
+            subscription_status = trans_sub_status_integrator.integrate()
+
+            if subscription_status:
+                subscription.status = subscription_status
+
+            subscription.save()
+
+            return Response(status=201)
 
     except ObjectDoesNotExist:
         raise Http404
 
-    return Response(status=201)
+    return Response(status=200)
