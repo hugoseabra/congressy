@@ -247,7 +247,7 @@ class Lot(models.Model, GatherosModelMixin):
         :return: string
         """
         if self.limit and self.limit > 0:
-            queryset = self.subscriptions
+            queryset = self.subscriptions.exclude(status='canceled')
             num_subs = queryset.count()
 
             if num_subs >= self.limit:

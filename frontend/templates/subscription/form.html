@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load i18n static widget_tweaks form_config_tags user_agents user_agent_tag %}
+{% load i18n static widget_tweaks form_config_tags user_agents user_agent_tag queryset_filter %}
 
 {% block title %}
     {% if object %}Editar{% else %}Nova{% endif %} Inscrição | Congressy
@@ -61,7 +61,7 @@
             <a href="{% url 'subscription:subscription-list' event.pk %}"
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
             </a>
         </li>
 {#        <li>#}
