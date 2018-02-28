@@ -169,7 +169,12 @@
                                                aria-hidden="true"></i>
                                         {% endif %}
                                         {{ transaction.get_status_display }}
-                                        - {{ transaction.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                        -
+                                        {% if transaction.statuses.last.date_created  %}
+                                            {{ transaction.statuses.last.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                        {% else %}
+                                            {{ transaction.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                        {% endif %}
                                         </strong>
 
                                     </td>
