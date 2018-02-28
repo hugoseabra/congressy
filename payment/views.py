@@ -84,6 +84,11 @@ class EventPaymentView(AccountMixin, ListView):
 
         congressy_percent = Decimal(settings.CONGRESSY_PLAN_PERCENT_10)
         for transaction in all_transactions:
+
+            if transaction.status == transaction.REFUNDED or \
+                            transaction.status == transaction.REFUSED:
+                continue
+
             amount = transaction.amount
             deductible = (congressy_percent * amount) / 100
             calculated_total = transaction.amount - deductible

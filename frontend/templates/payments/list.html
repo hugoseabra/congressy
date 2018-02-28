@@ -43,6 +43,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
+                <span class="badge float-right">{{ event.subscriptions.count }}</span>
             </a>
         </li>
         {#        <li>#}
@@ -128,15 +129,14 @@
                                                     data-html="true"
                                                     data-content='{% for status in transaction.statuses.all %}
 
-                                                    {% if status.status == status.AUTHORIZED or status.status == status.PAID or status.status == status.REFUNDED %}
-                                                        <i class="fa fa-circle" aria-hidden="true"
-                                                           style="color:#5cb85c"></i>
+                                                    {% if status.status == status.AUTHORIZED or status.status == status.PAID %}
+                                                        <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
                                                     {% elif status.status == status.PROCESSING or status.status == status.WAITING_PAYMENT or status.status == status.PENDING_REFUND or status.status == status.CHARGEDBACK %}
-                                                        <i class="fa fa-circle" aria-hidden="true"
-                                                           style="color: #f0ad4e"></i>
+                                                        <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>
+                                                    {% elif status.status == status.REFUNDED %}
+                                                       <i class="fa fa-circle" aria-hidden="true" style="color: #8977B6"></i>
                                                     {% elif status.status == status.REFUSED %}
-                                                        <i class="fa fa-circle" aria-hidden="true"
-                                                           style="color: #d9534f"></i>
+                                                        <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>
                                                     {% else %}
                                                         <i class="fa fa-circle" aria-hidden="true"></i>
                                                     {% endif %}
@@ -150,7 +150,7 @@
                                                     data-content="Nenhum dado até o momento.">
 
                                         {% endif %}
-                                        {% if transaction.status == transaction.AUTHORIZED or transaction.status == transaction.PAID or transaction.status == transaction.REFUNDED %}
+                                        {% if transaction.status == transaction.AUTHORIZED or transaction.status == transaction.PAID %}
                                             <i class="fa fa-circle"
                                                aria-hidden="true"
                                                style="color:#5cb85c"></i>
@@ -158,6 +158,8 @@
                                             <i class="fa fa-circle"
                                                aria-hidden="true"
                                                style="color: #f0ad4e"></i>
+                                        {% elif transaction.status == transaction.REFUNDED %}
+                                            <i class="fa fa-circle" aria-hidden="true" style="color: #8977B6"></i>
                                         {% elif transaction.status == transaction.REFUSED %}
                                             <i class="fa fa-circle"
                                                aria-hidden="true"
@@ -172,8 +174,11 @@
 
                                     </td>
                                     <td>
-                                        R$
-                                        {{ transaction.amount|money_divide_with_percentage|intcomma }}
+                                        {% if transaction.status == transaction.REFUSED or transaction.status == transaction.REFUNDED %}
+                                        -
+                                        {% else %}
+                                        R$ {{ transaction.amount|money_divide_with_percentage|intcomma }}
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
