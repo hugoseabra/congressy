@@ -4,7 +4,7 @@ Django Admin for Partners
 from django.contrib import admin
 
 from .models import Partner, PartnerPlan, PartnerContract
-
+from .forms import PartnerContractForm
 
 @admin.register(Partner)
 class PartnerAdmin(admin.ModelAdmin):
@@ -18,5 +18,6 @@ class PartnerPlanAdmin(admin.ModelAdmin):
 
 @admin.register(PartnerContract)
 class PartnerContractAdmin(admin.ModelAdmin):
+    form = PartnerContractForm
     list_display = ('event', 'partner')
 
