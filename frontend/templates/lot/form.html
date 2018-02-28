@@ -1,6 +1,7 @@
 {% extends "base/base.html" %}
 {% load l10n static event_tags  base_tags  widget_tweaks form_config_tags %}
 {% load humanize %}
+{% load queryset_filter %}
 
 {% block messages %}
     {% if messages %}
@@ -194,7 +195,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
-                <span class="badge float-right">{{ event.subscriptions.count }}</span>
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
             </a>
         </li>
         {#        <li>#}
