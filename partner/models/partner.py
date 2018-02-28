@@ -32,7 +32,7 @@ class Partner(models.Model):
     )
 
     def __str__(self):
-        return self.person.name + ' - ' + self.get_status_display()
+        return self.person.name
 
     class Meta:
         verbose_name = 'Parceiro'

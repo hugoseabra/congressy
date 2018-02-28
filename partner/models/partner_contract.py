@@ -10,19 +10,19 @@ class PartnerContract(models.Model):
     partner = models.ForeignKey(
         Partner,
         on_delete=models.CASCADE,
-        related_name='partner_contract',
+        related_name='partner_contracts',
     )
 
     partner_plan = models.ForeignKey(
         PartnerPlan,
         on_delete=models.CASCADE,
-        related_name='partner_contract',
+        related_name='partner_contracts',
     )
 
     event = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,
-        related_name='partner_contract',
+        related_name='partner_contracts',
     )
 
     def __str__(self):
