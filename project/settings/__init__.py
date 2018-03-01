@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'payment',
     'core',
     'hotsite',
-    'partner',
+    # 'partner',
 
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #

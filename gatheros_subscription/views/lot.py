@@ -160,6 +160,13 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
             kwargs={'event_pk': self.event.pk}
         )
 
+    def post(self, request, *args, **kwargs):
+        if 'limit_switch' not in request.POST:
+            request.POST = request.POST.copy()
+            request.POST['limit'] = 0
+
+        return super().post(request, *args, **kwargs)
+
     def can_view(self, show_message=True):
         can_view = super(LotAddFormView, self).can_view(False)
         can = can_view and self.request.user.has_perm(
@@ -209,6 +216,13 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         context['full_banking'] = self._get_full_banking()
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        if 'limit_switch' not in request.POST:
+            request.POST = request.POST.copy()
+            request.POST['limit'] = 0
+
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         try:
