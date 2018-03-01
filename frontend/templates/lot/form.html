@@ -152,7 +152,7 @@
 
             var price = $('#id_price').val().replace('.', '').replace(',', '.');
 
-            if (!price) {
+            if (parseFloat(price) <= 0) {
                 showPrices(false);
                 return;
             }
@@ -211,10 +211,13 @@
                 return;
             }
 
-            num_free_items = parseInt(num_free_items.val());
             price = price.text().replace('.', '').replace(',', '.');
-            price_receive = price_receive.text().replace('.', '').replace(',', '.');
+            price = parseFloat(price);
 
+            price_receive = price_receive.text().replace('.', '').replace(',', '.');
+            price_receive = parseFloat(price_receive);
+
+            num_free_items = parseInt(num_free_items.val());
             var interest = parseFloat(price * (2.29/100));
 
             var items = [];
@@ -224,7 +227,7 @@
             for (var i = 2; i <= parseInt(parts.val()); i++) {
                 var part_price_liquid = parseFloat(price/i);
                 var part_price = parseFloat(part_price_liquid + interest);
-                var part_recieve = parseFloat(price_receive);
+                var part_recieve = parseFloat(price_receive/i);
 
                 if (i <= num_free_items) {
                     // Collect interest

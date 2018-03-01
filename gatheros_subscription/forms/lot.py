@@ -125,4 +125,13 @@ class LotForm(forms.ModelForm):
             cleaned_data['date_end'] = \
                 self.event.date_end - timedelta(minutes=1)
 
+        price = self.cleaned_data.get('price')
+        if price > 0 and (price < 10 or price > 1000000):
+            raise forms.ValidationError(
+                {
+                    'price': 'Você deve informar um valor entre a R$ 10,00'
+                             ' e R$ 1.000.000,00'
+                }
+            )
+
         return cleaned_data
