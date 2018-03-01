@@ -3,8 +3,10 @@
 """
 
 from django.db import models
+
 from gatheros_event.models import Person
 from partner import constants
+from payment.models import BankAccount
 
 
 class Partner(models.Model):
@@ -17,6 +19,14 @@ class Partner(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
         related_name='partner',
+    )
+
+    bank_account = models.ForeignKey(
+        BankAccount,
+        on_delete=models.CASCADE,
+        related_name='partner_bank_account',
+        blank=True,
+        null=True,
     )
 
     status = models.CharField(

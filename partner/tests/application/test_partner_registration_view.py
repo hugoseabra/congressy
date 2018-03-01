@@ -5,9 +5,11 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 from faker import Faker
+from random import randint
 
 from gatheros_event.models import Person
 from partner.models import Partner
+from payment.models import BankAccount
 
 
 class PartnerRegistrationViewTests(TestCase):
@@ -15,9 +17,11 @@ class PartnerRegistrationViewTests(TestCase):
 
     def setUp(self):
         self.url = reverse('public:partner-registration')
-        self.faker = Faker()
+        self.faker = Faker('pt_BR')
         self.name = self.faker.name()
         self.email = self.faker.free_email()
+        self.phone = self.faker.phone_number()
+        self.cpf = self.faker.cpf()
 
     def test_public_partner_registration_get_is_200_ok(self):
         """ Testa se está tudo ok com view com submissão GET. """
@@ -28,7 +32,16 @@ class PartnerRegistrationViewTests(TestCase):
         """ Testa se está tudo ok com view com submissão POST. """
         data = {
             'name': self.name,
-            'email': self.email
+            'email': self.email,
+            'phone': self.phone,
+            'bank_code': BankAccount.CAIXA_ECONOMICA,
+            'agency': str(randint(1000, 9999)),
+            'agency_dv': '000',
+            'account': str(randint(40000, 60000)),
+            'account_dv': '001',
+            'document_number': self.cpf,
+            'legal_name': self.name,
+            'type': BankAccount.CONTA_CORRENTE,
         }
 
         response = self.client.post(self.url, data, follow=True)
