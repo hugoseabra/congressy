@@ -31,7 +31,6 @@ function process_payment(
     allow_installment = allow_installment === true;
 
     function handleSuccess(data) {
-        console.log(data);
         hide_payment_elements();
 
         switch (data.payment_method) {
