@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'payment',
     'core',
     'hotsite',
-    'partner',
+    # 'partner',
 
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
@@ -71,6 +71,7 @@ LANGUAGES = (
     ('pt-br', _('Português')),
 )
 # ============================= MIDDLEWARES ================================= #
+
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -315,3 +316,7 @@ CONGRESSY_PLAN_PERCENT_10 = 10
 # devido for menor do que este, o valor da transaçaõ da parte da congressy será
 # este valor.
 CONGRESSY_MINIMUM_AMOUNT = 4.99
+# ========================== PARTNER ======================================== #
+# Valor maximo em que a soma de todos os parceiros do evento não deve
+# ultrapassar do rateamento do montante da Congressy
+PARTNER_MAX_PERCENTAGE_IN_EVENT = 20.00

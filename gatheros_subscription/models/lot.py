@@ -134,29 +134,33 @@ class Lot(models.Model, GatherosModelMixin):
     )
     transfer_tax = models.BooleanField(
         default=False,
+        blank=True,
         verbose_name='repassar taxa',
-        help_text="Repasse a taxa para o participante e receba o valor integral do ingresso."
+        help_text="Repasse a taxa para o participante e receba o valor"
+                  " integral do ingresso."
     )
-
+    allow_installment = models.BooleanField(
+        default=True,
+        blank=True,
+        verbose_name='permitir parcelamento',
+    )
+    installment_limit = models.PositiveIntegerField(
+        default=10,
+        blank=True,
+        verbose_name='parcelas',
+        help_text="Número de parcelas permitido."
+    )
+    num_install_interest_absortion = models.PositiveIntegerField(
+        default=0,
+        null=True,
+        blank=True,
+        verbose_name='absorver juros de parcelas',
+        help_text="Número de parcelas que deseja absorver os juros."
+    )
     allow_installments = models.BooleanField(
         default=False,
         verbose_name='parcelamento',
         help_text="Permitir parcelamento do valor do ingresso."
-    )
-
-    transfer_interest_rate = models.BooleanField(
-        default=False,
-        verbose_name='repassar juros ao participante',
-        help_text="Repasse os juros das parcelas para o participante e receba o valor integral da parcela."
-    )
-
-    free_installments = models.CharField(
-        max_length=15,
-        choices=INSTALLMENTS,
-        verbose_name='parcelas isentas de juros',
-        help_text="Número de parcelas que irá assumir juros de parcelamento do participante.",
-        null=True,
-        blank=True
     )
 
     private = models.BooleanField(

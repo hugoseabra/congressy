@@ -1,0 +1,24 @@
+{% load humanize %}
+{% load i18n %}{% autoescape off %}
+
+    <p style="text-align: justify;">
+        {% if partner_name %}
+            Olá {{ partner_name }},
+        {% else %}
+            Olá,
+        {% endif %}
+    </p>
+    <p style="text-align: justify;">
+        Parabéns! Você está agora vinculado como parceiro do evento:
+    </p>
+    <h3>{{ event }}</h3>
+    <p style="text-align: justify;">
+        Organizado por: {{ organizer }}
+    </p>
+    <br />
+    <br />
+    <br />
+    <p style="text-align: justify;">
+        Equipe Congressy
+    </p>
+{% endautoescape %}

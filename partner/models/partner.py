@@ -31,4 +31,10 @@ class Partner(models.Model):
         verbose_name="aprovado"
     )
 
+    def __str__(self):
+        return self.person.name
+
+    class Meta:
+        verbose_name = 'Parceiro'
+        verbose_name_plural = 'Parceiros'
 

@@ -164,6 +164,82 @@ def notify_new_user(context):
     )
 
 
+def notify_new_partner(context):
+    """
+    Define a notificação para um novo parceiro na plataforma.
+    """
+
+    body = render_to_string('mailer/notify_partner_registration_email.html',
+                            context=context)
+
+    subject = 'Cadastro de parceria na  {0}'.format(context['site_name'])
+
+    if CELERY:
+        return send_mail.delay(
+            subject=subject,
+            body=body,
+            to=context['partner_email'],
+        )
+
+    return send_mail(
+        subject=subject,
+        body=body,
+        to=context['partner_email'],
+    )
+
+
+def notify_partner_contract(context):
+    """
+    Define a notificação para um parceiro quando o mesmo é vinculado a um
+    evento.
+    """
+
+    subject = 'Parceria Congressy: Vinculado ao evento {0}'.format(context[
+                                                                    'event'])
+
+    body = render_to_string('mailer/notify_partner_contract_email.html',
+                            context=context)
+
+    if CELERY:
+        return send_mail.delay(
+            subject=subject,
+            body=body,
+            to=context['partner_email'],
+        )
+
+    return send_mail(
+        subject=subject,
+        body=body,
+        to=context['partner_email'],
+    )
+
+
+def notify_new_partner_internal(context):
+    """
+    Define a notificação interna para o comercial no evento de cadastro um novo
+    parceiro na plataforma.
+    """
+
+    body = render_to_string(
+        'mailer/notify_partner_registration_internal_email.html',
+        context=context)
+
+    subject = 'Novo parceiro cadastrado: {0}'.format(context['partner_name'])
+
+    if CELERY:
+        return send_mail.delay(
+            subject=subject,
+            body=body,
+            to=context['partner_email'],
+        )
+
+    return send_mail(
+        subject=subject,
+        body=body,
+        to=settings.SALES_ALERT_EMAILS,
+    )
+
+
 def notify_reset_password(context):
     """
     Define a notificação para um usuario na plataforma.

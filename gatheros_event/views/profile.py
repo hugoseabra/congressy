@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.shortcuts import redirect, render_to_response
+from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views.generic import FormView, TemplateView
@@ -77,6 +78,7 @@ class ProfileView(AccountMixin, FormView):
 
 class ProfileCreateView(TemplateView, FormView):
     template_name = 'registration/register.html'
+    success_url = reverse_lazy('front:start')
     messages = {
         'success': 'Sua conta foi criada com sucesso! '
                    'Enviamos um email para "%s", click no link do email para ativar sua conta.'
@@ -107,22 +109,9 @@ class ProfileCreateView(TemplateView, FormView):
             self.messages['success'] % form.cleaned_data["email"]
         )
 
-        return redirect('front:start')
+        return redirect(self.get_success_url())
 
     def post(self, request, *args, **kwargs):
-
-        context = self.get_context_data(**kwargs)
-
-        name = self.request.POST.get('name')
-
-        if len(name.split(' ')) < 2:
-            messages.error(
-                self.request,
-                "Você deve informar seu sobrenome para criar sua conta."
-            )
-
-            return self.render_to_response(context)
-
         return super().post(request, *args, **kwargs)
 
 
