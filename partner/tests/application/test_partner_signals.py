@@ -8,7 +8,7 @@ from partner.models import PartnerContract
 from partner.tests.mocks import MockFactory
 
 
-class PartnerRegistrationViewTests(TestCase):
+class PartnerSignalTests(TestCase):
     """ Partner signals test implementation """
 
     def setUp(self):
