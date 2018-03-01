@@ -236,7 +236,7 @@ def notify_new_partner_internal(context):
     return send_mail(
         subject=subject,
         body=body,
-        to=context['partner_email'],
+        to=settings.SALES_ALERT_EMAILS,
     )
 
 
