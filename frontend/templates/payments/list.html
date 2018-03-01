@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
 {% load static event_tags  base_tags  widget_tweaks form_config_tags humanize l10n %}
+{% load queryset_filter %}
 {% block messages %}
     {% if messages %}
         {% for message in messages %}
@@ -43,7 +44,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
-                <span class="badge float-right">{{ event.subscriptions.count }}</span>
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
             </a>
         </li>
         {#        <li>#}
@@ -128,7 +129,6 @@
                                                     title="Histórico"
                                                     data-html="true"
                                                     data-content='{% for status in transaction.statuses.all %}
-
                                                     {% if status.status == status.AUTHORIZED or status.status == status.PAID %}
                                                         <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
                                                     {% elif status.status == status.PROCESSING or status.status == status.WAITING_PAYMENT or status.status == status.PENDING_REFUND or status.status == status.CHARGEDBACK %}

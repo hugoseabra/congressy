@@ -132,6 +132,11 @@ class PagarmeTransactionInstanceData:
             "price": self.as_payment_format(self.lot.get_calculated_price())
         }
 
+        # if self.subscription.lot.allow_installment is True \
+        #         and self.extra_data.get('installments'):
+
+
+
         # Estabelecer uma referência de qual o estado sistema houve a transação
         environment_version = os.getenv('ENVIRONMENT_VERSION')
 

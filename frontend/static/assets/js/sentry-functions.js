@@ -2,7 +2,7 @@ function setConfig(dsn, release) {
     Raven.config(dsn, {
         'environment': 'production',
         'release': release
-    });
+    }).install();
 }
 
 function setUserContext(id, username, email) {

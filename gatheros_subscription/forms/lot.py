@@ -15,6 +15,19 @@ class DateTimeInput(forms.DateTimeInput):
     input_type = 'tel'
 
 
+INSTALLMENT_CHOICES = (
+    (2, 2),
+    (3, 3),
+    (4, 4),
+    (5, 5),
+    (6, 6),
+    (7, 7),
+    (8, 8),
+    (9, 9),
+    (10, 10),
+)
+
+
 class LotForm(forms.ModelForm):
     """ Formulário de lote. """
     event = None
@@ -32,9 +45,10 @@ class LotForm(forms.ModelForm):
             'private',
             'exhibition_code',
             'transfer_tax',
-            'allow_installments',
-            'free_installments',
-            'transfer_interest_rate'
+            'allow_installment',
+            'installment_limit',
+            'num_install_interest_absortion',
+
             # 'discount_type',
             # 'discount',
 
@@ -44,6 +58,12 @@ class LotForm(forms.ModelForm):
             'price': TelephoneInput(),
             'date_start': DateTimeInput,
             'date_end': DateTimeInput,
+            'installment_limit': forms.Select(
+                choices=INSTALLMENT_CHOICES
+            ),
+            'num_install_interest_absortion': forms.Select(
+                choices=((0, 0,),) + INSTALLMENT_CHOICES
+            ),
         }
 
     def __init__(self, lang='pt-br', **kwargs):
