@@ -6,7 +6,7 @@ import absoluteuri
 from django.conf import settings
 
 from gatheros_event.models import Organization
-from gatheros_subscription.models import Lot
+from partner.models import PartnerContract
 from payment.exception import TransactionError
 
 CONGRESSY_RECIPIENT_ID = settings.PAGARME_RECIPIENT_ID
@@ -155,6 +155,27 @@ class PagarmeTransactionInstanceData:
 
         return transaction_data
 
+    def _create_partner_rule(self, partner, amount):
+        return {
+            "recipient_id": partner,
+            "amount": self.as_payment_format(amount),
+            "liable": True,
+            "charge_processing_fee": True,
+            "charge_remainder_fee": True
+        }
+
+    def _get_partner_organization(self, partner):
+
+        partner_organization = None
+
+        try:
+            partner_organization = Organization.objects.get(
+                name=partner.person.name)
+        except Organization.DoesNotExist:
+            pass
+
+        return partner_organization
+
     def _create_split_rules(self):
         """
         Contsroi as regras de split da transação.
@@ -191,6 +212,14 @@ class PagarmeTransactionInstanceData:
         # processado na transação.
         else:
             organization_amount = self.as_decimal(amount - congressy_amount)
+
+        all_partner_contracts = PartnerContract.objects.filter(event=self.event)
+
+        for contract in all_partner_contracts:
+            pass
+
+
+
 
         congressy_rule = {
             "recipient_id": CONGRESSY_RECIPIENT_ID,
