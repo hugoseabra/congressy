@@ -5,6 +5,7 @@ from django.utils import six
 from django.utils.datastructures import MultiValueDictKeyError
 from kanu_locations.models import City
 
+from core.forms.widgets import DateInput, AjaxChoiceField, TelephoneInput
 from gatheros_event.models import Occupation, Person
 
 
@@ -16,19 +17,6 @@ def create_years_list():
         years.append(epoch)
 
     return years
-
-
-class AjaxChoiceField(forms.ChoiceField):
-    def valid_value(self, value):
-        return True
-
-
-class TelephoneInput(forms.TextInput):
-    input_type = 'tel'
-
-
-class DateInput(forms.TextInput):
-    input_type = 'date'
 
 
 class PersonForm(forms.ModelForm):
