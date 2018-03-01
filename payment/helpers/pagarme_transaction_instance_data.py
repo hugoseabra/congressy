@@ -5,8 +5,8 @@ from decimal import Decimal
 import absoluteuri
 from django.conf import settings
 
+from payment.helpers.calculator import Calculator
 from gatheros_event.models import Organization
-from gatheros_subscription.models import Lot
 from payment.exception import TransactionError
 
 CONGRESSY_RECIPIENT_ID = settings.PAGARME_RECIPIENT_ID
@@ -18,41 +18,21 @@ class PagarmeTransactionInstanceData:
     def __init__(self, subscription, extra_data, event):
 
         self.subscription = subscription
+        self.lot = subscription.lot
         self.person = subscription.person
         self.extra_data = extra_data
         self.event = event
 
-        self.lot = subscription.lot
+        self._set_amount()
+        self._set_organization()
+        self._check_lot()
+        self._set_transaction_type()
+        self._set_installments()
 
-        if int(self.lot.pk) != int(self.extra_data.get('lot')):
-            raise TransactionError(
-                message="Inscrição não pertence ao lote informado."
-            )
-
-        self._get_organization()
-        self._get_transaction_type()
-
-    def _get_organization(self):
-
-        if 'organization' not in self.extra_data:
-            raise TransactionError(message="No organization")
-        self.organization = Organization.objects.get(
-            pk=self.extra_data['organization'])
-
-        if not self.organization.bank_account_id:
-            raise TransactionError(message="Organization has no bank account")
-
-    def _get_transaction_type(self):
-
-        allowed_payment_methods = ['boleto', 'credit_card']
-
-        if 'transaction_type' not in self.extra_data:
-            raise TransactionError(message='No transaction type')
-
-        if self.extra_data['transaction_type'] not in allowed_payment_methods:
-            raise TransactionError(message='Transaction type not allowed')
-
-        self.transaction_type = self.extra_data['transaction_type']
+        self.calculator = Calculator(
+            int(self.installments),
+            int(self.lot.num_install_interest_absortion)
+        )
 
     def get_data(self):
 
@@ -122,20 +102,30 @@ class PagarmeTransactionInstanceData:
                 }
             ],
 
-            "split_rules": self._create_split_rules(),
             "metadata": {
                 "evento": self.event.name,
                 "inscricao": str(self.subscription.pk)
             },
 
-            "amount": self.as_payment_format(self.lot.get_calculated_price()),
-            "price": self.as_payment_format(self.lot.get_calculated_price())
+            "amount": self.as_payment_format(self.amount),
+            "price": self.as_payment_format(self.amount),
+
+            "split_rules": self._create_split_rules(),
         }
 
-        # if self.subscription.lot.allow_installment is True \
-        #         and self.extra_data.get('installments'):
+        if self.transaction_type == 'credit_card':
+            transaction_data['payment_method'] = 'credit_card'
+            transaction_data['card_hash'] = self.extra_data['card_hash']
 
+            if self.subscription.lot.allow_installment is True \
+                    and self.extra_data.get('installments') \
+                    and int(self.extra_data.get('installments')) > 1:
+                transaction_data['installments'] = \
+                    int(self.extra_data.get('installments'))
 
+        if self.transaction_type == 'boleto':
+            transaction_data['installments'] = ''
+            transaction_data['payment_method'] = 'boleto'
 
         # Estabelecer uma referência de qual o estado sistema houve a transação
         environment_version = os.getenv('ENVIRONMENT_VERSION')
@@ -146,14 +136,63 @@ class PagarmeTransactionInstanceData:
                 'enviroment': 'production'
             }
 
-        if self.transaction_type == 'credit_card':
-            transaction_data['payment_method'] = 'credit_card'
-            transaction_data['card_hash'] = self.extra_data['card_hash']
-
-        if self.transaction_type == 'boleto':
-            transaction_data['payment_method'] = 'boleto'
-
         return transaction_data
+
+    @staticmethod
+    def as_decimal(value):
+        # Contexto de contrução de números decimais
+        return round(Decimal(value), 2)
+
+    @staticmethod
+    def as_payment_format(value):
+        value = str(round(value, 2))
+        value, cents = value.split('.')
+        return str(value + cents)
+
+    def _set_amount(self):
+        if self.extra_data.get('amount'):
+            self.amount = \
+                round(Decimal(self.extra_data.get('amount')), 2) / 100
+        else:
+            self.amount = 0
+
+    def _check_lot(self):
+        if int(self.lot.pk) != int(self.extra_data.get('lot')):
+            raise TransactionError(
+                message="Inscrição não pertence ao lote informado."
+            )
+
+    def _set_installments(self):
+        self.installments = 1
+
+        if self.transaction_type == 'credit_card' \
+                and self.lot.allow_installment is True \
+                and self.extra_data.get('installments') \
+                and int(self.extra_data.get('installments')) > 1:
+            self.installments = int(self.extra_data.get('installments'))
+
+    def _set_organization(self):
+        if 'organization' not in self.extra_data:
+            raise TransactionError(message="No organization")
+        self.organization = Organization.objects.get(
+            pk=self.extra_data['organization'])
+
+        if not self.organization.bank_account_id:
+            raise TransactionError(message="Organization has no bank account")
+
+    def _set_transaction_type(self):
+
+        allowed_payment_methods = ['boleto', 'credit_card']
+
+        if 'transaction_type' not in self.extra_data:
+            raise TransactionError(
+                message='Nenhum tipo de transação informado.'
+            )
+
+        if self.extra_data['transaction_type'] not in allowed_payment_methods:
+            raise TransactionError(message='Tip de transação não permitido.')
+
+        self.transaction_type = self.extra_data['transaction_type']
 
     def _create_split_rules(self):
         """
@@ -163,34 +202,41 @@ class PagarmeTransactionInstanceData:
             centavos são junto com o valor principal, sem separação de vingula.
         :return:
         """
-
-        # Preço padrão, sem cálculos de transferências de taxas.
-        amount = self.lot.price
-
-        # O cálculo do montante da congressy será sempre em cima do preço
-        # padrão.
-        congressy_percent = settings.CONGRESSY_PLAN_PERCENT_10
-        congressy_amount = round(
-            self.lot.price * (self.as_decimal(congressy_percent) / 100),
-            2
+        org_percent = self.as_decimal(
+            (100 - settings.CONGRESSY_PLAN_PERCENT_10) / 100
         )
+
+        # Com transferência, o valor da transaçaõ está maior do que o valor do
+        # lote.
+        #
+        # O organizador sempre receberá o valor normal
+        # do lote, pois a transação já está com as taxas que estão a cargo
+        # do participante pagá-las.
+        if self.subscription.lot.transfer_tax is True:
+            # Valor da transação deve ser maior do que o valor do lote.
+            assert self.amount > self.as_decimal(self.lot.price)
+
+            # organizador receberá valor do lote
+            organization_amount = self.as_decimal(self.lot.price)
+
+        # Caso contrário, o organizador pagará receberá o valor padrão
+        # subtraído das taxas da Congressy, já que não há taxas no valor do
+        # lote a ser processado na transação.
+        else:
+            organization_amount = self.calculator.get_receiver_amount(
+                self.lot.price,
+                org_percent,
+                self.installments
+            )
+
+        # Congressy receberá o restante
+        congressy_amount = self.amount - organization_amount
 
         # Se o valor é menor do que o mínimo configurado, o mínimo assume.
         minimum = self.as_decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         if congressy_amount < minimum:
             congressy_amount = minimum
-
-        # Com transferência, o organizador sempre receberá o valor padrão
-        # o valor das taxas já está inserido no valor do lote a ser processado
-        # na transação.
-        if self.subscription.lot.transfer_tax is True:
-            organization_amount = amount
-
-        # Caso contrário, o organizador receberá o valor padrão subtraído das
-        # taxas da Congressy, já que não há taxas no valor do lote a ser
-        # processado na transação.
-        else:
-            organization_amount = self.as_decimal(amount - congressy_amount)
+            organization_amount = self.as_decimal(self.amount - minimum)
 
         congressy_rule = {
             "recipient_id": CONGRESSY_RECIPIENT_ID,
@@ -214,12 +260,3 @@ class PagarmeTransactionInstanceData:
         }
 
         return [congressy_rule, organization_rule]
-
-    @staticmethod
-    def as_decimal(value):
-        # Contexto de contrução de números decimais
-        return round(Decimal(value), 2)
-
-    @staticmethod
-    def as_payment_format(value):
-        return str(round(value, 2)).replace('.', '')
