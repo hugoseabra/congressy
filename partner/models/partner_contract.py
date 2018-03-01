@@ -26,9 +26,7 @@ class PartnerContract(models.Model):
     )
 
     def __str__(self):
-        return '{} -- {} - {}'.format(self.event.name,
-                                      self.partner.person.name,
-                                      self.partner_plan.name)
+        return '{}'.format(self.partner_plan.name)
 
     class Meta:
         verbose_name = 'Contrato de Parceiro'
