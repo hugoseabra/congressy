@@ -18,6 +18,8 @@ class PartnerPlanModelTest(TestCase):
             person=self.person)
 
     def test_partner_plan_creation(self):
-        partner_plan = PartnerPlan(name='Plano #1', percent=5.2)
+        name = 'Plano #1'
+        partner_plan = PartnerPlan(name=name, percent=5.2)
         partner_plan.save()
+        self.assertEqual(partner_plan.__str__(), name)
         self.assertIsNotNone(partner_plan)

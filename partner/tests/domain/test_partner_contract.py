@@ -29,4 +29,5 @@ class PartnerContractModelTest(TestCase):
         )
 
         partner_contract.save()
+        self.assertEqual(partner_contract.__str__(), self.partner_plan.name)
         self.assertIsNotNone(partner_contract)
