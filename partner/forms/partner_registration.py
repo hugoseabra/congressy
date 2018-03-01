@@ -7,9 +7,12 @@ from django.utils import six
 from gatheros_event.forms import ProfileCreateForm
 from gatheros_event.models import Organization, Member
 from mailer.services import notify_new_partner, notify_new_partner_internal
+from partner.models import Partner
 
 
 class PartnerRegistrationForm(ProfileCreateForm):
+
+    partner = None
 
     def save(self, domain_override=None, request=None,
              commit=True,
@@ -36,6 +39,9 @@ class PartnerRegistrationForm(ProfileCreateForm):
         self.instance.user = self.user
         self.instance.save()
 
+        self.partner = Partner(person=self.instance)
+        self.partner.save()
+
         if not self.instance.members.count():
             org = Organization(internal=False, name=self.instance.name)
 
@@ -61,16 +67,5 @@ class PartnerRegistrationForm(ProfileCreateForm):
 
         notify_new_partner(context)
         notify_new_partner_internal(context)
-
-        if commit:
-            # If committing, save the instance and the m2m data immediately.
-            self.instance.save()
-            self._save_m2m()
-        else:
-            # If not committing, add a method to the form to allow deferred
-            # saving of m2m data.
-            self.save_m2m = self._save_m2m
-
-        super.save()
 
         return self.instance
