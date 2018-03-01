@@ -216,8 +216,30 @@ class PagarmeTransactionInstanceData:
             # Valor da transação deve ser maior do que o valor do lote.
             assert self.amount > self.as_decimal(self.lot.price)
 
-            # organizador receberá valor do lote
-            organization_amount = self.as_decimal(self.lot.price)
+            # Se há parcelamento, verificar se o organizador irá assumir
+            # juros de parcelas a partir de uma quantidade de parcelas.
+            absorb_num_installment = self.lot.num_install_interest_absortion
+
+            # se não há aborção de juros
+            if not absorb_num_installment:
+                organization_amount = self.as_decimal(self.lot.price)
+            else:
+                # Se há absorção, ver se o número de parcelas da transação
+                # está dentre as parcelas assumids
+                if self.installments <= absorb_num_installment:
+                    # juros de parcelas
+                    interest_price = \
+                        self.calculator.get_installment_interest(
+                            self.amount,
+                            self.installments
+                        )
+
+                    # adiciona valor de juros assumidas à parte da organização
+                    organization_amount = self.as_decimal(
+                        self.lot.price - interest_price
+                    )
+                else:
+                    organization_amount = self.as_decimal(self.lot.price)
 
         # Caso contrário, o organizador pagará receberá o valor padrão
         # subtraído das taxas da Congressy, já que não há taxas no valor do

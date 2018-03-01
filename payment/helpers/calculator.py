@@ -1,3 +1,4 @@
+from code import interact
 from decimal import Decimal
 
 
@@ -54,6 +55,14 @@ class Calculator(object):
             prices.append(round(part_amount, 2))
 
         return prices
+
+    def get_installment_interest(self, amount, installments=1):
+        amount = self._normalize_amount(amount)
+        if installments <= 1:
+            return round(amount, 2)
+
+        interests = amount * self.interests
+        return round(Decimal(interests * installments), 2)
 
     def get_receiver_amount(self, amount, percent, installments=1):
         """
