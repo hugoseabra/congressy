@@ -16,7 +16,7 @@ def notify_partner_of_contract(instance, raw, created, **_):
     """
 
     # Disable when loaded by fixtures or not a new contract
-    if raw is True or not created:
+    if raw is True or not created: # pragma: no cover
         return
 
     context = {
