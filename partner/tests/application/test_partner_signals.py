@@ -1,14 +1,11 @@
 """
      Partner Signal Tests
 """
-from django.contrib.auth.models import User
-from django.test import TestCase
-from django.urls import reverse
-from faker import Faker
 from django.core import mail
-from partner.tests.mocks import MockFactory
+from django.test import TestCase
 
 from partner.models import PartnerContract
+from partner.tests.mocks import MockFactory
 
 
 class PartnerRegistrationViewTests(TestCase):
@@ -36,7 +33,7 @@ class PartnerRegistrationViewTests(TestCase):
 
     def test_partner_and_event_old_contract_email(self):
         """ Testa se está tudo ok emails após a criação de um novo contrato
-        de parceria  """
+        de parceria  e a edição de um já existente """
 
         contract = PartnerContract(event=self.event, partner=self.partner,
                                    partner_plan=self.partner_plan)
