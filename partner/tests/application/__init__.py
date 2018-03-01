@@ -1,0 +1,3 @@
+"""
+    Partner application level tests
+"""

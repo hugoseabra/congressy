@@ -17,6 +17,7 @@ from gatheros_front.urls import (
 )
 from hotsite.urls import urlpatterns_public_hotsite
 from payment.urls import urlpatterns_public_payments_api, private_payment_urls
+from partner.urls import urlpatterns_public_partner
 
 handler500 = 'project.views.handler500'
 
@@ -31,6 +32,7 @@ private_urlpatterns = [
 ]
 
 public_urls = gatheros_front_public
+public_urls += urlpatterns_public_partner
 public_urls += urlpatterns_public_account
 public_urls += urlpatterns_public_password
 public_urls += urlpatterns_public_invitation

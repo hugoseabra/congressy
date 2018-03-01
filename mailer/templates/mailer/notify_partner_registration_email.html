@@ -1,0 +1,23 @@
+{% load humanize %}
+{% load i18n %}{% autoescape off %}
+
+    <p style="text-align: justify;">
+        {% if nome %}
+            Olá {{ nome }},
+        {% else %}
+            Olá,
+        {% endif %}
+    </p>
+    <p style="text-align: justify;">
+        Seja bem-vindo ao programa de parceiros da Congressy Plataforma de
+        Eventos!
+    </p>
+    <p style="text-align: justify;">
+        Seu cadastro foi realizado com sucesso, nossa equipe comercial estará
+        entrando em contato. Obrigado pelo seu interesse em se tornar um de
+        parceiro da Congressy.
+    </p>
+    <p style="text-align: justify;">
+        Equipe Congressy
+    </p>
+{% endautoescape %}
