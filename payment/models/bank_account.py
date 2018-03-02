@@ -3,6 +3,9 @@ from django.core.validators import RegexValidator
 
 
 class BankAccount(models.Model):
+    class Meta:
+        verbose_name = 'Conta Bancaria'
+        verbose_name_plural = 'Contas Bancarias'
 
     CONTA_CORRENTE = 'conta_corrente'
     CONTA_POUPANCA = 'conta_poupanca'
@@ -29,11 +32,6 @@ class BankAccount(models.Model):
         (SANTANDER, 'Santander'),
         (CAIXA_ECONOMICA, 'Caixa Economica')
     )
-
-    class Meta:
-        verbose_name = 'Conta Bancaria'
-        verbose_name_plural = 'Contas Bancarias'
-
 
     # Obrigatório - Código do banco
     bank_code = models.CharField(
@@ -95,10 +93,11 @@ class BankAccount(models.Model):
         blank=True,
         max_length=30,
         null=True,
-        verbose_name='Razão social',
+        verbose_name='Titular/Razão social',
         help_text='IMPORTANTE: este campo não pode ser muito diferente do'
-                  ' titular da conta. Se o titular tiver mais de 30 caracteres,'
-                  ' informe até onde os caracteres.'
+                  ' titular da conta. Se o titular tiver mais de 30'
+                  ' caracteres, você pode abreviar de forma que fique fácil'
+                  ' identificar títular.'
     )
 
     # Obrigatório - Tipo da conta
@@ -136,3 +135,6 @@ class BankAccount(models.Model):
         null=True,
         blank=True,
     )
+
+    def __str__(self):
+        return '{} - ({})'.format(self.bank_account_id, self.recipient_id)

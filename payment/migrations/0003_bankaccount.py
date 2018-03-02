@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('payment', '0002_auto_20180221_1718'),
     ]
@@ -16,20 +15,71 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='BankAccount',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('bank_code', models.CharField(blank=True, choices=[('001', 'Banco do Brasil'), ('341', 'Itau'), ('237', 'Bradesco'), ('033', 'Santander'), ('104', 'Caixa Economica')], max_length=3, null=True, validators=[django.core.validators.RegexValidator('^\\d{1,10}$')], verbose_name='Banco')),
-                ('agency', models.CharField(blank=True, max_length=5, null=True, validators=[django.core.validators.RegexValidator('^\\d{1,10}$')], verbose_name='Agencia')),
-                ('agency_dv', models.CharField(blank=True, max_length=1, null=True, validators=[django.core.validators.RegexValidator('^\\d{1,10}$')], verbose_name='Dígito verificador da agência')),
-                ('account', models.CharField(blank=True, max_length=13, null=True, validators=[django.core.validators.RegexValidator('^\\d{1,10}$')], verbose_name='Numero da Conta')),
-                ('account_dv', models.CharField(blank=True, max_length=2, null=True, validators=[django.core.validators.RegexValidator('^\\d{1,10}$')], verbose_name='Dígito verificador da Conta')),
-                ('document_number', models.CharField(blank=True, max_length=14, null=True, unique=True, verbose_name='CPF ou CNPJ')),
-                ('legal_name', models.CharField(blank=True, help_text='IMPORTANTE: este campo não pode ser muito diferente do titular da conta. Se o titular tiver mais de 30 caracteres, informe até onde os caracteres.', max_length=30, null=True, verbose_name='Razão social')),
-                ('account_type', models.CharField(blank=True, choices=[('conta_corrente', 'Conta corrente'), ('conta_poupanca', 'Conta poupanca'), ('conta_corrente_conjunta', 'Conta corrente conjunta'), ('conta_poupanca_conjunta', 'Conta poupanca conjunta')], default='conta_corrente', max_length=25, null=True, verbose_name='Tipo de Conta')),
-                ('bank_account_id', models.IntegerField(blank=True, null=True)),
-                ('document_type', models.CharField(blank=True, max_length=4, null=True)),
-                ('date_created', models.CharField(blank=True, max_length=50, null=True)),
+                ('id', models.AutoField(auto_created=True, primary_key=True,
+                                        serialize=False, verbose_name='ID')),
+                ('bank_code', models.CharField(blank=True, choices=[
+                    ('001', 'Banco do Brasil'), ('341', 'Itau'),
+                    ('237', 'Bradesco'), ('033', 'Santander'),
+                    ('104', 'Caixa Economica')], max_length=3, null=True,
+                                               validators=[
+                                                   django.core.validators.RegexValidator(
+                                                       '^\\d{1,10}$')],
+                                               verbose_name='Banco')),
+                ('agency',
+                 models.CharField(blank=True, max_length=5, null=True,
+                                  validators=[
+                                      django.core.validators.RegexValidator(
+                                          '^\\d{1,10}$')],
+                                  verbose_name='Agencia')),
+                ('agency_dv',
+                 models.CharField(blank=True, max_length=1, null=True,
+                                  validators=[
+                                      django.core.validators.RegexValidator(
+                                          '^\\d{1,10}$')],
+                                  verbose_name='Dígito verificador da agência')),
+                ('account',
+                 models.CharField(blank=True, max_length=13, null=True,
+                                  validators=[
+                                      django.core.validators.RegexValidator(
+                                          '^\\d{1,10}$')],
+                                  verbose_name='Numero da Conta')),
+                ('account_dv',
+                 models.CharField(blank=True, max_length=2, null=True,
+                                  validators=[
+                                      django.core.validators.RegexValidator(
+                                          '^\\d{1,10}$')],
+                                  verbose_name='Dígito verificador da Conta')),
+                ('document_number',
+                 models.CharField(blank=True, max_length=14, null=True,
+                                  unique=True, verbose_name='CPF ou CNPJ')),
+                ('legal_name', models.CharField(
+                    blank=True,
+                    max_length=30,
+                    null=True,
+                    verbose_name='Titular/Razão social',
+                    help_text='IMPORTANTE: este campo não pode ser muito'
+                              ' diferente do titular da conta. Se o titular'
+                              ' tiver mais de 30 caracteres, você pode'
+                              ' abreviar de forma que fique fácil identificar'
+                              ' títular.',
+                )),
+                ('account_type', models.CharField(blank=True, choices=[
+                    ('conta_corrente', 'Conta corrente'),
+                    ('conta_poupanca', 'Conta poupanca'),
+                    ('conta_corrente_conjunta', 'Conta corrente conjunta'),
+                    ('conta_poupanca_conjunta', 'Conta poupanca conjunta')],
+                                                  default='conta_corrente',
+                                                  max_length=25, null=True,
+                                                  verbose_name='Tipo de Conta')),
+                (
+                'bank_account_id', models.IntegerField(blank=True, null=True)),
+                ('document_type',
+                 models.CharField(blank=True, max_length=4, null=True)),
+                ('date_created',
+                 models.CharField(blank=True, max_length=50, null=True)),
                 ('ativo', models.BooleanField(default=False)),
-                ('recipient_id', models.CharField(blank=True, max_length=50, null=True)),
+                ('recipient_id',
+                 models.CharField(blank=True, max_length=50, null=True)),
             ],
             options={
                 'verbose_name_plural': 'Contas Bancarias',
