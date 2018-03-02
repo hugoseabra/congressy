@@ -4,7 +4,8 @@
 {% load queryset_filter %}
 
 {% block viewport %}
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 {% endblock %}
 
 {% block title %}Nova Parceiro | Congressy{% endblock %}
@@ -52,8 +53,11 @@
         </div>
 
         <div class="row">
-            <div class="col-md-8">
-                {% render_generic_field form.document_number label="CPF/CNPJ" help_text="Com ou sem pontuações:" %}
+            <div class="col-md-4">
+                {% render_generic_field form.type_of_document label="CPF/CNPJ" help_text="Tipo de Documento"%}
+            </div>
+            <div class="col-md-6">
+                {% render_generic_field form.document_number label="CPF" %}
             </div>
         </div>
 
@@ -100,11 +104,42 @@
     </form>
 {% endblock %}
 {% block local_js %}
-<script type="application/javascript">
-    $(document).ready(function () {
-        $('#id_phone').mask("(99) 99999-9999");
-    });
-</script>
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $('#id_phone').mask("(99) 99999-9999");
+
+            var type_of_document = $('#id_type_of_document');
+            var type_of_document_lable = $("label[for='id_document_number']");
+            var document_number = $('#id_document_number');
+
+
+            if (type_of_document.is(':checked')) {
+                type_of_document_lable.text('CNPJ:');
+                document_number.mask("99.999.999/9999-99");
+            } else {
+                type_of_document_lable.text('CPF:');
+                document_number.mask("999.999.999-99");
+            }
+
+            type_of_document.change(function () {
+
+                if ($(this).is(':checked')) {
+                    type_of_document_lable.text('CNPJ:');
+                    document_number.val("");
+                    document_number.mask("99.999.999/9999-99");
+                } else {
+                    type_of_document_lable.text('CPF:');
+                    document_number.val("");
+                    document_number.mask("999.999.999-99");
+                }
+
+            });
+
+
+        });
+
+
+    </script>
 
 
 {% endblock %}
