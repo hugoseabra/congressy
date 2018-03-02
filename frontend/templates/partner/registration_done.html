@@ -1,14 +1,26 @@
 {% extends "registration/login_base.html" %}
 {% load i18n %}
 
+{% block viewport %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+{% endblock %}
+
 {% block title %}Cadastro de parceiro{% endblock %}
-{% block login_block_title %}Cadastrado realizado com sucesso{% endblock %}
+{% block login_block_title %}Parceiro cadastrado com sucesso{% endblock %}
 
 {% block form %}
     <div class="text-center">
         <p style="font-size: 22px">
-            Seu cadastro foi realizado com sucesso!
+            Bem-vindo(a) à Congressy!
         </p>
+        <br />
         <i class="fas fa-check-circle fa-5x success-color"></i>
+        <br />
+        <br />
+        <hr />
+        <br />
+        <p class="text-center">
+            Vamos avaliar o seu cadastro e logo entraremos em contato com você.
+        </p>
     </div>
 {% endblock %}
