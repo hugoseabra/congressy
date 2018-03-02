@@ -51,7 +51,7 @@ class PartnerRegistrationViewTests(TestCase):
         }
 
         response = self.client.post(self.url, data, follow=True)
-        self.assertContains(response, b'Cadastrado realizado com sucesso')
+        self.assertContains(response, b' Bem-vindo(a) \xc3\xa0 Congressy!\n')
         self.assertEqual(response.status_code, 200)
 
         # Validating the persistence.

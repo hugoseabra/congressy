@@ -19,7 +19,7 @@ class PartnerContractForm(forms.ModelForm):
         super()._post_clean()
         event = self.cleaned_data.get('event')
 
-        if not event:
+        if not event: # pragma: no cover
             return
 
         partner_plan = self.cleaned_data.get('partner_plan')
