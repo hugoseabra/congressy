@@ -21,10 +21,10 @@ class Partner(models.Model):
         related_name='partner',
     )
 
-    bank_account = models.ForeignKey(
+    bank_account = models.OneToOneField(
         BankAccount,
-        on_delete=models.DO_NOTHING,
-        related_name='partners',
+        on_delete=models.CASCADE,
+        related_name='partner',
         blank=True,
         null=True,
     )
@@ -39,6 +39,12 @@ class Partner(models.Model):
     approved = models.BooleanField(
         default=False,
         verbose_name="aprovado"
+    )
+
+    recipient_id = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
