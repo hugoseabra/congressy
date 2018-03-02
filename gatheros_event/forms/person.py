@@ -5,6 +5,7 @@ from django.utils import six
 from django.utils.datastructures import MultiValueDictKeyError
 from kanu_locations.models import City
 
+from core.forms.cleaners import clear_string
 from core.forms.widgets import DateInput, AjaxChoiceField, TelephoneInput
 from gatheros_event.models import Occupation, Person
 
@@ -105,16 +106,16 @@ class PersonForm(forms.ModelForm):
         self.fields[field_name].required = True
 
     def clean_cpf(self):
-        return self.clear_string(self.data.get('cpf'))
+        return clear_string(self.data.get('cpf'))
 
     def clean_zip_code(self):
-        return self.clear_string(self.data.get('zip_code'))
+        return clear_string(self.data.get('zip_code'))
 
     def clean_phone(self):
-        return self.clear_string(self.data.get('phone'))
+        return clear_string(self.data.get('phone'))
 
     def clean_institution_cnpj(self):
-        return self.clear_string(self.data.get('institution_cnpj'))
+        return clear_string(self.data.get('institution_cnpj'))
 
     def clean_city(self):
         if 'city' not in self.data:
@@ -167,15 +168,3 @@ class PersonForm(forms.ModelForm):
             # Remain same value from persistence
             self.data[field_name] = value
 
-    @staticmethod
-    def clear_string(string):
-        if not string:
-            return ''
-
-        return str(string) \
-            .replace('.', '') \
-            .replace('-', '') \
-            .replace('/', '') \
-            .replace('(', '') \
-            .replace(')', '') \
-            .replace(' ', '')
