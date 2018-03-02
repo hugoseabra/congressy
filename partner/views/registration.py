@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 from django.views.generic import FormView, TemplateView
+from core.forms.cleaners import clear_string
 
 from partner.forms import FullPartnerRegistrationForm
 
@@ -24,6 +25,11 @@ class RegistrationView(TemplateView, FormView):
         messages.success(self.request, self.messages['success'].format(
             form.cleaned_data.get('email')))
         return redirect(self.success_url)
+
+    def post(self, request, *args, **kwargs):
+        request.POST = request.POST.copy()
+        request.POST.update({'document_number': clear_string(request.POST['document_number'])})
+        return super().post(request, *args, **kwargs)
 
 
 class RegistrationDoneView(generic.TemplateView):

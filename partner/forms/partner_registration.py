@@ -14,6 +14,7 @@ from partner.models import Partner
 from payment.forms import BankAccountForm
 
 
+# @TODO make this a form.Form
 class PartnerRegistrationForm(PersonForm):
     partner = None
     user = None
