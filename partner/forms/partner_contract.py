@@ -20,10 +20,17 @@ class PartnerContractForm(forms.ModelForm):
         cleaned_data = self.cleaned_data
 
         try:
-            PartnerContract.objects.get(event=cleaned_data['event'],
-                                        partner=cleaned_data['partner'])
-            raise forms.ValidationError('Parceiro já está vinculado a este '
-                                        'evento')
+            if not self.instance:
+                PartnerContract.objects.get(
+                    event=cleaned_data['event'],
+                    partner=cleaned_data['partner']
+                )
+
+                raise forms.ValidationError(
+                    'Parceiro já está vinculado a este '
+                    'evento'
+                )
+
         except PartnerContract.DoesNotExist:
             pass
 
@@ -38,8 +45,14 @@ class PartnerContractForm(forms.ModelForm):
 
         partner_plan = self.cleaned_data.get('partner_plan')
         partner_max_percentage = settings.PARTNER_MAX_PERCENTAGE_IN_EVENT
-        total_query = event.partner_contracts.aggregate(Sum(
-            'partner_plan__percent'))
+        total_query = event.partner_contracts
+
+        if self.instance:
+            total_query = total_query.exclude(pk=self.instance.pk)
+
+        total_query = total_query.aggregate(
+            Sum('partner_plan__percent')
+        )
 
         total = total_query.get('partner_plan__percent__sum')
 

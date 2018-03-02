@@ -26,22 +26,32 @@ class PartnerContractAdminInline(admin.StackedInline):
 
 @admin.register(Partner)
 class PartnerAdmin(admin.ModelAdmin):
+    search_fields = (
+        'person__name',
+        'bank_account__legal_name',
+        'contracts__event__name',
+        'contracts__partner_plan__name',
+    )
+
     inlines = [PartnerContractAdminInline]
-    form = forms.PartnerContractForm
-    ordering = ('person__name',)
+    form = forms.PartnerForm
+    ordering = ('person__name', 'bank_account__legal_name',)
     list_display = (
         'get_name',
         'get_email',
         'status',
         'get_num_contracts',
+        'get_legal_name',
+        'has_account',
         'approved',
     )
     fields = (
         'person',
         'status',
         'approved',
+        'bank_account',
     )
-    readonly_fields = ('person',)
+    readonly_fields = ('person', 'bank_account',)
 
     def has_add_permission(self, request):
         return False
@@ -55,9 +65,26 @@ class PartnerAdmin(admin.ModelAdmin):
     def get_num_contracts(self, instance):
         return instance.contracts.count()
 
+    def has_account(self, instance):
+        try:
+            instance.bank_account.recipient_id
+        except AttributeError:
+            return False
+
+        return True
+
+    def get_legal_name(self, instance):
+        try:
+            return instance.bank_account.legal_name
+        except AttributeError:
+            return '-'
+
     get_name.__name__ = 'nome'
+    get_legal_name.__name__ = 'titular'
     get_email.__name__ = 'e-mail'
     get_num_contracts.__name__ = '# Contratos'
+    has_account.__name__ = 'Conta'
+    has_account.boolean = True
 
 
 @admin.register(PartnerPlan)

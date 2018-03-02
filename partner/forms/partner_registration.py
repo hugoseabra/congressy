@@ -124,6 +124,12 @@ class FullPartnerRegistrationForm(CombinedFormBase):
         instances = super().save(commit)
         partner = instances.get('partner')
         bank_account = instances.get('bank_account')
+
+        if bank_account.document_type == 'cpf':
+            person = partner.person
+            person.cpf = bank_account.document_number
+            person.save()
+
         partner.bank_account = bank_account
         partner.save()
         return instances
