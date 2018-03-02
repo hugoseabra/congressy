@@ -97,3 +97,12 @@
 
     </form>
 {% endblock %}
+{% block local_js %}
+<script type="application/javascript">
+    $(document).ready(function () {
+        $('#id_phone').mask("(99) 99999-9999");
+    });
+</script>
+
+
+{% endblock %}
