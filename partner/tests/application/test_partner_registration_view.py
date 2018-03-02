@@ -21,7 +21,13 @@ class PartnerRegistrationViewTests(TestCase):
         self.name = self.faker.name()
         self.email = self.faker.free_email()
         self.phone = self.faker.phone_number()
-        self.cpf = self.faker.cpf()
+        self.cpf = '21375415301'
+        self.bank_code = BankAccount.CAIXA_ECONOMICA
+        self.agency = str(randint(1000, 9999))
+        self.agency_dv = str(randint(0, 9))
+        self.account = str(randint(40000, 60000))
+        self.account_dv = str(randint(0, 9))
+        self.account_type = BankAccount.CONTA_CORRENTE
 
     def test_public_partner_registration_get_is_200_ok(self):
         """ Testa se está tudo ok com view com submissão GET. """
@@ -34,14 +40,14 @@ class PartnerRegistrationViewTests(TestCase):
             'name': self.name,
             'email': self.email,
             'phone': self.phone,
-            'bank_code': BankAccount.CAIXA_ECONOMICA,
-            'agency': str(randint(1000, 9999)),
-            'agency_dv': '000',
-            'account': str(randint(40000, 60000)),
-            'account_dv': '001',
+            'bank_code': self.bank_code,
+            'agency': self.agency,
+            'agency_dv': self.agency_dv,
+            'account': self.account,
+            'account_dv': self.account_dv,
             'document_number': self.cpf,
             'legal_name': self.name,
-            'type': BankAccount.CONTA_CORRENTE,
+            'account_type': self.account_type,
         }
 
         response = self.client.post(self.url, data, follow=True)

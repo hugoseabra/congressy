@@ -7,16 +7,16 @@ from django.utils import six
 
 from core.forms import CombinedFormBase
 from core.forms.widgets import TelephoneInput
-from gatheros_event.forms import ProfileCreateForm
+from gatheros_event.forms import PersonForm
 from gatheros_event.models import Person, Organization, Member
 from mailer.services import notify_new_partner, notify_new_partner_internal
 from partner.models import Partner
 from payment.forms import BankAccountForm
 
 
-class PartnerRegistrationForm(ProfileCreateForm):
-
+class PartnerRegistrationForm(PersonForm):
     partner = None
+    user = None
 
     class Meta:
         """ Meta """
@@ -45,7 +45,7 @@ class PartnerRegistrationForm(ProfileCreateForm):
 
         """
 
-        super(ProfileCreateForm, self).save(commit=True)
+        super(PersonForm, self).save(commit=True)
 
         # Criando usuário
         if not self.user:
@@ -94,6 +94,24 @@ class PartnerRegistrationForm(ProfileCreateForm):
         notify_new_partner_internal(context)
 
         return self.instance
+
+    def clean_email(self):
+        return self.data.get('email').lower()
+
+    def clean(self):
+
+        cleaned_data = super(PartnerRegistrationForm, self).clean()
+
+        email = cleaned_data.get('email')
+
+        try:
+            self.user = User.objects.get(username=email)
+            raise forms.ValidationError(
+                "Esse email já existe em nosso sistema. Tente novamente.")
+        except User.DoesNotExist:
+            pass
+
+        return cleaned_data
 
 
 class FullPartnerRegistrationForm(CombinedFormBase):

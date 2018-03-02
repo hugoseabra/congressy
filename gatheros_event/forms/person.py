@@ -73,7 +73,10 @@ class PersonForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'placeholder': 'me@you.com'}),
             'phone': TelephoneInput(attrs={'placeholder': '(00) 00000-0000'}),
             'zip_code': TelephoneInput(),
-            'city': forms.HiddenInput()
+            'city': forms.HiddenInput(),
+            'birth_date': forms.SelectDateWidget(
+                attrs=({'style': 'width: 30%; display: inline-block;'}),
+                years=create_years_list(), )
         }
 
     def __init__(self, is_chrome=False, **kwargs):
@@ -94,11 +97,6 @@ class PersonForm(forms.ModelForm):
         if is_chrome:
             self.fields['birth_date'].widget = DateInput()
 
-        else:
-            self.fields['birth_date'].widget = forms.SelectDateWidget(
-                attrs=({'style': 'width: 30%; display: inline-block;'}),
-                years=create_years_list(),
-            )
 
     def setAsRequired(self, field_name):
         if field_name not in self.fields:

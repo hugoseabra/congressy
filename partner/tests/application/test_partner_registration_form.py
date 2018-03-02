@@ -23,7 +23,6 @@ class PartnerRegistrationFormTest(TestCase):
         self.phone = self.faker.phone_number()
 
     def test_regular_form_validation(self):
-
         form = PartnerRegistrationForm(data={
             'name': self.name,
             'email': self.email,
@@ -68,13 +67,12 @@ class PartnerFullRegistrationFormTest(TestCase):
         self.cpf = '21375415301'
         self.bank_code = BankAccount.CAIXA_ECONOMICA
         self.agency = str(randint(1000, 9999))
-        self.agency_dv = '000'
+        self.agency_dv = str(randint(0, 9))
         self.account = str(randint(40000, 60000))
-        self.account_dv = '01'
+        self.account_dv = str(randint(0, 9))
         self.account_type = BankAccount.CONTA_CORRENTE
 
     def test_regular_form_validation(self):
-
         form = FullPartnerRegistrationForm(data={
             'name': self.name,
             'email': self.email,
@@ -86,7 +84,7 @@ class PartnerFullRegistrationFormTest(TestCase):
             'account_dv': self.account_dv,
             'document_number': self.cpf,
             'legal_name': self.name,
-            'type': self.account_type,
+            'account_type': self.account_type,
         })
 
         self.assertTrue(form.is_valid())
@@ -96,6 +94,70 @@ class PartnerFullRegistrationFormTest(TestCase):
 
         person = Person.objects.get(email=self.email)
         self.assertIsNotNone(Partner.objects.get(person=person))
+
+    def test_same_email_form_validation(self):
+        form = FullPartnerRegistrationForm(data={
+            'name': self.name,
+            'email': self.email,
+            'phone': self.phone,
+            'bank_code': self.bank_code,
+            'agency': self.agency,
+            'agency_dv': self.agency_dv,
+            'account': self.account,
+            'account_dv': self.account_dv,
+            'document_number': self.cpf,
+            'legal_name': self.name,
+            'account_type': self.account_type,
+        })
+        form.save()
+
+        form2 = FullPartnerRegistrationForm(data={
+            'name': self.name,
+            'email': self.email,
+            'phone': self.phone,
+            'bank_code': self.bank_code,
+            'agency': self.agency,
+            'agency_dv': self.agency_dv,
+            'account': self.account,
+            'account_dv': self.account_dv,
+            'document_number': '24632511749',
+            'legal_name': self.name,
+            'account_type': self.account_type,
+        })
+
+        self.assertFalse(form2.is_valid())
+
+    def test_same_document_number_form_validation(self):
+        form = FullPartnerRegistrationForm(data={
+            'name': self.name,
+            'email': self.faker.free_email(),
+            'phone': self.phone,
+            'bank_code': self.bank_code,
+            'agency': self.agency,
+            'agency_dv': self.agency_dv,
+            'account': self.account,
+            'account_dv': self.account_dv,
+            'document_number': self.cpf,
+            'legal_name': self.name,
+            'account_type': self.account_type,
+        })
+        form.save()
+
+        form2 = FullPartnerRegistrationForm(data={
+            'name': self.name,
+            'email': self.email,
+            'phone': self.phone,
+            'bank_code': self.bank_code,
+            'agency': self.agency,
+            'agency_dv': self.agency_dv,
+            'account': self.account,
+            'account_dv': self.account_dv,
+            'document_number': self.cpf,
+            'legal_name': self.name,
+            'account_type': self.account_type,
+        })
+
+        self.assertFalse(form2.is_valid())
 
     def test_public_partner_registration_sending_partner_email(self):
         """ Testa se está tudo ok emails após o registro feito pelo parceiro """
@@ -113,4 +175,3 @@ class PartnerFullRegistrationFormTest(TestCase):
         # Caixa de mensagens deve possuir dois emails, um enviado ao parceiro
         #  e um enviado ao time interno de vendas.
         self.assertEqual(len(mail.outbox), 2)
-
