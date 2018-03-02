@@ -227,7 +227,7 @@
             for (var i = 2; i <= parseInt(parts.val()); i++) {
                 var part_price_liquid = parseFloat(price/i);
                 var part_price = parseFloat(part_price_liquid + interest);
-                var part_recieve = parseFloat(price_receive/i);
+                var part_recieve = price_receive;
 
                 if (i <= num_free_items) {
                     // Collect interest
