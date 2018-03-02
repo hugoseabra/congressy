@@ -42,7 +42,7 @@ class PartnerContractFormTest(TestCase):
         form.full_clean()
         self.assertFalse(form.is_valid())
 
-    def test_plans_exceed_defined_max_percentage(self):
+    def test_partners_exceed_defined_max_percentage(self):
         staging_plan = self.mock_factory._create_fake_partner_plan(
             percentage=15)
         bad_plan = self.mock_factory._create_fake_partner_plan(percentage=5.1)
@@ -54,28 +54,68 @@ class PartnerContractFormTest(TestCase):
             'partner_plan': staging_plan.pk,
             'event': self.event.pk,
         })
-        form.full_clean()
+
         self.assertTrue(form.is_valid())
         form.save()
 
         # Bad Plan
+        bad_person = self.mock_factory._create_fake_person()
+        bad_partner = self.mock_factory._create_fake_partner(bad_person)
         form = PartnerContractForm(data={
-            'partner': self.partner.pk,
+            'partner': bad_partner.pk,
             'partner_plan': bad_plan.pk,
             'event': self.event.pk,
         })
-        form.full_clean()
         self.assertFalse(form.is_valid())
 
         # Good Plan
+        good_person = self.mock_factory._create_fake_person()
+        good_partner = self.mock_factory._create_fake_partner(good_person)
+
         form = PartnerContractForm(data={
-            'partner': self.partner.pk,
+            'partner': good_partner.pk,
             'partner_plan': good_plan.pk,
             'event': self.event.pk,
         })
-        form.full_clean()
         self.assertTrue(form.is_valid())
         form.save()
+
+    def test_same_event_same_partner(self):
+
+        form = PartnerContractForm(data={
+            'partner': self.partner.pk,
+            'partner_plan': self.partner_plan.pk,
+            'event': self.event.pk,
+        })
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        form = PartnerContractForm(data={
+            'partner': self.partner.pk,
+            'partner_plan': self.partner_plan.pk,
+            'event': self.event.pk,
+        })
+
+        self.assertFalse(form.is_valid())
+
+    def test_same_event_different_partner(self):
+        form = PartnerContractForm(data={
+            'partner': self.partner.pk,
+            'partner_plan': self.partner_plan.pk,
+            'event': self.event.pk,
+        })
+        self.assertTrue(form.is_valid())
+
+        different_person = self.mock_factory._create_fake_person()
+        different_partner = self.mock_factory._create_fake_partner(
+            person=different_person)
+
+        form = PartnerContractForm(data={
+            'partner': different_partner.pk,
+            'partner_plan': self.partner_plan.pk,
+            'event': self.event.pk,
+        })
+        self.assertTrue(form.is_valid())
 
     def test_partner_and_event_new_contract_email(self):
         """ Testa se está tudo ok emails após a criação de um novo contrato

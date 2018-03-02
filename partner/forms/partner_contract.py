@@ -16,6 +16,19 @@ class PartnerContractForm(forms.ModelForm):
         model = PartnerContract
         fields = '__all__'
 
+    def clean(self):
+        cleaned_data = self.cleaned_data
+
+        try:
+            PartnerContract.objects.get(event=cleaned_data['event'],
+                                        partner=cleaned_data['partner'])
+            raise forms.ValidationError('Parceiro já está vinculado a este '
+                                        'evento')
+        except PartnerContract.DoesNotExist:
+            pass
+
+        return cleaned_data
+
     def _post_clean(self):
         super()._post_clean()
         event = self.cleaned_data.get('event')
