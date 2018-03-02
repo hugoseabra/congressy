@@ -18,9 +18,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}Congressy{% endblock %}</title>
     <meta name="description" content="">
-    {% block viewport %}{% endblock %}
-    {#    <meta name="viewport"#}
-    {#          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <!-- Bootstrap core CSS -->
 
     <link rel="stylesheet"
@@ -120,7 +119,14 @@
                     </div>
                 </div>
                 <div class="text-muted text-right cgsy-version">
-                    {% include "base/footer.html" %}
+                    <div class="row">
+                        <div class="col-xs-6 col-sm-8 col-md-8 col-lg-6 text-left">
+                            <a href="https://www.congressy.com/termos-de-uso/" style="color:white;font-size:14px;" target="_blank">Termos de uso</a>
+                        </div>
+                        <div class="col-xs-6 col-sm-4 col-md-4 col-lg-6">
+                            {% include "base/footer.html" %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
