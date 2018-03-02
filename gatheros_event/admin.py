@@ -5,7 +5,6 @@ Django Admin para Gatheros Event
 from django.contrib import admin
 from django.db.models import Sum
 
-from partner.models import Partner
 from .models import Category, Event, Info, Invitation, Member, Occupation, \
     Organization, Person, Place, Segment, Subject
 
@@ -95,18 +94,11 @@ class EventAdmin(admin.ModelAdmin):
     get_partner_percents.__name__ = '% Parceiros'
 
 
-class PartnerAdminInline(admin.StackedInline):
-    model = Partner
-    verbose_name_plural = 'Parceiro'
-    fields = ('status', 'approved',)
-
-
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     """
     Admin para Person
     """
-    inlines = [PartnerAdminInline]
     search_fields = ('name', 'email',)
     list_display = ('name', 'gender', 'user', 'created')
     ordering = ('created', 'name')
