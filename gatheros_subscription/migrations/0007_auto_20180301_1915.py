@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('gatheros_subscription', '0006_auto_20180223_0357'),
     ]
@@ -23,16 +22,24 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='lot',
             name='allow_installment',
-            field=models.BooleanField(default=True, verbose_name='permitir parcelamento'),
+            field=models.BooleanField(default=True,
+                                      verbose_name='permitir parcelamento'),
         ),
         migrations.AddField(
             model_name='lot',
             name='installment_limit',
-            field=models.PositiveIntegerField(blank=True, default=10, help_text='Número de parcelas permitido.', verbose_name='parcelas'),
+            field=models.PositiveIntegerField(blank=True, default=10,
+                                              help_text='Número de parcelas permitido.',
+                                              verbose_name='parcelas'),
         ),
         migrations.AddField(
             model_name='lot',
             name='num_install_interest_absortion',
-            field=models.PositiveIntegerField(blank=True, default=0, help_text='Número de parcelas que deseja absorver os juros.', null=True, verbose_name='absorver juros de parcelas'),
+            field=models.PositiveIntegerField(
+                blank=True, default=0,
+                null=True,
+                verbose_name='assumir juros de parcelas',
+                help_text="Número de parcelas que deseja assumir os juros.",
+            ),
         ),
     ]
