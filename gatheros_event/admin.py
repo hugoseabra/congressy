@@ -3,7 +3,9 @@
 Django Admin para Gatheros Event
 """
 from django.contrib import admin
+from django.db.models import Sum
 
+from partner.models import Partner
 from .models import Category, Event, Info, Invitation, Member, Occupation, \
     Organization, Person, Place, Segment, Subject
 
@@ -25,17 +27,13 @@ class EventAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_display = (
         'name',
+        'get_partner_percents',
         'organization',
-        'subscription_type',
-        'category',
         'date_start',
         'date_end',
-        'get_percent_completed',
-        'get_percent_attended',
-        'published',
         'pk'
     )
-    ordering = ['pk', 'name']
+    ordering = ['name']
     readonly_fields = ['slug']
 
     fieldsets = (
@@ -85,8 +83,22 @@ class EventAdmin(admin.ModelAdmin):
             '{0:.2f}'.format(instance.percent_attended)
         )
 
+    def get_partner_percents(self, instance):
+        total_query = instance.partner_contracts.aggregate(
+            Sum('partner_plan__percent')
+        )
+        total = total_query.get('partner_plan__percent__sum')
+        return '{}%'.format(total or 0)
+
     get_percent_completed.__name__ = 'Vagas restantes'
     get_percent_attended.__name__ = 'Credenciados'
+    get_partner_percents.__name__ = '% Parceiros'
+
+
+class PartnerAdminInline(admin.StackedInline):
+    model = Partner
+    verbose_name_plural = 'Parceiro'
+    fields = ('status', 'approved',)
 
 
 @admin.register(Person)
@@ -94,6 +106,7 @@ class PersonAdmin(admin.ModelAdmin):
     """
     Admin para Person
     """
+    inlines = [PartnerAdminInline]
     search_fields = ('name', 'email',)
     list_display = ('name', 'gender', 'user', 'created')
     ordering = ('created', 'name')
@@ -106,24 +119,31 @@ class PersonAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
+                'user',
                 'name',
                 'gender',
                 'pne',
                 'birth_date',
+                'avatar',
+            ),
+        }),
+        ('Documentos', {
+            'classes': ('collapse', 'closed'),
+            'fields': (
                 'cpf',
                 'rg',
                 'orgao_expedidor',
-                'avatar',
-                'user',
             ),
         }),
         ('Contato', {
+            'classes': ('collapse', 'closed'),
             'fields': (
                 'email',
                 'phone',
             ),
         }),
         ('Endereço', {
+            'classes': ('collapse', 'closed'),
             'fields': (
                 'zip_code',
                 'street',
@@ -134,6 +154,7 @@ class PersonAdmin(admin.ModelAdmin):
             ),
         }),
         ('Site pessoal e Redes Sociais', {
+            'classes': ('collapse', 'closed'),
             'fields': (
                 'website',
                 'facebook',
@@ -143,6 +164,7 @@ class PersonAdmin(admin.ModelAdmin):
             ),
         }),
         ('Termo de privacidade e política de uso', {
+            'classes': ('collapse', 'closed'),
             'fields': (
                 'term_version',
                 'politics_version',
@@ -170,6 +192,7 @@ class OrganizationAdmin(admin.ModelAdmin):
             ),
         }),
         ('Site e Redes Sociais', {
+            'classes': ('collapse', 'closed'),
             'fields': (
                 'website',
                 'facebook',
@@ -179,6 +202,7 @@ class OrganizationAdmin(admin.ModelAdmin):
             ),
         }),
         ('Dados Bancários', {
+            'classes': ('collapse', 'closed'),
             'fields': (
                 'bank_code',
                 'agency',
@@ -195,6 +219,7 @@ class OrganizationAdmin(admin.ModelAdmin):
             ),
         }),
         ('Provedor de recebimento', {
+            'classes': ('collapse', 'closed'),
             'fields': (
                 'cash_provider',
                 'cash_data',

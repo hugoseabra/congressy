@@ -9,9 +9,9 @@ SUSPENDED = 'suspended'
 
 
 STATUSES = (
-    (ACTIVE, 'Ativo'),
     (NON_ACTIVE, 'Não-ativo'),
     (SUSPENDED, 'Suspenso'),
+    (ACTIVE, 'Ativo'),
 )
 
 
