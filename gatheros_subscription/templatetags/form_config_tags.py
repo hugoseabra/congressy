@@ -21,9 +21,20 @@ def render_generic_field(
         field,
         required=False,
         use_required_field=True,
-        autofocus=False):
+        autofocus=False,
+        label=None,
+        help_text=None):
     if required is False and use_required_field is True:
         required = field.field.required
+
+    if label is not None:
+        field.label_tag = "<label for='id_{name}'>{label}:</label>".format(
+            name=field.name,
+            label=label
+        )
+
+    if help_text is not None:
+        field.help_text = help_text
 
     return {
         'field': field,
@@ -41,12 +52,17 @@ def render_typeahead_field(
         field,
         required=False,
         use_required_field=True,
-        autofocus=False):
+        autofocus=False,
+        label=None,
+        help_text=None):
     return render_generic_field(**{
         'field': field,
         'use_required_field': use_required_field,
         'required': required,
         'autofocus': autofocus,
+        'label': label,
+        'help_text': help_text,
+
     })
 
 
@@ -55,10 +71,15 @@ def render_multiselect_field(
         field,
         required=False,
         use_required_field=True,
-        autofocus=False):
+        autofocus=False,
+        label=None,
+        help_text=None):
+
     return render_generic_field(**{
         'field': field,
         'use_required_field': use_required_field,
         'required': required,
         'autofocus': autofocus,
+        'label': label,
+        'help_text': help_text,
     })

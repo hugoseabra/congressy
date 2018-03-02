@@ -6,6 +6,7 @@ from django.test import TestCase
 
 from partner.models import PartnerContract
 from partner.tests.mocks import MockFactory
+from django.db.utils import IntegrityError
 
 
 class PartnerContractModelTest(TestCase):
@@ -31,3 +32,47 @@ class PartnerContractModelTest(TestCase):
         partner_contract.save()
         self.assertEqual(partner_contract.__str__(), self.partner_plan.name)
         self.assertIsNotNone(partner_contract)
+
+    def test_same_event_same_partner(self):
+
+        partner_contract1 = PartnerContract.objects.create(
+            partner=self.partner,
+            partner_plan=self.partner_plan,
+            event=self.event
+        )
+
+        self.assertIsNotNone(
+            PartnerContract.objects.get(pk=partner_contract1.pk))
+
+        with self.assertRaises(IntegrityError):
+
+            PartnerContract.objects.create(
+                partner=self.partner,
+                partner_plan=self.partner_plan,
+                event=self.event
+            )
+
+    def test_same_event_different_partner(self):
+
+        original_partner_contract = PartnerContract.objects.create(
+            partner=self.partner,
+            partner_plan=self.partner_plan,
+            event=self.event
+        )
+
+        self.assertIsNotNone(
+            PartnerContract.objects.get(pk=original_partner_contract.pk))
+
+        different_person = self.fake_factory._create_fake_person()
+        different_partner = self.fake_factory._create_fake_partner(
+            person=different_person)
+
+        different_partner_contract = PartnerContract.objects.create(
+            partner=different_partner,
+            partner_plan=self.partner_plan,
+            event=self.event
+        )
+
+        self.assertIsNotNone(
+            PartnerContract.objects.get(pk=different_partner_contract.pk))
+

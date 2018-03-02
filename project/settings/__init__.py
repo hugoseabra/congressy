@@ -50,8 +50,7 @@ INSTALLED_APPS = [
     'payment',
     'core',
     'hotsite',
-    # 'partner',
-
+    'partner',
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'

@@ -104,7 +104,7 @@ class Lot(models.Model, GatherosModelMixin):
         blank=True,
         decimal_places=2,
         verbose_name='valor',
-        help_text='Valores acima de R$ 10,00'
+        help_text='R$ 10,00 a R$ 30.000,00'
     )
     tax = models.DecimalField(
         max_digits=5,

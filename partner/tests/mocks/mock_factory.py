@@ -66,7 +66,7 @@ class MockFactory:
         name = 'Partner Plan: ' + ' '.join(self.fake_factory.words(nb=2))
 
         if not percentage:
-            percentage = 5.5
+            percentage = 5
 
         partner_plan = PartnerPlan(name=name, percent=percentage)
         partner_plan.save()

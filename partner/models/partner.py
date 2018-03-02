@@ -3,8 +3,10 @@
 """
 
 from django.db import models
+
 from gatheros_event.models import Person
 from partner import constants
+from payment.models import BankAccount
 
 
 class Partner(models.Model):
@@ -19,6 +21,14 @@ class Partner(models.Model):
         related_name='partner',
     )
 
+    bank_account = models.OneToOneField(
+        BankAccount,
+        on_delete=models.CASCADE,
+        related_name='partner',
+        blank=True,
+        null=True,
+    )
+
     status = models.CharField(
         choices=constants.STATUSES,
         default=constants.NON_ACTIVE,
@@ -29,6 +39,12 @@ class Partner(models.Model):
     approved = models.BooleanField(
         default=False,
         verbose_name="aprovado"
+    )
+
+    recipient_id = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
