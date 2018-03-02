@@ -37,19 +37,11 @@
             {{ hidden_field }}
         {% endfor %}
 
-
-
         <div class="row">
             <div class="col-md-12">
                 {% render_generic_field form.name autofocus=True %}
                 {% render_generic_field form.email %}
                 {% render_generic_field form.phone %}
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                {% render_generic_field form.bank_code %}
             </div>
         </div>
 
@@ -60,8 +52,14 @@
         </div>
 
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 {% render_generic_field form.document_number label="CPF/CNPJ" help_text="Com ou sem pontuações:" %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                {% render_generic_field form.bank_code %}
             </div>
             <div class="col-md-6">
                 {% render_generic_field form.account_type %}
