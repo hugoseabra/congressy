@@ -80,7 +80,7 @@ class PartnerContractFormTest(TestCase):
         self.assertTrue(form.is_valid())
         form.save()
 
-    def test_same_event_same_partner(self):
+    def test_same_event_same_partner_add(self):
 
         form = PartnerContractForm(data={
             'partner': self.partner.pk,
@@ -97,6 +97,27 @@ class PartnerContractFormTest(TestCase):
         })
 
         self.assertFalse(form.is_valid())
+
+    def test_same_event_same_partner_edit(self):
+
+        form = PartnerContractForm(data={
+            'partner': self.partner.pk,
+            'partner_plan': self.partner_plan.pk,
+            'event': self.event.pk,
+        })
+        self.assertTrue(form.is_valid())
+        form.save()
+
+        form = PartnerContractForm(
+            instance=form.instance,
+            data={
+                'partner': self.partner.pk,
+                'partner_plan': self.partner_plan.pk,
+                'event': self.event.pk,
+            }
+        )
+
+        self.assertTrue(form.is_valid())
 
     def test_same_event_different_partner(self):
         form = PartnerContractForm(data={

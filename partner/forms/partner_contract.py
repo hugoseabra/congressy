@@ -20,7 +20,7 @@ class PartnerContractForm(forms.ModelForm):
         cleaned_data = self.cleaned_data
 
         try:
-            if not self.instance:
+            if not self.instance.pk:
                 PartnerContract.objects.get(
                     event=cleaned_data['event'],
                     partner=cleaned_data['partner']
@@ -62,14 +62,12 @@ class PartnerContractForm(forms.ModelForm):
             self.add_error('__all__', percent_to_high)
         elif total and (total + partner_plan.percent) > partner_max_percentage:
 
-            to_high_validation_error = 'A soma de todos os parceiros do ' \
-                                       'evento  não deve ultrapassar a {}%' \
-                                       ' do rateamento do montante da' \
-                                       ' Congressy. Porcentagem total até o' \
-                                       ' momento {}%'.format(
-                partner_max_percentage,
-                total
-            )
+            to_high_validation_error = \
+                'A soma de todos os parceiros do' \
+                ' evento  não deve ultrapassar a {}%' \
+                ' do rateamento do montante da' \
+                ' Congressy. Porcentagem total até o' \
+                ' momento {}%.'.format(partner_max_percentage, total)
 
             self.add_error('__all__', to_high_validation_error)
 
