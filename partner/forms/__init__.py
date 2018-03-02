@@ -4,4 +4,5 @@
 from .partner import PartnerForm
 from .partner_plan import PartnerPlanForm
 from .partner_contract import PartnerContractForm
-from .partner_registration import PartnerRegistrationForm
+from .partner_registration import PartnerRegistrationForm, \
+    FullPartnerRegistrationForm

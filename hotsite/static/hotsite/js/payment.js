@@ -6,6 +6,15 @@ function hide_payment_elements() {
     $('#id_button_pay').show();
 }
 
+function normalize_amount_as_payment(amount) {
+    amount = String(amount);
+    var len = amount.length;
+    var value = amount.substring(0, len-2);
+    var cents = amount.substr(len-2);
+    value = value.replace('.', '').replace('.', '').replace(',', '');
+    return String(value) + String(cents);
+}
+
 function process_payment(
     encryption_key,
     interest_rate,
@@ -22,7 +31,7 @@ function process_payment(
     var billing_title = 'Inscrição do evento: ' + event_name;
     var amount_id = $('#id_lot').val().toString();
     var lot = lots[amount_id];
-    var amount = lot.amount * 100;
+    var amount = normalize_amount_as_payment(lot.amount);
     var allow_installment = lot.allow_installment === true;
     var installment_limit = lot.installment_limit;
     var free_installment = parseInt(lot.free_installment);

@@ -1,5 +1,7 @@
-{% extends is_embeded|yesno:"registration/login_base_embeded.html,registration/login_base.html" %}
-{% load static %}
+{% extends "registration/login_base.html" %}
+{% load l10n static event_tags  base_tags  widget_tweaks form_config_tags %}
+{% load humanize %}
+{% load queryset_filter %}
 
 {% block title %}Nova Parceiro | Congressy{% endblock %}
 {% block login_block_title %}Nova conta de parceiro{% endblock %}
@@ -9,68 +11,134 @@
     <p class="text-center"> Olá, bem-vindo ao programa de parceiros da
         Congressy. Por gentileza complete o cadastro abaixo para se
         cadastrar como parceiro. </p>
-    <form id="createForm" action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form" onsubmit="submit_form(this);">
+
+
+    <form id="createForm"
+          action=""
+          method="post"
+          class="form-horizontal form-border"
+          role="form"
+          onsubmit="submit_form(this);">
+
         {% csrf_token %}
-        <div class="form-group">
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
             <div class="col-md-12">
-                <label for="name">Nome</label>
-                <input type="text"
-                       required
-                       name="name"
-                       class="form-control"
-                       id="name"
-                       placeholder="Nome e sobrenome"
-                >
-                {% for error in form.name.errors %}
-                    <div class="alert alert-danger
-                                    alert-dismissable">
-                        <button type="button" class="close"
-                                data-dismiss="alert"
-                                aria-hidden="true">×
-                        </button>
-                        {{ error }}
-                    </div>
-                {% endfor %}
+                {% render_generic_field form.name autofocus=True %}
+                {% render_generic_field form.email %}
+                {% render_generic_field form.phone %}
             </div>
         </div>
-        <div class="form-group">
+
+        <div class="row">
             <div class="col-md-12">
-                <label for="email">E-mail</label>
-                <input type="email"
-                       name="email"
-                       required
-                       class="form-control"
-                       id="email"
-                       placeholder="me@you.com">
-                {% for error in form.email.errors %}
-                    <div class="alert alert-danger
-                                    alert-dismissable">
-                        <button type="button" class="close"
-                                data-dismiss="alert"
-                                aria-hidden="true">×
-                        </button>
-                        {{ error }}
-                    </div>
-                {% endfor %}
+                {% render_generic_field form.legal_name %}
             </div>
         </div>
-        <div class="form-group">
-            <div class="col-md-12">
-                <button id="submitButton" class="btn btn-info btn-block">Enviar</button>
+
+        <div class="row">
+            <div class="col-md-4">
+                {% render_generic_field form.type_of_document label="CPF/CNPJ" help_text="Tipo de Documento"%}
+            </div>
+            <div class="col-md-6">
+                {% render_generic_field form.document_number label="CPF" %}
             </div>
         </div>
-        <div class="form-group" style="margin-bottom: 0">
-            <div class="form-group" style="margin-bottom: 0">
-                <div class="col-md-12 secondary-links">
-                    <div class="help-block">
-                        <span class="info">Já possui conta?</span>
-                        <a style="font-weight: bold;"
-                           href="{% url 'public:login' %}{% if is_embeded %}?embeded=1{% endif %}">
-                            Entrar
-                        </a>
-                    </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                {% render_generic_field form.bank_code %}
+            </div>
+            <div class="col-md-6">
+                {% render_generic_field form.account_type %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-9">
+                {% render_generic_field form.agency label="Agencia" %}
+            </div>
+            <div class="col-md-3">
+                {% render_generic_field form.agency_dv label='Dígito' %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-9">
+                {% render_generic_field form.account label="Conta" %}
+            </div>
+            <div class="col-md-3">
+                {% render_generic_field form.account_dv label='Dígito' %}
+            </div>
+        </div>
+
+        <div class="row">
+
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                <button id="submitButton" class="btn btn-info btn-block">
+                    Aceitar e Realizar Cadastro
+                </button>
+                <div class="help-block text-center" style="font-size: 13px;">
+                    Ao criar sua conta, você declara ter aceitado os
+                    <a href="https://www.congressy.com/termos-de-uso/" style="font-weight: bold;" target="_blank">termos de uso</a>.
                 </div>
             </div>
         </div>
+
+
     </form>
+{% endblock %}
+{% block local_js %}
+    <script type="application/javascript">
+        $(document).ready(function () {
+            $('#id_phone').mask("(99) 99999-9999");
+
+            var type_of_document = $('#id_type_of_document');
+            var type_of_document_lable = $("label[for='id_document_number']");
+            var document_number = $('#id_document_number');
+
+
+            if (type_of_document.is(':checked')) {
+                type_of_document_lable.text('CNPJ:');
+                document_number.mask("99.999.999/9999-99");
+            } else {
+                type_of_document_lable.text('CPF:');
+                document_number.mask("999.999.999-99");
+            }
+
+            type_of_document.change(function () {
+
+                if ($(this).is(':checked')) {
+                    type_of_document_lable.text('CNPJ:');
+                    document_number.val("");
+                    document_number.mask("99.999.999/9999-99");
+                } else {
+                    type_of_document_lable.text('CPF:');
+                    document_number.val("");
+                    document_number.mask("999.999.999-99");
+                }
+
+            });
+
+
+        });
+
+
+    </script>
+
+
 {% endblock %}

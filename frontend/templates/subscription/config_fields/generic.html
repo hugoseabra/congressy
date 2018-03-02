@@ -1,10 +1,12 @@
 {% load widget_tweaks form_config_tags %}
 
 <div class="form-group">
-    <label for="id_{{ name }}">
-        {{ label_tag|capfirst }}
-        <small style="color:#C9302C" {% if not required %}class="hidden"{% endif %}>*</small>
-    </label>
+
+    {{ label_tag|safe|capfirst }}
+    <small style="color:#C9302C" {% if not required %}class="hidden"{% endif %}>
+        *
+    </small>
+
     <div>
         {% include 'subscription/config_fields/render_field.html' with field=field required=required autofocus=autofocus %}
 

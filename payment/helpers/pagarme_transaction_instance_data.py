@@ -5,6 +5,7 @@ from decimal import Decimal
 import absoluteuri
 from django.conf import settings
 
+from partner import constants as partner_constants
 from payment.helpers.calculator import Calculator
 from gatheros_event.models import Organization
 from payment.exception import TransactionError
@@ -254,15 +255,42 @@ class PagarmeTransactionInstanceData:
         # Congressy receberá o restante
         congressy_amount = self.amount - organization_amount
 
+        # Valor líquido da congressy direto do valor do lote.
+        congressy_amount_liquid = self.lot.price * self.as_decimal(
+            settings.CONGRESSY_PLAN_PERCENT_10 / 100
+        )
+
         # Se o valor é menor do que o mínimo configurado, o mínimo assume.
         minimum = self.as_decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         if congressy_amount < minimum:
             congressy_amount = minimum
             organization_amount = self.as_decimal(self.amount - minimum)
 
+        # Verifica se há parceiros
+        partners = self.event.partner_contracts.filter(
+            partner__status=partner_constants.ACTIVE,
+            partner__approved=True
+        )
+
+        partners_amount = 0
+        partner_rules = []
+        for contract in partners:
+            percent_decimal = Decimal(contract.partner_plan.percent) / 100
+            # O parceiro ganha em cima do valor liquido da Congressy.
+            part_amount = self.as_decimal(
+                congressy_amount_liquid * percent_decimal
+            )
+            partners_amount += part_amount
+            partner_rules.append({
+                "recipient_id": contract.partner.bank_account.recipient_id,
+                "amount": self.as_payment_format(part_amount),
+                "liable": True,
+                "charge_processing_fee": False
+            })
+
         congressy_rule = {
             "recipient_id": CONGRESSY_RECIPIENT_ID,
-            "amount": self.as_payment_format(congressy_amount),
+            "amount": self.as_payment_format(congressy_amount - partners_amount),
             "liable": True,
             "charge_processing_fee": True,
             "charge_remainder_fee": True
@@ -281,4 +309,9 @@ class PagarmeTransactionInstanceData:
             "charge_processing_fee": False
         }
 
-        return [congressy_rule, organization_rule]
+        split_rules = [congressy_rule, organization_rule]
+
+        for partner_rule in partner_rules:
+            split_rules.append(partner_rule)
+
+        return split_rules

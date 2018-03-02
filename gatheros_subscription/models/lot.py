@@ -104,7 +104,7 @@ class Lot(models.Model, GatherosModelMixin):
         blank=True,
         decimal_places=2,
         verbose_name='valor',
-        help_text='Valores acima de R$ 10,00'
+        help_text='R$ 10,00 a R$ 30.000,00'
     )
     tax = models.DecimalField(
         max_digits=5,
@@ -155,8 +155,8 @@ class Lot(models.Model, GatherosModelMixin):
         default=0,
         null=True,
         blank=True,
-        verbose_name='absorver juros de parcelas',
-        help_text="Número de parcelas que deseja absorver os juros."
+        verbose_name='assumir juros de parcelas',
+        help_text="Número de parcelas que deseja assumir os juros."
     )
     allow_installments = models.BooleanField(
         default=False,

@@ -254,8 +254,8 @@
                     html += '</div>';
 
                 var html2 = '<div>';
-                    html2 += '<span>'+i+'x: </span>';
                     html2 += part_recieve;
+                    html2 += '<span> (se '+i+'x)</span>';
                     html2 += '</div>';
 
                 items.push(html);
@@ -525,7 +525,7 @@
                         <div class="row price-box">
                             <div id="subscription_price_block" class="col-sm-6 col-md-6">
                                 <div class="well">
-                                    <div style="font-size:14px;text-align: center;font-weight: bold">Preço da Inscrição (à vista):</div>
+                                    <div style="font-size:14px;text-align: center;font-weight: bold">Para o participante:</div>
                                     <div style="text-align: center;font-weight: bold;font-size: 24px;color: blue;">
                                         R$ <span class="subscription_price"></span>
                                     </div>
@@ -536,7 +536,7 @@
                             </div>
                             <div id="price_to_recieve_block" class="col-sm-6 col-md-6">
                                 <div class="well">
-                                    <div style="font-size:14px;text-align: center;font-weight: bold">Você receberá (à vista):</div>
+                                    <div style="font-size:14px;text-align: center;font-weight: bold">Para você:</div>
                                     <div style="text-align: center;font-weight: bold;font-size: 24px;color: green;">
                                         R$ <span class="price_to_recieve"></span>
                                     </div>
@@ -547,7 +547,10 @@
                             </div>
                             <div id="installment_price_to_receive_block" class="col-sm-4 col-md-4" style="display: none">
                                 <div>
-                                    <div style="font-size:14px;font-weight: bold">Você receberá (parcelado):</div>
+                                    <div style="font-size:14px;font-weight: bold">Para você:</div>
+                                    <div class="help-block" style="font-size:12px">
+                                        Se o participante pagar parcelado.
+                                    </div>
                                     <div style="font-weight: bold;font-size: 14px;color:green">
                                         <div id="installment_price_to_receive" style="padding: 4px 0 0 8px;"></div>
                                     </div>

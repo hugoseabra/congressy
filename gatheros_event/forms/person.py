@@ -5,6 +5,8 @@ from django.utils import six
 from django.utils.datastructures import MultiValueDictKeyError
 from kanu_locations.models import City
 
+from core.forms.cleaners import clear_string
+from core.forms.widgets import DateInput, AjaxChoiceField, TelephoneInput
 from gatheros_event.models import Occupation, Person
 
 
@@ -16,19 +18,6 @@ def create_years_list():
         years.append(epoch)
 
     return years
-
-
-class AjaxChoiceField(forms.ChoiceField):
-    def valid_value(self, value):
-        return True
-
-
-class TelephoneInput(forms.TextInput):
-    input_type = 'tel'
-
-
-class DateInput(forms.TextInput):
-    input_type = 'date'
 
 
 class PersonForm(forms.ModelForm):
@@ -85,7 +74,10 @@ class PersonForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'placeholder': 'me@you.com'}),
             'phone': TelephoneInput(attrs={'placeholder': '(00) 00000-0000'}),
             'zip_code': TelephoneInput(),
-            'city': forms.HiddenInput()
+            'city': forms.HiddenInput(),
+            'birth_date': forms.SelectDateWidget(
+                attrs=({'style': 'width: 30%; display: inline-block;'}),
+                years=create_years_list(), )
         }
 
     def __init__(self, is_chrome=False, **kwargs):
@@ -106,11 +98,6 @@ class PersonForm(forms.ModelForm):
         if is_chrome:
             self.fields['birth_date'].widget = DateInput()
 
-        else:
-            self.fields['birth_date'].widget = forms.SelectDateWidget(
-                attrs=({'style': 'width: 30%; display: inline-block;'}),
-                years=create_years_list(),
-            )
 
     def setAsRequired(self, field_name):
         if field_name not in self.fields:
@@ -119,16 +106,16 @@ class PersonForm(forms.ModelForm):
         self.fields[field_name].required = True
 
     def clean_cpf(self):
-        return self.clear_string(self.data.get('cpf'))
+        return clear_string(self.data.get('cpf'))
 
     def clean_zip_code(self):
-        return self.clear_string(self.data.get('zip_code'))
+        return clear_string(self.data.get('zip_code'))
 
     def clean_phone(self):
-        return self.clear_string(self.data.get('phone'))
+        return clear_string(self.data.get('phone'))
 
     def clean_institution_cnpj(self):
-        return self.clear_string(self.data.get('institution_cnpj'))
+        return clear_string(self.data.get('institution_cnpj'))
 
     def clean_city(self):
         if 'city' not in self.data:
@@ -181,15 +168,3 @@ class PersonForm(forms.ModelForm):
             # Remain same value from persistence
             self.data[field_name] = value
 
-    @staticmethod
-    def clear_string(string):
-        if not string:
-            return ''
-
-        return str(string) \
-            .replace('.', '') \
-            .replace('-', '') \
-            .replace('/', '') \
-            .replace('(', '') \
-            .replace(')', '') \
-            .replace(' ', '')

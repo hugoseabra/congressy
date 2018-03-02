@@ -5,7 +5,8 @@ import pagarme
 from django.conf import settings
 
 from mailer.tasks import send_mail
-from payment.exception import TransactionError, OrganizerRecipientError
+from payment.exception import TransactionError, OrganizerRecipientError, \
+    RecipientError
 from payment.models import Transaction, TransactionStatus
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
@@ -94,6 +95,10 @@ def create_pagarme_organizer_recipient(organization=None):
         },
     }
 
+    if organization.agencia_dv:
+        params['bank_account'].update(
+            {'agencia_dv': organization.agencia_dv})
+
     recipient = pagarme.recipient.create(params)
 
     # @TODO add wrapper here to check if its a dict or a list
@@ -121,3 +126,49 @@ def create_pagarme_organizer_recipient(organization=None):
     organization.active_recipient = True
 
     organization.save()
+
+
+def create_pagarme_recipient(recipient_dict):
+    params = {
+        'anticipatable_volume_percentage': '80',
+        'automatic_anticipation_enabled': 'false',
+        'transfer_day': '5',
+        'transfer_enabled': 'true',
+        'transfer_interval': 'weekly',
+        'bank_account': {
+            'agencia': recipient_dict['agencia'],
+            'bank_code': recipient_dict['bank_code'],
+            'conta': recipient_dict['conta'],
+            'conta_dv': recipient_dict['conta_dv'],
+            'document_number': recipient_dict['document_number'],
+            'legal_name': recipient_dict['legal_name'],
+            'type': recipient_dict['type'],
+        },
+    }
+
+    if recipient_dict.get('agencia_dv'):
+        params['bank_account'].update(
+            {'agencia_dv': recipient_dict.get('agencia_dv')})
+
+    # @TODO tratar exceção tanto de comunicação quanto de dados.
+    recipient = pagarme.recipient.create(params)
+
+    # @TODO add wrapper here to check if its a dict or a list
+    if not isinstance(recipient, dict):
+        subject = "Erro ao criar conta: Unknown API error"
+        body = """
+            Erro ao criar conta:
+
+            <br/>
+
+            Recipiente: {0} 
+            <br />
+            Erro:
+            <br/> 
+            <pre><code>{1}</code></pre>
+        """.format(recipient_dict['name'], json.dumps(recipient))
+
+        send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
+        raise RecipientError(message='Unknown API error')
+
+    return recipient
