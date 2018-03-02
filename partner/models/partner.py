@@ -23,8 +23,8 @@ class Partner(models.Model):
 
     bank_account = models.ForeignKey(
         BankAccount,
-        on_delete=models.CASCADE,
-        related_name='partner_bank_account',
+        on_delete=models.DO_NOTHING,
+        related_name='partners',
         blank=True,
         null=True,
     )

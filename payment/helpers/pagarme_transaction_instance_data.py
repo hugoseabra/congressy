@@ -5,6 +5,7 @@ from decimal import Decimal
 import absoluteuri
 from django.conf import settings
 
+from partner import constants as partner_constants
 from payment.helpers.calculator import Calculator
 from gatheros_event.models import Organization
 from payment.exception import TransactionError
@@ -260,6 +261,24 @@ class PagarmeTransactionInstanceData:
             congressy_amount = minimum
             organization_amount = self.as_decimal(self.amount - minimum)
 
+        # Verifica se há parceiros
+        partners = self.event.partner_contracts.filter(
+            partner__status=partner_constants.ACTIVE,
+            partner__approved=True
+        )
+
+        partner_rules = []
+        for contract in partners:
+            percent_decimal = Decimal(contract.plan.percent) / 100
+            part_amount = self.as_decimal(congressy_amount * percent_decimal)
+            congressy_amount = self.as_decimal(congressy_amount - part_amount)
+            partner_rules.append({
+                "recipient_id": contract.partner.bank_account.recipient_id,
+                "amount": self.as_payment_format(part_amount),
+                "liable": True,
+                "charge_processing_fee": False
+            })
+
         congressy_rule = {
             "recipient_id": CONGRESSY_RECIPIENT_ID,
             "amount": self.as_payment_format(congressy_amount),
@@ -281,4 +300,9 @@ class PagarmeTransactionInstanceData:
             "charge_processing_fee": False
         }
 
-        return [congressy_rule, organization_rule]
+        split_rules = [congressy_rule, organization_rule]
+
+        for partner_rule in partner_rules:
+            split_rules.append(partner_rule)
+
+        return split_rules

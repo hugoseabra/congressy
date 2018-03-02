@@ -2,21 +2,22 @@
     Model representation of the Partner Contract entity in the Database
 """
 from django.db import models
-from partner.models import Partner, PartnerPlan
+
 from gatheros_event.models import Event
+from partner.models import Partner, PartnerPlan
 
 
 class PartnerContract(models.Model):
     partner = models.ForeignKey(
         Partner,
         on_delete=models.CASCADE,
-        related_name='partner_contracts',
+        related_name='contracts',
     )
 
     partner_plan = models.ForeignKey(
         PartnerPlan,
         on_delete=models.CASCADE,
-        related_name='partner_contracts',
+        related_name='contracts',
     )
 
     event = models.ForeignKey(
@@ -31,3 +32,6 @@ class PartnerContract(models.Model):
     class Meta:
         verbose_name = 'Contrato de Parceiro'
         verbose_name_plural = 'Contratos de Parceiros'
+        unique_together = (
+            ("partner", "event"),
+        )
