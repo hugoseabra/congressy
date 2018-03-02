@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='lot',
             name='price',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=8, null=True, verbose_name='valor', help_text='Valores acima de R$ 10,00'),
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=8, null=True, verbose_name='valor', help_text='R$ 10,00 a R$ 30.000,00'),
         ),
         migrations.AlterField(
             model_name='lot',
