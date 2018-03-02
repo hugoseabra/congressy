@@ -103,7 +103,8 @@ class Lot(models.Model, GatherosModelMixin):
         null=True,
         blank=True,
         decimal_places=2,
-        verbose_name='valor'
+        verbose_name='valor',
+        help_text='Valores acima de R$ 10,00'
     )
     tax = models.DecimalField(
         max_digits=5,
@@ -134,16 +135,19 @@ class Lot(models.Model, GatherosModelMixin):
     )
     transfer_tax = models.BooleanField(
         default=False,
+        blank=True,
         verbose_name='repassar taxa',
         help_text="Repasse a taxa para o participante e receba o valor"
                   " integral do ingresso."
     )
     allow_installment = models.BooleanField(
         default=True,
+        blank=True,
         verbose_name='permitir parcelamento',
     )
     installment_limit = models.PositiveIntegerField(
         default=10,
+        blank=True,
         verbose_name='parcelas',
         help_text="Número de parcelas permitido."
     )

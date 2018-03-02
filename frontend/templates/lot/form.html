@@ -51,7 +51,6 @@
                 show(limitCheckbox);
             } else {
                 hide(limitCheckbox);
-                $('#id_limit').val(0);
             }
         }
 
@@ -98,12 +97,30 @@
                 return;
             }
 
+            var sub_price_block = $('#subscription_price_block');
+            var price_receive_block = $('#price_to_recieve_block');
+            var installments_block = $('#installment_price_to_receive_block');
+
             if (allow.prop('checked')) {
                 show(num_parts.parent().parent());
                 show(num_absortion.parent().parent().parent().parent());
+                price_receive_block.removeAttr('class').addClass('col-sm-4 col-md-4');
+                sub_price_block.removeAttr('class').addClass('col-sm-4 col-md-4');
+
+                window.setTimeout(function() {
+                    show(installments_block);
+                }, 300);
+
             } else {
                 hide(num_parts.parent().parent());
                 hide(num_absortion.parent().parent().parent().parent());
+
+                hide(installments_block);
+
+                window.setTimeout(function() {
+                    price_receive_block.removeAttr('class').addClass('col-sm-6 col-md-6');
+                    sub_price_block.removeAttr('class').addClass('col-sm-6 col-md-6');
+                }, 300);
             }
         }
 
@@ -135,7 +152,7 @@
 
             var price = $('#id_price').val().replace('.', '').replace(',', '.');
 
-            if (!price) {
+            if (parseFloat(price) <= 0) {
                 showPrices(false);
                 return;
             }
@@ -194,10 +211,13 @@
                 return;
             }
 
-            num_free_items = parseInt(num_free_items.val());
             price = price.text().replace('.', '').replace(',', '.');
-            price_receive = price_receive.text().replace('.', '').replace(',', '.');
+            price = parseFloat(price);
 
+            price_receive = price_receive.text().replace('.', '').replace(',', '.');
+            price_receive = parseFloat(price_receive);
+
+            num_free_items = parseInt(num_free_items.val());
             var interest = parseFloat(price * (2.29/100));
 
             var items = [];
@@ -207,7 +227,7 @@
             for (var i = 2; i <= parseInt(parts.val()); i++) {
                 var part_price_liquid = parseFloat(price/i);
                 var part_price = parseFloat(part_price_liquid + interest);
-                var part_recieve = parseFloat(price_receive);
+                var part_recieve = price_receive;
 
                 if (i <= num_free_items) {
                     // Collect interest
@@ -491,7 +511,7 @@
                                             type="button"
                                             data-html="true"
                                             class="btn btn-sm btn-default"
-                                            title="Demonstração de Parcelas"
+                                            title="Parcelas da Inscrição"
                                             data-container="body"
                                             data-toggle="popover"
                                             data-content="">
@@ -503,7 +523,7 @@
                             </div>
                         </div>
                         <div class="row price-box">
-                            <div class="col-sm-4 col-md-4">
+                            <div id="subscription_price_block" class="col-sm-6 col-md-6">
                                 <div class="well">
                                     <div style="font-size:14px;text-align: center;font-weight: bold">Preço da Inscrição (à vista):</div>
                                     <div style="text-align: center;font-weight: bold;font-size: 24px;color: blue;">
@@ -514,7 +534,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-4 col-md-4">
+                            <div id="price_to_recieve_block" class="col-sm-6 col-md-6">
                                 <div class="well">
                                     <div style="font-size:14px;text-align: center;font-weight: bold">Você receberá (à vista):</div>
                                     <div style="text-align: center;font-weight: bold;font-size: 24px;color: green;">
@@ -525,7 +545,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-4 col-md-4">
+                            <div id="installment_price_to_receive_block" class="col-sm-4 col-md-4" style="display: none">
                                 <div>
                                     <div style="font-size:14px;font-weight: bold">Você receberá (parcelado):</div>
                                     <div style="font-weight: bold;font-size: 14px;color:green">

@@ -57,24 +57,25 @@ class PartnerRegistrationForm(ProfileCreateForm):
 
             self.user.save()
 
-        # Vinculando usuário ao perfil
-        self.instance.user = self.user
-        self.instance.save()
+        person = self.instance
 
-        self.partner = Partner(person=self.instance)
-        self.partner.save()
+        # Vinculando usuário ao perfil
+        person.user = self.user
+        person.save()
+
+        self.instance = Partner.objects.create(person=person)
 
         # Criando Organização.
-        org = Organization(internal=False, name=self.instance.name)
+        org = Organization(internal=False, name=person.name)
 
-        for attr, value in six.iteritems(self.instance.get_profile_data()):
+        for attr, value in six.iteritems(person.get_profile_data()):
             setattr(org, attr, value)
 
         org.save()
 
         Member.objects.create(
             organization=org,
-            person=self.instance,
+            person=person,
             group=Member.ADMIN
         )
 
@@ -96,4 +97,15 @@ class PartnerRegistrationForm(ProfileCreateForm):
 
 
 class FullPartnerRegistrationForm(CombinedFormBase):
-    form_classes = [PartnerRegistrationForm, BankAccountForm]
+    form_classes = {
+        'partner': PartnerRegistrationForm,
+        'bank_account': BankAccountForm
+    }
+
+    def save(self, commit=True):
+        instances = super().save(commit)
+        partner = instances.get('partner')
+        bank_account = instances.get('bank_account')
+        partner.bank_account = bank_account
+        partner.save()
+        return instances

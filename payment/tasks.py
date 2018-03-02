@@ -150,6 +150,7 @@ def create_pagarme_recipient(recipient_dict):
         params['bank_account'].update(
             {'agencia_dv': recipient_dict.get('agencia_dv')})
 
+    # @TODO tratar exceção tanto de comunicação quanto de dados.
     recipient = pagarme.recipient.create(params)
 
     # @TODO add wrapper here to check if its a dict or a list
