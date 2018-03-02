@@ -1,6 +1,7 @@
 """
      Partner Contract Form tests
 """
+from django.core import mail
 from django.test import TestCase
 
 from partner.forms import PartnerContractForm
@@ -29,11 +30,9 @@ class PartnerContractFormTest(TestCase):
             'partner_plan': self.partner_plan.pk,
             'event': self.event.pk,
         })
-        form.full_clean()
         self.assertTrue(form.is_valid())
 
-    # Business Rule #1
-    def test_percent_plan_exceeds_defined_percentage(self):
+    def test_percent_plan_exceeds_defined_max_percentage(self):
         bad_plan = self.mock_factory._create_fake_partner_plan(percentage=30.5)
         form = PartnerContractForm(data={
             'partner': self.partner.pk,
@@ -43,8 +42,7 @@ class PartnerContractFormTest(TestCase):
         form.full_clean()
         self.assertFalse(form.is_valid())
 
-    # Business Rule #1
-    def test_does_exceed_defined_percentage(self):
+    def test_plans_exceed_defined_max_percentage(self):
         staging_plan = self.mock_factory._create_fake_partner_plan(
             percentage=15)
         bad_plan = self.mock_factory._create_fake_partner_plan(percentage=5.1)
@@ -79,7 +77,49 @@ class PartnerContractFormTest(TestCase):
         self.assertTrue(form.is_valid())
         form.save()
 
+    def test_partner_and_event_new_contract_email(self):
+        """ Testa se está tudo ok emails após a criação de um novo contrato
+        de parceria  """
 
+        contract = PartnerContractForm(data={
+            'partner': self.partner.pk,
+            'partner_plan': self.partner_plan.pk,
+            'event': self.event.pk,
+        })
+
+        contract.save()
+
+        # Caixa de mensagens deve possuir um email alertando do vinculo
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_partner_and_event_old_contract_email(self):
+        """ Testa se está tudo ok emails após a criação de um novo contrato
+        de parceria  e a edição de um já existente """
+
+        contract = PartnerContractForm(data={
+            'partner': self.partner.pk,
+            'partner_plan': self.partner_plan.pk,
+            'event': self.event.pk,
+        })
+
+        contract.save()
+
+        # Caixa de mensagens deve possuir um email alertando do vinculo
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Empty the test outbox
+        mail.outbox = []
+
+        # Caixa de mensagens deve estar vazia
+        self.assertEqual(len(mail.outbox), 0)
+
+        new_person = self.mock_factory._create_fake_person()
+        contract.person = new_person
+        contract.save()
+
+        # Caixa de mensagens não deve possuir um email alertando do vinculo,
+        # pois contrato já existia.
+        self.assertEqual(len(mail.outbox), 0)
 
 
 

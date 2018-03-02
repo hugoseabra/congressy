@@ -2,9 +2,10 @@
     Partner Contract Form used to validate domain and business rules
 """
 from django import forms
-from django.db.models import Sum
 from django.conf import settings
+from django.db.models import Sum
 
+from mailer.services import notify_partner_contract
 from partner.models import PartnerContract
 
 
@@ -19,7 +20,7 @@ class PartnerContractForm(forms.ModelForm):
         super()._post_clean()
         event = self.cleaned_data.get('event')
 
-        if not event: # pragma: no cover
+        if not event:  # pragma: no cover
             return
 
         partner_plan = self.cleaned_data.get('partner_plan')
@@ -30,7 +31,7 @@ class PartnerContractForm(forms.ModelForm):
         total = total_query.get('partner_plan__percent__sum')
 
         if partner_plan.percent > partner_max_percentage:
-            percent_to_high = 'O valor da porcentagem do plano ultrapassa {}%'.\
+            percent_to_high = 'O valor da porcentagem do plano ultrapassa {}%'. \
                 format(partner_max_percentage)
             self.add_error('__all__', percent_to_high)
         elif total and (total + partner_plan.percent) > partner_max_percentage:
@@ -39,11 +40,24 @@ class PartnerContractForm(forms.ModelForm):
                                        'evento  não deve ultrapassar a {}%' \
                                        ' do rateamento do montante da' \
                                        ' Congressy. Porcentagem total até o' \
-                                       ' momento {}%'. format(
-                                            partner_max_percentage,
-                                            total
-                                        )
+                                       ' momento {}%'.format(
+                partner_max_percentage,
+                total
+            )
 
             self.add_error('__all__', to_high_validation_error)
 
+    def save(self, commit=True):
+        saved_instance = super().save(commit)
 
+        context = {
+            'event': self.instance.event.name,
+            'organizer': self.instance.event.organization.name,
+            'partner_name': self.instance.partner.person.user.first_name,
+            'partner_email': self.instance.partner.person.email,
+
+        }
+
+        notify_partner_contract(context=context)
+
+        return saved_instance
