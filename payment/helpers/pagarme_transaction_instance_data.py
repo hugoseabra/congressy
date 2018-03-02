@@ -255,6 +255,11 @@ class PagarmeTransactionInstanceData:
         # Congressy receberá o restante
         congressy_amount = self.amount - organization_amount
 
+        # Valor líquido da congressy direto do valor do lote.
+        congressy_amount_liquid = self.lot.price * self.as_decimal(
+            settings.CONGRESSY_PLAN_PERCENT_10 / 100
+        )
+
         # Se o valor é menor do que o mínimo configurado, o mínimo assume.
         minimum = self.as_decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         if congressy_amount < minimum:
@@ -267,11 +272,15 @@ class PagarmeTransactionInstanceData:
             partner__approved=True
         )
 
+        partners_amount = 0
         partner_rules = []
         for contract in partners:
-            percent_decimal = Decimal(contract.plan.percent) / 100
-            part_amount = self.as_decimal(congressy_amount * percent_decimal)
-            congressy_amount = self.as_decimal(congressy_amount - part_amount)
+            percent_decimal = Decimal(contract.partner_plan.percent) / 100
+            # O parceiro ganha em cima do valor liquido da Congressy.
+            part_amount = self.as_decimal(
+                congressy_amount_liquid * percent_decimal
+            )
+            partners_amount += part_amount
             partner_rules.append({
                 "recipient_id": contract.partner.bank_account.recipient_id,
                 "amount": self.as_payment_format(part_amount),
@@ -281,7 +290,7 @@ class PagarmeTransactionInstanceData:
 
         congressy_rule = {
             "recipient_id": CONGRESSY_RECIPIENT_ID,
-            "amount": self.as_payment_format(congressy_amount),
+            "amount": self.as_payment_format(congressy_amount - partners_amount),
             "liable": True,
             "charge_processing_fee": True,
             "charge_remainder_fee": True

@@ -21,7 +21,6 @@ class BankAccountForm(forms.ModelForm):
 
     def __init__(self, data=None, *args, **kwargs):
 
-        self.recipient_id = None
         self.bank_account_id = None
         self.document_type = None
         self.date_created = None
