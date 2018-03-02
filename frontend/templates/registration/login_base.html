@@ -19,8 +19,8 @@
     <title>{% block title %}Congressy{% endblock %}</title>
     <meta name="description" content="">
     {% block viewport %}{% endblock %}
-{#    <meta name="viewport"#}
-{#          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
+    {#    <meta name="viewport"#}
+    {#          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
     <!-- Bootstrap core CSS -->
 
     <link rel="stylesheet"
@@ -35,6 +35,12 @@
 
     <!-- Main CSS -->
     <link rel="stylesheet" href="{% static "assets/css/main.css" %}"/>
+
+    <link rel="stylesheet" href="{% static "assets/css/animate.css" %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/icheck/css/all.css' %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/switchery/switchery.min.css" %}">
 
     <!-- Feature detection -->
     <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
@@ -132,6 +138,7 @@
     <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
     <script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
     <script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
+    <script src="{% static "assets/plugins/switchery/switchery.min.js" %}"></script>
     <script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
     <script src="{% static "assets/js/src/app.js" %}"></script>
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
@@ -144,5 +151,7 @@
         });
     });
 </script>
+{% block local_js %}
+{% endblock %}
 </body>
 </html>

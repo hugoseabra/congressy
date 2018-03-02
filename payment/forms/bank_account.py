@@ -1,11 +1,17 @@
 from django import forms
-
+from django.core.exceptions import ValidationError
+from localflavor.br.forms import BRCPFField, BRCNPJField
+from core.forms.cleaners import clear_string
+from payment import exception as PaymentExceptions
 from payment.models import BankAccount
 from payment.tasks import create_pagarme_recipient
-from payment import exception as PaymentExceptions
 
 
 class BankAccountForm(forms.ModelForm):
+
+    type_of_document = forms.BooleanField(label='Tipo de Documento',
+                                          required=False)
+
     class Meta:
         model = BankAccount
         fields = (
@@ -70,6 +76,19 @@ class BankAccountForm(forms.ModelForm):
             raise forms.ValidationError(e.message)
 
         return cleaned_data
+
+    def clean_document_number(self):
+
+        type_of_document = self.data.get('type_of_document')
+        document_number = clear_string(self.data.get('document_number'))
+
+        if type_of_document:
+            document_number = BRCNPJField().clean(document_number)
+
+        else:
+            document_number = BRCPFField().clean(document_number)
+
+        return document_number
 
     def save(self, commit=True):
         self.instance = super().save(commit)
