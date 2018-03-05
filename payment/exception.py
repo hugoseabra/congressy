@@ -61,3 +61,14 @@ class TransactionStatusIntegratorError(Error):
 
     def __init__(self, message):
         self.message = message
+
+
+class TransactionNotFound(Exception):
+    """Raised when a transaction does not exist for a subscription.
+
+    Attributes:
+        message -- explanation of why the specific transaction is not allowed
+    """
+
+    def __init__(self):
+        self.message = 'Transação não encontrada.'

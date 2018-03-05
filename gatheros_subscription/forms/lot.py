@@ -1,7 +1,6 @@
 """ Formulários de `Lot` """
 from datetime import timedelta, datetime
 
-from datetimewidget.widgets import DateTimeWidget
 from django import forms
 
 from gatheros_subscription.models import Lot
@@ -73,6 +72,10 @@ class LotForm(forms.ModelForm):
 
         super(LotForm, self).__init__(**kwargs)
 
+        if self.instance.pk and self.instance.subscriptions.count() > 0:
+            self.fields['price'].widget.attrs['disabled'] = 'disabled'
+            self.fields['price'].disabled = True
+
     def _set_dates_help_texts(self):
         last_lot = self.event.lots.last()
 
@@ -120,8 +123,6 @@ class LotForm(forms.ModelForm):
             )
             cleaned_data['date_end'] = date_end
         else:
-            # self.date_start = self.date_start.replace(hour=8, minute=0, second=0)
-            # self.date_end = self.event.date_start - timedelta(minutes=1)
             cleaned_data['date_end'] = \
                 self.event.date_end - timedelta(minutes=1)
 
@@ -131,6 +132,17 @@ class LotForm(forms.ModelForm):
                 {
                     'price': 'Você deve informar um valor entre a R$ 10,00'
                              ' e R$ 30.000,00'
+                }
+            )
+
+        # Não é permitido editar preço para lotes com inscrições.
+        if self.instance.pk \
+                and self.instance.has_changed('price') \
+                and self.instance.subscriptions.count() > 0:
+            raise forms.ValidationError(
+                {
+                    'price': 'Este lote já possui inscrições. Seu valor não'
+                             ' pode ser alterado.'
                 }
             )
 

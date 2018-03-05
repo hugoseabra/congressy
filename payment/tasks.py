@@ -5,8 +5,11 @@ import pagarme
 from django.conf import settings
 
 from mailer.tasks import send_mail
-from payment.exception import TransactionError, OrganizerRecipientError, \
-    RecipientError
+from payment.exception import (
+    OrganizerRecipientError,
+    RecipientError,
+    TransactionError,
+)
 from payment.models import Transaction, TransactionStatus
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
