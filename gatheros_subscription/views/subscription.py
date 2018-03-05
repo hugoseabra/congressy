@@ -570,7 +570,6 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
         try:
 
             pk = kwargs.get('pk')
-
             self.object = Subscription.objects.get(pk=pk)
             self.object.status = self.object.CANCELED_STATUS
             self.object.save()

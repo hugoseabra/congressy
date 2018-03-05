@@ -22,7 +22,6 @@ class Transaction(models.Model):
     BOLETO = 'boleto'
     CREDIT_CARD = 'credit_card'
 
-
     TRANSACTION_STATUS = (
         (PROCESSING, 'Processando'),
         (AUTHORIZED, 'Autorizado'),

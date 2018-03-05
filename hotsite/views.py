@@ -164,7 +164,10 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
         if user.is_authenticated:
             try:
                 person = user.person
-                Subscription.objects.get(person=person, event=self.event)
+                Subscription.objects.get(
+                    person=person,
+                    event=self.event
+                ).exclude(status=Subscription.CANCELED_STATUS)
                 return True
             except (Subscription.DoesNotExist, AttributeError):
                 pass
