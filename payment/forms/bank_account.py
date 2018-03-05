@@ -1,6 +1,6 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from localflavor.br.forms import BRCPFField, BRCNPJField
+
 from core.forms.cleaners import clear_string
 from payment import exception as PaymentExceptions
 from payment.models import BankAccount
@@ -8,7 +8,6 @@ from payment.tasks import create_pagarme_recipient
 
 
 class BankAccountForm(forms.ModelForm):
-
     type_of_document = forms.BooleanField(label='Tipo de Documento',
                                           required=False)
 
