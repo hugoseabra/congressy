@@ -685,19 +685,19 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         person = self.request.user.person
         query_set = super(MySubscriptionsListView, self).get_queryset()
 
-        notcheckedin = self.request.GET.get('notcheckedin')
-        if notcheckedin:
-            query_set = query_set.filter(attended=False)
-            self.has_filter = True
-
-        pastevents = self.request.GET.get('pastevents')
-        now = datetime.now()
-        if pastevents:
-            query_set = query_set.filter(event__date_end__lt=now)
-            self.has_filter = True
-
-        else:
-            query_set = query_set.filter(event__date_start__gt=now)
+        # notcheckedin = self.request.GET.get('notcheckedin')
+        # if notcheckedin:
+        #     query_set = query_set.filter(attended=False)
+        #     self.has_filter = True
+        #
+        # pastevents = self.request.GET.get('pastevents')
+        # now = datetime.now()
+        # if pastevents:
+        #     query_set = query_set.filter(event__date_end__lt=now)
+        #     self.has_filter = True
+        #
+        # else:
+        #     query_set = query_set.filter(event__date_start__gt=now)
 
         return query_set.filter(
             person=person,
@@ -706,15 +706,15 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
-
-        if self.get_paginate_by(self.object_list) is not None and hasattr(
-                self.object_list, 'exists'):
-            is_empty = not self.object_list.exists()
-        else:
-            is_empty = len(self.object_list) == 0
-
-        if is_empty:
-            return redirect(reverse('event:event-list'))
+        #
+        # if self.get_paginate_by(self.object_list) is not None and hasattr(
+        #         self.object_list, 'exists'):
+        #     is_empty = not self.object_list.exists()
+        # else:
+        #     is_empty = len(self.object_list) == 0
+        #
+        # if is_empty:
+        #     return redirect(reverse('event:event-list'))
 
         return response
 
@@ -722,6 +722,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         cxt = super(MySubscriptionsListView, self).get_context_data(**kwargs)
         cxt['has_filter'] = self.has_filter
         cxt['filter_events'] = self.get_events()
+        cxt['needs_boleto_link'] = self.check_if_needs_boleto_link()
         # cxt['filter_categories'] = self.get_categories()
         return cxt
 
@@ -751,6 +752,18 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             return False
         else:
             return True
+
+    def check_if_needs_boleto_link(self):
+        for subscription in self.object_list:
+
+            if subscription.status == subscription.AWAITING_STATUS:
+
+                for transaction in subscription.transactions.all():
+                    if transaction.status == transaction.WAITING_PAYMENT and \
+                            transaction.type == 'boleto':
+                        return True
+
+        return False
 
 
 class SubscriptionExportView(EventViewMixin, generic.View):
@@ -814,7 +827,6 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
         return "{}-{}.pdf".format(self.event.slug, self.subscription.pk)
 
     def pre_dispatch(self, request):
-
         uuid = self.kwargs.get('pk')
         self.subscription = get_object_or_404(Subscription,
                                               uuid=uuid)
