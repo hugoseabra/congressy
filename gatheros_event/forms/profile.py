@@ -5,6 +5,7 @@ Formulário relacionados a Convites de Pessoas a serem membros de organizações
 from uuid import uuid4
 
 import absoluteuri
+from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth import (
     password_validation,
@@ -26,6 +27,7 @@ class ProfileCreateForm(forms.ModelForm):
     email = forms.EmailField(label='E-mail', widget=forms.EmailInput(
         attrs={'class': 'form-control'}
     ))
+    captcha = CaptchaField()
 
     user = None
 
@@ -33,24 +35,6 @@ class ProfileCreateForm(forms.ModelForm):
         """ Meta """
         model = Person
         fields = ['name', 'email']
-
-    # def __init__(self, **kwargs):
-    #
-    #     data = kwargs.get('data')
-    #
-    #     # Buscar se person existe
-    #     if data:
-    #         try:
-    #             person = Person.objects.get(
-    #                 email=data.get('email')
-    #             )
-    #
-    #             kwargs['instance'] = person
-    #
-    #         except Person.DoesNotExist:
-    #             pass
-    #
-    #     super().__init__(**kwargs)
 
     def save(self, domain_override=None, request=None,
              subject_template='registration/account_confirmation_subject.txt',

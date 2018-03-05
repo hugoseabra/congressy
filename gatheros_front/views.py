@@ -19,14 +19,6 @@ from mailer.services import notify_set_password
 
 @login_required
 def start(request):
-    # org = account.get_organization(request)
-    #
-    # if org:
-    #     if org.internal:
-    #         return MySubscriptionsListView.as_view()(request)
-    #
-    #     return EventPanelView.as_view()(request, pk=org.pk)
-
     return MySubscriptionsListView.as_view()(request)
 
 
