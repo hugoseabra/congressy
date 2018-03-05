@@ -20,16 +20,25 @@
     <script type="application/javascript">
 
         $(document).ready(function () {
-            $('#id_phone').mask("(99) 99999-9999");
+            var phone_el = $('#id_phone');
+            var uf_el = $('#id_state');
+            var city_el = $('#id_city_name');
+            var city_id_el = $('#id_city_name');
+
+            if(phone_el.val()){
+                phone_el.mask("(99) 99999-9999");
+            }
+
+
             $('#id_zip_code').mask("99.999-999");
 
             //If we have a value already, preload results from API
-            if ($('#id_city').val()) {
+            if (city_id_el.val()) {
                 $.ajax({
                     url: "/api/cities/" + $('#id_city').val(),
                     success: function (result) {
-                        $('#id_state').val(result.uf);
-                        $('#id_city_name').val(result.name);
+                        uf_el.val(result.uf);
+                        city_el.val(result.name);
                         //populate the html with result here
                     }
                 });
@@ -42,11 +51,9 @@
 
         window.setTimeout(function () {
             {% if person.city %}
-                 console.log('HAS OBJECT');
                 uf_el.val('{{ person.city.uf }}');
                 fetch_cities(uf_el, '{{ person.city.pk }}');
             {% else %}
-                console.log('doesnt HAS OBJECT');
                 uf_el.val('');
                 city_el.val('');
                 city_el.prop('disabled', true);

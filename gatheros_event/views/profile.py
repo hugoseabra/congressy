@@ -79,7 +79,7 @@ class ProfileView(AccountMixin, FormView):
     def post(self, request, *args, **kwargs):
         request.POST = request.POST.copy()
 
-        to_be_pre_cleaned = ['cpf', 'zip_code', 'institution_cnpj']
+        to_be_pre_cleaned = ['zip_code', 'institution_cnpj']
 
         for field in to_be_pre_cleaned:
             request.POST.update({field: clear_string(request.POST[
