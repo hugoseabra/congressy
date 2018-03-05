@@ -101,42 +101,81 @@
 {% block toptitle %}{% endblock %}
 
 {% block content %}
+
     <div class="row">
+
         <div class="col-md-12">
+
             <div class="panel panel-primary">
+
                 <div class="panel-body">
+
                     {% if object_list %}
+
                         <table id="subscription_table"
                                class="table table-striped table-bordered dataTable no-footer nowrap"
                                cellspacing="0"
                                width="100%">
+
                             <thead>
+
                             <tr>
                                 <th>Evento</th>
+                                <th>Status</th>
                                 <th>Código</th>
-                                <th class="hidden-xs hidden-sm">Data Inscrição</th>
+                                <th class="hidden-xs hidden-sm">Data Inscrição
+                                </th>
                                 <th>Voucher</th>
                             </tr>
+
                             </thead>
 
                             <tbody>
 
                             {% for item in object_list %}
+
                                 <tr>
                                     <td>
-                                        <a href="{% url 'public:hotsite' item.event.slug %}" target="_blank">
+                                        <a href="{% url 'public:hotsite' item.event.slug %}"
+                                           target="_blank">
                                             <div>
                                                 <strong>{{ item.event.name }}</strong>
                                                 <span style="font-size: medium;color:dimgray">({{ item.event.organization.name }})</span>
                                             </div>
                                         </a>
                                     </td>
+
+                                    <td>
+
+                                        {% if item.status == item.CONFIRMED_STATUS %}
+                                            <i class="fa fa-circle"
+                                               aria-hidden="true"
+                                               style="color:#5cb85c"></i>
+                                        {% elif item.status == item.AWAITING_STATUS %}
+                                            <i class="fa fa-circle"
+                                               aria-hidden="true"
+                                               style="color: #f0ad4e"></i>
+                                        {% elif item.status == item.CANCELED_STATUS %}
+                                            <i class="fa fa-circle"
+                                               aria-hidden="true"
+                                               style="color: #d9534f"></i>
+                                        {% else %}
+                                            <i class="fa fa-circle"
+                                               aria-hidden="true"></i>
+                                        {% endif %}
+
+                                        {{ item.get_status_display }}
+
+                                    </td>
+
                                     <td>
                                         {{ item.code }}
                                     </td>
+
                                     <td class="hidden-xs hidden-sm">
                                         {{ item.created|date:"d/m/Y H\hi" }}
                                     </td>
+
                                     <td>
 
                                         {% if item.status == item.CONFIRMED_STATUS %}
@@ -149,19 +188,29 @@
                                         {% endif %}
 
                                     </td>
+
                                 </tr>
+
                             {% endfor %}
 
                             </tbody>
+
                         </table>
+
                     {% else %}
+
                         <div style="background: #FFF;padding:10px;margin-bottom: 3px">
                             Nenhuma inscrição
                         </div>
+
                     {% endif %}
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
 {% endblock %}
