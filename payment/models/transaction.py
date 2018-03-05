@@ -79,6 +79,13 @@ class Transaction(models.Model):
         blank=True,
     )
 
+    liquid_amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        null=True,
+        blank=True,
+    )
+
     subscription = models.ForeignKey(
         Subscription,
         on_delete=models.DO_NOTHING,

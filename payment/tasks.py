@@ -18,7 +18,10 @@ congressy_id = settings.PAGARME_RECIPIENT_ID
 
 
 # @TODO-low create a mock of the response to use during testing
-def create_pagarme_transaction(payment=None, subscription=None):
+def create_pagarme_transaction(transaction_data, subscription=None):
+    payment = transaction_data.get_data()
+    liquid_amount = transaction_data.liquid_amount
+
     if not payment or not subscription:
         return
 
@@ -63,6 +66,7 @@ def create_pagarme_transaction(payment=None, subscription=None):
     transaction_instance.type = trx['payment_method']
     transaction_instance.date_created = trx['date_created']
     transaction_instance.amount = amount
+    transaction_instance.liquid_amount = liquid_amount
     transaction_instance.save()
 
     transaction_status = TransactionStatus(

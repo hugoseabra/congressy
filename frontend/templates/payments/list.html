@@ -182,7 +182,7 @@
                                         {% if transaction.status == transaction.REFUSED or transaction.status == transaction.REFUNDED %}
                                         -
                                         {% else %}
-                                        R$ {{ transaction.amount|money_divide_with_percentage|intcomma }}
+                                        R$ {{ transaction.liquid_amount|unlocalize|intcomma }}
                                         {% endif %}
                                     </td>
                                 </tr>

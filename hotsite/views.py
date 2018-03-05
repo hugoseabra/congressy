@@ -630,7 +630,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                     )
 
                     create_pagarme_transaction(
-                        payment=transaction_data.get_data(),
+                        transaction_data=transaction_data,
                         subscription=subscription
                     )
 
