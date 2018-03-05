@@ -30,6 +30,11 @@ class EventMixin(generic.View):
     event = None
 
     def dispatch(self, request, *args, **kwargs):
+        slug = self.kwargs.get('slug')
+
+        if not slug:
+            return redirect('https://congressy.com')
+
         self.event = get_object_or_404(Event, slug=self.kwargs.get('slug'))
         response = super().dispatch(request, *args, **kwargs)
         return response

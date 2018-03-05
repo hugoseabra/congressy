@@ -737,13 +737,10 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
     def get_events(self):
         """ Resgata eventos dos inscrições o usuário possui inscrições. """
         queryset = self.get_queryset()
-        return queryset \
-            .values(
+        return queryset.values(
             'event__name',
             'event__id',
-        ) \
-            .distinct() \
-            .order_by('event__name')
+        ).distinct().order_by('event__name')
 
     def can_access(self):
         try:
