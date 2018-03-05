@@ -17,6 +17,8 @@ from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
+from core.forms.widgets import AjaxChoiceField, TelephoneInput
+from core.util import create_years_list
 from gatheros_event.models import Person, Organization, Member
 from mailer.services import notify_new_user
 
@@ -192,6 +194,44 @@ class ProfileForm(forms.ModelForm):
     """
     Pessoas que são usuários do sistema
     """
+
+    states = (
+        ('', '----'),
+        # replace the value '----' with whatever you want, it won't matter
+        ("AC", "Acre"),
+        ("AL", "Alagoas"),
+        ("AP", "Amapá"),
+        ("AM", "Manaus"),
+        ("BA", "Bahia"),
+        ("CE", "Ceará"),
+        ("DF", "Distrito Federal"),
+        ("ES", "Espírito Santo"),
+        ("GO", "Goiás"),
+        ("MA", "Maranhão"),
+        ("MT", "Mato Grosso"),
+        ("MS", "Mato Grosso do Sul"),
+        ("MG", "Minas Gerais"),
+        ("PA", "Pará"),
+        ("PB", "Paraíba"),
+        ("PR", "Paraná"),
+        ("PE", "Pernambuco"),
+        ("PI", "Piauí"),
+        ("RJ", "Rio de Janeiro"),
+        ("RN", "Rio Grande do Norte"),
+        ("RS", "Rio Grande do Sul"),
+        ("RO", "Rondônia"),
+        ("RR", "Roraima"),
+        ("SC", "Santa Catarina"),
+        ("SP", "São Paulo"),
+        ("SE", "Sergipe"),
+        ("TO", "Tocantins"),
+    )
+    empty = (
+        ('', '----'),
+    )
+
+    state = forms.ChoiceField(label='Estado', choices=states, required=False)
+    city_name = AjaxChoiceField(label='Cidade', choices=empty, required=False)
     email = forms.EmailField(label='E-Mail')
 
     error_messages = {
@@ -213,7 +253,23 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         """ Meta """
         model = Person
-        fields = ['name', 'email', 'phone', 'new_password1', 'new_password2']
+        fields = ['name', 'email', 'new_password1', 'new_password2',
+                  'gender', 'birth_date', 'zip_code', 'phone', 'city', 'cpf',
+                  'street', 'number', 'complement', 'village', 'institution',
+                  'institution_cnpj', 'function']
+
+        widgets = {
+            # CPF como telefone para aparecer como número no mobile
+            'cpf': TelephoneInput(),
+            'name': forms.TextInput(attrs={'placeholder': 'Nome completo'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'me@you.com'}),
+            'phone': TelephoneInput(attrs={'placeholder': '(00) 00000-0000'}),
+            'zip_code': TelephoneInput(),
+            'city': forms.HiddenInput(),
+            'birth_date': forms.SelectDateWidget(
+                attrs=({'style': 'width: 30%; display: inline-block;'}),
+                years=create_years_list(), ),
+        }
 
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):
