@@ -19,25 +19,24 @@
 
         <div class="hero-content">
             <div class="hero-content-inner">
-
                 <div class="hero-heading text-center row"
                      data-animation="fadeIn">
                     <div class="col-md-10 col-md-offset-1">
 
-                        <h1 class="hero-title">{{ event.name }}</h1>
+                        <h1 class="hero-title">
+                            {{ event.name }}
+                        </h1>
 
                         <p class="hero-tagline">
-                        <div>
                             <i class="fa fa-calendar"></i>
                             {{ event.get_period }}
-                        </div>
-                        {% if event.place and event.place.name %}
-                            <div>
-                                <i class="fa fa-map-marker"></i>
-                                {{ event.place.name }}
-                            </div>
-                        {% endif %}
                         </p>
+                        {% if event.place and event.place.name %}
+                        <p class="hero-tagline">
+                            <i class="fa fa-map-marker"></i>
+                            {{ event.place.name }}
+                        </p>
+                        {% endif %}
                     </div>
                 </div>
 
