@@ -1,12 +1,15 @@
 {% extends "base/base.html" %}
 
-{% load i18n static widget_tweaks%}
+{% load i18n static widget_tweaks %}
+
 {% block title %}Editar Perfil | Congressy{% endblock %}
 
 {% block page_title %}Editar Perfil{% endblock %}
+
 {% block page_sub_title %}{{ request.user.get_full_name }}{% endblock %}
 
 {% block sidebar %}{% endblock %}
+
 {% block sidebar-bars %}{% endblock %}
 
 {% block scripts %}
@@ -22,7 +25,9 @@
 {% endblock %}
 
 {% block content %}
+
     <form action="" method="post" enctype="multipart/form-data">
+
         {% csrf_token %}
 
         <div class="row">
@@ -40,24 +45,47 @@
         </div>
 
         <div class="row">
+
             <div class="col-md-12">
+
                 <div class="panel panel-primary">
+
                     <div class="panel-body">
+
                         {% for field in form %}
+
                             {% if field.field.widget.input_type == "hidden" %}
+
                                 {{ field }}
-                            {% else %}
+
+                            {% elif field.id_for_label == 'id_email' %}
+
                                 <div class="form-group">
 
                                     <label for="{{ field.id_for_label }}">
                                         {{ field.label }}
+                                    </label>
+
+                                    {{ field |add_class:"form-control" }}
+
+                                </div>
+
+                            {% else %}
+
+                                <div class="form-group">
+
+                                    <label for="{{ field.id_for_label }}">
+                                        {{ field.label }}
+
                                         {% if field.field.required %}
                                             <small style="color:#C9302C">*
                                             </small>
                                         {% endif %}
+
                                     </label>
 
                                     <div>
+
                                         {% if field.field.widget.input_type == "checkbox" %}
                                             {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
                                         {% elif field.id_for_label == "id_phone" %}
@@ -65,6 +93,7 @@
                                         {% else %}
                                             {{ field |add_class:"form-control" }}
                                         {% endif %}
+
                                         {% if field.errors %}
                                             {% for error in field.errors %}
                                                 <div class="alert alert-danger
@@ -79,19 +108,27 @@
                                                 </div>
                                             {% endfor %}
                                         {% endif %}
+
                                         {% if field.help_text %}
                                             <div>
                                                 <small class="text-muted">{{ field.help_text|safe }}</small>
                                             </div>
                                         {% endif %}
+
                                     </div>
 
                                 </div>
+
                             {% endif %}
+
                         {% endfor %}
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
         <div class="row">

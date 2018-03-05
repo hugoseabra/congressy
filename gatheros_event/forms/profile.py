@@ -214,12 +214,6 @@ class ProfileForm(forms.ModelForm):
         """ Meta """
         model = Person
         fields = ['name', 'email', 'phone', 'new_password1', 'new_password2']
-        # exclude = [
-        #     'user',
-        #     'synchronized',
-        #     'term_version',
-        #     'politics_version',
-        # ]
 
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):
@@ -227,6 +221,9 @@ class ProfileForm(forms.ModelForm):
 
         super(ProfileForm, self).__init__(*args, **kwargs)
         self.user = user
+
+        self.fields['email'].widget.attrs['disabled'] = 'disabled'
+        self.fields['email'].disabled = True
 
         self.fields['new_password1'].required = password_required
         self.fields['new_password2'].required = password_required
