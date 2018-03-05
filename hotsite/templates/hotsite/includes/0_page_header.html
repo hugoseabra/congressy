@@ -1,11 +1,18 @@
-{% load static base_tags %}
-
+{% load i18n static base_tags %}
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <!DOCTYPE html>
-<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
-<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
-<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!-->
-<html lang="en"> <!--<![endif]-->
+<!--[if lt IE 7 ]>
+<html class="ie ie6" lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<![endif]-->
+<!--[if IE 7 ]>
+<html class="ie ie7" lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<![endif]-->
+<!--[if IE 8 ]>
+<html class="ie ie8" lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<![endif]-->
+<!--[if (gte IE 9)|!(IE)]>
+<html lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<!--<![endif]-->
 <head>
 
     <meta charset="utf-8">
