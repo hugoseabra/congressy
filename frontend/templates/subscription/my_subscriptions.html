@@ -125,6 +125,9 @@
                                 <th>Código</th>
                                 <th class="hidden-xs hidden-sm">Data Inscrição
                                 </th>
+                                {% if needs_boleto_link %}
+                                    <th>Boleto</th>
+                                {% endif %}
                                 <th>Voucher</th>
                             </tr>
 
@@ -175,14 +178,49 @@
                                     <td class="hidden-xs hidden-sm">
                                         {{ item.created|date:"d/m/Y H\hi" }}
                                     </td>
+                                    {% if needs_boleto_link %}
+
+                                        {% if item.transactions.count > 0 %}
+
+
+                                            {% for transaction in item.transactions.all %}
+
+                                                {% if transaction.status == transaction.WAITING_PAYMENT and transaction.type == 'boleto' %}
+
+                                                    <td>
+                                                        <div class="text-center">
+                                                            <a target="_blank"
+                                                               href="{{ transaction.data.boleto_url }}">
+                                                                <i class="fas
+                                                             fa-link"></i>
+                                                            </a>
+                                                        </div>
+
+                                                    </td>
+
+                                                {% else %}
+                                                    <td>---</td>
+                                                {% endif %}
+
+                                            {% endfor %}
+
+
+                                        {% else %}
+
+                                            <td>---</td>
+
+                                        {% endif %}
+
+                                    {% endif %}
 
                                     <td>
 
                                         {% if item.status == item.CONFIRMED_STATUS %}
-
-                                            <a href="{% url 'subscription:subscription-voucher' item.event.pk item.pk %}">
-                                                <i class="fas fa-file-pdf"></i>
-                                            </a>
+                                            <div class="text-center">
+                                                <a href="{% url 'subscription:subscription-voucher' item.event.pk item.pk %}">
+                                                    <i class="fas fa-file-pdf"></i>
+                                                </a>
+                                            </div>
                                         {% else %}
                                             ---
                                         {% endif %}

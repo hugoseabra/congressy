@@ -723,6 +723,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
         cxt = super(MySubscriptionsListView, self).get_context_data(**kwargs)
         cxt['has_filter'] = self.has_filter
         cxt['filter_events'] = self.get_events()
+        cxt['needs_boleto_link'] = self.check_if_needs_boleto_link()
         # cxt['filter_categories'] = self.get_categories()
         return cxt
 
@@ -752,6 +753,18 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
             return False
         else:
             return True
+
+    def check_if_needs_boleto_link(self):
+        for subscription in self.object_list:
+
+            if subscription.status == subscription.AWAITING_STATUS:
+
+                for transaction in subscription.transactions.all():
+                    if transaction.status == transaction.WAITING_PAYMENT and \
+                            transaction.type == 'boleto':
+                        return True
+
+        return False
 
 
 class SubscriptionExportView(EventViewMixin, generic.View):
@@ -815,7 +828,6 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
         return "{}-{}.pdf".format(self.event.slug, self.subscription.pk)
 
     def pre_dispatch(self, request):
-
         uuid = self.kwargs.get('pk')
         self.subscription = get_object_or_404(Subscription,
                                               uuid=uuid)
