@@ -47,16 +47,15 @@ class LotForm(forms.ModelForm):
             'allow_installment',
             'installment_limit',
             'num_install_interest_absortion',
-
-            # 'discount_type',
-            # 'discount',
-
         ]
+
         widgets = {
             'event': forms.HiddenInput(),
             'price': TelephoneInput(),
-            'date_start': DateTimeInput,
-            'date_end': DateTimeInput,
+            'date_start': DateTimeInput(attrs={'placeholder': 'dd/mm/aaaa '
+                                                              'hh:mm'}),
+            'date_end': DateTimeInput(attrs={'placeholder': 'dd/mm/aaaa '
+                                                            'hh:mm'}),
             'installment_limit': forms.Select(
                 choices=INSTALLMENT_CHOICES
             ),
@@ -127,7 +126,7 @@ class LotForm(forms.ModelForm):
                 self.event.date_end - timedelta(minutes=1)
 
         price = self.cleaned_data.get('price')
-        if price > 0 and (price < 10 or price > 30000):
+        if price is not None and price > 0 and (price < 10 or price > 30000):
             raise forms.ValidationError(
                 {
                     'price': 'Você deve informar um valor entre a R$ 10,00'
