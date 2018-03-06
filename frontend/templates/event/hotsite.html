@@ -94,6 +94,12 @@
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
+        <li>
+            <a href="{% url 'survey:survey-create' event.pk %}"
+               title="Survey">
+                <i class="fa  fa-fw fa-rocket"></i> Survey
+            </a>
+        </li>
         {% if has_paid_lots %}
             <li>
                 <a href="{% url 'payment:event-payments' event.pk %}"
@@ -106,7 +112,8 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
+    <form action="" method="post" class="form-horizontal"
+          enctype="multipart/form-data" role="form">
         {% csrf_token %}
         <div class="row">
             <div class="col-md-8" id="block-form">
@@ -136,7 +143,9 @@
                                             <label for="{{ field.id_for_label }}">
                                                 {{ field.label }}
                                                 {% if field.field.required %}
-                                                    <small style="color:#C9302C">*</small>
+                                                    <small style="color:#C9302C">
+                                                        *
+                                                    </small>
                                                 {% endif %}
                                             </label>
 
@@ -218,9 +227,11 @@
                                         <i class="fas fa-check-circle fa-5x {% if info and info.image_main %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
-                                        <div class="title">Banner principal</div>
+                                        <div class="title">Banner principal
+                                        </div>
                                         <div class="text-muted description">
-                                            Deixa o site do evento mais apresentável.
+                                            Deixa o site do evento mais
+                                            apresentável.
                                         </div>
                                     </div>
                                 </div>
@@ -229,10 +240,13 @@
                                         <i class="fas fa-check-circle fa-5x {% if info and info.lead %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
-                                        <div class="title">Descrição rápida</div>
+                                        <div class="title">Descrição rápida
+                                        </div>
                                         <div class="text-muted description">
-                                            Motiva o visitante a permanecer no site,
-                                            aumentando a possibilidade de conclusão de
+                                            Motiva o visitante a permanecer no
+                                            site,
+                                            aumentando a possibilidade de
+                                            conclusão de
                                             sua inscrição.
                                         </div>
                                     </div>
@@ -244,8 +258,10 @@
                                     <div>
                                         <div class="title">Sobre o evento</div>
                                         <div class="text-muted description">
-                                            Deixa claro para o visitante que ainda não
-                                            conhece os detalhes do evento e gostaria de
+                                            Deixa claro para o visitante que
+                                            ainda não
+                                            conhece os detalhes do evento e
+                                            gostaria de
                                             saber do que se trata.
                                         </div>
                                     </div>

@@ -1,0 +1,176 @@
+{% extends "base/base.html" %}
+{% load static base_tags queryset_filter %}
+
+
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+            <li>
+                <a href="{% url 'subscription:lot-list' event.pk %}"
+                   title="Inscrições">
+                    <i class="fa  fa-fw fa-rocket"></i>
+                    Lotes/Categorias
+                </a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+            </a>
+        </li>
+        {#        <li>#}
+        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+        {#               title="Check-in">#}
+        {#                <i class="fa  fa-fw fa-rocket"></i>#}
+        {#                Check-in#}
+        {#            </a>#}
+        {#        </li>#}
+    </ul>
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+        <li class="active">
+            <a href="{% url 'survey:survey-create' event.pk %}"
+               title="Survey">
+                <i class="fa  fa-fw fa-rocket"></i> Survey
+            </a>
+        </li>
+        {% if has_paid_lots %}
+            <li>
+                <a href="{% url 'payment:event-payments' event.pk %}"
+                   title="Pagamentos">
+                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissable">
+                <button type="button" class="close"
+                        data-dismiss="alert" aria-hidden="true">×
+                </button>
+                {{ message|get_first_item }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock messages %}
+
+{% block title %}
+    Formulário de Inscrição |
+    Congressy
+{% endblock %}
+
+{% block page_title %}
+    Configuração de Formulário
+{% endblock %}
+
+{% block page_sub_title %}
+    {% if event %}
+        {{ event.name }} (ID: {{ event.pk }})
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+
+        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+            <div class="panel panel-primary">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">Configurar Formulário</h3>
+                </div>
+
+                <div class="panel-body">
+
+                    <!-- Simple List -->
+                    <ul id="simpleList" class="list-group">
+                        <li class="list-group-item" data-id="1">1<i
+                                class="js-remove">✖</i></li>
+                        <li class="list-group-item" data-id="2">2<i
+                                class="js-remove">✖</i></li>
+                        <li class="list-group-item" data-id="3">3<i
+                                class="js-remove">✖</i></li>
+                        <li class="list-group-item" data-id="4">4<i
+                                class="js-remove">✖</i></li>
+                        <li class="list-group-item" data-id="5">5<i
+                                class="js-remove">✖</i></li>
+
+                    </ul>
+
+
+                    <button id="addUser">Add</button>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <!-- DnD -->
+    <!-- jsDelivr :: Sortable (https://www.jsdelivr.com/package/npm/sortablejs) -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
+    <script type="application/javascript">
+        $(document).ready(function () {
+
+            console.log('READY');
+            var byId = function (id) {
+                return document.getElementById(id);
+            }
+
+            // Editable list
+            var editableList = Sortable.create(byId('simpleList'), {
+                animation: 150,
+                filter: '.js-remove',
+                onFilter: function (evt) {
+                    console.log('removed => ' + evt.item.dataset.id);
+                    evt.item.parentNode.removeChild(evt.item);
+                },
+                onSort: function (evt) {
+                    console.log(this.toArray());
+
+                },
+            });
+
+            byId('addUser').onclick = function () {
+                Ply.dialog('prompt', {
+                    title: 'Add',
+                    form: {name: 'name'}
+                }).done(function (ui) {
+                    var el = document.createElement('li');
+                    el.innerHTML = ui.data.name + '<i class="js-remove">✖</i>';
+                    editableList.el.appendChild(el);
+                });
+            };
+
+        });
+    </script>
+{% endblock %}
+

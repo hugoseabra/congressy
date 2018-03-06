@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'core',
     'hotsite',
     'partner',
+    'survey',
+    
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
