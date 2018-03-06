@@ -8,7 +8,7 @@ from django.utils import six
 from lxml import html
 
 
-def send_mail(subject, body, to):
+def send_mail(subject, body, to, reply_to=None):
     """ Envia um email """
     if not to:
         to = []
@@ -17,11 +17,14 @@ def send_mail(subject, body, to):
 
     body_txt = html.document_fromstring(body).text_content()
 
+    if not reply_to:
+        reply_to = settings.CONGRESSY_REPLY_TO
+
     mail = EmailMultiAlternatives(
         subject=subject.strip(),
         body=body_txt,
         to=to,
-        reply_to=[settings.CONGRESSY_REPLY_TO]
+        reply_to=[reply_to]
     )
 
     mail.attach_alternative(body, 'text/html')
