@@ -17,8 +17,8 @@ from gatheros_front.urls import (
     urlpatterns_public as gatheros_front_public,
 )
 from hotsite.urls import urlpatterns_public_hotsite
-from payment.urls import urlpatterns_public_payments_api, private_payment_urls
 from partner.urls import urlpatterns_public_partner
+from payment.urls import private_payment_urls, urlpatterns_public_payments_api
 
 handler500 = 'project.views.handler500'
 
@@ -52,9 +52,16 @@ public_urlpatterns += [
     url(r'^captcha/', include('captcha.urls')),
 ]
 
-public_urlpatterns += [
-    url(r'^', RedirectView.as_view(url='https://congressy.com'), name='root'),
-]
+if not settings.DEBUG:
+    public_urlpatterns += [
+        url(
+            r'^',
+            RedirectView.as_view(
+                url='https://congressy.com'
+            ),
+            name='root'
+        ),
+    ]
 
 # API
 api_urls = [

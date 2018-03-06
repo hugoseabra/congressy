@@ -18,6 +18,14 @@
           href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
     <link rel="stylesheet"
           href="{% static 'assets/plugins/icheck/css/all.css' %}">
+
+    <style media="screen" type="text/css">
++     td {
++       max-width: 120px;
++       white-space: nowrap;
++       text-overflow: ellipsis;
++     }
++    </style>
 {% endblock %}
 
 {% block scripts %}
@@ -28,8 +36,6 @@
     <script>
 
         $(document).ready(function () {
-            customCheckbox();
-
             $('#subscription_table').DataTable({
                 "language": {
                     sEmptyTable: "Nenhum registro encontrado",
@@ -64,6 +70,10 @@
                         "targets": [-1]
                     },
                     {
+                        "targets": 0,
+                        "className": "nowrap"
+                    },
+                    {
                         "width": "10%",
                         "targets": 1,
                         "className": "text-center"
@@ -73,6 +83,11 @@
                         "targets": 2,
                         "className": "text-center"
                     },
+                    {
+                        "width": "13%",
+                        "targets": 3,
+                        "className": "text-center"
+                    }
 
                 ],
                 // Default order
@@ -121,8 +136,8 @@
 
                             <tr>
                                 <th>Evento</th>
-                                <th>Status</th>
-                                <th>Código</th>
+                                <th class="hidden-xs">Status</th>
+                                <th class="hidden-xs">Código</th>
                                 <th class="hidden-xs hidden-sm">Data Inscrição
                                 </th>
                                 {% if needs_boleto_link %}
@@ -148,7 +163,7 @@
                                         </a>
                                     </td>
 
-                                    <td>
+                                    <td class="hidden-xs">
 
                                         {% if item.status == item.CONFIRMED_STATUS %}
                                             <i class="fa fa-circle"
@@ -171,7 +186,7 @@
 
                                     </td>
 
-                                    <td>
+                                    <td class="hidden-xs">
                                         {{ item.code }}
                                     </td>
 
@@ -179,40 +194,24 @@
                                         {{ item.created|date:"d/m/Y H\hi" }}
                                     </td>
                                     {% if needs_boleto_link %}
-
+                                        <td>
                                         {% if item.transactions.count > 0 %}
-
-
                                             {% for transaction in item.transactions.all %}
-
-                                                {% if transaction.status == transaction.WAITING_PAYMENT and transaction.type == 'boleto' %}
-
-                                                    <td>
-                                                        <div class="text-center">
-                                                            <a target="_blank"
-                                                               href="{{ transaction.data.boleto_url }}">
-                                                                <i class="fas
-                                                             fa-link"></i>
-                                                            </a>
-                                                        </div>
-
-                                                    </td>
-
+                                                <div class="text-center">
+                                                {% if transaction.status == transaction.WAITING_PAYMENT and transaction.type == transaction.BOLETO %}
+                                                    <a target="_blank" href="{{ transaction.data.boleto_url }}">
+                                                        <i class="fas fa-link"></i>
+                                                    </a>
                                                 {% else %}
-                                                    <td>---</td>
+                                                    ---
                                                 {% endif %}
-
+                                                </div>
                                             {% endfor %}
-
-
                                         {% else %}
-
-                                            <td>---</td>
-
+                                        ---
                                         {% endif %}
-
+                                        </td>
                                     {% endif %}
-
                                     <td>
 
                                         {% if item.status == item.CONFIRMED_STATUS %}
