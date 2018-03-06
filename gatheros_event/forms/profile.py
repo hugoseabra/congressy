@@ -5,7 +5,6 @@ Formulário relacionados a Convites de Pessoas a serem membros de organizações
 from uuid import uuid4
 
 import absoluteuri
-import phonenumbers
 from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth import (
@@ -20,7 +19,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from localflavor.br.forms import BRCPFField, BRCNPJField
 
-from core.forms.cleaners import clear_string
+from core.forms.cleaners import clear_string, clean_phone as phone_cleaner
 from core.forms.widgets import AjaxChoiceField, TelephoneInput
 from core.util import create_years_list
 from gatheros_event.models import Person, Organization, Member
@@ -239,7 +238,6 @@ class ProfileForm(forms.ModelForm):
 
     cpf = BRCPFField(required=False, label="CPF")
 
-
     class Meta:
         """ Meta """
         model = Person
@@ -300,22 +298,9 @@ class ProfileForm(forms.ModelForm):
 
     def clean_phone(self):
 
-        dirty_phone = clear_string(self.cleaned_data.get('phone'))
+        cleaned_phone = phone_cleaner(self.cleaned_data.get('phone'))
 
-        if dirty_phone:
-
-            tmp_dirty_phone = '+55' + clear_string(dirty_phone)
-
-            phone = phonenumbers.parse(tmp_dirty_phone)
-
-            if not phonenumbers.is_possible_number(phone) or not \
-                    phonenumbers.is_valid_number(phone):
-                raise forms.ValidationError(
-                    'Telefone Inválido',
-                    code='invalid_phone',
-                    params={'phone': dirty_phone},
-                )
-        return dirty_phone
+        return cleaned_phone
 
     def save(self, **_):
         """ Salva dados. """

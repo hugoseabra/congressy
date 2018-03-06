@@ -148,6 +148,16 @@
 
 {% block scripts %}
     {{ block.super }}
+
+    <!-- mask -->
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+        <script type="application/javascript">
+        $(document).ready(function () {
+            $('#id_phone').mask("(99) 99999-9999");
+        });
+    </script>
+
+
     <!-- ckeditor -->
     <script type="text/javascript"
             src="{% static "ckeditor/ckeditor-init.js" %}"></script>

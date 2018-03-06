@@ -4,15 +4,7 @@ from datetime import timedelta, datetime
 from django import forms
 
 from gatheros_subscription.models import Lot
-
-
-class TelephoneInput(forms.TextInput):
-    input_type = 'tel'
-
-
-class DateTimeInput(forms.DateTimeInput):
-    input_type = 'tel'
-
+from core.forms import DateTimeInput, TelephoneInput
 
 INSTALLMENT_CHOICES = (
     (2, 2),
