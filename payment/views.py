@@ -283,5 +283,17 @@ def postback_url_view(request, uidb64):
 
         return Response(status=201)
 
+    except mailer_notification.NotifcationError as e:
+        body = """Um erro ocorreu durante o postback:   
+                <pre><code>{0}</code></pre>
+        """.format(str(e))
+
+        send_mail(
+            subject="Error postbackcall",
+            body=body,
+            to=settings.DEV_ALERT_EMAILS
+        )
+        raise e
+
     except ObjectDoesNotExist:
         raise Http404
