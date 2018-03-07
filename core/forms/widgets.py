@@ -13,3 +13,6 @@ class TelephoneInput(forms.TextInput):
 class DateInput(forms.TextInput):
     input_type = 'date'
 
+
+class DateTimeInput(forms.DateTimeInput):
+    input_type = 'tel'

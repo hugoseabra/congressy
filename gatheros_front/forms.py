@@ -1,8 +1,7 @@
 from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth import authenticate
-from django.contrib.auth.forms import (
-    AuthenticationForm, )
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UsernameField, UserModel
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _

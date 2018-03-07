@@ -97,6 +97,42 @@
             <div class="panel panel-primary">
                 <div class="panel-body">
                     {% if object_list %}
+                        <table class="table no-footer"
+                               cellspacing="0"
+                               width="100%"
+                               style="border-collapse: separate;empty-cells: hide;">
+                            <tbody>
+                            <tr>
+                                <td class="text-muted" style="border:none;text-align: right"><strong>Total:</strong></td>
+                                <td width="15%" style="border:none;">
+                                    <strong style="font-size:16px">
+                                        R$ {{ totals.total|money_divide|intcomma }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted text-right" style="border:none;">
+                                    <strong>Total (aguardando):</strong>
+                                </td>
+                                <td style="border:none;">
+                                    <strong class="text-muted" style="font-size:16px">
+                                        R$ {{ totals.pending|money_divide|intcomma }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted text-right" style="border:none;"><strong>Total (recebível):</strong></td>
+                                <td style="border:none;">
+                                    <strong style="font-size:16px;color:blue">
+                                        R$ {{ totals.paid|money_divide|intcomma }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            </tbody>
+
+                        </table>
+                        <hr />
+
                         <table id="payments_table"
                                class="table table-striped dataTable no-footer
                                nowrap"
@@ -106,9 +142,9 @@
                             <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Tipo de Pagamento</th>
-                                <th>Status</th>
-                                <th>Valor</th>
+                                <th width="5%" class="text-center">Tipo</th>
+                                <th width="25%" class="hidden-xs">Status</th>
+                                <th width="15%">Valor</th>
                             </tr>
                             </thead>
 
@@ -116,104 +152,111 @@
 
                             {% for transaction in object_list %}
                                 <tr>
-                                    <td>
+                                    <td class="nowrap">
                                         {{ transaction.subscription.person.name }}
                                     </td>
-                                    <td>
+                                    <td class="text-center" style="font-size: 22px;">
+                                        {% if transaction.type == transaction.BOLETO %}
+                                        <i class="fas fa-barcode" title="{{ transaction.get_type_display }}"></i>
+                                        {% elif transaction.type == transaction.CREDIT_CARD %}
+                                        <i class="far fa-credit-card" title="{{ transaction.get_type_display }}"></i>
+                                        {% else %}
                                         {{ transaction.get_type_display }}
+                                        {% endif %}
                                     </td>
-                                    <td>
+                                    <td class="hidden-xs nowrap">
                                         {% if transaction.statuses.all %}
-
-                                            <strong data-toggle="popover"
-                                                    title="Histórico"
-                                                    data-html="true"
-                                                    data-content='{% for status in transaction.statuses.all %}
-                                                    {% if status.status == status.AUTHORIZED or status.status == status.PAID %}
-                                                        <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
-                                                    {% elif status.status == status.PROCESSING or status.status == status.WAITING_PAYMENT or status.status == status.PENDING_REFUND or status.status == status.CHARGEDBACK %}
-                                                        <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>
-                                                    {% elif status.status == status.REFUNDED %}
-                                                       <i class="fa fa-circle" aria-hidden="true" style="color: #8977B6"></i>
-                                                    {% elif status.status == status.REFUSED %}
-                                                        <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>
-                                                    {% else %}
-                                                        <i class="fa fa-circle" aria-hidden="true"></i>
-                                                    {% endif %}
-                                                    {{ status.get_status_display }}
-                                                    - {{ status.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
-                                                    <br />
+                                        <div data-toggle="popover"
+                                                title="Histórico"
+                                                data-html="true"
+                                                data-content='{% for status in transaction.statuses.all %}
+                                                {% if status.status == status.AUTHORIZED or status.status == status.PAID %}
+                                                    <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
+                                                {% elif status.status == status.PROCESSING or status.status == status.WAITING_PAYMENT or status.status == status.PENDING_REFUND or status.status == status.CHARGEDBACK %}
+                                                    <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>
+                                                {% elif status.status == status.REFUNDED %}
+                                                   <i class="fa fa-circle" aria-hidden="true" style="color: #8977B6"></i>
+                                                {% elif status.status == status.REFUSED %}
+                                                    <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>
+                                                {% else %}
+                                                    <i class="fa fa-circle" aria-hidden="true"></i>
+                                                {% endif %}
+                                                <strong>{{ status.get_status_display }}</strong>
+                                                - {{ status.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                                <br />
                                             {% endfor %}'>
                                         {% else %}
-                                            <strong data-toggle="popover"
+                                            <div data-toggle="popover"
                                                     title="Histórico"
                                                     data-content="Nenhum dado até o momento.">
-
                                         {% endif %}
                                         {% if transaction.status == transaction.AUTHORIZED or transaction.status == transaction.PAID %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color:#5cb85c"></i>
+                                            <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
                                         {% elif transaction.status == transaction.PROCESSING or transaction.status == transaction.WAITING_PAYMENT or transaction.status == transaction.PENDING_REFUND or transaction.status == transaction.CHARGEDBACK %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color: #f0ad4e"></i>
+                                            <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>
                                         {% elif transaction.status == transaction.REFUNDED %}
                                             <i class="fa fa-circle" aria-hidden="true" style="color: #8977B6"></i>
                                         {% elif transaction.status == transaction.REFUSED %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"
-                                               style="color: #d9534f"></i>
+                                            <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>
                                         {% else %}
-                                            <i class="fa fa-circle"
-                                               aria-hidden="true"></i>
+                                            <i class="fa fa-circle" aria-hidden="true"></i>
                                         {% endif %}
-                                        {{ transaction.get_status_display }}
-                                        -
+                                        <strong>{{ transaction.get_status_display }}</strong>
+                                        <div style="text-indent: 18px;font-weight: bold" class="text-muted">
                                         {% if transaction.statuses.last.date_created  %}
                                             {{ transaction.statuses.last.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
                                         {% else %}
                                             {{ transaction.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
                                         {% endif %}
-                                        </strong>
-
+                                        </div>
                                     </td>
                                     <td>
                                         {% if transaction.status == transaction.REFUSED or transaction.status == transaction.REFUNDED %}
                                         -
                                         {% else %}
-                                        R$ {{ transaction.amount|money_divide_with_percentage|intcomma }}
+                                        R$ {{ transaction.liquid_amount|default_if_none:'-'|unlocalize|intcomma }}
                                         {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
-
+                            </tbody>
+                        </table>
+                        <hr />
+                        <table class="table no-footer"
+                               cellspacing="0"
+                               width="100%"
+                               style="border-collapse: separate;empty-cells: hide;">
+                            <tbody>
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <strong class="text-muted"
-                                            style="font-size:18px">Previsão:
-                                        R$ {{ total_payables|money_divide|intcomma }}</strong>
+                                <td class="text-muted" style="border:none;text-align: right"><strong>Total:</strong></td>
+                                <td width="15%" style="border:none;">
+                                    <strong style="font-size:16px">
+                                        R$ {{ totals.total|money_divide|intcomma }}
+                                    </strong>
                                 </td>
                             </tr>
-
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <strong class="text-success"
-                                            style="font-size:21px">Total:
-                                        R$ {{ total_paid_payables|money_divide|intcomma }}</strong>
+                                <td class="text-muted text-right" style="border:none;">
+                                    <strong>Total (aguardando):</strong>
+                                </td>
+                                <td style="border:none;">
+                                    <strong class="text-muted" style="font-size:16px">
+                                        R$ {{ totals.pending|money_divide|intcomma }}
+                                    </strong>
                                 </td>
                             </tr>
-
-
+                            <tr>
+                                <td class="text-muted text-right" style="border:none;"><strong>Total (recebível):</strong></td>
+                                <td style="border:none;">
+                                    <strong style="font-size:16px;color:blue">
+                                        R$ {{ totals.paid|money_divide|intcomma }}
+                                    </strong>
+                                </td>
+                            </tr>
                             </tbody>
 
                         </table>
+
                     {% else %}
                         <h3>Nenhum dado.</h3>
                     {% endif %}

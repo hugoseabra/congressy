@@ -151,6 +151,9 @@ class PagarmeTransactionInstanceData:
         return str(value + cents)
 
     def _set_amount(self):
+        # Setado no _create_split_rules()
+        self.liquid_amount = 0
+
         if self.extra_data.get('amount'):
             self.amount = \
                 round(Decimal(self.extra_data.get('amount')), 2) / 100
@@ -301,6 +304,8 @@ class PagarmeTransactionInstanceData:
             org_recipient_id = settings.PAGARME_TEST_RECIPIENT_ID
         else:
             org_recipient_id = self.organization.recipient_id
+
+        self.liquid_amount = organization_amount
 
         organization_rule = {
             "recipient_id": org_recipient_id,

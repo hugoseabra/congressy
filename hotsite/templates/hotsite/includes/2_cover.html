@@ -19,25 +19,24 @@
 
         <div class="hero-content">
             <div class="hero-content-inner">
-
                 <div class="hero-heading text-center row"
                      data-animation="fadeIn">
                     <div class="col-md-10 col-md-offset-1">
 
-                        <h1 class="hero-title">{{ event.name }}</h1>
+                        <h1 class="hero-title">
+                            {{ event.name }}
+                        </h1>
 
                         <p class="hero-tagline">
-                        <div>
                             <i class="fa fa-calendar"></i>
                             {{ event.get_period }}
-                        </div>
-                        {% if event.place and event.place.name %}
-                            <div>
-                                <i class="fa fa-map-marker"></i>
-                                {{ event.place.name }}
-                            </div>
-                        {% endif %}
                         </p>
+                        {% if event.place and event.place.name %}
+                        <p class="hero-tagline">
+                            <i class="fa fa-map-marker"></i>
+                            {{ event.place.name }}
+                        </p>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -81,11 +80,12 @@
                     <div class="hero-features-right col-md-5"
                          data-animation="fadeIn">
                         {% if subscription_enabled and not subsciption_finished %}
-                            {% if has_paid_lots and has_configured_bank_account and not has_active_bank_account %}
-                                <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
-                                    Evento está sendo configurado, volte em breve para realizar sua inscrição!</p>
-                            {% else %}
+                            {% if has_paid_lots and has_configured_bank_account and has_active_bank_account %}
                                 {% include 'hotsite/subscription_simple_form.html' %}
+                            {% else %}
+                                <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
+                                    Evento está sendo configurado, volte em
+                                    breve para realizar sua inscrição!</p>
                             {% endif %}
                         {% endif %}
                     </div>

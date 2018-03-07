@@ -4,7 +4,7 @@ from gatheros_subscription import views
 
 urls = [
     url(
-        r'^subscriptions$',
+        r'^subscriptions/$',
         views.MySubscriptionsListView.as_view(),
         name='my-subscriptions'
     ),

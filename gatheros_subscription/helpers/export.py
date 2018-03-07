@@ -5,7 +5,7 @@ from datetime import datetime
 from openpyxl import Workbook
 from six import BytesIO
 
-from payment.models import TransactionStatus
+from payment.models import Transaction
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
@@ -118,35 +118,33 @@ def _export_payments(worksheet, event):
         'TIPO',
         'STATUS',
         'DATA PAGAMENTO',
-        'VALOR (R$)'
+        'VALOR INSCRICAO (R$)'
+        'VALOR A RECEBER (R$)'
     ])
 
-    statuses = TransactionStatus.objects.filter(
-        transaction__subscription__event=event
-    )
+    transactions = Transaction.objects.filter(subscription__event=event)
 
     collector = {}
-    for row_idx, status in enumerate(statuses):
+    for row_idx, transaction in enumerate(transactions):
         if row_idx == 0:
             continue
 
         if row_idx not in collector:
             collector[row_idx] = []
 
-        sub = status.transaction.subscription
+        sub = transaction.subscription
 
         created = datetime.strptime(
-            status.date_created,
+            transaction.date_created,
             "%Y-%m-%dT%H:%M:%S.%fZ"
         )
 
         collector[row_idx].append(sub.person.name)
-        collector[row_idx].append(status.transaction.get_type_display())
-        collector[row_idx].append(status.get_status_display())
-        collector[row_idx].append(created.strftime(
-            '%d/%m/%Y %H:%M:%S'
-        ))
-        collector[row_idx].append(status.transaction.amount)
+        collector[row_idx].append(transaction.get_type_display())
+        collector[row_idx].append(transaction.get_status_display())
+        collector[row_idx].append(created.strftime('%d/%m/%Y %H:%M:%S'))
+        collector[row_idx].append(transaction.amount)
+        collector[row_idx].append(transaction.liquid_amount)
 
     for row in collector.keys():
         worksheet.append(collector[row])

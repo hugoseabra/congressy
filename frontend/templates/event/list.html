@@ -52,6 +52,10 @@
                         "targets": [-1]
                     },
                     {
+                        "targets": 0,
+                        "className": "nowrap"
+                    },
+                    {
                         "width": "10%",
                         "targets": 2,
                         "className": "text-center"
@@ -103,7 +107,7 @@
                             <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Categoria</th>
+                                <th class="hidden-xs hidden-sm">Categoria</th>
                                 <th># Insc.</th>
                                 <th></th>
                             </tr>
@@ -134,7 +138,7 @@
 
                                         </a>
                                     </td>
-                                    <td>{{ event.category.name }}</td>
+                                    <td class="hidden-xs hidden-sm">{{ event.category.name }}</td>
                                     <td>
                                         {{ event.subscriptions.all|length }}
                                         {% if event.limit %} /

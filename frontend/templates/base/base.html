@@ -115,7 +115,7 @@
                                             {% if not organization_unique_admin %}
                                             <li>
                                                 <a href="{% url 'event:organization-cancel-membership' organization.pk %}">
-                                                    <i class="fa fa-sign-out"></i>
+                                                    <i class="fas fa-sign-in-alt"></i>
                                                     Sair da organização
                                                 </a>
                                             </li>
@@ -142,7 +142,7 @@
                 <ul class="nav navbar-nav navbar-right">
                     {% if has_subscriptions %}
                     <li class="dropdown profile hidden-xs">
-                        <a href="{% url 'front:start' %}" aria-expanded="true">
+                        <a href="{% url 'subscription:my-subscriptions' %}" aria-expanded="true">
                             <span class="meta">
                                 <span class="fa fa-list"></span>
                                 <span class="text  hidden-xs">Minhas Inscrições</span>

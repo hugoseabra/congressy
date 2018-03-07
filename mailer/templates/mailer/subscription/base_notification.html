@@ -1,0 +1,32 @@
+{% load humanize %}
+
+<p style="text-align: justify;">
+    Prezado(a) Sr(a). <strong>{{ person.user.first_name }}</strong>,
+</p>
+{% block introduction %}{% endblock %}
+<hr />
+<div style="text-align: justify;">
+    <h2>Dados da inscrição</h2>
+    <p style="margin-left:10px">
+        <strong>Nome do Evento:</strong> {{ event.name }}
+        <br/>
+        <strong>Data:</strong> {{ period }}
+        <br/>
+        <strong>Registrado em:</strong> {{ date|date:"DATETIME_FORMAT" }}
+        <br/>
+        <strong>Link do evento: </strong> <a target="_blank" href="{{ event_url }}">{{ event_url }}</a>
+    </p>
+</div>
+{% block extra_content %}{% endblock %}
+<br /><br />
+<p style="text-align: justify;">
+    Contamos com a sua presença!
+</p>
+
+<p style="text-align: justify;">
+    <strong>Congressy</strong>
+    &nbsp;&ndash; Crie seu evento agora mesmo!
+
+    <br />
+    <a target="_blank" href="congressy.com">www.congressy.com</a>
+</p>

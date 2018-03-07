@@ -8,11 +8,11 @@ urls = [
     #     views.SubscriptionAttendanceView.as_view(),
     #     name='subscription-attendance'
     # ),
-    url(
-        r'^(?P<pk>[0-9A-Fa-f-]+)/delete/$',
-        views.SubscriptionCancelView.as_view(),
-        name='subscription-delete'
-    ),
+    # url(
+    #     r'^(?P<pk>[0-9A-Fa-f-]+)/delete/$',
+    #     views.SubscriptionCancelView.as_view(),
+    #     name='subscription-delete'
+    # ),
     # url(
     #     r'^(?P<pk>[0-9A-Fa-f-]+)/edit/$',
     #     views.SubscriptionEditFormView.as_view(),
