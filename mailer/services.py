@@ -5,29 +5,37 @@ from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from mailer import exception
+from gatheros_subscription.helpers.voucher import (
+    create_voucher,
+    get_voucher_file_name,
+)
+from mailer import checks
 
 CELERY = False
 
 if settings.DEBUG:
-    from .tasks import send_mail
+    from .tasks import MailerAttachment, send_mail
 else:
     try:
-        from .worker import send_mail
+        from .worker import MailerAttachment, send_mail
 
         CELERY = True
     except ImportError:
-        from .tasks import send_mail
+        from .tasks import MailerAttachment, send_mail
 
 
-def notify_new_subscription(event, subscription):
+def notify_new_unpaid_subscription_boleto(event, transaction):
     """
-    Define a notificação para uma nova inscrição
+    Notifica participante de nova inscrição de um lote não-pago pelo método de
+    boleto.
     """
+    subscription = transaction.subscription
     person = subscription.person
 
-    # local = '{}'.format(
-    #     event.place,
-    # )
+    checks.check_notification_transaction_unpaid_boleto(transaction)
+
+    boleto_url = transaction.boleto_url
 
     event_url = absoluteuri.reverse(
         'public:hotsite',
@@ -37,36 +45,146 @@ def notify_new_subscription(event, subscription):
     )
 
     # @TODO set event.date_start to period
-    body = render_to_string('mailer/notify_subscription.html', {
-        # 'gender_article': 'a' if person.gender == 'F' else 'o',
-        'gender_article': 'o(a)',
+    template_name = 'mailer/subscription/notify_unpaid_subscription.html'
+    body = render_to_string(template_name, {
         'person': person,
         'event': event,
-        'event_url': event_url,
         'period': event.date_start,
-        # 'count': subscription.count,
+        'event_url': event_url,
         'date': subscription.created,
-        # 'local': local
+        'has_voucher': False,
+        'boleto_url': boleto_url,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': None,
+
     })
 
-    if CELERY:
-        return send_mail.delay(
-            subject='Inscrição: {}'.format(event.name),
-            body=body,
-            to=person.email,
-        )
+    sender = send_mail.delay if CELERY else send_mail
 
-    return send_mail(
+    return sender(
         subject='Inscrição: {}'.format(event.name),
         body=body,
-        to=person.email
+        to=person.email,
     )
 
 
-def notify_new_user_and_subscription(event, subscription):
+def notify_paid_subscription_boleto(event, transaction):
     """
-    Define a notificação para uma nova inscrição com novo user
+    Notifica participante de nova inscrição de um lote pago pelo método de
+    boleto.
     """
+    subscription = transaction.subscription
+    person = subscription.person
+
+    checks.check_notification_transaction_paid_boleto(transaction)
+
+    # Se inscrição confirmada, envia o voucher.
+    voucher_attach = MailerAttachment(
+        name=get_voucher_file_name(subscription),
+        content=create_voucher(subscription),
+        mime='application/pdf'
+    )
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = 'mailer/subscription/notify_paid_subscription.html'
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': True,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': None,
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        attachment=voucher_attach,
+    )
+
+
+def notify_new_user_and_unpaid_subscription_boleto(event, transaction):
+    subscription = transaction.subscription
+    person = subscription.person
+
+    checks.check_notification_transaction_unpaid_boleto(transaction)
+
+    boleto_url = transaction.boleto_url
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    user = person.user
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    password_set_url = absoluteuri.reverse(
+        'password_reset_confirm',
+        kwargs={
+            'uidb64': uid,
+            'token': token,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = \
+        'mailer/subscription/notify_new_user_and_unpaid_subscription.html'
+
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': False,
+        'boleto_url': boleto_url,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': password_set_url,
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+    )
+
+
+def notify_new_user_and_paid_subscription_boleto(event, transaction):
+    """
+    Notifica participante de nova inscrição de um lote pago pelo método de
+    cartão de crédito.
+    """
+    subscription = transaction.subscription
+
+    checks.check_notification_transaction_paid_boleto(transaction)
+
+    voucher_attach = MailerAttachment(
+        name=get_voucher_file_name(subscription),
+        content=create_voucher(subscription),
+        mime='application/pdf'
+    )
+
     person = subscription.person
 
     event_url = absoluteuri.reverse(
@@ -79,8 +197,7 @@ def notify_new_user_and_subscription(event, subscription):
     user = person.user
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
-
-    password_reset_url = absoluteuri.reverse(
+    password_set_url = absoluteuri.reverse(
         'password_reset_confirm',
         kwargs={
             'uidb64': uid,
@@ -89,15 +206,339 @@ def notify_new_user_and_subscription(event, subscription):
     )
 
     # @TODO set event.date_start to period
-    body = render_to_string('mailer/notify_user_and_subscription.html', {
-        'password_reset_url': password_reset_url,
-        'event': event,
-        'event_url': event_url,
-        # 'gender_article': 'a' if person.gender == 'F' else 'o',
+    template_name = \
+        'mailer/subscription/notify_new_user_and_paid_subscription.html'
+
+    body = render_to_string(template_name, {
         'person': person,
+        'event': event,
         'period': event.date_start,
-        'count': subscription.count,
+        'event_url': event_url,
         'date': subscription.created,
+        'has_voucher': True,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': password_set_url,
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        attachment=voucher_attach,
+    )
+
+
+def notify_new_unpaid_subscription_credit_card(event, transaction):
+    """
+    Notifica participante de nova inscrição de um lote pago pelo método de
+    cartão de crédito.
+    """
+    subscription = transaction.subscription
+
+    checks.check_notification_transaction_unpaid_credit_card(transaction)
+
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = 'mailer/subscription/notify_unpaid_subscription.html'
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': False,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+    )
+
+
+def notify_new_paid_subscription_credit_card(event, transaction):
+    """
+    Notifica participante de nova inscrição de um lote pago pelo método de
+    cartão de crédito.
+    """
+    subscription = transaction.subscription
+
+    checks.check_notification_transaction_paid_credit_card(transaction)
+
+    voucher_attach = MailerAttachment(
+        name=get_voucher_file_name(subscription),
+        content=create_voucher(subscription),
+        mime='application/pdf'
+    )
+
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = 'mailer/subscription/notify_paid_subscription.html'
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': True,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        attachment=voucher_attach,
+    )
+
+
+def notify_new_user_and_unpaid_subscription_credit_card(event, transaction):
+    """
+    Notifica participante de nova inscrição de um lote pago pelo método de
+    cartão de crédito.
+    """
+    subscription = transaction.subscription
+
+    checks.check_notification_transaction_unpaid_credit_card(transaction)
+
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    user = person.user
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    password_set_url = absoluteuri.reverse(
+        'password_reset_confirm',
+        kwargs={
+            'uidb64': uid,
+            'token': token,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = \
+        'mailer/subscription/notify_new_user_and_unpaid_subscription.html'
+
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': False,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': password_set_url,
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+    )
+
+
+def notify_new_user_and_paid_subscription_credit_card(event, transaction):
+    """
+    Notifica participante de nova inscrição de um lote pago pelo método de
+    cartão de crédito.
+    """
+    subscription = transaction.subscription
+
+    checks.check_notification_transaction_paid_credit_card(transaction)
+
+    voucher_attach = MailerAttachment(
+        name=get_voucher_file_name(subscription),
+        content=create_voucher(subscription),
+        mime='application/pdf'
+    )
+
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = \
+        'mailer/subscription/notify_new_user_and_paid_subscription.html'
+
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': True,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': '',
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        attachment=voucher_attach,
+    )
+
+
+def notify_new_free_subscription(event, subscription):
+    """
+    Notifica participante de nova inscrição de um lote gratuito.
+    """
+    if not subscription.free:
+        raise exception.NotifcationError(
+            'Lote de inscrição não é gratuito. A notificação para inscrição'
+            ' gratuita não pode ser realizada.'
+        )
+
+    if subscription.status != subscription.CONFIRMED_STATUS:
+        raise exception.NotifcationError(
+            "Notificação de inscrição gratuita deve sempre estar confirmada."
+            " A notificação não será realizada porque a inscrição ainda não"
+            " está como confirmada.."
+        )
+
+    # Se inscrição confirmada, envia o voucher.
+    voucher_attach = MailerAttachment(
+        name=get_voucher_file_name(subscription),
+        content=create_voucher(subscription),
+        mime='application/pdf'
+    )
+
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    # @TODO set event.date_start to
+    template_name = 'mailer/subscription/notify_free_subscription.html'
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': True,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        attachment=voucher_attach,
+    )
+
+
+def notify_new_user_and_free_subscription(event, subscription):
+    """
+    Notifica participante de nova conta e nova inscrição de um lote gratuito.
+    """
+    if not subscription.free:
+        raise exception.NotifcationError(
+            'Lote de inscrição não é gratuito. A notificação para inscrição'
+            ' gratuita não pode ser realizada.'
+        )
+
+    if subscription.status != subscription.CONFIRMED_STATUS:
+        raise exception.NotifcationError(
+            "Notificação de inscrição gratuita deve sempre estar confirmada."
+            " A notificação não será realizada porque a inscrição ainda não"
+            " está como confirmada.."
+        )
+
+    # Se inscrição confirmada, envia o voucher.
+    voucher_attach = MailerAttachment(
+        name=get_voucher_file_name(subscription),
+        content=create_voucher(subscription),
+        mime='application/pdf'
+    )
+
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    user = person.user
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    password_set_url = absoluteuri.reverse(
+        'password_reset_confirm',
+        kwargs={
+            'uidb64': uid,
+            'token': token,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = \
+        'mailer/subscription/notify_new_user_and_free_subscription.html'
+
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': True,
+        'password_set_url': password_set_url,
     })
 
     if CELERY:
@@ -105,12 +546,14 @@ def notify_new_user_and_subscription(event, subscription):
             subject='Inscrição: {}'.format(event.name),
             body=body,
             to=person.email,
+            attachment=voucher_attach,
         )
 
     return send_mail(
         subject='Inscrição: {}'.format(event.name),
         body=body,
-        to=person.email
+        to=person.email,
+        attachment=voucher_attach,
     )
 
 
@@ -118,8 +561,8 @@ def notify_invite(organization, link, invitator, invited_person, email):
     """
     Define a notificação para um novo convite
     """
-
-    body = render_to_string('mailer/notify_invitation.html', {
+    template_name = 'mailer/notify_invitation.html'
+    body = render_to_string(template_name, {
         'organizacao': organization,
         'hospedeiro': invitator,
         'convidado': invited_person,

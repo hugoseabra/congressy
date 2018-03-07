@@ -14,18 +14,18 @@ task_params = {
 
 
 @app.task(**task_params)
-def send_mail(self, subject, body, to):
+def send_mail(self, subject, body, to, attachment=None):
     try:
-        return tasks.send_mail(subject, body, to)
+        return tasks.send_mail(subject, body, to, attachment)
 
     except SMTPAuthenticationError as exc:
         raise self.retry(exc=exc)
 
 
 @app.task(**task_params)
-def send_mass_mail(self, subject, body, to):
+def send_mass_mail(self, subject, body, to, attachment=None):
     try:
-        return tasks.send_mass_mail(subject, body, to)
+        return tasks.send_mass_mail(subject, body, to, attachment)
 
     except SMTPAuthenticationError as exc:
         raise self.retry(exc=exc)

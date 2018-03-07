@@ -8,7 +8,7 @@ from django.utils import six
 from lxml import html
 
 
-def send_mail(subject, body, to):
+def send_mail(subject, body, to, attachment=None):
     """ Envia um email """
     if not to:
         to = []
@@ -26,10 +26,13 @@ def send_mail(subject, body, to):
 
     mail.attach_alternative(body, 'text/html')
 
+    if attachment and isinstance(attachment, MailerAttachment):
+        mail.attach(attachment.name, attachment.content, attachment.mime)
+
     return mail.send(False)
 
 
-def send_mass_mail(subject, body, to):
+def send_mass_mail(subject, body, to, attachment=None):
     """
     Envia diversos e-mails, abrindo apenas uma conexão.
 
@@ -64,6 +67,18 @@ def send_mass_mail(subject, body, to):
             connection=connection
         )
         message.attach_alternative(body, 'text/html')
+
+        if attachment and isinstance(attachment, MailerAttachment):
+            message.attach(attachment.name, attachment.content,
+                           attachment.mime)
+
         messages.append(message)
 
     return connection.send_messages(messages)
+
+
+class MailerAttachment(object):
+    def __init__(self, name, content, mime):
+        self.name = name
+        self.content = content
+        self.mime = mime
