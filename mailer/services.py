@@ -67,6 +67,7 @@ def notify_new_unpaid_subscription_boleto(event, transaction):
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
+        reply_to=event.organization.email,
     )
 
 
@@ -115,6 +116,7 @@ def notify_paid_subscription_boleto(event, transaction):
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
+        reply_to=event.organization.email,
         attachment=voucher_attach,
     )
 
@@ -168,6 +170,7 @@ def notify_new_user_and_unpaid_subscription_boleto(event, transaction):
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
+        reply_to=event.organization.email,
     )
 
 
@@ -229,6 +232,7 @@ def notify_new_user_and_paid_subscription_boleto(event, transaction):
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
+        reply_to=event.organization.email,
         attachment=voucher_attach,
     )
 
@@ -271,6 +275,7 @@ def notify_new_unpaid_subscription_credit_card(event, transaction):
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
+        reply_to=event.organization.email,
     )
 
 
@@ -318,6 +323,7 @@ def notify_new_paid_subscription_credit_card(event, transaction):
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
+        reply_to=event.organization.email,
         attachment=voucher_attach,
     )
 
@@ -374,6 +380,7 @@ def notify_new_user_and_unpaid_subscription_credit_card(event, transaction):
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
+        reply_to=event.organization.email,
     )
 
 
@@ -424,6 +431,7 @@ def notify_new_user_and_paid_subscription_credit_card(event, transaction):
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
+        reply_to=event.organization.email,
         attachment=voucher_attach,
     )
 
@@ -480,6 +488,7 @@ def notify_new_free_subscription(event, subscription):
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
+        reply_to=event.organization.email,
         attachment=voucher_attach,
     )
 
@@ -548,9 +557,11 @@ def notify_new_user_and_free_subscription(event, subscription):
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
+        reply_to=event.organization.email,
         attachment=voucher_attach,
     )
 
+# ============================ ACCOUNT EMAILS =============================== #
 
 def notify_new_user(context):
     """
@@ -576,8 +587,10 @@ def notify_new_partner(context):
     Define a notificação para um novo parceiro na plataforma.
     """
 
-    body = render_to_string('mailer/notify_partner_registration_email.html',
-                            context=context)
+    body = render_to_string(
+        'mailer/notify_partner_registration_email.html',
+        context=context
+    )
 
     subject = 'Cadastro de parceria na  {0}'.format(context['site_name'])
 
@@ -588,28 +601,6 @@ def notify_new_partner(context):
         body=body,
         to=context['partner_email'],
     )
-
-
-def notify_partner_contract(context):
-    """
-    Define a notificação para um parceiro quando o mesmo é vinculado a um
-    evento.
-    """
-
-    subject = 'Parceria Congressy: Vinculado ao evento {0}'.format(context[
-                                                                       'event'])
-
-    body = render_to_string('mailer/notify_partner_contract_email.html',
-                            context=context)
-
-    sender = send_mail.delay if CELERY else send_mail
-
-    return sender(
-        subject=subject,
-        body=body,
-        to=context['partner_email'],
-    )
-
 
 def notify_reset_password(context):
     """
@@ -648,6 +639,27 @@ def notify_set_password(context):
         to=context['email'],
     )
 
+# ============================ PARTNER EMAILS =============================== #
+
+def notify_partner_contract(context):
+    """
+    Define a notificação para um parceiro quando o mesmo é vinculado a um
+    evento.
+    """
+
+    subject = 'Parceria Congressy: Vinculado ao evento {0}'.format(context[
+                                                                       'event'])
+
+    body = render_to_string('mailer/notify_partner_contract_email.html',
+                            context=context)
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject=subject,
+        body=body,
+        to=context['partner_email'],
+    )
 
 # ============================ INTERNAL EMAILS ============================== #
 def notify_new_partner_internal(context):
@@ -711,14 +723,11 @@ def notify_invite(organization, link, inviter, invited_person, email):
         'link': link,
     })
 
-    # @TODO remove me after all organizers have an email address.
-    reply_to = organization.email
-
     sender = send_mail.delay if CELERY else send_mail
 
     return sender(
         subject='Convite: {}'.format(organization),
         body=body,
         to=email,
-        reply_to=reply_to,
+        reply_to=organization.email,
     )
