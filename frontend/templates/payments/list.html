@@ -106,7 +106,7 @@
                             <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th width="5%">Tipo</th>
+                                <th width="5%" class="text-center">Tipo</th>
                                 <th width="25%" class="hidden-xs">Status</th>
                                 <th width="15%">Valor</th>
                             </tr>
@@ -121,9 +121,9 @@
                                     </td>
                                     <td class="text-center" style="font-size: 22px;">
                                         {% if transaction.type == transaction.BOLETO %}
-                                        <i class="fas fa-barcode"></i>
+                                        <i class="fas fa-barcode" title="{{ transaction.get_type_display }}"></i>
                                         {% elif transaction.type == transaction.CREDIT_CARD %}
-                                        <i class="far fa-credit-card"></i>
+                                        <i class="far fa-credit-card" title="{{ transaction.get_type_display }}"></i>
                                         {% else %}
                                         {{ transaction.get_type_display }}
                                         {% endif %}
@@ -189,9 +189,21 @@
                                 <td></td>
                                 <td class="hidden-xs"></td>
                                 <td>
-                                    <strong class="text-muted"
-                                            style="font-size:16px">Previsão:
-                                        R$ {{ total_payables|money_divide|intcomma }}</strong>
+                                    <strong class="text-muted" style="font-size:16px">
+                                        Total:
+                                        R$ {{ total_payables|money_divide|intcomma }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td class="hidden-xs"></td>
+                                <td>
+                                    <strong class="text-muted" style="font-size:16px">
+                                        Total (aguardando):
+                                        R$ {{ total_payables|money_divide|intcomma }}
+                                    </strong>
                                 </td>
                             </tr>
 
@@ -201,7 +213,7 @@
                                 <td class="hidden-xs"></td>
                                 <td>
                                     <strong class="text-success"
-                                            style="font-size:16px">Total:
+                                            style="font-size:16px">Total (líquido):
                                         R$ {{ total_paid_payables|money_divide|intcomma }}</strong>
                                 </td>
                             </tr>

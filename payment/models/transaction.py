@@ -86,6 +86,18 @@ class Transaction(models.Model):
         blank=True,
     )
 
+    boleto_url = models.TextField(
+        verbose_name='URL do boleto',
+        null=True,
+        blank=True,
+    )
+
+    boleto_expiration_date = models.DateField(
+        verbose_name='vencimento do boleto',
+        null=True,
+        blank=True,
+    )
+
     subscription = models.ForeignKey(
         Subscription,
         on_delete=models.DO_NOTHING,
