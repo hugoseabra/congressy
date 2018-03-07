@@ -109,3 +109,18 @@ class Transaction(models.Model):
     @property
     def paid(self):
         return self.status == self.PAID
+
+    @property
+    def pending(self):
+        return \
+            self.status == self.WAITING_PAYMENT \
+            or self.status == self.PROCESSING \
+            or self.status == self.AUTHORIZED
+
+    @property
+    def cancelled(self):
+        return \
+            self.status == self.REFUNDED \
+            or self.status == self.PENDING_REFUND \
+            or self.status == self.REFUSED \
+            or self.status == self.CHARGEDBACK

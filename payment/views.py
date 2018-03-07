@@ -60,12 +60,7 @@ class EventPaymentView(AccountMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(EventPaymentView, self).get_context_data(**kwargs)
         context['event'] = self.event
-        context['total_paid_payables'] = self._get_payables(
-            transaction_type='paid'
-        )
-        context['total_payables'] = self._get_payables(
-            transaction_type='total'
-        )
+        context['totals'] = self._get_payables()
 
         return context
 
@@ -76,38 +71,27 @@ class EventPaymentView(AccountMixin, ListView):
 
         return all_transactions
 
-    def _get_payables(self, transaction_type=None):
+    def _get_payables(self):
 
-        if not transaction_type:
-            return 0
+        totals = {
+            'total': Decimal(0.00),
+            'pending': Decimal(0.00),
+            'paid': Decimal(0.00),
+        }
 
-        all_transactions = []
+        transactions = \
+            Transaction.objects.filter(subscription__event=self.event)
 
-        if transaction_type == 'paid':
-            all_transactions = Transaction.objects.filter(
-                subscription__event=self.event,
-                status=Transaction.PAID
-            )
-        elif transaction_type == 'total':
-            all_transactions = Transaction.objects.filter(
-                subscription__event=self.event
-            )
+        for transaction in transactions:
+            totals['total'] += transaction.liquid_amount or Decimal(0.00)
 
-        total = 0
+            if transaction.paid:
+                totals['paid'] += transaction.liquid_amount or Decimal(0.00)
 
-        congressy_percent = Decimal(settings.CONGRESSY_PLAN_PERCENT_10)
-        for transaction in all_transactions:
+            if transaction.pending:
+                totals['pending'] += transaction.liquid_amount or Decimal(0.00)
 
-            if transaction.status == transaction.REFUNDED or \
-                            transaction.status == transaction.REFUSED:
-                continue
-
-            amount = transaction.amount
-            deductible = (congressy_percent * amount) / 100
-            calculated_total = transaction.amount - deductible
-            total += calculated_total
-
-        return total
+        return totals
 
 
 @api_view(['POST'])

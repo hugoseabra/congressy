@@ -97,6 +97,42 @@
             <div class="panel panel-primary">
                 <div class="panel-body">
                     {% if object_list %}
+                        <table class="table no-footer"
+                               cellspacing="0"
+                               width="100%"
+                               style="border-collapse: separate;empty-cells: hide;">
+                            <tbody>
+                            <tr>
+                                <td class="text-muted" style="border:none;text-align: right"><strong>Total:</strong></td>
+                                <td width="15%" style="border:none;">
+                                    <strong style="font-size:16px">
+                                        R$ {{ totals.total|money_divide|intcomma }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted text-right" style="border:none;">
+                                    <strong>Total (aguardando):</strong>
+                                </td>
+                                <td style="border:none;">
+                                    <strong class="text-muted" style="font-size:16px">
+                                        R$ {{ totals.pending|money_divide|intcomma }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted text-right" style="border:none;"><strong>Total (recebível):</strong></td>
+                                <td style="border:none;">
+                                    <strong style="font-size:16px;color:blue">
+                                        R$ {{ totals.paid|money_divide|intcomma }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            </tbody>
+
+                        </table>
+                        <hr />
+
                         <table id="payments_table"
                                class="table table-striped dataTable no-footer
                                nowrap"
@@ -178,50 +214,49 @@
                                         {% if transaction.status == transaction.REFUSED or transaction.status == transaction.REFUNDED %}
                                         -
                                         {% else %}
-                                        R$ {{ transaction.liquid_amount|unlocalize|intcomma }}
+                                        R$ {{ transaction.liquid_amount|default_if_none:'-'|unlocalize|intcomma }}
                                         {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}
-
+                            </tbody>
+                        </table>
+                        <hr />
+                        <table class="table no-footer"
+                               cellspacing="0"
+                               width="100%"
+                               style="border-collapse: separate;empty-cells: hide;">
+                            <tbody>
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td class="hidden-xs"></td>
-                                <td>
-                                    <strong class="text-muted" style="font-size:16px">
-                                        Total:
-                                        R$ {{ total_payables|money_divide|intcomma }}
+                                <td class="text-muted" style="border:none;text-align: right"><strong>Total:</strong></td>
+                                <td width="15%" style="border:none;">
+                                    <strong style="font-size:16px">
+                                        R$ {{ totals.total|money_divide|intcomma }}
                                     </strong>
                                 </td>
                             </tr>
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td class="hidden-xs"></td>
-                                <td>
+                                <td class="text-muted text-right" style="border:none;">
+                                    <strong>Total (aguardando):</strong>
+                                </td>
+                                <td style="border:none;">
                                     <strong class="text-muted" style="font-size:16px">
-                                        Total (aguardando):
-                                        R$ {{ total_payables|money_divide|intcomma }}
+                                        R$ {{ totals.pending|money_divide|intcomma }}
                                     </strong>
                                 </td>
                             </tr>
-
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td class="hidden-xs"></td>
-                                <td>
-                                    <strong class="text-success"
-                                            style="font-size:16px">Total (líquido):
-                                        R$ {{ total_paid_payables|money_divide|intcomma }}</strong>
+                                <td class="text-muted text-right" style="border:none;"><strong>Total (recebível):</strong></td>
+                                <td style="border:none;">
+                                    <strong style="font-size:16px;color:blue">
+                                        R$ {{ totals.paid|money_divide|intcomma }}
+                                    </strong>
                                 </td>
                             </tr>
-
-
                             </tbody>
 
                         </table>
+
                     {% else %}
                         <h3>Nenhum dado.</h3>
                     {% endif %}
