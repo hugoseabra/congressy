@@ -100,21 +100,40 @@ def postback_url_view(request, uidb64):
     if not uidb64:
         raise Http404
 
+
     try:
-        transaction = Transaction.objects.get(uuid=uidb64)
-        subscription = transaction.subscription
-        event = subscription.event
-
-        old_status = transaction.status
-
         data = request.data.copy()
 
+        transaction = Transaction.objects.get(uuid=uidb64)
+        old_status = transaction.status
         new_desired_status = data.get('current_status', '')
 
         # Only continue the postback workflow if the new_desired_status and
         # old_stats are different.
         if old_status == new_desired_status:
             return Response(status=200)
+
+        # Create a state machine using the old transaction status as it's
+        # initial value.
+        transaction_director = TransactionDirector(
+            status=new_desired_status,
+            old_status=old_status
+        )
+        transaction_director_status = transaction_director.direct()
+
+        # Translate/integrate the status returned from the director to a
+        #   subscription status.
+        trans_sub_status_integrator = TransactionSubscriptionStatusIntegrator(
+            transaction_director_status
+        )
+
+        subscription_status = trans_sub_status_integrator.integrate()
+
+        if subscription_status:
+            transaction.subscription.status = subscription_status
+            transaction.subscription.save()
+
+        event = transaction.subscription.event
 
         boleto_url = data.get('transaction[boleto_url]', '')
 
@@ -137,26 +156,6 @@ def postback_url_view(request, uidb64):
 
         subscription = \
             Subscription.objects.get(pk=transaction.subscription.pk)
-
-        # Create a state machine using the old transaction status as it's
-        # initial value.
-
-        transaction_director = TransactionDirector(
-            status=new_desired_status,
-            old_status=old_status)
-        transaction_director_status = transaction_director.direct()
-
-        # Translate/integrate the status returned from the director to a
-        #   subscription status.
-        trans_sub_status_integrator = TransactionSubscriptionStatusIntegrator(
-            transaction_director_status)
-
-        subscription_status = trans_sub_status_integrator.integrate()
-
-        if subscription_status:
-            subscription.status = subscription_status
-
-        subscription.save()
 
         payment_method = data.get('transaction[payment_method]')
 
