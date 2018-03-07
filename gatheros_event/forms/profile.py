@@ -241,10 +241,25 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         """ Meta """
         model = Person
-        fields = ['name', 'email', 'new_password1', 'new_password2',
-                  'gender', 'birth_date', 'zip_code', 'phone', 'city', 'cpf',
-                  'street', 'number', 'complement', 'village', 'institution',
-                  'institution_cnpj', 'function']
+        fields = [
+            'name',
+            'email',
+            'new_password1',
+            'new_password2',
+            'gender',
+            'birth_date',
+            'zip_code',
+            'phone',
+            'city',
+            'cpf',
+            'street',
+            'number',
+            'complement',
+            'village',
+            'institution',
+            'institution_cnpj',
+            'function'
+        ]
 
         widgets = {
             # CPF como telefone para aparecer como número no mobile
@@ -286,15 +301,15 @@ class ProfileForm(forms.ModelForm):
         return password2
 
     def clean_institution_cnpj(self):
-        dirty_institution_cnpj = self.cleaned_data.get('institution_cnpj')
-        cleaned_institution_cnpj = BRCNPJField().clean(dirty_institution_cnpj)
-        return cleaned_institution_cnpj
+        institution_cnpj = self.cleaned_data.get('institution_cnpj')
+        if institution_cnpj:
+            institution_cnpj = BRCNPJField().clean(institution_cnpj)
+        return institution_cnpj
 
     def clean_cpf(self):
-        dirty_cpf = self.cleaned_data.get('cpf')
-        cleaned_cpf = BRCPFField().clean(dirty_cpf)
-
-        return clear_string(cleaned_cpf)
+        cpf = self.cleaned_data.get('cpf')
+        cpf = BRCPFField().clean(cpf)
+        return clear_string(cpf)
 
     def clean_phone(self):
 

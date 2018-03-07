@@ -82,8 +82,8 @@ class ProfileView(AccountMixin, FormView):
         to_be_pre_cleaned = ['zip_code', 'institution_cnpj']
 
         for field in to_be_pre_cleaned:
-            request.POST.update({field: clear_string(request.POST[
-                                                         field])})
+            if field in request.POST:
+                request.POST[field] = clear_string(request.POST[field])
 
         return super().post(request, *args, **kwargs)
 
