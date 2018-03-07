@@ -1,5 +1,5 @@
 from django.views import generic
-from core.views import EventViewMixin
+from gatheros_event.views.mixins import EventViewMixin
 
 
 class CreateSurveyView(EventViewMixin, generic.TemplateView):

@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.views import generic
 
-from core.views import EventViewMixin
+from gatheros_event.views.mixins import EventViewMixin
 from gatheros_subscription.forms import FormConfigForm
 
 
