@@ -60,7 +60,6 @@ class Login(auth_views.LoginView):
 
 
 class SetPasswordView(View):
-
     success_url = reverse_lazy('public:login')
     http_method_names = ['post']
 

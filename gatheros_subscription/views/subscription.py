@@ -677,9 +677,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
     template_name = 'subscription/my_subscriptions.html'
     ordering = ('event__name', 'event__date_start', 'event__date_end',)
     has_filter = False
-
-    def get_permission_denied_url(self):
-        return reverse('front:start')
+    permission_denied_url = reverse_lazy('front:start')
 
     def get_queryset(self):
         person = self.request.user.person
@@ -706,15 +704,15 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
     def get(self, request, *args, **kwargs):
         response = super().get(request, *args, **kwargs)
-        #
-        # if self.get_paginate_by(self.object_list) is not None and hasattr(
-        #         self.object_list, 'exists'):
-        #     is_empty = not self.object_list.exists()
-        # else:
-        #     is_empty = len(self.object_list) == 0
-        #
-        # if is_empty:
-        #     return redirect(reverse('event:event-list'))
+
+        if self.get_paginate_by(self.object_list) is not None and hasattr(
+                self.object_list, 'exists'):
+            is_empty = not self.object_list.exists()
+        else:
+            is_empty = len(self.object_list) == 0
+
+        if is_empty:
+            return redirect(reverse('event:event-list'))
 
         return response
 
