@@ -174,7 +174,7 @@ def postback_url_view(request, uidb64):
         sub_user = subscription.person.user
         is_new_subscription = not sub_user.last_login
         is_paid = new_desired_status == Transaction.PAID
-        is_starting_status = new_desired_status == Transaction.PROCESSING
+        is_starting_status = new_desired_status == Transaction.WAITING_PAYMENT
 
         if is_new_subscription:
             if payment_method == Transaction.BOLETO:
