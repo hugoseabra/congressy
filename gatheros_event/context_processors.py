@@ -24,7 +24,10 @@ def account(request):
     has_subscriptions = False
     try:
         person = request.user.person
-        subs = Subscription.objects.filter(person=person).count()
+        subs = Subscription.objects \
+            .filter(person=person) \
+            .exclude(status=Subscription.CANCELED_STATUS) \
+            .count()
         has_subscriptions = subs > 0
 
     except (AttributeError, ObjectDoesNotExist):

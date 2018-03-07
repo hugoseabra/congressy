@@ -17,8 +17,8 @@ from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from mailer.services import (
-    notify_new_subscription,
-    notify_new_user_and_subscription,
+    notify_new_free_subscription,
+    notify_new_user_and_free_subscription,
 )
 from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
@@ -30,6 +30,11 @@ class EventMixin(generic.View):
     event = None
 
     def dispatch(self, request, *args, **kwargs):
+        slug = self.kwargs.get('slug')
+
+        if not slug:
+            return redirect('https://congressy.com')
+
         self.event = get_object_or_404(Event, slug=self.kwargs.get('slug'))
         response = super().dispatch(request, *args, **kwargs)
         return response
@@ -164,7 +169,10 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
         if user.is_authenticated:
             try:
                 person = user.person
-                Subscription.objects.get(person=person, event=self.event)
+                Subscription.objects.get(
+                    person=person,
+                    event=self.event
+                )
                 return True
             except (Subscription.DoesNotExist, AttributeError):
                 pass
@@ -413,6 +421,11 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         if not enabled:
             return redirect('public:hotsite', slug=self.event.slug)
 
+        # Se o já inscrito e porém, não há lotes pagos, não há o que
+        # fazer aqui.
+        if self.is_subscribed() and not self.has_paid_lots():
+            return redirect('public:hotsite-status', slug=self.event.slug)
+
         return response
 
     def get_form(self, **kwargs):
@@ -627,7 +640,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                     )
 
                     create_pagarme_transaction(
-                        payment=transaction_data.get_data(),
+                        transaction_data=transaction_data,
                         subscription=subscription
                     )
 
@@ -651,15 +664,14 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         else:
             # CONDIÇÃO 8
             subscription.status = subscription.CONFIRMED_STATUS
+            subscription.save()
 
-        subscription.save()
+            # CONDIÇÃO 5 e 7
+            if new_account and new_subscription:
+                notify_new_user_and_free_subscription(self.event, subscription)
 
-        # CONDIÇÃO 5 e 7
-        if new_account and new_subscription:
-            notify_new_user_and_subscription(self.event, subscription)
-
-        elif new_subscription:
-            notify_new_subscription(self.event, subscription)
+            else:
+                notify_new_free_subscription(self.event, subscription)
 
         messages.success(
             self.request,

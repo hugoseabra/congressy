@@ -5,6 +5,7 @@ Formulário relacionados a Convites de Pessoas a serem membros de organizações
 from uuid import uuid4
 
 import absoluteuri
+from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth import (
     password_validation,
@@ -16,7 +17,11 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from localflavor.br.forms import BRCPFField, BRCNPJField
 
+from core.forms.cleaners import clear_string, clean_phone as phone_cleaner
+from core.forms.widgets import AjaxChoiceField, TelephoneInput
+from core.util import create_years_list
 from gatheros_event.models import Person, Organization, Member
 from mailer.services import notify_new_user
 
@@ -26,6 +31,7 @@ class ProfileCreateForm(forms.ModelForm):
     email = forms.EmailField(label='E-mail', widget=forms.EmailInput(
         attrs={'class': 'form-control'}
     ))
+    captcha = CaptchaField()
 
     user = None
 
@@ -33,24 +39,6 @@ class ProfileCreateForm(forms.ModelForm):
         """ Meta """
         model = Person
         fields = ['name', 'email']
-
-    # def __init__(self, **kwargs):
-    #
-    #     data = kwargs.get('data')
-    #
-    #     # Buscar se person existe
-    #     if data:
-    #         try:
-    #             person = Person.objects.get(
-    #                 email=data.get('email')
-    #             )
-    #
-    #             kwargs['instance'] = person
-    #
-    #         except Person.DoesNotExist:
-    #             pass
-    #
-    #     super().__init__(**kwargs)
 
     def save(self, domain_override=None, request=None,
              subject_template='registration/account_confirmation_subject.txt',
@@ -192,6 +180,44 @@ class ProfileForm(forms.ModelForm):
     """
     Pessoas que são usuários do sistema
     """
+
+    states = (
+        ('', '----'),
+        # replace the value '----' with whatever you want, it won't matter
+        ("AC", "Acre"),
+        ("AL", "Alagoas"),
+        ("AP", "Amapá"),
+        ("AM", "Manaus"),
+        ("BA", "Bahia"),
+        ("CE", "Ceará"),
+        ("DF", "Distrito Federal"),
+        ("ES", "Espírito Santo"),
+        ("GO", "Goiás"),
+        ("MA", "Maranhão"),
+        ("MT", "Mato Grosso"),
+        ("MS", "Mato Grosso do Sul"),
+        ("MG", "Minas Gerais"),
+        ("PA", "Pará"),
+        ("PB", "Paraíba"),
+        ("PR", "Paraná"),
+        ("PE", "Pernambuco"),
+        ("PI", "Piauí"),
+        ("RJ", "Rio de Janeiro"),
+        ("RN", "Rio Grande do Norte"),
+        ("RS", "Rio Grande do Sul"),
+        ("RO", "Rondônia"),
+        ("RR", "Roraima"),
+        ("SC", "Santa Catarina"),
+        ("SP", "São Paulo"),
+        ("SE", "Sergipe"),
+        ("TO", "Tocantins"),
+    )
+    empty = (
+        ('', '----'),
+    )
+
+    state = forms.ChoiceField(label='Estado', choices=states, required=False)
+    city_name = AjaxChoiceField(label='Cidade', choices=empty, required=False)
     email = forms.EmailField(label='E-Mail')
 
     error_messages = {
@@ -210,16 +236,28 @@ class ProfileForm(forms.ModelForm):
         required=False
     )
 
+    cpf = BRCPFField(required=False, label="CPF")
+
     class Meta:
         """ Meta """
         model = Person
-        fields = ['name', 'email', 'phone', 'new_password1', 'new_password2']
-        # exclude = [
-        #     'user',
-        #     'synchronized',
-        #     'term_version',
-        #     'politics_version',
-        # ]
+        fields = ['name', 'email', 'new_password1', 'new_password2',
+                  'gender', 'birth_date', 'zip_code', 'phone', 'city', 'cpf',
+                  'street', 'number', 'complement', 'village', 'institution',
+                  'institution_cnpj', 'function']
+
+        widgets = {
+            # CPF como telefone para aparecer como número no mobile
+            'cpf': TelephoneInput(),
+            'name': forms.TextInput(attrs={'placeholder': 'Nome completo'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'me@you.com'}),
+            'phone': TelephoneInput(attrs={'placeholder': '(00) 00000-0000'}),
+            'zip_code': TelephoneInput(),
+            'city': forms.HiddenInput(),
+            'birth_date': forms.SelectDateWidget(
+                attrs=({'style': 'width: 30%; display: inline-block;'}),
+                years=create_years_list(), ),
+        }
 
     def __init__(self, user, password_required=True, *args, **kwargs):
         if hasattr(user, 'person'):
@@ -227,6 +265,9 @@ class ProfileForm(forms.ModelForm):
 
         super(ProfileForm, self).__init__(*args, **kwargs)
         self.user = user
+
+        self.fields['email'].widget.attrs['disabled'] = 'disabled'
+        self.fields['email'].disabled = True
 
         self.fields['new_password1'].required = password_required
         self.fields['new_password2'].required = password_required
@@ -243,6 +284,23 @@ class ProfileForm(forms.ModelForm):
                 )
         password_validation.validate_password(password2, self.user)
         return password2
+
+    def clean_institution_cnpj(self):
+        dirty_institution_cnpj = self.cleaned_data.get('institution_cnpj')
+        cleaned_institution_cnpj = BRCNPJField().clean(dirty_institution_cnpj)
+        return cleaned_institution_cnpj
+
+    def clean_cpf(self):
+        dirty_cpf = self.cleaned_data.get('cpf')
+        cleaned_cpf = BRCPFField().clean(dirty_cpf)
+
+        return clear_string(cleaned_cpf)
+
+    def clean_phone(self):
+
+        cleaned_phone = phone_cleaner(self.cleaned_data.get('phone'))
+
+        return cleaned_phone
 
     def save(self, **_):
         """ Salva dados. """

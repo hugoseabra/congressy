@@ -26,15 +26,15 @@ class EventForm(forms.ModelForm):
             'date_start',
             'date_end',
             'subscription_type',
-            # 'subscription_offline',
-            # 'published'
         ]
 
         widgets = {
             'organization': forms.HiddenInput,
             'subscription_type': forms.RadioSelect,
-            'date_start': DateTimeInput,
-            'date_end': DateTimeInput,
+            'date_start': DateTimeInput(attrs={'placeholder': 'dd/mm/aaaa '
+                                                              'hh:mm'}),
+            'date_end': DateTimeInput(attrs={'placeholder': 'dd/mm/aaaa '
+                                                            'hh:mm'}),
         }
 
     def __init__(self, user, lang='pt-br', *args, **kwargs):

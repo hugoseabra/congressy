@@ -147,6 +147,10 @@ class Subscription(models.Model, GatherosModelMixin):
     def confirmed(self):
         return self.status == Subscription.CONFIRMED_STATUS
 
+    @property
+    def free(self):
+        return not self.lot.price
+
     def save(self, *args, **kwargs):
         """ Salva entidade. """
         self.full_clean()
