@@ -103,28 +103,143 @@
 
                 <div class="panel-body">
 
-                    <!-- Simple List -->
-                    <ul id="simpleList" class="list-group">
-                        <li class="list-group-item" data-id="1">1<i
-                                class="js-remove">✖</i></li>
-                        <li class="list-group-item" data-id="2">2<i
-                                class="js-remove">✖</i></li>
-                        <li class="list-group-item" data-id="3">3<i
-                                class="js-remove">✖</i></li>
-                        <li class="list-group-item" data-id="4">4<i
-                                class="js-remove">✖</i></li>
-                        <li class="list-group-item" data-id="5">5<i
-                                class="js-remove">✖</i></li>
-
-                    </ul>
+                    <div id='fields'>
+                        <strong>Nenhuma questão.</strong>
+                    </div>
 
 
-                    <button id="addUser">Add</button>
+                    <button type="button"
+                            class="btn btn-success btn-lg"
+                            data-toggle="modal"
+                            data-target="#addQuestionModal"
+                            style="margin-top: 15px;">
+                        <i class="fas fa-plus"></i>
+                        Adicionar
+                    </button>
+                </div>
 
+            </div>
+
+            <!-- Modals -->
+            <div class="modal fade" id="addQuestionModal"
+                 tabindex="-1"
+                 role="dialog">
+
+                <div class="modal-dialog " role="document">
+
+                    <div class="modal-content">
+
+
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                                    data-dismiss="modal"
+                                    aria-label="Close"><span
+                                    aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">
+                                Adicionar ao Formulário </h4>
+                        </div>
+
+
+                        <div id="questionForm" class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+
+                                    <strong style="font-size: 15px">
+                                        Escolha um campo:
+                                    </strong>
+                                    <hr/>
+
+                                    <button type="button"
+                                            class="btn-block btn btn-primary field-type-btn">
+                                        <div class="pull-left">
+                                            <i class="far fa-calendar-alt"></i>
+                                            Data
+                                        </div>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn-block btn btn-primary field-type-btn">
+                                        <div class="pull-left">
+                                            <i class="fas fa-i-cursor"></i>
+                                            Text
+                                        </div>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn-block btn btn-primary field-type-btn">
+                                        <div class="pull-left">
+                                            <i class="fas fa-align-left"></i>
+                                            Parágrafo
+                                        </div>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn-block btn btn-primary field-type-btn">
+                                        <div class="pull-left">
+                                            <i class="fas fa-list-ul"></i>
+                                            Lista
+                                        </div>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn-block btn btn-primary field-type-btn">
+                                        <div class="pull-left">
+                                            <i class="far fa-check-circle"></i>
+                                            Múltipla Escolha
+                                        </div>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn-block btn btn-primary field-type-btn">
+                                        <div class="pull-left">
+                                            <i class="far fa-check-square"></i>
+                                            Várias Opções
+                                        </div>
+                                    </button>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <strong style="font-size: 15px">
+                                        Configuração do campo:
+                                    </strong>
+                                    <hr/>
+                                    <div class="form-group">
+                                        <label for="titile">Titulo:</label>
+                                        <input type="text" class="form-control"
+                                               id="title">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pwd">Password:</label>
+                                        <input type="password"
+                                               class="form-control" id="pwd">
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-danger"
+                                    data-dismiss="modal">Cancelar
+                            </button>
+                            <button type="button"
+                                    class="btn btn-primary">Salvar
+                            </button>
+                        </div>
+
+
+                    </div>
 
                 </div>
 
             </div>
+
 
         </div>
 
@@ -135,17 +250,44 @@
 {% block scripts %}
 
     <!-- DnD -->
-    <!-- jsDelivr :: Sortable (https://www.jsdelivr.com/package/npm/sortablejs) -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
     <script type="application/javascript">
         $(document).ready(function () {
 
             console.log('READY');
-            var byId = function (id) {
-                return document.getElementById(id);
-            }
 
-            // Editable list
+            $(".field-type-btn").on('click', function () {
+
+                $(".field-type-btn").removeClass('active');
+                $(this).addClass('active')
+
+            });
+
+
+            //loadDoc();
+        });
+
+        var byId = function (id) {
+            return document.getElementById(id);
+        }
+
+        function loadDoc() {
+
+            $.ajax({
+                url: location.pathname.substr(1),
+                success: function (result) {
+                    document.getElementById("fields").innerHTML =
+                        result;
+                    creatList();
+
+                }
+            });
+        }
+
+
+
+
+        function creatList() {
             var editableList = Sortable.create(byId('simpleList'), {
                 animation: 150,
                 filter: '.js-remove',
@@ -158,19 +300,9 @@
 
                 },
             });
+        }
 
-            byId('addUser').onclick = function () {
-                Ply.dialog('prompt', {
-                    title: 'Add',
-                    form: {name: 'name'}
-                }).done(function (ui) {
-                    var el = document.createElement('li');
-                    el.innerHTML = ui.data.name + '<i class="js-remove">✖</i>';
-                    editableList.el.appendChild(el);
-                });
-            };
 
-        });
     </script>
 {% endblock %}
 

@@ -16,4 +16,13 @@ class CreateSurveyView(EventViewMixin, generic.TemplateView):
         context['event'] = self.event
         return context
 
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.is_ajax():
+            self.template_name = 'survey/fields.html'
+
+        response = super().render_to_response(context, **response_kwargs)
+
+        return response
+
+
 
