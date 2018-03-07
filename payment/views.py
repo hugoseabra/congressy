@@ -11,6 +11,7 @@ from django.views.generic import ListView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from mailer import exception as mailer_notification
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
@@ -191,6 +192,14 @@ def postback_url_view(request, uidb64):
                         event,
                         transaction
                     )
+                else:
+                    raise mailer_notification.NotifcationError(
+                        'Notificação de transação de boleto de nova inscrição'
+                        ' não pôde ser realizada devido ao seguinte erro:'
+                        ' status desconhecido para notificação - "{}".'.format(
+                            new_desired_status
+                        )
+                    )
 
             if payment_method == Transaction.CREDIT_CARD:
                 if is_starting_status:
@@ -206,6 +215,21 @@ def postback_url_view(request, uidb64):
                         event,
                         transaction
                     )
+                else:
+                    raise mailer_notification.NotifcationError(
+                        'Notificação de transação de cartão de crédito de nova'
+                        ' inscrição não pôde ser realizada devido ao seguinte'
+                        ' erro: status desconhecido para notificação'
+                        ' - "{}".'.format(new_desired_status)
+                    )
+            else:
+                raise mailer_notification.NotifcationError(
+                    'Notificação de transação de nova inscrição não pôde ser'
+                    ' realizada devido ao seguinte erro: método de  pagamento'
+                    ' desconhecido para notificação - "{}".'.format(
+                        new_desired_status
+                    )
+                )
 
         # Não é nova inscrição
         else:
@@ -216,6 +240,15 @@ def postback_url_view(request, uidb64):
                 # Se não é status inicial, certamente o boleto foi pago.
                 elif is_paid:
                     notify_paid_subscription_boleto(event, transaction)
+
+                else:
+                    raise mailer_notification.NotifcationError(
+                        'Notificação de transação de boleto de inscrição'
+                        ' não pôde ser realizada devido ao seguinte erro:'
+                        ' status desconhecido para notificação - "{}".'.format(
+                            new_desired_status
+                        )
+                    )
 
             if payment_method == Transaction.CREDIT_CARD:
                 if is_starting_status:
@@ -231,6 +264,22 @@ def postback_url_view(request, uidb64):
                         event,
                         transaction
                     )
+                else:
+                    raise mailer_notification.NotifcationError(
+                        'Notificação de transação de cartão de crédito de'
+                        ' inscrição não pôde ser realizada devido ao seguinte'
+                        ' erro: status desconhecido para notificação'
+                        ' - "{}".'.format(new_desired_status)
+                    )
+
+            else:
+                raise mailer_notification.NotifcationError(
+                    'Notificação de transação de inscrição não pôde ser'
+                    ' realizada devido ao seguinte erro: método de  pagamento'
+                    ' desconhecido para notificação - "{}".'.format(
+                        new_desired_status
+                    )
+                )
 
         return Response(status=201)
 
