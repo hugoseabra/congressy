@@ -7,6 +7,7 @@ from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
 
+from core.forms import TelephoneInput, clean_phone as phone_cleaner
 from gatheros_event.models import Member, Organization
 
 
@@ -18,19 +19,11 @@ class OrganizationForm(forms.ModelForm):
 
     class Meta:
         model = Organization
-        # fields = (
-        #     'name',
-        #     'description_html',
-        #     'avatar',
-        #     'website',
-        #     'facebook',
-        #     'twitter',
-        #     'linkedin',
-        #     'skype',
-        # )
 
         fields = (
             'name',
+            'phone',
+            'email',
             'description_html',
             'website',
             'facebook',
@@ -41,6 +34,10 @@ class OrganizationForm(forms.ModelForm):
 
         widgets = {
             'description_html': CKEditorWidget(),
+            'phone': TelephoneInput(attrs={'placeholder': '(99) 99999-9999'}),
+            'email': forms.TextInput(
+                attrs={'type': 'email',
+                       'placeholder': 'me@you.com'}),
         }
 
     def __init__(self, user, internal=False, data=None, *args, **kwargs):
@@ -64,6 +61,14 @@ class OrganizationForm(forms.ModelForm):
 
         super(OrganizationForm, self).__init__(data=data, *args, **kwargs)
 
+        extra_required_fields = [
+            'phone',
+            'email',
+        ]
+
+        for field in extra_required_fields:
+            self.fields[field].required = True
+
     def save(self, commit=True):
         """ Salva dados. """
         # noinspection PyProtectedMember
@@ -81,6 +86,15 @@ class OrganizationForm(forms.ModelForm):
             )
 
         return result
+
+    def clean_phone(self):
+
+        cleaned_phone = phone_cleaner(self.cleaned_data.get('phone'))
+
+        return cleaned_phone
+
+    def clean_email(self):
+        return self.data.get('email').lower()
 
 
 class OrganizationManageMembershipForm(forms.Form):
@@ -134,6 +148,8 @@ class OrganizationFinancialForm(forms.ModelForm):
     class Meta:
         model = Organization
         fields = (
+            'phone',
+            'email',
             'bank_code',
             'agency',
             'agencia_dv',
@@ -143,6 +159,14 @@ class OrganizationFinancialForm(forms.ModelForm):
             'cnpj_ou_cpf',
             'account_type',
         )
+
+        widgets = {
+            'phone': TelephoneInput(attrs={'placeholder': '(99) 99999-9999'}),
+            'email': forms.TextInput(
+                attrs={'type': 'email',
+                       'placeholder': 'me@you.com'}),
+        }
+
 
     def __init__(self, user, internal=False, data=None, *args, **kwargs):
         self.user = user
@@ -163,11 +187,26 @@ class OrganizationFinancialForm(forms.ModelForm):
                            ' organização.'
             })
 
-        super(OrganizationFinancialForm, self).__init__(data=data, *args, **kwargs)
+        super(OrganizationFinancialForm, self).__init__(data=data, *args,
+                                                        **kwargs)
 
-        banking_required_fields = ['bank_code', 'agency', 'account', 'cnpj_ou_cpf', 'account_type']
+        banking_required_fields = [
+            'bank_code',
+            'agency',
+            'account',
+            'cnpj_ou_cpf',
+            'account_type',
+        ]
 
         for field in banking_required_fields:
+            self.fields[field].required = True
+
+        extra_required_fields = [
+            'phone',
+            'email',
+        ]
+
+        for field in extra_required_fields:
             self.fields[field].required = True
 
     def save(self, commit=True):
@@ -189,49 +228,11 @@ class OrganizationFinancialForm(forms.ModelForm):
 
         return result
 
-    # def clean(self):
-    #
-    #     cleaned_data = super(OrganizationFinancialForm, self).clean()
-    #
-    #     bank_account = create_payme_back_account(cleaned_data)
-    #
-    #     message = None
-    #
-    #     try:
-    #         if bank_account:
-    #             message = bank_account[0]['message']
-    #     except KeyError:
-    #         pass
-    #
-    #     if message:
-    #
-    #         if message == 'Invalid format':
-    #
-    #             parameter_name = bank_account[0]['parameter_name']
-    #
-    #             if parameter_name == 'document_number':
-    #                 parameter_name = 'cnpj_ou_cpf'
-    #
-    #             self.add_error(parameter_name, ValidationError('Formato de CPF ou CNPJ invalido'))
-    #     else:
-    #
-    #         organization = self.instance
-    #
-    #         organization.active_bank_account = True
-    #         organization.bank_account_id = bank_account['id']
-    #         organization.document_type = bank_account['document_type']
-    #         organization.charge_transfer_fees = bank_account['charge_transfer_fees']
-    #         organization.date_created = bank_account['date_created']
-    #
-    #         recipient = create_payme_recipient(bank_account)
-    #
-    #         organization.active_recipient = True
-    #         organization.recipient_id = recipient['id']
-    #
-    #     return cleaned_data
+    def clean_phone(self):
 
+        cleaned_phone = phone_cleaner(self.cleaned_data.get('phone'))
 
+        return cleaned_phone
 
-
-
-
+    def clean_email(self):
+        return self.data.get('email').lower()

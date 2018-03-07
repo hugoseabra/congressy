@@ -8,12 +8,17 @@ from django.utils import six
 from lxml import html
 
 
-def send_mail(subject, body, to, attachment=None):
+def send_mail(subject, body, to, reply_to=None, attachment=None):
     """ Envia um email """
     if not to:
         to = []
     elif isinstance(to, six.string_types):
         to = [to]
+
+    if not reply_to:
+        reply_to = [settings.CONGRESSY_REPLY_TO]
+    elif isinstance(reply_to, six.string_types):
+        reply_to = [reply_to]
 
     body_txt = html.document_fromstring(body).text_content()
 
@@ -21,7 +26,7 @@ def send_mail(subject, body, to, attachment=None):
         subject=subject.strip(),
         body=body_txt,
         to=to,
-        reply_to=[settings.CONGRESSY_REPLY_TO]
+        reply_to=reply_to
     )
 
     mail.attach_alternative(body, 'text/html')
@@ -30,51 +35,6 @@ def send_mail(subject, body, to, attachment=None):
         mail.attach(attachment.name, attachment.content, attachment.mime)
 
     return mail.send(False)
-
-
-def send_mass_mail(subject, body, to, attachment=None):
-    """
-    Envia diversos e-mails, abrindo apenas uma conexão.
-
-    :param self:
-        Self instance assumed by @app.task
-    :param subject:
-        E-mail subject
-    :param body:
-        E-mail html body
-    :param to:
-        E-mail addresses to send the message
-    :return:
-        Number of sent messages.
-    """
-
-    if not isinstance(to, list) and not isinstance(to, tuple):
-        raise TypeError('"to" argument must be a list or tuple')
-
-    body_txt = html.document_fromstring(body).text_content()
-    subject = subject.strip()
-
-    connection = get_connection()
-
-    messages = []
-    for address in to:
-        message = EmailMultiAlternatives(
-            subject=subject,
-            body=body_txt,
-            to=address,
-            from_email=settings.CONGRESSY_EMAIL_SENDER,
-            reply_to=settings.CONGRESSY_REPLY_TO,
-            connection=connection
-        )
-        message.attach_alternative(body, 'text/html')
-
-        if attachment and isinstance(attachment, MailerAttachment):
-            message.attach(attachment.name, attachment.content,
-                           attachment.mime)
-
-        messages.append(message)
-
-    return connection.send_messages(messages)
 
 
 class MailerAttachment(object):
