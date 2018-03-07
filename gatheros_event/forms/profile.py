@@ -312,10 +312,7 @@ class ProfileForm(forms.ModelForm):
         return clear_string(cpf)
 
     def clean_phone(self):
-
-        cleaned_phone = phone_cleaner(self.cleaned_data.get('phone'))
-
-        return cleaned_phone
+        return phone_cleaner(self.cleaned_data.get('phone'))
 
     def save(self, **_):
         """ Salva dados. """
