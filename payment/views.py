@@ -11,11 +11,11 @@ from django.views.generic import ListView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from mailer import exception as mailer_notification
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.models import Subscription
+from mailer import exception as mailer_notification
 from mailer.services import (
     notify_new_paid_subscription_credit_card,
     notify_new_unpaid_subscription_boleto,
@@ -97,18 +97,6 @@ class EventPaymentView(AccountMixin, ListView):
 
 @api_view(['POST'])
 def postback_url_view(request, uidb64):
-    body = """
-            We have received a postback call, here is the data:
-
-            <pre><code>{0}</code></pre>
-    """.format(json.dumps(request.data))
-
-    send_mail(
-        subject="Recived a postbackcall",
-        body=body,
-        to=settings.DEV_ALERT_EMAILS
-    )
-
     if not uidb64:
         raise Http404
 
@@ -201,7 +189,7 @@ def postback_url_view(request, uidb64):
                         )
                     )
 
-            if payment_method == Transaction.CREDIT_CARD:
+            elif payment_method == Transaction.CREDIT_CARD:
                 if is_starting_status:
                     # Pode acontecer um delay no pagamento de cartão
                     notify_new_user_and_unpaid_subscription_credit_card(
@@ -250,7 +238,7 @@ def postback_url_view(request, uidb64):
                         )
                     )
 
-            if payment_method == Transaction.CREDIT_CARD:
+            elif payment_method == Transaction.CREDIT_CARD:
                 if is_starting_status:
                     # Pode acontecer um delay no pagamento de cartão
                     notify_new_unpaid_subscription_credit_card(
@@ -280,6 +268,18 @@ def postback_url_view(request, uidb64):
                         new_desired_status
                     )
                 )
+
+        body = """
+                    We have received a postback call, here is the data:
+
+                    <pre><code>{0}</code></pre>
+            """.format(json.dumps(request.data))
+
+        send_mail(
+            subject="Recived a postbackcall",
+            body=body,
+            to=settings.DEV_ALERT_EMAILS
+        )
 
         return Response(status=201)
 
