@@ -5,12 +5,12 @@ from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from mailer import exception
+
 from gatheros_subscription.helpers.voucher import (
     create_voucher,
     get_voucher_file_name,
 )
-from mailer import checks
+from mailer import exception, checks
 
 CELERY = False
 
@@ -25,7 +25,7 @@ else:
         from .tasks import MailerAttachment, send_mail
 
 
-# ============================= CONGRESSY EMAILS ===============================
+# =========================== SUBSCRIBER EMAILS ============================= #
 def notify_new_unpaid_subscription_boleto(event, transaction):
     """
     Notifica participante de nova inscrição de um lote não-pago pelo método de
@@ -542,45 +542,13 @@ def notify_new_user_and_free_subscription(event, subscription):
         'password_set_url': password_set_url,
     })
 
-    if CELERY:
-        return send_mail.delay(
-            subject='Inscrição: {}'.format(event.name),
-            body=body,
-            to=person.email,
-            attachment=voucher_attach,
-        )
+    sender = send_mail.delay if CELERY else send_mail
 
-    return send_mail(
+    return sender(
         subject='Inscrição: {}'.format(event.name),
         body=body,
         to=person.email,
         attachment=voucher_attach,
-    )
-
-
-def notify_invite(organization, link, invitator, invited_person, email):
-    """
-    Define a notificação para um novo convite
-    """
-    template_name = 'mailer/notify_invitation.html'
-    body = render_to_string(template_name, {
-        'organizacao': organization,
-        'hospedeiro': invitator,
-        'convidado': invited_person,
-        'link': link,
-    })
-
-    if CELERY:
-        return send_mail.delay(
-            subject='Convite: {}'.format(organization),
-            body=body,
-            to=email,
-        )
-
-    return send_mail(
-        subject='Convite: {}'.format(organization),
-        body=body,
-        to=email,
     )
 
 
@@ -594,14 +562,9 @@ def notify_new_user(context):
 
     subject = 'Confirmação de cadastro na {0}'.format(context['site_name'])
 
-    if CELERY:
-        return send_mail.delay(
-            subject=subject,
-            body=body,
-            to=context['email'],
-        )
+    sender = send_mail.delay if CELERY else send_mail
 
-    return send_mail(
+    return sender(
         subject=subject,
         body=body,
         to=context['email'],
@@ -618,14 +581,9 @@ def notify_new_partner(context):
 
     subject = 'Cadastro de parceria na  {0}'.format(context['site_name'])
 
-    if CELERY:
-        return send_mail.delay(
-            subject=subject,
-            body=body,
-            to=context['partner_email'],
-        )
+    sender = send_mail.delay if CELERY else send_mail
 
-    return send_mail(
+    return sender(
         subject=subject,
         body=body,
         to=context['partner_email'],
@@ -639,19 +597,14 @@ def notify_partner_contract(context):
     """
 
     subject = 'Parceria Congressy: Vinculado ao evento {0}'.format(context[
-                                                                    'event'])
+                                                                       'event'])
 
     body = render_to_string('mailer/notify_partner_contract_email.html',
                             context=context)
 
-    if CELERY:
-        return send_mail.delay(
-            subject=subject,
-            body=body,
-            to=context['partner_email'],
-        )
+    sender = send_mail.delay if CELERY else send_mail
 
-    return send_mail(
+    return sender(
         subject=subject,
         body=body,
         to=context['partner_email'],
@@ -668,14 +621,9 @@ def notify_reset_password(context):
 
     subject = 'Redefina sua senha na {0}'.format(context['site_name'])
 
-    if CELERY:
-        return send_mail.delay(
-            subject=subject,
-            body=body,
-            to=context['email'],
-        )
+    sender = send_mail.delay if CELERY else send_mail
 
-    return send_mail(
+    return sender(
         subject=subject,
         body=body,
         to=context['email'],
@@ -692,23 +640,16 @@ def notify_set_password(context):
 
     subject = 'Defina sua senha na {0}'.format(context['site_name'])
 
-    if CELERY:
-        return send_mail.delay(
-            subject=subject,
-            body=body,
-            to=context['email'],
-        )
+    sender = send_mail.delay if CELERY else send_mail
 
-    return send_mail(
+    return sender(
         subject=subject,
         body=body,
         to=context['email'],
     )
 
 
-# ============================== INTERNAL  EMAILS ==============================
-
-
+# ============================ INTERNAL EMAILS ============================== #
 def notify_new_partner_internal(context):
     """
     Define a notificação interna para o comercial no evento de cadastro um novo
@@ -721,14 +662,9 @@ def notify_new_partner_internal(context):
 
     subject = 'Novo parceiro cadastrado: {0}'.format(context['partner_name'])
 
-    if CELERY:
-        return send_mail.delay(
-            subject=subject,
-            body=body,
-            to=settings.SALES_ALERT_EMAILS,
-        )
+    sender = send_mail.delay if CELERY else send_mail
 
-    return send_mail(
+    return sender(
         subject=subject,
         body=body,
         to=settings.SALES_ALERT_EMAILS,
@@ -753,23 +689,16 @@ def notify_new_event(event):
         }
     )
 
-    if CELERY:
-        send_mail.delay(
-            body=body,
-            subject="Novo evento: {}".format(event.name),
-            to=settings.SALES_ALERT_EMAILS
-        )
+    sender = send_mail.delay if CELERY else send_mail
 
-    send_mail(
+    sender(
         body=body,
         subject="Novo evento: {}".format(event.name),
         to=settings.SALES_ALERT_EMAILS
     )
 
 
-# ============================= ORGANIZATION  EMAILS ===========================
-
-
+# =========================== ORGANIZATION  EMAILS ========================== #
 def notify_invite(organization, link, inviter, invited_person, email):
     """
         Define a notificação para um novo convite
@@ -783,144 +712,13 @@ def notify_invite(organization, link, inviter, invited_person, email):
     })
 
     # @TODO remove me after all organizers have an email address.
-    if organization_has_email(organization):
-        reply_to = organization.email
-    else:
-        reply_to = None
+    reply_to = organization.email
 
-    if CELERY:
-        return send_mail.delay(
-            subject='Convite: {}'.format(organization),
-            body=body,
-            to=email,
-            reply_to=reply_to,
-        )
+    sender = send_mail.delay if CELERY else send_mail
 
-    return send_mail(
+    return sender(
         subject='Convite: {}'.format(organization),
         body=body,
         to=email,
         reply_to=reply_to,
     )
-
-
-# ============================= PARTICIPANTE EMAILS ============================
-
-
-def notify_new_subscription(event, subscription):
-    """
-        Define a notificação para uma nova inscrição
-    """
-    person = subscription.person
-
-    event_url = absoluteuri.reverse(
-        'public:hotsite',
-        kwargs={
-            'slug': event.slug,
-        }
-    )
-
-    # @TODO set event.date_start to period
-    body = render_to_string('mailer/notify_subscription.html', {
-        # 'gender_article': 'a' if person.gender == 'F' else 'o',
-        'gender_article': 'o(a)',
-        'person': person,
-        'event': event,
-        'event_url': event_url,
-        'period': event.date_start,
-        # 'count': subscription.count,
-        'date': subscription.created,
-        # 'local': local
-    })
-
-    # @TODO remove me after all organizers have an email address.
-    if organization_has_email(event.organization):
-        reply_to = event.organization.email
-    else:
-        reply_to = None
-
-    if CELERY:
-        return send_mail.delay(
-            subject='Inscrição: {}'.format(event.name),
-            body=body,
-            to=person.email,
-            reply_to=reply_to
-        )
-
-    return send_mail(
-        subject='Inscrição: {}'.format(event.name),
-        body=body,
-        to=person.email,
-        reply_to=reply_to
-    )
-
-
-def notify_new_user_and_subscription(event, subscription):
-    """
-    Define a notificação para uma nova inscrição com novo user
-    """
-    person = subscription.person
-
-    event_url = absoluteuri.reverse(
-        'public:hotsite',
-        kwargs={
-            'slug': event.slug,
-        }
-    )
-
-    user = person.user
-    uid = urlsafe_base64_encode(force_bytes(user.pk))
-    token = default_token_generator.make_token(user)
-
-    password_reset_url = absoluteuri.reverse(
-        'password_reset_confirm',
-        kwargs={
-            'uidb64': uid,
-            'token': token,
-        }
-    )
-
-    # @TODO set event.date_start to period
-    body = render_to_string('mailer/notify_user_and_subscription.html', {
-        'password_reset_url': password_reset_url,
-        'event': event,
-        'event_url': event_url,
-        # 'gender_article': 'a' if person.gender == 'F' else 'o',
-        'person': person,
-        'period': event.date_start,
-        'count': subscription.count,
-        'date': subscription.created,
-    })
-
-    # @TODO remove me after all organizers have an email address.
-    if organization_has_email(event.organization):
-        reply_to = event.organization.email
-    else:
-        reply_to = None
-
-    if CELERY:
-        return send_mail.delay(
-            subject='Inscrição: {}'.format(event.name),
-            body=body,
-            to=person.email,
-            reply_to=reply_to,
-        )
-
-    return send_mail(
-        subject='Inscrição: {}'.format(event.name),
-        body=body,
-        to=person.email,
-        reply_to=reply_to,
-    )
-
-
-# =================== HELPER FUNCTIONS =========================================
-
-
-# @TODO remove me after all organizers have an email address.
-def organization_has_email(organization):
-
-    if organization.email:
-        return True
-
-    return False
