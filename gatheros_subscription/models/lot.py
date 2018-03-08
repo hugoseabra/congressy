@@ -13,6 +13,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.encoding import force_text
 
+from core.model import track_data
 from gatheros_event.models import Event
 from gatheros_event.models.mixins import GatherosModelMixin
 from .rules import lot as rule
@@ -48,6 +49,7 @@ class LotManager(models.Manager):
                 return code
 
 
+@track_data('price')
 class Lot(models.Model, GatherosModelMixin):
     """ Modelo de Lote """
 
@@ -155,8 +157,8 @@ class Lot(models.Model, GatherosModelMixin):
         default=0,
         null=True,
         blank=True,
-        verbose_name='absorver juros de parcelas',
-        help_text="Número de parcelas que deseja absorver os juros."
+        verbose_name='assumir juros de parcelas',
+        help_text="Número de parcelas que deseja assumir os juros."
     )
     allow_installments = models.BooleanField(
         default=False,
@@ -193,7 +195,6 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name_plural = 'lotes'
         ordering = ['date_start', 'date_end', 'pk', 'name']
         unique_together = (("name", "event"),)
-
 
     @property
     def percent_completed(self):

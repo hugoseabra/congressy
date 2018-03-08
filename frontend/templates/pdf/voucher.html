@@ -1,4 +1,4 @@
-{% load static %}
+{% load static l10n humanize %}
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -53,26 +53,37 @@
                    style="border-width: 0;margin-top: 50px">
                 <tbody style="border-width: 0;">
                 <tr style="border-width: 0;">
-                    <td class="col-sm-2" style="border-width: 0;"><strong>Data
-                        / Horário</strong></td>
-                    <td class="col-sm-2">{{ event.get_period }}</td>
-                    <td><img src="data:image/png;base64,{{ qrcode }}"></td>
+                    <td class="col-sm-2" style="border-width: 0;">
+                        <strong>Data / Horário</strong>
+                    </td>
+                    <td class="col-sm-2">
+                        {{ event.get_period }}
+                    </td>
+                    <td class="col-sm-8">
+                        <img src="data:image/png;base64,{{ qrcode }}">
+                    </td>
                 </tr>
-                {% if event.place.name %}
+                {% if place and place.name %}
                     <tr style="border-width: 0;">
-                        <td class="col-sm-2" style="border-width: 0;"><strong>Local</strong>
+                        <td class="col-sm-2" style="border-width: 0;">
+                            <strong>Local</strong>
                         </td>
-                        <td class="col-sm-2"
-                            style="border-width: 0;">{{ event.place.name|upper }}</td>
+                        <td class="col-sm-2" style="border-width: 0;">
+                            {{ place.name|upper }}
+                        </td>
                     </tr>
                 {% endif %}
+                {% if subscription.lot.price and subscription.lot.price > 0 %}
                 <tr style="border-width: 0;">
-                    <td class="col-sm-2" style="border-width: 0;"><strong>Tipo
-                        de Ingresso</strong></td>
-                    <td class="col-sm-2"
-                        style="border-width: 0;"> {{ lot.name }} |
-                        R$ {{ lot.get_calculated_price }}</td>
+                    <td class="col-sm-2" style="border-width: 0;">
+                        <strong>Tipo de Ingresso</strong>
+                    </td>
+                    <td class="col-sm-2" style="border-width: 0;">
+                        {{ lot.name }} |
+                        R$ {{ subscription.lot.price|unlocalize|intcomma }}
+                    </td>
                 </tr>
+                {% endif %}
                 </tbody>
             </table>
 

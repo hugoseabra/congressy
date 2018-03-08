@@ -10,6 +10,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views.generic import FormView, TemplateView
 
+from core.forms.cleaners import clear_string
 from gatheros_event.forms import ProfileCreateForm, ProfileForm
 from gatheros_event.views.mixins import AccountMixin
 from mailer.services import notify_reset_password
@@ -75,6 +76,22 @@ class ProfileView(AccountMixin, FormView):
         messages.success(self.request, self.messages['success'])
         return redirect('event:profile')
 
+    def post(self, request, *args, **kwargs):
+        request.POST = request.POST.copy()
+
+        to_be_pre_cleaned = ['zip_code', 'institution_cnpj']
+
+        for field in to_be_pre_cleaned:
+            request.POST.update({field: clear_string(request.POST[
+                                                         field])})
+
+        return super().post(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['person'] = self.member.person
+        return context
+
 
 class ProfileCreateView(TemplateView, FormView):
     template_name = 'registration/register.html'
@@ -85,7 +102,6 @@ class ProfileCreateView(TemplateView, FormView):
     }
 
     def dispatch(self, request, *args, **kwargs):
-
         if request.user.is_authenticated:
             return redirect('front:start')
 

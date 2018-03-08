@@ -46,25 +46,14 @@
 
         {% block messages %}
             {% if messages %}
-                <div style="width:100%;margin-top:3px;padding-bottom:10px">
+            <div style="width:100%;margin-top:3px;padding-bottom:10px">
                 {% for message in messages %}
-
-                    {% if message.tags %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible"
-                             role="alert">
-
-                    {% else %}
-                        <div class="alert alert-warning alert-dismissible"
-                             role="alert">
-                    {% endif %}
-
-                <button type="button" class="close" data-dismiss="alert"
-                        aria-label="Close"><span
-                        aria-hidden="true">&times;</span>
-                </button>
-                {{ message|capfirst }}
-                </div>
-
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}warning{% endif %} alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message|capfirst }}
+                    </div>
                 {% endfor %}
             </div>
             {% endif %}
@@ -90,7 +79,6 @@
                     <i class="fa fa-check-circle fa-5x"
                        style="color: darkgreen"
                        aria-hidden="true"></i>
-
                 </div>
             </div>
         {% else %}
@@ -111,8 +99,12 @@
             <div class="form-group form-group-submit">
                 <button class="btn btn-primary btn-lg btn-block"
                         data-loading-text="Quero me inscrever">
-                    Fazer inscrição
+                    Realizar inscrição
                 </button>
+                <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
+                    Ao realizar sua inscrição, você declara ter aceitado os
+                    <a href="https://www.congressy.com/termos-de-uso/" style="font-weight: bold;" target="_blank">termos de uso</a>.
+                </div>
             </div>
 
         {% endif %}

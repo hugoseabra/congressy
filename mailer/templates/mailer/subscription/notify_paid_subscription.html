@@ -1,0 +1,13 @@
+{% extends 'mailer/subscription/base_notification.html' %}
+{% load humanize %}
+
+{% block introduction %}
+    {% include 'mailer/subscription/includes/new-subscription.html' %}
+    {% include 'mailer/subscription/includes/paid-subscription.html' %}
+    {% include 'mailer/subscription/includes/voucher.html' %}
+{% endblock %}
+
+{% block extra_content %}
+    {% include 'mailer/subscription/includes/boleto-url.html' %}
+    {% include 'mailer/subscription/includes/account.html' %}
+{% endblock %}

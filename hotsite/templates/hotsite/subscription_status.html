@@ -59,8 +59,8 @@
                                 <table class="table table-hover">
                                     <thead>
                                     <tr>
-                                        <th class="col-xs-1">Status</th>
-                                        <th class="col-xs-2">Data</th>
+                                        <th class="col-xs-1 hidden-xs">Status</th>
+                                        <th class="col-xs-2 hidden-xs">Data</th>
                                         <th class="col-xs-3">Forma de
                                             Pagamento
                                         </th>
@@ -70,7 +70,7 @@
                                     <tbody>
                                     {% for transaction in transactions %}
                                         <tr>
-                                            <td>
+                                            <td class="hidden-xs">
 
                                                 {% if transaction.status == 'processing' or transaction.status == 'waiting_payment' or transaction.status == 'pending_refund' or transaction.status == 'chargedback' %}
                                                     <i class="fa fa-circle"
@@ -92,7 +92,7 @@
                                             </td>
 
 
-                                            <td>
+                                            <td class="hidden-xs">
                                                 {% to_datetime transaction.data.date_created as created_date %}
                                                 {{ created_date }}h
                                             </td>

@@ -1,32 +1,77 @@
 {% extends "base/base.html" %}
 
-{% load i18n static widget_tweaks%}
+{% load i18n static widget_tweaks form_config_tags %}
+
 {% block title %}Editar Perfil | Congressy{% endblock %}
 
 {% block page_title %}Editar Perfil{% endblock %}
+
 {% block page_sub_title %}{{ request.user.get_full_name }}{% endblock %}
 
 {% block sidebar %}{% endblock %}
+
 {% block sidebar-bars %}{% endblock %}
 
 {% block scripts %}
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <!-- Script used in in subscription. -->
+
+    <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script type="application/javascript">
 
         $(document).ready(function () {
-            $('#id_email').attr('readonly', 'readonly');
-            $('#id_phone').mask("(99) 99999-9999");
+            var phone_el = $('#id_phone');
+            var uf_el = $('#id_state');
+            var city_el = $('#id_city_name');
+            var city_id_el = $('#id_city_name');
+
+            if(phone_el.val()){
+                phone_el.mask("(99) 99999-9999");
+            }
+
+
+            $('#id_zip_code').mask("99.999-999");
+
+            //If we have a value already, preload results from API
+            if (city_id_el.val()) {
+                $.ajax({
+                    url: "/api/cities/" + $('#id_city').val(),
+                    success: function (result) {
+                        uf_el.val(result.uf);
+                        city_el.val(result.name);
+                        //populate the html with result here
+                    }
+                });
+            }
+            showHideCepLoader();
         });
+
+        var uf_el = $('#id_state');
+        var city_el = $('#id_city_name');
+
+        window.setTimeout(function () {
+            {% if person.city %}
+                uf_el.val('{{ person.city.uf }}');
+                fetch_cities(uf_el, '{{ person.city.pk }}');
+            {% else %}
+                uf_el.val('');
+                city_el.val('');
+                city_el.prop('disabled', true);
+            {% endif %}
+        }, 300);
 
     </script>
 {% endblock %}
 
 {% block content %}
+
     <form action="" method="post" enctype="multipart/form-data">
+
         {% csrf_token %}
 
+
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar">
                     <div class="float-right">
                         <button type="submit" class="btn btn-success">
@@ -36,67 +81,178 @@
                     </div>
                     <div class="clearfix"></div>
                 </div>
+
             </div>
         </div>
 
         <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-primary">
-                    <div class="panel-body">
-                        {% for field in form %}
-                            {% if field.field.widget.input_type == "hidden" %}
-                                {{ field }}
-                            {% else %}
-                                <div class="form-group">
 
-                                    <label for="{{ field.id_for_label }}">
-                                        {{ field.label }}
-                                        {% if field.field.required %}
-                                            <small style="color:#C9302C">*
-                                            </small>
-                                        {% endif %}
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Dados pessoais</div>
+                    </div>
+                    <div class="panel-body">
+
+
+                        {% if form.non_field_errors %}
+                            {% render_errors form.non_field_errors %}
+                        {% endif %}
+
+                        {% for hidden_field in form.hidden_fields %}
+                            {% if hidden_field.errors %}
+                                {% render_errors hidden_field.errors %}
+                            {% endif %}
+                            {{ hidden_field }}
+                        {% endfor %}
+
+                        <div class="row">
+                            <div class="col-md-9">
+                                {% render_generic_field form.name %}
+                            </div>
+
+                            <div class="col-md-3">
+                                {% render_generic_field form.gender %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <label for="{{ form.email.id_for_label }}">
+                                        {{ form.email.label }}
                                     </label>
 
-                                    <div>
-                                        {% if field.field.widget.input_type == "checkbox" %}
-                                            {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
-                                        {% elif field.id_for_label == "id_phone" %}
-                                            {{ field |add_class:"form-control" |attr:"type:tel" |attr:"placeholder:(99) 99999-9999" }}
-                                        {% else %}
-                                            {{ field |add_class:"form-control" }}
-                                        {% endif %}
-                                        {% if field.errors %}
-                                            {% for error in field.errors %}
-                                                <div class="alert alert-danger
-                                            alert-dismissable">
-                                                    <button type="button"
-                                                            class="close"
-                                                            data-dismiss="alert"
-                                                            aria-hidden="true">
-                                                        ×
-                                                    </button>
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                        {% if field.help_text %}
-                                            <div>
-                                                <small class="text-muted">{{ field.help_text|safe }}</small>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
+                                    {{ form.email |add_class:"form-control" }}
                                 </div>
-                            {% endif %}
-                        {% endfor %}
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                {% render_generic_field form.cpf %}
+
+                            </div>
+
+                        </div>
+
+                        <div class="row" style="padding-bottom: 30px">
+
+                            <div class="col-md-6">
+
+                                {% render_generic_field form.birth_date %}
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                {% render_generic_field form.phone %}
+
+                            </div>
+
+                        </div>
                     </div>
                 </div>
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Instituição</div>
+                    </div>
+                    <div class="panel-body">
+
+
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                {% render_generic_field form.institution %}
+                            </div>
+
+
+                            <div class="col-md-4">
+                                {% render_generic_field form.institution_cnpj %}
+                            </div>
+
+
+                            <div class="col-md-4">
+                                {% render_generic_field form.function %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Endereço</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                {% render_generic_field form.zip_code %}
+                                <div id="cep_loader"
+                                     style="width: 22px;position: absolute;
+                                     top: 33px;right: 33px;">
+                                    <img src="{% static 'assets/img/loader.gif' %}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row address-row">
+                            <div class="col-md-9">
+                                {% render_generic_field form.street %}
+                            </div>
+                            <div class="col-md-3 address-row">
+                                {% render_generic_field form.number %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 address-row">
+                                {% render_generic_field form.complement %}
+                            </div>
+                            <div class="col-md-6 address-row">
+                                {% render_generic_field form.village %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 address-row">
+                                {% render_generic_field form.state %}
+                            </div>
+                            <div class="col-md-9 address-row">
+                                {% render_generic_field form.city_name %}
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Alterar senha</div>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% render_generic_field form.new_password1 %}
+                            </div>
+
+                            <div class="col-md-6">
+                                {% render_generic_field form.new_password2 %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
+
         </div>
 
         <div class="row">
-            <div class="col-md-12">
-                <div class="buttonbar bottom">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar">
                     <div class="float-right">
                         <button type="submit" class="btn btn-success">
                             <i class="fa fa-save"></i>
@@ -105,6 +261,7 @@
                     </div>
                     <div class="clearfix"></div>
                 </div>
+
             </div>
         </div>
 

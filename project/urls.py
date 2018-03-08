@@ -5,6 +5,7 @@ import os
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
+from django.views.generic import RedirectView
 
 from gatheros_event.urls.invitation import urlpatterns_public_invitation
 from gatheros_event.urls.me import (
@@ -16,8 +17,8 @@ from gatheros_front.urls import (
     urlpatterns_public as gatheros_front_public,
 )
 from hotsite.urls import urlpatterns_public_hotsite
-from payment.urls import urlpatterns_public_payments_api, private_payment_urls
 from partner.urls import urlpatterns_public_partner
+from payment.urls import private_payment_urls, urlpatterns_public_payments_api
 
 handler500 = 'project.views.handler500'
 
@@ -48,6 +49,21 @@ public_urlpatterns = [
     url(r'^', include(urlpatterns_public_password)),
 ]
 
+public_urlpatterns += [
+    url(r'^captcha/', include('captcha.urls')),
+]
+
+if not settings.DEBUG:
+    public_urlpatterns += [
+        url(
+            r'^',
+            RedirectView.as_view(
+                url='https://congressy.com'
+            ),
+            name='root'
+        ),
+    ]
+
 # API
 api_urls = [
     url(r'^', include(urlpatterns_public_payments_api, 'payment')),
@@ -60,10 +76,6 @@ urlpatterns = admin_urlpatterns
 urlpatterns += private_urlpatterns
 urlpatterns += public_urlpatterns
 urlpatterns += api_urlpatterns
-
-urlpatterns += [
-    url(r'^captcha/', include('captcha.urls')),
-]
 
 # ============================ STATIC CONFIG ================================ #
 urlpatterns += static.static(

@@ -7,17 +7,8 @@ from kanu_locations.models import City
 
 from core.forms.cleaners import clear_string
 from core.forms.widgets import DateInput, AjaxChoiceField, TelephoneInput
+from core.util import create_years_list
 from gatheros_event.models import Occupation, Person
-
-
-def create_years_list():
-    years = []
-    epoch = 1950
-    for i in range(60):
-        epoch += 1
-        years.append(epoch)
-
-    return years
 
 
 class PersonForm(forms.ModelForm):
@@ -98,7 +89,6 @@ class PersonForm(forms.ModelForm):
         if is_chrome:
             self.fields['birth_date'].widget = DateInput()
 
-
     def setAsRequired(self, field_name):
         if field_name not in self.fields:
             return
@@ -167,4 +157,3 @@ class PersonForm(forms.ModelForm):
 
             # Remain same value from persistence
             self.data[field_name] = value
-
