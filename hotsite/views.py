@@ -424,7 +424,10 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         # Se o já inscrito e porém, não há lotes pagos, não há o que
         # fazer aqui.
         if self.is_subscribed() and not self.has_paid_lots():
-            return redirect('public:hotsite-status', slug=self.event.slug)
+            return redirect(
+                'public:subscription-status',
+                slug=self.event.slug
+            )
 
         return response
 
