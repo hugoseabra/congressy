@@ -13,7 +13,6 @@ class Option(models.Model):
     class Meta:
         verbose_name = 'Opção de uma pergunta'
         verbose_name_plural = 'Opções de uma pergunta'
-        ordering = ['']
 
     name = models.CharField(
         max_length=255,

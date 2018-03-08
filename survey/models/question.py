@@ -2,7 +2,7 @@
     Question domain model.
 """
 from django.db import models
-from . import Survey
+from survey.models import Survey
 
 
 class Question(models.Model):
@@ -13,9 +13,8 @@ class Question(models.Model):
     class Meta:
         verbose_name = 'Pergunta de Questionario'
         verbose_name_plural = 'Perguntas de Questionario'
-        ordering = ['']
 
-    title = models.CharField(
+    name = models.CharField(
         max_length=255,
         verbose_name='titulo',
         help_text='Título da pergunta'
@@ -27,16 +26,15 @@ class Question(models.Model):
         help_text="Obrigatoriedade da pergunta"
     )
 
+    is_complex = models.BooleanField(
+        default=False,
+        verbose_name='pergunta com opções',
+        help_text="Pergunta possui opções."
+    )
+
     survey = models.ForeignKey(
         Survey,
         on_delete=models.CASCADE,
-        verbose_name='questionario'
+        verbose_name='questionario',
     )
-
-
-
-
-
-
-
 
