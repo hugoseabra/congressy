@@ -425,7 +425,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         # fazer aqui.
         if self.is_subscribed() and not self.has_paid_lots():
             return redirect(
-                'public:subscription-status',
+                'public:hotsite-subscription-status',
                 slug=self.event.slug
             )
 
