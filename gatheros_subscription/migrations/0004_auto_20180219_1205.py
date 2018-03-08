@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                         'institution-cnpj-required',
                         'Mostrar e Tornar obrigatório')],
                 default='institution-cnpj-hide',
-                help_text='CNPJ da empresa com a qual você o(a) partcipante'
+                help_text='CNPJ da empresa com a qual o(a) partcipante está'
                           ' vinculado(a).',
                 max_length=35, verbose_name='CNPJ'),
         ),

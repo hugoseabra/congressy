@@ -137,7 +137,7 @@ class FormConfig(models.Model):
         default=INSTITUTION_CNPJ_HIDE,
         max_length=35,
         verbose_name='CNPJ',
-        help_text='CNPJ da empresa com a qual você o(a) partcipante'
+        help_text='CNPJ da empresa com a qual o(a) partcipante está'
                   ' vinculado(a).'
     )
 
