@@ -1,5 +1,6 @@
 """
-    Mock factory used during tests to create required objects
+    Mock factory used during tests to create required gatheros event
+    domain objects.
 """
 from datetime import datetime, timedelta
 
@@ -15,7 +16,7 @@ class MockFactory:
     """
 
     def __init__(self):
-        self.fake_factory = Faker()
+        self.fake_factory = Faker('pt_BR')
 
     def fake_person(self):
         person = Person(name=self.fake_factory.name(), email=self.fake_factory.free_email())
