@@ -717,7 +717,7 @@ def notify_invite(organization, link, inviter, invited_person, email):
     """
 
     body = render_to_string('mailer/notify_invitation.html', {
-        'organizacao': organization,
+        'organizacao': organization.name,
         'hospedeiro': inviter,
         'convidado': invited_person,
         'link': link,
@@ -726,7 +726,7 @@ def notify_invite(organization, link, inviter, invited_person, email):
     sender = send_mail.delay if CELERY else send_mail
 
     return sender(
-        subject='Convite: {}'.format(organization),
+        subject='Convite: {}'.format(organization.name),
         body=body,
         to=email,
         reply_to=organization.email,
