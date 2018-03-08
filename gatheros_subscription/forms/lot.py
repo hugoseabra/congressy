@@ -1,29 +1,27 @@
 """ Formulários de `Lot` """
 from datetime import timedelta, datetime
 
-from datetimewidget.widgets import DateTimeWidget
 from django import forms
 
 from gatheros_subscription.models import Lot
+from core.forms import DateTimeInput, TelephoneInput
 
-
-class TelephoneInput(forms.TextInput):
-    input_type = 'tel'
+INSTALLMENT_CHOICES = (
+    (2, 2),
+    (3, 3),
+    (4, 4),
+    (5, 5),
+    (6, 6),
+    (7, 7),
+    (8, 8),
+    (9, 9),
+    (10, 10),
+)
 
 
 class LotForm(forms.ModelForm):
     """ Formulário de lote. """
     event = None
-
-    dateTimeUsOptions = {
-        'format': 'mm/dd/yyyy hh:ii',
-        'autoclose': True,
-    }
-
-    dateTimePtBROptions = {
-        'format': 'dd/mm/yyyy hh:ii',
-        'autoclose': True,
-    }
 
     class Meta:
         """ Meta """
@@ -38,47 +36,36 @@ class LotForm(forms.ModelForm):
             'private',
             'exhibition_code',
             'transfer_tax',
-            'allow_installments',
-            'free_installments',
-            'transfer_interest_rate'
-            # 'discount_type',
-            # 'discount',
-
-
+            'allow_installment',
+            'installment_limit',
+            'num_install_interest_absortion',
         ]
+
         widgets = {
             'event': forms.HiddenInput(),
             'price': TelephoneInput(),
-            'date_start':  DateTimeWidget(
-                bootstrap_version=3,
-                attrs={'style': 'background-color:#FFF'},
+            'date_start': DateTimeInput(attrs={'placeholder': 'dd/mm/aaaa '
+                                                              'hh:mm'}),
+            'date_end': DateTimeInput(attrs={'placeholder': 'dd/mm/aaaa '
+                                                            'hh:mm'}),
+            'installment_limit': forms.Select(
+                choices=INSTALLMENT_CHOICES
             ),
-            'date_end':  DateTimeWidget(
-                bootstrap_version=3,
-                attrs={'style': 'background-color:#FFF'},
+            'num_install_interest_absortion': forms.Select(
+                choices=((0, 0,),) + INSTALLMENT_CHOICES
             ),
         }
 
     def __init__(self, lang='pt-br', **kwargs):
         self.lang = lang
 
-        # if 'instance' in kwargs and kwargs['instance'] is not None:
-        #     self.instance = kwargs.get('instance')
-        #     if not self.instance.exhibition_code:
-        #         kwargs['initial']['exhibition_code'] = \
-        #             str(uuid.uuid4()).split('-')[0].upper()
-        #
-        # else:
-        #     event = kwargs.get('initial').get('event')
-        #     kwargs['initial']['date_end'] = event.date_start - timedelta(minutes=1)
-
         self.event = kwargs.get('initial').get('event')
 
         super(LotForm, self).__init__(**kwargs)
 
-        # self._set_dates_help_texts()
-        #
-        self._set_widget_date()
+        if self.instance.pk and self.instance.subscriptions.count() > 0:
+            self.fields['price'].widget.attrs['disabled'] = 'disabled'
+            self.fields['price'].disabled = True
 
     def _set_dates_help_texts(self):
         last_lot = self.event.lots.last()
@@ -112,44 +99,12 @@ class LotForm(forms.ModelForm):
             'O evento inicia-se em {}. O final do lote será anterior a' \
             ' este data.'.format(event_date_start)
 
-    def _set_widget_date(self):
-
-        self.fields['date_start'].widget = DateTimeWidget(
-            bootstrap_version=3,
-            attrs={'style': 'background-color:#FFF'},
-            options={
-                'startDate': '{0:%d-%m-%Y %H:%M}'.format(
-                    datetime.now() - timedelta(minutes=10)
-                ),
-                'endDate': '{0:%d-%m-%Y %H:%M}'.format(
-                     self.event.date_start - timedelta(minutes=2)
-                 )
-            }
-        )
-
-        self.fields['date_end'].widget = DateTimeWidget(
-            bootstrap_version=3,
-            attrs={'style': 'background-color:#FFF'},
-            options={
-                'startDate': '{0:%d-%m-%Y %H:%M}'.format(datetime.now()),
-                'endDate': '{0:%d-%m-%Y %H:%M}'.format(
-                    self.event.date_start - timedelta(minutes=2)
-                )
-            }
-        )
-
-        if self.lang == 'en' or self.lang == 'en-us':
-            self.fields['date_start'].widget.options = self.dateTimeUsOptions
-            self.fields['date_end'].widget.options = self.dateTimeUsOptions
-        else:
-            self.fields['date_start'].widget.options = self.dateTimePtBROptions
-            self.fields['date_end'].widget.options = self.dateTimePtBROptions
-
     def clean(self):
         cleaned_data = super().clean()
         raw_data = self.data
 
-        date_start = datetime.strptime(raw_data['date_start'], '%d/%m/%Y %H:%M')
+        date_start = datetime.strptime(raw_data['date_start'],
+                                       '%d/%m/%Y %H:%M')
         cleaned_data['date_start'] = date_start
 
         if 'date_end' in raw_data and raw_data['date_end']:
@@ -159,46 +114,27 @@ class LotForm(forms.ModelForm):
             )
             cleaned_data['date_end'] = date_end
         else:
-            # self.date_start = self.date_start.replace(hour=8, minute=0, second=0)
-            # self.date_end = self.event.date_start - timedelta(minutes=1)
             cleaned_data['date_end'] = \
                 self.event.date_end - timedelta(minutes=1)
 
+        price = self.cleaned_data.get('price')
+        if price is not None and price > 0 and (price < 10 or price > 30000):
+            raise forms.ValidationError(
+                {
+                    'price': 'Você deve informar um valor entre a R$ 10,00'
+                             ' e R$ 30.000,00'
+                }
+            )
+
+        # Não é permitido editar preço para lotes com inscrições.
+        if self.instance.pk \
+                and self.instance.has_changed('price') \
+                and self.instance.subscriptions.count() > 0:
+            raise forms.ValidationError(
+                {
+                    'price': 'Este lote já possui inscrições. Seu valor não'
+                             ' pode ser alterado.'
+                }
+            )
+
         return cleaned_data
-
-
-    # def clean_date_start(self):
-    #     lots = self.event.lots.order_by('date_start')
-    #     date_start = self.cleaned_data['date_start']
-    #
-    #     lot_dt = date_start
-    #     for lot in lots:
-    #         lot.date_end = lot_dt - timedelta(minutes=1)
-    #         lot.save()
-    #
-    #         lot_dt = lot.date_start
-    #
-    #     return date_start
-
-
-    # SMART WIDGET
-    # def _set_widget_start_date(self):
-    #
-    #     previous_lot_exist = self.event.lots.last()
-    #     last_call = self.event.date_start - timedelta(minutes=1)
-    #
-    #     if previous_lot_exist:
-    #         if previous_lot_exist.date_start < datetime.now():
-    #             str_date = '{0:%d-%m-%Y %H:%M}'.format(datetime.now())
-    #         else:
-    #             str_date = '{0:%d-%m-%Y %H:%M}'.format(
-    #                 previous_lot_exist.date_start + timedelta(days=1))
-    #         last_date_str = '{0:%d-%m-%Y %H:%M}'.format(last_call)
-    #     else:
-    #         str_date = '{0:%d-%m-%Y %H:%M}'.format(datetime.now())
-    #         last_date_str = '{0:%d-%m-%Y %H:%M}'.format(last_call)
-    #
-    #     self.fields['date_start'].widget = DateTimeWidget(
-    #         bootstrap_version=3,
-    #         attrs={'style': 'background-color:#FFF'},
-    #         options={'startDate': str_date, 'endDate': last_date_str})

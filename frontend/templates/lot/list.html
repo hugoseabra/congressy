@@ -2,6 +2,7 @@
 {# @TODO Change the icons in nav_aside_itens  #}
 {% load static %}
 {% load event_tags %}
+{% load queryset_filter %}
 
 {% block title %} Lotes | Congressy{% endblock %}
 
@@ -56,6 +57,10 @@
                         "width": "3%",
                         "className": "text-center",
                         "targets": [-1]
+                    },
+                    {
+                        "targets": 0,
+                        "className": "nowrap"
                     }
                 ],
                 // Default order
@@ -80,6 +85,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
             </a>
         </li>
         {#        <li>#}
@@ -147,8 +153,8 @@
                             <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Tipo</th>
-                                <th>Inscrições</th>
+                                <th class="hidden-xs hidden-sm">Tipo</th>
+                                <th class="hidden-xs">Inscrições</th>
                                 <th>Preço</th>
                                 <th></th>
                             </tr>
@@ -174,12 +180,12 @@
                                 <small class="text-muted">{{ lot.get_period }}</small>
                             </td>
 
-                            <td>{% if lot.price and lot.price > 0 %}
+                            <td class="hidden-xs hidden-sm">{% if lot.price and lot.price > 0 %}
                                 Pago{% else %}Gratuito{% endif %}</td>
 
 
-                            <td>
-                                {{ lot.subscriptions.all|length }}
+                            <td class="hidden-xs">
+                                {{ lot.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}
                                 {% if lot.limit %}
                                     / {{ lot.limit }}
                                     vagas

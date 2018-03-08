@@ -51,12 +51,18 @@ $(document).ready(function() {
         '{{ event.place.lat }}'.replace(',', '.'),
         '{{ event.place.long }}'.replace(',', '.')
     );
+});
+</script>
+{% endif %}
+<script>
+$(document).ready(function() {
     $('input[type=email]').on('keyup', function() {
         $(this).val($(this).val().toLowerCase());
     })
 });
 </script>
-{% endif %}
+
+
 
 {% include 'sentry-javascript-sdk.html' %}
 {% include 'hotjar.html' %}

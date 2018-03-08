@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load i18n static widget_tweaks %}
+{% load i18n static widget_tweaks queryset_filter %}
 
 {% block title %}
     Formulário de Inscrição | Congressy
@@ -114,6 +114,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
             </a>
         </li>
         {#        <li>#}

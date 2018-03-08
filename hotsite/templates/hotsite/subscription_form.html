@@ -255,6 +255,7 @@
 
 
                     <input type="hidden" id="id_amount" name="amount">
+                    <input type="hidden" id="id_installments" name="installments">
                     <input type="hidden" id="id_card_hash" name="card_hash">
                     <input type="hidden" id="id_transaction_type" name="transaction_type">
 
@@ -272,14 +273,18 @@
                     <input type="hidden" id="id_organization" name="organization" value={{ event.organization.pk }}>
                     <button type="submit" class="btn btn-primary btn-lg btn-block"
                             data-loading-text="Enviar">
-                        Enviar
+                        Aceitar e Realizar inscrição
                     </button>
+                    <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
+                        Ao realizar sua inscrição, você declara ter aceitado os
+                        <a href="https://www.congressy.com/termos-de-uso/" style="font-weight: bold;" target="_blank">termos de uso</a>.
+                    </div>
                 </div>
             </div>
         </div>
     </form>
 
-    <section class="text-right cgsy-footer footer-wrapper text-muted">
+    <section class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
         {% include "base/footer.html" %}
     </section>
 {% endif %}

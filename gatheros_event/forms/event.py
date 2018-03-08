@@ -3,7 +3,6 @@ Formulários de Event
 """
 import os
 
-from datetimewidget.widgets import DateTimeWidget
 from django import forms
 from django.shortcuts import get_object_or_404
 from gatheros_event.models.rules import event as rule
@@ -11,18 +10,12 @@ from gatheros_event.models.rules import event as rule
 from gatheros_event.models import Event, Member, Organization
 
 
+class DateTimeInput(forms.DateTimeInput):
+    input_type = 'tel'
+
+
 class EventForm(forms.ModelForm):
     """Formulário principal de evento"""
-
-    dateTimeUsOptions = {
-        'format': 'mm/dd/yyyy hh:ii',
-        'autoclose': True,
-    }
-
-    dateTimePtBROptions = {
-        'format': 'dd/mm/yyyy hh:ii',
-        'autoclose': True,
-    }
 
     class Meta:
         model = Event
@@ -33,43 +26,26 @@ class EventForm(forms.ModelForm):
             'date_start',
             'date_end',
             'subscription_type',
-            # 'subscription_offline',
-            # 'published'
         ]
-
-        # widgets = {'organization': forms.HiddenInput,
-        #            'date_start': forms.DateTimeInput,
-        #            'date_end': forms.DateTimeInput,
-        #            }
 
         widgets = {
             'organization': forms.HiddenInput,
-            'date_start': DateTimeWidget(
-                bootstrap_version=3,
-                attrs={'style': 'background-color:#FFF'}
-            ),
-            'date_end': DateTimeWidget(
-                bootstrap_version=3,
-                attrs={'style': 'background-color:#FFF'}
-            ),
             'subscription_type': forms.RadioSelect,
+            'date_start': DateTimeInput(attrs={'placeholder': 'dd/mm/aaaa '
+                                                              'hh:mm'}),
+            'date_end': DateTimeInput(attrs={'placeholder': 'dd/mm/aaaa '
+                                                            'hh:mm'}),
         }
 
     def __init__(self, user, lang='pt-br', *args, **kwargs):
         self.user = user
 
+        instance = kwargs.get('instance')
+
         super(EventForm, self).__init__(*args, **kwargs)
 
-        instance = kwargs.get('instance')
         if instance is None:
             self._configure_organization_field()
-
-        if lang == 'en' or lang == 'en-us':
-            self.fields['date_start'].widget.options = self.dateTimeUsOptions
-            self.fields['date_end'].widget.options = self.dateTimeUsOptions
-        else:
-            self.fields['date_start'].widget.options = self.dateTimePtBROptions
-            self.fields['date_end'].widget.options = self.dateTimePtBROptions
 
     def _configure_organization_field(self):
         orgs = []
@@ -89,20 +65,12 @@ class EventForm(forms.ModelForm):
         self.fields['organization'].choices = orgs
         self.fields['organization'].label = 'Realizador'
 
-    def full_clean(self):
-        super().full_clean()
-
-        if not self.is_bound:  # Stop further processing.
-            return
-
-        try:
-            rule.rule_1_data_inicial_antes_da_data_final(
-                self.cleaned_data['date_start'],
-                self.cleaned_data['date_end']
-            )
-
-        except forms.ValidationError as e:
-            self.add_error(None, e)
+    def clean(self):
+        rule.rule_1_data_inicial_antes_da_data_final(
+            self.cleaned_data['date_start'],
+            self.cleaned_data['date_end']
+        )
+        return super().clean()
 
 
 class EventEditDatesForm(forms.ModelForm):

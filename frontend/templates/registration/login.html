@@ -9,8 +9,18 @@
 {# @TODO Implementar Oauth2. #}
 
 {% block form %}
-    <p class="text-center">Entre com suas credenciais para acessar sua conta.</p>
-    <form action="" method="post" class="form-horizontal" role="form" onsubmit="submit_form(this);">
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <p class="text-center">Entre com suas credenciais para acessar sua
+        conta.</p>
+    <form action="" method="post" class="form-horizontal" role="form"
+          onsubmit="submit_form(this);">
         {% csrf_token %}
         <div class="form-group">
             <div class="col-md-12">
@@ -55,13 +65,16 @@
         <div class="form-group" style="margin-bottom: 0">
             <div class="col-md-6 secondary-links">
                 <div class="help-block">
-                    <a href="{% url 'public:profile_create' %}{% if is_embeded %}?embeded=1{% endif %}"
+                    <a href="
+                            {% url 'public:profile_create' %}{% if is_embeded %}?embeded=1{% endif %}"
                        style="font-weight: bold;">Criar conta</a>
                 </div>
             </div>
             <div class="col-md-6 secondary-links">
                 <div class="help-block text-right left-when-small">
-                    <a href="{% url 'password_reset' %}" {% if is_embeded %}target="_blank"{% endif %}>Esqueceu sua
+                    <a href="{% url 'password_reset' %}"
+                       {% if is_embeded %}target="_blank"{% endif %}>Esqueceu
+                        sua
                         senha?</a>
                 </div>
             </div>

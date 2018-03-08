@@ -1,5 +1,6 @@
 {% extends 'hotsite/base.html' %}
 {% load static user_agents user_agent_tag %}
+{% load l10n humanize %}
 
 {% block styles %}
     <style>
@@ -61,7 +62,12 @@
         var lots = {};
         {% for lot in paid_lots %}
             {% if lot.price %}
-                lots['{{ lot.pk }}'] = parseFloat({{ lot.get_calculated_price }});
+                lots['{{ lot.pk }}'] = {
+                    'amount': '{{ lot.get_calculated_price|unlocalize|intcomma }}',
+                    'allow_installment': {% if lot.allow_installment %}true{% else %}false{% endif %},
+                    'installment_limit': {{ lot.installment_limit }},
+                    'free_installment': {{ lot.num_install_interest_absortion|default_if_none:0 }}
+                };
             {% endif %}
         {% endfor %}
 
@@ -77,6 +83,7 @@
             $('#id_button_pay').on('click', function () {
                 process_payment(
                     '{{ pagarme_encryption_key }}',
+                    2.29,
                     '{{ event.name }}',
                     lots,
                     allowed_transactions

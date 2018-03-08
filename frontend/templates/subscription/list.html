@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 
-{% load i18n static  subscription_tags %}
+{% load i18n static  subscription_tags queryset_filter %}
 
 {% block title %} Inscrições | Congressy{% endblock %}
 
@@ -67,8 +67,17 @@
                         "targets": [-1]
                     },
                     {
-                        "width": "18%",
+                        "targets": 0,
+                        "className": "nowrap"
+                    },
+                    {
+                        "width": "13%",
                         "targets": 1,
+                        "className": "text-center"
+                    },
+                    {
+                        "width": "13%",
+                        "targets": 2,
                         "className": "text-center"
                     }
                 ],
@@ -109,6 +118,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
             </a>
         </li>
         {#        <li>#}
@@ -177,7 +187,7 @@
                             <thead>
                             <tr>
                                 <th>Nome do Participante</th>
-                                <th>Cód. Inscrição</th>
+                                <th class="hidden-xs">Cód. Inscrição</th>
                                 <th>Status</th>
                                 <th></th>
                             </tr>
@@ -208,7 +218,7 @@
                                         </a>
                                         <div class="text-muted">{{ item.created }}</div>
                                     </td>
-                                    <td>
+                                    <td class="hidden-xs">
                                         {{ item.code }}
                                     </td>
 
@@ -245,13 +255,12 @@
                                                         </a>
                                                     </li>
                                                 {% endif %}
-                                                <li>
-                                                    <a href="{% url 'subscription:subscription-delete' event.pk item.pk %}">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                        Cancelar
-                                                    </a>
-                                                </li>
-
+{#                                                <li>#}
+{#                                                    <a href="{% url 'subscription:subscription-delete' event.pk item.pk %}">#}
+{#                                                        <i class="fas fa-trash-alt"></i>#}
+{#                                                        Cancelar#}
+{#                                                    </a>#}
+{#                                                </li>#}
                                             </ul>
                                         </div>
                                     </td>

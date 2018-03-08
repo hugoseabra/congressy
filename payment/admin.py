@@ -4,9 +4,7 @@ Django Admin para Payments
 """
 from django.contrib import admin
 
-from .models import Transaction, TransactionStatus
-
-admin.site.register(TransactionStatus)
+from .models import Transaction, TransactionStatus, BankAccount
 
 
 @admin.register(Transaction)
@@ -15,5 +13,18 @@ class TransactionAdmin(admin.ModelAdmin):
         'subscription__person__name',
         'subscription__event__name',
     )
+    list_display = ('subscription', 'status', 'type', 'date_created', 'amount')
 
 
+@admin.register(TransactionStatus)
+class TransactionStatusAdmin(admin.ModelAdmin):
+    search_fields = (
+        'transaction__subscription__person__name',
+        'transaction__subscription__event__name',
+    )
+    list_display = ('transaction', 'date_created', 'status')
+
+
+@admin.register(BankAccount)
+class BankAccountAdmin(admin.ModelAdmin):
+    list_display = ('document_number', 'date_created', 'ativo', 'recipient_id')

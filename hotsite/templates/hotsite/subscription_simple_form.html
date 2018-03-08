@@ -1,90 +1,114 @@
 {% load form_config_tags %}
 
 <!-- FORM -->
-<form action="{% url 'public:hotsite' event.slug %}" method="post"
-      class="form"
-      role="form" onsubmit="submit_form_no_loader(this); return false;">
+{% if is_subscribed_and_never_logged_in %}
+    <form method="post" action="{% url 'public:password-set' %}"
+          class="form"
+          role="form" onsubmit="submit_form_no_loader(this); return false;">
 
-    {% csrf_token %}
+        {% csrf_token %}
 
-    {% if user.is_authenticated %}
         <h4 class="form-heading"
-            style="font-weight: bold;">Olá, {{ user.first_name }}</h4>
-    {% else %}
-        <h4 class="form-heading"
-            style="font-weight: bold;">Inscreva-se
-            agora!</h4>
-    {% endif %}
+            style="font-weight: bold;">Defina sua senha</h4>
 
-    {% block messages %}
-        {% if messages %}
-            <div style="width:100%;margin-top:3px;padding-bottom:10px">
-            {% for message in messages %}
-
-                {% if message.tags %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible"
-                         role="alert">
-
-                {% else %}
-                    <div class="alert alert-warning alert-dismissible"
-                         role="alert">
-                {% endif %}
-
-            <button type="button" class="close" data-dismiss="alert"
-                    aria-label="Close"><span aria-hidden="true">&times;</span>
-            </button>
-            {{ message|capfirst }}
-            </div>
-
-            {% endfor %}
-        </div>
-        {% endif %}
-    {% endblock messages %}
-
-    <div class="form-validation alert"></div>
-
-    {% if is_subscribed %}
         <div class="text-center">
             <p style="font-size: 18px">
-                Você já está inscrito(a) neste evento.
-
+                Você já está inscrito(a) neste evento. Clique no link abaixo
+                para definir sua senha e ver sua inscrição.
             </p>
-            {% if has_paid_lots %}
-            <p style="font-size: 18px">
-                <a class="btn btn-success" href="{% url 'public:hotsite-subscription-status' event.slug %}">
-                    Veja sua inscrição!
-                </a>
-            </p>
-            {% endif %}
-            <div style="align-items: center;display: flex;justify-content: center;">
-                <i class="fa fa-check-circle fa-5x" style="color: darkgreen"
-                   aria-hidden="true"></i>
 
-            </div>
-        </div>
-    {% else %}
-        {% if not person or not person.email or not person.name or not person.phone %}
-            <p class="text-muted">
-                Preencha os dados seguintes para inicar sua inscrição.
-            </p>
-        {% endif %}
 
-        {% if not person or person and not person.name %}
-            {% render_generic_field form.name autofocus=True %}
-        {% endif %}
+            <input type="hidden"
+                   name="email"
+                   id="id_email"
+                   value="{{ email }}">
 
-        {% if not person or person and not person.email %}
-            {% render_generic_field form.email required=True %}
-        {% endif %}
-
-        <div class="form-group form-group-submit">
-            <button class="btn btn-primary btn-lg btn-block"
-                    data-loading-text="Quero me inscrever">
-                Fazer inscrição
+            <button type="submit" class="btn btn-primary">
+                Definir minha senha
             </button>
         </div>
+    </form>
+{% else %}
+    <form action="{% url 'public:hotsite' event.slug %}" method="post"
+          class="form"
+          role="form" onsubmit="submit_form_no_loader(this); return false;">
 
-    {% endif %}
+        {% csrf_token %}
+
+        {% if user.is_authenticated %}
+            <h4 class="form-heading"
+                style="font-weight: bold;">Olá, {{ user.first_name }}</h4>
+        {% else %}
+            <h4 class="form-heading"
+                style="font-weight: bold;">Inscreva-se
+                agora!</h4>
+        {% endif %}
+
+        {% block messages %}
+            {% if messages %}
+            <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}warning{% endif %} alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message|capfirst }}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endblock messages %}
+
+        <div class="form-validation alert"></div>
+
+        {% if is_subscribed %}
+            <div class="text-center">
+                <p style="font-size: 18px">
+                    Você já está inscrito(a) neste evento.
+
+                </p>
+                {% if has_paid_lots %}
+                    <p style="font-size: 18px">
+                        <a class="btn btn-success"
+                           href="{% url 'public:hotsite-subscription-status' event.slug %}">
+                            Veja sua inscrição!
+                        </a>
+                    </p>
+                {% endif %}
+                <div style="align-items: center;display: flex;justify-content: center;">
+                    <i class="fa fa-check-circle fa-5x"
+                       style="color: darkgreen"
+                       aria-hidden="true"></i>
+                </div>
+            </div>
+        {% else %}
+            {% if not person or not person.email or not person.name or not person.phone %}
+                <p class="text-muted">
+                    Preencha os dados seguintes para inicar sua inscrição.
+                </p>
+            {% endif %}
+
+            {% if not person or person and not person.name %}
+                {% render_generic_field form.name autofocus=True %}
+            {% endif %}
+
+            {% if not person or person and not person.email %}
+                {% render_generic_field form.email required=True %}
+            {% endif %}
+
+            <div class="form-group form-group-submit">
+                <button class="btn btn-primary btn-lg btn-block"
+                        data-loading-text="Quero me inscrever">
+                    Realizar inscrição
+                </button>
+                <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
+                    Ao realizar sua inscrição, você declara ter aceitado os
+                    <a href="https://www.congressy.com/termos-de-uso/" style="font-weight: bold;" target="_blank">termos de uso</a>.
+                </div>
+            </div>
+
+        {% endif %}
 
 
-</form>
+    </form>
+{% endif %}

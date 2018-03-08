@@ -1,11 +1,16 @@
 import json
 from decimal import Decimal
+from datetime import datetime
 
 import pagarme
 from django.conf import settings
 
 from mailer.tasks import send_mail
-from payment.exception import TransactionError, OrganizerRecipientError
+from payment.exception import (
+    OrganizerRecipientError,
+    RecipientError,
+    TransactionError,
+)
 from payment.models import Transaction, TransactionStatus
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
@@ -14,7 +19,10 @@ congressy_id = settings.PAGARME_RECIPIENT_ID
 
 
 # @TODO-low create a mock of the response to use during testing
-def create_pagarme_transaction(payment=None, subscription=None):
+def create_pagarme_transaction(transaction_data, subscription=None):
+    payment = transaction_data.get_data()
+    liquid_amount = transaction_data.liquid_amount
+
     if not payment or not subscription:
         return
 
@@ -23,10 +31,12 @@ def create_pagarme_transaction(payment=None, subscription=None):
         subscription=subscription
     )
 
-    trx = pagarme.transaction.create(payment)
+    try:
+        trx = pagarme.transaction.create(payment)
 
-    # @TODO add wrapper here to check if its a dict or a list
-    if not isinstance(trx, dict):
+    except Exception as e:
+        # @TODO add wrapper here to check if its a dict or a list
+        # @TODO trigger do
         subject = "Erro ao criar transação: Unknown API error"
         body = """
             Erro ao criar transação:
@@ -42,7 +52,7 @@ def create_pagarme_transaction(payment=None, subscription=None):
             <br/> 
             
             <pre><code>{1}</code></pre>
-        """.format(json.dumps(payment), json.dumps(trx))
+        """.format(json.dumps(payment), str(e))
 
         send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
         raise TransactionError(message='Unknown API error')
@@ -59,6 +69,16 @@ def create_pagarme_transaction(payment=None, subscription=None):
     transaction_instance.type = trx['payment_method']
     transaction_instance.date_created = trx['date_created']
     transaction_instance.amount = amount
+    transaction_instance.liquid_amount = liquid_amount
+
+    if transaction_instance.type == Transaction.BOLETO:
+        boleto_exp_date = trx.get('boleto_expiration_date')
+        if boleto_exp_date:
+            transaction_instance.boleto_expiration_date = datetime.strptime(
+                boleto_exp_date,
+                "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
+
     transaction_instance.save()
 
     transaction_status = TransactionStatus(
@@ -94,6 +114,10 @@ def create_pagarme_organizer_recipient(organization=None):
         },
     }
 
+    if organization.agencia_dv:
+        params['bank_account'].update(
+            {'agencia_dv': organization.agencia_dv})
+
     recipient = pagarme.recipient.create(params)
 
     # @TODO add wrapper here to check if its a dict or a list
@@ -121,3 +145,49 @@ def create_pagarme_organizer_recipient(organization=None):
     organization.active_recipient = True
 
     organization.save()
+
+
+def create_pagarme_recipient(recipient_dict):
+    params = {
+        'anticipatable_volume_percentage': '80',
+        'automatic_anticipation_enabled': 'false',
+        'transfer_day': '5',
+        'transfer_enabled': 'true',
+        'transfer_interval': 'weekly',
+        'bank_account': {
+            'agencia': recipient_dict['agencia'],
+            'bank_code': recipient_dict['bank_code'],
+            'conta': recipient_dict['conta'],
+            'conta_dv': recipient_dict['conta_dv'],
+            'document_number': recipient_dict['document_number'],
+            'legal_name': recipient_dict['legal_name'],
+            'type': recipient_dict['type'],
+        },
+    }
+
+    if recipient_dict.get('agencia_dv'):
+        params['bank_account'].update(
+            {'agencia_dv': recipient_dict.get('agencia_dv')})
+
+    # @TODO tratar exceção tanto de comunicação quanto de dados.
+    recipient = pagarme.recipient.create(params)
+
+    # @TODO add wrapper here to check if its a dict or a list
+    if not isinstance(recipient, dict):
+        subject = "Erro ao criar conta: Unknown API error"
+        body = """
+            Erro ao criar conta:
+
+            <br/>
+
+            Recipiente: {0} 
+            <br />
+            Erro:
+            <br/> 
+            <pre><code>{1}</code></pre>
+        """.format(recipient_dict['name'], json.dumps(recipient))
+
+        send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
+        raise RecipientError(message='Unknown API error')
+
+    return recipient

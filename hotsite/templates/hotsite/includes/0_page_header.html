@@ -1,11 +1,18 @@
-{% load static base_tags %}
-
+{% load i18n static base_tags %}
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <!DOCTYPE html>
-<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
-<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
-<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!-->
-<html lang="en"> <!--<![endif]-->
+<!--[if lt IE 7 ]>
+<html class="ie ie6" lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<![endif]-->
+<!--[if IE 7 ]>
+<html class="ie ie7" lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<![endif]-->
+<!--[if IE 8 ]>
+<html class="ie ie8" lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<![endif]-->
+<!--[if (gte IE 9)|!(IE)]>
+<html lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<!--<![endif]-->
 <head>
 
     <meta charset="utf-8">
@@ -50,18 +57,6 @@
             filter: blur(18px);
         }
     </style>
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-320.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-360.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-375.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-384.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-412.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-414.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-480.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-600.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-768.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-800.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-1024.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/screen/device-1280.css' %}">
 
     {% block styles %}{% endblock %}
 </head>

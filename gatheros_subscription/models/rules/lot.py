@@ -101,14 +101,3 @@ def rule_10_lote_privado_deve_ter_codigo_promocional(lot):
             'Lotes privados devem possui um código promocional para acessá-lo.'
         ]})
 
-
-def rule_11_evento_encerrado_nao_pode_ter_novo(lot, adding=True):
-    """
-    Novo lote deve ter data final posterior a data atual.
-    """
-    if adding is True and datetime.now() > lot.event.date_end:
-        raise IntegrityError(
-            'O evento \'{}\' já foi encerrado e não pode ter novo lote'.format(
-                lot.event.name
-            )
-        )

@@ -19,6 +19,8 @@ private_payment_urls = [
     ),
 ]
 
-urlpatterns_private_payments = [url(r'^', include(private_payment_urls))]
+urlpatterns_private_payments = [
+    url(r'^events/(?P<event_pk>[\d]+)/lots/', include(private_payment_urls))
+]
 
 urlpatterns_public_payments_api = [url(r'^', include(public_payment_api_urls))]

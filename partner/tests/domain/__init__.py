@@ -1,1 +1,1 @@
-""" Partner domain-level tests """
+""" Partner domain level tests """

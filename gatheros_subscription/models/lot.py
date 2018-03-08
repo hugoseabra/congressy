@@ -13,6 +13,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.encoding import force_text
 
+from core.model import track_data
 from gatheros_event.models import Event
 from gatheros_event.models.mixins import GatherosModelMixin
 from .rules import lot as rule
@@ -48,6 +49,7 @@ class LotManager(models.Manager):
                 return code
 
 
+@track_data('price')
 class Lot(models.Model, GatherosModelMixin):
     """ Modelo de Lote """
 
@@ -103,7 +105,8 @@ class Lot(models.Model, GatherosModelMixin):
         null=True,
         blank=True,
         decimal_places=2,
-        verbose_name='valor'
+        verbose_name='valor',
+        help_text='R$ 10,00 a R$ 30.000,00'
     )
     tax = models.DecimalField(
         max_digits=5,
@@ -134,29 +137,33 @@ class Lot(models.Model, GatherosModelMixin):
     )
     transfer_tax = models.BooleanField(
         default=False,
+        blank=True,
         verbose_name='repassar taxa',
-        help_text="Repasse a taxa para o participante e receba o valor integral do ingresso."
+        help_text="Repasse a taxa para o participante e receba o valor"
+                  " integral do ingresso."
     )
-
+    allow_installment = models.BooleanField(
+        default=True,
+        blank=True,
+        verbose_name='permitir parcelamento',
+    )
+    installment_limit = models.PositiveIntegerField(
+        default=10,
+        blank=True,
+        verbose_name='parcelas',
+        help_text="Número de parcelas permitido."
+    )
+    num_install_interest_absortion = models.PositiveIntegerField(
+        default=0,
+        null=True,
+        blank=True,
+        verbose_name='assumir juros de parcelas',
+        help_text="Número de parcelas que deseja assumir os juros."
+    )
     allow_installments = models.BooleanField(
         default=False,
         verbose_name='parcelamento',
         help_text="Permitir parcelamento do valor do ingresso."
-    )
-
-    transfer_interest_rate = models.BooleanField(
-        default=False,
-        verbose_name='repassar juros ao participante',
-        help_text="Repasse os juros das parcelas para o participante e receba o valor integral da parcela."
-    )
-
-    free_installments = models.CharField(
-        max_length=15,
-        choices=INSTALLMENTS,
-        verbose_name='parcelas isentas de juros',
-        help_text="Número de parcelas que irá assumir juros de parcelamento do participante.",
-        null=True,
-        blank=True
     )
 
     private = models.BooleanField(
@@ -188,7 +195,6 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name_plural = 'lotes'
         ordering = ['date_start', 'date_end', 'pk', 'name']
         unique_together = (("name", "event"),)
-
 
     @property
     def percent_completed(self):
@@ -247,7 +253,7 @@ class Lot(models.Model, GatherosModelMixin):
         :return: string
         """
         if self.limit and self.limit > 0:
-            queryset = self.subscriptions
+            queryset = self.subscriptions.exclude(status='canceled')
             num_subs = queryset.count()
 
             if num_subs >= self.limit:
@@ -292,10 +298,6 @@ class Lot(models.Model, GatherosModelMixin):
         rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)
         rule.rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(self)
         rule.rule_8_lot_interno_nao_pode_ter_preco(self)
-        rule.rule_11_evento_encerrado_nao_pode_ter_novo(
-            self,
-            self._state.adding
-        )
 
     def __str__(self):
         return '{} - {}'.format(self.event.name, self.name)

@@ -5,10 +5,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 from django.shortcuts import redirect, render_to_response
+from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.views.generic import FormView, TemplateView
 
+from core.forms.cleaners import clear_string
 from gatheros_event.forms import ProfileCreateForm, ProfileForm
 from gatheros_event.views.mixins import AccountMixin
 from mailer.services import notify_reset_password
@@ -74,16 +76,32 @@ class ProfileView(AccountMixin, FormView):
         messages.success(self.request, self.messages['success'])
         return redirect('event:profile')
 
+    def post(self, request, *args, **kwargs):
+        request.POST = request.POST.copy()
+
+        to_be_pre_cleaned = ['zip_code', 'institution_cnpj']
+
+        for field in to_be_pre_cleaned:
+            request.POST.update({field: clear_string(request.POST[
+                                                         field])})
+
+        return super().post(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['person'] = self.member.person
+        return context
+
 
 class ProfileCreateView(TemplateView, FormView):
     template_name = 'registration/register.html'
+    success_url = reverse_lazy('front:start')
     messages = {
         'success': 'Sua conta foi criada com sucesso! '
                    'Enviamos um email para "%s", click no link do email para ativar sua conta.'
     }
 
     def dispatch(self, request, *args, **kwargs):
-
         if request.user.is_authenticated:
             return redirect('front:start')
 
@@ -107,22 +125,9 @@ class ProfileCreateView(TemplateView, FormView):
             self.messages['success'] % form.cleaned_data["email"]
         )
 
-        return redirect('front:start')
+        return redirect(self.get_success_url())
 
     def post(self, request, *args, **kwargs):
-
-        context = self.get_context_data(**kwargs)
-
-        name = self.request.POST.get('name')
-
-        if len(name.split(' ')) < 2:
-            messages.error(
-                self.request,
-                "Você deve informar seu sobrenome para criar sua conta."
-            )
-
-            return self.render_to_response(context)
-
         return super().post(request, *args, **kwargs)
 
 

@@ -45,7 +45,6 @@ public_password_urls = [
     ),
     url(
         r'^reset-password/$',
-        #auth_views.PasswordResetView.as_view(),
         views.PasswordResetView.as_view(),
         name='password_reset'
     ),
