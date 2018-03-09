@@ -19,7 +19,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from localflavor.br.forms import BRCPFField, BRCNPJField
 
-from core.forms.cleaners import clear_string, clean_phone as phone_cleaner
+from core.forms.cleaners import clear_string, clean_cellphone as phone_cleaner
 from core.forms.widgets import AjaxChoiceField, TelephoneInput
 from core.util import create_years_list
 from gatheros_event.models import Person, Organization, Member
@@ -241,10 +241,25 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         """ Meta """
         model = Person
-        fields = ['name', 'email', 'new_password1', 'new_password2',
-                  'gender', 'birth_date', 'zip_code', 'phone', 'city', 'cpf',
-                  'street', 'number', 'complement', 'village', 'institution',
-                  'institution_cnpj', 'function']
+        fields = [
+            'name',
+            'email',
+            'new_password1',
+            'new_password2',
+            'gender',
+            'birth_date',
+            'zip_code',
+            'phone',
+            'city',
+            'cpf',
+            'street',
+            'number',
+            'complement',
+            'village',
+            'institution',
+            'institution_cnpj',
+            'function'
+        ]
 
         widgets = {
             # CPF como telefone para aparecer como número no mobile
@@ -286,21 +301,23 @@ class ProfileForm(forms.ModelForm):
         return password2
 
     def clean_institution_cnpj(self):
-        dirty_institution_cnpj = self.cleaned_data.get('institution_cnpj')
-        cleaned_institution_cnpj = BRCNPJField().clean(dirty_institution_cnpj)
-        return cleaned_institution_cnpj
+        institution_cnpj = self.cleaned_data.get('institution_cnpj')
+        if institution_cnpj:
+            institution_cnpj = BRCNPJField().clean(institution_cnpj)
+        return institution_cnpj
 
     def clean_cpf(self):
-        dirty_cpf = self.cleaned_data.get('cpf')
-        cleaned_cpf = BRCPFField().clean(dirty_cpf)
-
-        return clear_string(cleaned_cpf)
+        cpf = self.cleaned_data.get('cpf')
+        if cpf:
+            cpf = BRCPFField().clean(cpf)
+            return clear_string(cpf)
+        return cpf
 
     def clean_phone(self):
-
-        cleaned_phone = phone_cleaner(self.cleaned_data.get('phone'))
-
-        return cleaned_phone
+        phone = self.cleaned_data.get('phone')
+        if phone:
+            phone = phone_cleaner(phone)
+        return phone
 
     def save(self, **_):
         """ Salva dados. """

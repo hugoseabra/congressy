@@ -13,7 +13,14 @@ class TransactionAdmin(admin.ModelAdmin):
         'subscription__person__name',
         'subscription__event__name',
     )
-    list_display = ('subscription', 'status', 'type', 'date_created', 'amount')
+    list_display = (
+        'subscription',
+        'status',
+        'type',
+        'date_created',
+        'liquid_amount',
+        'amount'
+    )
 
 
 @admin.register(TransactionStatus)
