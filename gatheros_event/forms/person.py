@@ -4,8 +4,9 @@ from django.db.models.fields import NOT_PROVIDED
 from django.utils import six
 from django.utils.datastructures import MultiValueDictKeyError
 from kanu_locations.models import City
+from localflavor.br.forms import BRCPFField
 
-from core.forms.cleaners import clear_string
+from core.forms.cleaners import clear_string, clean_cellphone as phone_cleaner
 from core.forms.widgets import DateInput, AjaxChoiceField, TelephoneInput
 from core.util import create_years_list
 from gatheros_event.models import Occupation, Person
@@ -95,17 +96,21 @@ class PersonForm(forms.ModelForm):
 
         self.fields[field_name].required = True
 
-    def clean_cpf(self):
-        return clear_string(self.data.get('cpf'))
-
     def clean_zip_code(self):
         return clear_string(self.data.get('zip_code'))
 
-    def clean_phone(self):
-        return clear_string(self.data.get('phone'))
+    def clean_cpf(self):
+        cpf = self.cleaned_data.get('cpf')
+        if cpf:
+            cpf = BRCPFField().clean(cpf)
+            return clear_string(cpf)
+        return cpf
 
-    def clean_institution_cnpj(self):
-        return clear_string(self.data.get('institution_cnpj'))
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if phone:
+            phone = phone_cleaner(phone)
+        return phone
 
     def clean_city(self):
         if 'city' not in self.data:
