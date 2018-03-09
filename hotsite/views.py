@@ -530,17 +530,17 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         user = self.request.user
 
         # CONDIÇÃO 7
-        if self.has_paid_lots():
-            allowed_transaction = request.POST.get(
-                'allowed_transaction',
-                False
-            )
-
-            # CONDIÇÃO 6
-            if allowed_transaction:
-                request.session['allowed_transaction'] = allowed_transaction
-                slug = kwargs.get('slug')
-                return redirect('public:hotsite-subscription', slug=slug)
+        # if self.has_paid_lots():
+        #     allowed_transaction = request.POST.get(
+        #         'allowed_transaction',
+        #         False
+        #     )
+        #
+        #     # CONDIÇÃO 6
+        #     if allowed_transaction:
+        #         request.session['allowed_transaction'] = allowed_transaction
+        #         slug = kwargs.get('slug')
+        #         return redirect('public:hotsite-subscription', slug=slug)
 
         # CONDIÇÃO 1
         if not user.is_authenticated or not self.subscription_enabled():
