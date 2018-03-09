@@ -45,6 +45,7 @@ class FormConfigView(EventViewMixin, generic.FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['event'] = self.get_event()
+        kwargs['has_paid_lots'] = self.has_paid_lots()
 
         self.event = self.get_event()
         if self.object:

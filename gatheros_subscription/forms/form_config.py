@@ -47,16 +47,15 @@ class FormConfigForm(forms.ModelForm):
 
     def save(self, commit=True):
 
-        if self.has_paid_lots:
-            if self.has_paid_lots:
-                # Força valores
-                self.instance.email = True
-                self.instance.city = True
-                self.instance.phone = True
+        if self.instance and self.has_paid_lots:
+            # Força valores
+            self.instance.email = True
+            self.instance.city = True
+            self.instance.phone = True
 
-                self.instance.cpf = self.instance.CPF_REQUIRED
-                self.instance.birth_date = self.instance.BIRTH_DATE_REQUIRED
-                self.instance.address = self.instance.ADDRESS_SHOW
+            self.instance.cpf = self.instance.CPF_REQUIRED
+            self.instance.birth_date = self.instance.BIRTH_DATE_REQUIRED
+            self.instance.address = self.instance.ADDRESS_SHOW
 
         self.instance.event = self.event
 

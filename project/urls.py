@@ -56,7 +56,7 @@ public_urlpatterns += [
 if not settings.DEBUG:
     public_urlpatterns += [
         url(
-            r'^',
+            r'^$',
             RedirectView.as_view(
                 url='https://congressy.com'
             ),
