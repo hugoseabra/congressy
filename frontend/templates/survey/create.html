@@ -107,148 +107,6 @@
                         <strong>Nenhuma questão.</strong>
                     </div>
 
-
-                    <button type="button"
-                            class="btn btn-success btn-lg"
-                            data-toggle="modal"
-                            data-target="#addQuestionModal"
-                            style="margin-top: 15px;">
-                        <i class="fas fa-plus"></i>
-                        Adicionar
-                    </button>
-                </div>
-
-            </div>
-
-            <!-- Modals -->
-            <div class="modal fade" id="addQuestionModal"
-                 tabindex="-1"
-                 role="dialog">
-
-                <div class="modal-dialog " role="document">
-
-                    <div class="modal-content">
-
-
-                        <div class="modal-header">
-                            <button type="button" class="close"
-                                    data-dismiss="modal"
-                                    aria-label="Close"><span
-                                    aria-hidden="true">&times;</span>
-                            </button>
-                            <h4 class="modal-title">
-                                Adicionar ao Formulário </h4>
-                        </div>
-
-                        <form method="post" name="questionForm"
-                              id="id_questionForm" action="">
-
-                            {% csrf_token %}
-
-
-                            <div id="questionForm" class="modal-body">
-
-                                <div class="row">
-
-                                    <div class="col-md-6">
-
-                                        <strong style="font-size: 15px">
-                                            Escolha um campo:
-                                        </strong>
-                                        <hr/>
-
-                                        <button type="button"
-                                                class="btn-block btn btn-primary field-type-btn">
-                                            <div class="pull-left">
-                                                <i class="far fa-calendar-alt"></i>
-                                                Data
-                                            </div>
-                                        </button>
-
-                                        <button type="button"
-                                                class="btn-block btn btn-primary field-type-btn">
-                                            <div class="pull-left">
-                                                <i class="fas fa-i-cursor"></i>
-                                                Text
-                                            </div>
-                                        </button>
-
-                                        <button type="button"
-                                                class="btn-block btn btn-primary field-type-btn">
-                                            <div class="pull-left">
-                                                <i class="fas fa-align-left"></i>
-                                                Parágrafo
-                                            </div>
-                                        </button>
-
-                                        {#                                        <button type="button"#}
-                                        {#                                                class="btn-block btn btn-primary field-type-btn">#}
-                                        {#                                            <div class="pull-left">#}
-                                        {#                                                <i class="fas fa-list-ul"></i>#}
-                                        {#                                                Lista#}
-                                        {#                                            </div>#}
-                                        {#                                        </button>#}
-                                        {##}
-                                        {#                                        <button type="button"#}
-                                        {#                                                class="btn-block btn btn-primary field-type-btn">#}
-                                        {#                                            <div class="pull-left">#}
-                                        {#                                                <i class="far fa-check-circle"></i>#}
-                                        {#                                                Múltipla Escolha#}
-                                        {#                                            </div>#}
-                                        {#                                        </button>#}
-                                        {##}
-                                        {#                                        <button type="button"#}
-                                        {#                                                class="btn-block btn btn-primary field-type-btn">#}
-                                        {#                                            <div class="pull-left">#}
-                                        {#                                                <i class="far fa-check-square"></i>#}
-                                        {#                                                Várias Opções#}
-                                        {#                                            </div>#}
-                                        {#                                        </button>#}
-
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <strong style="font-size: 15px">
-                                            Configuração do campo:
-                                        </strong>
-                                        <hr/>
-                                        <div class="form-group">
-                                            <label for="name">Titulo:</label>
-                                            <input type="text"
-                                                   class="form-control"
-                                                   id="id_name">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="titile">Campo de
-                                                ajuda:</label>
-                                            <input type="help_text"
-                                                   class="form-control"
-                                                   id="id_help_text">
-                                        </div>
-
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="modal-footer">
-                                <button type="button"
-                                        class="btn btn-danger"
-                                        data-dismiss="modal">Cancelar
-                                </button>
-                                <button type="submit"
-                                        class="btn btn-primary">Salvar
-                                </button>
-                            </div>
-
-
-                        </form>
-
-                    </div>
-
                 </div>
 
             </div>
@@ -258,26 +116,446 @@
 
     </div>
 
+    <div class="row">
+
+        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+            <div class="panel panel-primary">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">Novo Campo</h3>
+                </div>
+
+                <div class="panel-body">
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <strong style="font-size: 20px">
+                                Escolha um novo campo:
+                            </strong>
+                            <hr/>
+
+                            <a data-field-type="Data"
+                               data-field-icon="far fa-calendar-alt"
+                               title="Data"
+                               class="open-AddSimpleQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="far fa-calendar-alt"></i>
+                                    Data
+                                </div>
+                            </a>
+
+                            <a data-field-type="Text"
+                               data-field-icon="fas fa-i-cursor"
+                               title="Text"
+                               class="open-AddSimpleQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="fas fa-i-cursor"></i>
+                                    Text
+                                </div>
+                            </a>
+
+                            <a data-field-type="Parágrafo"
+                               data-field-icon="fas fa-align-left"
+                               title="Parágrafo"
+                               class="open-AddSimpleQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="fas fa-align-left"></i>
+                                    Parágrafo
+                                </div>
+                            </a>
+
+                            <a data-field-type="Lista"
+                               data-field-icon="fas fa-list-ul"
+                               title="Lista"
+                               class="open-AddComplexQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="fas fa-list-ul"></i>
+                                    Lista
+                                </div>
+                            </a>
+
+                            <a data-field-type="Múltipla Escolha"
+                               data-field-icon="far fa-check-circle"
+                               title="Múltipla Escolha"
+                               class="open-AddComplexQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="far fa-check-circle"></i>
+                                    Múltipla Escolha
+                                </div>
+                            </a>
+
+                            <a data-field-type="Várias Opções"
+                               data-field-icon="far fa-check-square"
+                               title="Várias Opções"
+                               class="open-AddComplexQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="far fa-check-square"></i>
+                                    Várias Opções
+                                </div>
+                            </a>
+
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="addComplexQuestionModal"
+         tabindex="-1"
+         role="dialog">
+
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">
+                        Adicionar ao Formulário </h4>
+                </div>
+
+                <form method="post" name="questionForm"
+                      id="id_questionForm" action="">
+
+                    {% csrf_token %}
+
+
+                    <div id="questionForm" class="modal-body">
+
+
+                        <strong style="font-size: 25px">
+                            <span class="typeOfField"></span>
+                            <i class="iconOfField"></i>
+                        </strong>
+                        <hr/>
+                        <div class="form-group">
+                            <label for="id_name">Titulo:</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="id_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_help_text">Campo de
+                                ajuda:</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="id_help_text">
+                        </div>
+
+                        <hr>
+
+                        <!--
+
+                            TO BE CONTINUED:
+
+                            Make this field  a text field.
+                            Add help_text to help the organizer;
+
+
+
+                        -->
+
+                        <ul id="optionsList" class="list-group">
+
+                            <li class="list-group-item" data-id="1">
+                                <div class="row">
+                                    <div class="col-md-11">
+
+
+                                        <form class="form-inline">
+                                            <div class="form-group">
+                                                <label for="exampleInputName2">Name</label>
+                                                <input type="text"
+                                                       class="form-control"
+                                                       id="exampleInputName2"
+                                                       placeholder="Jane Doe">
+                                            </div>
+                                            <div class="form-group">
+                                                <label
+                                                        for="exampleInputEmail2">Value</label>
+                                                <input type="email"
+                                                       class="form-control"
+                                                       id="exampleInputEmail2"
+                                                       placeholder="jane.doe@example.com">
+                                            </div>
+                                            <button type="submit"
+                                                    class="btn btn-default">Send
+                                                invitation
+                                            </button>
+                                        </form>
+
+
+                                    </div>
+                                    <div class="col-sm-1 control-buttons">
+
+                                        <div class="row">
+                                            <i class="js-remove far fa-window-close"
+                                               style="margin-left:10px;"></i>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item" data-id="2">
+                                <div class="row">
+                                    <div class="col-md-11">
+
+
+                                        <form class="form-inline">
+                                            <div class="form-group">
+                                                <label for="exampleInputName2">Name</label>
+                                                <input type="text"
+                                                       class="form-control"
+                                                       id="exampleInputName2"
+                                                       placeholder="Jane Doe">
+                                            </div>
+                                            <div class="form-group">
+                                                <label
+                                                        for="exampleInputEmail2">Value</label>
+                                                <input type="email"
+                                                       class="form-control"
+                                                       id="exampleInputEmail2"
+                                                       placeholder="jane.doe@example.com">
+                                            </div>
+                                            <button type="submit"
+                                                    class="btn btn-default">Send
+                                                invitation
+                                            </button>
+                                        </form>
+
+
+                                    </div>
+                                    <div class="col-sm-1 control-buttons">
+
+                                        <div class="row">
+                                            <i class="js-remove far fa-window-close"
+                                               style="margin-left:10px;"></i>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item" data-id="3">
+                                <div class="row">
+                                    <div class="col-md-11">
+
+
+                                        <form class="form-inline">
+                                            <div class="form-group">
+                                                <label for="exampleInputName2">Name</label>
+                                                <input type="text"
+                                                       class="form-control"
+                                                       id="exampleInputName2"
+                                                       placeholder="Jane Doe">
+                                            </div>
+                                            <div class="form-group">
+                                                <label
+                                                        for="exampleInputEmail2">Value</label>
+                                                <input type="email"
+                                                       class="form-control"
+                                                       id="exampleInputEmail2"
+                                                       placeholder="jane.doe@example.com">
+                                            </div>
+                                            <button type="submit"
+                                                    class="btn btn-default">Send
+                                                invitation
+                                            </button>
+                                        </form>
+
+
+                                    </div>
+                                    <div class="col-sm-1 control-buttons">
+
+                                        <div class="row">
+                                            <i class="js-remove far fa-window-close"
+                                               style="margin-left:10px;"></i>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </li>
+
+
+                        </ul>
+
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-primary">Salvar
+                        </button>
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal fade" id="addSimpleQuestionModal"
+         tabindex="-1"
+         role="dialog">
+
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">
+                        Adicionar ao Formulário </h4>
+                </div>
+
+                <form method="post" name="questionForm"
+                      id="id_questionForm" action="">
+
+                    {% csrf_token %}
+
+
+                    <div id="questionForm" class="modal-body">
+
+
+                        <strong style="font-size: 25px">
+
+                            <span class="typeOfField"></span>
+                            <i class="iconOfField"></i>
+                        </strong>
+
+
+                        <hr/>
+                        <div class="form-group">
+                            <label for="id_name">Titulo:</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="id_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_help_text">Campo de
+                                ajuda:</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="id_help_text">
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-primary">Salvar
+                        </button>
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
 {% endblock %}
 
 {% block scripts %}
 
     <!-- DnD -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
+
+
     <script type="application/javascript">
         $(document).ready(function () {
 
             console.log('READY');
 
-            $(".field-type-btn").on('click', function () {
-
-                $(".field-type-btn").removeClass('active');
-                $(this).addClass('active')
+            var radios = $('input[type=radio]');
+            radios.iCheck({
+                checkboxClass: 'icheckbox_flat-grey',
+                radioClass: 'iradio_flat-grey'
             });
 
             loadDoc();
 
         });
+
+
+        $(document).on("click", ".open-AddSimpleQuestionDialog", function () {
+            var typeOfField = $(this).data('field-type');
+            var IconOfField = $(this).data('field-icon');
+            var typeEl = $('.modal-body .typeOfField');
+            var iconEl = $('.modal-body .iconOfField');
+
+
+            typeEl.text(typeOfField);
+            iconEl.attr('class', 'iconOfField');
+            iconEl.addClass(IconOfField);
+            $('#addSimpleQuestionModal').modal('show');
+        });
+
+
+        $(document).on("click", ".open-AddComplexQuestionDialog", function () {
+
+            var typeOfField = $(this).data('field-type');
+            var IconOfField = $(this).data('field-icon');
+            var typeEl = $('.modal-body .typeOfField');
+            var iconEl = $('.modal-body .iconOfField');
+
+
+            typeEl.text(typeOfField);
+            iconEl.attr('class', 'iconOfField');
+            iconEl.addClass(IconOfField);
+            $('#addComplexQuestionModal').modal('show');
+        });
+
 
         function loadDoc() {
 
@@ -286,17 +564,30 @@
                 success: function (result) {
                     document.getElementById("fields").innerHTML =
                         result;
-                    createList();
+                    var editableList = createFieldList();
+                    var optionsList = createOptionsList();
+                    app.switcheryToggle();
+                    var radios = $('input[type=radio]');
+                    radios.iCheck({
+                        checkboxClass: 'icheckbox_flat-grey',
+                        radioClass: 'iradio_flat-grey'
+                    });
                 }
             });
+
+
         }
 
         function byId(id) {
             return document.getElementById(id);
         }
 
-        function createList() {
-            var editableList = Sortable.create(byId('simpleList'), {
+        function byClass(className) {
+            return document.getElementsByClassName(className);
+        }
+
+        function createFieldList() {
+            return Sortable.create(byId('simpleList'), {
                 animation: 150,
                 filter: '.js-remove',
                 handle: ".my-handle",
@@ -307,23 +598,37 @@
                 onSort: function (evt) {
                     console.log(this.toArray());
 
+                }
+            });
+        }
+
+        function createOptionsList() {
+
+            return Sortable.create(byId('optionsList'), {
+                animation: 150,
+                filter: '.js-remove',
+                handle: ".my-handle",
+                onFilter: function (evt) {
+                    console.log('removed => ' + evt.item.dataset.id);
+                    evt.item.parentNode.removeChild(evt.item);
                 },
             });
         }
 
 
     </script>
+
 {% endblock %}
 
 {% block styles %}
     <style>
 
-        i {
-            opacity: 0.3;
+        .list-group-item .control-buttons {
+            visibility: hidden;
         }
 
-        i:hover {
-            opacity: 1;
+        .list-group-item:hover .control-buttons {
+            visibility: visible;
         }
 
     </style>

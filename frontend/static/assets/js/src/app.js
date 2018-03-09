@@ -42,6 +42,7 @@ var app = function () {
     };
 
     var switcheryElements = {};
+
     var switcheryToggle = function () {
         var elems = Array.prototype.slice.call(
             document.querySelectorAll('.js-switch')
@@ -93,6 +94,7 @@ var app = function () {
     return {
         'setSwitchery': setSwitchery,
         'disableSwitchery': enableDisableSwitchery,
+        'switcheryToggle': switcheryToggle,
         'switcheryElements': switcheryElements
     };
 }();
