@@ -288,10 +288,22 @@
 
 
             $(document).ready(function () {
+                {% if LANGUAGE_CODE == 'pt-br' %}
                 $('#id_date_start_0').mask("99/99/9999");
                 $('#id_date_start_1').mask("99:99");
                 $('#id_date_end_0').mask("99/99/9999");
                 $('#id_date_end_1').mask("99:99");
+                {% elif LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
+                $('#id_date_start_0').mask("99/99/9999");
+                $('#id_date_start_1').mask("99:99");
+                $('#id_date_end_0').mask("99/99/9999");
+                $('#id_date_end_1').mask("99:99");
+                {% else %}
+                $('#id_date_start_0').mask("9999-99-99");
+                $('#id_date_start_1').mask("99:99");
+                $('#id_date_end_0').mask("9999-99-99");
+                $('#id_date_end_1').mask("99:99");
+                {% endif %}
 
 
                 $('#id_price').mask('#.##0,00', {reverse: true});
