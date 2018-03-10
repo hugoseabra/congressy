@@ -1,0 +1,1 @@
+curl -X POST 'https://api.pagar.me/1/transactions' -H 'content-type: application/json' -d @create_transaction_test.json
