@@ -11,6 +11,17 @@
         input#id_city, input#id_city_search {
             text-transform: uppercase;
         }
+
+        .loader-box {
+            width: 100%;
+            position:absolute;
+            top: 5%;
+        }
+
+        .loader {
+            width: 47px;
+            margin:0 auto;
+        }
     </style>
 {% endblock %}
 
@@ -104,6 +115,12 @@
                 city_el.prop('disabled', true);
             {% endif %}
             }, 300);
+
+            $('[data-toggle="popover"]').popover({
+                placement: 'bottom',
+                container: 'body',
+                trigger: 'click'
+            });
         });
     </script>
 {% endblock %}

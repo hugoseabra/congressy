@@ -9,7 +9,7 @@
                         <div class="col-md-12" style="text-align: left;">
                             <h3>{{ event.organization }}</h3>
                             <div class="team-member-description">
-                                {{ event.organization.description_html|safe }}
+                                {{ event.organization.description_html|safe|default_if_none:''}}
                             </div>
                         </div>
                     </div>

@@ -67,26 +67,9 @@
 
         <div class="form-validation alert"></div>
 
-        {% if paid_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="panel-title">Ingresso</div>
-                </div>
-
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <select class="form-control" name="lot" id="id_lot">
-                                {% for lot in paid_lots %}
-                                    <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
-                                {% endfor %}
-                            </select>
-                            <div class="text-muted small">Escolha o tipo de ingresso.</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
+        <div style="margin-bottom: 20px" id="lots-field">
+            {% include 'hotsite/includes/form_lots.html' %}
+        </div>
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -185,7 +168,7 @@
                     <div class="row">
                         <div class="col-md-3">
                             {% render_generic_field form.zip_code required=True %}
-                            <div id="cep_loader" style="width: 22px;position: absolute;top: 59px;right: 33px;">
+                            <div id="cep_loader" style="width: 22px;position: absolute;top: 40px;right: 24px;">
                                 <img src="{% static 'assets/img/loader.gif' %}"/>
                             </div>
                         </div>
