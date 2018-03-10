@@ -184,8 +184,7 @@ class Lot(models.Model, GatherosModelMixin):
         null=True,
         blank=True,
         verbose_name='código de exibição',
-        help_text="Código foi gerado, porém você pode personaliza-lo como"
-                  " quiser."
+        help_text="Personaliza-lo como quiser."
     )
 
     objects = LotManager()

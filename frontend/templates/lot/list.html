@@ -59,6 +59,13 @@
                         "targets": [-1]
                     },
                     {
+                        "searchable": false,
+                        "orderable": false,
+                        "width": "8%",
+                        "className": null,
+                        "targets": [-2]
+                    },
+                    {
                         "targets": 0,
                         "className": "nowrap"
                     }
@@ -154,8 +161,9 @@
                             <tr>
                                 <th>Nome</th>
                                 <th class="hidden-xs hidden-sm">Tipo</th>
-                                <th class="hidden-xs">Inscrições</th>
+                                <th class="hidden-xs hidden-sm">Inscrições</th>
                                 <th>Preço</th>
+                                <th>Código</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -176,7 +184,7 @@
                                 {% else %}
                                     {{ lot.name }}
                                 {% endif %}
-                                <br/>
+                                <br />
                                 <small class="text-muted">{{ lot.get_period }}</small>
                             </td>
 
@@ -184,7 +192,7 @@
                                 Pago{% else %}Gratuito{% endif %}</td>
 
 
-                            <td class="hidden-xs">
+                            <td class="hidden-xs hidden-sm">
                                 {{ lot.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}
                                 {% if lot.limit %}
                                     / {{ lot.limit }}
@@ -195,12 +203,21 @@
                                     <span style="color:dimgray">(aberto)</span>
                                 {% endif %}
                             </td>
-
                             <td>
                                 {% if lot.price and lot.price > 0 %}
                                     R$ {{ lot.get_calculated_price }}
                                 {% else %}
                                     ----
+                                {% endif %}
+                            </td>
+                            <td class="hidden-xs">
+                                {% if lot.private %}
+                                    <div>
+                                        <span class="badge badge-primary">Privado</span>
+                                    </div>
+                                    <div>
+                                        {{ lot.exhibition_code|default_if_none:'' }}
+                                    </div>
                                 {% endif %}
                             </td>
                             <td>
