@@ -55,7 +55,7 @@ INSTALLED_APPS = [
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
-USE_I18N = False
+USE_I18N = True
 USE_L10N = True
 USE_TZ = False
 
@@ -143,6 +143,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
+            os.path.join(BASE_DIR, 'core', 'forms', 'templates'),
             os.path.join(BASE_DIR, 'frontend', 'templates'),
             os.path.join(BASE_DIR, 'gatheros_event', 'templates'),
             os.path.join(BASE_DIR, 'hotsite', 'templates'),
