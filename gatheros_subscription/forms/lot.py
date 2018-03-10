@@ -61,6 +61,14 @@ class LotForm(forms.ModelForm):
 
         self.event = kwargs.get('initial').get('event')
 
+        instance = kwargs.get('instance')
+        if not instance or instance and not instance.exhibition_code:
+            initial = kwargs.get('initial', {})
+            initial.update(
+                {'exhibition_code': Lot.objects.generate_promo_code()}
+            )
+            kwargs['initial'] = initial
+
         super(LotForm, self).__init__(**kwargs)
 
         if self.instance.pk and self.instance.subscriptions.count() > 0:
@@ -138,3 +146,9 @@ class LotForm(forms.ModelForm):
             )
 
         return cleaned_data
+
+    def clean_exhibition_code(self):
+        code = self.cleaned_data.get('exhibition_code')
+        if code:
+            code = ''.join(code.split())
+        return code

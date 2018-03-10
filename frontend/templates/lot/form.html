@@ -150,7 +150,13 @@
                 return;
             }
 
-            var price = $('#id_price').val().replace('.', '').replace(',', '.');
+            var price = $('#id_price').val();
+            if (!price) {
+                showPrices(false);
+                return;
+            }
+
+            price = price.replace('.', '').replace(',', '.');
 
             if (parseFloat(price) <= 0) {
                 showPrices(false);
@@ -177,18 +183,32 @@
                 parent.css('visibility', 'visible');
             };
 
-            $('.congressy_tax').text(as_currency(congressy_price));
+            if (congressy_price > 0) {
+                $('.congressy_tax').text(as_currency(congressy_price));
+            } else {
+                $('.congressy_tax').text('-');
+            }
 
             if (transfer_tax) {
                 show_tax(subscription_price);
                 hide_tax(price_to_recieve);
-                subscription_price.text(as_currency(price + congressy_price));
-                price_to_recieve.text(as_currency(price));
+                if (congressy_price > 0) {
+                    subscription_price.text(as_currency(price + congressy_price));
+                    price_to_recieve.text(as_currency(price));
+                } else {
+                    subscription_price.text('-');
+                    price_to_recieve.text('-');
+                }
             } else {
                 show_tax(price_to_recieve);
                 hide_tax(subscription_price);
-                subscription_price.text(as_currency(price));
-                price_to_recieve.text(as_currency(price - congressy_price));
+                if (congressy_price > 0) {
+                    subscription_price.text(as_currency(price));
+                    price_to_recieve.text(as_currency(price - congressy_price));
+                } else {
+                    subscription_price.text('-');
+                    price_to_recieve.text('-');
+                }
             }
         }
 
@@ -300,6 +320,12 @@
 
             $('#id_num_install_interest_absortion').on('change', function () {
                 calcInstallments();
+            });
+
+            $('#id_exhibition_code').on('keyup', function() {
+                var el = $(this);
+                var value = el.val();
+                el.val(value.replace(/ /gi, ''));
             });
 
             var id_price = $('#id_price');
@@ -506,7 +532,7 @@
                                         {% render_generic_field form.num_install_interest_absortion %}
                                     </div>
                                     <div class="float-left">
-                                        <button style="position: absolute;top: 38px;"
+                                        <button style="position: absolute;top: 32px;"
                                             id="installment-items"
                                             type="button"
                                             data-html="true"
@@ -575,25 +601,25 @@
                         {% endif %}
                     </div>
                 </div>
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Privacidade
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% render_generic_field form.private %}
+                            </div>
+                            <div class="col-md-3">
+                                {% render_generic_field form.exhibition_code %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {#                <div class="panel panel-primary">#}
-            {#                    <div class="panel-heading">#}
-            {#                        <div class="panel-title">#}
-            {#                            Privacidade#}
-            {#                        </div>#}
-            {#                    </div>#}
-            {#                    <div class="panel-body">#}
-            {#                        <div class="row">#}
-            {#                            <div class="col-xl-2 col-lg-4 col-md-4">#}
-            {#                                {% render_generic_field form.private %}#}
-            {#                            </div>#}
-            {#                            <div class="col-xl-4 col-lg-4 col-md-4">#}
-            {#                                {% render_generic_field form.exhibition_code %}#}
-            {#                            </div>#}
-            {#                        </div>#}
-            {#                    </div>#}
-            {#                </div>#}
-        </div>
         </div>
         <div class="row">
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
