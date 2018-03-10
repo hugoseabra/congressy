@@ -66,7 +66,7 @@ LOCALE_PATHS = (
 
 LANGUAGES = (
     ('en', _('English')),
-    ('en-US', _('English')),
+    ('en-us', _('English (US)')),
     ('pt-br', _('Português')),
 )
 # ============================= MIDDLEWARES ================================= #

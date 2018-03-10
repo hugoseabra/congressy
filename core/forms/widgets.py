@@ -1,6 +1,7 @@
 from datetime import datetime
 from django import forms
 from django.forms.utils import to_current_timezone
+from django.utils.translation import get_language
 
 
 class AjaxChoiceField(forms.ChoiceField):
@@ -16,11 +17,39 @@ class DateInput(forms.DateInput):
     input_type = 'tel'
     template_name = 'forms/widgets/date.html'
 
+    def value_from_datadict(self, data, files, name):
+        value = super().value_from_datadict(data, files, name)
+
+        lang = get_language()
+
+        try:
+            if lang == 'en' or lang == 'en-us':
+                format = '%m/%d/%Y'
+            elif lang == 'pt-br':
+                format = '%d/%m/%Y'
+            else:
+                format = '%Y/%m/%d'
+
+            value = datetime.strptime(dt, format)
+
+        except ValueError:
+            pass
+
+        return value
+
+
+
 
 class TimeInput(forms.TimeInput):
     input_type = 'tel'
     template_name = 'forms/widgets/time.html'
 
+    def value_from_datadict(self, data, files, name):
+        value = super().value_from_datadict(data, files, name)
+        if len(value) == 5:
+            value += ':00'
+
+        return value
 
 class SplitDateTimeWidget(forms.MultiWidget):
     """
@@ -30,41 +59,46 @@ class SplitDateTimeWidget(forms.MultiWidget):
     template_name = 'forms/widgets/splitdatetime.html'
 
     def __init__(self, attrs=None, date_format=None, time_format=None):
-
         now = datetime.now()
-
-        date_attrs = attrs or {}
-        date_attrs.update({
-            'placeholder': now.strftime('%d/%m/%Y')
-        });
-        date = DateInput(attrs=date_attrs, format=date_format)
-
-        time_attrs = attrs or {}
-        time_attrs.update({
-            'placeholder': now.strftime('%H:%M')
-        });
-        time = TimeInput(attrs=time_attrs, format=time_format)
+        date = DateInput(attrs=attrs, format=date_format)
+        time = TimeInput(attrs=attrs, format=time_format)
 
         super().__init__((date, time), attrs)
 
     def value_from_datadict(self, data, files, name):
-        value = super().value_from_datadict(data, files, name)
-        if len(value) == 2:
-            if len(value[1]) == 5:
-                value[1] += ':00'
+        date, time = super().value_from_datadict(data, files, name)
 
-            dt = '{} {}'.format(value[0], value[1])
+        if isinstance(date, datetime):
+            date = date.strftime('%Y/%m/%d')
 
-            try:
-                value = datetime.strptime(dt, '%d/%m/%Y %H:%M:%S')
-            except ValueError:
-                # message handled by field
-                forms.ValidationError('')
+        dt = '{} {}'.format(date, time)
+
+        try:
+            if lang == 'en' or lang == 'en-us':
+                format = '%m/%d/%Y %H:%M:%S'
+            elif lang == 'pt-br':
+                format = '%d/%m/%Y %H:%M:%S'
+            else:
+                format = '%Y/%m/%d %H:%M:%S'
+
+            value = datetime.strptime(dt, format)
+
+        except ValueError:
+            pass
 
         return value
 
     def decompress(self, value):
-        if value:
-            value = to_current_timezone(value)
-            return [value.date(), value.time().replace(microsecond=0)]
-        return [None, None]
+        if not value:
+            return [None, None]
+
+        lang = get_language()
+        value = to_current_timezone(value)
+
+        if lang == 'en' or lang == 'en-us':
+            date = value.strftime('%m/%d/%Y')
+        else:
+            date = value.date()
+
+        return [date, value.time().replace(microsecond=0)]
+
