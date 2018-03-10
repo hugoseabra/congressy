@@ -34,7 +34,7 @@
                         {% if event.place and event.place.name %}
                         <p class="hero-tagline">
                             <i class="fa fa-map-marker"></i>
-                            {{ event.place.name }}
+                            {{ event.place.name|default_if_none:'' }}
                         </p>
                         {% endif %}
                     </div>
