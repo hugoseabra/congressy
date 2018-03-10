@@ -11,6 +11,17 @@
         input#id_city, input#id_city_search {
             text-transform: uppercase;
         }
+
+        .loader-box {
+            width: 100%;
+            position:absolute;
+            top: 5%;
+        }
+
+        .loader {
+            width: 47px;
+            margin:0 auto;
+        }
     </style>
 {% endblock %}
 
@@ -59,13 +70,35 @@
     <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
     <script src="{% static "hotsite/js/payment.js" %}"></script>
     <script>
+        function load_common_lots() {
+            $('#lots-field').html(common_lots_content);
+            $('#id_lot').on('change', function() {
+                var id = $(this).val();
+                $('#id_amount').val(amounts[id]);
+            });
+            $('#id_lot').trigger('change');
+
+            start_popover();
+        }
+
         var lots = {};
+        var amounts = {};
         {% for lot in paid_lots %}
-            {% if lot.price %}
+            {% if lot.price and lot.price > 0 %}
+                amounts[['{{ lot.pk }}']] = '{{ lot.get_calculated_price|unlocalize|intcomma }}';
                 lots['{{ lot.pk }}'] = {
-                    'amount': '{{ lot.get_calculated_price|unlocalize|intcomma }}',
                     'allow_installment': {% if lot.allow_installment %}true{% else %}false{% endif %},
-                    'installment_limit': {{ lot.installment_limit }},
+                    'installment_limit': {% if lot.allow_installment %}{{ lot.installment_limit }}{% else %}0{% endif %},
+                    'free_installment': {{ lot.num_install_interest_absortion|default_if_none:0 }}
+                };
+            {% endif %}
+        {% endfor %}
+        {% for lot in private_lots %}
+            {% if lot.price and lot.price > 0 %}
+                amounts[['{{ lot.pk }}']] = '{{ lot.get_calculated_price|unlocalize|intcomma }}';
+                lots['{{ lot.pk }}'] = {
+                    'allow_installment': {% if lot.allow_installment %}true{% else %}false{% endif %},
+                    'installment_limit': {% if lot.allow_installment %}{{ lot.installment_limit }}{% else %}0{% endif %},
                     'free_installment': {{ lot.num_install_interest_absortion|default_if_none:0 }}
                 };
             {% endif %}
@@ -80,6 +113,11 @@
 
         $(document).ready(function() {
             $('#id_email').attr('readonly', 'readonly');
+            $('#id_lot').on('change', function() {
+                var id = $(this).val();
+                $('#id_amount').val(amounts[id]);
+            });
+
             $('#id_button_pay').on('click', function () {
                 process_payment(
                     '{{ pagarme_encryption_key }}',
@@ -103,6 +141,8 @@
                 city_el.val('');
                 city_el.prop('disabled', true);
             {% endif %}
+
+            $('#id_lot').trigger('change');
             }, 300);
         });
     </script>

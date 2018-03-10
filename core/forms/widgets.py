@@ -30,7 +30,7 @@ class DateInput(forms.DateInput):
             else:
                 format = '%Y/%m/%d'
 
-            value = datetime.strptime(dt, format)
+            value = datetime.strptime(value, format)
 
         except ValueError:
             pass
@@ -66,27 +66,30 @@ class SplitDateTimeWidget(forms.MultiWidget):
         super().__init__((date, time), attrs)
 
     def value_from_datadict(self, data, files, name):
+        lang = get_language()
         date, time = super().value_from_datadict(data, files, name)
 
         if isinstance(date, datetime):
-            date = date.strftime('%Y/%m/%d')
+            date = date.strftime('%Y-%m-%d')
+            format = '%Y-%m-%d %H:%M:%S'
 
-        dt = '{} {}'.format(date, time)
-
-        try:
+        else:
             if lang == 'en' or lang == 'en-us':
                 format = '%m/%d/%Y %H:%M:%S'
             elif lang == 'pt-br':
                 format = '%d/%m/%Y %H:%M:%S'
             else:
-                format = '%Y/%m/%d %H:%M:%S'
+                format = '%Y-%m-%d %H:%M:%S'
 
-            value = datetime.strptime(dt, format)
+        dt = '{} {}'.format(date, time)
+
+        try:
+            return datetime.strptime(dt, format)
 
         except ValueError:
             pass
 
-        return value
+        return [date, time]
 
     def decompress(self, value):
         if not value:
@@ -97,8 +100,9 @@ class SplitDateTimeWidget(forms.MultiWidget):
 
         if lang == 'en' or lang == 'en-us':
             date = value.strftime('%m/%d/%Y')
+        elif lang == 'pt-br':
+            date = value.strftime('%d/%m/%Y')
         else:
             date = value.date()
 
         return [date, value.time().replace(microsecond=0)]
-

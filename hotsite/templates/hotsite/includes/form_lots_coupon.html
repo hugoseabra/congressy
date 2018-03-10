@@ -1,0 +1,32 @@
+{% load l10n humanize %}
+{% if paid_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="panel-title">Ingresso</div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <button type="button" onclick="load_common_lots()" class="btn btn-primary btn-sm">Voltar</button>
+                </div>
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4 style="font-weight: bold;padding-bottom:0;margin-bottom:0">CUPOM VÁLIDO</h4>
+                            <div>
+                                <span style="color:darkgreen;font-weight: bold;">
+                                    {{ lot.display_publicly }}
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-muted text-right" style="padding-right:20px">{{ lot.exhibition_code }}</div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="lot" id="id_lot" value="{{ lot.pk }}" />
+    <input type="hidden" name="amount" id="id_amount" value="{{ lot.get_calculated_price|unlocalize|intcomma }}" />
+    <input type="hidden" name="exhibition_code" id="id_exhibition_code" value="{{ lot.exhibition_code }}" />
+{% endif %}
