@@ -266,15 +266,22 @@
     </script>
     <script src="{% static 'assets/js/event.js' %}"></script>
     <!-- ref: http://maplacejs.com/ -->
+    {% if object.place and object.place.show_location is True %}
     <script src="{% static 'hotsite/js/maplace-0.1.3.min.js' %}"></script>
+    {% endif %}
     <script>
-    $(document).ready(function() {
-        $('#id_date_start').mask("99/99/9999 99:99");
-        $('#id_date_end').mask("99/99/9999 99:99");
-        {% if object.place and object.place.show_location is True %}
-            show_location(true);
-        {% endif %}
-    });
+    (function($) {
+        $(document).ready(function() {
+            $('#id_date_start_0').mask("99/99/9999");
+            $('#id_date_start_1').mask("99:99");
+            $('#id_date_end_0').mask("99/99/9999");
+            $('#id_date_end_1').mask("99:99");
+
+            {% if object.place and object.place.show_location is True %}
+                show_location(true);
+            {% endif %}
+        });
+    })(jQuery);
     </script>
 {% endblock %}
 
