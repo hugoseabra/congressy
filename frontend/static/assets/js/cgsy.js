@@ -1,213 +1,214 @@
+(function($) {
 //========================= MOBILE TOP MENU =================================//
-$(document).ready(function() {
-    $('#mobile-top-menu-button').click(function() {
-        var block = $("#mobile-top-menu");
+    $(document).ready(function() {
+        $('#mobile-top-menu-button').click(function() {
+            var block = $("#mobile-top-menu");
 
-        var right = 0;
+            var right = 0;
 
-        if ($(this).hasClass('active')) {
-            $(this).removeClass('active');
-            right = -285;
-        } else {
-            $(this).addClass('active');
-        }
+            if ($(this).hasClass('active')) {
+                $(this).removeClass('active');
+                right = -285;
+            } else {
+                $(this).addClass('active');
+            }
 
-        block.animate({"right": right}, 300);
+            block.animate({"right": right}, 300);
+        });
     });
-});
 
 //============================ FORM SUBMIT ==================================//
-function submit_form(form) {
-    form = $(form);
+    function submit_form(form) {
+        form = $(form);
 
-    var button;
+        var button;
 
-    button = form.find('button')
-        .not(':button[type=button]')
-        .not(':button[type=reset]')
-    ;
+        button = form.find('button')
+            .not(':button[type=button]')
+            .not(':button[type=reset]')
+        ;
 
-    if (!button.length) {
-        button = form.find('input[type=submit]');
-    }
+        if (!button.length) {
+            button = form.find('input[type=submit]');
+        }
 
-    if (button) {
-        button.css('visibility', 'hidden');
+        if (button) {
+            button.css('visibility', 'hidden');
 
-        var loader = '<div class="loader-block">';
+            var loader = '<div class="loader-block">';
             loader += '<div class="img-block fa-2x">';
             loader += '<i class="fas info-color fa-circle-notch fa-spin"></i>';
             loader += '</div>';
             loader += '</div>';
 
-        loader = $(loader);
-        loader.insertAfter(button);
-        loader.fadeIn();
+            loader = $(loader);
+            loader.insertAfter(button);
+            loader.fadeIn();
 
-        return true;
-    }
-}
-
-function submit_form_no_loader(form) {
-    var button;
-    button = $(form).find('button')
-        .not(':button[type=button]')
-        .not(':button[type=reset]')
-    ;
-
-    if (!button.length) {
-        button = $(form).find('input[type=submit]');
+            return true;
+        }
     }
 
-    if (button) {
-        button.text('Aguarde...');
-        window.setTimeout(function() { form.submit(); } , 500);
+    function submit_form_no_loader(form) {
+        var button;
+        button = $(form).find('button')
+            .not(':button[type=button]')
+            .not(':button[type=reset]')
+        ;
+
+        if (!button.length) {
+            button = $(form).find('input[type=submit]');
+        }
+
+        if (button) {
+            button.text('Aguarde...');
+            window.setTimeout(function() { form.submit(); } , 500);
+        }
     }
-}
 //========================== BUSCA POR CEP ==================================//
-function showHideCepLoader(show) {
-    var cep_el = $('#id_zip_code');
-    if (!cep_el.length) {
-        return;
-    }
-    var el = $('#cep_loader');
-    if (show === true) {
-        el.fadeIn();
-        cep_el.attr('disabled', 'disabled').addClass('disabled');
-        cep_el.css('background-color', '#fff');
-    } else {
-        el.fadeOut();
-        cep_el.removeAttr('disabled').removeClass('disabled');
-        cep_el.removeAttr('style');
-    }
-}
-
-/**
- * Remove acentos de strings
- * @param  {String} string acentuada
- * @return {String} string sem acento
- */
-
-var map = {
-    "â":"a",
-    "Â":"A",
-    "à":"a",
-    "À":"A",
-    "á":"a",
-    "Á":"A",
-    "ã":"a",
-    "Ã":"A",
-    "ê":"e",
-    "Ê":"E",
-    "è":"e",
-    "È":"E",
-    "é":"e",
-    "É":"E",
-    "î":"i",
-    "Î":"I",
-    "ì":"i",
-    "Ì":"I",
-    "í":"i",
-    "Í":"I",
-    "õ":"o",
-    "Õ":"O",
-    "ô":"o",
-    "Ô":"O",
-    "ò":"o",
-    "Ò":"O",
-    "ó":"o",
-    "Ó":"O",
-    "ü":"u",
-    "Ü":"U",
-    "û":"u",
-    "Û":"U",
-    "ú":"u",
-    "Ú":"U",
-    "ù":"u",
-    "Ù":"U",
-    "ç":"c",
-    "Ç":"C"
-};
-
-function removerAcentos(s){
-    return s.replace(/[\W\[\] ]/g,function(a){return map[a]||a})
-};
-
-
-var zip_code_el = $('#id_zip_code');
-var zip_code_initial_value = zip_code_el.val();
-function searchByCep() {
-    var el = $('#id_zip_code');
-    var cep = el.val().replace(/\D/g, '');
-
-    if (cep.length < 8) {
-        return;
+    function showHideCepLoader(show) {
+        var cep_el = $('#id_zip_code');
+        if (!cep_el.length) {
+            return;
+        }
+        var el = $('#cep_loader');
+        if (show === true) {
+            el.fadeIn();
+            cep_el.attr('disabled', 'disabled').addClass('disabled');
+            cep_el.css('background-color', '#fff');
+        } else {
+            el.fadeOut();
+            cep_el.removeAttr('disabled').removeClass('disabled');
+            cep_el.removeAttr('style');
+        }
     }
 
-    if (cep == zip_code_initial_value.replace(/\D/g, '')) {
-        return;
-    }
+    /**
+     * Remove acentos de strings
+     * @param  {String} string acentuada
+     * @return {String} string sem acento
+     */
 
-    zip_code_initial_value = cep;
+    var map = {
+        "â":"a",
+        "Â":"A",
+        "à":"a",
+        "À":"A",
+        "á":"a",
+        "Á":"A",
+        "ã":"a",
+        "Ã":"A",
+        "ê":"e",
+        "Ê":"E",
+        "è":"e",
+        "È":"E",
+        "é":"e",
+        "É":"E",
+        "î":"i",
+        "Î":"I",
+        "ì":"i",
+        "Ì":"I",
+        "í":"i",
+        "Í":"I",
+        "õ":"o",
+        "Õ":"O",
+        "ô":"o",
+        "Ô":"O",
+        "ò":"o",
+        "Ò":"O",
+        "ó":"o",
+        "Ó":"O",
+        "ü":"u",
+        "Ü":"U",
+        "û":"u",
+        "Û":"U",
+        "ú":"u",
+        "Ú":"U",
+        "ù":"u",
+        "Ù":"U",
+        "ç":"c",
+        "Ç":"C"
+    };
 
-    //Expressão regular para validar o CEP.
-    var validacep = /^[0-9]{8}$/;
+    function removerAcentos(s){
+        return s.replace(/[\W\[\] ]/g,function(a){return map[a]||a})
+    };
 
-    //Valida o formato do CEP.
-    if(!validacep.test(cep)) {
-        alert("Formato de CEP inválido.");
-        showHideCepLoader(false);
-        window.setTimeout(function() { $('#id_zip_code').focus(); }, 100);
-        return;
-    }
 
-    var street = $('#id_street');
-    var number = $('#id_number');
-    var complement = $('#id_complement');
-    var village = $('#id_village');
-    var state = $('#id_state');
-    var city = $('#id_city');
+    var zip_code_el = $('#id_zip_code');
+    var zip_code_initial_value = zip_code_el.val();
+    function searchByCep() {
+        var el = $('#id_zip_code');
+        var cep = el.val().replace(/\D/g, '');
 
-    street.val('');
-    number.val('');
-    complement.val('');
-    village.val('');
-    // city.val('');
+        if (cep.length < 8) {
+            return;
+        }
 
-    var url = "https://viacep.com.br/ws/"+ cep +"/json/?callback=?";
+        if (cep == zip_code_initial_value.replace(/\D/g, '')) {
+            return;
+        }
 
-    //Consulta o webservice viacep.com.br/
-    showHideCepLoader(true);
+        zip_code_initial_value = cep;
 
-    $.getJSON(url, function(response) {
-        if ('erro' in response) {
-            alert("CEP não encontrado.");
+        //Expressão regular para validar o CEP.
+        var validacep = /^[0-9]{8}$/;
+
+        //Valida o formato do CEP.
+        if(!validacep.test(cep)) {
+            alert("Formato de CEP inválido.");
             showHideCepLoader(false);
             window.setTimeout(function() { $('#id_zip_code').focus(); }, 100);
             return;
         }
 
-        street.val(response.logradouro);
-        village.val(response.bairro);
-        state.val(response.uf);
+        var street = $('#id_street');
+        var number = $('#id_number');
+        var complement = $('#id_complement');
+        var village = $('#id_village');
+        var state = $('#id_state');
+        var city = $('#id_city');
 
-        var cep_city = removerAcentos(response.localidade).toUpperCase();
-        console.log(cep_city);
+        street.val('');
+        number.val('');
+        complement.val('');
+        village.val('');
+        // city.val('');
 
-        fetch_cities(state, null, function(cities) {
-            $.each(cities, function(i, city) {
-               if (cep_city === removerAcentos(city.name)) {
-                   $('#id_city_name').val(city.id);
-                   $('#id_city').val(city.id);
-               }
+        var url = "https://viacep.com.br/ws/"+ cep +"/json/?callback=?";
+
+        //Consulta o webservice viacep.com.br/
+        showHideCepLoader(true);
+
+        $.getJSON(url, function(response) {
+            if ('erro' in response) {
+                alert("CEP não encontrado.");
+                showHideCepLoader(false);
+                window.setTimeout(function() { $('#id_zip_code').focus(); }, 100);
+                return;
+            }
+
+            street.val(response.logradouro);
+            village.val(response.bairro);
+            state.val(response.uf);
+
+            var cep_city = removerAcentos(response.localidade).toUpperCase();
+            console.log(cep_city);
+
+            fetch_cities(state, null, function(cities) {
+                $.each(cities, function(i, city) {
+                    if (cep_city === removerAcentos(city.name)) {
+                        $('#id_city_name').val(city.id);
+                        $('#id_city').val(city.id);
+                    }
+                });
             });
+
+            showHideCepLoader(false);
+            window.setTimeout(function() { $('#id_street').focus(); }, 100);
         });
-
-        showHideCepLoader(false);
-        window.setTimeout(function() { $('#id_street').focus(); }, 100);
-    });
-}
-
+    }
+})(jQuery);
 //========================= CAIXA DE FILTROS ================================//
 window.cgsy = window.cgsy || {};
 (function(window, $) {
