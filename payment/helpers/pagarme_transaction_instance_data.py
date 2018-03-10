@@ -194,7 +194,7 @@ class PagarmeTransactionInstanceData:
             )
 
         if self.extra_data['transaction_type'] not in allowed_payment_methods:
-            raise TransactionError(message='Tip de transação não permitido.')
+            raise TransactionError(message='Tipo de transação não permitido.')
 
         self.transaction_type = self.extra_data['transaction_type']
 
