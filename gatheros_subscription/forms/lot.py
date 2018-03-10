@@ -102,7 +102,7 @@ class LotForm(forms.ModelForm):
                 ' alterado.'
             )
 
-        return cleaned_data
+        return price
 
     def clean_exhibition_code(self):
         code = self.cleaned_data.get('exhibition_code')
