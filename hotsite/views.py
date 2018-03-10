@@ -49,7 +49,7 @@ class EventMixin(generic.View):
         context['paid_lots'] = [
             lot
             for lot in self.get_lots()
-            if  lot.status == lot.LOT_STATUS_RUNNING
+            if lot.status == lot.LOT_STATUS_RUNNING
         ]
         context['subscription_enabled'] = self.subscription_enabled()
         context['subsciption_finished'] = self.subsciption_finished()
@@ -423,8 +423,11 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
         # Se o já inscrito e porém, não há lotes pagos, não há o que
         # fazer aqui.
-        if self.is_subscribed() and not self.has_paid_lots():
-            return redirect('public:hotsite-status', slug=self.event.slug)
+        if self.is_subscribed() and self.has_paid_lots():
+            return redirect(
+                'public:hotsite-subscription-status',
+                slug=self.event.slug
+            )
 
         return response
 
@@ -527,17 +530,17 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         user = self.request.user
 
         # CONDIÇÃO 7
-        if self.has_paid_lots():
-            allowed_transaction = request.POST.get(
-                'allowed_transaction',
-                False
-            )
-
-            # CONDIÇÃO 6
-            if allowed_transaction:
-                request.session['allowed_transaction'] = allowed_transaction
-                slug = kwargs.get('slug')
-                return redirect('public:hotsite-subscription', slug=slug)
+        # if self.has_paid_lots():
+        #     allowed_transaction = request.POST.get(
+        #         'allowed_transaction',
+        #         False
+        #     )
+        #
+        #     # CONDIÇÃO 6
+        #     if allowed_transaction:
+        #         request.session['allowed_transaction'] = allowed_transaction
+        #         slug = kwargs.get('slug')
+        #         return redirect('public:hotsite-subscription', slug=slug)
 
         # CONDIÇÃO 1
         if not user.is_authenticated or not self.subscription_enabled():
@@ -699,6 +702,13 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
         response = super().dispatch(request, *args, **kwargs)
 
         self.person = self.get_person()
+
+        # Se  não há lotes pagos, não há o que fazer aqui.
+        if not self.has_paid_lots():
+            return redirect(
+                'public:hotsite',
+                slug=self.event.slug
+            )
 
         try:
             self.subscription = Subscription.objects.get(

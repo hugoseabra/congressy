@@ -28,7 +28,7 @@ olefile==0.44
 openpyxl==2.4.8
 pagarme-python==3.1.0
 packaging==16.8
-phonenumbers==8.4.1
+phonenumbers==8.9.1
 Pillow==4.1.0
 progressbar2==3.30.2
 psycopg2==2.7.3.2
