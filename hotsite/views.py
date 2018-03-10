@@ -52,6 +52,11 @@ class EventMixin(TemplateNameableMixin, generic.View):
             for lot in self.get_lots()
             if lot.status == lot.LOT_STATUS_RUNNING
         ]
+        context['private_lots'] = [
+            lot
+            for lot in self.get_private_lots()
+            if lot.status == lot.LOT_STATUS_RUNNING
+        ]
         context['subscription_enabled'] = self.subscription_enabled()
         context['subsciption_finished'] = self.subsciption_finished()
         context['has_paid_lots'] = self.has_paid_lots()
@@ -106,6 +111,9 @@ class EventMixin(TemplateNameableMixin, generic.View):
 
     def get_lots(self):
         return self.event.lots.filter(private=False)
+
+    def get_private_lots(self):
+        return self.event.lots.filter(private=True)
 
 
 class SubscriptionFormMixin(EventMixin, generic.FormView):
@@ -844,7 +852,7 @@ class CouponView(EventMixin, generic.TemplateView):
         code = request.POST.get('coupon')
         if code:
             try:
-                lot = Lot.objects.get(exhibition_code=code)
+                lot = Lot.objects.get(exhibition_code=str(code).upper())
 
                 if lot.status != Lot.LOT_STATUS_RUNNING:
                     raise Http404

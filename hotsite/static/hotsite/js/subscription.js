@@ -1,3 +1,45 @@
+function send(url, method, data, success_callback, error_callback) {
+    // CSRF code
+    function getCookie(name) {
+        var cookieValue = null;
+        var i = 0;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (i; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    $.ajax({
+        url: url,
+        type: method,
+        data: data || {},
+        encode: true,
+        crossDomain: false,
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        },
+        success: success_callback || function() {},
+        error: error_callback || function() {}
+    });
+}
+
+var common_lots_content = null;
 function load_coupon() {
     var url = $('#id_coupon_url');
 
@@ -22,51 +64,21 @@ function load_coupon() {
         button.addClass('disabled').attr('disabled', 'disabled').text('Aguarde...');
 
     var lot_fields = $('#lots-field');
+    common_lots_content = lot_fields.html()
 
-    // CSRF code
-    function getCookie(name) {
-        var cookieValue = null;
-        var i = 0;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (i; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    var csrftoken = getCookie('csrftoken');
-
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    $.ajax({
-        url: url,
-        type: 'POST',
-        data: {'coupon': coupon},
-        encode: true,
-        crossDomain: false,
-        beforeSend: function(xhr, settings) {
-          if (!csrfSafeMethod(settings.type)) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-          }
-        },
-        success: function (response) {
+    send(
+        url,
+        'POST',
+        {'coupon': coupon},
+        function (response) {
             lot_fields.html(response);
         },
-        error: function(response) {
+        function() {
             button.removeClass('disabled').removeAttr('disabled').text('Enviar');
             $('#id_coupon').val('');
             alert('Cupom inválido.');
         }
-    });
-
+    );
 
     $('#coupon_link').popover('hide');
 }
@@ -108,6 +120,14 @@ function fetch_cities(uf_el, selected_value, callback) {
     });
 }
 
+function start_popover() {
+    $('[data-toggle="popover"]').popover({
+        placement: 'bottom',
+        container: 'body',
+        trigger: 'click'
+    });
+}
+
 (function($) {
     $(document).ready(function () {
         $('#id_phone').mask("(99) 99999-9999");
@@ -137,5 +157,7 @@ function fetch_cities(uf_el, selected_value, callback) {
         $('#id_zip_code').on('keyup', function () {
             searchByCep();
         });
+
+        start_popover();
     });
 })(jQuery);

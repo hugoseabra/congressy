@@ -107,5 +107,5 @@ class LotForm(forms.ModelForm):
     def clean_exhibition_code(self):
         code = self.cleaned_data.get('exhibition_code')
         if code:
-            code = ''.join(code.split())
+            code = ''.join(code.split()).upper()
         return code

@@ -7,15 +7,17 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-primary btn-sm">Voltar</button>
+                    <button type="button" onclick="load_common_lots()" class="btn btn-primary btn-sm">Voltar</button>
                 </div>
                 <div class="col-md-10">
                     <div class="row">
                         <div class="col-md-12">
                             <h4 style="font-weight: bold;padding-bottom:0;margin-bottom:0">CUPOM VÁLIDO</h4>
                             <div>
-                                <strong>{{ lot.name|upper }} = </strong>
-                                <span style="color:darkgreen;font-weight: bold;">R$ {{ lot.price|unlocalize|intcomma }}</span>
+                                <span style="color:darkgreen;font-weight: bold;">
+                                    {{ lot.display_publicly }}
+                                </span>
+
                             </div>
                         </div>
                     </div>
@@ -25,5 +27,6 @@
         </div>
     </div>
     <input type="hidden" name="lot" id="id_lot" value="{{ lot.pk }}" />
+    <input type="hidden" name="amount" id="id_amount" value="{{ lot.get_calculated_price|unlocalize|intcomma }}" />
     <input type="hidden" name="exhibition_code" id="id_exhibition_code" value="{{ lot.exhibition_code }}" />
 {% endif %}
