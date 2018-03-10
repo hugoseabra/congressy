@@ -34,328 +34,337 @@
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
     <script type="application/javascript">
-        $('#id_date_start').mask("99/99/9999 99:99");
-        $('#id_date_end').mask("99/99/9999 99:99");
 
-        function show(el) {
-            $(el).fadeIn();
-        }
-
-        function hide(el) {
-            $(el).fadeOut();
-        }
-
-        function showHideLimit() {
-            var limitCheckbox = $('#id_limit').parent().parent().parent();
-            if ($('#limit_switch').prop('checked')) {
-                show(limitCheckbox);
-            } else {
-                hide(limitCheckbox);
-            }
-        }
-
-        function showHideExihibitionCode() {
-            var exhibition_code = $('#id_exhibition_code').parent().parent().parent();
-            if ($('#id_private').prop('checked')) {
-                show(exhibition_code);
-            } else {
-                hide(exhibition_code);
-            }
-        }
-
-        function showHideTransferTax() {
-            var transfer_tax = $('#id_transfer_tax');
-            var allow_installment = $('#id_allow_installment');
-
-            if (!transfer_tax.length || !allow_installment.length) {
-                return;
+        (function($) {
+            function show(el) {
+                $(el).fadeIn();
             }
 
-            allow_installment = allow_installment.parent().parent().parent();
-            transfer_tax = transfer_tax.parent().parent().parent();
-
-            if (parseFloat($('#id_price').val()) > 0) {
-                show(transfer_tax);
-                show(allow_installment);
-            } else {
-                hide(transfer_tax);
-                app.setSwitchery('#id_allow_installment', false);
-                hide(allow_installment);
-            }
-        }
-
-        function showHideInstallmentFields() {
-            var allow = $('#id_allow_installment');
-            if (!allow.length) {
-                return;
+            function hide(el) {
+                $(el).fadeOut();
             }
 
-            var num_parts = $('#id_installment_limit');
-            var num_absortion = $('#id_num_install_interest_absortion');
-
-            if (!num_parts.length || !num_absortion.length) {
-                return;
+            function showHideLimit() {
+                var limitCheckbox = $('#id_limit').parent().parent().parent();
+                if ($('#limit_switch').prop('checked')) {
+                    show(limitCheckbox);
+                } else {
+                    hide(limitCheckbox);
+                }
             }
 
-            var sub_price_block = $('#subscription_price_block');
-            var price_receive_block = $('#price_to_recieve_block');
-            var installments_block = $('#installment_price_to_receive_block');
-
-            if (allow.prop('checked')) {
-                show(num_parts.parent().parent());
-                show(num_absortion.parent().parent().parent().parent());
-                price_receive_block.removeAttr('class').addClass('col-sm-4 col-md-4');
-                sub_price_block.removeAttr('class').addClass('col-sm-4 col-md-4');
-
-                window.setTimeout(function() {
-                    show(installments_block);
-                }, 300);
-
-            } else {
-                hide(num_parts.parent().parent());
-                hide(num_absortion.parent().parent().parent().parent());
-
-                hide(installments_block);
-
-                window.setTimeout(function() {
-                    price_receive_block.removeAttr('class').addClass('col-sm-6 col-md-6');
-                    sub_price_block.removeAttr('class').addClass('col-sm-6 col-md-6');
-                }, 300);
-            }
-        }
-
-        function showPrices(action) {
-            action = action === true;
-            var price_box = $('.price-box');
-            if (action) {
-                price_box.fadeIn();
-            } else {
-                price_box.fadeOut();
-            }
-        }
-
-        function calculatePrices() {
-            var minimum = parseFloat(
-                '{{ congressy_minimum_price|unlocalize|intcomma }}'
-                    .replace(',', '.')
-            );
-            var percent = parseFloat(
-                '{{ congressy_plan_percent_10|unlocalize|intcomma }}'
-                    .replace(',', '.')
-            );
-            percent = percent/100;
-
-            var id_price = $('#id_price');
-            if (!id_price.length) {
-                return;
+            function showHideExihibitionCode() {
+                var exhibition_code = $('#id_exhibition_code').parent().parent().parent();
+                if ($('#id_private').prop('checked')) {
+                    show(exhibition_code);
+                } else {
+                    hide(exhibition_code);
+                }
             }
 
-            var price = $('#id_price').val();
-            if (!price) {
-                showPrices(false);
-                return;
+            function showHideTransferTax() {
+                var transfer_tax = $('#id_transfer_tax');
+                var allow_installment = $('#id_allow_installment');
+
+                if (!transfer_tax.length || !allow_installment.length) {
+                    return;
+                }
+
+                allow_installment = allow_installment.parent().parent().parent();
+                transfer_tax = transfer_tax.parent().parent().parent();
+
+                if (parseFloat($('#id_price').val()) > 0) {
+                    show(transfer_tax);
+                    show(allow_installment);
+                } else {
+                    hide(transfer_tax);
+                    app.setSwitchery('#id_allow_installment', false);
+                    hide(allow_installment);
+                }
             }
 
-            price = price.replace('.', '').replace(',', '.');
+            function showHideInstallmentFields() {
+                var allow = $('#id_allow_installment');
+                if (!allow.length) {
+                    return;
+                }
 
-            if (parseFloat(price) <= 0) {
-                showPrices(false);
-                return;
+                var num_parts = $('#id_installment_limit');
+                var num_absortion = $('#id_num_install_interest_absortion');
+
+                if (!num_parts.length || !num_absortion.length) {
+                    return;
+                }
+
+                var sub_price_block = $('#subscription_price_block');
+                var price_receive_block = $('#price_to_recieve_block');
+                var installments_block = $('#installment_price_to_receive_block');
+
+                if (allow.prop('checked')) {
+                    show(num_parts.parent().parent());
+                    show(num_absortion.parent().parent().parent().parent());
+                    price_receive_block.removeAttr('class').addClass('col-sm-4 col-md-4');
+                    sub_price_block.removeAttr('class').addClass('col-sm-4 col-md-4');
+
+                    window.setTimeout(function() {
+                        show(installments_block);
+                    }, 300);
+
+                } else {
+                    hide(num_parts.parent().parent());
+                    hide(num_absortion.parent().parent().parent().parent());
+
+                    hide(installments_block);
+
+                    window.setTimeout(function() {
+                        price_receive_block.removeAttr('class').addClass('col-sm-6 col-md-6');
+                        sub_price_block.removeAttr('class').addClass('col-sm-6 col-md-6');
+                    }, 300);
+                }
             }
 
-            price = parseFloat(price);
-
-            var congressy_price = price * percent;
-            if (congressy_price < minimum) {
-                congressy_price = minimum;
+            function showPrices(action) {
+                action = action === true;
+                var price_box = $('.price-box');
+                if (action) {
+                    price_box.fadeIn();
+                } else {
+                    price_box.fadeOut();
+                }
             }
 
-            var subscription_price = $('.subscription_price');
-            var price_to_recieve = $('.price_to_recieve');
-            var transfer_tax = $('#id_transfer_tax').prop('checked');
+            function calculatePrices() {
+                var minimum = parseFloat(
+                    '{{ congressy_minimum_price|unlocalize|intcomma }}'
+                        .replace(',', '.')
+                );
+                var percent = parseFloat(
+                    '{{ congressy_plan_percent_10|unlocalize|intcomma }}'
+                        .replace(',', '.')
+                );
+                percent = percent/100;
 
-            var hide_tax = function(tax_el) {
-                var parent = tax_el.parent().parent().find('.congressy_tax').parent();
-                parent.css('visibility', 'hidden');
-            };
-            var show_tax = function(tax_el) {
-                var parent = tax_el.parent().parent().find('.congressy_tax').parent();
-                parent.css('visibility', 'visible');
-            };
+                var id_price = $('#id_price');
+                if (!id_price.length) {
+                    return;
+                }
 
-            if (congressy_price > 0) {
-                $('.congressy_tax').text(as_currency(congressy_price));
-            } else {
-                $('.congressy_tax').text('-');
-            }
+                var price = $('#id_price').val();
+                if (!price) {
+                    showPrices(false);
+                    return;
+                }
 
-            if (transfer_tax) {
-                show_tax(subscription_price);
-                hide_tax(price_to_recieve);
+                price = price.replace('.', '').replace(',', '.');
+
+                if (parseFloat(price) <= 0) {
+                    showPrices(false);
+                    return;
+                }
+
+                price = parseFloat(price);
+
+                var congressy_price = price * percent;
+                if (congressy_price < minimum) {
+                    congressy_price = minimum;
+                }
+
+                var subscription_price = $('.subscription_price');
+                var price_to_recieve = $('.price_to_recieve');
+                var transfer_tax = $('#id_transfer_tax').prop('checked');
+
+                var hide_tax = function(tax_el) {
+                    var parent = tax_el.parent().parent().find('.congressy_tax').parent();
+                    parent.css('visibility', 'hidden');
+                };
+                var show_tax = function(tax_el) {
+                    var parent = tax_el.parent().parent().find('.congressy_tax').parent();
+                    parent.css('visibility', 'visible');
+                };
+
                 if (congressy_price > 0) {
-                    subscription_price.text(as_currency(price + congressy_price));
-                    price_to_recieve.text(as_currency(price));
+                    $('.congressy_tax').text(as_currency(congressy_price));
                 } else {
-                    subscription_price.text('-');
-                    price_to_recieve.text('-');
-                }
-            } else {
-                show_tax(price_to_recieve);
-                hide_tax(subscription_price);
-                if (congressy_price > 0) {
-                    subscription_price.text(as_currency(price));
-                    price_to_recieve.text(as_currency(price - congressy_price));
-                } else {
-                    subscription_price.text('-');
-                    price_to_recieve.text('-');
-                }
-            }
-        }
-
-        function calcInstallments() {
-            var popover = $('#installment-items');
-            var price = $('.subscription_price');
-            var price_receive = $('.price_to_recieve');
-            var parts = $('#id_installment_limit');
-            var num_free_items = $('#id_num_install_interest_absortion');
-
-            if (!popover.length || !price.length || !parts.length || !num_free_items.length || !price_receive.length) {
-                return;
-            }
-
-            if (!price.text()) {
-                return;
-            }
-
-            if (!price_receive.text()) {
-                return;
-            }
-
-            price = price.text().replace('.', '').replace(',', '.');
-            price = parseFloat(price);
-
-            price_receive = price_receive.text().replace('.', '').replace(',', '.');
-            price_receive = parseFloat(price_receive);
-
-            num_free_items = parseInt(num_free_items.val());
-            var interest = parseFloat(price * (2.29/100));
-
-            var items = [];
-            var items2 = [];
-            var interest_sum = 0.00;
-
-            for (var i = 2; i <= parseInt(parts.val()); i++) {
-                var part_price_liquid = parseFloat(price/i);
-                var part_price = parseFloat(part_price_liquid + interest);
-                var part_recieve = price_receive;
-
-                if (i <= num_free_items) {
-                    // Collect interest
-                    interest_sum += parseFloat((part_price - part_price_liquid));
-
-                    // Force liquid price
-                    part_price = part_price_liquid;
-
-                    part_price = as_currency(part_price);
-                    part_price = '<strong>R$ '+part_price+'</strong>';
-                    part_price = part_price+' (sem juros)';
-
-                    part_recieve = parseFloat(part_recieve - (interest * i));
-
-                } else {
-                    part_price = '<strong>R$ '+as_currency(part_price)+'</strong>';
+                    $('.congressy_tax').text('-');
                 }
 
-                part_recieve = '<strong>R$ '+as_currency(parseFloat(part_recieve))+'</strong>';
-
-                var html = '<div>';
-                    html += '<span>'+i+'x: </span>';
-                    html += part_price;
-                    html += '</div>';
-
-                var html2 = '<div>';
-                    html2 += part_recieve;
-                    html2 += '<span> (se '+i+'x)</span>';
-                    html2 += '</div>';
-
-                items.push(html);
-                items2.push(html2);
+                if (transfer_tax) {
+                    show_tax(subscription_price);
+                    hide_tax(price_to_recieve);
+                    if (congressy_price > 0) {
+                        subscription_price.text(as_currency(price + congressy_price));
+                        price_to_recieve.text(as_currency(price));
+                    } else {
+                        subscription_price.text('-');
+                        price_to_recieve.text('-');
+                    }
+                } else {
+                    show_tax(price_to_recieve);
+                    hide_tax(subscription_price);
+                    if (congressy_price > 0) {
+                        subscription_price.text(as_currency(price));
+                        price_to_recieve.text(as_currency(price - congressy_price));
+                    } else {
+                        subscription_price.text('-');
+                        price_to_recieve.text('-');
+                    }
+                }
             }
 
-            popover.attr('data-content', items.join(''));
-            $('#installment_price_to_receive').html(items2.join(''));
-        }
+            function calcInstallments() {
+                var popover = $('#installment-items');
+                var price = $('.subscription_price');
+                var price_receive = $('.price_to_recieve');
+                var parts = $('#id_installment_limit');
+                var num_free_items = $('#id_num_install_interest_absortion');
 
-        $(document).ready(function () {
-            $('#id_price').mask('#.##0,00', {reverse: true});
+                if (!popover.length || !price.length || !parts.length || !num_free_items.length || !price_receive.length) {
+                    return;
+                }
 
-            showHideLimit();
-            showHideExihibitionCode();
-            showHideTransferTax();
-            calculatePrices();
-            showHideInstallmentFields();
-            calcInstallments();
+                if (!price.text()) {
+                    return;
+                }
 
-            $('#limit_switch').on('change', function () {
+                if (!price_receive.text()) {
+                    return;
+                }
+
+                price = price.text().replace('.', '').replace(',', '.');
+                price = parseFloat(price);
+
+                price_receive = price_receive.text().replace('.', '').replace(',', '.');
+                price_receive = parseFloat(price_receive);
+
+                num_free_items = parseInt(num_free_items.val());
+                var interest = parseFloat(price * (2.29/100));
+
+                var items = [];
+                var items2 = [];
+                var interest_sum = 0.00;
+
+                for (var i = 2; i <= parseInt(parts.val()); i++) {
+                    var part_price_liquid = parseFloat(price/i);
+                    var part_price = parseFloat(part_price_liquid + interest);
+                    var part_recieve = price_receive;
+
+                    if (i <= num_free_items) {
+                        // Collect interest
+                        interest_sum += parseFloat((part_price - part_price_liquid));
+
+                        // Force liquid price
+                        part_price = part_price_liquid;
+
+                        part_price = as_currency(part_price);
+                        part_price = '<strong>R$ '+part_price+'</strong>';
+                        part_price = part_price+' (sem juros)';
+
+                        part_recieve = parseFloat(part_recieve - (interest * i));
+
+                    } else {
+                        part_price = '<strong>R$ '+as_currency(part_price)+'</strong>';
+                    }
+
+                    part_recieve = '<strong>R$ '+as_currency(parseFloat(part_recieve))+'</strong>';
+
+                    var html = '<div>';
+                        html += '<span>'+i+'x: </span>';
+                        html += part_price;
+                        html += '</div>';
+
+                    var html2 = '<div>';
+                        html2 += part_recieve;
+                        html2 += '<span> (se '+i+'x)</span>';
+                        html2 += '</div>';
+
+                    items.push(html);
+                    items2.push(html2);
+                }
+
+                popover.attr('data-content', items.join(''));
+                $('#installment_price_to_receive').html(items2.join(''));
+            }
+
+
+
+            $(document).ready(function () {
+                $('#id_date_start_0').mask("99/99/9999");
+                $('#id_date_start_1').mask("99:99");
+                $('#id_date_end_0').mask("99/99/9999");
+                $('#id_date_end_1').mask("99:99");
+
+
+                $('#id_price').mask('#.##0,00', {reverse: true});
+
                 showHideLimit();
-            });
-
-            $('#id_private').on('change', function () {
                 showHideExihibitionCode();
-            });
-
-            $('#id_transfer_tax').on('change', function () {
+                showHideTransferTax();
                 calculatePrices();
-                calcInstallments();
-            });
-
-            $('#id_allow_installment').on('change', function () {
                 showHideInstallmentFields();
                 calcInstallments();
-            });
 
-            $('#id_installment_limit').on('change', function () {
-                calcInstallments();
-            });
+                $('#limit_switch').on('change', function () {
+                    showHideLimit();
+                });
 
-            $('#id_num_install_interest_absortion').on('change', function () {
-                calcInstallments();
-            });
+                $('#id_private').on('change', function () {
+                    showHideExihibitionCode();
+                });
 
-            $('#id_exhibition_code').on('keyup', function() {
-                var el = $(this);
-                var value = el.val();
-                el.val(value.replace(/ /gi, ''));
-            });
-
-            var id_price = $('#id_price');
-            if (id_price.length) {
-                $('#id_price').on('keyup', function () {
-                    var transfer_tax = $('#id_transfer_tax').parent().parent().parent();
-                    var allow_installment = $('#id_allow_installment').parent().parent().parent();
-                    var val = parseFloat($(this).val());
-                    if (val > 0) {
-                        show(transfer_tax);
-                        show(allow_installment);
-                        showPrices(true);
-                    } else {
-                        app.setSwitchery('#id_allow_installment', false);
-                        hide(transfer_tax);
-                        hide(allow_installment);
-                        showPrices(false);
-                    }
-                    showHideInstallmentFields();
+                $('#id_transfer_tax').on('change', function () {
                     calculatePrices();
                     calcInstallments();
                 });
-            }
 
-            $('[data-toggle="popover"]').popover({
-                placement: 'bottom',
-                container: 'body',
-                trigger: 'hover'
+                $('#id_allow_installment').on('change', function () {
+                    showHideInstallmentFields();
+                    calcInstallments();
+                });
+
+                $('#id_installment_limit').on('change', function () {
+                    calcInstallments();
+                });
+
+                $('#id_num_install_interest_absortion').on('change', function () {
+                    calcInstallments();
+                });
+
+                $('#id_exhibition_code').on('keyup', function() {
+                    var el = $(this);
+                    var value = el.val();
+                    el.val(value.replace(/ /gi, ''));
+                });
+
+                var id_price = $('#id_price');
+                if (id_price.length) {
+                    $('#id_price').on('keyup', function () {
+                        var transfer_tax = $('#id_transfer_tax').parent().parent().parent();
+                        var allow_installment = $('#id_allow_installment').parent().parent().parent();
+                        var val = parseFloat($(this).val());
+                        if (val > 0) {
+                            show(transfer_tax);
+                            show(allow_installment);
+                            showPrices(true);
+                        } else {
+                            app.setSwitchery('#id_allow_installment', false);
+                            hide(transfer_tax);
+                            hide(allow_installment);
+                            showPrices(false);
+                        }
+                        showHideInstallmentFields();
+                        calculatePrices();
+                        calcInstallments();
+                    });
+                }
+
+                $('[data-toggle="popover"]').popover({
+                    placement: 'bottom',
+                    container: 'body',
+                    trigger: 'hover'
+                });
             });
-        });
+
+        })(jQuery);
     </script>
 {% endblock %}
 
@@ -456,15 +465,15 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-xl-9 col-lg-11 col-md-11">
+                            <div class="col-xl-10 col-lg-11 col-md-11">
                                 {% render_generic_field form.name autofocus=True %}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-xl-5 col-lg-6 col-md-6">
+                            <div class="col-md-5">
                                 {% render_generic_field form.date_start %}
                             </div>
-                            <div class="col-xl-4 col-lg-5 col-md-5">
+                            <div class="col-md-5">
                                 {% render_generic_field form.date_end %}
                             </div>
                         </div>

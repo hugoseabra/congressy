@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                         'institution-cnpj-required',
                         'Mostrar e Tornar obrigatório')],
                 default='institution-cnpj-hide',
-                help_text='CNPJ da empresa com a qual você o(a) partcipante'
+                help_text='CNPJ da empresa com a qual o(a) partcipante está'
                           ' vinculado(a).',
                 max_length=35, verbose_name='CNPJ'),
         ),
@@ -70,7 +70,7 @@ class Migration(migrations.Migration):
                              'function-required',
                              'Mostrar e Tornar obrigatório')],
                 default='function-hide',
-                help_text='Cargo ou função que exerce profissialmente.',
+                help_text='Cargo ou função que exerce profissionalmente.',
                 max_length=35, verbose_name='Cargo/Função'
             ),
         ),

@@ -10,6 +10,9 @@ from .models import Transaction, TransactionStatus, BankAccount
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
     search_fields = (
+        'uuid',
+        'subscription__uuid',
+        'subscription__person__uuid',
         'subscription__person__name',
         'subscription__event__name',
     )

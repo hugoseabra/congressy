@@ -49,11 +49,12 @@
     {% block styles %}{% endblock %}
 
     <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
-    {% if form %}
-        {{ form.media }}
-    {% endif %}
 
     {% block headscripts %}{% endblock %}
+
+    {% if form %}
+        {{ form.media.css }}
+    {% endif %}
 
     <!-- Feature detection -->
     <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
@@ -357,5 +358,9 @@
 </script>
 
 {% block scripts %}{% endblock %}
+
+{% if form %}
+    {{ form.media.js }}
+{% endif %}
 </body>
 </html>
