@@ -70,7 +70,7 @@ class Migration(migrations.Migration):
                              'function-required',
                              'Mostrar e Tornar obrigatório')],
                 default='function-hide',
-                help_text='Cargo ou função que exerce profissialmente.',
+                help_text='Cargo ou função que exerce profissionalmente.',
                 max_length=35, verbose_name='Cargo/Função'
             ),
         ),
