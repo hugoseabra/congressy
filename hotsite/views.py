@@ -4,7 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import six
@@ -13,6 +13,7 @@ from django.views import generic
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 
+from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
 from gatheros_subscription.models import FormConfig, Lot, Subscription
@@ -26,7 +27,7 @@ from payment.models import Transaction
 from payment.tasks import create_pagarme_transaction
 
 
-class EventMixin(generic.View):
+class EventMixin(TemplateNameableMixin, generic.View):
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -54,6 +55,7 @@ class EventMixin(generic.View):
         context['subscription_enabled'] = self.subscription_enabled()
         context['subsciption_finished'] = self.subsciption_finished()
         context['has_paid_lots'] = self.has_paid_lots()
+        context['has_coupon'] = self.has_coupon()
         context['has_configured_bank_account'] = \
             self.event.organization.is_bank_account_configured()
         context['has_active_bank_account'] = \
@@ -70,6 +72,15 @@ class EventMixin(generic.View):
                 continue
 
             if lot.price > 0:
+                return True
+
+        return False
+
+    def has_coupon(self):
+        """ Retorna se possui cupon, seja qual for. """
+        for lot in self.event.lots.all():
+            # código de exibição
+            if lot.private and lot.exhibition_code:
                 return True
 
         return False
@@ -94,7 +105,7 @@ class EventMixin(generic.View):
         return self.event.get_period()
 
     def get_lots(self):
-        return self.event.lots.all()
+        return self.event.lots.filter(private=False)
 
 
 class SubscriptionFormMixin(EventMixin, generic.FormView):
@@ -820,3 +831,28 @@ class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
                 pass
 
         return False
+
+
+class CouponView(EventMixin, generic.TemplateView):
+    template_name = 'hotsite/includes/form_lots_coupon.html'
+    http_method_names = ['post']
+
+    def post(self, request, *args, **kwargs):
+
+        cxt = self.get_context_data(**kwargs)
+
+        code = request.POST.get('coupon')
+        if code:
+            try:
+                lot = Lot.objects.get(exhibition_code=code)
+
+                if lot.status != Lot.LOT_STATUS_RUNNING:
+                    raise Http404
+
+                cxt['lot'] = lot
+                return self.render_to_response(cxt)
+
+            except Lot.DoesNotExist:
+                pass
+
+        raise Http404
