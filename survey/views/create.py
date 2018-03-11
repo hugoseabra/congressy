@@ -24,5 +24,7 @@ class CreateSurveyView(EventViewMixin, generic.TemplateView):
 
         return response
 
+    def post(self, *args, **kwargs):
 
 
+        print('hello world')
