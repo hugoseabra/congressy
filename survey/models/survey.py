@@ -16,5 +16,16 @@ class Survey(models.Model):
     name = models.CharField(
         max_length=255,
         verbose_name='nome',
-        help_text='Nome do questionario'
     )
+
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='descrição'
+    )
+
+    created = models.DateTimeField(
+        verbose_name='criado em',
+        auto_now_add=True,
+    )
+

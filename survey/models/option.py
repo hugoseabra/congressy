@@ -14,23 +14,32 @@ class Option(models.Model):
         verbose_name = 'Opção de uma pergunta'
         verbose_name_plural = 'Opções de uma pergunta'
 
-    name = models.CharField(
-        max_length=255,
-        verbose_name='nome',
-        help_text='Nome da opção'
-    )
-
-    value = models.CharField(
-        max_length=255,
-        verbose_name='valor',
-        help_text='Valor da opção'
-    )
-
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,
         verbose_name='pergunta',
     )
+
+    name = models.CharField(
+        max_length=255,
+        verbose_name='nome',
+    )
+
+    value = models.CharField(
+        max_length=255,
+        verbose_name='valor',
+    )
+
+    active = models.BooleanField(
+        default=True,
+        verbose_name='ativo'
+    )
+
+    intro = models.BooleanField(
+        default=False,
+    )
+
+
 
 
 
