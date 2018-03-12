@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from django import forms
 from django.forms.utils import to_current_timezone
 from django.utils.translation import get_language
@@ -38,8 +39,6 @@ class DateInput(forms.DateInput):
         return value
 
 
-
-
 class TimeInput(forms.TimeInput):
     input_type = 'tel'
     template_name = 'forms/widgets/time.html'
@@ -50,6 +49,7 @@ class TimeInput(forms.TimeInput):
             value += ':00'
 
         return value
+
 
 class SplitDateTimeWidget(forms.MultiWidget):
     """
