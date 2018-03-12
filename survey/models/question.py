@@ -87,10 +87,17 @@ class Question(models.Model):
     def has_options(self):
         return self.options.count() > 0
 
+    @property
     def accepts_options(self):
         """ Campos aceitos pelo formulário. """
-        self.with_options = self.type in [
+
+        accepted_fields = [
             self.FIELD_SELECT,
             self.FIELD_CHECKBOX_GROUP,
             self.FIELD_RADIO_GROUP,
         ]
+
+        if self.type in accepted_fields:
+            return True
+
+        return False

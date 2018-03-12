@@ -16,7 +16,7 @@ class QuestionModelFormTest(TestCase):
         self.fake_factory = MockFactory()
         self.survey = self.fake_factory.fake_survey()
 
-    def test_same_question_same_survey_prefix(self):
+    def test_same_question_same_survey_with_prefix(self):
         """
         Testa se pergunta com um nome repetido no formulário é salvo com
         sucesso inserindo um prefixo e mantendo a unicidade.
@@ -56,6 +56,8 @@ class QuestionModelFormTest(TestCase):
         form1.save()
         self.assertTrue(form2.is_valid())
         form2.save()
+        self.assertTrue(form3.is_valid())
+        form3.save()
 
         self.assertEqual(form1.instance.name, og_slug)
         self.assertNotEqual(form2.instance.name, og_slug)

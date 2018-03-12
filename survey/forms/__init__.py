@@ -2,5 +2,6 @@
     Survey Module forms
 """
 
-from .question_model_form import QuestionModelForm
+from .question import QuestionModelForm
+from .option import OptionModelForm
 
