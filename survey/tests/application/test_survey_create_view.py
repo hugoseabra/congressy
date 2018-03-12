@@ -19,14 +19,15 @@ class SurveyCreateViewTests(TestCase):
         self.event = self.event_mock_factory.fake_event(self.organization)
 
     def test_private_partner_registration_get_is_200_ok(self):
-        """ Tests if GET requests are responding ok.  """
-
-        self.assertLoginRequired(url='survey:survey-create',
-                                 event_pk=self.event.pk)
-
-        user1 = self.person.user
-        # Logged in, must fetch normally.
-        with self.login(username=user1.username, password='password'):
-            self.get_check_200('survey:survey-create', event_pk=self.event.pk)
+        self.fail('not implemented...')
+        # """ Tests if GET requests are responding ok.  """
+        #
+        # self.assertLoginRequired(url='survey:survey-create',
+        #                          event_pk=self.event.pk)
+        #
+        # user1 = self.person.user
+        # # Logged in, must fetch normally.
+        # with self.login(username=user1.username, password='password'):
+        #     self.get_check_200('survey:survey-create', event_pk=self.event.pk)
 
 

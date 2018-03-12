@@ -18,7 +18,7 @@ class AnswerModelTest(TestCase):
                                                  type=Question.FIELD_SELECT)
         self.option = self.faker.fake_option(self.question)
 
-    def answer_with_human_display_when_selectable_question(self):
+    def test_answer_with_human_display_when_selectable_question(self):
         """
         Testa se resposta de uma pergunta com suporte a opções sempre possui
         saída de valor para o usuário (human_display).

@@ -56,3 +56,5 @@ class MockFactory:
             question=question,
         )
         option.save()
+
+        return option

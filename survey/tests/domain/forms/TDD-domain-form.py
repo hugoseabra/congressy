@@ -5,19 +5,6 @@ Testes de domínio do módulo Survey conforme documentação.
 from django.test import TestCase
 
 
-class SurveyQuestionTest(TestCase):
-    """
-    Testes de ModelForm para Pergunta
-    """
-
-    def question_unique_in_survey_prefix(self):
-        """
-        Testa se pergunta com um nome repetido no formulário é salvo com
-        sucesso inserindo um prefixo e mantendo a unicidade.
-        """
-        self.fail('not implmented')
-
-
 class SurveyOptionTest(TestCase):
     """
     Testes de ModelForm de Opção de perguntas
