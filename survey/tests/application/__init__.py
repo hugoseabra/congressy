@@ -1,3 +1,0 @@
-"""
-    Survey application level tests
-"""
