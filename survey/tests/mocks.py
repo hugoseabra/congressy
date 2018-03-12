@@ -2,10 +2,12 @@
     Mock factory used during tests to create required survey domain objects.
 """
 
+from django.contrib.auth.models import User
 from faker import Faker
-
-from survey.models import Survey, Question, Option
 from random import randint
+
+from gatheros_event.models import Person
+from survey.models import Survey, Question, Option
 
 
 class MockFactory:
@@ -16,8 +18,21 @@ class MockFactory:
     def __init__(self):
         self.fake_factory = Faker('pt_BR')
 
-    def fake_survey(self):
+    def fake_person(self):
+        person = Person(name=self.fake_factory.name())
+        first_name = person.name.split(' ')[0]
+        user = User.objects.create_user(first_name,
+                                        self.fake_factory.free_email(),
+                                        '123')
+        user.save()
+        person.user = user
+        person.save()
 
+        assert person is not None
+
+        return person
+
+    def fake_survey(self):
         survey = Survey(
             name=' '.join(self.fake_factory.words(nb=2)),
         )
@@ -30,7 +45,6 @@ class MockFactory:
 
     def fake_question(self, survey, type=Question.FIELD_INPUT_TEXT,
                       required=False, active=True):
-
         name = ' '.join(self.fake_factory.words(nb=3))
         help_text = ' '.join(self.fake_factory.words(nb=6))
 
@@ -49,7 +63,6 @@ class MockFactory:
         return question
 
     def fake_option(self, question):
-
         option = Option(
             name=' '.join(self.fake_factory.words(nb=2)),
             value=str(randint(0, 100)),
