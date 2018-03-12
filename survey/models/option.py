@@ -13,11 +13,15 @@ class Option(models.Model):
     class Meta:
         verbose_name = 'Opção de uma pergunta'
         verbose_name_plural = 'Opções de uma pergunta'
+        unique_together = (
+            ('question', 'value',),
+        )
 
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,
         verbose_name='pergunta',
+        related_name='options'
     )
 
     name = models.CharField(
@@ -38,11 +42,3 @@ class Option(models.Model):
     intro = models.BooleanField(
         default=False,
     )
-
-
-
-
-
-
-
-

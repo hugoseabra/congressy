@@ -28,17 +28,23 @@ class MockFactory:
 
         return survey
 
-    def fake_question(self, survey, required=False, complex=False):
+    def fake_question(self, survey, type=Question.FIELD_INPUT_TEXT,
+                      required=False, active=True):
+
+        name = ' '.join(self.fake_factory.words(nb=3))
+        help_text = ' '.join(self.fake_factory.words(nb=6))
+
         question = Question(
-            name=' '.join(self.fake_factory.words(nb=3)),
-            is_required=required,
-            is_complex=complex,
             survey=survey,
+            type=type,
+            name=name,
+            label=name,
+            required=required,
+            help_text=help_text,
+            active=active,
         )
 
         question.save()
-
-        assert question is not None
 
         return question
 

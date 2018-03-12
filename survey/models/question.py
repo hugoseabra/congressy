@@ -56,14 +56,14 @@ class Question(models.Model):
         verbose_name='tipo'
     )
 
-    label = models.CharField(
-        max_length=255,
-        verbose_name='rotulo'
-    )
-
     name = models.CharField(
         max_length=255,
         verbose_name='titulo',
+    )
+
+    label = models.CharField(
+        max_length=255,
+        verbose_name='rotulo'
     )
 
     required = models.BooleanField(
