@@ -1,8 +1,8 @@
-{% extends "base/simple-base.html" %}
-{% load i18n static %}
-{% load widget_tweaks %}
+{% extends "base/base.html" %}
 
-{% block title %} Convite | Congressy{% endblock %}
+{% load i18n static widget_tweaks form_config_tags %}
+
+{% block title %}Convite{% endblock %}
 {% block page_title %}Convite{% endblock %}
 {% block page_sub_title %}Criar conta{% endblock %}
 {% block page_description %}
@@ -10,25 +10,85 @@
     convidado(a).
 {% endblock %}
 
-{% block scripts %}
-    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
-    <script type="application/javascript">
-        $(document).ready(function () {
-            $('#id_phone').mask("(99) 99999-9999");
-        });
-    </script>
-{% endblock %}
 
 {% block sidebar %}{% endblock %}
 
+{% block sidebar-bars %}{% endblock %}
+
+{% block scripts %}
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <!-- Script used in in subscription. -->
+
+    <script src="{% static "hotsite/js/subscription.js" %}"></script>
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+            var phone_el = $('#id_phone');
+            var uf_el = $('#id_state');
+            var city_el = $('#id_city_name');
+            var city_id_el = $('#id_city_name');
+
+            if(phone_el.val()){
+                phone_el.mask("(99) 99999-9999");
+            }
+
+
+            $('#id_zip_code').mask("99.999-999");
+
+            //If we have a value already, preload results from API
+            if (city_id_el.val()) {
+                $.ajax({
+                    url: "/api/cities/" + $('#id_city').val(),
+                    success: function (result) {
+                        uf_el.val(result.uf);
+                        city_el.val(result.name);
+                        //populate the html with result here
+                    }
+                });
+            }
+            showHideCepLoader();
+        });
+
+        var uf_el = $('#id_state');
+        var city_el = $('#id_city_name');
+
+        window.setTimeout(function () {
+            {% if person.city %}
+                uf_el.val('{{ person.city.uf }}');
+                fetch_cities(uf_el, '{{ person.city.pk }}');
+            {% else %}
+                uf_el.val('');
+                city_el.val('');
+                city_el.prop('disabled', true);
+            {% endif %}
+        }, 300);
+
+    </script>
+{% endblock %}
+
 {% block content %}
-    <form action="" method="post">{% csrf_token %}
+
+    <form action="" method="post" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar">
                     <div class="float-left">
                         <a href="{% url 'public:invitation-decision' invite.pk %}" class="btn btn-primary" title="Voltar">
-                            <i class="fa fa-arrow-left"></i>
+                            <i class="fas fa-arrow-left"></i>
                         </a>
                     </div>
                     <div class="float-right">
@@ -39,57 +99,91 @@
                     </div>
                     <div class="clearfix"></div>
                 </div>
+
             </div>
         </div>
+
         <div class="row">
-            <div class="col-md-12">
+
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
                 <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Dados pessoais</div>
+                    </div>
                     <div class="panel-body">
-                        <div class="form-group">
-                            {% for field in form %}
+                        {% if form.non_field_errors %}
+                            {% render_errors form.non_field_errors %}
+                        {% endif %}
+
+                        {% for hidden_field in form.hidden_fields %}
+                            {% if hidden_field.errors %}
+                                {% render_errors hidden_field.errors %}
+                            {% endif %}
+                            {{ hidden_field }}
+                        {% endfor %}
+
+                        <div class="row">
+                            <div class="col-md-9">
+                                {% render_generic_field form.name %}
+                            </div>
+
+                            <div class="col-md-3">
+                                {% render_generic_field form.gender %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-9">
                                 <div class="form-group">
+                                    <label for="{{ form.email.id_for_label }}">
+                                        {{ form.email.label }}
+                                    </label>
 
-                                    <label for="{{ field.id_for_label }}">
-                                        {{ field.label }}</label>
-                                    <div>
-                                        {% if field.field.widget.input_type == "checkbox" %}
-                                            {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
-                                        {% else %}
-                                            {{ field |add_class:"form-control" }}
-                                        {% endif %}
-                                        {% if field.errors %}
-                                            {% for error in field.errors %}
-                                                <div class="alert alert-danger
-                                                alert-dismissable">
-                                                    <button type="button"
-                                                            class="close"
-                                                            data-dismiss="alert"
-                                                            aria-hidden="true">×
-                                                    </button>
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                        {% if field.help_text %}
-                                            <div>
-                                                <small class="text-muted">{{ field.help_text|safe }}</small>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
+                                    {{ form.email |add_class:"form-control" }}
                                 </div>
-                            {% endfor %}
+
+                            </div>
+                            <div class="col-md-3">
+
+                                {% render_generic_field form.phone %}
+
+                            </div>
                         </div>
                     </div>
                 </div>
+
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Alterar senha</div>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% render_generic_field form.new_password1 %}
+                            </div>
+
+                            <div class="col-md-6">
+                                {% render_generic_field form.new_password2 %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
+
         </div>
+
         <div class="row">
-            <div class="col-md-12">
-                <div class="buttonbar bottom">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar">
                     <div class="float-left">
                         <a href="{% url 'public:invitation-decision' invite.pk %}" class="btn btn-primary" title="Voltar">
-                            <i class="fa fa-arrow-left"></i>
+                            <i class="fas fa-arrow-left"></i>
                         </a>
                     </div>
                     <div class="float-right">
@@ -100,8 +194,10 @@
                     </div>
                     <div class="clearfix"></div>
                 </div>
+
             </div>
         </div>
+
     </form>
 
 {% endblock %}

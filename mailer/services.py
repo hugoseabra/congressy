@@ -426,7 +426,7 @@ def notify_new_user_and_unpaid_subscription_credit_card(event, transaction):
     )
 
 
-def notify_new_user_and_unpaid_subscription_credit_card(event, transaction):
+def notify_new_user_and_refused_subscription_credit_card(event, transaction):
     """
     Notifica participante de nova inscrição de um lote pago pelo método de
     cartão de crédito.

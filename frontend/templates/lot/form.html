@@ -3,19 +3,6 @@
 {% load humanize %}
 {% load queryset_filter %}
 
-{% block messages %}
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissable">
-                <button type="button" class="close"
-                        data-dismiss="alert" aria-hidden="true">×
-                </button>
-                {{ message|get_first_item }}
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endblock messages %}
-
 {% block title %}
     {% if object %}Editar{% else %}Novo{% endif %} Lote | Congressy
 {% endblock %}

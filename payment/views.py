@@ -18,10 +18,12 @@ from gatheros_subscription.models import Subscription
 from mailer import exception as mailer_notification
 from mailer.services import (
     notify_new_paid_subscription_credit_card,
+    notify_new_refused_subscription_credit_card,
     notify_new_unpaid_subscription_boleto,
     notify_new_unpaid_subscription_credit_card,
     notify_new_user_and_paid_subscription_credit_card,
     notify_new_user_and_paid_subscription_boleto,
+    notify_new_user_and_refused_subscription_credit_card,
     notify_new_user_and_unpaid_subscription_credit_card,
     notify_new_user_and_unpaid_subscription_boleto,
     notify_paid_subscription_boleto,
@@ -100,7 +102,6 @@ def postback_url_view(request, uidb64):
     if not uidb64:
         raise Http404
 
-
     try:
         data = request.data.copy()
 
@@ -162,6 +163,7 @@ def postback_url_view(request, uidb64):
         sub_user = subscription.person.user
         is_new_subscription = not sub_user.last_login
         is_paid = new_desired_status == Transaction.PAID
+        is_refused = new_desired_status == Transaction.REFUSED
         is_starting_status = new_desired_status == Transaction.WAITING_PAYMENT
 
         if is_new_subscription:
@@ -199,6 +201,11 @@ def postback_url_view(request, uidb64):
                 # Se não é status inicial, certamente o boleto foi pago.
                 elif is_paid:
                     notify_new_user_and_paid_subscription_credit_card(
+                        event,
+                        transaction
+                    )
+                elif is_refused:
+                    notify_new_user_and_refused_subscription_credit_card(
                         event,
                         transaction
                     )
@@ -248,6 +255,11 @@ def postback_url_view(request, uidb64):
                 # Se não é status inicial, certamente o boleto foi pago.
                 elif is_paid:
                     notify_new_paid_subscription_credit_card(
+                        event,
+                        transaction
+                    )
+                elif is_refused:
+                    notify_new_refused_subscription_credit_card(
                         event,
                         transaction
                     )
