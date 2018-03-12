@@ -19,6 +19,9 @@ campo de múltiplas escolhas;
 
 - Pertence a uma pergunta;
 - Deve sempre ser de um campo que suporte opções: SELECT, RADIO ou CHECKBOX;
+- Deve ser possível definir uma opção como "intro" que define o primeiro 
+campo em branco;
+- Não pode haver mais de um campo como "Intro" em uma pergunta;
 - Não pode haver duas opções com mesmo valor para a mesma pergunta;
 
 
