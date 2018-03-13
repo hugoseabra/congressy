@@ -5,8 +5,8 @@ import os
 
 from django import forms
 from django.shortcuts import get_object_or_404
-from gatheros_event.models.rules import event as rule
 
+from core.forms.widgets import SplitDateTimeWidget
 from gatheros_event.models import Event, Member, Organization
 
 
@@ -31,10 +31,8 @@ class EventForm(forms.ModelForm):
         widgets = {
             'organization': forms.HiddenInput,
             'subscription_type': forms.RadioSelect,
-            'date_start': DateTimeInput(attrs={'placeholder': 'dd/mm/aaaa '
-                                                              'hh:mm'}),
-            'date_end': DateTimeInput(attrs={'placeholder': 'dd/mm/aaaa '
-                                                            'hh:mm'}),
+            'date_start': SplitDateTimeWidget(),
+            'date_end': SplitDateTimeWidget(),
         }
 
     def __init__(self, user, lang='pt-br', *args, **kwargs):
@@ -65,12 +63,18 @@ class EventForm(forms.ModelForm):
         self.fields['organization'].choices = orgs
         self.fields['organization'].label = 'Realizador'
 
-    def clean(self):
-        rule.rule_1_data_inicial_antes_da_data_final(
-            self.cleaned_data['date_start'],
-            self.cleaned_data['date_end']
-        )
-        return super().clean()
+    def clean_date_end(self):
+        date_end = self.cleaned_data.get('date_end')
+        if not date_end:
+            date_end = datetime.now() - timedelta(minutes=1)
+
+        date_start = self.cleaned_data.get('date_start')
+        if date_start and date_start > date_end:
+            raise forms.ValidationError(
+                'Data inicial deve ser anterior a data final.'
+            )
+
+        return date_end
 
 
 class EventEditDatesForm(forms.ModelForm):

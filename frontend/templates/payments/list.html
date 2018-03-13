@@ -141,6 +141,7 @@
                                style="border-collapse: separate;empty-cells: hide;">
                             <thead>
                             <tr>
+                                <th class="hidden-xs nowrap">Lote</th>
                                 <th>Nome</th>
                                 <th width="5%" class="text-center">Tipo</th>
                                 <th width="25%" class="hidden-xs">Status</th>
@@ -152,6 +153,9 @@
 
                             {% for transaction in object_list %}
                                 <tr>
+                                    <td class="hidden-xs nowrap">
+                                        {{ transaction.subscription.lot.name }}
+                                    </td>
                                     <td class="nowrap">
                                         {{ transaction.subscription.person.name }}
                                     </td>

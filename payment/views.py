@@ -15,12 +15,15 @@ from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.models import Subscription
+from mailer import exception as mailer_notification
 from mailer.services import (
     notify_new_paid_subscription_credit_card,
+    notify_new_refused_subscription_credit_card,
     notify_new_unpaid_subscription_boleto,
     notify_new_unpaid_subscription_credit_card,
     notify_new_user_and_paid_subscription_credit_card,
     notify_new_user_and_paid_subscription_boleto,
+    notify_new_user_and_refused_subscription_credit_card,
     notify_new_user_and_unpaid_subscription_credit_card,
     notify_new_user_and_unpaid_subscription_boleto,
     notify_paid_subscription_boleto,
@@ -96,36 +99,42 @@ class EventPaymentView(AccountMixin, ListView):
 
 @api_view(['POST'])
 def postback_url_view(request, uidb64):
-    body = """
-            We have received a postback call, here is the data:
-
-            <pre><code>{0}</code></pre>
-    """.format(json.dumps(request.data))
-
-    send_mail(
-        subject="Recived a postbackcall",
-        body=body,
-        to=settings.DEV_ALERT_EMAILS
-    )
-
     if not uidb64:
         raise Http404
 
     try:
-        transaction = Transaction.objects.get(uuid=uidb64)
-        subscription = transaction.subscription
-        event = subscription.event
-
-        old_status = transaction.status
-
         data = request.data.copy()
 
+        transaction = Transaction.objects.get(uuid=uidb64)
+        old_status = transaction.status
         new_desired_status = data.get('current_status', '')
 
         # Only continue the postback workflow if the new_desired_status and
         # old_stats are different.
         if old_status == new_desired_status:
             return Response(status=200)
+
+        # Create a state machine using the old transaction status as it's
+        # initial value.
+        transaction_director = TransactionDirector(
+            status=new_desired_status,
+            old_status=old_status
+        )
+        transaction_director_status = transaction_director.direct()
+
+        # Translate/integrate the status returned from the director to a
+        #   subscription status.
+        trans_sub_status_integrator = TransactionSubscriptionStatusIntegrator(
+            transaction_director_status
+        )
+
+        subscription_status = trans_sub_status_integrator.integrate()
+
+        if subscription_status:
+            transaction.subscription.status = subscription_status
+            transaction.subscription.save()
+
+        event = transaction.subscription.event
 
         boleto_url = data.get('transaction[boleto_url]', '')
 
@@ -149,32 +158,13 @@ def postback_url_view(request, uidb64):
         subscription = \
             Subscription.objects.get(pk=transaction.subscription.pk)
 
-        # Create a state machine using the old transaction status as it's
-        # initial value.
-
-        transaction_director = TransactionDirector(
-            status=new_desired_status,
-            old_status=old_status)
-        transaction_director_status = transaction_director.direct()
-
-        # Translate/integrate the status returned from the director to a
-        #   subscription status.
-        trans_sub_status_integrator = TransactionSubscriptionStatusIntegrator(
-            transaction_director_status)
-
-        subscription_status = trans_sub_status_integrator.integrate()
-
-        if subscription_status:
-            subscription.status = subscription_status
-
-        subscription.save()
-
         payment_method = data.get('transaction[payment_method]')
 
         sub_user = subscription.person.user
         is_new_subscription = not sub_user.last_login
         is_paid = new_desired_status == Transaction.PAID
-        is_starting_status = new_desired_status == Transaction.PROCESSING
+        is_refused = new_desired_status == Transaction.REFUSED
+        is_starting_status = new_desired_status == Transaction.WAITING_PAYMENT
 
         if is_new_subscription:
             if payment_method == Transaction.BOLETO:
@@ -191,8 +181,16 @@ def postback_url_view(request, uidb64):
                         event,
                         transaction
                     )
+                else:
+                    raise mailer_notification.NotifcationError(
+                        'Notificação de transação de boleto de nova inscrição'
+                        ' não pôde ser realizada devido ao seguinte erro:'
+                        ' status desconhecido para notificação - "{}".'.format(
+                            new_desired_status
+                        )
+                    )
 
-            if payment_method == Transaction.CREDIT_CARD:
+            elif payment_method == Transaction.CREDIT_CARD:
                 if is_starting_status:
                     # Pode acontecer um delay no pagamento de cartão
                     notify_new_user_and_unpaid_subscription_credit_card(
@@ -206,6 +204,26 @@ def postback_url_view(request, uidb64):
                         event,
                         transaction
                     )
+                elif is_refused:
+                    notify_new_user_and_refused_subscription_credit_card(
+                        event,
+                        transaction
+                    )
+                else:
+                    raise mailer_notification.NotifcationError(
+                        'Notificação de transação de cartão de crédito de nova'
+                        ' inscrição não pôde ser realizada devido ao seguinte'
+                        ' erro: status desconhecido para notificação'
+                        ' - "{}".'.format(new_desired_status)
+                    )
+            else:
+                raise mailer_notification.NotifcationError(
+                    'Notificação de transação de nova inscrição não pôde ser'
+                    ' realizada devido ao seguinte erro: método de  pagamento'
+                    ' desconhecido para notificação - "{}".'.format(
+                        new_desired_status
+                    )
+                )
 
         # Não é nova inscrição
         else:
@@ -217,7 +235,16 @@ def postback_url_view(request, uidb64):
                 elif is_paid:
                     notify_paid_subscription_boleto(event, transaction)
 
-            if payment_method == Transaction.CREDIT_CARD:
+                else:
+                    raise mailer_notification.NotifcationError(
+                        'Notificação de transação de boleto de inscrição'
+                        ' não pôde ser realizada devido ao seguinte erro:'
+                        ' status desconhecido para notificação - "{}".'.format(
+                            new_desired_status
+                        )
+                    )
+
+            elif payment_method == Transaction.CREDIT_CARD:
                 if is_starting_status:
                     # Pode acontecer um delay no pagamento de cartão
                     notify_new_unpaid_subscription_credit_card(
@@ -231,8 +258,53 @@ def postback_url_view(request, uidb64):
                         event,
                         transaction
                     )
+                elif is_refused:
+                    notify_new_refused_subscription_credit_card(
+                        event,
+                        transaction
+                    )
+                else:
+                    raise mailer_notification.NotifcationError(
+                        'Notificação de transação de cartão de crédito de'
+                        ' inscrição não pôde ser realizada devido ao seguinte'
+                        ' erro: status desconhecido para notificação'
+                        ' - "{}".'.format(new_desired_status)
+                    )
+
+            else:
+                raise mailer_notification.NotifcationError(
+                    'Notificação de transação de inscrição não pôde ser'
+                    ' realizada devido ao seguinte erro: método de  pagamento'
+                    ' desconhecido para notificação - "{}".'.format(
+                        new_desired_status
+                    )
+                )
+
+        body = """
+                    We have received a postback call, here is the data:
+
+                    <pre><code>{0}</code></pre>
+            """.format(json.dumps(request.data))
+
+        send_mail(
+            subject="Recived a postbackcall",
+            body=body,
+            to=settings.DEV_ALERT_EMAILS
+        )
 
         return Response(status=201)
+
+    except mailer_notification.NotifcationError as e:
+        body = """Um erro ocorreu durante o postback:   
+                <pre><code>{0}</code></pre>
+        """.format(str(e))
+
+        send_mail(
+            subject="Error postbackcall",
+            body=body,
+            to=settings.DEV_ALERT_EMAILS
+        )
+        raise e
 
     except ObjectDoesNotExist:
         raise Http404

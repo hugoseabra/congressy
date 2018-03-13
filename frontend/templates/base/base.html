@@ -1,17 +1,18 @@
-{% load static %}
-{% load base_tags %}
-
+{% load i18n static base_tags %}
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <!DOCTYPE html>
-<!--[if lt IE 7]>
-<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>
-<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>
-<html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js">
+<!--[if lt IE 7 ]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<![endif]-->
+<!--[if IE 7 ]>
+<html class="no-js lt-ie9 lt-ie8" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<![endif]-->
+<!--[if IE 8 ]>
+<html class="no-js lt-ie9" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<![endif]-->
+<!--[if (gte IE 9)|!(IE)]>
+<html class="no-js" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
 <!--<![endif]-->
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -48,11 +49,12 @@
     {% block styles %}{% endblock %}
 
     <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
-    {% if form %}
-        {{ form.media }}
-    {% endif %}
 
     {% block headscripts %}{% endblock %}
+
+    {% if form %}
+        {{ form.media.css }}
+    {% endif %}
 
     <!-- Feature detection -->
     <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
@@ -356,5 +358,9 @@
 </script>
 
 {% block scripts %}{% endblock %}
+
+{% if form %}
+    {{ form.media.js }}
+{% endif %}
 </body>
 </html>

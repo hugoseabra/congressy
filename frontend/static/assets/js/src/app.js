@@ -1,4 +1,6 @@
-var app = function () {
+(function(window, $) {
+
+window.app = function () {
 
     $(function () {
         navToggleRight();
@@ -98,3 +100,4 @@ var app = function () {
 }();
 
 
+})(window, jQuery);

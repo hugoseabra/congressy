@@ -34,6 +34,7 @@ class TransactionSubscriptionStatusIntegrator:
         'waiting_payment',
         'chargeback'
         'pending_refund',
+        'refused',
     ]
 
     confirmed_status = [
@@ -41,7 +42,6 @@ class TransactionSubscriptionStatusIntegrator:
     ]
 
     cancelled_status = [
-        'refused',
         'refunded',
     ]
 
