@@ -16,10 +16,4 @@ class Manager(forms.ModelForm):
     """
     Manager
     """
-    def get(self, pk):
-        try:
-            return self._meta.model.objects.get(pk=pk)
-        except ObjectDoesNotExist:
-            pass
-
-        return None
+    pass

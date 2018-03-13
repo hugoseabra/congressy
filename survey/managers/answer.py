@@ -13,7 +13,7 @@ from survey.models import Answer, Question
 
 class AnswerManager(forms.ModelForm):
     """
-        Implementação do formulario.
+        Manager
     """
 
     class Meta:
@@ -30,7 +30,7 @@ class AnswerManager(forms.ModelForm):
         self.user = user
 
         if not instance and isinstance(user, User):
-            instance = self._retrieve_user_answer(user, kwargs.get('data'))
+            instance = self._retrieve_user_answer()
 
         super().__init__(instance=instance, **kwargs)
 
@@ -39,19 +39,13 @@ class AnswerManager(forms.ModelForm):
         self.instance.user = self.user
         return super().save(commit=commit)
 
-    @staticmethod
-    def _retrieve_user_answer(user, data):
+    def _retrieve_user_answer(self):
         """
         Verifica se usuário já respondeu o survey e, se sim, resgata
         a instância do formulário para seta-lo como edit.
         """
         try:
-            question_pk = data.get('question')
-
-            if question_pk:
-                question = Question.objects.get(pk=question_pk)
-                return Answer.objects.get(question=question, user=user)
-
+            return Answer.objects.get(question=self.question, user=self.user)
         except (Answer.DoesNotExist, Question.DoesNotExist):
             pass
 
