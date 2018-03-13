@@ -51,7 +51,7 @@ class OptionManager(forms.ModelForm):
 
         if not self.question.accepts_options:
             raise forms.ValidationError(
-                {'questionz': 'Pergunta não permite opções'}
+                {'__all__': 'Pergunta não permite opções'}
             )
 
         return cleaned_data

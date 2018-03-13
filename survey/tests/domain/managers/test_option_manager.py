@@ -2,14 +2,15 @@
     Testing the Option model form
 """
 
-from test_plus.test import TestCase
-from survey.forms import OptionModelForm
-from survey.tests import MockFactory
 from django.utils.text import slugify
+from test_plus.test import TestCase
+
+from survey.managers import OptionManager
 from survey.models import Question
+from survey.tests import MockFactory
 
 
-class OptionModelFormTest(TestCase):
+class OptionManagerTest(TestCase):
     """ Main test implementation """
 
     def setUp(self):
@@ -26,28 +27,28 @@ class OptionModelFormTest(TestCase):
         option_name = "Random Option."
         og_slug = slugify(option_name)
         value = 42
-        form1 = OptionModelForm(
+        form1 = OptionManager(
             data={
-                'question': self.question.pk,
                 'name': option_name,
                 'value': str(value),
-            }
+            },
+            question=self.question,
         )
 
-        form2 = OptionModelForm(
+        form2 = OptionManager(
             data={
-                'question': self.question.pk,
                 'name': option_name,
                 'value': str(value + 1),
-            }
+            },
+            question=self.question,
         )
 
-        form3 = OptionModelForm(
+        form3 = OptionManager(
             data={
-                'question': self.question.pk,
                 'name': option_name,
                 'value': str(value + 2),
-            }
+            },
+            question=self.question,
         )
 
         self.assertTrue(form1.is_valid())
@@ -77,28 +78,28 @@ class OptionModelFormTest(TestCase):
         question2 = self.faker.fake_question(survey=self.survey, type=type)
         question3 = self.faker.fake_question(survey=self.survey, type=type)
 
-        form1 = OptionModelForm(
+        form1 = OptionManager(
             data={
-                'question': question1.pk,
                 'name': option_name,
                 'value': str(value),
-            }
+            },
+            question=question1,
         )
 
-        form2 = OptionModelForm(
+        form2 = OptionManager(
             data={
-                'question': question2.pk,
                 'name': option_name,
                 'value': str(value + 1),
-            }
+            },
+            question=question2,
         )
 
-        form3 = OptionModelForm(
+        form3 = OptionManager(
             data={
-                'question': question3.pk,
                 'name': option_name,
                 'value': str(value + 2),
-            }
+            },
+            question=question3,
         )
 
         self.assertTrue(form1.is_valid())
@@ -125,23 +126,23 @@ class OptionModelFormTest(TestCase):
             type=Question.FIELD_INPUT_TEXT,
         )
 
-        correct_form = OptionModelForm(
+        correct_form = OptionManager(
             data={
-                'question': selectable_question.pk,
                 'name': "Correct Form",
                 'value': "41",
-            }
+            },
+            question=selectable_question,
         )
 
         self.assertTrue(correct_form.is_valid())
         correct_form.save()
 
-        incorrect_form = OptionModelForm(
+        incorrect_form = OptionManager(
             data={
-                'question': non_selectable_question.pk,
                 'name': "Incorrect Form",
                 'value': "42",
-            }
+            },
+            question=non_selectable_question,
         )
 
         self.assertFalse(incorrect_form.is_valid())
