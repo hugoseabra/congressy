@@ -3,13 +3,13 @@
 """
 
 from test_plus.test import TestCase
-from survey.forms import QuestionModelForm
+from survey.managers import QuestionManager
 from survey.models import Question
 from survey.tests import MockFactory
 from django.utils.text import slugify
 
 
-class QuestionModelFormTest(TestCase):
+class QuestionManagerTest(TestCase):
     """ Main test implementation """
 
     def setUp(self):
@@ -25,31 +25,31 @@ class QuestionModelFormTest(TestCase):
         question_name = "Random Question"
         og_slug = slugify(question_name)
 
-        form1 = QuestionModelForm(
+        form1 = QuestionManager(
             data={
-                'survey': self.survey.pk,
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
-            }
+            },
+            survey=self.survey,
         )
 
-        form2 = QuestionModelForm(
+        form2 = QuestionManager(
             data={
-                'survey': self.survey.pk,
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
-            }
+            },
+            survey=self.survey,
         )
 
-        form3 = QuestionModelForm(
+        form3 = QuestionManager(
             data={
-                'survey': self.survey.pk,
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
-            }
+            },
+            survey=self.survey,
         )
 
         self.assertTrue(form1.is_valid())
@@ -76,22 +76,22 @@ class QuestionModelFormTest(TestCase):
         survey1 = self.survey
         survey2 = self.fake_factory.fake_survey()
 
-        form1 = QuestionModelForm(
+        form1 = QuestionManager(
             data={
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
-                'survey': survey1.pk,
-            }
+            },
+            survey=survey1,
         )
 
-        form2 = QuestionModelForm(
+        form2 = QuestionManager(
             data={
-                'survey': survey2.pk,
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
-            }
+            },
+            survey=survey2,
         )
 
         self.assertTrue(form1.is_valid())
