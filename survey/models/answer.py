@@ -1,10 +1,11 @@
 """
     Answer domain model.
+    Resposta de um questionário, referente a uma pergunta a pertecente a um
+    Autor.
 """
-from django.contrib.auth.models import User
 from django.db import models
 
-from survey.models import Question
+from survey.models import Author, Question
 
 
 class Answer(models.Model):
@@ -17,21 +18,23 @@ class Answer(models.Model):
         verbose_name_plural = 'respostas'
 
     def __str__(self):
-        return self.value
+        return '{}: {} ({})'.format(
+            self.question.label,
+            self.author.name,
+            self.value
+        )
 
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,
-        verbose_name='resposta',
+        verbose_name='pergunta',
         related_name='answers',
     )
 
-    user = models.ForeignKey(
-        User,
+    author = models.ForeignKey(
+        Author,
         on_delete=models.CASCADE,
-        verbose_name='usuario',
-        blank=True,
-        null=True,
+        verbose_name='autor',
         related_name='answers',
     )
 

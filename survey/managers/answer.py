@@ -7,8 +7,8 @@ por:
 """
 
 from django import forms
-from django.contrib.auth.models import User
-from survey.models import Answer, Question
+
+from survey.models import Answer
 
 
 class AnswerManager(forms.ModelForm):
@@ -21,32 +21,49 @@ class AnswerManager(forms.ModelForm):
         model = Answer
         exclude = (
             'question',
-            'user',
+            'author',
         )
 
-    def __init__(self, question, user=None, instance=None, **kwargs):
+    def __init__(self, question, author, instance=None, **kwargs):
 
         self.question = question
-        self.user = user
+        self.author = author
 
-        if not instance and isinstance(user, User):
-            instance = self._retrieve_user_answer()
+        if not instance:
+            instance = self._retrieve_author_answer(question, author)
 
         super().__init__(instance=instance, **kwargs)
 
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if self.instance:
+            same_survey = \
+                self.instance.question.survey.pk == self.question.survey.pk
+
+            if not same_survey:
+                raise forms.ValidationError({
+                    '__all__': 'Esta resposta não pertence a este'
+                               ' questionário.'
+                })
+
+        return cleaned_data
+
     def save(self, commit=True):
         self.instance.question = self.question
-        self.instance.user = self.user
+        self.instance.author = self.author
         return super().save(commit=commit)
 
-    def _retrieve_user_answer(self):
+    @staticmethod
+    def _retrieve_user_answer(question, user):
         """
         Verifica se usuário já respondeu o survey e, se sim, resgata
         a instância do formulário para seta-lo como edit.
         """
         try:
-            return Answer.objects.get(question=self.question, user=self.user)
-        except (Answer.DoesNotExist, Question.DoesNotExist):
+            return Answer.objects.get(question=question, user=user)
+
+        except Answer.DoesNotExist:
             pass
 
         return None
