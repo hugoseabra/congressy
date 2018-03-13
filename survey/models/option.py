@@ -1,5 +1,6 @@
 """
     Option domain model.
+    Opção de uma pergunta que suporta múltiplas possibilidades de resposta.
 """
 from django.db import models
 from . import Question

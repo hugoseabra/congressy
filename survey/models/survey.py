@@ -1,5 +1,6 @@
 """
     Survey domain model.
+    Questionário para acumular perguntas diversas de um determinado autor.
 """
 from django.db import models
 

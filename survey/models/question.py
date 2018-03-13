@@ -1,5 +1,7 @@
 """
     Question domain model.
+    Pergunta de um Questionário, que poderá ser de diversos tipos, obrigatório
+    ou não, ativo ou não.
 """
 from django.db import models
 from survey.models import Survey
