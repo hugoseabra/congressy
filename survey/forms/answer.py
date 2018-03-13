@@ -24,8 +24,6 @@ class AnswerModelForm(forms.ModelForm):
         if not instance and isinstance(user, User):
             instance = self._retrieve_user_answer(user, kwargs.get('data'))
 
-            print('hi')
-
         super().__init__(instance=instance, **kwargs)
 
     @staticmethod

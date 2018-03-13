@@ -3,9 +3,10 @@
 """
 
 from test_plus.test import TestCase
-from survey.tests import MockFactory
+
 from survey.forms import AnswerModelForm
-from survey.models import Answer
+from survey.tests import MockFactory
+
 
 class AnswerModelFormTest(TestCase):
     """ Main test implementation """
@@ -50,4 +51,8 @@ class AnswerModelFormTest(TestCase):
         self.assertTrue(edited_answer.is_valid())
         edited_answer.save()
 
-        self.assertEqual(edited_answer.instance, new_answer.instance)
+        self.assertNotEqual(edited_answer.instance.value,
+                            new_answer.instance.value)
+        self.assertEqual(edited_answer.instance.question,
+                         new_answer.instance.question)
+        self.assertEqual(edited_answer.instance.user, new_answer.instance.user)
