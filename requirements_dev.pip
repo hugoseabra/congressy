@@ -2,5 +2,6 @@
 django-debug-toolbar
 django-logtailer
 django-nose
+django-fake-model
 django-test-plus
 pylint-django
