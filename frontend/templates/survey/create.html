@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load static base_tags queryset_filter %}
+{% load static base_tags queryset_filter form_config_tags %}
 
 
 {% block nav_aside_itens %}
@@ -242,13 +242,12 @@
                         Adicionar ao Formulário </h4>
                 </div>
 
-                <form method="post" name="questionForm"
-                      id="id_questionForm" action="">
+                <form method="post">
 
                     {% csrf_token %}
 
 
-                    <div id="questionForm" class="modal-body">
+                    <div class="modal-body">
 
 
                         <strong style="font-size: 25px">
@@ -256,35 +255,15 @@
                             <i class="iconOfField"></i>
                         </strong>
                         <hr/>
-                        <div class="form-group">
-                            <label for="id_name">Titulo:</label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="id_name">
-                        </div>
-                        <div class="form-group">
-                            <label for="id_help_text">Campo de
-                                ajuda:</label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="id_help_text">
-                            <span class="help-block">
-                                Uma instrução similar a está para ajudar seu
-                                participante a entender melhor a pergunta.
-                            </span>
-                        </div>
+                        {% render_generic_field complex_form.title autofocus=True %}
+                        {% render_generic_field complex_form.help_text %}
 
                         <hr>
 
-                        <div class="form-group">
-                            <label for="options">Opções:</label>
-                            <textarea class="form-control" rows="5"
-                                      id="id_options"></textarea>
-                            <span class="help-block">
-                                Insira as opções da sua pergunta uma linha de
-                                cada vez.
-                            </span>
-                        </div>
+                        {% render_generic_field complex_form.options %}
+                        {% for hidden in complex_form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
                     </div>
 
 
@@ -306,8 +285,7 @@
         </div>
 
     </div>
-    <div class="modal fade" id="addSimpleQuestionModal"
-         tabindex="-1"
+    <div class="modal fade" id="addSimpleQuestionModal" tabindex="-1"
          role="dialog">
 
         <div class="modal-dialog " role="document">
@@ -325,41 +303,27 @@
                         Adicionar ao Formulário </h4>
                 </div>
 
-                <form method="post" name="questionForm"
-                      id="id_questionForm" action="">
-
-                    {% csrf_token %}
+                <form method="post">
 
 
-                    <div id="questionForm" class="modal-body">
+                    <div class="modal-body">
 
 
                         <strong style="font-size: 25px">
-
                             <span class="typeOfField"></span>
                             <i class="iconOfField"></i>
                         </strong>
 
 
                         <hr/>
-                        <div class="form-group">
-                            <label for="id_name">Titulo:</label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="id_name">
-                        </div>
-                        <div class="form-group">
-                            <label for="id_help_text">Campo de
-                                ajuda:</label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="id_help_text">
-                            <span class="help-block">
-                                Uma instrução similar a está para ajudar seu
-                                participante a entender melhor a pergunta.
-                            </span>
-                        </div>
+                        {% csrf_token %}
 
+                        {% render_generic_field simple_form.title autofocus=True %}
+                        {% render_generic_field simple_form.help_text %}
+
+                        {% for hidden in simple_form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
 
                     </div>
 
@@ -413,11 +377,12 @@
             var IconOfField = $(this).data('field-icon');
             var typeEl = $('.modal-body .typeOfField');
             var iconEl = $('.modal-body .iconOfField');
-
+            var formTypeEl = $('#id_simple_form-type');
 
             typeEl.text(typeOfField);
             iconEl.attr('class', 'iconOfField');
             iconEl.addClass(IconOfField);
+            formTypeEl.val('simple');
             $('#addSimpleQuestionModal').modal('show');
         });
 
@@ -428,11 +393,12 @@
             var IconOfField = $(this).data('field-icon');
             var typeEl = $('.modal-body .typeOfField');
             var iconEl = $('.modal-body .iconOfField');
-
+            var formTypeEl = $('#id_complex_form-type');
 
             typeEl.text(typeOfField);
             iconEl.attr('class', 'iconOfField');
             iconEl.addClass(IconOfField);
+            formTypeEl.val('complex');
             $('#addComplexQuestionModal').modal('show');
         });
 

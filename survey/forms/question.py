@@ -41,3 +41,52 @@ class QuestionModelForm(forms.ModelForm):
                 counter += 1
 
         return slug
+
+
+class NewSimpleQuestionForm(forms.Form):
+    title = forms.CharField(
+        label='Título',
+        required=True,
+        widget=forms.TextInput()
+    )
+
+    help_text = forms.CharField(
+        label='Texto de ajuda',
+        required=True,
+        widget=forms.TextInput(),
+        help_text='Uma instrução similar a está para ajudar seu participante '
+                  'a entender melhor a pergunta.',
+    )
+
+    type = forms.CharField(
+        required=True,
+        widget=forms.HiddenInput()
+    )
+
+
+class NewComplexQuestionForm(forms.Form):
+    title = forms.CharField(
+        label='Título',
+        required=True,
+        widget=forms.TextInput()
+    )
+
+    help_text = forms.CharField(
+        label='Texto de ajuda',
+        required=True,
+        widget=forms.TextInput(),
+        help_text='Uma instrução similar a está para ajudar seu participante '
+                  'a entender melhor a pergunta.',
+    )
+
+    options = forms.CharField(
+        label='Opções',
+        required=True,
+        widget=forms.Textarea(),
+        help_text='Insira as opções da sua pergunta uma linha de cada vez.'
+    )
+
+    type = forms.CharField(
+        required=True,
+        widget=forms.HiddenInput()
+    )
