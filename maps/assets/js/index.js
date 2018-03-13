@@ -1,4 +1,4 @@
-function initAutocomplete() {
+function init() {
     var map1 = new google.maps.Map(document.getElementById('map1'), {
         center: {lat: -33.8688, lng: 151.2195},
         zoom: 13,
