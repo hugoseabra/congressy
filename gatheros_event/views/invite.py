@@ -414,12 +414,15 @@ class InvitationProfileView(TemplateView):
         invite = context.get('invite')
 
         # Cria os forms que fazem parte do post
-        form = ProfileForm(user=invite.to, data=request.POST)
+        form = ProfileForm(
+            user=invite.to,
+            data=request.POST,
+            initial={'email': invite.to.email},
+        )
 
         # Verifica erros no form
         if not form.is_valid():
             context.update({
-                'messages': messages.get_messages(self.request),
                 'form': form,
             })
             return render_to_response(

@@ -42,12 +42,12 @@
 
     <script>
         function resize_status_block() {
-            $('#block-status-icons').height($('#block-form').height() - 23);
+            $('#block-status-icons').height($('#block-form').height() + 15);
         }
 
         $(document).ready(function () {
-            $(window).resize(resize_status_block);
-            resize_status_block();
+{#            $(window).resize(resize_status_block);#}
+{#            resize_status_block();#}
         });
     </script>
 {% endblock %}
@@ -109,24 +109,28 @@
     <form action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
         {% csrf_token %}
         <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-8" id="block-form">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="buttonbar">
-                            <div class="float-right">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fa fa-save"></i>
-                                    Salvar
-                                </button>
-                            </div>
-                            <div class="clearfix"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
                         <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    Capa da Página
+                                </div>
+                            </div>
                             <div class="panel-body">
                                 {% for field in form %}
                                     {% if field.field.widget.input_type == "hidden" %}
@@ -174,26 +178,13 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="buttonbar bottom">
-                            <div class="float-right">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fa fa-save"></i>
-                                    Salvar
-                                </button>
-                            </div>
-                            <div class="clearfix"></div>
-                        </div>
-                    </div>
-                </div>
             </div>
-
-            <div class="col-md-4">
+            <div class="col-md-4 hidden-xs hidden-sm">
                 <div class="panel panel-primary" id="block-status-icons">
                     <div class="panel-heading">
-                        Etapas de configuração
+                        <div class="panel-title">
+                            Etapas de configuração
+                        </div>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -253,6 +244,40 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Localização
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                asdf
+                            </div>
+                            <div class="col-md-6">
+                                asdfs
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
                 </div>
             </div>
         </div>

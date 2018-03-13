@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from django import forms
 from django.forms.utils import to_current_timezone
 from django.utils.translation import get_language
@@ -24,7 +25,8 @@ class DateInput(forms.DateInput):
 
         try:
             if lang == 'en' or lang == 'en-us':
-                format = '%m/%d/%Y'
+                # format = '%m/%d/%Y'
+                format = '%d/%m/%Y'
             elif lang == 'pt-br':
                 format = '%d/%m/%Y'
             else:
@@ -38,8 +40,6 @@ class DateInput(forms.DateInput):
         return value
 
 
-
-
 class TimeInput(forms.TimeInput):
     input_type = 'tel'
     template_name = 'forms/widgets/time.html'
@@ -50,6 +50,7 @@ class TimeInput(forms.TimeInput):
             value += ':00'
 
         return value
+
 
 class SplitDateTimeWidget(forms.MultiWidget):
     """
@@ -75,7 +76,8 @@ class SplitDateTimeWidget(forms.MultiWidget):
 
         else:
             if lang == 'en' or lang == 'en-us':
-                format = '%m/%d/%Y %H:%M:%S'
+                # format = '%m/%d/%Y %H:%M:%S'
+                format = '%d/%m/%Y %H:%M:%S'
             elif lang == 'pt-br':
                 format = '%d/%m/%Y %H:%M:%S'
             else:
@@ -99,7 +101,8 @@ class SplitDateTimeWidget(forms.MultiWidget):
         value = to_current_timezone(value)
 
         if lang == 'en' or lang == 'en-us':
-            date = value.strftime('%m/%d/%Y')
+            # date = value.strftime('%m/%d/%Y')
+            date = value.strftime('%d/%m/%Y')
         elif lang == 'pt-br':
             date = value.strftime('%d/%m/%Y')
         else:

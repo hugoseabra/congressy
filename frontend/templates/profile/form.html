@@ -69,6 +69,16 @@
 
         {% csrf_token %}
 
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
 
         <div class="row">
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
