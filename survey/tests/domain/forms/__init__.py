@@ -1,3 +1,0 @@
-"""
-    Survey domain form tests
-"""
