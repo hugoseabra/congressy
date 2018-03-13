@@ -1,20 +1,15 @@
 """
-    Testing the Answer model form
+    Testing the Answer Manager
 """
 
 from test_plus.test import TestCase
 
-from survey.forms import AnswerModelForm
+from survey.managers import AnswerManager
 from survey.tests import MockFactory
 
 
-class AnswerModelFormTest(TestCase):
+class AnswerManagerTest(TestCase):
     """ Main test implementation """
-
-    faker = None
-    survey = None
-    question = None
-    person = None
 
     def setUp(self):
         self.faker = MockFactory()
@@ -29,23 +24,23 @@ class AnswerModelFormTest(TestCase):
         editada, não gerando nova resposta.
         """
 
-        new_answer = AnswerModelForm(
+        new_answer = AnswerManager(
             data={
-                'question': self.question.pk,
                 'value': 'Uma resposta.',
             },
-            user=self.person.user
+            user=self.person.user,
+            question=self.question,
         )
 
         self.assertTrue(new_answer.is_valid())
         new_answer.save()
 
-        edited_answer = AnswerModelForm(
+        edited_answer = AnswerManager(
             data={
-                'question': self.question.pk,
                 'value': 'Uma resposta editada.',
             },
-            user=self.person.user
+            user=self.person.user,
+            question=self.question,
         )
 
         self.assertTrue(edited_answer.is_valid())
