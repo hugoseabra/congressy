@@ -25,7 +25,8 @@ class DateInput(forms.DateInput):
 
         try:
             if lang == 'en' or lang == 'en-us':
-                format = '%m/%d/%Y'
+                # format = '%m/%d/%Y'
+                format = '%d/%m/%Y'
             elif lang == 'pt-br':
                 format = '%d/%m/%Y'
             else:
@@ -75,7 +76,8 @@ class SplitDateTimeWidget(forms.MultiWidget):
 
         else:
             if lang == 'en' or lang == 'en-us':
-                format = '%m/%d/%Y %H:%M:%S'
+                # format = '%m/%d/%Y %H:%M:%S'
+                format = '%d/%m/%Y %H:%M:%S'
             elif lang == 'pt-br':
                 format = '%d/%m/%Y %H:%M:%S'
             else:
@@ -99,7 +101,8 @@ class SplitDateTimeWidget(forms.MultiWidget):
         value = to_current_timezone(value)
 
         if lang == 'en' or lang == 'en-us':
-            date = value.strftime('%m/%d/%Y')
+            # date = value.strftime('%m/%d/%Y')
+            date = value.strftime('%d/%m/%Y')
         elif lang == 'pt-br':
             date = value.strftime('%d/%m/%Y')
         else:
