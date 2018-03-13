@@ -28,8 +28,8 @@ class ApplicationServiceMixin(forms.Form):
     """
     manager_class = None
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         self.manager = self._get_manager(**kwargs)
 
@@ -41,7 +41,7 @@ class ApplicationServiceMixin(forms.Form):
 
     def _get_manager(self, **kwargs):
         manager_class = self._get_manager_class()
-        manager = manager_class(self._get_manager_kwargs(**kwargs))
+        manager = manager_class(**self._get_manager_kwargs(**kwargs))
 
         if not isinstance(manager, Manager):
             raise ManagerWrongTypeError('Manager inválido.')
@@ -75,6 +75,3 @@ class ApplicationServiceMixin(forms.Form):
 
     def save(self, commit=True):
         return self.manager.save(commit=commit)
-
-    def get(self, pk):
-        return self.manager.get(pk=pk)
