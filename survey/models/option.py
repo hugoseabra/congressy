@@ -17,6 +17,9 @@ class Option(models.Model):
             ('question', 'value',),
         )
 
+    def __str__(self):
+        return self.name + ' - ' + self.value
+
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,

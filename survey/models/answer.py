@@ -16,6 +16,9 @@ class Answer(models.Model):
         verbose_name = 'resposta'
         verbose_name_plural = 'respostas'
 
+    def __str__(self):
+        return self.value
+
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,

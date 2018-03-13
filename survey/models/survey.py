@@ -13,6 +13,9 @@ class Survey(models.Model):
         verbose_name = 'questionario'
         verbose_name_plural = 'questionarios'
 
+    def __str__(self):
+        return self.name
+
     name = models.CharField(
         max_length=255,
         verbose_name='nome',

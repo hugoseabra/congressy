@@ -17,6 +17,9 @@ class Question(models.Model):
             ('survey', 'name',),
         )
 
+    def __str__(self):
+        return self.name
+
     FIELD_INPUT_TEXT = 'input-text'
     FIELD_INPUT_NUMBER = 'input-number'
     FIELD_INPUT_DATE = 'input-date'
