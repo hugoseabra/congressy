@@ -1,6 +1,6 @@
 from django import forms
-from django.contrib import messages
 from django.utils import six
+
 
 # TODO add test and documentation
 
