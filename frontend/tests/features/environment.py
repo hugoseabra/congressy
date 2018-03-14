@@ -2,8 +2,8 @@ import os
 import django
 from selenium import webdriver
 
-language = 'en-US'
-browser = 'opera'
+language = 'pt-BR'
+browser = 'chrome'
 
 from selenium.webdriver.chrome.options import Options
 # This is necessary for all installed apps to be recognized, for some reason.
@@ -81,6 +81,7 @@ def before_scenario(context, scenario):
     if(browser=='opera'):
         options = webdriver.ChromeOptions()
         options.add_argument('--lang=' + language)
+        options.add_argument("--start-maximized")
         options.add_experimental_option('prefs', {'intl.accept_languages': language})
         options.binary_location = "/usr/bin/opera"
         opera_path = '/home/gabriel/congressy/cgsy/frontend/tests/web_drivers/operadriver'
@@ -88,6 +89,8 @@ def before_scenario(context, scenario):
     elif(browser=='chrome'):
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--lang='+language)
+        chrome_options.add_argument('DJDT_DEBUG = True')
+        chrome_options.add_argument("--start-maximized")
         chrome_options.add_experimental_option('prefs', {'intl.accept_languages': language})
         chrome_path = '/home/gabriel/congressy/cgsy/frontend/tests/web_drivers/chromedriver'
         context.browser =  webdriver.Chrome(executable_path= chrome_path, chrome_options=chrome_options)

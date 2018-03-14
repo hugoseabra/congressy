@@ -77,7 +77,7 @@
     "fields": {
       "name": "Ana Carolina",
       "gender": "F",
-      "email": null,
+      "email": "ana.carolina@me.com",
       "city": 117,
       "zip_code": "69075765",
       "street": "Rua 3 C",
