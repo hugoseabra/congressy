@@ -16,6 +16,7 @@ class AnswerManagerTest(TestCase):
         self.survey = self.faker.fake_survey()
         self.question = self.faker.fake_question(survey=self.survey)
         self.person = self.faker.fake_person()
+        self.author = self.faker.fake_author(survey=self.survey)
 
     def test_answer_unique_if_user(self):
         """
@@ -28,8 +29,8 @@ class AnswerManagerTest(TestCase):
             data={
                 'value': 'Uma resposta.',
             },
-            user=self.person.user,
             question=self.question,
+            author=self.author,
         )
 
         self.assertTrue(new_answer.is_valid())
@@ -39,8 +40,8 @@ class AnswerManagerTest(TestCase):
             data={
                 'value': 'Uma resposta editada.',
             },
-            user=self.person.user,
             question=self.question,
+            author=self.author,
         )
 
         self.assertTrue(edited_answer.is_valid())
@@ -50,4 +51,5 @@ class AnswerManagerTest(TestCase):
                             new_answer.instance.value)
         self.assertEqual(edited_answer.instance.question,
                          new_answer.instance.question)
-        self.assertEqual(edited_answer.instance.user, new_answer.instance.user)
+        self.assertEqual(edited_answer.instance.author,
+                         new_answer.instance.author)

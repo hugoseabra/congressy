@@ -17,6 +17,7 @@ class AnswerModelTest(TestCase):
         self.question = self.faker.fake_question(self.survey,
                                                  type=Question.FIELD_SELECT)
         self.option = self.faker.fake_option(self.question)
+        self.author = self.faker.fake_author(survey=self.survey)
 
     def test_answer_with_human_display_when_selectable_question(self):
         """
@@ -27,6 +28,7 @@ class AnswerModelTest(TestCase):
         answer = Answer(
             question=self.question,
             value=self.option.value,
+            author=self.author,
         )
 
         self.assertIsNotNone(answer._get_human_display())
