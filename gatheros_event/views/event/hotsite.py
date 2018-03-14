@@ -12,7 +12,6 @@ class EventHotsiteView(AccountMixin, FormView):
     form_class = forms.HotsiteForm
     template_name = 'event/hotsite.html'
     event = None
-    object = None
 
     def can_access(self):
         if not self.event:
@@ -48,7 +47,10 @@ class EventHotsiteView(AccountMixin, FormView):
         kwargs['event'] = event
 
         try:
-            kwargs['instance'] = event.info
+            kwargs['instances'] = {
+                'info': event.info,
+                'place': event.place,
+            }
         except Info.DoesNotExist:
             pass
 
@@ -59,13 +61,17 @@ class EventHotsiteView(AccountMixin, FormView):
             self.request,
             "Configurações de páginas atualizadas com sucesso."
         )
-        self.object = form.save()
+        form.save()
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.warning(self.request, 'Verifique os campos abaixo.')
+        return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
         event = self._get_event()
 
-        context = super(EventHotsiteView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['event'] = event
         context['has_paid_lots'] = self.has_paid_lots()
 

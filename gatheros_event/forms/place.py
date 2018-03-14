@@ -1,13 +1,9 @@
-import re
-from io import BytesIO
-from urllib.parse import urlencode
-
-import requests
 from django import forms
-from django.conf import settings
-from django.core.files import File
 from django.utils.safestring import mark_safe
+from kanu_locations.models import City
 
+from core.forms.cleaners import clear_string
+from core.forms.widgets import AjaxChoiceField, TelephoneInput
 from gatheros_event.models import Place
 
 
@@ -26,6 +22,7 @@ class GooglePictureWidget(forms.widgets.Widget):
             """.format(link=link, img=value.url)
         )
 
+
 FIELD_NAME_MAPPING = {
     'name': 'place_name',
 }
@@ -34,6 +31,44 @@ FIELD_NAME_MAPPING = {
 class PlaceForm(forms.ModelForm):
     """ Formulário de local de evento. """
 
+    states = (
+        ('', '----'),
+        # replace the value '----' with whatever you want, it won't matter
+        ("AC", "Acre"),
+        ("AL", "Alagoas"),
+        ("AP", "Amapá"),
+        ("AM", "Manaus"),
+        ("BA", "Bahia"),
+        ("CE", "Ceará"),
+        ("DF", "Distrito Federal"),
+        ("ES", "Espírito Santo"),
+        ("GO", "Goiás"),
+        ("MA", "Maranhão"),
+        ("MT", "Mato Grosso"),
+        ("MS", "Mato Grosso do Sul"),
+        ("MG", "Minas Gerais"),
+        ("PA", "Pará"),
+        ("PB", "Paraíba"),
+        ("PR", "Paraná"),
+        ("PE", "Pernambuco"),
+        ("PI", "Piauí"),
+        ("RJ", "Rio de Janeiro"),
+        ("RN", "Rio Grande do Norte"),
+        ("RS", "Rio Grande do Sul"),
+        ("RO", "Rondônia"),
+        ("RR", "Roraima"),
+        ("SC", "Santa Catarina"),
+        ("SP", "São Paulo"),
+        ("SE", "Sergipe"),
+        ("TO", "Tocantins"),
+    )
+    empty = (
+        ('', '----'),
+    )
+
+    state = forms.ChoiceField(label='Estado', choices=states, required=False)
+    city_name = AjaxChoiceField(label='Cidade', choices=empty, required=False)
+
     class Meta:
         """ Meta """
         model = Place
@@ -41,132 +76,35 @@ class PlaceForm(forms.ModelForm):
             'show_location',
             'lat',
             'long',
-            # 'show_address',
-            # 'name',
-            # 'phone',
-            # 'zip_code',
-            # 'street',
-            # 'complement',
-            # 'number',
-            # 'village',
-            # 'city',
-            # 'reference',
+            'show_address',
+            'name',
+            'phone',
+            'zip_code',
+            'street',
+            'complement',
+            'number',
+            'village',
+            'city',
+            'reference',
 
         )
+
         widgets = {
-            'organization': forms.HiddenInput(),
-            'google_maps_img': GooglePictureWidget(),
-            'google_streetview_img': GooglePictureWidget(),
+            'city': forms.HiddenInput(),
+            'zip_code': TelephoneInput(),
         }
 
-    def __init__(self, event=None, **kwargs):
+    def __init__(self, event, **kwargs):
         self.event = event
         super().__init__(**kwargs)
 
-    # def add_prefix(self, field_name):
-    #     # look up field name; return original if not found
-    #     field_name = FIELD_NAME_MAPPING.get(field_name, field_name)
-    #     return super().add_prefix(field_name)
-
-    def clean_google_streetview_link(self):
-        """ Validando o link do Google StreetViuew """
-        if not self.cleaned_data['google_streetview_link']:
+    def clean_city(self):
+        if 'city' not in self.data:
             return None
 
-        return self.cleaned_data['google_streetview_link']
-
-    def _get_streetview_parans(self):
-        url = self.cleaned_data['google_streetview_link']
-        if not url:
-            return None
-
-        assert 'google.com' in self.cleaned_data['google_streetview_link']
-        assert '/maps/' in self.cleaned_data['google_streetview_link']
-
-        parsed = re.compile(r'/@(.*),(.+),(.+),(.+),(.+),(.+)/').search(url)
-        return {
-            'latitude': float(parsed.group(1)),
-            'longitude': float(parsed.group(2)),
-            'heading': float(parsed.group(5).replace('h', '')),
-            'pitch': int(float(parsed.group(6).replace('t', ''))) - 90,
-            'fov': int(float(parsed.group(4).replace('y', '')))
-        }
-
-    def clean_google_maps_link(self):
-        """
-        Construindo a url do Google Maps pela url do Google StreetView
-        :return: str
-        """
-        params = self._get_streetview_parans()
-
-        if not params:
-            return None
-
-        query = {
-            'api': 1,
-            'z': 10,
-            'query': '%s,%s' % (params['latitude'], params['longitude'])
-        }
-        base_url = 'https://www.google.com/maps/search/?'
-        return base_url + urlencode(query, True)
-
-    def clean_google_maps_img(self):
-        """
-        Fazendo o download da imagem estática do Google Maps
-        :return: Img
-        """
-
-        params = self._get_streetview_parans()
-
-        if not params:
-            return None
-
-        center = '%s,%s' % (params['latitude'], params['longitude'])
-        query = {
-            'maptype': 'roadmap',
-            'size': '640x480',
-            'center': center,
-            'zoom': 14,
-            'key': settings.GOOGLE_MAPS_API_KEY,
-            'markers': 'color:red|%s' % center
-        }
-        base_url = 'https://maps.googleapis.com/maps/api/staticmap?'
-        url = base_url + urlencode(query, True)
-
-        # Download da imagem
-        res = requests.get(url)
-        file_name = '%s,%s,maps.png' % (params['latitude'],
-                                        params['longitude'])
-        return File(BytesIO(res.content), file_name)
-
-    def clean_google_streetview_img(self):
-        """
-        Fazendo o download da imagem estática do Google StreetView
-        :return: Img
-        """
-
-        params = self._get_streetview_parans()
-
-        if not params:
-            return None
-
-        query = {
-            'size': '640x480',
-            'heading': params['heading'],
-            'pitch': params['pitch'],
-            'fov': params['fov'],
-            'location': '%s,%s' % (params['latitude'], params['longitude']),
-            'key': settings.GOOGLE_MAPS_API_KEY,
-        }
-        base_url = 'https://maps.googleapis.com/maps/api/streetview?'
-        url = base_url + urlencode(query, True)
-
-        # Download da imagem
-        res = requests.get(url)
-        file_name = '%s,%s,streetview.png' % (params['latitude'],
-                                              params['longitude'])
-        return File(BytesIO(res.content), file_name)
+        return City.objects.get(pk=self.data['city'])
 
     def save(self, commit=True):
         self.instance.event = self.event
-        return super().save(commit)
+        self.instance = super().save(commit=commit)
+        return self.instance

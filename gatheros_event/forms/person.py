@@ -69,7 +69,8 @@ class PersonForm(forms.ModelForm):
             'city': forms.HiddenInput(),
             'birth_date': forms.SelectDateWidget(
                 attrs=({'style': 'width: 30%; display: inline-block;'}),
-                years=create_years_list(), )
+                years=create_years_list(),
+            )
         }
 
     def __init__(self, is_chrome=False, **kwargs):
@@ -97,7 +98,11 @@ class PersonForm(forms.ModelForm):
         self.fields[field_name].required = True
 
     def clean_zip_code(self):
-        return clear_string(self.data.get('zip_code'))
+        zip_code = self.data.get('zip_code')
+        if zip_code:
+            zip_code = clear_string(zip_code)
+
+        return zip_code
 
     def clean_cpf(self):
         cpf = self.cleaned_data.get('cpf')

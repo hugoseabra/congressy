@@ -18,8 +18,8 @@ from .invitation import (
     InvitationCreateForm,
     InvitationDecisionForm,
 )
-from .hotsite import HotsiteForm
 from .organization import OrganizationForm, OrganizationManageMembershipForm, OrganizationFinancialForm
 from .person import PersonForm
 from .place import PlaceForm
+from .hotsite import HotsiteForm
 from .profile import ProfileCreateForm, ProfileForm

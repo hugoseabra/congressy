@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 
-{% load static i18n widget_tweaks queryset_filter %}
+{% load static i18n widget_tweaks queryset_filter form_config_tags %}
 
 {% block title %} Página do Evento | Congressy{% endblock %}
 
@@ -46,6 +46,7 @@
     <script type="text/javascript"
             src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
+    <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script>
         window.cgsy = window.cgsy || {};
         window.cgsy.maps = window.cgsy.maps || {};
@@ -109,15 +110,47 @@
                 map1,
                 {lat: -16.672248190781488, lng: -49.213632157711004}
             );
+        }
 
-            document.getElementById('submitEndereco').addEventListener('click', function() {
-                var address = $('#endereco').val();
-                window.cgsy.maps.search_by_address(map1, address);
-            });
+        function resize_status_block() {
+            var form_height = $('#block-form').height();
+            var icons_height = $('#block-status-icons').height();
+            if (form_height > icons_height) {
+                $('#block-status-icons').height(form_height);
+            }
+
+            if (icons_height > form_height) {
+                $('#block-form').height(icons_height);
+            }
         }
 
         $(document).ready(function () {
+            $(window).on('resize', function() {
+                window.setTimeout(function() {
+                    resize_status_block();
+                }, 400);
+            });
+            window.setTimeout(function() {
+                resize_status_block();
+            }, 400);
 
+            var uf_el = $('#id_state');
+            var city_el = $('#id_city_name');
+
+            $('#id_zip_code').mask("99.999-999");
+
+            showHideCepLoader();
+
+            window.setTimeout(function () {
+                {% if event.place and event.place.city %}
+                    uf_el.val('{{ event.place.city.uf }}');
+                    fetch_cities(uf_el, '{{ event.place.city.pk }}');
+                {% else %}
+                    uf_el.val('');
+                    city_el.val('');
+                    city_el.prop('disabled', true);
+                {% endif %}
+            }, 300);
         });
     </script>
 {% endblock %}
@@ -178,6 +211,18 @@
 {% block content %}
     <form action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
         {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar">
@@ -191,65 +236,38 @@
                 </div>
             </div>
         </div>
-        <div class="row hide">
-            <div class="col-md-8" id="block-form">
+        <div class="row">
+            <div class="col-md-9">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="panel panel-primary">
+                        <div class="panel panel-primary" id="block-form">
                             <div class="panel-heading">
                                 <div class="panel-title">
                                     Capa da Página
                                 </div>
                             </div>
                             <div class="panel-body">
-                                {% for field in form %}
-                                    {% if field.field.widget.input_type == "hidden" %}
-                                        {{ field }}
-                                    {% else %}
-                                        <div class="form-group">
-                                            <label for="{{ field.id_for_label }}">
-                                                {{ field.label }}
-                                                {% if field.field.required %}
-                                                    <small style="color:#C9302C">*</small>
-                                                {% endif %}
-                                            </label>
-
-                                            <div>
-                                                {% if field.field.widget.input_type == "checkbox" %}
-                                                    {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
-                                                {% else %}
-                                                    {{ field |add_class:"form-control" }}
-                                                {% endif %}
-                                                {% if field.errors %}
-                                                    {% for error in field.errors %}
-                                                        <div class="alert alert-danger
-                                                    alert-dismissable">
-                                                            <button type="button"
-                                                                    class="close"
-                                                                    data-dismiss="alert"
-                                                                    aria-hidden="true">
-                                                                ×
-                                                            </button>
-                                                            {% trans error %}
-                                                        </div>
-                                                    {% endfor %}
-                                                {% endif %}
-                                                {% if field.help_text %}
-                                                    <div>
-                                                        <small class="text-muted">{{ field.help_text|safe }}</small>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.image_main %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.lead %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.description_html %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 hidden-xs hidden-sm">
+            <div class="col-md-3 hidden-xs hidden-sm">
                 <div class="panel panel-primary" id="block-status-icons">
                     <div class="panel-heading">
                         <div class="panel-title">
@@ -292,7 +310,7 @@
                                     <div>
                                         <div class="title">Descrição rápida</div>
                                         <div class="text-muted description">
-                                            Motiva o visitante a permanecer no site,
+                                            Motive o visitante a permanecer no site,
                                             aumentando a possibilidade de conclusão de
                                             sua inscrição.
                                         </div>
@@ -328,19 +346,58 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-md-6">
-                                asdfs
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.name %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-xl-4">
+                                        {% render_generic_field form.zip_code %}
+                                        <div id="cep_loader" style="width: 22px;position: absolute;
+                                             top: 33px;right: 33px;">
+                                            <img src="{% static 'assets/img/loader.gif' %}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.street %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.number %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.complement %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.village %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 address-row">
+                                        {% render_generic_field form.state %}
+                                    </div>
+                                    <div class="col-md-8 address-row">
+                                        {% render_generic_field form.city_name %}
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-6">
-                                <form>
-                                    <input type="text" id = "endereco">
-                                    <input type="button" id="submitEndereco">
-                                </form>
-                                <div id="map1"></div>
-                                <form>
-                                    <input type="text" id="lat" readonly="yes"><br>
-                                    <input type="text" id="lng" readonly="yes"><br>
-                                    <input type="text" id="zoom" readonly="yes">
-                                </form>
+{#                                <form>#}
+{#                                    <input type="text" id = "endereco">#}
+{#                                    <input type="button" id="submitEndereco">#}
+{#                                </form>#}
+{#                                <div id="map1"></div>#}
+{#                                <form>#}
+{#                                    <input type="text" id="lat" readonly="yes"><br>#}
+{#                                    <input type="text" id="lng" readonly="yes"><br>#}
+{#                                    <input type="text" id="zoom" readonly="yes">#}
+{#                                </form>#}
                             </div>
                         </div>
                     </div>
@@ -349,7 +406,7 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <div class="buttonbar">
+                <div class="buttonbar bottom">
                     <div class="float-right">
                         <button type="submit" class="btn btn-success">
                             <i class="fa fa-save"></i>
