@@ -1,7 +1,5 @@
-from .survey import SurveyManager
-from .question import QuestionManager
-from .option import OptionManager
-from .answer import AnswerManager
 from .mixins import Manager
-
-
+from .answer import AnswerManager
+from .option import OptionManager
+from .question import QuestionManager
+from .survey import SurveyManager
