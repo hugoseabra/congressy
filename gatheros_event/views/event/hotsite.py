@@ -48,8 +48,8 @@ class EventHotsiteView(AccountMixin, FormView):
 
         try:
             kwargs['instances'] = {
-                'info': event.info,
-                'place': event.place,
+                'info': event.info if hasattr(event, 'info') else None,
+                'place': event.place if hasattr(event, 'place') else None,
             }
         except Info.DoesNotExist:
             pass

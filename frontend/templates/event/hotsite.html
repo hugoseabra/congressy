@@ -29,17 +29,21 @@
         .django-ckeditor-widget {
             display: block !important;
         }
-        #map1, #map2 {
+        #map, #map_banner {
             width: 100%;
             height: 300px;
+            border: 3px solid #DDD;
+        }
+        #map_banner div {
+            width: 32%;
+            margin: 15% auto;
+            text-align: center;
         }
     </style>
 {% endblock %}
 
 {% block scripts %}
     {{ block.super }}
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw&libraries=places&callback=init&language=pt-BR&region=BR" async defer></script>
-
     <!-- ckeditor -->
     <script type="text/javascript"
             src="{% static "ckeditor/ckeditor-init.js" %}"></script>
@@ -49,17 +53,73 @@
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script>
         window.cgsy = window.cgsy || {};
-        window.cgsy.maps = window.cgsy.maps || {};
+        cgsy.maps = cgsy.maps || {};
 
         (function($, window) {
-            var google = window.google;
-            var maps = window.cgsy.maps;
+            window.cgsy.maps.retrieveAddress = function() {
+                var name = $('#id_name');
+                var street = $('#id_street');
+                var city = $('#id_city_name :selected');
+                var state = $('#id_state :selected');
 
-            maps.setCenter = function(map, location) {
+
+                var address = name.val();
+                    address += ', ' + street.val();
+                    address += ', ' + city.text();
+                    address += ', ' + state.text();
+
+                console.log(address);
+
+                var map = new window.google.maps.Map(
+                    document.getElementById("map"),
+                    {
+                        zoom: 18,
+                        center: {lat: 40.731, lng: -73.997}
+                    }
+                );
+
+                window.cgsy.maps.searchByAddress(map, address);
+            };
+
+            window.cgsy.maps.hideMap = function() {
+                var height = $('#place-form-block').height();
+                $('#map').height(height);
+                $('#map_banner').height(height);
+
+                $('#map').hide();
+                $('#map_banner').show();
+            };
+
+            window.cgsy.maps.showMap = function() {
+                var height = $('#place-form-block').height();
+                $('#map').height(height);
+                $('#map_banner').height(height);
+
+                $('#map').show();
+                $('#map_banner').hide();
+            };
+
+            window.cgsy.maps.init = function(lat, long, zoom) {
+                var map = new window.google.maps.Map(
+                    document.getElementById("map"),
+                    {
+                        center: {lat: parseFloat(lat), lng: parseFloat(long) },
+                        zoom: parseInt(zoom) || 18
+                    }
+                );
+                window.cgsy.maps.addMarker(
+                    map,
+                    {lat: parseFloat(lat), lng: parseFloat(long) }
+                );
+            };
+
+            window.cgsy.maps.setCenter = function(map, location) {
                 map.setCenter(location);
             };
 
-            maps.addMarker = function(map, location) {
+            window.cgsy.maps.addMarker = function(map, location) {
+                window.cgsy.maps.showMap();
+
                 window.cgsy.maps.setCenter(map, location);
 
                 var marker = new window.google.maps.Marker({
@@ -68,9 +128,9 @@
                     draggable: true
                 });
 
-                var lat_el = $('#lat');
-                var lng_el = $('#lng');
-                var zoom_el = $('#zoom');
+                var lat_el = $('#id_lat');
+                var lng_el = $('#id_long');
+                var zoom_el = $('#id_zoom');
 
                 lat_el.val(marker.position.lat());
                 lng_el.val(marker.position.lng());
@@ -86,31 +146,20 @@
                 });
             };
 
-            maps.search_by_address = function(map, address) {
+            window.cgsy.maps.searchByAddress = function(map, address) {
                 var geocoder = new window.google.maps.Geocoder;
                 geocoder.geocode({'address': address}, function(results, status) {
                     if (status !== 'OK') {
                         alert('Geocode was not successful for the following reason: ' + status);
                         return;
                     }
+
                     var location = results[0].geometry.location;
                     window.cgsy.maps.addMarker(map, location);
                 });
             };
 
         })(jQuery, window);
-
-        function init() {
-            var map1 = new google.maps.Map(document.getElementById('map1'), {
-                center: {lat: -16.672248190781488, lng: -49.213632157711004},
-                zoom: 18
-            });
-
-            window.cgsy.maps.addMarker(
-                map1,
-                {lat: -16.672248190781488, lng: -49.213632157711004}
-            );
-        }
 
         function resize_status_block() {
             var form_height = $('#block-form').height();
@@ -152,6 +201,49 @@
                 {% endif %}
             }, 300);
         });
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw&libraries=places&language=pt-BR&region=BR"></script>
+
+    <script>
+    $(document).ready(function () {
+        google.maps.event.addDomListener(
+            window,
+            "load",
+            function() {
+                {% if event.place.lat and event.place.long %}
+                    window.cgsy.maps.init(
+                        '{{ event.place.lat }}',
+                        '{{ event.place.long }}',
+                        '{{ event.place.zoom|default_if_none:18 }}'
+                    );
+                {% else %}
+                    {% if event.place.name or event.place.street %}
+                        window.cgsy.maps.retrieveAddress();
+                    {% else %}
+                        window.cgsy.maps.hideMap();
+                    {% endif %}
+                {% endif %}
+            }
+        );
+
+        (function($) {
+            var map_reload_timer = null;
+            function reloadMap() {
+                window.clearTimeout(map_reload_timer);
+                map_reload_timer = window.setTimeout(function() {
+                    window.cgsy.maps.retrieveAddress();
+                }, 1500);
+            }
+
+            $('#id_name').on('keyup', function() { reloadMap(); });
+            $('#id_zip_code').on('keyup', function() { reloadMap(); });
+            $('#id_street').on('keyup', function() { reloadMap(); });
+            $('#id_village').on('keyup', function() { reloadMap(); });
+            $('#id_state').on('change', function() { reloadMap(); });
+            $('#id_city_name').on('change', function() { reloadMap(); });
+        })(jQuery);
+    });
     </script>
 {% endblock %}
 
@@ -345,7 +437,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6" id="place-form-block">
                                 <div class="row">
                                     <div class="col-md-12">
                                         {% render_generic_field form.name %}
@@ -388,16 +480,10 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-{#                                <form>#}
-{#                                    <input type="text" id = "endereco">#}
-{#                                    <input type="button" id="submitEndereco">#}
-{#                                </form>#}
-{#                                <div id="map1"></div>#}
-{#                                <form>#}
-{#                                    <input type="text" id="lat" readonly="yes"><br>#}
-{#                                    <input type="text" id="lng" readonly="yes"><br>#}
-{#                                    <input type="text" id="zoom" readonly="yes">#}
-{#                                </form>#}
+                                <div id="map" style="display:none"></div>
+                                <div id="map_banner" style="display:none">
+                                    <div class="text-muted">Informe o local para ver o mapa.</div>
+                                </span>
                             </div>
                         </div>
                     </div>

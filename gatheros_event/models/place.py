@@ -55,19 +55,24 @@ class Place(models.Model, GatherosModelMixin):
         null=True,
         verbose_name='telefone'
     )
-    long = models.DecimalField(
-        max_digits=15,
-        decimal_places=6,
+    long = models.CharField(
+        max_length=50,
         blank=True,
         null=True,
         verbose_name='longitude'
     )
-    lat = models.DecimalField(
-        max_digits=15,
-        decimal_places=6,
+    lat = models.CharField(
+        max_length=50,
         blank=True,
         null=True,
         verbose_name='latitude'
+    )
+    zoom = models.CharField(
+        default=18,
+        max_length=4,
+        blank=True,
+        null=True,
+        verbose_name='zoom do mapa'
     )
 
     zip_code = models.CharField(

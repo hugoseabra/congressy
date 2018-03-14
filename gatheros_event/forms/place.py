@@ -76,6 +76,7 @@ class PlaceForm(forms.ModelForm):
             'show_location',
             'lat',
             'long',
+            'zoom',
             'show_address',
             'name',
             'phone',
@@ -92,6 +93,9 @@ class PlaceForm(forms.ModelForm):
         widgets = {
             'city': forms.HiddenInput(),
             'zip_code': TelephoneInput(),
+            'lat': forms.HiddenInput(),
+            'long': forms.HiddenInput(),
+            'zoom': forms.HiddenInput(),
         }
 
     def __init__(self, event, **kwargs):
@@ -99,10 +103,13 @@ class PlaceForm(forms.ModelForm):
         super().__init__(**kwargs)
 
     def clean_city(self):
-        if 'city' not in self.data:
-            return None
+        city = self.cleaned_data.get('city')
 
-        return City.objects.get(pk=self.data['city'])
+        if city:
+            city = City.objects.get(pk=self.data['city'])
+
+        return city
+
 
     def save(self, commit=True):
         self.instance.event = self.event
