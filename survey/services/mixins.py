@@ -6,8 +6,8 @@ da aplicação com o domínio através de conectores diretos com Serviços de Do
 
 from django import forms
 
-
 from survey.managers.mixins import Manager
+from django.forms.utils import ErrorList
 
 
 class ManagerClassMissingError(Exception):
@@ -29,7 +29,26 @@ class ApplicationServiceMixin(forms.Form):
     manager_class = None
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+
+        data = kwargs.get('data')
+        files = kwargs.get('files')
+        auto_id = kwargs.get('auto_id', 'id_%s')
+        prefix = kwargs.get('prefix')
+        initial = kwargs.get('initial')
+        error_class = kwargs.get('error_class', ErrorList)
+        label_suffix = kwargs.get('label_suffix')
+        empty_permitted = kwargs.get('empty_permitted', False)
+        field_order = kwargs.get('field_order')
+        use_required_attribute = kwargs.get('use_required_attribute')
+        renderer = kwargs.get('renderer')
+
+        super().__init__(data=data, files=files, auto_id=auto_id,
+                         prefix=prefix, initial=initial,
+                         error_class=error_class, label_suffix=label_suffix,
+                         empty_permitted=empty_permitted,
+                         field_order=field_order,
+                         use_required_attribute=use_required_attribute,
+                         renderer=renderer)
 
         self.manager = self._get_manager(**kwargs)
 
