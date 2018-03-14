@@ -39,13 +39,12 @@ class AnswerManager(Manager):
         cleaned_data = super().clean()
 
         if self.instance.pk:
-            same_survey = \
-                self.instance.question.survey.pk == self.question.survey.pk
+            same_question = \
+                self.instance.question.pk == self.question.pk
 
-            if not same_survey:
+            if not same_question:
                 raise forms.ValidationError({
-                    '__all__': 'Esta resposta não pertence a este'
-                               ' questionário.'
+                    '__all__': 'Esta resposta não pertence a esta pergunta'
                 })
 
         return cleaned_data
