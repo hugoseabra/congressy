@@ -52,17 +52,6 @@
             {{ hidden_field }}
         {% endfor %}
 
-        {% if place_form.non_field_errors %}
-            {% render_errors place_form.non_field_errors %}
-        {% endif %}
-
-        {% for hidden_field in place_form.hidden_fields %}
-            {% if hidden_field.errors %}
-                {% render_errors hidden_field.errors %}
-            {% endif %}
-            {{ hidden_field }}
-        {% endfor %}
-
         <div class="row">
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar">
@@ -147,86 +136,6 @@
                         </div>
                     </div>
                 </div>
-{#                <div class="panel panel-primary">#}
-{#                    <div class="panel-heading">#}
-{#                        <div class="panel-title">Localização</div>#}
-{#                    </div>#}
-{#                    <div class="panel-body">#}
-{#                        <div class="row">#}
-{#                            <div class="col-md-12">#}
-{#                                <div class="row">#}
-{#                                    <div class="col-md-12">#}
-{#                                        {% render_generic_field place_form.show_location %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row location-field" style="display:none">#}
-{#                                    <div class="col-md-3">#}
-{#                                        {% render_generic_field place_form.lat %}#}
-{#                                    </div>#}
-{#                                    <div class="col-md-3">#}
-{#                                        {% render_generic_field place_form.long %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row location-field map-field" style="display: none">#}
-{#                                    <div class="col-md-12">#}
-{#                                        <div id="gmap"></div>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row location-field no-map" style="display:none">#}
-{#                                    <div class="col-md-12">#}
-{#                                        <div class="text-center text-muted well well-sm" style="width:100%;font-size: 14px;">#}
-{#                                            Informe a latitude e longitude#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row location-field" style="display:none">#}
-{#                                    <div class="col-md-12">#}
-{#                                        <br />#}
-{#                                        <hr />#}
-{#                                        <br />#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row">#}
-{#                                    <div class="col-md-12">#}
-{#                                        {% render_generic_field place_form.show_address %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row address-field" style="display:none">#}
-{#                                    <div class="col-sm-2">#}
-{#                                        {% render_generic_field place_form.zip_code %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row address-field" style="display:none">#}
-{#                                    <div class="col-md-8">#}
-{#                                        {% render_generic_field place_form.street %}#}
-{#                                    </div>#}
-{#                                    <div class="col-md-4">#}
-{#                                        {% render_generic_field place_form.number %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row address-field" style="display:none">#}
-{#                                    <div class="col-md-3">#}
-{#                                        {% render_generic_field place_form.complement %}#}
-{#                                    </div>#}
-{#                                    <div class="col-md-4">#}
-{#                                        {% render_generic_field place_form.village %}#}
-{#                                    </div>#}
-{#                                    <div class="col-md-5">#}
-{#                                        {% render_generic_field place_form.reference %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row address-field" style="display:none">#}
-{#                                    <div class="col-md-8">#}
-{#                                        {% render_generic_field place_form.name %}#}
-{#                                    </div>#}
-{#                                    <div class="col-md-4">#}
-{#                                        {% render_generic_field place_form.phone %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
             </div>
         </div>
         <div class="row">

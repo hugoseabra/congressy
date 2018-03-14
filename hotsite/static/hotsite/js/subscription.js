@@ -113,7 +113,6 @@ function fetch_cities(uf_el, selected_value, callback) {
             city_el.prop('disabled', false);
 
             if (callback) {
-                console.log(result.results);
                 callback(result.results)
             }
         }

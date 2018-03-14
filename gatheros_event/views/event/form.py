@@ -39,22 +39,6 @@ class BaseEventView(AccountMixin, View):
 
         return self.event
 
-    def get_place_form(self, **kwargs):
-        if 'instance' in kwargs:
-            del kwargs['instance']
-
-        event = self.get_event()
-
-        if event:
-            kwargs.update({'event': event})
-
-            try:
-                kwargs.update({'instance': event.place})
-            except AttributeError:
-                pass
-
-        return forms.PlaceForm(**kwargs)
-
     def form_valid(self, form):
         try:
             response = super(BaseEventView, self).form_valid(form)
@@ -78,7 +62,6 @@ class BaseEventView(AccountMixin, View):
         context['next_path'] = self._get_referer_url()
         context['form_title'] = self.get_form_title()
         context['is_manager'] = self.has_internal_organization
-        context['place_form'] = self.get_place_form()
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
 
         return context
@@ -134,6 +117,7 @@ class EventAddFormView(BaseEventView, generic.CreateView):
     form_class = forms.EventForm
     success_message = 'Evento criado com sucesso.'
     form_title = 'Novo evento'
+    object = None
 
     def get_form(self, form_class=None):
         if not form_class:
@@ -159,25 +143,14 @@ class EventAddFormView(BaseEventView, generic.CreateView):
 
         else:
             self.object = None
-
             form = self.get_form()
             if form.is_valid():
-                self.event = form.save()
-                place_form = self.get_place_form(**self.get_form_kwargs())
-
-                if not place_form.is_valid():
-                    return self.render_to_response(self.get_context_data(
-                        form=form,
-                        place_form=place_form
-                    ))
-
-                place_form.save()
+                self.object = self.event = form.save()
                 return self.form_valid(form)
 
             else:
                 return self.render_to_response(self.get_context_data(
                     form=form,
-                    place_form=self.get_place_form(**self.get_form_kwargs())
                 ))
 
     def get_initial(self):
@@ -228,22 +201,12 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
-            self.event = form.save()
-            place_form = self.get_place_form(**self.get_form_kwargs())
-
-            if not place_form.is_valid():
-                return self.render_to_response(self.get_context_data(
-                    form=form,
-                    place_form=place_form
-                ))
-
-            place_form.save()
+            self.object = self.event = form.save()
             return self.form_valid(form)
 
         else:
             return self.render_to_response(self.get_context_data(
                 form=form,
-                place_form=self.get_place_form(**self.get_form_kwargs())
             ))
 
 
