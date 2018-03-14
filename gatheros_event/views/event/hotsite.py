@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import reverse, get_object_or_404
 from django.views.generic import FormView
@@ -74,6 +75,7 @@ class EventHotsiteView(AccountMixin, FormView):
         context = super().get_context_data(**kwargs)
         context['event'] = event
         context['has_paid_lots'] = self.has_paid_lots()
+        context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
 
         try:
             context['info'] = event.info
