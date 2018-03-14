@@ -99,3 +99,5 @@ class AnswerManagerTest(TestCase):
         error_message = list(error_dict.values())[0][0].message
         self.assertEqual(error_message,
                          'Esta resposta não pertence a esta pergunta')
+        self.assertEqual(edited_answer.instance.author,
+                         new_answer.instance.author)
