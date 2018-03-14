@@ -104,29 +104,39 @@ class ApplicationServiceMixinTest(TestCase):
 
         self.assertEqual(name, MyFakeModel.objects.get(name=name).name)
 
-
     def test_service_editing(self):
         service_class = ApplicationServiceMixin
         service_class.manager_class = self.correct_manager
 
         name = "Jon Snow"
 
-        instance = service_class(
+        initial_instance = service_class(
             data={
                 'name': name
             }
         )
 
-        self.assertTrue(instance.is_valid())
-        instance.save()
+        self.assertTrue(initial_instance.is_valid())
+        initial_instance.save()
 
-        self.assertEqual(name, MyFakeModel.objects.get(name=name).name)
+        persisted_instance = MyFakeModel.objects.get(name=name)
+
+        self.assertEqual(name, persisted_instance.name)
 
         new_name = 'Jon Targaryn'
 
-        """
-            TO BE CONTINUED: implement and test partials.
-        """
+        editing_instance = service_class(
+            data={
+                'name': new_name,
+            },
+            instance=persisted_instance,
+        )
+
+        self.assertTrue(editing_instance.is_valid())
+        editing_instance.save()
+
+        self.assertEqual(new_name, MyFakeModel.objects.get(name=new_name).name)
+
 
 
 
