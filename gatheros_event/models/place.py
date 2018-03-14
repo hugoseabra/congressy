@@ -28,8 +28,8 @@ class Place(models.Model, GatherosModelMixin):
     )
     show_location = models.BooleanField(
         default=False,
-        verbose_name='mostrar localização',
-        help_text='Exibir mapa do local onde o evento irá acontecer.'
+        verbose_name='ativar localização no site',
+        help_text='Marque para mostrar a localização do evento no site.'
     )
     show_address = models.BooleanField(
         default=False,
@@ -38,9 +38,9 @@ class Place(models.Model, GatherosModelMixin):
     )
     name = models.CharField(
         max_length=255,
-        verbose_name='nome',
+        verbose_name='nome do local',
         blank=True,
-        null=True,
+        null=True
     )
     city = models.ForeignKey(
         City,

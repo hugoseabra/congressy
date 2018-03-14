@@ -159,6 +159,7 @@ class Event(models.Model, GatherosModelMixin):
         help_text='Eventos não publicados e com data futura serão considerados'
                   ' rascunhos.'
     )
+    created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
 
     class Meta:
         verbose_name = 'evento'

@@ -184,7 +184,6 @@ function searchByCep() {
         state.val(response.uf);
 
         var cep_city = removerAcentos(response.localidade).toUpperCase();
-        console.log(cep_city);
 
         fetch_cities(state, null, function (cities) {
             $.each(cities, function (i, city) {

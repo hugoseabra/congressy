@@ -31,13 +31,16 @@
         }
         #map, #map_banner {
             width: 100%;
-            height: 300px;
+            height: 600px;
             border: 3px solid #DDD;
         }
         #map_banner div {
             width: 32%;
             margin: 15% auto;
             text-align: center;
+        }
+        .address-row {
+{#            display: none;#}
         }
     </style>
 {% endblock %}
@@ -61,14 +64,13 @@
                 var street = $('#id_street');
                 var city = $('#id_city_name :selected');
                 var state = $('#id_state :selected');
-
+                var zip_code = $('#id_zip_code');
 
                 var address = name.val();
-                    address += ', ' + street.val();
-                    address += ', ' + city.text();
-                    address += ', ' + state.text();
-
-                console.log(address);
+{#                    address += ', ' + street.val();#}
+{#                    address += ', ' + city.text();#}
+{#                    address += ', ' + state.text();#}
+{#                    address += '. ' + zip_code.val();#}
 
                 var map = new window.google.maps.Map(
                     document.getElementById("map"),
@@ -82,24 +84,19 @@
             };
 
             window.cgsy.maps.hideMap = function() {
-                var height = $('#place-form-block').height();
-                $('#map').height(height);
-                $('#map_banner').height(height);
-
                 $('#map').hide();
                 $('#map_banner').show();
             };
 
             window.cgsy.maps.showMap = function() {
-                var height = $('#place-form-block').height();
-                $('#map').height(height);
-                $('#map_banner').height(height);
-
                 $('#map').show();
                 $('#map_banner').hide();
             };
 
             window.cgsy.maps.init = function(lat, long, zoom) {
+                $('#map-loader').show();
+                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
                 var map = new window.google.maps.Map(
                     document.getElementById("map"),
                     {
@@ -144,14 +141,65 @@
                 window.google.maps.event.addListener(map, 'zoom_changed', function () {
                     zoom_el.val(map.getZoom());
                 });
+
+                $('#map-loader').hide();
+                $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
             };
 
             window.cgsy.maps.searchByAddress = function(map, address) {
+                $('#map-loader').show();
+                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
                 var geocoder = new window.google.maps.Geocoder;
                 geocoder.geocode({'address': address}, function(results, status) {
                     if (status !== 'OK') {
                         alert('Geocode was not successful for the following reason: ' + status);
                         return;
+                    }
+                    var components = results[0].address_components;
+                    if (components.length) {
+                        var uf, city;
+                        $.each(components, function(i, component) {
+                            if ($.inArray('postal_code', component.types)!=-1) {
+                                $('#id_zip_code').val(component.short_name);
+                                searchByCep();
+                            }
+                            if ($.inArray('sublocality_level_1', component.types)!=-1) {
+                                $('#id_street').val(component.short_name);
+                            }
+                            if ($.inArray('street_number', component.types)!=-1) {
+                                $('#id_number').val(component.short_name);
+                            }
+                            if ($.inArray('administrative_area_level_1', component.types)!=-1) {
+                                uf = component.short_name;
+                            }
+                            if ($.inArray('administrative_area_level_2', component.types)!=-1) {
+                                city = component.short_name.toUpperCase();
+                            }
+                        });
+
+                        if (uf) {
+                            $('#id_state').val(uf);
+
+                            if (city) {
+                                fetch_cities($('#id_state'), null, function(results) {
+                                    if (!results.length) {
+                                        return;
+                                    }
+                                    $.each(results, function(i, city_obj) {
+                                        if (city_obj.name == city) {
+                                            var options = $('#id_city_name').find('option:contains('+city+')');
+                                            $.each(options, function(ii, option) {
+                                                var el = $(option);
+                                                if (el.text() == city) {
+                                                    $('#id_city_name').val(city_obj.id);
+                                                }
+                                            });
+                                        }
+                                    });
+                                });
+                            }
+                        }
                     }
 
                     var location = results[0].geometry.location;
@@ -186,7 +234,7 @@
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
 
-            $('#id_zip_code').mask("99.999-999");
+            $('#id_zip_code').mask("99999-999");
 
             showHideCepLoader();
 
@@ -230,18 +278,33 @@
         (function($) {
             var map_reload_timer = null;
             function reloadMap() {
+                $('#map-loader').show();
+                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
                 window.clearTimeout(map_reload_timer);
+
+                $('#id_zip_code').val('');
+                $('#id_street').val('');
+                $('#id_number').val('');
+                $('#id_complement').val('');
+                $('#id_village').val('');
+                $('#id_state').val('');
+                $('#id_city_name').prop('disabled', true);
+
                 map_reload_timer = window.setTimeout(function() {
                     window.cgsy.maps.retrieveAddress();
                 }, 1500);
             }
 
-            $('#id_name').on('keyup', function() { reloadMap(); });
-            $('#id_zip_code').on('keyup', function() { reloadMap(); });
-            $('#id_street').on('keyup', function() { reloadMap(); });
-            $('#id_village').on('keyup', function() { reloadMap(); });
-            $('#id_state').on('change', function() { reloadMap(); });
-            $('#id_city_name').on('change', function() { reloadMap(); });
+            $('#id_name').on('keypress', function(e) {
+                if(e.which == 13) {
+                    reloadMap();
+                }
+            });
+            $('#reload-map-button').on('click', function() { reloadMap(); });
+            $('.submit-button').click(function() {
+                $('#hotsite-form').submit();
+            });
         })(jQuery);
     });
     </script>
@@ -301,7 +364,7 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
+    <form id="hotsite-form" action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -319,7 +382,7 @@
             <div class="col-md-12">
                 <div class="buttonbar">
                     <div class="float-right">
-                        <button type="submit" class="btn btn-success">
+                        <button type="button" class="btn btn-success submit-button">
                             <i class="fa fa-save"></i>
                             Salvar
                         </button>
@@ -440,24 +503,34 @@
                             <div class="col-md-6" id="place-form-block">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        {% render_generic_field form.name %}
+                                        {% render_generic_field form.show_location %}
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row name-row">
+                                    <div class="col-md-12 col-lg-8 col-xl-9">
+                                        {% render_generic_field form.name help_text='Pesquise pelo nome do local.' %}
+                                    </div>
+                                    <div class="col-md-12 col-lg-4 col-xl-3" style="padding-left: 30px;padding-right: 30px">
+                                        <div class="hidden-xs hidden-sm hidden-md" style="height:32px" ></div>
+                                        <button id="reload-map-button" type="button" class="btn btn-sm btn-block btn-primary">Buscar</button>
+                                        <div class="hidden-lg" style="height:32px" ></div>
+                                    </div>
+                                </div>
+                                <div class="row address-row">
                                     <div class="col-md-6 col-xl-4">
-                                        {% render_generic_field form.zip_code %}
+                                        {% render_generic_field form.zip_code  help_text='Informe o CEP para encontrar o endereço.' %}
                                         <div id="cep_loader" style="width: 22px;position: absolute;
                                              top: 33px;right: 33px;">
                                             <img src="{% static 'assets/img/loader.gif' %}"/>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row address-row">
                                     <div class="col-md-12">
                                         {% render_generic_field form.street %}
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row address-row">
                                     <div class="col-md-6">
                                         {% render_generic_field form.number %}
                                     </div>
@@ -465,12 +538,12 @@
                                         {% render_generic_field form.complement %}
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row address-row">
                                     <div class="col-md-12">
                                         {% render_generic_field form.village %}
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row address-row">
                                     <div class="col-md-4 address-row">
                                         {% render_generic_field form.state %}
                                     </div>
@@ -478,8 +551,17 @@
                                         {% render_generic_field form.city_name %}
                                     </div>
                                 </div>
+                                <hr />
+                                <div class="text-center text-muted" style="font-size:12px">
+                                    A Congressy não se responsabiliza pelos dados de pesquisa advindos
+                                    do Google.
+                                </div>
                             </div>
                             <div class="col-md-6">
+                                <div id="map-loader" class="fas info-color fa-2x fa-circle-notch fa-spin" style="position:absolute;z-index:1000;top:0;display:none"></div>
+                                <div class="text-center" style="padding:10px;">
+                                    Arraste o marcador para a posição desejada.
+                                </div>
                                 <div id="map" style="display:none"></div>
                                 <div id="map_banner" style="display:none">
                                     <div class="text-muted">Informe o local para ver o mapa.</div>
@@ -494,7 +576,7 @@
             <div class="col-md-12">
                 <div class="buttonbar bottom">
                     <div class="float-right">
-                        <button type="submit" class="btn btn-success">
+                        <button type="button" class="btn btn-success submit-button">
                             <i class="fa fa-save"></i>
                             Salvar
                         </button>
