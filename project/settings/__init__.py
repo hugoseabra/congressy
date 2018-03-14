@@ -219,7 +219,7 @@ FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'payment/tests/fixtures'),
 ]
 # ============================== GOOGLE ===================================== #
-GOOGLE_MAPS_API_KEY = 'AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw'
+GOOGLE_MAPS_API_KEY = 'AIzaSyAPpiE3QALhF_5AhBSZJ9K27eDiJXCtTK0'
 # ============================= CKEDITOR ==================================== #
 CKEDITOR_CONFIGS = {
     'default': {
