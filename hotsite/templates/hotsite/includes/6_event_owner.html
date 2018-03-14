@@ -8,14 +8,15 @@
                     <div class="row">
                         <div class="col-md-12" style="text-align: left;">
                             <h3>{{ event.organization }}</h3>
+                            {% if event.organization.description_html %}
                             <div class="team-member-description">
                                 {{ event.organization.description_html|safe|default_if_none:''}}
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </section>
 {% endif %}
