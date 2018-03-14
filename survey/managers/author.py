@@ -9,10 +9,11 @@ por:
 from django import forms
 from django.contrib.auth.models import User
 
+from survey.managers import Manager
 from survey.models import Author
 
 
-class AuthorManager(forms.ModelForm):
+class AuthorManager(Manager):
     """ Manager """
 
     class Meta:
@@ -35,7 +36,7 @@ class AuthorManager(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        if self.instance:
+        if self.instance.pk:
             same_survey = \
                 self.instance.survey.pk == self.survey.pk
 

@@ -6,19 +6,16 @@ por:
 - Exigir a preexistência de objetos de dependência;
 """
 
-from django import forms
-from django.db.models import ObjectDoesNotExist
-
-from .mixins import Manager
 from survey.models import Survey
+from .mixins import Manager
 
 
 class SurveyManager(Manager):
     """
     Manager
     """
+
     class Meta:
         """ Meta """
         model = Survey
         fields = '__all__'
-

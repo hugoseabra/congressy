@@ -7,9 +7,6 @@ por:
 """
 
 from django import forms
-from django.db.models import ObjectDoesNotExist
-
-from survey.models import Survey
 
 
 class Manager(forms.ModelForm):

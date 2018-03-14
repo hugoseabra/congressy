@@ -6,12 +6,13 @@ por:
 - Exigir a preexistência de objetos de dependência;
 """
 
-from django import forms
-from survey.models import Question
 from django.utils.text import slugify
 
+from survey.managers import Manager
+from survey.models import Question
 
-class QuestionManager(forms.ModelForm):
+
+class QuestionManager(Manager):
     """ Manager """
 
     class Meta:

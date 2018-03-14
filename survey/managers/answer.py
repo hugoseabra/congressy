@@ -8,10 +8,11 @@ por:
 
 from django import forms
 
+from survey.managers import Manager
 from survey.models import Answer
 
 
-class AnswerManager(forms.ModelForm):
+class AnswerManager(Manager):
     """
         Manager
     """
@@ -30,14 +31,14 @@ class AnswerManager(forms.ModelForm):
         self.author = author
 
         if not instance:
-            instance = self._retrieve_author_answer(question, author)
+            instance = self._retrieve_author_answer()
 
         super().__init__(instance=instance, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
 
-        if self.instance:
+        if self.instance.pk:
             same_survey = \
                 self.instance.question.survey.pk == self.question.survey.pk
 
@@ -54,15 +55,14 @@ class AnswerManager(forms.ModelForm):
         self.instance.author = self.author
         return super().save(commit=commit)
 
-    @staticmethod
-    def _retrieve_user_answer(question, user):
+    def _retrieve_author_answer(self):
         """
         Verifica se usuário já respondeu o survey e, se sim, resgata
         a instância do formulário para seta-lo como edit.
         """
         try:
-            return Answer.objects.get(question=question, user=user)
-
+            return Answer.objects.get(question=self.question,
+                                      author=self.author)
         except Answer.DoesNotExist:
             pass
 

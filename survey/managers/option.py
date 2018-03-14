@@ -7,11 +7,13 @@ por:
 """
 
 from django import forms
-from survey.models import Option
 from django.utils.text import slugify
 
+from survey.managers import Manager
+from survey.models import Option
 
-class OptionManager(forms.ModelForm):
+
+class OptionManager(Manager):
     """ Manager """
 
     class Meta:
@@ -38,7 +40,8 @@ class OptionManager(forms.ModelForm):
         counter = 1
 
         while exists:
-            query_set = Option.objects.filter(name=slug, question=self.question)
+            query_set = Option.objects.filter(name=slug,
+                                              question=self.question)
             exists = query_set.exists()
             if exists:
                 slug = original_slug + '-' + str(counter)
