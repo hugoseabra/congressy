@@ -7,7 +7,7 @@ from faker import Faker
 from random import randint
 
 from gatheros_event.models import Person
-from survey.models import Survey, Question, Option
+from survey.models import Survey, Question, Option, Author
 
 
 class MockFactory:
@@ -71,3 +71,16 @@ class MockFactory:
         option.save()
 
         return option
+
+    def fake_author(self, survey, user=None):
+
+        author = Author(
+            survey=survey,
+            user=user,
+            name=self.fake_factory.name(),
+        )
+
+        author.save()
+
+        return author
+
