@@ -136,11 +136,3 @@ class ApplicationServiceMixinTest(TestCase):
         editing_instance.save()
 
         self.assertEqual(new_name, MyFakeModel.objects.get(name=new_name).name)
-
-
-
-
-
-
-
-
