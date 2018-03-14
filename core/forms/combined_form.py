@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import NON_FIELD_ERRORS
 from django.forms.utils import ErrorList
 from django.utils import six
 
