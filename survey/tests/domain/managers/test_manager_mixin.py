@@ -61,3 +61,29 @@ class ApplicationServiceMixinTest(TestCase):
         self.assertEqual(error_list[0], 'name')
         self.assertIsInstance(error_dict['name'][0], forms.ValidationError)
 
+    def test_manager_editing(self):
+
+        manager = self.correct_manager
+
+        name = 'Jon Snow'
+        new_name = 'Jon Targaryn'
+
+        inital_instance = manager(
+            data={
+                'name': name
+            }
+        )
+
+        self.assertTrue(inital_instance.is_valid())
+        inital_instance.save()
+
+        persisted_instance = ApplicationServiceFakeModel.objects.get(name=name)
+
+        editing_instance = manager(
+            data={
+                'name': new_name
+            },
+            instance=persisted_instance,
+        )
+        self.assertTrue(editing_instance.is_valid())
+        editing_instance.save()
