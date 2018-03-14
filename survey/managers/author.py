@@ -24,14 +24,20 @@ class AuthorManager(Manager):
             'user',
         )
 
-    def __init__(self, survey, user=None, instance=None, **kwargs):
+    def __init__(self, survey, user=None, instance=None, data=None, **kwargs):
         self.survey = survey
         self.user = user
 
-        if not instance and isinstance(user, User):
-            instance = self._retrieve_user_author(survey, user)
+        if not data:
+            data = {}
 
-        super().__init__(instance=instance, **kwargs)
+        if user and user.person:
+            data['name'] = user.person.name
+
+        if not instance and isinstance(user, User):
+            instance = self._retrieve_user_author()
+
+        super().__init__(instance=instance, data=data, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -48,21 +54,18 @@ class AuthorManager(Manager):
         return cleaned_data
 
     def save(self, commit=True):
-        self.instance.survey = self.question
+        self.instance.survey = self.survey
         self.instance.user = self.user
         return super().save(commit=commit)
 
-    @staticmethod
-    def _retrieve_user_author(survey, user):
+    def _retrieve_user_author(self):
         """
         Verifica se usuário já possui referência como autor para o
         questionário.
         """
-        if not isinstance(user, User):
-            return None
 
         try:
-            return Author.objects.get(user=user, survey=survey)
+            return Author.objects.get(user=self.user, survey=self.survey)
 
         except Author.DoesNotExist:
             pass
