@@ -1,4 +1,4 @@
-{% load static %}
+ {% load static %}
 
 {% if event.place and event.place.show_location is True and event.place.lat and event.place.long %}
     <!-- GOOGLE MAPS
@@ -10,40 +10,55 @@
 
             <!-- MAPS IMAGE -->
             <div class="maps-image fadeIn animated done-animation" data-animation="fadeIn">
-                <div id="gmap"></div>
+                <div id="gmap" style="padding:0"></div>
             </div>
 
-{#            <!-- MAPS TEXT -->#}
-{#            <div class="maps-text fadeIn animated done-animation" data-animation="fadeIn">#}
-{##}
-{#                <div class="maps-text-inner">#}
-{##}
-{#                    <h2 class="section-heading text-left">Made with <span class="fa fa-heart text-primary"></span> in Kuta, Bali</h2>#}
-{##}
-{#                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed feugiat arcu ut orci porta, eget porttitor felis suscipit. Sed a nisl ullamcorper, tempus augue at, rutrum lacus. Duis et turpis eros.</p>#}
-{##}
-{#                    <div class="row">#}
-{#                        <address class="col-sm-6">#}
-{#                            <strong>Drew Headquarter</strong>#}
-{#                            <ul class="fa-ul">#}
-{#                                <li><i class="fa-li fa fa-home"></i>Jalan Pantai Kuta, Kuta<br>Bali, Indonesia</li>#}
-{#                                <li><i class="fa-li fa fa-phone"></i>Phone: +62 109 876543</li>#}
-{#                                <li><i class="fa-li fa fa-fax"></i>Fax: +62 109 876543</li>#}
-{#                            </ul>#}
-{#                        </address>#}
-{#                        <address class="col-sm-6">#}
-{#                            <strong>Workshop &amp; Store</strong>#}
-{#                            <ul class="fa-ul">#}
-{#                                <li><i class="fa-li fa fa-home"></i>Jalan Legian, Kuta<br>Bali, Indonesia</li>#}
-{#                                <li><i class="fa-li fa fa-phone"></i>Phone: +62 109 876543</li>#}
-{#                                <li><i class="fa-li fa fa-fax"></i>Fax: +62 109 876543</li>#}
-{#                            </ul>#}
-{#                        </address>#}
-{#                    </div>#}
-{##}
-{#                </div>#}
-{##}
-{#            </div>#}
+            <!-- MAPS TEXT -->
+            <div class="maps-text fadeIn animated done-animation" data-animation="fadeIn">
+                <div class="maps-text-inner">
+                    <h2 class="section-heading text-left">Local do Evento</h2>
+                    <p></p>
+                    <div class="row">
+                        <address class="col-sm-6">
+                            {% if event.place.name %}
+                            <strong>{{ event.place.name|upper }}</strong>
+                            {% endif %}
+                            <ul class="fa-ul">
+                                <li>
+                                    <i class="fa-li fa fa-location-arrow"></i>
+                                    {{ event.place.street|default_if_none:'' }}
+                                    {% if event.place.number %}
+                                        , Nº. {{ event.place.number }}
+                                    {% endif %}
+                                    {% if event.place.complement %}
+                                        , {{ event.place.complement }},
+                                    {% endif %}
+                                    <br>
+                                    {% if event.place.city %}
+                                        {{event.place.city.name}}-{{ event.place.city.uf }}
+                                    {% endif %}
+                                    .
+                                    <br>
+                                    {% if event.place.zip_code %}
+                                        CEP: {{event.place.zip_code.0}}{{event.place.zip_code.1}}{{event.place.zip_code.2}}{{event.place.zip_code.3}}{{event.place.zip_code.4}}-{{event.place.zip_code.5}}{{event.place.zip_code.6}}{{event.place.zip_code.7}}
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </address>
+                        <address class="col-sm-6">
+                            <strong>Quanto tempo para chegar?</strong>
+                            <ul class="fa-ul">
+                                <li><i class="fa-li fa fa-car"></i> <a href="https://maps.google.com/?saddr=Current+Location&daddr={{ event.place.lat }},{{ event.place.long }}&driving" target="_blank">Carro</a></li>
+                                <li><i class="fa-li fa fa-bus"></i> <a href="https://maps.google.com/?saddr=Current+Location&dirflg=r&daddr={{ event.place.lat }},{{ event.place.long }}&mode=transit" target="_blank">Ônibus</a></li>
+                                <li><i class="fa-li fa fa-bicycle"></i> <a href="https://maps.google.com/?saddr=Current+Location&dirflg=b&daddr={{ event.place.lat }},{{ event.place.long }}&mode=bicycling" target="_blank">Bicicleta</a></li>
+                                <li><i class="fa-li fa fa-blind"></i> <a href="https://maps.google.com/?saddr=Current+Location&dirflg=w&daddr={{ event.place.lat }},{{ event.place.long }}" target="_blank">Andando</a></li>
+                            </ul>
+                        </address>
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
