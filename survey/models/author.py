@@ -3,7 +3,7 @@
     Autor de respostas de uma questionário.
 """
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, IntegrityError
 
 from survey.models import Survey
 
@@ -45,3 +45,8 @@ class Author(models.Model):
         auto_now=True,
         verbose_name='criado em'
     )
+
+    def clean(self):
+        if isinstance(self.user, User) and self.user.is_anonymous:
+            raise IntegrityError('Usuário não pode ser anônimo.')
+

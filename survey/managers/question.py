@@ -18,14 +18,7 @@ class QuestionManager(Manager):
     class Meta:
         """ Meta """
         model = Question
-        exclude = (
-            'survey',
-        )
-
-    def __init__(self, survey, **kwargs):
-        self.survey = survey
-        kwargs.update({'survey': survey})
-        super().__init__(**kwargs)
+        fields = '__all__'
 
     def clean_name(self):
         """
@@ -47,7 +40,3 @@ class QuestionManager(Manager):
                 counter += 1
 
         return slug
-
-    def save(self, commit=True):
-        self.instance.survey = self.survey
-        return super().save(commit=commit)

@@ -19,13 +19,15 @@ class OptionManager(Manager):
     class Meta:
         """ Meta """
         model = Option
-        exclude = (
-            'question',
-        )
+        fields = '__all__'
 
-    def __init__(self, question, *args, **kwargs):
-        self.question = question
-        super().__init__(*args, **kwargs)
+    def clean_question(self):
+        question = self.cleaned_data.get('question')
+
+        if not question.accepts_options:
+            raise forms.ValidationError('Pergunta não permite opções')
+
+        return question
 
     def clean_name(self):
         """
@@ -40,25 +42,13 @@ class OptionManager(Manager):
         counter = 1
 
         while exists:
-            query_set = Option.objects.filter(name=slug,
-                                              question=self.question)
+            query_set = Option.objects.filter(
+                name=slug,
+                question=self.question
+            )
             exists = query_set.exists()
             if exists:
                 slug = original_slug + '-' + str(counter)
                 counter += 1
 
         return slug
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if not self.question.accepts_options:
-            raise forms.ValidationError(
-                {'__all__': 'Pergunta não permite opções'}
-            )
-
-        return cleaned_data
-
-    def save(self, commit=True):
-        self.instance.question = self.question
-        return super().save(commit=commit)

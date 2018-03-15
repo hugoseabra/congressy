@@ -19,31 +19,23 @@ class AuthorManager(Manager):
     class Meta:
         """ Meta """
         model = Author
-        exclude = (
-            'survey',
-            'user',
+        fields = '__all__'
+
+    def __init__(self, user=None, **kwargs):
+
+        self.user = None
+
+        data = self._set_author_data_from_user(
+            kwargs.get('data', {}),
+            user
         )
+        kwargs['data'] = data
 
-    def __init__(self, survey, user=None, **kwargs):
-        self.survey = survey
-        self.user = user
-
-        kwargs.update({'survey': survey})
-
-        data = kwargs.get('data', {})
-        instance = kwargs.get('instance')
-
-        if data:
-            data = data.copy()
-
-        if user and user.person:
-            data['name'] = user.person.name
-            kwargs['data'] = data
-            kwargs.update({'user': user})
-
-        if not instance and isinstance(user, User):
-            instance = self._retrieve_user_author()
-            kwargs['instance'] = instance
+        kwargs['instance'] = self._set_instance_from_user(
+            user,
+            data.get('survey'),
+            kwargs.get('instance')
+        )
 
         super().__init__(**kwargs)
 
@@ -51,29 +43,57 @@ class AuthorManager(Manager):
         cleaned_data = super().clean()
 
         if self.instance.pk:
-            same_survey = \
-                self.instance.survey.pk == self.survey.pk
+            survey = self.cleaned_data.get('survey')
 
-            if not same_survey:
+            if self.instance.survey.pk != survey.pk:
                 raise forms.ValidationError({
                     '__all__': 'Este autor não pertence a este questionário.'
                 })
 
         return cleaned_data
 
-    def save(self, commit=True):
-        self.instance.survey = self.survey
-        self.instance.user = self.user
-        return super().save(commit=commit)
+    def _set_author_data_from_user(self, data, user=None):
+        """
+        Se um usuário (não anônimo) for passado, preservar os dados de usuário
+        nos dados de autor.
+        """
+        # Garante possibilidade de alteração da dict()
+        data = data.copy()
 
-    def _retrieve_user_author(self):
+        if isinstance(user, User) and not user.is_anonymous():
+            self.user = user
+
+            # Nome do autor é o nome do usuário
+            data['name'] = user.get_full_name()
+
+            # User deve estar em data
+            data.update({'user': user.pk})
+
+        return data
+
+    def _set_instance_from_user(self, user, survey_pk, instance):
+        """
+        Se user (não anônimo) for passado e não houver instância de Autor,
+        resgata autor vinculado ao usuário da persistência (se existir).
+        """
+        # Se estiver tudo ok com a instância, ela deve ser retornada.
+        if isinstance(instance, self.Meta.model):
+            return instance
+
+        # Não aceitar instância de usuários anômimo
+        if not isinstance(user, User) or user.is_anonymous():
+            return None
+
+        return self._retrieve_user_author(survey_pk)
+
+    def _retrieve_user_author(self, survey_pk):
         """
         Verifica se usuário já possui referência como autor para o
         questionário.
         """
 
         try:
-            return Author.objects.get(user=self.user, survey=self.survey)
+            return Author.objects.get(user=self.user, survey_id=survey_pk)
 
         except Author.DoesNotExist:
             pass
