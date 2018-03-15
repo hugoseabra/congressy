@@ -3,7 +3,7 @@
     Resposta de um questionário, referente a uma pergunta a pertecente a um
     Autor.
 """
-from django.db import models
+from django.db import IntegrityError, models
 
 from survey.models import Author, Question
 
@@ -64,6 +64,13 @@ class Answer(models.Model):
 
         option = self.question.options.get(value=self.value)
         return option.name
+
+    def clean(self):
+        if self.question.survey != self.author.survey:
+            raise IntegrityError(
+                'A pergunta e o autor não pertencem ao mesmo '
+                'questionário.'
+            )
 
     def get_value_display(self):
         """
