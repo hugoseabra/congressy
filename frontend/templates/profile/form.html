@@ -9,8 +9,8 @@
 {% block page_sub_title %}{{ request.user.get_full_name }}{% endblock %}
 
 {% block sidebar %}{% endblock %}
-
 {% block sidebar-bars %}{% endblock %}
+{% block toptitle %}{% endblock %}
 
 {% block scripts %}
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
@@ -30,7 +30,7 @@
             }
 
 
-            $('#id_zip_code').mask("99.999-999");
+            $('#id_zip_code').mask("99999-999");
 
             //If we have a value already, preload results from API
             if (city_id_el.val()) {
@@ -104,19 +104,6 @@
                         <div class="panel-title">Dados pessoais</div>
                     </div>
                     <div class="panel-body">
-
-
-                        {% if form.non_field_errors %}
-                            {% render_errors form.non_field_errors %}
-                        {% endif %}
-
-                        {% for hidden_field in form.hidden_fields %}
-                            {% if hidden_field.errors %}
-                                {% render_errors hidden_field.errors %}
-                            {% endif %}
-                            {{ hidden_field }}
-                        {% endfor %}
-
                         <div class="row">
                             <div class="col-md-9">
                                 {% render_generic_field form.name %}

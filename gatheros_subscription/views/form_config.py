@@ -5,9 +5,7 @@ from django.views import generic
 
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
-from gatheros_event.views.mixins import (
-    AccountMixin,
-)
+from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.forms import FormConfigForm
 
 

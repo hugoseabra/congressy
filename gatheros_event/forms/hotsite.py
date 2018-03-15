@@ -4,6 +4,8 @@ Formulários de Informação de evento
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 
+from core.forms.combined_form import CombinedFormBase
+from gatheros_event.forms import PlaceForm
 from gatheros_event.models import Info
 
 
@@ -33,7 +35,7 @@ class BaseModelFileForm(forms.ModelForm):
         storage.delete(path)
 
 
-class HotsiteForm(BaseModelFileForm):
+class InfoForm(BaseModelFileForm):
     class Meta:
         """ Meta """
         model = Info
@@ -46,7 +48,7 @@ class HotsiteForm(BaseModelFileForm):
             'description_html': CKEditorWidget(),
         }
 
-    def __init__(self, event, **kwargs):
+    def __init__(self, event=None, **kwargs):
         self.event = event
         super().__init__(**kwargs)
 
@@ -66,3 +68,10 @@ class HotsiteForm(BaseModelFileForm):
     def save(self, commit=True):
         self.instance.event = self.event
         return super().save(commit)
+
+
+class HotsiteForm(CombinedFormBase):
+    form_classes = {
+        'info': InfoForm,
+        'place': PlaceForm
+    }

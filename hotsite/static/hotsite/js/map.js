@@ -81,32 +81,36 @@ var gmap_options = {
 };
 
 var rmvMap;
+function show_map(lat, long, zoom) {
 
-function show_map(lat, long) {
     if (lat && long) {
-        render_map(lat, long);
+        render_map(lat, long, zoom);
     }
 }
 
-function render_map(lat, long) {
+function render_map(lat, long, zoom) {
+    console.log(lat);
+    console.log(long);
+    console.log(zoom);
     var location_options = {
         locations: [{
-            lat: lat,
-            lon: long,
+            lat: parseFloat(lat),
+            lon: parseFloat(long),
             animation: google.maps.Animation.DROP,
             html: "Drew Headquarter",
             icon: MAP_POINTER,
             clickable: false
         }],
         map_options: {
+            available_travel_modes : [ "DRIVING", "BICYCLING", "WALKING" ],
             scrollwheel: false,
             mapTypeControl: true,
             streetViewControl: true,
             zoomControlOptions: {
                 style: google.maps.ZoomControlStyle.SMALL
             },
-            zoom: 16,
-            set_center: [lat, long]
+            zoom: parseInt(zoom) || 18,
+            set_center: [parseFloat(lat), parseFloat(long)]
         }
     };
 

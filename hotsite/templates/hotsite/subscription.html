@@ -51,7 +51,7 @@
         $(document).ready(function () {
             IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
             {% if config and config.address == config.ADDRESS_SHOW %}
-                $('#id_zip_code').mask("99.999-999");
+                $('#id_zip_code').mask("99999-999");
             {% endif %}
             if ($('#id_city').val()) {
                 $.ajax({

@@ -1,9 +1,8 @@
 # pylint: skip-file
 import os
 
-from django.utils.translation import ugettext_lazy as _
-
 from django.contrib.messages import constants as message_constants
+from django.utils.translation import ugettext_lazy as _
 
 # ========================== BASE CONFIGURATION ============================= #
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -136,7 +135,12 @@ FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 class InvalidTemplateVariable(str):
     def __mod__(self, other):
         from django.template.base import TemplateSyntaxError
-        raise TemplateSyntaxError("Invalid variable : '%s'" % other)
+        # access to current settings
+        from django.conf import settings
+
+        # display the message on page in make log it only on stage development
+        if settings.DEBUG is False:
+            raise TemplateSyntaxError("Invalid variable : '{}'".format(other))
 
 
 TEMPLATES = [
@@ -151,7 +155,7 @@ TEMPLATES = [
         ],
         'APP_DIRS': True,
         'OPTIONS': {
-            'string_if_invalid': InvalidTemplateVariable("%s"),
+            # 'string_if_invalid': InvalidTemplateVariable("%s"),
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',

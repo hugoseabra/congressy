@@ -107,8 +107,9 @@ var MAP_POINTER = "{% static 'hotsite/images/contents/map-1.png'%}";
 <script>
 $(document).ready(function() {
     show_map(
-        '{{ event.place.lat }}'.replace(',', '.'),
-        '{{ event.place.long }}'.replace(',', '.')
+        '{{ event.place.lat }}',
+        '{{ event.place.long }}',
+        '{{ event.place.zoom|default_if_none:18 }}'
     );
 });
 </script>

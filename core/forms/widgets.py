@@ -4,6 +4,8 @@ from django import forms
 from django.forms.utils import to_current_timezone
 from django.utils.translation import get_language
 
+from core.forms.cleaners import clear_string
+
 
 class AjaxChoiceField(forms.ChoiceField):
     def valid_value(self, value):
@@ -12,6 +14,13 @@ class AjaxChoiceField(forms.ChoiceField):
 
 class TelephoneInput(forms.TextInput):
     input_type = 'tel'
+
+    def value_from_datadict(self, data, files, name):
+        data = super().value_from_datadict(data, files, name)
+        if data:
+            data = clear_string(str(data))
+
+        return data
 
 
 class DateInput(forms.DateInput):

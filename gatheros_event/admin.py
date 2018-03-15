@@ -30,6 +30,7 @@ class EventAdmin(admin.ModelAdmin):
         'organization',
         'date_start',
         'date_end',
+        'created',
         'pk'
     )
     ordering = ['name']
