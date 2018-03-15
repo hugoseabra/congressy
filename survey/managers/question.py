@@ -22,9 +22,10 @@ class QuestionManager(Manager):
             'survey',
         )
 
-    def __init__(self, survey, *args, **kwargs):
+    def __init__(self, survey, **kwargs):
         self.survey = survey
-        super().__init__(*args, **kwargs)
+        kwargs.update({'survey': survey})
+        super().__init__(**kwargs)
 
     def clean_name(self):
         """
