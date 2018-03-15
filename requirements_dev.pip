@@ -1,5 +1,7 @@
 -r requirements.pip
+behave
 django-debug-toolbar
 django-logtailer
 django-nose
+selenium
 pylint-django
