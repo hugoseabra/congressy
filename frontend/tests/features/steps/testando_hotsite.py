@@ -1,7 +1,6 @@
 from behave import given, then, when
 from nose.tools import eq_
 import time
-from selenium.common.exceptions import NoSuchElementException
 
 
 
@@ -20,9 +19,14 @@ def step_impl(context):
     djToolBar.click()
     eventos = driver.find_element_by_css_selector('li.dropdown:nth-child(3)')
     eventos.click()
+
 @when('Clica no evento \'{evento}\'')
 def step_impl(context,evento):
     driver = context.browser
+    evento = int(evento)
+    if(evento%10 !=0):
+        evento = evento % 10
+    evento = str(10)
     link ='#event_table > tbody > tr:nth-child('+evento+') > td.sorting_1 > a'
     evento = driver.find_element_by_css_selector(link)
     evento.click()
@@ -47,16 +51,11 @@ def step_impl(context):
     campo_data = driver.find_element_by_css_selector('.col-md-offset-1 > div:nth-child(3)').is_displayed()
     eq_(campo_data,True)
 
-@then('A descricao rapida \'{flag}\'')
-def step_impl(context, flag):
+@then('A descricao rapida')
+def step_impl(context):
     driver = context.browser
-    try:
-        campo_descricao = driver.find_element_by_css_selector('.lead').is_displayed()
-    except NoSuchElementException:
-        if(flag == 'não existe'):
-            return True
-        else:
-            False
+    campo_descricao = driver.find_element_by_css_selector('.lead').is_displayed()
+    eq_(campo_descricao, True)
 
 
 @then('A mensagem de Inscrições encerradas')
@@ -107,3 +106,18 @@ def step_impl(context,lote):
 def step_impl(context):
     driver = context.browser
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+@then('Usuario ja esta logado aparece o botao de visualizar inscricao')
+def step_impl(context):
+    driver = context.browser
+    campo_mensagem = driver.find_element_by_css_selector('.btn-success').is_displayed()
+    eq_(campo_mensagem, True)
+
+@when('Clica para ir para a pagina \'{pagina}\'')
+def step_impl(context, pagina):
+    driver = context.browser
+    pagina = str(int(pagina) + 1)
+    path = 'li.paginate_button:nth-child('+pagina+') > a:nth-child(1)'
+    botao_pagina = driver.find_element_by_css_selector(path)
+    botao_pagina.click()
+
