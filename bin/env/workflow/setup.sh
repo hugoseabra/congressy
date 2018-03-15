@@ -3,8 +3,8 @@ set -ex
 
 export DJANGO_SETTINGS_MODULE=project.settings.dev
 
-#pip install -r requirements_dev.pip
-#
+pip install -r requirements_dev.pip
+
 export BASE_DIR=`python -c "
 import $DJANGO_SETTINGS_MODULE as settings
 print(settings.BASE_DIR)"`
