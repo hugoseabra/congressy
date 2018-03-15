@@ -84,13 +84,16 @@ class Manager(forms.ModelForm):
             if key in related_classes:
                 related = related_classes.get(key)
                 if not isinstance(value, related):
-                    errors[f.name] = f.related_model
+                    errors[key] = related
 
         if errors:
             msg = []
             for key, related_class in errors.items():
-                msg.append('"{}" expects, "{}" instance'.format(key,
-                                                            related_class))
+                msg_txt = '"{}" expects, "{}", received "{} {}" '
+                msg.append(msg_txt.format(key,
+                                          related_class,
+                                          value,
+                                          value.__class__))
 
             raise TypeError(
                 'Argumentos não são instâncias de modelos relacionados:'
@@ -106,4 +109,3 @@ class Manager(forms.ModelForm):
                 del kwargs[f.name]
 
         return kwargs
-
