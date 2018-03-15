@@ -20,6 +20,33 @@ class AnswerManagerTest(TestCase):
         self.person = self.faker.fake_person()
         self.author = self.faker.fake_author(survey=self.survey)
 
+    def test_answer_manager_creation(self):
+        """
+            Testa a criação de um manager de respostas
+        """
+
+        manager = AnswerManager(
+            data={
+                'value': 'Uma resposta.',
+            },
+            question=self.question,
+            author=self.author,
+        )
+
+        self.assertEqual(manager.question, self.question)
+        self.assertEqual(manager.author, self.author)
+        manager.save()
+
+        # Validando a verificação de instancias e referencias no kwargs
+        with self.assertRaises(TypeError):
+            AnswerManager(
+                data={
+                    'value': 'Uma resposta.',
+                },
+                question=self.question.pk,
+                author=self.author,
+            )
+
     def test_answer_unique_if_user(self):
         """
         Testa se o usuário, ao submeter resposta de um formulário que ele
