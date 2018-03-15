@@ -16,7 +16,7 @@ class Manager(forms.ModelForm):
 
     def __init__(self, **kwargs):
         """
-            TODO: Melhorar o comportamento deste:
+            @TODO: Melhorar o comportamento deste:
                 Caveat deste comportamento, quando alguém implementa este
                 manager e criar uma assinatura diferente desta padrão como:
                 '__init__(self, extra_field, **kwargs)'
@@ -37,6 +37,8 @@ class Manager(forms.ModelForm):
                 será usado para no metodo 'save' visto que esse atributo não
                 está vinculado ao atributo 'self.instance'
 
+            @TODO: verificar a possibilidade do __init__ receber apenas kwargs:
+                Se receber outros parãmetros, levantar um raise.
         """
 
         self._check_argument_instances(kwargs)
@@ -97,7 +99,7 @@ class Manager(forms.ModelForm):
 
             raise TypeError(
                 'Argumentos não são instâncias de modelos relacionados:'
-                ' {}'.format(', '.join(msg))
+                ' {}'.format('; '.join(msg))
             )
 
     def _clear_arguments(self, kwargs):
