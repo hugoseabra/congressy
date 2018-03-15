@@ -16,6 +16,35 @@ class QuestionManagerTest(TestCase):
         self.fake_factory = MockFactory()
         self.survey = self.fake_factory.fake_survey()
 
+    def test_question_manager_creation(self):
+        """
+            Testa a criação de um manager de perguntas
+        """
+
+        question_name = ' '.join(self.fake_factory.fake_factory.words(nb=2))
+
+        manager = QuestionManager(
+            data={
+                'type': Question.FIELD_INPUT_TEXT,
+                'name': question_name,
+                'label': question_name,
+            },
+            survey=self.survey,
+        )
+
+        self.assertEqual(manager.survey, self.survey)
+
+        # Validando a verificação de instancias e referencias no kwargs
+        with self.assertRaises(TypeError):
+            QuestionManager(
+                data={
+                    'type': Question.FIELD_INPUT_TEXT,
+                    'name': question_name,
+                    'label': question_name,
+                },
+                survey=self.survey.pk,
+            )
+
     def test_same_question_same_survey_with_prefix(self):
         """
         Testa se pergunta com um nome repetido no formulário é salvo com
