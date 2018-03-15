@@ -34,12 +34,22 @@ class AnswerManager(Manager):
 
         if not instance:
             instance = self._retrieve_author_answer()
+            kwargs.update({'author': author})
 
         super().__init__(instance=instance, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
 
+        # Regra de negocio:
+        #   Autor e pergunta devem ser do mesmo questionario.
+        if self.author.survey != self.question.survey:
+            raise forms.ValidationError({
+                '__all__': 'A pergunta e o autor não pertencem ao mesmo '
+                           'questionário.'
+            })
+
+        # Edição de resposta
         if self.instance.pk:
             same_question = \
                 self.instance.question.pk == self.question.pk
@@ -47,6 +57,14 @@ class AnswerManager(Manager):
             if not same_question:
                 raise forms.ValidationError({
                     '__all__': 'Esta resposta não pertence a esta pergunta'
+                })
+
+            same_author = \
+                self.instance.author.pk == self.author.pk
+
+            if not same_author:
+                raise forms.ValidationError({
+                    '__all__': 'Esta resposta não pertence a este autor'
                 })
 
         return cleaned_data
