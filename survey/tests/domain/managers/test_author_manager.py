@@ -54,6 +54,16 @@ class AuthorManagerTest(TestCase):
         self.assertEqual(author_with_user_and_data.instance.name,
                          self.person.name)
 
+        # Validando a verificação de instancias e referencias no kwargs
+        with self.assertRaises(TypeError):
+            AuthorManager(
+                data={
+                    'name': self.faker.fake_factory.name(),
+                },
+                survey=self.survey.pk,
+                user=None,
+            )
+
     def test_author_creation_with_same_user_on_multiple_surveys(self):
         """
             Testa se o mesmo usuario consegue responder multiplos

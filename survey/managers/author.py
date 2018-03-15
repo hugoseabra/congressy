@@ -24,20 +24,28 @@ class AuthorManager(Manager):
             'user',
         )
 
-    def __init__(self, survey, user=None, instance=None, data=None, **kwargs):
+    def __init__(self, survey, user=None, **kwargs):
         self.survey = survey
         self.user = user
 
-        if not data:
-            data = {}
+        kwargs.update({'survey': survey})
+
+        data = kwargs.get('data', {})
+        instance = kwargs.get('instance')
+
+        if data:
+            data = data.copy()
 
         if user and user.person:
             data['name'] = user.person.name
+            kwargs['data'] = data
+            kwargs.update({'user': user})
 
         if not instance and isinstance(user, User):
             instance = self._retrieve_user_author()
+            kwargs['instance'] = instance
 
-        super().__init__(instance=instance, data=data, **kwargs)
+        super().__init__(**kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
