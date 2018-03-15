@@ -1,6 +1,7 @@
 from behave import given, then, when
 from nose.tools import eq_
 import time
+from selenium.common.exceptions import NoSuchElementException
 
 
 
@@ -77,11 +78,16 @@ def step_impl(context):
     campo_mensagem = driver.find_element_by_css_selector('#owner > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1)').is_displayed()
     eq_(campo_mensagem, True)
 
-@then('\'{flag}\'o bloco de inscricao')
+@then('\'{flag}\' o bloco de inscricao')
 def step_impl(context, flag):
     driver = context.browser
-    campo_mensagem = driver.find_element_by_css_selector('.form').is_displayed()
-    eq_(campo_mensagem, True)
+    try:
+        campo_mensagem = driver.find_element_by_css_selector('.form').is_displayed()
+    except NoSuchElementException:
+        assert(flag == 'Possui')
+
+    assert(flag is "Possui")
+
 
 @then('Existe o botao para fazer a inscricao')
 def step_impl(context):

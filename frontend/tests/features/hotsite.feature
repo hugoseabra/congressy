@@ -13,6 +13,7 @@ Feature: Testando hotsite
     And Existe o campo de descricao do organizador
     And Existe o bloco do banner
 
+     @select
   Scenario: Usuario testa o evento 'Futuro - Futuro'
     Given Usuario logado na pagina eventos
     When Clica no evento '2'
@@ -22,7 +23,7 @@ Feature: Testando hotsite
     And A descricao rapida
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
-    And Existe o bloco de inscricao
+    And 'Possui' o bloco de inscricao
     And Existe o botao para fazer a inscricao
     And Existe o bloco do banner
 
@@ -282,7 +283,7 @@ Feature: Testando hotsite
     And Existe o bloco do banner
     And Existe o lote '1'
 
-    @select
+
  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Expirado e 1 Disponível Ilimitado'
     Given Usuario logado na pagina eventos
     When Rola a pagina ate o fim
