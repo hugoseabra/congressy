@@ -29,6 +29,8 @@ class AnswerManager(Manager):
 
         self.question = question
         self.author = author
+        kwargs.update({'question': question})
+        kwargs.update({'author': author})
 
         if not instance:
             instance = self._retrieve_author_answer()
