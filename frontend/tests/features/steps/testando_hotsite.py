@@ -26,8 +26,9 @@ def step_impl(context,evento):
     evento = int(evento)
     if(evento%10 !=0):
         evento = evento % 10
-    evento = str(10)
-    link ='#event_table > tbody > tr:nth-child('+evento+') > td.sorting_1 > a'
+    else:
+        evento = str(10)
+    link ='#event_table > tbody > tr:nth-child({}) > td.sorting_1 > a'.format(evento)
     evento = driver.find_element_by_css_selector(link)
     evento.click()
 
