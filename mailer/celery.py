@@ -1,7 +1,6 @@
 import logging
 import os
 
-from django.conf import settings
 from celery import Celery
 
 logger = logging.getLogger("Celery[Mailer]")
