@@ -6,6 +6,7 @@ from . import *
 SECRET_KEY = '1@==vhll7d5v(%=t++oy-38+639o-4*f73^!o=v!a^z$#(6x%$'
 
 DEBUG = True
+DEBUG_PROPAGATE_EXCEPTIONS = True
 # ================================= APPS ==================================== #
 INSTALLED_APPS.extend([
     'debug_toolbar',
