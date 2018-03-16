@@ -20,5 +20,5 @@ class RuleChecker(ABC):
     :raise RuleIntegrityError
     """
     @abstractmethod
-    def check(self, entity_instance):  # pragma: no cover
+    def check(self, *args, **kwargs):  # pragma: no cover
         pass

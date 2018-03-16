@@ -3,18 +3,18 @@
     Resposta de um questionário, referente a uma pergunta a pertecente a um
     Autor.
 """
-from django.db import IntegrityError, models
+from django.db import models
 
 from survey.models import Author, Question
-from survey.models.mixins import RuleChecker, Entity
+from survey.models.mixins import RuleChecker, Entity, RuleIntegrityError
 
 
 class SameSurveyRule(RuleChecker):
     """ Regra de negócio: pergunta e autor devem ser do mesmo questionário. """
 
-    def check(self, entity_instance):
-        if entity_instance.question.survey != entity_instance.author.survey:
-            raise IntegrityError(
+    def check(self):
+        if self.question.survey != self.author.survey:
+            raise RuleIntegrityError(
                 'A pergunta e o autor não pertencem ao mesmo '
                 'questionário.'
             )
@@ -33,7 +33,7 @@ class Answer(Entity, models.Model):
         verbose_name = 'resposta'
         verbose_name_plural = 'respostas'
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return '{}: {} ({})'.format(
             self.question.label,
             self.author.name,
@@ -71,10 +71,10 @@ class Answer(Entity, models.Model):
     )
 
     def save(self, *args, **kwargs):
-        self.human_display = self._get_human_display()
+        self.human_display = self.get_human_display()
         super().save(*args, **kwargs)
 
-    def _get_human_display(self):
+    def get_human_display(self):
         if not self.question.accepts_options:
             return None
 
@@ -86,7 +86,5 @@ class Answer(Entity, models.Model):
         Resgata valor da resposta conforme a sua pergunta: se possui um
         display humanizado ou não.
         """
-        if self.human_display is not None:
-            return self.human_display
 
         return self.value
