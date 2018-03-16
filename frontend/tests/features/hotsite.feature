@@ -1,11 +1,179 @@
 #Todos os testes foram gerados usando o email: 'ana.carolina@me.com'
-
+@select
 Feature: Testando hotsite
-  @select
-  Scenario: Usuario testa o evento 'Disponivel - Disponivel'
-    Given Usuario logado na pagina eventos
-    When Clica no evento '1'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
+
+#  Scenario: Usuario testa o evento 'Disponivel - Disponivel'
+#    Given Usuário entra no hotsite do evento '1'
+#    Then Aparece o titulo
+#    Then Aparece a data do evento
+#    And A descricao rapida
+#    And Aparece descricao do evento
+#    And Existe o campo de descricao do organizador
+#    And 'Não possui' o bloco de inscricao
+#    And 'Não possui' o botao para fazer a inscricao
+#    And 'Não possui' o campo email
+#    And 'Não possui' o campo nome
+#    And 'Não possui' o lote '1'
+#    And 'Não possui' o lote '2'
+#    And Existe o bloco do banner
+#
+#
+#  Scenario: Usuario testa o evento 'Futuro - Futuro'
+#    Given Usuário entra no hotsite do evento '2'
+#    Then Aparece o titulo
+#    Then Aparece a data do evento
+#    And A descricao rapida
+#    And Aparece descricao do evento
+#    And Existe o campo de descricao do organizador
+#    And 'Possui' o bloco de inscricao
+#    And 'Possui' o botao para fazer a inscricao
+#    And 'Não possui' o campo email
+#    And 'Não possui' o campo nome
+#    And 'Não possui' o lote '1'
+#    And 'Não possui' o lote '2'
+#    And Existe o bloco do banner
+
+
+  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Disponível e 1 Não-iniciado'
+    Given Usuário entra no hotsite do evento '3'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Possui' o lote '1'
+    And 'Não possui' o lote '2'
+
+   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Disponível Ilimitado'
+    Given Usuário entra no hotsite do evento '4'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Possui' o lote '1'
+    And 'Não possui' o lote '2'
+
+
+   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Expirado e 1 Disponível Limitado (5 vagas)'
+    Given Usuário entra no hotsite do evento '5'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Possui' o lote '1'
+    And 'Não possui' o lote '2'
+
+
+  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Disponível Limitado Lotado'
+    Given Usuário entra no hotsite do evento '6'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Não possui' o bloco de inscricao
+    And 'Não possui' o botao para fazer a inscricao
+    And 'Não possui' o campo email
+    And 'Não possui' o campo nome
+    And 'Possui' o lote '1'
+    And 'Não possui' o lote '2'
+
+#   Evento em que o usuario usado para teste está inscrito
+  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Disponível Limitado Lotado e 1 Disponível Limitado (5 vagas)'
+    Given Usuário entra no hotsite do evento '7'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Possui' o lote '1'
+    And 'Possui' o lote '2'
+
+
+  Scenario: 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Disponível Limitado Lotado e 1 Não-iniciado'
+    Given Usuário entra no hotsite do evento '8'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Não possui' o bloco de inscricao
+    And 'Não possui' o botao para fazer a inscricao
+    And 'Não possui' o campo email
+    And 'Não possui' o campo nome
+    And 'Possui' o lote '1'
+    And 'Não possui' o lote '2'
+
+
+  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Expirado e 1 Disponível Ilimitado'
+    Given Usuário entra no hotsite do evento '9'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And  O campo nome tem o tipo text
+    And 'Possui' o lote '1'
+    And 'Possui' o lote '2'
+
+
+  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Expirado e 1 Disponível Ilimitado'
+    Given Usuário entra no hotsite do evento '10'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And  O campo nome tem o tipo text
+    And 'Possui' o lote '1'
+    And 'Possui' o lote '2'
+
+  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Expirado e 1 Disponível Limitado Lotado'
+    Given Usuário entra no hotsite do evento '11'
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
@@ -13,292 +181,218 @@ Feature: Testando hotsite
     And Existe o campo de descricao do organizador
     And 'Não possui' o bloco de inscricao
     And 'Não possui' o botao para fazer a inscricao
-    And Existe o bloco do banner
-
-
-  Scenario: Usuario testa o evento 'Futuro - Futuro'
-    Given Usuario logado na pagina eventos
-    When Clica no evento '2'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
-    Then Aparece o titulo
-    Then Aparece a data do evento
-    And A descricao rapida
-    And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And 'Possui' o bloco de inscricao
-    And 'Possui' o botao para fazer a inscricao
-    And Existe o bloco do banner
-
-
-  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Disponível e 1 Não-iniciado'
-    Given Usuario logado na pagina eventos
-    When Clica no evento '3'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
-    Then Aparece o titulo
-    Then Aparece a data do evento
-    And A descricao rapida
-    And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And Existe o bloco do banner
-    And Existe o lote '1'
-    And Existe o lote '2'
-
-   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Disponível Ilimitado'
-    Given Usuario logado na pagina eventos
-    When Clica no evento '4'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
-    Then Aparece o titulo
-    Then Aparece a data do evento
-    And A descricao rapida
-    And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And Existe o bloco do banner
-    And Existe o bloco de inscricao
-    And Existe o botao para fazer a inscricao
-    And Existe o lote '1'
-
-
-   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Expirado e 1 Disponível Limitado (5 vagas)'
-    Given Usuario logado na pagina eventos
-    When Clica no evento '5'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
-    Then Aparece o titulo
-    Then Aparece a data do evento
-    And A descricao rapida
-    And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And Existe o bloco do banner
-    And Existe o bloco de inscricao
-    And Existe o botao para fazer a inscricao
-    And Existe o lote '1'
-
-
-  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Disponível Ilimitado'
-    Given Usuario logado na pagina eventos
-    When Clica no evento '6'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
-    Then Aparece o titulo
-    Then Aparece a data do evento
-    And A descricao rapida
-    And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And Existe o bloco do banner
-    And Existe o lote '1'
-
-#   Evento em que o usuario usado para teste está inscrito
-  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Disponível Limitado Lotado e 1 Disponível Limitado (5 vagas)'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica no evento '7'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
-    Then Aparece o titulo
-    Then Aparece a data do evento
-    And A descricao rapida
-    And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And Existe o bloco do banner
-    And Existe o bloco de inscricao
-    And Usuario ja esta logado aparece o botao de visualizar inscricao
-    And Existe o lote '1'
-    And Existe o lote '2'
-
-
-  Scenario: 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Disponível Limitado Lotado e 1 Não-iniciado'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica no evento '8'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
-    Then Aparece o titulo
-    Then Aparece a data do evento
-    And A descricao rapida
-    And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And Existe o bloco do banner
-    And Existe o lote '1'
-
-
-  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Expirado e 1 Disponível Ilimitado'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica no evento '9'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
-    Then Aparece o titulo
-    Then Aparece a data do evento
-    And A descricao rapida
-    And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And Existe o bloco do banner
-    And Existe o bloco de inscricao
-    And Existe o botao para fazer a inscricao
-    And Existe o lote '1'
-    And Existe o lote '2'
-
-
-  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Expirado e 1 Disponível Ilimitado'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica no evento '10'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
-    Then Aparece o titulo
-    Then Aparece a data do evento
-    And A descricao rapida
-    And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And Existe o bloco do banner
-    And Existe o bloco de inscricao
-    And Existe o botao para fazer a inscricao
-    And Existe o lote '1'
-    And Existe o lote '2'
-
-  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Expirado e 1 Disponível Limitado Lotado'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica para ir para a pagina '2'
-    And Clica no evento '11'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
-    Then Aparece o titulo
-    Then Aparece a data do evento
-    And A descricao rapida
-    And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And Existe o lote '1'
-    And Existe o lote '2'
+    And 'Não Possui' o campo email
+    And 'Não Possui' o campo nome
+    And 'Possui' o lote '1'
+    And 'Possui' o lote '2'
 
   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 1 Lote Não Disponível (data futura)'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica para ir para a pagina '2'
-    And Clica no evento '12'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
+    Given Usuário entra no hotsite do evento '12'
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
+    And 'Não possui' o bloco de inscricao
+    And 'Não possui' o botao para fazer a inscricao
+    And 'Não possui' o campo email
+    And 'Não possui' o campo nome
+    And 'Não possui' o lote '1'
+    And 'Não possui' o lote '2'
 
   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' com Transferência de Taxas - 2 Lotes Expirados'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica para ir para a pagina '2'
-    And Clica no evento '13'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
+    Given Usuário entra no hotsite do evento '13'
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
-    And Existe o lote '1'
-    And Existe o lote '2'
+    And 'Não possui' o bloco de inscricao
+    And 'Não possui' o botao para fazer a inscricao
+    And 'Não possui' o campo email
+    And 'Não possui' o campo nome
+    And 'Possui' o lote '1'
+    And 'Possui' o lote '2'
 
   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Disponível e 1 Não-iniciado'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica para ir para a pagina '2'
-    And Clica no evento '14'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
+    Given Usuário entra no hotsite do evento '14'
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
     And Existe o bloco do banner
-    And Existe o bloco de inscricao
-    And Existe o botao para fazer a inscricao
-    And Existe o lote '1'
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Possui' o lote '1'
+    And 'Não possui' o lote '2'
 
   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Disponível Ilimitado'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica para ir para a pagina '2'
-    And Clica no evento '15'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
+    Given Usuário entra no hotsite do evento '15'
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
     And Aparece descricao do evento
-    And Existe o campo de descricao do organizador
-    And Existe o bloco do banner
-    And Existe o bloco de inscricao
-    And Existe o botao para fazer a inscricao
-    And Existe o lote '1'
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Possui' o lote '1'
+    And 'Não possui' o lote '2'
 
   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Disponível Limitado (5 vagas)'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica para ir para a pagina '2'
-    And Clica no evento '16'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
+    Given Usuário entra no hotsite do evento '16'
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
     And Existe o bloco do banner
-    And Existe o bloco de inscricao
-    And Existe o botao para fazer a inscricao
-    And Existe o lote '1'
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Possui' o lote '1'
+    And 'Não possui' o lote '2'
 
   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Disponível Limitado Lotado'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica para ir para a pagina '2'
-    And Clica no evento '17'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
+      Given Usuário entra no hotsite do evento '17'
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
     And Existe o bloco do banner
-    And Existe o lote '1'
+    And 'Não possui' o bloco de inscricao
+    And 'Não possui' o botao para fazer a inscricao
+    And 'Não possui' o campo email
+    And 'Não possui' o campo nome
+    And 'Possui' o lote '1'
+    And 'Não possui' o lote '2'
 
-#   Evento em que o usuario usado para teste está inscrito
   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Disponível Limitado Lotado e 1 Disponível Limitado (5 vagas)'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica para ir para a pagina '2'
-    And Clica no evento '18'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
+   Given Usuário entra no hotsite do evento '18'
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
     And Existe o bloco do banner
-    And Existe o bloco de inscricao
-    And Usuario ja esta logado aparece o botao de visualizar inscricao
-    And Existe o lote '1'
-    And Existe o lote '2'
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Possui' o lote '1'
+    And 'Possui' o lote '2'
 
 
   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Disponível Limitado Lotado e 1 Não-iniciado'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica para ir para a pagina '2'
-    And Clica no evento '19'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
+      Given Usuário entra no hotsite do evento '19'
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
     And Existe o bloco do banner
-    And Existe o lote '1'
+    And 'Não possui' o bloco de inscricao
+    And 'Não possui' o botao para fazer a inscricao
+    And 'Não possui' o campo email
+    And 'Não possui' o campo nome
+    And 'Possui' o lote '1'
+    And 'Não possui' o lote '2'
 
 
  Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Expirado e 1 Disponível Ilimitado'
-    Given Usuario logado na pagina eventos
-    When Rola a pagina ate o fim
-    And Clica para ir para a pagina '2'
-    And Clica no evento '20'
-    And Usuario vai para pagina de editar o evento e clica para visualizar pagina
+    Given Usuário entra no hotsite do evento '20'
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
     And Existe o bloco do banner
-    And Existe o bloco de inscricao
-    And Existe o botao para fazer a inscricao
-    And Existe o lote '1'
-    And Existe o lote '2'
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o lote '1'
+    And 'Possui' o lote '2'
+
+ Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Expirado e 1 Disponível Limitado (5 vagas)'
+    Given Usuário entra no hotsite do evento '21'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Possui' o campo email
+    And 'Possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Possui' o bloco de inscricao
+    And 'Possui' o botao para fazer a inscricao
+    And 'Possui' o lote '1'
+    And 'Possui' o lote '2'
+
+ Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Expirado e 1 Disponível Limitado Lotado'
+    Given Usuário entra no hotsite do evento '22'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Não possui' o campo email
+    And 'Não possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Não possui' o bloco de inscricao
+    And 'Não possui' o botao para fazer a inscricao
+    And 'Possui' o lote '1'
+    And 'Possui' o lote '2'
+
+ Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 1 Lote Não Disponível (data futura)'
+    Given Usuário entra no hotsite do evento '23'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Não possui' o campo email
+    And 'Não possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Não possui' o bloco de inscricao
+    And 'Não possui' o botao para fazer a inscricao
+    And 'Não possui' o lote '1'
+    And 'Não possui' o lote '2'
+
+   Scenario: Usuario testa o evento 'Futuro e Pago c/ 'Lotes' sem Transferência de Taxas - 2 Lotes Expirados'
+    Given Usuário entra no hotsite do evento '24'
+    Then Aparece o titulo
+    Then Aparece a data do evento
+    And A descricao rapida
+    And Aparece descricao do evento
+    And Existe o campo de descricao do organizador
+    And Existe o bloco do banner
+    And 'Não possui' o campo email
+    And 'Não possui' o campo nome
+    And  O campo email tem o tipo email
+    And O campo nome tem o tipo text
+    And 'Não possui' o bloco de inscricao
+    And 'Não possui' o botao para fazer a inscricao
+    And 'Possui' o lote '1'
+    And 'Possui' o lote '2'

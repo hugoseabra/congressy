@@ -1,45 +1,85 @@
 from behave import given, then, when
 from nose.tools import eq_
-import time
-from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
+path_inicial = 'http://0.0.0.0:8001/'
+slugs = [
+    'disponivel-disponivel/',
+    'futuro-futuro/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-1-lote-disponivel-e-1-nao-iniciado/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-1-lote-disponivel-ilimitado/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-1-lote-disponivel-limitado-5-vagas/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-1-lote-disponivel-limitado-lotado/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-1-lote-disponivel-limitado-lotado-e-1-disponivel-limitado-5-vagas/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-1-lote-disponivel-limitado-lotado-e-1-nao-iniciado/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-ilimitado/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-limitado-5-vagas/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-limitado-lotado/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-1-lote-nao-disponivel-data-futura/',
+    'futuro-e-pago-c-lotes-com-transferencia-de-taxas-2-lotes-expirados/',
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-disponivel-e-1-nao-iniciado/',
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-disponivel-ilimitado/',
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-disponivel-limitado-5-vagas/',
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-disponivel-limitado-lotado/',
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-disponivel-limitado-lotado-e-1-disponivel-limitado-5-vagas/',
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-disponivel-limitado-lotado-e-1-nao-iniciado',
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-ilimitado/'
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-limitado-5-vagas/'
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-limitado-lotado/'
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-nao-disponivel-data-futura/',
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-2-lotes-expirados/',
 
-
-@given('Usuario logado na pagina eventos')
-def step_impl(context):
-    driver = context.browser
-    context.browser.get('http://0.0.0.0:8001/login/')
-    email = driver.find_element_by_id('email')
-    email.send_keys('ana.carolina@me.com')
-    senha = driver.find_element_by_id('password')
-    senha.send_keys('123')
-    driver = context.browser
-    login_button = driver.find_element_by_tag_name('button')
-    login_button.click()
-    djToolBar = driver.find_element_by_css_selector('#djHideToolBarButton')
-    djToolBar.click()
-    eventos = driver.find_element_by_css_selector('li.dropdown:nth-child(3)')
-    eventos.click()
-
-@when('Clica no evento \'{evento}\'')
+]
+@given ('Usuário entra no hotsite do evento \'{evento}\'')
 def step_impl(context,evento):
+    path = path_inicial+slugs[int(evento)-1]
     driver = context.browser
-    evento = int(evento)
-    if(evento%10 !=0):
-        evento = evento % 10
-    else:
-        evento = str(10)
-    link ='#event_table > tbody > tr:nth-child({}) > td.sorting_1 > a'.format(evento)
-    evento = driver.find_element_by_css_selector(link)
-    evento.click()
+    driver.get(path)
+    try:
+        myElem = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, '.hero-title')))
 
-@when('Usuario vai para pagina de editar o evento e clica para visualizar pagina')
-def step_impl(context):
-    driver = context.browser
-    btn = driver.find_element_by_css_selector('a.btn')
-    btn.click()
-    time.sleep(5)
-    driver.switch_to.window(driver.window_handles[1])
+    except TimeoutException:
+        print("Timed out waiting for page to load")
+
+# @given('Usuario logado na pagina eventos')
+# def step_impl(context):
+#     driver = context.browser
+#     context.browser.get('http://0.0.0.0:8001/login/')
+#     email = driver.find_element_by_id('email')
+#     email.send_keys('ana.carolina@me.com')
+#     senha = driver.find_element_by_id('password')
+#     senha.send_keys('123')
+#     driver = context.browser
+#     login_button = driver.find_element_by_tag_name('button')
+#     login_button.click()
+#     djToolBar = driver.find_element_by_css_selector('#djHideToolBarButton')
+#     djToolBar.click()
+#     eventos = driver.find_element_by_css_selector('li.dropdown:nth-child(3)')
+#     eventos.click()
+#
+# @when('Clica no evento \'{evento}\'')
+# def step_impl(context,evento):
+#     driver = context.browser
+#     evento = int(evento)
+#     if(evento%10 !=0):
+#         evento = evento % 10
+#     else:
+#         evento = str(10)
+#     link ='#event_table > tbody > tr:nth-child({}) > td.sorting_1 > a'.format(evento)
+#     evento = driver.find_element_by_css_selector(link)
+#     evento.click()
+#
+# @when('Usuario vai para pagina de editar o evento e clica para visualizar pagina')
+# def step_impl(context):
+#     driver = context.browser
+#     btn = driver.find_element_by_css_selector('a.btn')
+#     btn.click()
+#     time.sleep(5)
+#     driver.switch_to.window(driver.window_handles[1])
 
 @then('Aparece o titulo')
 def step_impl(context):
@@ -82,22 +122,54 @@ def step_impl(context):
 def step_impl(context, flag):
     driver = context.browser
     try:
-        campo_mensagem = driver.find_element_by_css_selector('.form').is_displayed()
+        campo_mensagem = driver.find_element_by_css_selector('.form')
     except NoSuchElementException:
         assert(flag == 'Não possui')
 
-    assert(flag is "Possui")
+    else:
+        assert(flag == "Possui")
 
 
 @then('\'{flag}\' o botao para fazer a inscricao')
 def step_impl(context,flag):
     driver = context.browser
     try:
-        campo_mensagem = driver.find_element_by_css_selector('button.btn').is_displayed()
+        campo_mensagem = driver.find_element_by_css_selector('button.btn')
     except NoSuchElementException:
         assert(flag == 'Não possui')
+    else:
+        assert(flag == "Possui")
 
-    assert(flag is "Possui")
+@then('\'{flag}\' o campo nome')
+def step_impl(context,flag):
+    driver = context.browser
+    try:
+        campo_mensagem = driver.find_element_by_css_selector('#id_name')
+    except NoSuchElementException:
+        assert(flag == 'Não possui')
+    else:
+        assert(flag == "Possui")
+
+@then('\'{flag}\' o campo email')
+def step_impl(context,flag):
+    driver = context.browser
+    try:
+        campo_mensagem = driver.find_element_by_css_selector('#id_email')
+    except NoSuchElementException:
+        assert(flag == 'Não possui')
+    else:
+        assert(flag == "Possui")
+@then('O campo nome tem o tipo text')
+def step_impl(context):
+    driver = context.browser
+    campo_input = driver.find_element_by_css_selector('#id_name').get_attribute('type')
+    eq_(campo_input, 'text')
+
+@then('O campo email tem o tipo email')
+def step_impl(context):
+    driver = context.browser
+    campo_input = driver.find_element_by_css_selector('#id_email').get_attribute('type')
+    eq_(campo_input, 'email')
 
 @then('Existe o bloco do banner')
 def step_impl(context):
@@ -106,17 +178,23 @@ def step_impl(context):
         return True
     return False
 
-@then('Existe o lote \'{lote}\'')
-def step_impl(context,lote):
+@then('\'{flag}\' o lote \'{lote}\'')
+def step_impl(context,lote,flag):
     driver = context.browser
     path = '.icon-list > li:nth-child('+lote+')'
-    campo_mensagem = driver.find_element_by_css_selector(path).is_displayed()
-    eq_(campo_mensagem, True)
+    try:
+        campo_mensagem = driver.find_element_by_css_selector(path)
+    except NoSuchElementException:
+        assert (flag == 'Não possui')
 
-@when('Rola a pagina ate o fim')
-def step_impl(context):
-    driver = context.browser
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    else:
+        assert (flag == "Possui")
+
+
+# @when('Rola a pagina ate o fim')
+# def step_impl(context):
+#     driver = context.browser
+#     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
 # @then('Usuario ja esta logado aparece o botao de visualizar inscricao')
 # def step_impl(context):
@@ -124,11 +202,11 @@ def step_impl(context):
 #     campo_mensagem = driver.find_element_by_css_selector('.btn-success').is_displayed()
 #     eq_(campo_mensagem, True)
 
-@when('Clica para ir para a pagina \'{pagina}\'')
-def step_impl(context, pagina):
-    driver = context.browser
-    pagina = str(int(pagina) + 1)
-    path = 'li.paginate_button:nth-child('+pagina+') > a:nth-child(1)'
-    botao_pagina = driver.find_element_by_css_selector(path)
-    botao_pagina.click()
+# @when('Clica para ir para a pagina \'{pagina}\'')
+# def step_impl(context, pagina):
+#     driver = context.browser
+#     pagina = str(int(pagina) + 1)
+#     path = 'li.paginate_button:nth-child('+pagina+') > a:nth-child(1)'
+#     botao_pagina = driver.find_element_by_css_selector(path)
+#     botao_pagina.click()
 
