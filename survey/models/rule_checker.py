@@ -3,6 +3,7 @@
 """
 
 from django.db.utils import IntegrityError
+from abc import ABC, abstractmethod
 
 
 class RuleIntegrityError(IntegrityError):
@@ -12,11 +13,12 @@ class RuleIntegrityError(IntegrityError):
     pass
 
 
-class RuleChecker(object):
+class RuleChecker(ABC):
     """
     Classe concreta de implementação de verficação de integridade de domínio
     de uma entidade.
     :raise RuleIntegrityError
     """
-    def check(self, entity_instance):
+    @abstractmethod
+    def check(self, entity_instance):  # pragma: no cover
         pass

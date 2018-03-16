@@ -20,7 +20,7 @@ class SameSurveyRule(RuleChecker):
             )
 
 
-class Answer(Entity):
+class Answer(Entity, models.Model):
     """
         Answer domain model implementation.
     """

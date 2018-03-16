@@ -3,11 +3,9 @@
     Resposta de um questionário, referente a uma pergunta a pertecente a um
     Autor.
 """
-from django.db import models
 from django.forms import ValidationError
 
-
-from survey.models.rule_checkers import RuleChecker, RuleIntegrityError
+from survey.models.rule_checker import RuleChecker, RuleIntegrityError
 
 
 class RuleInstanceTypeError(TypeError):
@@ -21,7 +19,7 @@ class RuleInstanceTypeError(TypeError):
             message)
 
 
-class Entity(models.Model):
+class Entity(object):
     """
         Answer domain model implementation.
     """
@@ -58,4 +56,3 @@ class Entity(models.Model):
                 rule.check(self)
             except RuleIntegrityError as e:
                 raise ValidationError(str(e))
-
