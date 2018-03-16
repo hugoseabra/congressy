@@ -34,11 +34,7 @@ class Entity(object):
                 checked_rules.append(rule)
                 continue
 
-            if issubclass(rule, RuleChecker):
-                checked_rules.append(rule())
-                continue
-
-            raise RuleInstanceTypeError(rule)
+            raise RuleInstanceTypeError(rule.__class__)
 
         if checked_rules:
             self.rule_instances = checked_rules
