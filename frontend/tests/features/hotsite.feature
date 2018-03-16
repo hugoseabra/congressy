@@ -1,6 +1,7 @@
 #Todos os testes foram gerados usando o email: 'ana.carolina@me.com'
 
 Feature: Testando hotsite
+  @select
   Scenario: Usuario testa o evento 'Disponivel - Disponivel'
     Given Usuario logado na pagina eventos
     When Clica no evento '1'
@@ -8,12 +9,13 @@ Feature: Testando hotsite
     Then Aparece o titulo
     Then Aparece a data do evento
     And A descricao rapida
-    And A mensagem de Inscrições encerradas
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
+    And 'Não possui' o bloco de inscricao
+    And 'Não possui' o botao para fazer a inscricao
     And Existe o bloco do banner
 
-     @select
+
   Scenario: Usuario testa o evento 'Futuro - Futuro'
     Given Usuario logado na pagina eventos
     When Clica no evento '2'
@@ -24,7 +26,7 @@ Feature: Testando hotsite
     And Aparece descricao do evento
     And Existe o campo de descricao do organizador
     And 'Possui' o bloco de inscricao
-    And Existe o botao para fazer a inscricao
+    And 'Possui' o botao para fazer a inscricao
     And Existe o bloco do banner
 
 

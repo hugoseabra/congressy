@@ -60,11 +60,11 @@ def step_impl(context):
     eq_(campo_descricao, True)
 
 
-@then('A mensagem de Inscrições encerradas')
-def step_impl(context):
-    driver = context.browser
-    campo_mensagem = driver.find_element_by_css_selector('.hero-features-left > p:nth-child(2)').is_displayed()
-    eq_(campo_mensagem,True)
+# @then('A mensagem de Inscrições encerradas')
+# def step_impl(context):
+#     driver = context.browser
+#     campo_mensagem = driver.find_element_by_css_selector('.hero-features-left > p:nth-child(2)').is_displayed()
+#     eq_(campo_mensagem,True)
 
 @then('Aparece descricao do evento')
 def step_impl(context):
@@ -84,16 +84,20 @@ def step_impl(context, flag):
     try:
         campo_mensagem = driver.find_element_by_css_selector('.form').is_displayed()
     except NoSuchElementException:
-        assert(flag == 'Possui')
+        assert(flag == 'Não possui')
 
     assert(flag is "Possui")
 
 
-@then('Existe o botao para fazer a inscricao')
-def step_impl(context):
+@then('\'{flag}\' o botao para fazer a inscricao')
+def step_impl(context,flag):
     driver = context.browser
-    campo_mensagem = driver.find_element_by_css_selector('button.btn').is_displayed()
-    eq_(campo_mensagem, True)
+    try:
+        campo_mensagem = driver.find_element_by_css_selector('button.btn').is_displayed()
+    except NoSuchElementException:
+        assert(flag == 'Não possui')
+
+    assert(flag is "Possui")
 
 @then('Existe o bloco do banner')
 def step_impl(context):
@@ -114,11 +118,11 @@ def step_impl(context):
     driver = context.browser
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-@then('Usuario ja esta logado aparece o botao de visualizar inscricao')
-def step_impl(context):
-    driver = context.browser
-    campo_mensagem = driver.find_element_by_css_selector('.btn-success').is_displayed()
-    eq_(campo_mensagem, True)
+# @then('Usuario ja esta logado aparece o botao de visualizar inscricao')
+# def step_impl(context):
+#     driver = context.browser
+#     campo_mensagem = driver.find_element_by_css_selector('.btn-success').is_displayed()
+#     eq_(campo_mensagem, True)
 
 @when('Clica para ir para a pagina \'{pagina}\'')
 def step_impl(context, pagina):
