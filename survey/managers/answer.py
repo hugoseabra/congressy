@@ -24,11 +24,10 @@ class AnswerManager(Manager):
 
     def __init__(self, **kwargs):
 
-        instance = kwargs.get('instance')
+        data = kwargs.get('data')
+        existing_instance = kwargs.get('instance')
 
-        # Em caso de edição
-        if instance and instance.pk:
-            data = kwargs.get('data')
+        if not existing_instance:
             kwargs['instance'] = self._retrieve_author_answer(
                 data.get('question'),
                 data.get('author')
@@ -50,19 +49,34 @@ class AnswerManager(Manager):
         return question
 
     def clean_author(self):
+        # Aplicação das Regras de negocio:
+        # Condições para que regras sejam aplicadas:
+        #   - Deve ser uma edição de uma respostas
+        #
+        # Regras:
+        #
+        #   - Author passado via instancia e autor passado via dados devem
+        #       ser do mesmo questionario.
+        #
+        #   - Author passado via instancia e autor passado via dados devem
+        #       possuir a mesma pergunta.
+
+        # Resgatando os valores do campos de data.
+        # Obs.: São instancias, e não apenas referencia: 'pk'
         author = self.cleaned_data.get('author')
         question = self.cleaned_data.get('question')
 
-        # em caso de edição
-        if self.instance.pk and self.instance.author.pk != author.pk:
-            raise forms.ValidationError('A resposta não pertence a este autor')
+        # Deve ser uma edição de uma respostas
+        if self.instance.pk:
 
-        # Regra de negocio:
-        #   Autor e pergunta devem ser do mesmo questionario.
-        if author.survey != question.survey:
-            raise forms.ValidationError(
-                'A pergunta e o autor não pertencem ao mesmo questionário.'
-            )
+            if self.instance.author.survey != author.survey:
+                raise forms.ValidationError(
+                    'A pergunta e o autor não pertencem ao mesmo questionário.'
+                )
+
+            if self.instance.question != question:
+                raise forms.ValidationError(
+                    'A resposta não pertence a este autor')
 
         return author
 
@@ -73,7 +87,7 @@ class AnswerManager(Manager):
         a instância do formulário para seta-lo como edit.
         """
         try:
-            return Answer.objects.get(question=question, author=author)
+            return Answer.objects.get(question_id=question, author_id=author)
 
         except Answer.DoesNotExist:
             pass

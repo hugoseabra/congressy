@@ -23,36 +23,33 @@ class AuthorManagerTest(TestCase):
             usuarios.
         """
 
-        author_with_no_user_and_with_data = AuthorManager(
+        author_with_user = AuthorManager(
             data={
                 'name': self.faker.fake_factory.name(),
+                'survey': self.survey.pk,
             },
-            survey=self.survey,
-            user=None,
+            user=self.person.user.pk,
         )
 
-        author_with_user_and_no_data = AuthorManager(
-            survey=self.survey,
-            user=self.person.user
-        )
+        self.assertTrue(author_with_user.is_valid())
 
-        author_with_user_and_data = AuthorManager(
+        # Validando que survey não pode ter dois autores.
+        new_survey = self.faker.fake_survey()
+
+        author_with_no_user = AuthorManager(
             data={
                 'name': self.faker.fake_factory.name(),
+                'survey': new_survey.pk,
             },
-            survey=self.survey,
-            user=self.person.user
         )
 
-        self.assertTrue(author_with_no_user_and_with_data.is_valid())
-        self.assertTrue(author_with_user_and_no_data.is_valid())
-        self.assertTrue(author_with_user_and_data.is_valid())
+        self.assertTrue(author_with_no_user.is_valid())
 
         # Testa salva pra ver que não alterou o nome do autor do nome do
         # usuario.
-        author_with_user_and_data.save()
-        self.assertEqual(author_with_user_and_data.instance.name,
-                         self.person.name)
+        author_with_user.save()
+        self.assertEqual(author_with_user.instance.name,
+                         self.person.user.get_full_name())
 
         # Validando a verificação de instancias e referencias no kwargs
         with self.assertRaises(TypeError):
