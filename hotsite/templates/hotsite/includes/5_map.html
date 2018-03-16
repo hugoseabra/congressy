@@ -16,43 +16,47 @@
             <!-- MAPS TEXT -->
             <div class="maps-text fadeIn animated done-animation" data-animation="fadeIn">
                 <div class="maps-text-inner">
-                    <h2 class="section-heading text-left">Local do Evento</h2>
+                    <h2 class="section-heading text-center">Local do Evento</h2>
                     <p></p>
                     <div class="row">
                         <address class="col-sm-6">
-                            {% if event.place.name %}
-                            <strong>{{ event.place.name|upper }}</strong>
-                            {% endif %}
-                            <ul class="fa-ul">
-                                <li>
-                                    <i class="fa-li fa fa-location-arrow"></i>
-                                    {{ event.place.street|default_if_none:'' }}
-                                    {% if event.place.number %}
-                                        , Nº. {{ event.place.number }}
-                                    {% endif %}
-                                    {% if event.place.complement %}
-                                        , {{ event.place.complement }},
-                                    {% endif %}
-                                    <br>
-                                    {% if event.place.city %}
-                                        {{event.place.city.name}}-{{ event.place.city.uf }}
-                                    {% endif %}
-                                    .
-                                    <br>
-                                    {% if event.place.zip_code %}
-                                        CEP: {{event.place.zip_code.0}}{{event.place.zip_code.1}}{{event.place.zip_code.2}}{{event.place.zip_code.3}}{{event.place.zip_code.4}}-{{event.place.zip_code.5}}{{event.place.zip_code.6}}{{event.place.zip_code.7}}
-                                    {% endif %}
-                                </li>
-                            </ul>
+                            <div  style="margin-left:30px">
+                                {% if event.place.name %}
+                                <strong>{{ event.place.name|upper }}</strong>
+                                {% endif %}
+                                <ul class="fa-ul text-left">
+                                    <li>
+                                        <i class="fa-li fa fa-location-arrow"></i>
+                                        {{ event.place.street|default_if_none:'' }}
+                                        {% if event.place.number %}
+                                            , Nº. {{ event.place.number }}
+                                        {% endif %}
+                                        {% if event.place.complement %}
+                                            , {{ event.place.complement }},
+                                        {% endif %}
+                                        <br>
+                                        {% if event.place.city %}
+                                            {{event.place.city.name}}-{{ event.place.city.uf }}
+                                        {% endif %}
+                                        .
+                                        <br>
+                                        {% if event.place.zip_code %}
+                                            CEP: {{event.place.zip_code.0}}{{event.place.zip_code.1}}{{event.place.zip_code.2}}{{event.place.zip_code.3}}{{event.place.zip_code.4}}-{{event.place.zip_code.5}}{{event.place.zip_code.6}}{{event.place.zip_code.7}}
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </div>
                         </address>
                         <address class="col-sm-6">
-                            <strong>Quanto tempo para chegar?</strong>
-                            <ul class="fa-ul">
-                                <li><i class="fa-li fa fa-car"></i> <a href="https://maps.google.com/?saddr=Current+Location&daddr={{ event.place.lat }},{{ event.place.long }}&driving" target="_blank">Carro</a></li>
-                                <li><i class="fa-li fa fa-bus"></i> <a href="https://maps.google.com/?saddr=Current+Location&dirflg=r&daddr={{ event.place.lat }},{{ event.place.long }}&mode=transit" target="_blank">Ônibus</a></li>
-                                <li><i class="fa-li fa fa-bicycle"></i> <a href="https://maps.google.com/?saddr=Current+Location&dirflg=b&daddr={{ event.place.lat }},{{ event.place.long }}&mode=bicycling" target="_blank">Bicicleta</a></li>
-                                <li><i class="fa-li fa fa-blind"></i> <a href="https://maps.google.com/?saddr=Current+Location&dirflg=w&daddr={{ event.place.lat }},{{ event.place.long }}" target="_blank">Andando</a></li>
-                            </ul>
+                            <div  style="margin-left:30px">
+                                <strong>Quanto tempo para chegar?</strong>
+                                <ul class="fa-ul">
+                                    <li><i class="fa-li fa fa-car"></i> <a href="https://maps.google.com/?saddr=Current+Location&daddr={{ event.place.lat }},{{ event.place.long }}&driving" target="_blank">Carro</a></li>
+                                    <li><i class="fa-li fa fa-bus"></i> <a href="https://maps.google.com/?saddr=Current+Location&dirflg=r&daddr={{ event.place.lat }},{{ event.place.long }}&mode=transit" target="_blank">Ônibus</a></li>
+                                    <li><i class="fa-li fa fa-bicycle"></i> <a href="https://maps.google.com/?saddr=Current+Location&dirflg=b&daddr={{ event.place.lat }},{{ event.place.long }}&mode=bicycling" target="_blank">Bicicleta</a></li>
+                                    <li><i class="fa-li fa fa-blind"></i> <a href="https://maps.google.com/?saddr=Current+Location&dirflg=w&daddr={{ event.place.lat }},{{ event.place.long }}" target="_blank">Andando</a></li>
+                                </ul>
+                            </div>
                         </address>
                     </div>
 
