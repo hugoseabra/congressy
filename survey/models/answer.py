@@ -6,12 +6,28 @@
 from django.db import IntegrityError, models
 
 from survey.models import Author, Question
+from survey.models.mixins import RuleChecker, Entity
 
 
-class Answer(models.Model):
+class SameSurveyRule(RuleChecker):
+    """ Regra de negócio: pergunta e autor devem ser do mesmo questionário. """
+
+    def check(self, entity_instance):
+        if entity_instance.question.survey != entity_instance.author.survey:
+            raise IntegrityError(
+                'A pergunta e o autor não pertencem ao mesmo '
+                'questionário.'
+            )
+
+
+class Answer(Entity):
     """
         Answer domain model implementation.
     """
+
+    rule_instances = [
+        SameSurveyRule,
+    ]
 
     class Meta:
         verbose_name = 'resposta'
@@ -64,13 +80,6 @@ class Answer(models.Model):
 
         option = self.question.options.get(value=self.value)
         return option.name
-
-    def clean(self):
-        if self.question.survey != self.author.survey:
-            raise IntegrityError(
-                'A pergunta e o autor não pertencem ao mesmo '
-                'questionário.'
-            )
 
     def get_value_display(self):
         """
