@@ -12,6 +12,10 @@ class AjaxChoiceField(forms.ChoiceField):
         return True
 
 
+class PriceInput(forms.TextInput):
+    input_type = 'tel'
+
+
 class TelephoneInput(forms.TextInput):
     input_type = 'tel'
 

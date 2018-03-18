@@ -91,8 +91,7 @@ class BaseFormLotView(BaseLotView, generic.FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['congressy_minimum_price'] = settings.CONGRESSY_MINIMUM_AMOUNT
-        context['congressy_plan_percent_10'] = \
-            settings.CONGRESSY_PLAN_PERCENT_10
+        context['congressy_plan_percent'] = self.event.congressy_percent
         return context
 
     def get_form_kwargs(self):

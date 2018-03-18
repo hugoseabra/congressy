@@ -209,7 +209,7 @@ class PagarmeTransactionInstanceData:
         :return:
         """
         org_percent = self.as_decimal(
-            (100 - settings.CONGRESSY_PLAN_PERCENT_10) / 100
+            (100 - float(self.event.congressy_percent)) / 100
         )
 
         # Com transferência, o valor da transaçaõ está maior do que o valor do
@@ -262,7 +262,7 @@ class PagarmeTransactionInstanceData:
 
         # Valor líquido da congressy direto do valor do lote.
         congressy_amount_liquid = self.lot.price * self.as_decimal(
-            settings.CONGRESSY_PLAN_PERCENT_10 / 100
+            self.event.congressy_percent / 100
         )
 
         # Se o valor é menor do que o mínimo configurado, o mínimo assume.
