@@ -262,7 +262,7 @@ class PagarmeTransactionInstanceData:
 
         # Valor líquido da congressy direto do valor do lote.
         congressy_amount_liquid = self.lot.price * self.as_decimal(
-            self.event.congressy_percent / 100
+            float(self.event.congressy_percent) / 100
         )
 
         # Se o valor é menor do que o mínimo configurado, o mínimo assume.
