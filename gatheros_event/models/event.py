@@ -164,7 +164,7 @@ class Event(models.Model, GatherosModelMixin):
     )
 
     congressy_percent = models.CharField(
-        max_length=15,
+        max_length=5,
         choices=CONGRESSY_PERCENTS,
         default=CONGRESSY_PERCENT_10_0,
         verbose_name='percentual congressy',
