@@ -4,9 +4,10 @@
 """
 from django.db import models
 from . import Question
+from survey.models.mixins import Entity
 
 
-class Option(models.Model):
+class Option(Entity, models.Model):
     """
         Option domain model implementation.
     """
@@ -18,7 +19,7 @@ class Option(models.Model):
             ('question', 'value',),
         )
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.name + ' - ' + self.value
 
     question = models.ForeignKey(

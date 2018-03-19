@@ -81,15 +81,17 @@ class AnswerManager(Manager):
         return author
 
     @staticmethod
-    def _retrieve_author_answer(question, author):
+    def _retrieve_author_answer(question_id, author_id):
         """
         Verifica se usuário já respondeu o survey e, se sim, resgata
         a instância do formulário para seta-lo como edit.
         """
+        found = None
         try:
-            return Answer.objects.get(question_id=question, author_id=author)
+            found = Answer.objects.get(question_id=int(question_id),
+                                       author_id=int(author_id))
 
         except Answer.DoesNotExist:
             pass
 
-        return None
+        return found

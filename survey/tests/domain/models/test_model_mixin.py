@@ -13,52 +13,42 @@ from django.forms import ValidationError
 class EntityTest(TestCase):
     """ Entity test implementation """
 
-    def test_entity_creation(self):
-        """
-            Tests instantiation of the Entity object.
-
-        """
-        self.assertTrue(isinstance(Entity(), Entity))
-
-    def test_entity_creation_with_rules(self):
+    def test_entity_rule_checkers_validation(self):
         """
             Tests instantiation of the Entity object with rules passed.
         """
 
-        class TestChecker(RuleChecker):
-
-            def check(self, entity_instance):
-                pass
-
-        class NotAChecker(object):
+        # TESTES FALHANDO
+        # Testing creation with wrong type of rule checkers.
+        class NotAChecker:
             pass
 
-        entity = Entity
-
-        # Testing creation with correct rules.
-        entity.rule_instances = [
-            TestChecker()
-        ]
-
-        self.assertTrue(isinstance(entity(), Entity))
-
-        # Testing creation with wrong type of rules.
         wrong_entity = Entity
-        wrong_instance = NotAChecker()
         wrong_entity.rule_instances = [
-            wrong_instance,
+            NotAChecker(),
         ]
 
         with self.assertRaises(RuleInstanceTypeError) as e:
             wrong_entity()
-            self.assertEqual(str(e.msg), "<class 'survey.tests.domain.models."
-                                         "test_model_mixin.EntityTest."
-                                         "test_entity_creation_with_rules."
-                                         "<locals>.NotAChecker'>")
 
-    def test_entity_cleaning(self):
+        # TESTES FALHANDO
+        # Testing creation with correct rules.
+        class TestChecker(RuleChecker):
+            def check(self, entity_instance):
+                pass
+
+        entity = Entity
+        entity.rule_instances = [
+            TestChecker()
+        ]
+
+        # instance does not raise exception
+        entity()
+
+    def test_entity_clean_triggering_rule_error(self):
         """
-            Tests cleaning(validation) of an entity.
+            Testando se o clean do mixin engatilha o exception dos
+            rules.
         """
 
         class TestCheckerWithExceptions(RuleChecker):
@@ -76,4 +66,4 @@ class EntityTest(TestCase):
 
         with self.assertRaises(ValidationError) as e:
             entity_with_errors.clean()
-            self.assertEqual(str(e.msg, 'Test error'))
+            self.assertEqual(str(e.msg), 'Test error')

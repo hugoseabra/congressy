@@ -25,25 +25,15 @@ class QuestionManagerTest(TestCase):
 
         manager = QuestionManager(
             data={
+                'survey': self.survey.pk,
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
             },
-            survey=self.survey,
         )
 
-        self.assertEqual(manager.survey, self.survey)
-
-        # Validando a verificação de instancias e referencias no kwargs
-        with self.assertRaises(TypeError):
-            QuestionManager(
-                data={
-                    'type': Question.FIELD_INPUT_TEXT,
-                    'name': question_name,
-                    'label': question_name,
-                },
-                survey=self.survey.pk,
-            )
+        self.assertTrue(manager.is_valid())
+        manager.save()
 
     def test_same_question_same_survey_with_prefix(self):
         """
@@ -59,8 +49,8 @@ class QuestionManagerTest(TestCase):
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
+                'survey': self.survey.pk,
             },
-            survey=self.survey,
         )
 
         form2 = QuestionManager(
@@ -68,8 +58,8 @@ class QuestionManagerTest(TestCase):
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
+                'survey': self.survey.pk,
             },
-            survey=self.survey,
         )
 
         form3 = QuestionManager(
@@ -77,8 +67,8 @@ class QuestionManagerTest(TestCase):
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
+                'survey': self.survey.pk,
             },
-            survey=self.survey,
         )
 
         self.assertTrue(form1.is_valid())
@@ -107,20 +97,20 @@ class QuestionManagerTest(TestCase):
 
         form1 = QuestionManager(
             data={
+                'survey': survey1.pk,
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
             },
-            survey=survey1,
         )
 
         form2 = QuestionManager(
             data={
+                'survey': survey2.pk,
                 'type': Question.FIELD_INPUT_TEXT,
                 'name': question_name,
                 'label': question_name,
             },
-            survey=survey2,
         )
 
         self.assertTrue(form1.is_valid())

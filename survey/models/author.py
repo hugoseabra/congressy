@@ -3,12 +3,13 @@
     Autor de respostas de uma questionário.
 """
 from django.contrib.auth.models import User
-from django.db import models, IntegrityError
+from django.db import models
 
 from survey.models import Survey
+from survey.models.mixins import Entity
 
 
-class Author(models.Model):
+class Author(Entity, models.Model):
     """
         Author domain model implementation.
     """
@@ -17,7 +18,7 @@ class Author(models.Model):
         verbose_name = 'autor'
         verbose_name_plural = 'autores'
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.name
 
     survey = models.ForeignKey(
@@ -45,8 +46,3 @@ class Author(models.Model):
         auto_now=True,
         verbose_name='criado em'
     )
-
-    def clean(self):
-        if isinstance(self.user, User) and self.user.is_anonymous:
-            raise IntegrityError('Usuário não pode ser anônimo.')
-

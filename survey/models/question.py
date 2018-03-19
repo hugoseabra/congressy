@@ -5,9 +5,10 @@
 """
 from django.db import models
 from survey.models import Survey
+from survey.models.mixins import Entity
 
 
-class Question(models.Model):
+class Question(Entity, models.Model):
     """
         Question domain model implementation.
     """
@@ -19,7 +20,7 @@ class Question(models.Model):
             ('survey', 'name',),
         )
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.name
 
     FIELD_INPUT_TEXT = 'input-text'

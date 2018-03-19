@@ -48,8 +48,8 @@ class AuthorManagerTest(TestCase):
         # Testa salva pra ver que não alterou o nome do autor do nome do
         # usuario.
         author_with_user.save()
-        self.assertEqual(author_with_user.instance.name,
-                         self.person.user.get_full_name())
+        self.assertEqual(author_with_user.instance.user,
+                         self.person.user)
 
         # Validando a verificação de instancias e referencias no kwargs
         with self.assertRaises(TypeError):
@@ -72,16 +72,22 @@ class AuthorManagerTest(TestCase):
         different_survey3 = self.faker.fake_survey()
 
         author1 = AuthorManager(
+            data={
+                'survey': different_survey1.pk
+            },
             user=self.person.user,
-            survey=different_survey1,
         )
         author2 = AuthorManager(
+            data={
+                'survey': different_survey2.pk
+            },
             user=self.person.user,
-            survey=different_survey2,
         )
         author3 = AuthorManager(
+            data={
+                'survey': different_survey3.pk
+            },
             user=self.person.user,
-            survey=different_survey3,
         )
 
         self.assertTrue(author1.is_valid())
@@ -98,15 +104,19 @@ class AuthorManagerTest(TestCase):
         different_survey = self.faker.fake_survey()
 
         author = AuthorManager(
+            data={
+                'survey':self.survey.pk
+            },
             user=self.person.user,
-            survey=self.survey,
         )
 
         self.assertTrue(author.is_valid())
         author.save()
 
         author_edit = AuthorManager(
-            survey=different_survey,
+            data={
+                'survey': different_survey.pk,
+            },
             user=self.person.user,
             instance=author.instance,
         )

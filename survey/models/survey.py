@@ -14,7 +14,7 @@ class Survey(models.Model):
         verbose_name = 'questionario'
         verbose_name_plural = 'questionarios'
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return self.name
 
     name = models.CharField(

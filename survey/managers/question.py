@@ -25,6 +25,7 @@ class QuestionManager(Manager):
         Slugify deve garantir que o nome de Question em um survey seja único.
         """
         name = self.cleaned_data.get('name')
+        survey = self.cleaned_data.get('survey')
 
         original_slug = slugify(name)
         exists = True
@@ -33,7 +34,7 @@ class QuestionManager(Manager):
         counter = 1
 
         while exists:
-            query_set = Question.objects.filter(name=slug, survey=self.survey)
+            query_set = Question.objects.filter(name=slug, survey=survey)
             exists = query_set.exists()
             if exists:
                 slug = original_slug + '-' + str(counter)

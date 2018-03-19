@@ -23,11 +23,16 @@ class AuthorManager(Manager):
 
     def __init__(self, user=None, **kwargs):
 
-        self.user = None
+        self.user = user
+
+        if self.user and type(user) == int:
+            try:
+                self.user = User.objects.get(pk=user)
+            except User.DoesNotExist:
+                pass
 
         data = self._set_author_data_from_user(
             kwargs.get('data', {}),
-            user
         )
         kwargs['data'] = data
 
@@ -52,7 +57,7 @@ class AuthorManager(Manager):
 
         return cleaned_data
 
-    def _set_author_data_from_user(self, data, user=None):
+    def _set_author_data_from_user(self, data):
         """
         Se um usuário (não anônimo) for passado, preservar os dados de usuário
         nos dados de autor.
@@ -60,14 +65,13 @@ class AuthorManager(Manager):
         # Garante possibilidade de alteração da dict()
         data = data.copy()
 
-        if isinstance(user, User) and not user.is_anonymous():
-            self.user = user
+        if isinstance(self.user, User) and not self.user.is_anonymous():
 
             # Nome do autor é o nome do usuário
-            data['name'] = user.get_full_name()
+            data['name'] = self.user.get_full_name()
 
             # User deve estar em data
-            data.update({'user': user.pk})
+            data.update({'user': self.user.pk})
 
         return data
 

@@ -30,9 +30,13 @@ class AnswerManagerTest(TestCase):
             author=self.author,
         )
 
-        found = AnswerManager._retrieve_author_answer(question=self.question,
-                                                      author=self.author)
+        found = AnswerManager._retrieve_author_answer(
+            question_id=self.question.pk,
+            author_id=self.author.pk,
+        )
 
+        self.assertIsNotNone(found)
+        self.assertIsInstance(found, Answer)
         self.assertEqual(found, existing_answer)
 
     def test_answer_manager_creation(self):
@@ -163,7 +167,7 @@ class AnswerManagerTest(TestCase):
         )
 
         # Criando um novo survey para validar a regra de igualdade de surveys.
-        new_survey = self.faker.fake_survey()\
+        new_survey = self.faker.fake_survey()
 
         # Criando um novo autor com o novo survey para validar a regra de
         # igualdade de surveys.
@@ -171,7 +175,6 @@ class AnswerManagerTest(TestCase):
 
         # Criando um novo autor para validar a regra de igualdade de autores.
         new_author = self.faker.fake_author(survey=self.survey)
-
 
         non_identical_surveys_manager = AnswerManager(
             data={

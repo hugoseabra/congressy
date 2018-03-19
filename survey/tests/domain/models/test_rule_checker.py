@@ -20,7 +20,7 @@ class RuleCheckerTest(TestCase):
             def check(self, entity_instance):
                 pass
 
-        self.assertIsNotNone(TestChecker())
+        TestChecker()
 
     def test_rule_checker_incorrect_creation(self):
         """
@@ -33,7 +33,3 @@ class RuleCheckerTest(TestCase):
 
         with self.assertRaises(TypeError) as e:
             TestChecker()
-
-            self.assertEqual(str(e.msg),
-                             "Can't instantiate abstract class TestChecker "
-                             "with abstract methods check")
