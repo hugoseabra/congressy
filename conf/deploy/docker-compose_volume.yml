@@ -1,10 +1,10 @@
 version: "3"
 services:
   # Preparação de volumes.
-  cron:
+  volume:
     image: cgsy:latest
     entrypoint:
-      - /services/cron/container-entry.sh
+      - /services/volume/container-entry.sh
     volumes:
       - "./media:/var/www/cgsy/media"
     env_file: /tmp/env-file

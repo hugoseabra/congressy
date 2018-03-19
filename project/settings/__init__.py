@@ -118,8 +118,7 @@ SITE_ID = 1
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
-# @TODO Mudar para /media em produção.
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # Name of cache backend to cache user agents. If it not specified default
