@@ -71,7 +71,7 @@ class AnswerManager(Manager):
 
             if self.instance.author.survey != author.survey:
                 raise forms.ValidationError(
-                    'A pergunta e o autor não pertencem ao mesmo questionário.'
+                    'A pergunta e o autor não pertencem ao mesmo questionário'
                 )
 
             if self.instance.question != question:

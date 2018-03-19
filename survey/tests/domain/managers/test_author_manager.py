@@ -45,6 +45,17 @@ class AuthorManagerTest(TestCase):
 
         self.assertTrue(author_with_no_user.is_valid())
 
+        # User pk 800 does not exist.
+        author_with_non_existing_user = AuthorManager(
+            data={
+                'name': self.faker.fake_factory.name(),
+                'survey': new_survey.pk,
+            },
+            user=800,
+        )
+
+        self.assertTrue(author_with_non_existing_user.is_valid())
+
         # Testa salva pra ver que não alterou o nome do autor do nome do
         # usuario.
         author_with_user.save()
@@ -105,7 +116,7 @@ class AuthorManagerTest(TestCase):
 
         author = AuthorManager(
             data={
-                'survey':self.survey.pk
+                'survey': self.survey.pk
             },
             user=self.person.user,
         )

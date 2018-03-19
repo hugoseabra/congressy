@@ -71,3 +71,24 @@ class QuestionModelTest(TestCase):
 
         self.assertEqual(Question.objects.filter(name="Question #1").count(),
                          2)
+
+    def test_question_has_options(self):
+        """
+            Testa se a propriedade do model "has_options" está retornando o
+            numero correto de opções vinculadas a pergunta.
+        """
+
+        question = Question(
+            survey=self.survey,
+            type=Question.FIELD_SELECT,
+            label='label #1',
+            name="Question #1",
+            help_text='Some kind of help_text',
+        )
+        question.save()
+
+        # Cria três opções vinculadas a essa pergunta
+        for _ in range(3):
+            self.fake_factory.fake_option(question=question)
+
+        self.assertTrue(question.has_options)

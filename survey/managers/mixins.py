@@ -35,13 +35,3 @@ class Manager(forms.ModelForm):
             raise EntityTypeError(model)
 
         super().__init__(**kwargs)
-
-    def clean(self):
-        try:
-            cleaned_data = super().clean()
-
-        except IntegrityError as e:
-            msg = 'Erro de integridade: {}'.format(str(e))
-            raise forms.ValidationError({'__all__': msg})
-
-        return cleaned_data

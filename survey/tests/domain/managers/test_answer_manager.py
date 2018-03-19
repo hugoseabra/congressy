@@ -2,6 +2,7 @@
     Testing the Answer Manager
 """
 
+from django import forms
 from test_plus.test import TestCase
 
 from survey.managers import AnswerManager
@@ -151,16 +152,16 @@ class AnswerManagerTest(TestCase):
             caso de edição de respostas conforme especificada dentro do
             clean de autores:
 
-                - Author passado via instancia e autor passado via dados devem
-                   ser do mesmo questionario.
+              - Author passado via instancia e autor passado via dados devem
+                  ser do mesmo questionario.
 
-                - Author passado via instancia e autor passado via dados devem
-                   possuir o mesmo survey.
+              - Author passado via instancia e autor passado via dados devem
+                  possuir a mesma pergunta.
 
         """
 
         # Criando uma instancia pra ser ser usada para interagir via o manager.
-        Answer.objects.create(
+        instance = Answer.objects.create(
             value="Winter is coming.",
             question=self.question,
             author=self.author,
@@ -168,20 +169,44 @@ class AnswerManagerTest(TestCase):
 
         # Criando um novo survey para validar a regra de igualdade de surveys.
         new_survey = self.faker.fake_survey()
-
-        # Criando um novo autor com o novo survey para validar a regra de
-        # igualdade de surveys.
-        new_author_with_new_survey = self.faker.fake_author(survey=new_survey)
-
-        # Criando um novo autor para validar a regra de igualdade de autores.
-        new_author = self.faker.fake_author(survey=self.survey)
+        diferente_survey_author = self.faker.fake_author(survey=new_survey)
 
         non_identical_surveys_manager = AnswerManager(
             data={
                 'value': 'Uma resposta.',
                 'question': self.question.pk,
-                'author': new_author_with_new_survey.pk,
+                'author': diferente_survey_author.pk,
             },
+            instance=instance,
+        )
+        #
+        self.assertFalse(non_identical_surveys_manager.is_valid())
+        error_dict = non_identical_surveys_manager.errors.as_data()
+        self.assertIsInstance(error_dict['author'][0],
+                              forms.ValidationError)
+        self.assertEqual(error_dict['author'][0].message,
+                         'A pergunta e o autor não pertencem ao mesmo '
+                         'questionário')
+
+        # Criando uma nova pergunta para testar a regra de igualdade de
+        # perguntas.
+        new_question = self.faker.fake_question(self.survey)
+
+        # Testando que Author passado via instancia e autor passado via dados
+        # devem possuir a mesma pergunta.
+        non_identical_questions_manager = AnswerManager(
+            data={
+                'value': 'Uma resposta.',
+                'question': new_question.pk,
+                'author': self.author.pk,
+            },
+            instance=instance,
         )
 
-        self.assertFalse(non_identical_surveys_manager.is_valid())
+        self.assertFalse(non_identical_questions_manager.is_valid())
+
+        error_dict = non_identical_questions_manager.errors.as_data()
+        self.assertIsInstance(error_dict['author'][0],
+                              forms.ValidationError)
+        self.assertEqual(error_dict['author'][0].message,
+                         'A resposta não pertence a este autor')
