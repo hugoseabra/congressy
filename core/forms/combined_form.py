@@ -13,7 +13,6 @@ class CombinedFormBase(forms.Form):
     messages = {}
 
     def __init__(self, **kwargs):
-
         data = kwargs.get('data')
         files = kwargs.get('files')
         auto_id = kwargs.get('auto_id', 'id_%s')
@@ -26,14 +25,6 @@ class CombinedFormBase(forms.Form):
         use_required_attribute = kwargs.get('use_required_attribute')
         renderer = kwargs.get('renderer')
 
-        super().__init__(data=data, files=files, auto_id=auto_id,
-                         prefix=prefix, initial=initial,
-                         error_class=error_class, label_suffix=label_suffix,
-                         empty_permitted=empty_permitted,
-                         field_order=field_order,
-                         use_required_attribute=use_required_attribute,
-                         renderer=renderer)
-
         if 'instance' in kwargs:
             raise Exception(
                 'You must provide instances as a dict(), not an only instance.'
@@ -43,6 +34,7 @@ class CombinedFormBase(forms.Form):
             self.instances = kwargs.get('instances', {})
             del kwargs['instances']
 
+        form_instances = []
         for name, form_class in six.iteritems(self.form_classes):
             form_kwargs = kwargs.copy()
             # form_kwargs.update({'prefix': name})
@@ -51,9 +43,21 @@ class CombinedFormBase(forms.Form):
                 form_kwargs.update({'instance': self.instances.get(name)})
 
             form = form_class(**form_kwargs)
+            form_instances.append(form)
+
             setattr(self, name, form)
+            initial.update(form.initial)
+
+        super().__init__(data=data, files=files, auto_id=auto_id,
+                         prefix=prefix, initial=initial,
+                         error_class=error_class, label_suffix=label_suffix,
+                         empty_permitted=empty_permitted,
+                         field_order=field_order,
+                         use_required_attribute=use_required_attribute,
+                         renderer=renderer)
+
+        for form in form_instances:
             self.fields.update(form.fields)
-            self.initial.update(form.initial)
 
     def is_valid(self):
         isValid = True
@@ -66,8 +70,7 @@ class CombinedFormBase(forms.Form):
         # is_valid will trigger clean method
         # so it should be called after all other forms is_valid are called
         # otherwise clean_data will be empty
-        if not super().is_valid():
-            isValid = False
+        super().is_valid()
 
         for name in self.form_classes.keys():
             form = getattr(self, name)

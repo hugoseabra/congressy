@@ -85,6 +85,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         'count',
         'attended',
         'attended_on',
-        'synchronized'
+        'synchronized',
+        'congressy_percent',
     ]
     ordering = ('lot', 'count', 'person',)

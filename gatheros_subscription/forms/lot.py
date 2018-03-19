@@ -1,10 +1,10 @@
 """ Formulários de `Lot` """
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 from django import forms
 
+from core.forms import PriceInput, SplitDateTimeWidget
 from gatheros_subscription.models import Lot
-from core.forms import SplitDateTimeWidget, TelephoneInput
 
 INSTALLMENT_CHOICES = (
     (2, 2),
@@ -43,7 +43,7 @@ class LotForm(forms.ModelForm):
 
         widgets = {
             'event': forms.HiddenInput(),
-            'price': TelephoneInput(),
+            'price': PriceInput(),
             'date_start': SplitDateTimeWidget(),
             'date_end': SplitDateTimeWidget(),
             'installment_limit': forms.Select(

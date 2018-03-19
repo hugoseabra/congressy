@@ -218,8 +218,6 @@ FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'gatheros_subscription/tests/fixtures'),
     os.path.join(BASE_DIR, 'payment/tests/fixtures'),
 ]
-# ============================== GOOGLE ===================================== #
-GOOGLE_MAPS_API_KEY = 'AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw'
 # ============================= CKEDITOR ==================================== #
 CKEDITOR_CONFIGS = {
     'default': {
@@ -310,11 +308,8 @@ WKHTMLTOPDF_CMD = os.path.join(
 )
 
 # ============================= PAYMENT ===================================== #
-# Planos da congress, contemplam percentuais de recebimento em cima das
+# Planos da congressy, contemplam percentuais de recebimento em cima das
 # transações
-
-# Informar o valor em percentual, sem o símbolo
-CONGRESSY_PLAN_PERCENT_10 = 10
 
 # Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
 # devido for menor do que este, o valor da transaçaõ da parte da congressy será

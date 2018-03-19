@@ -105,3 +105,13 @@
         </div>
     </form>
 {% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('input[type=email]').on('keyup', function () {
+            $(this).val($(this).val().toLowerCase());
+        });
+    });
+</script>
+{% endblock %}

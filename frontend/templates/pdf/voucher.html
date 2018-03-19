@@ -23,7 +23,9 @@
         </div>
     </div>
     <div class="row" align="center">
-        <h2>Comprovate do Pedido | Ingresso</h2>
+        <h1>Comprovate do Pedido | Ingresso</h1>
+        <div style="font-weight: bold;font-size:18px">{{ subscription.code }}</div>
+        <div style="font-size:14px">{{ subscription.created }}</div>
     </div>
     <hr/>
     <br>
@@ -31,19 +33,17 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h3>{{ event.name|upper }}</h3>
+            <h3 class="text-center" style="font-weight: bold;">{{ event.name|upper }}</h3>
             <br/>
             <p style="font-size: 20px">
                 <strong>
                     {{ organization.name|upper }}
                 </strong>
                 agradece o seu interesse em participar
-                do <strong>{{ event.name|upper }}</strong>
+                de seu evento.
             </p>
 
-            <p style="margin-top: 20px;font-size: 20px">Confirmamos o seu
-                pedido conforme dados
-                abaixo:</p>
+            <p style="margin-top: 20px;font-size: 20px">Abaixo estão os dados do seu pedido:</p>
             <br/>
 
 

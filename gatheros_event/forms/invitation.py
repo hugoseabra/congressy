@@ -51,7 +51,7 @@ class InvitationCreateForm(forms.Form):
         organization = self.initial.get('organization')
         invited_user, _ = User.objects.get_or_create(
             username=email,
-            defaults={'email': email}
+            defaults={'email': email.lower()}
         )
         invite = Invitation(
             author=organization.get_member(person=self.user),
