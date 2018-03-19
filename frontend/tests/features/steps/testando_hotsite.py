@@ -26,12 +26,24 @@ slugs = [
     'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-disponivel-limitado-lotado/',
     'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-disponivel-limitado-lotado-e-1-disponivel-limitado-5-vagas/',
     'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-disponivel-limitado-lotado-e-1-nao-iniciado',
-    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-ilimitado/'
-    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-limitado-5-vagas/'
-    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-limitado-lotado/'
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-ilimitado/',
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-limitado-5-vagas/',
+    'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-expirado-e-1-disponivel-limitado-lotado/',
     'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-1-lote-nao-disponivel-data-futura/',
     'futuro-e-pago-c-lotes-sem-transferencia-de-taxas-2-lotes-expirados/',
-
+    'futuro-publicado-insc-desativadas-futuro-publicado-insc-desativadas/',
+    'futuro-publicado-insc-simples-futuro-publicado-insc-simples/',
+    'futuro-publicado-e-gratuito-c-lotes-1-lote-disponivel-e-1-nao-iniciado/',
+    'futuro-publicado-e-gratuito-c-lotes-1-lote-disponivel-ilimitado/',
+    'futuro-publicado-e-gratuito-c-lotes-1-lote-disponivel-limitado-5-vagas/',
+    'futuro-publicado-e-gratuito-c-lotes-1-lote-disponivel-limitado-lotado/',
+    'futuro-publicado-e-gratuito-c-lotes-1-lote-disponivel-limitado-lotado-e-1-disponivel-limitado-5-vagas/',
+    'futuro-publicado-e-gratuito-c-lotes-1-lote-disponivel-limitado-lotado-e-1-nao-iniciado/',
+    'futuro-publicado-e-gratuito-c-lotes-1-lote-expirado-e-1-disponivel-ilimitado/',
+    'futuro-publicado-e-gratuito-c-lotes-1-lote-expirado-e-1-disponivel-limitado-5-vagas/',
+    'futuro-publicado-e-gratuito-c-lotes-1-lote-expirado-e-1-disponivel-limitado-lotado/',
+    'futuro-publicado-e-gratuito-c-lotes-1-lote-nao-disponivel-data-futura/',
+    'futuro-publicado-e-gratuito-c-lotes-2-lotes-expirados/'
 ]
 @given ('Usuário entra no hotsite do evento \'{evento}\'')
 def step_impl(context,evento):
