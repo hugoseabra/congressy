@@ -37,13 +37,11 @@ class Option(Entity, models.Model):
     value = models.CharField(
         max_length=255,
         verbose_name='valor',
+        null=True,
+        blank=True,
     )
 
     active = models.BooleanField(
         default=True,
         verbose_name='ativo'
-    )
-
-    intro = models.BooleanField(
-        default=False,
     )

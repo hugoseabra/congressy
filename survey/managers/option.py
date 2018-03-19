@@ -22,6 +22,14 @@ class OptionManager(Manager):
         fields = '__all__'
 
     def clean_question(self):
+        """
+            Implementação da regra de negocio:
+
+                - Deve sempre ser de uma pergunta que suporte opções:
+                    SELECT, RADIO ou CHECKBOX;
+
+        """
+
         question = self.cleaned_data.get('question')
 
         if not question.accepts_options:

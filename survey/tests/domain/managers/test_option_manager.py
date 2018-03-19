@@ -19,6 +19,74 @@ class OptionManagerTest(TestCase):
         self.question = self.faker.fake_question(survey=self.survey,
                                                  type=Question.FIELD_SELECT)
 
+    def test_option_of_selectable_question(self):
+        """
+            Testa se opção é de um campo com suporte a opções.
+
+            Conforme a regra:
+                - Deve sempre ser de uma pergunta que suporte opções:
+                    SELECT, RADIO ou CHECKBOX;
+        """
+
+        # Correct
+        selectables = [
+            Question.FIELD_SELECT,
+            Question.FIELD_RADIO_GROUP,
+            Question.FIELD_CHECKBOX_GROUP
+        ]
+
+        for question_type in selectables:
+            selectable_question = self.faker.fake_question(
+                survey=self.survey,
+                type=question_type,
+            )
+
+            correct_form = OptionManager(
+                data={
+                    'question': selectable_question.pk,
+                    'name': ' '.join(self.faker.fake_factory.words(nb=3)),
+                    'value': ' '.join(self.faker.fake_factory.words(nb=2)),
+                },
+            )
+
+            self.assertTrue(correct_form.is_valid())
+            correct_form.save()
+
+        # Incorrect
+        for question_type in Question.TYPES:
+            if question_type in selectables:
+                continue
+
+            non_selectable_question = self.faker.fake_question(
+                survey=self.survey,
+                type=question_type,
+            )
+
+            incorrect_form = OptionManager(
+                data={
+                    'question': non_selectable_question.pk,
+                    'name': ' '.join(self.faker.fake_factory.words(nb=3)),
+                    'value': ' '.join(self.faker.fake_factory.words(nb=2)),
+                },
+            )
+
+            self.assertFalse(incorrect_form.is_valid())
+
+    def test_setting_an_intro_option_as_first(self):
+        """
+            Testa se a regra:
+                - Deve ser possível definir uma opção como "intro" que define
+                  o primeiro  pergunta em branco
+
+            está validando.
+        """
+        manager = OptionManager(
+            data={
+                'question': self.question.pk,
+                'name': 'Intro Option',
+            },
+        )
+
     def test_same_option_same_question_with_prefix(self):
         """
         Testa se opção com um valor repetido na pergunta é salva com sucesso
@@ -112,37 +180,3 @@ class OptionManagerTest(TestCase):
         self.assertEqual(form1.instance.name, og_slug)
         self.assertEqual(form2.instance.name, og_slug)
         self.assertEqual(form3.instance.name, og_slug)
-
-    def test_option_of_selectable_question(self):
-        """ Testa se opção é de um campo com suporte a opções. """
-
-        selectable_question = self.faker.fake_question(
-            survey=self.survey,
-            type=Question.FIELD_SELECT,
-        )
-
-        non_selectable_question = self.faker.fake_question(
-            survey=self.survey,
-            type=Question.FIELD_INPUT_TEXT,
-        )
-
-        correct_form = OptionManager(
-            data={
-                'question': selectable_question.pk,
-                'name': "Correct Form",
-                'value': "41",
-            },
-        )
-
-        self.assertTrue(correct_form.is_valid())
-        correct_form.save()
-
-        incorrect_form = OptionManager(
-            data={
-                'question': non_selectable_question.pk,
-                'name': "Incorrect Form",
-                'value': "42",
-            },
-        )
-
-        self.assertFalse(incorrect_form.is_valid())

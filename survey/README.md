@@ -13,15 +13,14 @@
 - Percente a um formulário;
 - Nome deve ser sempre único para o formulário, a não ser que que seja um 
 pergunta de múltiplas escolhas;
+- Deve ser possível definir uma opção como "intro" que define a primeira 
+opção em branco;
 
 
 ### Opção de Pergunta (Option)
 
 - Pertence a uma pergunta;
 - Deve sempre ser de uma pergunta que suporte opções: SELECT, RADIO ou CHECKBOX;
-- Deve ser possível definir uma opção como "intro" que define o primeiro 
-pergunta em branco;
-- Não pode haver mais de uma pergunta como "Intro" em uma pergunta;
 - Não pode haver duas opções com mesmo valor para a mesma pergunta;
 
 

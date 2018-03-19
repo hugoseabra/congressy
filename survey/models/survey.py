@@ -3,9 +3,10 @@
     Questionário para acumular perguntas diversas de um determinado autor.
 """
 from django.db import models
+from survey.models.mixins import Entity
 
 
-class Survey(models.Model):
+class Survey(Entity, models.Model):
     """
         Survey domain model implementation.
     """

@@ -2,17 +2,18 @@
     Testing the application service mixin.
 """
 
-from django_fake_model import models as f
+from django import forms
 from django.db import models
+from django_fake_model import models as f
 from test_plus.test import TestCase
 
 from survey.managers import Manager
+from survey.models.mixins import Entity
 from survey.services import ApplicationServiceMixin, \
     ManagerClassMissingError, ManagerWrongTypeError
-from django import forms
 
 
-class MyFakeModel(f.FakeModel):
+class MyFakeModel(Entity, f.FakeModel):
     name = models.CharField(max_length=100)
 
 
@@ -21,13 +22,11 @@ class ApplicationServiceMixinTest(TestCase):
     """ Main test implementation """
 
     class CorrectModelManager(Manager):
-
         class Meta:
             model = MyFakeModel
             fields = '__all__'
 
-    class IncorrectModelManager(forms.ModelForm):
-
+    class ModelFormManager(forms.ModelForm):
         class Meta:
             model = MyFakeModel
             fields = '__all__'
@@ -36,9 +35,9 @@ class ApplicationServiceMixinTest(TestCase):
             return False
 
     def setUp(self):
-        # Create a dummy model which extends the mixin
         self.correct_manager = self.CorrectModelManager
-        self.incorrect_manager = self.IncorrectModelManager
+        self.model_form_manager = self.ModelFormManager
+        self.service_class = ApplicationServiceMixin
 
     def test_service_creation(self):
         """
@@ -50,17 +49,37 @@ class ApplicationServiceMixinTest(TestCase):
 
         self.assertIsInstance(correct_instance, ApplicationServiceMixin)
 
-        incorrect_service_class = ApplicationServiceMixin
-        incorrect_service_class.manager_class = self.incorrect_manager
-        with self.assertRaises(ManagerWrongTypeError):
-            incorrect_service_class()
+        self.assertEqual(correct_instance.fields,
+                         correct_instance.manager.fields)
+        self.assertEqual(correct_instance.initial,
+                         correct_instance.manager.initial)
 
-        incorrect_service_class.manager_class = None
-        with self.assertRaises(ManagerClassMissingError):
-            incorrect_service_class()
+    def test_service_manager_retrieval(self):
+        """
+            Testa se está buscando corretamente o manager.
+        """
+
+        service_class = self.service_class
+        service_class.manager_class = self.correct_manager
+        service = service_class()
+
+        # Correto
+        self.assertIsInstance(service._get_manager(), self.correct_manager)
+
+        # Incorreto
+        service.manager_class = self.model_form_manager
+        with self.assertRaises(ManagerWrongTypeError) as e:
+            service._get_manager()
+            self.assertEqual(e.msg, 'Manager inválido')
+
+        service.manager_class = None
+        with self.assertRaises(ManagerClassMissingError) as e:
+            service._get_manager()
+            self.assertEqual(e.msg,
+                             'Você deve informar uma class de Manager do '
+                             'Model')
 
     def test_service_is_valid(self):
-
         service_class = ApplicationServiceMixin
         service_class.manager_class = self.correct_manager
 

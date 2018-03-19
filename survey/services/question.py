@@ -1,28 +1,37 @@
 """
-Application Service
+    Serviço de Aplicação para Perguntas
+
+    Deve permitir as seguintes ações:
+
+        1. Adicionar uma pergunta;
+        2. Resgatar uma pergunta;
+        3. Editar uma pergunta;
+        4. Excluir uma pergunta;
+
 """
 from survey.services import mixins
 from survey.managers import QuestionManager
-from survey.models import Survey
 
 
 class QuestionService(mixins.ApplicationServiceMixin):
     """ Application Service """
     manager_class = QuestionManager
 
-    def clean_survey(self):
-        survey = self.cleaned_data.get('survey')
-        if survey:
-            try:
-                survey = Survey.objects.get(pk=survey)
-            except Survey.DoesNotExist:
-                mixins.forms.ValidationError(
-                    'Questionário não informado ou inválido.'
-                )
-
-        return survey
-
-    def _get_manager_kwargs(self, **kwargs):
-        kwargs = super()._get_manager_kwargs(**kwargs)
-        kwargs['survey'] = self.cleaned_data.get('survey')
-        return kwargs
+    """
+        ### Novo Pergunta
+    
+        É possível criar uma Pergunta e depois adicionar ao Questionário:
+        
+        ```python
+        question_service = QuestionService()
+         
+        question = question_service.create(
+            type=constants.INPUT_TYPE,
+            label='Qual o seu nome?',
+            required=True,
+            help_text='Informe o seu nome completo.'
+        )
+         
+        
+        survey.add_question(question)
+    """

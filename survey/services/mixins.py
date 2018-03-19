@@ -60,23 +60,21 @@ class ApplicationServiceMixin(forms.Form):
 
     def _get_manager(self, **kwargs):
         manager_class = self._get_manager_class()
+
         manager = manager_class(**self._get_manager_kwargs(**kwargs))
 
         if not isinstance(manager, Manager):
-            raise ManagerWrongTypeError('Manager inválido.')
+            raise ManagerWrongTypeError('Manager inválido')
 
         return manager
 
     def _get_manager_class(self):
         if not self.manager_class:
             raise ManagerClassMissingError(
-                "Você deve informar uma class de Manager do Model."
+                "Você deve informar uma class de Manager do Model"
             )
 
         return self.manager_class
-
-    def _get_manager_kwargs(self, **kwargs):
-        return kwargs
 
     def is_valid(self):
         manager_valid = self.manager.is_valid()
@@ -94,3 +92,7 @@ class ApplicationServiceMixin(forms.Form):
 
     def save(self, commit=True):
         return self.manager.save(commit=commit)
+
+    @staticmethod
+    def _get_manager_kwargs(**kwargs):
+        return kwargs

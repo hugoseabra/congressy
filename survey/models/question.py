@@ -89,6 +89,11 @@ class Question(Entity, models.Model):
         verbose_name='ativo'
     )
 
+    intro = models.BooleanField(
+        default=False,
+        verbose_name='primeira entrada vazia.'
+    )
+
     @property
     def has_options(self):
         return self.options.count() > 0
