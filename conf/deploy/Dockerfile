@@ -98,18 +98,19 @@ RUN pip install --no-cache-dir -r requirements.pip
 COPY ./conf/deploy/scripts.sh /scripts.sh
 COPY ./conf/deploy/scripts.py /scripts.py
 
-COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
-#COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
 COPY ./conf/deploy/setup/configure-settings.py /configure-settings.py
-#COPY ./conf/deploy/setup/configure-version.py /configure-version.py
 COPY ./conf/deploy/setup/configure-sync.py /configure-sync.py
 COPY ./conf/deploy/setup/configure-cron.py /configure-cron.py
+COPY ./conf/deploy/setup/configure-version.py /configure-version.py
+COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
+COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
 COPY ./conf/deploy/services /services
 
 # -----------------------------------------------------------------------------
 COPY ./. ./.
 
 RUN chmod 775 /services/volume/container-entry.sh \
-              /services/cron/container-entry.sh
+              /services/cron/container-entry.sh \
+              /services/web/manage/container-entry.sh
 
 EXPOSE 80

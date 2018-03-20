@@ -1,10 +1,44 @@
 version: "3"
 services:
+  redis:
+    image: redis:4-alpine
+    restart: always
+    networks:
+      - redis
+    volumes:
+      - "redis:/data"
+
   # Preparação de volumes.
+  volume:
+    image: cgsy:latest
+    entrypoint:
+      - /services/volume/container-entry.sh
+    volumes:
+      - "./media:/var/www/cgsy/media"
+    env_file: ./env-file
+
   cron:
     image: cgsy:latest
     entrypoint:
       - /services/cron/container-entry.sh
     volumes:
       - "./media:/var/www/cgsy/media"
-    env_file: env-file
+    env_file: ./env-file
+
+  manage:
+    image: cgsy:latest
+    networks:
+      - redis
+    ports:
+      - "8000:80"
+    entrypoint:
+      - /services/web/manage/container-entry.sh
+    volumes:
+      - "./media:/var/www/cgsy/media"
+    env_file: ./env-file
+
+networks:
+  redis:
+
+volumes:
+  redis:
