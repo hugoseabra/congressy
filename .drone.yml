@@ -96,8 +96,6 @@ pipeline:
       - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ./bin/env/staging/env-cgsy-staging
       - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-cgsy-staging
       - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
