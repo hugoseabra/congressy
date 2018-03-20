@@ -19,4 +19,5 @@ def setup(env_dict, origin_file_path, file_path):
 
     with open(file_path, 'w') as out_file:
         out_file.write(add_env_variables(env_dict, text))
+        out_file.write("\n") # add last line as blank line
         out_file.close()

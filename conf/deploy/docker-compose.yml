@@ -7,10 +7,4 @@ services:
       - /services/cron/container-entry.sh
     volumes:
       - "./media:/var/www/cgsy/media"
-    env_file: /tmp/env-file
-
-networks:
-  redis:
-
-volumes:
-  redis:
+    env_file: env-file
