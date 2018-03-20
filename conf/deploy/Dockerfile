@@ -53,7 +53,7 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
 
 # install uwsgi now because it takes a little while
 RUN pip install --no-cache-dir --upgrade \
-        pip \
+        pip setuptools \
         # required by celery
         lxml \
         celery[redis] \
