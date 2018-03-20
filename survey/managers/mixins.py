@@ -35,3 +35,6 @@ class Manager(forms.ModelForm):
             raise EntityTypeError(model)
 
         super().__init__(**kwargs)
+
+    def get(self, pk):
+        return self.Meta.model.objects.get(pk=pk)
