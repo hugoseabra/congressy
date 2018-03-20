@@ -279,6 +279,48 @@ def notify_new_unpaid_subscription_credit_card(event, transaction):
     )
 
 
+def notify_new_refused_subscription_credit_card(event, transaction):
+    """
+    Notifica participante de nova inscrição de um lote pago pelo método de
+    cartão de crédito e o cartão foi recusado.
+    """
+    subscription = transaction.subscription
+
+    checks.check_notification_transaction_refused_credit_card(transaction)
+
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = 'mailer/subscription/notify_refused_subscription.html'
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': False,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        reply_to=event.organization.email,
+    )
+
+
 def notify_new_paid_subscription_credit_card(event, transaction):
     """
     Notifica participante de nova inscrição de um lote pago pelo método de
@@ -360,6 +402,62 @@ def notify_new_user_and_unpaid_subscription_credit_card(event, transaction):
     # @TODO set event.date_start to period
     template_name = \
         'mailer/subscription/notify_new_user_and_unpaid_subscription.html'
+
+    body = render_to_string(template_name, {
+        'person': person,
+        'event': event,
+        'period': event.date_start,
+        'event_url': event_url,
+        'date': subscription.created,
+        'has_voucher': False,
+        'boleto_url': None,
+        'my_account_url': absoluteuri.reverse('front:start'),
+        'reset_password_url': absoluteuri.reverse('public:password_reset'),
+        'password_set_url': password_set_url,
+    })
+
+    sender = send_mail.delay if CELERY else send_mail
+
+    return sender(
+        subject='Inscrição: {}'.format(event.name),
+        body=body,
+        to=person.email,
+        reply_to=event.organization.email,
+    )
+
+
+def notify_new_user_and_refused_subscription_credit_card(event, transaction):
+    """
+    Notifica participante de nova inscrição de um lote pago pelo método de
+    cartão de crédito.
+    """
+    subscription = transaction.subscription
+
+    checks.check_notification_transaction_refused_credit_card(transaction)
+
+    person = subscription.person
+
+    event_url = absoluteuri.reverse(
+        'public:hotsite',
+        kwargs={
+            'slug': event.slug,
+        }
+    )
+
+    user = person.user
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    password_set_url = absoluteuri.reverse(
+        'password_reset_confirm',
+        kwargs={
+            'uidb64': uid,
+            'token': token,
+        }
+    )
+
+    # @TODO set event.date_start to period
+    template_name = \
+        'mailer/subscription/notify_new_user_and_refused_subscription.html'
 
     body = render_to_string(template_name, {
         'person': person,

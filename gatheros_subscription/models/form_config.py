@@ -137,7 +137,7 @@ class FormConfig(models.Model):
         default=INSTITUTION_CNPJ_HIDE,
         max_length=35,
         verbose_name='CNPJ',
-        help_text='CNPJ da empresa com a qual você o(a) partcipante'
+        help_text='CNPJ da empresa com a qual o(a) partcipante está'
                   ' vinculado(a).'
     )
 
@@ -146,7 +146,7 @@ class FormConfig(models.Model):
         default=FUNCTION_HIDE,
         max_length=35,
         verbose_name='Cargo/Função',
-        help_text='Cargo ou função que exerce profissialmente.'
+        help_text='Cargo ou função que exerce profissionalmente.'
     )
 
     class Meta:

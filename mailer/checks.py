@@ -88,6 +88,26 @@ def check_notification_transaction_paid_credit_card(transaction):
         )
 
 
+def check_notification_transaction_refused_credit_card(transaction):
+    """
+    Verifica notificação de transação paga do tipo 'credit_card'
+
+    - inscrição deve estar como 'confirmada';
+    - transação deve ser do tipo 'credit_card';
+    - transação deve pode estar com status de 'paga';
+    """
+    _check_refused_transaction(transaction)
+
+    if transaction.type != transaction.CREDIT_CARD:
+        raise exception.NotifcationError(
+            "Tipo de transação inválido para esta notificação: '{type}'. Esta"
+            " notificação é para transações do tipo '{cc}'".format(
+                type=transaction.type,
+                cc=transaction.CREDIT_CARD
+            )
+        )
+
+
 def _check_unpaid_transaction(transaction):
     """ Verifica transações não pagas. """
     subscription = transaction.subscription
@@ -107,7 +127,7 @@ def _check_unpaid_transaction(transaction):
 
 
 def _check_paid_transaction(transaction):
-    """ Verifica transações não pagas. """
+    """ Verifica transações pagas. """
     subscription = transaction.subscription
 
     if subscription.status != subscription.CONFIRMED_STATUS:
@@ -120,4 +140,21 @@ def _check_paid_transaction(transaction):
         raise exception.NotifcationError(
             "Transação ainda não está paga. A notificação é somente para"
             " transação paga."
+        )
+
+
+def _check_refused_transaction(transaction):
+    """ Verifica transações pagas e recusadas. """
+    subscription = transaction.subscription
+
+    if subscription.status != subscription.AWAITING_STATUS:
+        raise exception.NotifcationError(
+            "Notificação de inscrição recusada só poderá ser feita se"
+            " inscrição estiver pendete. Esta inscrição não está pendente."
+        )
+
+    if transaction.status == transaction.PAID:
+        raise exception.NotifcationError(
+            "Transação ainda já está paga. A notificação é somente para"
+            " transação recusada."
         )

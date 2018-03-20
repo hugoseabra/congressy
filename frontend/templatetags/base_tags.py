@@ -92,17 +92,3 @@ def money_divide(value):
     except (ValueError, ZeroDivisionError):
         return None
 
-
-@register.filter
-def money_divide_with_percentage(amount):
-    if not amount:
-        return ' --- '
-
-    congressy_percent = Decimal(settings.CONGRESSY_PLAN_PERCENT_10)
-    congressy_amount = amount * (congressy_percent / 100)
-
-    minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
-    if congressy_amount < minimum:
-        congressy_amount = minimum
-
-    return round(amount - congressy_amount, 2)

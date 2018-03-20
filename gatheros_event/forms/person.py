@@ -18,33 +18,33 @@ class PersonForm(forms.ModelForm):
     states = (
         ('', '----'),
         # replace the value '----' with whatever you want, it won't matter
-        ("AC", "Acre"),
-        ("AL", "Alagoas"),
-        ("AP", "Amapá"),
-        ("AM", "Manaus"),
-        ("BA", "Bahia"),
-        ("CE", "Ceará"),
-        ("DF", "Distrito Federal"),
-        ("ES", "Espírito Santo"),
-        ("GO", "Goiás"),
-        ("MA", "Maranhão"),
-        ("MT", "Mato Grosso"),
-        ("MS", "Mato Grosso do Sul"),
-        ("MG", "Minas Gerais"),
-        ("PA", "Pará"),
-        ("PB", "Paraíba"),
-        ("PR", "Paraná"),
-        ("PE", "Pernambuco"),
-        ("PI", "Piauí"),
-        ("RJ", "Rio de Janeiro"),
-        ("RN", "Rio Grande do Norte"),
-        ("RS", "Rio Grande do Sul"),
-        ("RO", "Rondônia"),
-        ("RR", "Roraima"),
-        ("SC", "Santa Catarina"),
-        ("SP", "São Paulo"),
-        ("SE", "Sergipe"),
-        ("TO", "Tocantins"),
+        ("AC", "AC"),
+        ("AL", "AL"),
+        ("AP", "AP"),
+        ("AM", "AM"),
+        ("BA", "BA"),
+        ("CE", "CE"),
+        ("DF", "DF"),
+        ("ES", "ES"),
+        ("GO", "GO"),
+        ("MA", "MA"),
+        ("MT", "MT"),
+        ("MS", "MS"),
+        ("MG", "MG"),
+        ("PA", "PA"),
+        ("PB", "PB"),
+        ("PR", "PR"),
+        ("PE", "PE"),
+        ("PI", "PI"),
+        ("RJ", "RJ"),
+        ("RN", "RN"),
+        ("RS", "RS"),
+        ("RO", "RO"),
+        ("RR", "RR"),
+        ("SC", "SC"),
+        ("SP", "SP"),
+        ("SE", "SE"),
+        ("TO", "TO"),
     )
     empty = (
         ('', '----'),
@@ -69,7 +69,8 @@ class PersonForm(forms.ModelForm):
             'city': forms.HiddenInput(),
             'birth_date': forms.SelectDateWidget(
                 attrs=({'style': 'width: 30%; display: inline-block;'}),
-                years=create_years_list(), )
+                years=create_years_list(),
+            )
         }
 
     def __init__(self, is_chrome=False, **kwargs):
@@ -97,7 +98,11 @@ class PersonForm(forms.ModelForm):
         self.fields[field_name].required = True
 
     def clean_zip_code(self):
-        return clear_string(self.data.get('zip_code'))
+        zip_code = self.data.get('zip_code')
+        if zip_code:
+            zip_code = clear_string(zip_code)
+
+        return zip_code
 
     def clean_cpf(self):
         cpf = self.cleaned_data.get('cpf')

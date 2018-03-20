@@ -10,6 +10,10 @@ from django.db import models
 from django.db.models import Max
 
 from gatheros_event.models import Event, Person
+from gatheros_event.models.constants import (
+    CONGRESSY_PERCENTS,
+    CONGRESSY_PERCENT_10_0,
+)
 from gatheros_event.models.mixins import GatherosModelMixin
 from . import Lot
 from .rules import subscription as rule
@@ -128,6 +132,14 @@ class Subscription(models.Model, GatherosModelMixin):
     )
     synchronized = models.BooleanField(default=False)
 
+    congressy_percent = models.CharField(
+        max_length=5,
+        choices=CONGRESSY_PERCENTS,
+        default=CONGRESSY_PERCENT_10_0,
+        verbose_name='percentual congressy',
+        help_text="Valor percentual da congressy."
+    )
+
     objects = SubscriptionManager()
 
     class Meta:
@@ -155,6 +167,7 @@ class Subscription(models.Model, GatherosModelMixin):
         """ Salva entidade. """
         self.full_clean()
         self.check_rules()
+        self.congressy_percent = self.event.congressy_percent
         super(Subscription, self).save(*args, **kwargs)
 
     def clean(self):
