@@ -14,7 +14,8 @@ from django.db import models
 from django.utils.encoding import force_text
 
 from core.model import track_data
-from gatheros_event.models import Event, EventSurvey
+from gatheros_event.models import Event
+from .event_survey import EventSurvey
 from gatheros_event.models.mixins import GatherosModelMixin
 from .rules import lot as rule
 
