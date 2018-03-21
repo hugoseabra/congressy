@@ -5,10 +5,10 @@ feita por um organizador de evento, dono de uma organização, e que deseja
 apresentar informações ligadas a ela a pessoa que possam se interessar em
 participar do evento.
 """
-import os
-from collections import Counter
 from datetime import datetime
 
+import os
+from collections import Counter
 from django.db import models
 from django.utils.encoding import force_text
 from stdimage import StdImageField
@@ -18,7 +18,6 @@ from core.model import track_data
 from core.util import model_field_slugify
 from . import Category, Organization
 from .mixins import GatherosModelMixin
-from .rules import event as rule
 
 
 def get_image_path(instance, filename):
