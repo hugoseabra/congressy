@@ -8,8 +8,9 @@ from mailer.celery import app
 
 task_params = {
     'bind': True,
-    'rate_limit': '300/h',  # Tentar até 300x por hora
-    'default_retry_delay': 15 * 60  # retry in 15m
+    'rate_limit': '10/m',  # Tentar até 10 tasks por minuto
+    'default_retry_delay': 15 * 60,  # retry in 15m
+    'ignore_result': True, # ignora os resultados da task
 }
 
 

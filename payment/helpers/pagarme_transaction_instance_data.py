@@ -95,9 +95,7 @@ class PagarmeTransactionInstanceData:
                 {
                     "id": str(transaction_id),
                     "title": self.event.name,
-                    "unit_price": self.as_payment_format(
-                        self.lot.get_calculated_price()
-                    ),
+                    "unit_price": self.as_payment_format(self.amount),
                     "quantity": 1,
                     "tangible": False
                 }
@@ -147,7 +145,9 @@ class PagarmeTransactionInstanceData:
     @staticmethod
     def as_payment_format(value):
         value = str(round(value, 2))
-        value, cents = value.split('.')
+        v_split = value.split('.')
+        value = v_split[0]
+        cents = v_split[1] if len(v_split) == 2 else ''
         return str(value + cents)
 
     def _set_amount(self):
@@ -158,7 +158,9 @@ class PagarmeTransactionInstanceData:
             self.amount = \
                 round(Decimal(self.extra_data.get('amount')), 2) / 100
         else:
-            self.amount = 0
+            raise TransactionError(
+                message="Transação sem valor."
+            )
 
     def _check_lot(self):
         if int(self.lot.pk) != int(self.extra_data.get('lot')):
@@ -194,7 +196,7 @@ class PagarmeTransactionInstanceData:
             )
 
         if self.extra_data['transaction_type'] not in allowed_payment_methods:
-            raise TransactionError(message='Tip de transação não permitido.')
+            raise TransactionError(message='Tipo de transação não permitido.')
 
         self.transaction_type = self.extra_data['transaction_type']
 
@@ -207,7 +209,7 @@ class PagarmeTransactionInstanceData:
         :return:
         """
         org_percent = self.as_decimal(
-            (100 - settings.CONGRESSY_PLAN_PERCENT_10) / 100
+            (100 - float(self.event.congressy_percent)) / 100
         )
 
         # Com transferência, o valor da transaçaõ está maior do que o valor do
@@ -260,7 +262,7 @@ class PagarmeTransactionInstanceData:
 
         # Valor líquido da congressy direto do valor do lote.
         congressy_amount_liquid = self.lot.price * self.as_decimal(
-            settings.CONGRESSY_PLAN_PERCENT_10 / 100
+            float(self.event.congressy_percent) / 100
         )
 
         # Se o valor é menor do que o mínimo configurado, o mínimo assume.

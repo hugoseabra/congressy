@@ -1,6 +1,65 @@
-{% load static %}
+{% load i18n static base_tags %}
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<!DOCTYPE html>
+<!--[if lt IE 7 ]>
+<html class="ie ie6" lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<![endif]-->
+<!--[if IE 7 ]>
+<html class="ie ie7" lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<![endif]-->
+<!--[if IE 8 ]>
+<html class="ie ie8" lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<![endif]-->
+<!--[if (gte IE 9)|!(IE)]>
+<html lang="{{ LANGUAGE_CODE|default:"pt-br"}}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<!--<![endif]-->
+<head>
 
-{% include 'hotsite/includes/0_page_header.html' %}
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- BASIC INFO -->
+    <title>{{ event.name }} | Congressy</title>
+    <meta name="author" content="{{ event.organization }}">
+    <meta name="description"
+          content="{{ info.description }}">
+
+    <!-- FAVICONS -->
+    <link rel="icon" href="{% static 'hotsite/images/favicons/favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'hotsite/images/favicons/apple-touch-icon.png' %}">
+
+    <!-- CSS
+    ================================= -->
+
+    <!-- GOOGLE FONTS -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
+
+    <!-- LIBRARIES CSS -->
+    <link rel="stylesheet" href="{% static 'hotsite/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/fontawesome-all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'hotsite/css/animate.min.css' %}">
+
+    <!-- SPECIFIC CSS -->
+    <link rel="stylesheet" href="{% static 'hotsite/css/style.css' %}">
+
+    <!-- COLOR -->
+    <link id="color-css" rel="stylesheet" href="{% static 'hotsite/css/colors/blue.css' %}">
+    <style>
+        img.blurred {
+            -webkit-filter: blur(18px);
+            -moz-filter: blur(18px);
+            -o-filter: blur(18px);
+            -ms-filter: blur(18px);
+            filter: blur(18px);
+        }
+    </style>
+
+    {% block styles %}{% endblock %}
+</head>
 
 {% if remove_preloader %}
     <body>
@@ -48,8 +107,9 @@ var MAP_POINTER = "{% static 'hotsite/images/contents/map-1.png'%}";
 <script>
 $(document).ready(function() {
     show_map(
-        '{{ event.place.lat }}'.replace(',', '.'),
-        '{{ event.place.long }}'.replace(',', '.')
+        '{{ event.place.lat }}',
+        '{{ event.place.long }}',
+        '{{ event.place.zoom|default_if_none:18 }}'
     );
 });
 </script>

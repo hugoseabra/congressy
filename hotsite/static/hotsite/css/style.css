@@ -467,7 +467,7 @@ iframe {
 	background-color: rgba(255,255,255,0.2);
 }
 .form-group {
-	margin: 20px 0;
+	margin: 4px 0;
 }
 .form-group-submit {
 	margin-top: 30px;
@@ -488,13 +488,13 @@ iframe {
 	color: #888;
 }
 .form-control:-moz-placeholder {
-	color: #888;  
+	color: #888;
 }
 .form-control::-moz-placeholder {
-	color: #888;  
+	color: #888;
 }
 .form-control:-ms-input-placeholder {
-	color: #888;  
+	color: #888;
 }
 .form-control {
 	font-size: inherit;
@@ -1058,7 +1058,7 @@ iframe {
 	margin-bottom: 20px;
 }
 .hero-tagline {
-	font-size: 20px;
+	font-size: 16px;
 }
 .hero-buttons {
 	margin-top: 30px;

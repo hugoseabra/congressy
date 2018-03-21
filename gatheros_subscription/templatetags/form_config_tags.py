@@ -33,14 +33,14 @@ def render_generic_field(
             label=label
         )
 
-    if help_text is not None:
-        field.help_text = help_text
+    if not help_text:
+        help_text = field.help_text
 
     return {
         'field': field,
         'label_tag': field.label_tag,
         'name': field.name,
-        'help_text': field.help_text,
+        'help_text': help_text,
         'errors': field.errors,
         'required': required,
         'autofocus': autofocus,

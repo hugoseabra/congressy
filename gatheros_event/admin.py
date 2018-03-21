@@ -30,6 +30,7 @@ class EventAdmin(admin.ModelAdmin):
         'organization',
         'date_start',
         'date_end',
+        'created',
         'pk'
     )
     ordering = ['name']
@@ -43,6 +44,7 @@ class EventAdmin(admin.ModelAdmin):
                 'category',
                 'date_start',
                 'date_end',
+                'congressy_percent',
                 'image_main',
                 'published',
                 'slug',

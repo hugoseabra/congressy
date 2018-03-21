@@ -29,9 +29,10 @@ function process_payment(
     }
 
     var billing_title = 'Inscrição do evento: ' + event_name;
-    var amount_id = $('#id_lot').val().toString();
-    var lot = lots[amount_id];
-    var amount = normalize_amount_as_payment(lot.amount);
+    var amount = normalize_amount_as_payment($('#id_amount').val());
+
+    var lot_id = $('#id_lot').val().toString();
+    var lot = lots[lot_id];
     var allow_installment = lot.allow_installment === true;
     var installment_limit = lot.installment_limit;
     var free_installment = parseInt(lot.free_installment);

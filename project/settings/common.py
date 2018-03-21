@@ -4,7 +4,8 @@
 # A configuração de banco de dados é gerada automaticamente pelo deploy.
 # Não mude as configurações de DATABASES.
 #############################################################################
-
+# ============================== GOOGLE ===================================== #
+GOOGLE_MAPS_API_KEY = 'AIzaSyAPpiE3QALhF_5AhBSZJ9K27eDiJXCtTK0'
 from project.settings import *
 
 # ========================== BASE CONFIGURATION ============================= #
@@ -42,6 +43,8 @@ AUTH_PASSWORD_VALIDATORS = [
     #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     # },
 ]
+# ============================== GOOGLE ===================================== #
+GOOGLE_MAPS_API_KEY = 'AIzaSyAPpiE3QALhF_5AhBSZJ9K27eDiJXCtTK0'
 # ============================= PAGAR.ME ==================================== #
 PAGARME_API_KEY = 'ak_live_7Rxgr3GlxWycVDMNeeG2InzwPsoPrM'
 PAGARME_ENCRYPTION_KEY = 'ek_live_Hlpg45VTiyNOnAE4dmkEBbQDEtUZCX'

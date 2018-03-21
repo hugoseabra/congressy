@@ -16,6 +16,10 @@ from stdimage.validators import MaxSizeValidator, MinSizeValidator
 
 from core.model import track_data
 from core.util import model_field_slugify
+from gatheros_event.models.constants import (
+    CONGRESSY_PERCENTS,
+    CONGRESSY_PERCENT_10_0,
+)
 from . import Category, Organization
 from .mixins import GatherosModelMixin
 
@@ -158,6 +162,16 @@ class Event(models.Model, GatherosModelMixin):
         help_text='Eventos não publicados e com data futura serão considerados'
                   ' rascunhos.'
     )
+
+    congressy_percent = models.CharField(
+        max_length=5,
+        choices=CONGRESSY_PERCENTS,
+        default=CONGRESSY_PERCENT_10_0,
+        verbose_name='percentual congressy',
+        help_text="Valor percentual da congressy caso o evento seja pago."
+    )
+
+    created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
 
     class Meta:
         verbose_name = 'evento'

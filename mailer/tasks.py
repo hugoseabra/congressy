@@ -3,7 +3,7 @@ Task to send e-mails
 """
 
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives, get_connection
+from django.core.mail import EmailMultiAlternatives
 from django.utils import six
 from lxml import html
 

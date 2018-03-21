@@ -103,7 +103,7 @@ class Migration(migrations.Migration):
             model_name='lot',
             name='exhibition_code',
             field=models.CharField(blank=True,
-                                   help_text='Código foi gerado, porém você pode personaliza-lo como quiser.',
+                                   help_text="Personaliza-lo como quiser.",
                                    max_length=15, null=True,
                                    verbose_name='código de exibição'),
         ),

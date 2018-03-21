@@ -1,9 +1,8 @@
 # pylint: skip-file
 import os
 
-from django.utils.translation import ugettext_lazy as _
-
 from django.contrib.messages import constants as message_constants
+from django.utils.translation import ugettext_lazy as _
 
 # ========================== BASE CONFIGURATION ============================= #
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -57,7 +56,7 @@ INSTALLED_APPS = [
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
-USE_I18N = False
+USE_I18N = True
 USE_L10N = True
 USE_TZ = False
 
@@ -68,7 +67,7 @@ LOCALE_PATHS = (
 
 LANGUAGES = (
     ('en', _('English')),
-    ('en-US', _('English')),
+    ('en-us', _('English (US)')),
     ('pt-br', _('Português')),
 )
 # ============================= MIDDLEWARES ================================= #
@@ -138,13 +137,19 @@ FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 class InvalidTemplateVariable(str):
     def __mod__(self, other):
         from django.template.base import TemplateSyntaxError
-        raise TemplateSyntaxError("Invalid variable : '%s'" % other)
+        # access to current settings
+        from django.conf import settings
+
+        # display the message on page in make log it only on stage development
+        if settings.DEBUG is False:
+            raise TemplateSyntaxError("Invalid variable : '{}'".format(other))
 
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
+            os.path.join(BASE_DIR, 'core', 'forms', 'templates'),
             os.path.join(BASE_DIR, 'frontend', 'templates'),
             os.path.join(BASE_DIR, 'gatheros_event', 'templates'),
             os.path.join(BASE_DIR, 'hotsite', 'templates'),
@@ -152,7 +157,7 @@ TEMPLATES = [
         ],
         'APP_DIRS': True,
         'OPTIONS': {
-            'string_if_invalid': InvalidTemplateVariable("%s"),
+            # 'string_if_invalid': InvalidTemplateVariable("%s"),
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -215,8 +220,6 @@ FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'gatheros_subscription/tests/fixtures'),
     os.path.join(BASE_DIR, 'payment/tests/fixtures'),
 ]
-# ============================== GOOGLE ===================================== #
-GOOGLE_MAPS_API_KEY = 'AIzaSyD6ejnl_NChhfZhI_GoNT12FfCVCdOlgtw'
 # ============================= CKEDITOR ==================================== #
 CKEDITOR_CONFIGS = {
     'default': {
@@ -307,11 +310,8 @@ WKHTMLTOPDF_CMD = os.path.join(
 )
 
 # ============================= PAYMENT ===================================== #
-# Planos da congress, contemplam percentuais de recebimento em cima das
+# Planos da congressy, contemplam percentuais de recebimento em cima das
 # transações
-
-# Informar o valor em percentual, sem o símbolo
-CONGRESSY_PLAN_PERCENT_10 = 10
 
 # Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
 # devido for menor do que este, o valor da transaçaõ da parte da congressy será
