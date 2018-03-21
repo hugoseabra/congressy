@@ -31,7 +31,9 @@
       "document_type": null,
       "date_created": null,
       "active_recipient": false,
-      "recipient_id": null
+      "recipient_id": null,
+      "phone": null,
+      "email": null
     }
   },
   {
@@ -66,7 +68,9 @@
       "document_type": null,
       "date_created": null,
       "active_recipient": false,
-      "recipient_id": null
+      "recipient_id": null,
+      "phone": null,
+      "email": null
     }
   },
   {
@@ -101,7 +105,9 @@
       "document_type": null,
       "date_created": null,
       "active_recipient": false,
-      "recipient_id": null
+      "recipient_id": null,
+      "phone": null,
+      "email": null
     }
   },
   {
@@ -136,7 +142,9 @@
       "document_type": null,
       "date_created": null,
       "active_recipient": false,
-      "recipient_id": null
+      "recipient_id": null,
+      "phone": null,
+      "email": null
     }
   },
   {
@@ -171,7 +179,9 @@
       "document_type": null,
       "date_created": null,
       "active_recipient": false,
-      "recipient_id": null
+      "recipient_id": null,
+      "phone": null,
+      "email": null
     }
   },
   {
@@ -206,7 +216,9 @@
       "document_type": "cnpj",
       "date_created": "2018-02-01T19:59:12.861Z",
       "active_recipient": true,
-      "recipient_id": "re_cjdd53hts01jb8p6dp7vfhd7i"
+      "recipient_id": "re_cjdd53hts01jb8p6dp7vfhd7i",
+      "phone": null,
+      "email": null
     }
   },
   {
@@ -241,7 +253,9 @@
       "document_type": null,
       "date_created": null,
       "active_recipient": false,
-      "recipient_id": null
+      "recipient_id": null,
+      "phone": null,
+      "email": null
     }
   },
   {
@@ -276,7 +290,46 @@
       "document_type": "cpf",
       "date_created": "2018-01-25T16:16:35.936Z",
       "active_recipient": true,
-      "recipient_id": "re_cjcupb1iq0200zl6d89r92s32"
+      "recipient_id": "re_cjcupb1iq0200zl6d89r92s32",
+      "phone": null,
+      "email": null
+    }
+  },
+  {
+    "model": "gatheros_event.organization",
+    "pk": 9,
+    "fields": {
+      "name": "Nathan S Martins",
+      "description": "None",
+      "description_html": null,
+      "slug": "nathan-s-martins",
+      "avatar_width": null,
+      "avatar_height": null,
+      "avatar": "",
+      "website": null,
+      "facebook": null,
+      "twitter": null,
+      "linkedin": null,
+      "skype": null,
+      "cash_provider": null,
+      "cash_data": null,
+      "active": true,
+      "internal": false,
+      "bank_code": null,
+      "agency": null,
+      "agencia_dv": null,
+      "account": null,
+      "conta_dv": null,
+      "cnpj_ou_cpf": null,
+      "legal_name": null,
+      "account_type": "conta_corrente",
+      "bank_account_id": null,
+      "document_type": null,
+      "date_created": null,
+      "active_recipient": false,
+      "recipient_id": null,
+      "phone": null,
+      "email": null
     }
   }
 ]
