@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'kanu_locations',
 
     # CONGRESSY APPS
+    'base',
     'frontend',
     'gatheros_event',
     'gatheros_subscription',

@@ -1,13 +1,16 @@
 """
 Define uma implementação de um Serviço de Aplicação (Application
 Service) que rege uma pre-arquitetura de como estabelecer a comunicação
-da aplicação com o domínio através de conectores diretos com Serviços de Domínio.
+da aplicação com o domínio através de conectores diretos com Serviços de
+Domínio.
 """
 
 from django import forms
-
-from survey.managers.mixins import Manager
 from django.forms.utils import ErrorList
+
+from base.managers import Manager
+
+__all__ = ['ApplicationServiceMixin']
 
 
 class ManagerClassMissingError(Exception):

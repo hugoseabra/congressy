@@ -2,12 +2,15 @@
     Testing the model mixin
 """
 
+from django.forms import ValidationError
 from test_plus.test import TestCase
 
-from survey.models.mixins import Entity, RuleInstanceTypeError, \
-    RuleIntegrityError
-from survey.models.rule_checker import RuleChecker
-from django.forms import ValidationError
+from base.models import (
+    Entity,
+    RuleChecker,
+    RuleInstanceTypeError,
+    RuleIntegrityError,
+)
 
 
 class EntityTest(TestCase):

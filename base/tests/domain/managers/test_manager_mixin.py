@@ -6,8 +6,8 @@ from django.db import models
 from django_fake_model import models as f
 from test_plus.test import TestCase
 
-from survey.managers.mixins import Manager, EntityTypeError
-from survey.models.mixins import Entity
+from base.managers import Manager, EntityTypeError
+from base.models import Entity
 
 
 class FakeEntity(Entity, f.FakeModel):

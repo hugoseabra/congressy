@@ -4,7 +4,7 @@
 
 from test_plus.test import TestCase
 
-from survey.models.rule_checker import RuleChecker
+from base.models import RuleChecker
 
 
 class RuleCheckerTest(TestCase):
@@ -16,7 +16,6 @@ class RuleCheckerTest(TestCase):
         """
 
         class TestChecker(RuleChecker):
-
             def check(self, entity_instance):
                 pass
 

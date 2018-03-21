@@ -1,11 +1,19 @@
 """
-    Answer domain model.
-    Resposta de um questionário, referente a uma pergunta a pertecente a um
-    Autor.
+    Survey module domain models
 """
+from abc import ABC, abstractmethod
+
+from django.db.utils import IntegrityError
 from django.forms import ValidationError
 
-from survey.models.rule_checker import RuleChecker, RuleIntegrityError
+__all__ = ['Entity', 'RuleChecker']
+
+
+class RuleIntegrityError(IntegrityError):
+    """
+    Exceção erro durante verificação de integridade de entidade de domínio.
+    """
+    pass
 
 
 class RuleInstanceTypeError(TypeError):
@@ -17,6 +25,18 @@ class RuleInstanceTypeError(TypeError):
     def __init__(self, message):
         self.message = 'Rule informado não é um RuleChecker: {}'.format(
             message)
+
+
+class RuleChecker(ABC):
+    """
+    Classe concreta de implementação de verficação de integridade de domínio
+    de uma entidade.
+    :raise RuleIntegrityError
+    """
+
+    @abstractmethod
+    def check(self, *args, **kwargs):  # pragma: no cover
+        pass
 
 
 class Entity(object):
