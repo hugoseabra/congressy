@@ -111,7 +111,7 @@ pipeline:
       - sh ./bin/env/staging/03_start-cgsy-staging.sh
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
     volumes:
-      - ~/media/:/media
+      - /media:/media
     when:
       branch: [ hotfix/*, release/*, feature/cron-service ]
 
