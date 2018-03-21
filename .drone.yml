@@ -95,19 +95,19 @@ pipeline:
       sentry_private_dsn
     ]
     commands:
-      - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/staging/env-cgsy-staging
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DOMAIN=$${DOMAIN_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/staging/env-manage-staging
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/staging/env-manage-staging
+      - echo "DOMAIN=$${DOMAIN_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ./bin/env/staging/env-manage-staging
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ./bin/env/staging/env-manage-staging
+      - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ./bin/env/staging/env-manage-staging
+      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ./bin/env/staging/env-manage-staging
       - sh ./bin/env/staging/03_start-cgsy-staging.sh
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
     when:
