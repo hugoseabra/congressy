@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'captcha',
     'wkhtmltopdf',
+    'django_bitly',
 
     # KANU_APPS
     'kanu_locations',
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     'core',
     'hotsite',
     'partner',
+    'bitly',
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
@@ -152,6 +154,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'gatheros_event', 'templates'),
             os.path.join(BASE_DIR, 'hotsite', 'templates'),
             os.path.join(BASE_DIR, 'mailer', 'templates'),
+            os.path.join(BASE_DIR, 'bitly', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -306,7 +309,10 @@ SALES_ALERT_EMAILS = [
 WKHTMLTOPDF_CMD = os.path.join(
     BASE_DIR, "bin", "wkhtmltox", "bin", 'wkhtmltopdf'
 )
-
+# =============================== BITLY ===================================== #
+BITLY_LOGIN = 'congressy'
+BITLY_API_KEY = 'R_90819c7eac3f4c039e5f9c37f6786dda'
+BITLY_TIMEOUT = 5
 # ============================= PAYMENT ===================================== #
 # Planos da congressy, contemplam percentuais de recebimento em cima das
 # transações
