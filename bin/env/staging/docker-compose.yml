@@ -22,7 +22,7 @@ services:
       - /services/volume/container-entry.sh
     env_file: ./env-manage-staging
     volumes:
-      - "./media:/var/www/cgsy/media"
+      - "/media:/var/www/cgsy/media"
 
   cron:
     image: cgsy-staging
@@ -35,6 +35,8 @@ services:
       - postgres
       - mailhog
     env_file: ./env-manage-staging
+    volumes:
+      - "/media:/var/www/cgsy/media"
 
   manage:
     image: cgsy-staging
@@ -49,6 +51,8 @@ services:
     ports:
       - "8080:80"
     env_file: ./env-manage-staging
+    volumes:
+      - "/media:/var/www/cgsy/media"
 
 networks:
   postgres:

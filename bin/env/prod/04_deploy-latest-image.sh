@@ -32,7 +32,7 @@ fi
 if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     docker exec -i awsecr pull cgsy:latest
     docker exec -i awsecr pull cgsy:${VERSION}
-    docker-compose -f ~/cgsy/docker-compose.yml up -d
+    docker-compose -f ~/cgsy/docker-compose.yml up -d --remove-orphans --force
     sleep 10
 
     echo ;
