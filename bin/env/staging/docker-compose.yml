@@ -16,7 +16,7 @@ version: '3'
 services:
   # Preparação de volumes.
   volume:
-    image: cgsy:latest
+    image: cgsy-staging
     container_name: volume-staging
     entrypoint:
       - /services/volume/container-entry.sh
@@ -25,7 +25,7 @@ services:
       - "./media:/var/www/cgsy/media"
 
   cron:
-    image: cgsy:latest
+    image: cgsy-staging
     container_name: cron-staging
     depends_on:
       - volume
@@ -37,7 +37,7 @@ services:
     env_file: ./env-manage-staging
 
   manage:
-    image: cgsy:latest
+    image: cgsy-staging
     container_name: manage-staging
     depends_on:
       - volume
