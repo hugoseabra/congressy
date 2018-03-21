@@ -45,9 +45,9 @@
             </a>
         </li>
         <li class="active">
-            <a href="{% url 'survey:survey-create' event.pk %}"
+            <a href="{% url 'subscription:survey-list' event.pk %}"
                title="Survey">
-                <i class="fa  fa-fw fa-rocket"></i> Survey
+                <i class="fa  fa-fw fa-rocket"></i> Questionário
             </a>
         </li>
         {% if has_paid_lots %}
@@ -75,12 +75,12 @@
 {% endblock messages %}
 
 {% block title %}
-    Formulário de Inscrição |
+    Questionários  |
     Congressy
 {% endblock %}
 
 {% block page_title %}
-    Configuração de Formulário
+    Lista de Questionários
 {% endblock %}
 
 {% block page_sub_title %}
@@ -92,140 +92,44 @@
 {% block content %}
 
     <div class="row">
-
-        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-
-            <div class="panel panel-primary">
-
-                <div class="panel-heading">
-                    <h3 class="panel-title">Configurar Formulário</h3>
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-right">
+                    <button type="button" class="btn btn-success"
+                            data-toggle="modal" data-target="#addSurvey">
+                        <i class="fa fa-plus"></i>
+                        Adicionar
+                    </button>
                 </div>
-
-                <div class="panel-body">
-
-                    <div id='fields'>
-                        <strong>Nenhuma questão.</strong>
-                    </div>
-
-                </div>
-
+                <div class="clearfix"></div>
             </div>
-
-
         </div>
-
     </div>
 
     <div class="row">
-
-        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-
+        <div class="col-md-12">
             <div class="panel panel-primary">
-
-                <div class="panel-heading">
-                    <h3 class="panel-title">Novo Campo</h3>
-                </div>
-
                 <div class="panel-body">
-
-                    <div class="row">
-
-                        <div class="col-md-6">
-
-                            <strong style="font-size: 20px">
-                                Escolha um novo campo:
-                            </strong>
-                            <hr/>
-
-                            <a data-field-type="Data"
-                               data-field-icon="far fa-calendar-alt"
-                               title="Data"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="far fa-calendar-alt"></i>
-                                    Data
-                                </div>
-                            </a>
-
-                            <a data-field-type="Text"
-                               data-field-icon="fas fa-i-cursor"
-                               title="Text"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="fas fa-i-cursor"></i>
-                                    Text
-                                </div>
-                            </a>
-
-                            <a data-field-type="Parágrafo"
-                               data-field-icon="fas fa-align-left"
-                               title="Parágrafo"
-                               class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="fas fa-align-left"></i>
-                                    Parágrafo
-                                </div>
-                            </a>
-
-                            <a data-field-type="Lista"
-                               data-field-icon="fas fa-list-ul"
-                               title="Lista"
-                               class="open-AddComplexQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="fas fa-list-ul"></i>
-                                    Lista
-                                </div>
-                            </a>
-
-                            <a data-field-type="Múltipla Escolha"
-                               data-field-icon="far fa-check-circle"
-                               title="Múltipla Escolha"
-                               class="open-AddComplexQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="far fa-check-circle"></i>
-                                    Múltipla Escolha
-                                </div>
-                            </a>
-
-                            <a data-field-type="Várias Opções"
-                               data-field-icon="far fa-check-square"
-                               title="Várias Opções"
-                               class="open-AddComplexQuestionDialog btn
-                               btn-primary btn-block">
-                                <div class="text-left">
-
-                                    <i class="far fa-check-square"></i>
-                                    Várias Opções
-                                </div>
-                            </a>
-
-
-                        </div>
-
-
-                    </div>
-
+                    {% if object_list %}
+                        <ul>
+                            {% for event_survey in object_list %}
+                                <li>
+                                    {{ event_survey.survey.name }}
+                                    <a href="
+{% url 'subscription:survey-edit' event.pk event_survey.pk %}">editar</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <h3>Nenhum dado.</h3>
+                    {% endif %}
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-    <!-- Modals -->
-    <div class="modal fade" id="addComplexQuestionModal"
-         tabindex="-1"
+
+    <div class="modal fade" id="addSurvey"
          role="dialog">
 
         <div class="modal-dialog " role="document">
@@ -239,7 +143,7 @@
                             aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">
-                        Adicionar ao Formulário </h4>
+                        Novo questionário</h4>
                 </div>
 
                 <form method="post">
@@ -248,22 +152,8 @@
 
 
                     <div class="modal-body">
-
-
-                        <strong style="font-size: 25px">
-                            <span class="typeOfField"></span>
-                            <i class="iconOfField"></i>
-                        </strong>
-                        <hr/>
-                        {% render_generic_field complex_form.title autofocus=True %}
-                        {% render_generic_field complex_form.help_text %}
-
-                        <hr>
-
-                        {% render_generic_field complex_form.options %}
-                        {% for hidden in complex_form.hidden_fields %}
-                            {{ hidden }}
-                        {% endfor %}
+                        {% render_generic_field form.name autofocus=True %}
+                        {% render_generic_field form.description %}
                     </div>
 
 
@@ -273,68 +163,7 @@
                                 data-dismiss="modal">Cancelar
                         </button>
                         <button type="submit"
-                                class="btn btn-primary">Salvar
-                        </button>
-                    </div>
-
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-    <div class="modal fade" id="addSimpleQuestionModal" tabindex="-1"
-         role="dialog">
-
-        <div class="modal-dialog " role="document">
-
-            <div class="modal-content">
-
-
-                <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal"
-                            aria-label="Close"><span
-                            aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">
-                        Adicionar ao Formulário </h4>
-                </div>
-
-                <form method="post">
-
-
-                    <div class="modal-body">
-
-
-                        <strong style="font-size: 25px">
-                            <span class="typeOfField"></span>
-                            <i class="iconOfField"></i>
-                        </strong>
-
-
-                        <hr/>
-                        {% csrf_token %}
-
-                        {% render_generic_field simple_form.title autofocus=True %}
-                        {% render_generic_field simple_form.help_text %}
-
-                        {% for hidden in simple_form.hidden_fields %}
-                            {{ hidden }}
-                        {% endfor %}
-
-                    </div>
-
-
-                    <div class="modal-footer">
-                        <button type="button"
-                                class="btn btn-danger"
-                                data-dismiss="modal">Cancelar
-                        </button>
-                        <button type="submit"
-                                class="btn btn-primary">Salvar
+                                class="btn btn-success">Salvar
                         </button>
                     </div>
 
@@ -359,8 +188,6 @@
     <script type="application/javascript">
         $(document).ready(function () {
 
-            console.log('READY');
-
             var radios = $('input[type=radio]');
             radios.iCheck({
                 checkboxClass: 'icheckbox_flat-grey',
@@ -383,7 +210,8 @@
             iconEl.attr('class', 'iconOfField');
             iconEl.addClass(IconOfField);
             formTypeEl.val('simple');
-            $('#addSimpleQuestionModal').modal('show');
+            $('#options').hide();
+            $('#addQuestion').modal('show');
         });
 
 
@@ -399,14 +227,15 @@
             iconEl.attr('class', 'iconOfField');
             iconEl.addClass(IconOfField);
             formTypeEl.val('complex');
-            $('#addComplexQuestionModal').modal('show');
+            $('#options').show();
+            $('#addQuestion').modal('show');
         });
 
 
         function loadDoc() {
 
             $.ajax({
-                url: location.pathname.substr(1),
+                url: location.pathname + '?template_name=survey/fields',
                 success: function (result) {
                     document.getElementById("fields").innerHTML =
                         result;
