@@ -23,11 +23,11 @@ pipeline:
     image: postgres:9.6-alpine
     pull: true
     secrets: [
-      dbhost_staging,
-      dbuser_staging,
-      dbpass_staging,
-      dbname_staging,
-      dbport_staging
+      dbhost,
+      dbuser,
+      dbpass,
+      dbname,
+      dbport
     ]
     volumes:
       - /tmp/bkp:/tmp/bkp

@@ -42,14 +42,14 @@ BKP_FILE_PATH="$BKP_DUMP_DIR/$BKP_FILE_NAME.sql"
 
 if [ ! -f "$BKP_FILE_PATH" ]; then
     # Dump do DB
-    PGPASSWORD=${DBPASS_STAGING} pg_dump \
-      --host ${DBHOST_STAGING} \
-      --port ${DBPORT_STAGING} \
-      --username ${DBUSER_STAGING} \
+    PGPASSWORD=${DBPASS} pg_dump \
+      --host ${DBHOST} \
+      --port ${DBPORT} \
+      --username ${DBUSER} \
       --schema public \
       --format=c \
       --verbose \
-      ${DBNAME_STAGING} > ${BKP_FILE_PATH}
+      ${DBNAME} > ${BKP_FILE_PATH}
 
     echo "1" > ${BKP_DUMP_DIR}/recreate.txt
 else
