@@ -47,7 +47,7 @@ services:
       - postgres
       - mailhog
     ports:
-      - "8081:80"
+      - "8080:80"
     env_file: ./env-manage-staging
 
 networks:
