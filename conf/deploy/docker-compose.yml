@@ -19,6 +19,8 @@ services:
 
   cron:
     image: cgsy:latest
+    depends_on:
+      - volume
     entrypoint:
       - /services/cron/container-entry.sh
     volumes:
@@ -27,6 +29,8 @@ services:
 
   manage:
     image: cgsy:latest
+    depends_on:
+      - volume
     networks:
       - redis
     ports:

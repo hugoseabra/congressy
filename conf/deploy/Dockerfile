@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # Docker IMAGE congressy/cgsy
 # docker build --rm -t cgsy .
-# docker tag catalog <repo_url>/catalog:<tag>
+# docker tag catalog <repo_url>/cgsy:<tag>
 # -----------------------------------------------------------------------------
 FROM python:3.6
 MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
@@ -91,7 +91,7 @@ WORKDIR /var/www/cgsy
 # COPY requirements.txt and RUN pip install BEFORE adding the rest of your code, this will cause Docker's caching mechanism
 # to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
 COPY ./requirements.pip ./.
-RUN pip install --no-cache-dir -r requirements.pip
+RUN pip install --no-cache-dir --upgrade -r requirements.pip
 
 # -----------------------------------------------------------------------------
 # Setup configuration files

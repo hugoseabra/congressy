@@ -12,11 +12,37 @@
 # - env-file "env-cgsy-staging" é construído pelo CI dinamicamente por causa
 #   das informações sensíveis.
 ###############################################################################
-version: '2.3'
+version: '3'
 services:
-  cgsy-staging:
-    image: cgsy-staging
-    container_name: cgsy-staging
+  # Preparação de volumes.
+  volume:
+    image: cgsy:latest
+    container_name: volume-staging
+    entrypoint:
+      - /services/volume/container-entry.sh
+    env_file: ./env-cgsy-staging
+    volumes:
+      - "./media:/var/www/cgsy/media"
+
+  cron:
+    image: cgsy:latest
+    container_name: cron-staging
+    depends_on:
+      - volume
+    entrypoint:
+      - /services/cron/container-entry.sh
+    networks:
+      - postgres
+      - mailhog
+    env_file: ./env-cgsy-staging
+
+  manage:
+    image: cgsy:latest
+    container_name: manage-staging
+    depends_on:
+      - volume
+    entrypoint:
+      - /services/web/manage/container-entry.sh
     networks:
       - postgres
       - mailhog

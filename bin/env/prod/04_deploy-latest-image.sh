@@ -40,10 +40,6 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     echo ;
     docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
 
-    # Reseta configurações para o próximo release
-#    rm -f "$BASE/cgsy/tagged_version"
-#    rm -f "$BASE/cgsy/version"
-
     # Sucesso
     exit 0
 

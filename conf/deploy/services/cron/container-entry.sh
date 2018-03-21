@@ -17,6 +17,6 @@ printf "OK"
 echo;
 
 run_python_script "Configurando SETTINGS" /configure-settings.py
-run_python_script_with_output "Executando migrate" "manage.py migrate django_cron"
+run_python_script_with_output "Executando migrate" "manage.py migrate"
 
 /usr/sbin/cron -f -L 15
