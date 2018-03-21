@@ -1,0 +1,12 @@
+{% extends 'base/base.html' %}
+
+{% load bitly %}
+
+{% block content %}
+
+{{ myobject|bitlify }}
+{{ myobject|clicks }}
+{{ myobject|referrers }}
+{{ myobject|referrer_chart:"250x100" }}
+
+{% endblock %}
