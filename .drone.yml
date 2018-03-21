@@ -5,7 +5,7 @@
 ###############################################################################
 # Branches added globally
 branches:
-  include: [ master, hotfix/*, release/*, feature/cron-service ]
+  include: [ master, hotfix/*, release/* ]
 
 # Custom definition for cloning, adding tags and depth
 clone:
@@ -34,7 +34,7 @@ pipeline:
     commands:
       - ./bin/env/staging/01_backup-db-staging.sh
     when:
-      branch: [ hotfix/*, release/*, feature/cron-service ]
+      branch: [ hotfix/*, release/* ]
 
   recreate-staging-db:
     image: tmaier/docker-compose
@@ -46,7 +46,7 @@ pipeline:
       - sh ./bin/env/staging/02_recreate-db-staging.sh
     when:
       branch:
-        include: [ hotfix/*, release/*, feature/cron-service ]
+        include: [ hotfix/*, release/* ]
 
   save-staging-version:
     image: alpine
@@ -72,14 +72,14 @@ pipeline:
           -t cgsy-staging \
           -f ./conf/staging/Dockerfile .
     when:
-      branch: [ hotfix/*, release/*, feature/cron-service ]
+      branch: [ hotfix/*, release/* ]
 
   deploy-staging-env:
     image: tmaier/docker-compose
     pull: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /media:/media
+      - /tmp/cgsy-media:/media
     secrets: [
       aws_key,
       aws_secret,
