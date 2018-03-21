@@ -5,7 +5,7 @@
 ###############################################################################
 # Branches added globally
 branches:
-  include: [ master, hotfix/*, release/* ]
+  include: [ master, hotfix/*, release/*, feature/cron-service ]
 
 # Custom definition for cloning, adding tags and depth
 clone:
@@ -34,7 +34,7 @@ pipeline:
     commands:
       - ./bin/env/staging/01_backup-db-staging.sh
     when:
-      branch: [ hotfix/*, release/* ]
+      branch: [ hotfix/*, release/*, feature/cron-service ]
 
   recreate-staging-db:
     image: tmaier/docker-compose
@@ -46,7 +46,7 @@ pipeline:
       - sh ./bin/env/staging/02_recreate-db-staging.sh
     when:
       branch:
-        include: [ hotfix/*, release/* ]
+        include: [ hotfix/*, release/*, feature/cron-service ]
 
   save-staging-version:
     image: alpine
@@ -57,7 +57,7 @@ pipeline:
       - echo "${DRONE_COMMIT_AUTHOR}" > ./build_author
       - echo "${DRONE_BUILD_LINK}" > ./build_link
     when:
-      branch: [ hotfix/*, release/* ]
+      branch: [ hotfix/*, release/*, feature/cron-service ]
 
   build-staging-image:
     image: docker
@@ -72,7 +72,7 @@ pipeline:
           -t cgsy-staging \
           -f ./conf/staging/Dockerfile .
     when:
-      branch: [ hotfix/*, release/* ]
+      branch: [ hotfix/*, release/*, feature/cron-service ]
 
   deploy-staging-env:
     image: tmaier/docker-compose
@@ -111,7 +111,7 @@ pipeline:
       - sh ./bin/env/staging/03_start-cgsy-staging.sh
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
     when:
-      branch: [ hotfix/*, release/* ]
+      branch: [ hotfix/*, release/*, feature/cron-service ]
 
   notify-staging-on-telegram:
     image: appleboy/drone-telegram
