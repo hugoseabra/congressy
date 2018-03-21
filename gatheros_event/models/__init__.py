@@ -13,4 +13,3 @@ from .event import Event
 from .place import Place
 from .info import Info
 from .invitation import Invitation
-from .event_survey import EventSurvey
