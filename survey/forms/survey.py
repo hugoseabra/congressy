@@ -19,7 +19,7 @@ class SurveyForm(forms.Form):
         Cria um campo para o formulário conforme interface django field:
         field e widget.
         :param name: Nome do campo
-        :param field_type: tipo do campo, conforme survey.fields.field.Field
+        :param field_type: tipo do campo, conforme survey.fields.Field
         :param initial: valor inicial
         :param required: se obrigatório
         :param label: valor do rótulo

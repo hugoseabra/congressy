@@ -43,7 +43,7 @@ class QuestionModelForm(forms.ModelForm):
         return slug
 
 
-class SimpleQuestionForm(forms.Form):
+class QuestionForm(forms.Form):
     title = forms.CharField(
         label='Título',
         required=True,
@@ -58,17 +58,9 @@ class SimpleQuestionForm(forms.Form):
                   'a entender melhor a pergunta.',
     )
 
-    type = forms.CharField(
-        required=True,
-        widget=forms.HiddenInput()
-    )
-
-
-class ComplexQuestionForm(SimpleQuestionForm):
-
     options = forms.CharField(
         label='Opções',
-        required=True,
+        required=False,
         widget=forms.Textarea(),
         help_text='Insira as opções da sua pergunta uma linha de cada vez.'
     )
