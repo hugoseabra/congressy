@@ -11,6 +11,7 @@ from django.db.models import Max
 
 from gatheros_event.models import Event, Person
 from gatheros_event.models.mixins import GatherosModelMixin
+from survey.models import Author
 from . import Lot
 from .rules import subscription as rule
 
@@ -54,7 +55,7 @@ class Subscription(models.Model, GatherosModelMixin):
     STATUSES = (
         (CONFIRMED_STATUS, 'Confirmado'),
         (CANCELED_STATUS, 'Cancelado'),
-        (AWAITING_STATUS,  'Pendente'),
+        (AWAITING_STATUS, 'Pendente'),
     )
 
     uuid = models.UUIDField(
@@ -127,6 +128,15 @@ class Subscription(models.Model, GatherosModelMixin):
         verbose_name='modificado em'
     )
     synchronized = models.BooleanField(default=False)
+
+    author = models.OneToOneField(
+        Author,
+        on_delete=models.DO_NOTHING,
+        verbose_name='autor de resposta',
+        related_name='subscription',
+        blank=True,
+        null=True
+    )
 
     objects = SubscriptionManager()
 

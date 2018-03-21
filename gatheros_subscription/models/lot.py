@@ -4,17 +4,17 @@ Lotes são importantes para agrupar as inscrições de um evento, para separar
 os critérios de inscrições: se gratuitas, se limitadas, se privados, etc.
 """
 
-import locale
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+import locale
 from django.conf import settings
 from django.db import models
 from django.utils.encoding import force_text
 
 from core.model import track_data
-from gatheros_event.models import Event
+from gatheros_event.models import Event, EventSurvey
 from gatheros_event.models.mixins import GatherosModelMixin
 from .rules import lot as rule
 
@@ -186,6 +186,15 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='código de exibição',
         help_text="Código foi gerado, porém você pode personaliza-lo como"
                   " quiser."
+    )
+
+    survey = models.ForeignKey(
+        EventSurvey,
+        on_delete=models.DO_NOTHING,
+        verbose_name='formulario',
+        related_name='lots',
+        blank=True,
+        null=True
     )
 
     objects = LotManager()
