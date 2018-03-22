@@ -8,8 +8,9 @@ from gatheros_event.views.mixins import EventViewMixin, AccountMixin
 from gatheros_subscription.forms import SurveyForm
 from gatheros_subscription.models import EventSurvey
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
-from survey.forms import QuestionForm
-from survey.models import Survey
+from survey.forms import QuestionForm, SurveyForm as FullSurveyForm
+from survey.models import Survey, Question
+from django.http import HttpResponse
 
 
 class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
@@ -26,13 +27,26 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
         context['survey'] = self.survey
-        context['form'] = QuestionForm
+        context['form'] = QuestionForm(survey=self.survey)
+        context['full_survey_form'] = FullSurveyForm(
+            survey=self.survey)
 
         return context
 
     def post(self, request, *args, **kwargs):
 
-        context = self.get_context_data(**kwargs)
+        if self.request.is_ajax():
+
+            action = self.request.POST.get('action')
+            question_id = self.request.POST.get('question_id')
+
+            if action == 'delete':
+                question = get_object_or_404(Question, pk=question_id)
+                question.delete()
+
+                return HttpResponse(status=200)
+            else:
+                return HttpResponse(status=500)
 
         question_type = self.request.POST.get('question_type', None)
 
@@ -49,25 +63,34 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
             )
         else:
 
-            question_form = QuestionForm(data=request.POST)
+            question_data = {
+                'survey': self.survey.pk,
+                'type': request.POST.get('question_type'),
+                'name': request.POST.get('name'),
+                'label': request.POST.get('name'),
+                'help_text': request.POST.get('help_text'),
+                'options': request.POST.get('options')
+            }
 
-            """
-                TO BE CONTINUED: 
-                    INJECT A SERVICE HERE TO VALIDATE AND SAVE DATA.
-            """
+            question_form = QuestionForm(survey=self.survey,
+                                         data=question_data)
 
-            # if question_form.is_valid():
-            #
-            #     model_data = {
-            #         'type': question_type,
-            #         'title': question_form.cleaned_data.get('title'),
-            #
-            #     }
-            #
-            #     question_model_form = QuestionModelForm(data=question_form)
-            #     print('hell ya')
+            if question_form.is_valid():
+                question_form.save()
+                messages.success(
+                    self.request,
+                    "Pergunta criada com sucesso!"
+                )
+            else:
+                messages.error(
+                    self.request,
+                    "Corrija os erros abaixo."
+                )
 
-        return self.render_to_response(context)
+        return redirect(reverse_lazy('subscription:survey-edit', kwargs={
+            'event_pk': self.event.pk,
+            'survey_pk': self.survey.pk,
+        }))
 
     def get_survey(self):
         """ Resgata questionário do contexto da view. """
