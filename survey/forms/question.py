@@ -4,8 +4,10 @@
 """
 
 from django import forms
-from survey.models import Question
 from django.utils.text import slugify
+from django.contrib import messages
+from survey.models import Question
+from survey.services import QuestionService, OptionService
 
 
 class QuestionModelForm(forms.ModelForm):
@@ -44,15 +46,15 @@ class QuestionModelForm(forms.ModelForm):
 
 
 class QuestionForm(forms.Form):
-    title = forms.CharField(
-        label='Título',
+    name = forms.CharField(
+        label='Nome do campo',
         required=True,
         widget=forms.TextInput()
     )
 
     help_text = forms.CharField(
         label='Texto de ajuda',
-        required=True,
+        required=False,
         widget=forms.TextInput(),
         help_text='Uma instrução similar a está para ajudar seu participante '
                   'a entender melhor a pergunta.',
@@ -65,3 +67,36 @@ class QuestionForm(forms.Form):
         help_text='Insira as opções da sua pergunta uma linha de cada vez.'
     )
 
+    def __init__(self, survey, **kwargs):
+        self.survey = survey
+        super().__init__(**kwargs)
+        self.service = QuestionService(**kwargs)
+
+    def is_valid(self):
+        form_is_valid = super().is_valid()
+        service_is_valid = self.service.is_valid()
+        return form_is_valid and service_is_valid
+
+    def save(self):
+        question = self.service.save()
+
+        options = self.cleaned_data.get('options', None)
+
+        if options:
+            option_list = options.splitlines()
+            for option in option_list:
+                option_data = {
+                    'question': question.pk,
+                    'name': option,
+                    'value': option
+                }
+                option_service = OptionService(data=option_data)
+                if option_service.is_valid():
+                    option_service.save()
+                else:
+                    messages.error(
+                        self.request,
+                        "Não foi possivel salvar a opção: {}".format(option)
+                    )
+
+        return question

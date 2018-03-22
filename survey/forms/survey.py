@@ -7,13 +7,18 @@ from .field import SurveyField
 
 class SurveyForm(forms.Form):
     """ Formulário Dinâmico. """
+    """ Old kanuform """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, survey, *args, **kwargs):
+        self.survey = survey
         super(SurveyForm, self).__init__(*args, **kwargs)
-        self.survey_fields = OrderedDict()
-        self.fields.keyOrder = []
+        for question in self.survey.questions.all().order_by('pk'):
+            self.create_field(id=question.pk, name=question.name,
+                              field_type=question.type,
+                              label=question.label,
+                              required=question.required)
 
-    def create_field(self, name, field_type, initial=None, required=False,
+    def create_field(self, id, name, field_type, initial=None, required=False,
                      label=None, **kwargs):
         """
         Cria um campo para o formulário conforme interface django field:
@@ -26,50 +31,8 @@ class SurveyForm(forms.Form):
         :param kwargs: outros valores
         :rtype: DjangoField
         """
-        field = SurveyField(field_type, initial, required, label, **kwargs)
+        field = SurveyField(field_type, initial, required, label,
+                            attrs={'data-id': id}, **kwargs)
         self.fields[name] = field.get_django_field()
-        self.fields.keyOrder.append(name)
-        self.survey_fields.update({name: field})
 
         return field.get_django_field()
-
-    def set_attr(self, field_name, name, value):
-        """
-        Seta atributo em um campo do formulário.
-        :param field_name: nome do campo
-        :param name: nome do atributo
-        :param value: valor do atributo
-        """
-        field = self.get_field_by_name(field_name)
-        survey_field = self.survey_fields.get(field_name)
-        if not field or not survey_field:
-            return
-
-        if name == 'required' and not survey_field.has_requirement():
-            return
-
-        field.widget.attrs.update({name: value})
-
-    def unset_attr(self, field_name, name):
-        """
-        Remove atributo em um campo do formulário.
-        :param field_name: nome do campo
-        :param name: nome do atributo
-        """
-        field = self.get_field_by_name(field_name)
-        attrs = field.widget.attrs
-        attr = attrs.get(name)
-        if attr:
-            del attrs[name]
-
-        field.widget.attrs = attrs
-
-    def get_field_by_name(self, name):
-        field = self.fields.get(name)
-        if not field:
-            raise Exception(
-                'Não foi possível encontrar um campo com o nome'
-                ' `{}`.'.format(name)
-            )
-
-        return field
