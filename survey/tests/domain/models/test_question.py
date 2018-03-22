@@ -11,7 +11,7 @@ from survey.tests import MockFactory
 
 
 class QuestionModelTest(TestCase):
-    """ Main test implementation """
+    """ Question model test """
 
     def setUp(self):
         self.fake_factory = MockFactory()
@@ -92,3 +92,156 @@ class QuestionModelTest(TestCase):
             self.fake_factory.fake_option(question=question)
 
         self.assertTrue(question.has_options)
+
+
+class QuestionManagerTest(TestCase):
+    """
+        Question Manager test
+    """
+    def setUp(self):
+        self.fake_factory = MockFactory()
+        self.survey = self.fake_factory.fake_survey()
+
+    def test_question_manager_next_order(self):
+
+        question_name = self.fake_factory.fake_factory.words(nb=3)
+        instance = Question.objects.create(
+            survey=self.survey,
+            type=Question.FIELD_INPUT_TEXT,
+            label=question_name,
+            name=question_name,
+            help_text='Some kind of help_text',
+        )
+        self.assertIs(instance.order, 1)
+        self.assertIs(Question.objects.next_order(self.survey), 2)
+
+    def test_question_on_creation_ordering(self):
+        """
+            Testa se o manager está entregando a ordem correta, e se a
+            atualização de ordens está funcionando.
+        """
+
+        for i in range(5):
+            question_name = self.fake_factory.fake_factory.words(nb=3)
+            question = Question(
+                survey=self.survey,
+                type=Question.FIELD_INPUT_TEXT,
+                label=question_name,
+                name=question_name,
+                help_text='Some kind of help_text',
+            )
+
+            question.save()
+
+        self.assertIs(Question.objects.first().order, 1)
+        self.assertIs(Question.objects.last().order, 5)
+
+    def test_question_on_update_ordering(self):
+        """
+            Testa se o manager está entregando a ordem correta, e se a
+            atualização de ordens está funcionando.
+        """
+
+        question_name = self.fake_factory.fake_factory.words(nb=3)
+        Question.objects.create(
+            survey=self.survey,
+            type=Question.FIELD_INPUT_TEXT,
+            label=question_name,
+            name=question_name,
+            help_text='Some kind of help_text',
+        )
+
+        self.assertIs(Question.objects.first().order, 1)
+        self.assertIs(Question.objects.last().order, 1)
+
+        first_instance = Question.objects.first()
+
+        question_name = 'unique test name'
+
+        instance = Question.objects.create(
+            survey=self.survey,
+            type=Question.FIELD_INPUT_TEXT,
+            label=question_name,
+            name=question_name,
+            help_text='Some kind of help_text',
+            order=1,
+        )
+
+        first_instance_again = Question.objects.get(pk=first_instance.pk)
+
+        self.assertIs(instance.order, 1)
+        self.assertIs(first_instance_again.order, 2)
+
+    def test_question_manager_adjust_at_order_beginning(self):
+
+        for i in range(5):
+            question_name = self.fake_factory.fake_factory.words(nb=3)
+            Question.objects.create(
+                survey=self.survey,
+                type=Question.FIELD_INPUT_TEXT,
+                label=question_name,
+                name=question_name,
+                help_text='Some kind of help_text',
+            )
+
+        first = Question.objects.filter(survey=self.survey).first()
+        self.assertIs(first.order, 1)
+
+        question_name = self.fake_factory.fake_factory.words(nb=3)
+        new_instance = Question.objects.create(
+            survey=self.survey,
+            type=Question.FIELD_INPUT_TEXT,
+            label=question_name,
+            name=question_name,
+            help_text='Some kind of help_text',
+            order=1,
+        )
+        self.assertIs(new_instance.order, 1)
+
+        qs = Question.objects.filter(survey=self.survey)\
+            .exclude(pk=new_instance.pk)
+
+        counter = new_instance.order + 1
+        for question in qs.order_by('order'):
+            if question.order < counter:
+                continue
+
+            self.assertIs(question.order, counter)
+            counter += 1
+
+    def test_question_manager_adjust_at_order_middle(self):
+
+        for i in range(5):
+            question_name = self.fake_factory.fake_factory.words(nb=3)
+            Question.objects.create(
+                survey=self.survey,
+                type=Question.FIELD_INPUT_TEXT,
+                label=question_name,
+                name=question_name,
+                help_text='Some kind of help_text',
+            )
+
+        first = Question.objects.filter(survey=self.survey).first()
+        self.assertIs(first.order, 1)
+
+        question_name = self.fake_factory.fake_factory.words(nb=3)
+        new_instance = Question.objects.create(
+            survey=self.survey,
+            type=Question.FIELD_INPUT_TEXT,
+            label=question_name,
+            name=question_name,
+            help_text='Some kind of help_text',
+            order=3,
+        )
+        self.assertIs(new_instance.order, 3)
+
+        qs = Question.objects.filter(survey=self.survey)\
+            .exclude(pk=new_instance.pk)
+
+        counter = new_instance.order + 1
+        for question in qs.order_by('order'):
+            if question.order < counter:
+                continue
+
+            self.assertIs(question.order, counter)
+            counter += 1
