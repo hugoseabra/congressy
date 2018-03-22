@@ -18,8 +18,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}Congressy{% endblock %}</title>
     <meta name="description" content="">
-{#    <meta name="viewport"#}
-{#          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
+    {#    <meta name="viewport"#}
+    {#          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet"
@@ -42,6 +42,15 @@
           href="{% static 'assets/plugins/icheck/css/all.css' %}">
     <link rel="stylesheet"
           href="{% static "assets/plugins/switchery/switchery.min.css" %}">
+
+    <!-- Messenger -->
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/messenger.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/messenger-theme-flat.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/location-sel.css" %}">
+
 
     <!-- Custom styles for this theme -->
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
@@ -75,7 +84,8 @@
         <div class="brand">
             <a href="{% url 'front:start' %}">
                 <img class="base_logo" src=
-                        "{% static "assets/img/header-logo.png" %}" width="70%"/>
+                        "{% static "assets/img/header-logo.png" %}"
+                     width="70%"/>
             </a>
         </div>
         <!--logo end-->
@@ -84,84 +94,91 @@
             {% if user %}
                 <ul class="nav navbar-nav navbar-left">
                     {% block sidebar-bars %}
-                    <li class="toggle-navigation toggle-left">
-                        <button class="sidebar-toggle" id="toggle-left">
-                            <i class="fa fa-bars"></i>
-                        </button>
-                    </li>
+                        <li class="toggle-navigation toggle-left">
+                            <button class="sidebar-toggle" id="toggle-left">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                        </li>
                     {% endblock %}
                     {% block toptitle %}
                         {% if organization %}
-                        <li>
-                            <div class="float:left" style="margin-top: 18px;">
-                               <h2 style="color:#FFF;font-weight: bold;">
-                                   {% if not organization.internal %}
-                                   <div class="btn-group">
-                                        <button
-                                            type="button"
-                                            class="btn btn-trans
+                            <li>
+                                <div class="float:left"
+                                     style="margin-top: 18px;">
+                                    <h2 style="color:#FFF;font-weight: bold;">
+                                        {% if not organization.internal %}
+                                            <div class="btn-group">
+                                                <button
+                                                        type="button"
+                                                        class="btn btn-trans
                                             btn-default
                                             btn-sm dropdown-toggle"
-                                            data-toggle="dropdown"
-                                            aria-expanded="false"
-                                        >
-                                            <span class="fas fa-cog"></span>
-                                        </button>
-                                        <ul class="dropdown-menu animated fadeInRight" role="menu">
-                                            <li>
-                                                <a href="{% url 'event:organization-edit' organization.pk %}">
-                                                    <i class="fas fa-pencil-alt"></i>
-                                                    Editar organização
-                                                </a>
-                                            </li>
-                                            {% if not organization_unique_admin %}
-                                            <li>
-                                                <a href="{% url 'event:organization-cancel-membership' organization.pk %}">
-                                                    <i class="fas fa-sign-in-alt"></i>
-                                                    Sair da organização
-                                                </a>
-                                            </li>
-                                            {% endif %}
-                                            {% if not member_unique_organization and organization.is_deletable and user has 'gatheros_event.delete_organization' of organization %}
-                                            <li>
-                                                <a href="{% url 'event:organization-delete' organization.pk %}">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                    Excluir organização
-                                                </a>
-                                            </li>
-                                            {% endif %}
-                                        </ul>
-                                    </div>
-                                    &ensp;{% endif %}
-                                    {{ organization.name|truncatechars:35 }}
-                               </h2>
-                            </div>
-                            <div class="clearfix"></div>
-                        </li>
+                                                        data-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                >
+                                                    <span class="fas fa-cog"></span>
+                                                </button>
+                                                <ul class="dropdown-menu animated fadeInRight"
+                                                    role="menu">
+                                                    <li>
+                                                        <a href="{% url 'event:organization-edit' organization.pk %}">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                            Editar organização
+                                                        </a>
+                                                    </li>
+                                                    {% if not organization_unique_admin %}
+                                                        <li>
+                                                            <a href="{% url 'event:organization-cancel-membership' organization.pk %}">
+                                                                <i class="fas fa-sign-in-alt"></i>
+                                                                Sair da
+                                                                organização
+                                                            </a>
+                                                        </li>
+                                                    {% endif %}
+                                                    {% if not member_unique_organization and organization.is_deletable and user has 'gatheros_event.delete_organization' of organization %}
+                                                        <li>
+                                                            <a href="{% url 'event:organization-delete' organization.pk %}">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                                Excluir
+                                                                organização
+                                                            </a>
+                                                        </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                            &ensp;{% endif %}
+                                        {{ organization.name|truncatechars:35 }}
+                                    </h2>
+                                </div>
+                                <div class="clearfix"></div>
+                            </li>
                         {% endif %}
                     {% endblock %}
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if has_subscriptions %}
-                    <li class="dropdown profile hidden-xs">
-                        <a href="{% url 'subscription:my-subscriptions' %}" aria-expanded="true">
+                        <li class="dropdown profile hidden-xs">
+                            <a href="{% url 'subscription:my-subscriptions' %}"
+                               aria-expanded="true">
                             <span class="meta">
                                 <span class="fa fa-list"></span>
                                 <span class="text  hidden-xs">Minhas Inscrições</span>
                             </span>
-                        </a>
-                    </li>
+                            </a>
+                        </li>
                     {% endif %}
                     <li class="dropdown profile hidden-xs">
                         <a href="javascript:void(0);" class="dropdown-toggle"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                           data-toggle="dropdown" aria-haspopup="true"
+                           aria-expanded="true">
                                 <span class="meta">
                                     <span class="fa fa-sitemap"></span>
                                     <span class="text  hidden-xs">Organizações</span>
                                     <span class="caret hidden-xs"></span>
                                 </span>
                         </a>
-                        <ul class="dropdown-menu animated fadeInRight" aria-labelledby="dropdownMenu1">
+                        <ul class="dropdown-menu animated fadeInRight"
+                            aria-labelledby="dropdownMenu1">
                             {% if not organization.internal and member.is_admin %}
                                 <li>
                                     <span style="font-weight: 700">
@@ -206,10 +223,10 @@
                                     {% endif %}
                                 {% endfor %}
                                 <input
-                                    type="hidden"
-                                    name="organization-context-pk"
-                                    id="organization-context-pk"/>
-                                    <input
+                                        type="hidden"
+                                        name="organization-context-pk"
+                                        id="organization-context-pk"/>
+                                <input
                                         type="hidden"
                                         name="next"
                                         value="{{ request.path }}"/>
@@ -225,7 +242,8 @@
                         </ul>
                     </li>
                     <li class="dropdown profile hidden-xs">
-                        <a href="{% url 'event:event-list' %}" aria-expanded="true">
+                        <a href="{% url 'event:event-list' %}"
+                           aria-expanded="true">
                             <span class="meta">
                                 <span class="fa fa-calendar"></span>
                                 <span class="text  hidden-xs">Eventos</span>
@@ -242,7 +260,8 @@
                                     <span class="caret hidden-xs"></span>
                                 </span>
                         </a>
-                        <ul class="dropdown-menu animated fadeInRight " role="menu">
+                        <ul class="dropdown-menu animated fadeInRight "
+                            role="menu">
                             <li>
                                 <a href="{% url 'event:profile' %}">
                                     <span class="icon">
@@ -272,15 +291,16 @@
             {% if organization and not organization.internal %}
                 <div class="sidebar-profile">
                     <div class="profile-body dropdown">
-                       {% if member.is_admin %}
-                       <a href="javascript:void(0);" class="dropdown-toggle"
-                           data-toggle="dropdown" aria-expanded="false">
-                       {% endif %}
-                            <h4>
-                                {{ organization.name|truncatechars:50 }}
-                            </h4>
                         {% if member.is_admin %}
-                        </a>
+                            <a href="javascript:void(0);"
+                               class="dropdown-toggle"
+                               data-toggle="dropdown" aria-expanded="false">
+                        {% endif %}
+                        <h4>
+                            {{ organization.name|truncatechars:50 }}
+                        </h4>
+                        {% if member.is_admin %}
+                            </a>
                         {% endif %}
                         <small class="title">
                             {{ member.get_group_display }}
@@ -343,6 +363,9 @@
 <script src="{% static "assets/plugins/switchery/switchery.min.js" %}"></script>
 <script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
 <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger.min.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger-theme-flat.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger-theme-future.js" %}"></script>
 <script src="{% static "assets/js/src/app.js" %}"></script>
 <script src="{% static "assets/js/cgsy.js" %}"></script>
 
