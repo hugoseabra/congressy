@@ -242,8 +242,8 @@
                             aria-label="Close"><span
                             aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title">
-                        Adicionar ao Formulário </h4>
+                    <p style="font-size: 15px" class="modal-title">
+                        Adicionar ao Formulário </p>
                 </div>
 
                 <form method="post">
@@ -259,7 +259,7 @@
                             <i class="iconOfField"></i>
                         </strong>
                         <hr/>
-                        {% render_generic_field form.title autofocus=True %}
+                        {% render_generic_field form.name autofocus=True %}
                         {% render_generic_field form.help_text %}
 
                         <hr>
@@ -277,12 +277,78 @@
                                 data-dismiss="modal">Cancelar
                         </button>
                         <button type="submit"
-                                class="btn btn-primary">Salvar
+                                class="btn btn-success">Salvar
                         </button>
                     </div>
 
 
                 </form>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal fade" id="confirmDelete"
+         role="dialog">
+
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <p style="font-size: 25px" class="modal-title">
+                        Certeza que deseja deletar essa pergunta?
+                    </p>
+                    <i style="font-size: 20px" id="removingQuestion"></i>
+                    <input type="hidden" id="removingQuestionId">
+                    <input type="hidden" id="removingQuestionName">
+                </div>
+
+                {#                <form method="post">#}
+                {##}
+                {#                    {% csrf_token %}#}
+                {##}
+                {##}
+                {#                    <div class="modal-body">#}
+                {##}
+                {##}
+                {#                        <strong style="font-size: 25px">#}
+                {#                            <span class="typeOfField"></span>#}
+                {#                            <i class="iconOfField"></i>#}
+                {#                        </strong>#}
+                {#                        <hr/>#}
+                {#                        {% render_generic_field form.name autofocus=True %}#}
+                {#                        {% render_generic_field form.help_text %}#}
+                {##}
+                {#                        <hr>#}
+                {#                        <div id="options">#}
+                {#                            {% render_generic_field form.options %}#}
+                {#                        </div>#}
+                {#                        <input type="hidden" id="id_question_type"#}
+                {#                               name="question_type">#}
+                {#                    </div>#}
+                {##}
+                {##}
+                {#                </form>#}
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-danger"
+                            data-dismiss="modal">Cancelar
+                    </button>
+                    <button type="button"
+                            class="btn btn-success"
+                            id="deleteQuestion"
+                            data-dismiss="modal"
+                    >
+                        Salvar
+                    </button>
+                </div>
 
             </div>
 
@@ -296,7 +362,10 @@
 {% block scripts %}
 
     <!-- DnD -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js">
+    </script>
+
+
 
 
     <script type="application/javascript">
@@ -309,6 +378,11 @@
             });
 
             loadDoc();
+
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'future'
+            };
 
         });
 
@@ -329,7 +403,6 @@
             $('#addQuestion').modal('show');
         });
 
-
         $(document).on("click", ".open-AddComplexQuestionDialog", function () {
 
             var typeOfField = $(this).data('field-type');
@@ -347,6 +420,35 @@
             $('#addQuestion').modal('show');
         });
 
+        $('#deleteQuestion').on('click', function () {
+
+            var questionId = $('#removingQuestionId').val();
+            var questionName = $('#removingQuestionName').val();
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            $.ajax({
+                type: "POST",
+                url: location.pathname,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: {
+                    question_id: questionId,
+                    action: 'delete'
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Pergunta removida com sucesso!',
+                        type: 'success'
+                    });
+                    loadDoc();
+                }
+            });
+            var questionListEl = $("ul").find("[data-name='" + questionName +
+                "']");
+            questionListEl.remove();
+        });
+
 
         function loadDoc() {
 
@@ -356,7 +458,6 @@
                     document.getElementById("fields").innerHTML =
                         result;
                     var editableList = createFieldList();
-                    var optionsList = createOptionsList();
                     app.switcheryToggle();
                     var radios = $('input[type=radio]');
                     radios.iCheck({
@@ -365,16 +466,10 @@
                     });
                 }
             });
-
-
         }
 
         function byId(id) {
             return document.getElementById(id);
-        }
-
-        function byClass(className) {
-            return document.getElementsByClassName(className);
         }
 
         function createFieldList() {
@@ -383,8 +478,20 @@
                 filter: '.js-remove',
                 handle: ".my-handle",
                 onFilter: function (evt) {
-                    console.log('removed => ' + evt.item.dataset.id);
-                    evt.item.parentNode.removeChild(evt.item);
+                    console.log('removed => ' + evt.item.dataset.name);
+                    var questionEl = $('#removingQuestion');
+                    var questionIdEl = $('#removingQuestionId');
+                    var questionNameEl = $('#removingQuestionName');
+
+                    questionEl.text(evt.item.dataset.label);
+                    var question = evt.item.childNodes[1].childNodes[1]
+                        .childNodes[1].childNodes[5].childNodes[1]
+                        .childNodes[3];
+
+                    questionIdEl.val(question.getAttribute('data-id'));
+                    questionNameEl.val(evt.item.dataset.name);
+                    $('#confirmDelete').modal('show');
+                    {#evt.item.parentNode.removeChild(evt.item);#}
                 },
                 onSort: function (evt) {
                     console.log(this.toArray());
@@ -392,21 +499,6 @@
                 }
             });
         }
-
-        function createOptionsList() {
-
-            return Sortable.create(byId('optionsList'), {
-                animation: 150,
-                filter: '.js-remove',
-                handle: ".my-handle",
-                onFilter: function (evt) {
-                    console.log('removed => ' + evt.item.dataset.id);
-                    evt.item.parentNode.removeChild(evt.item);
-                },
-            });
-        }
-
-
     </script>
 
 {% endblock %}

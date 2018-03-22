@@ -1,45 +1,43 @@
-<ul id="simpleList" class="list-group">
-
-
-
-    <li class="list-group-item" data-id="1">
-        <div class="row">
-
-            <div class="col-md-10">
-
-                <select class="form-control" name="lot" id="id_lot">
-
-                    <option value="21">1º Lote - R$ 220,00</option>
-
-                </select>
-
-
-
-                <div class="text-muted small">Escolha o tipo de ingresso.</div>
-            </div>
-            <div class="col-md-2 control-buttons">
-
+{% load static base_tags queryset_filter form_config_tags %}
+{% if full_survey_form.fields|length > 0  %}
+    <ul id="simpleList" class="list-group">
+        {% for field in full_survey_form %}
+            <li class="list-group-item"
+                data-name="{{ field.name }}"
+                data-label="{{ field.label }}"
+            >
                 <div class="row">
-                    <i class="my-handle fas fa-bars"></i>
-                    <i class="js-remove far fa-window-close" style="margin-left:
+
+                    <div class="col-md-10">
+
+                        {% render_generic_field field %}
+
+                    </div>
+                    <div class="col-md-2 control-buttons">
+
+                        <div class="row">
+                            <i class="my-handle fas fa-bars"></i>
+                            <i class="js-remove far fa-window-close" style="margin-left:
                 10px;"></i>
-                </div>
+                        </div>
 
-                <div class="row">
-                    <div class="checkbox">
-                        <label><input  type="checkbox"
-                                      class="js-switch"
-                                      value="">Obrigatorio</label>
+                        <div class="row">
+                            <div class="checkbox">
+                                <label><input type="checkbox"
+                                              class="js-switch"
+                                              value="">Obrigatorio</label>
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
-
-
-            </div>
-        </div>
-    </li>
-
-
-</ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <strong>Nenhuma questão.</strong>
+{% endif %}
 
 
 
