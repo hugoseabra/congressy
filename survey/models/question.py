@@ -64,12 +64,12 @@ class Question(Entity, models.Model):
 
     name = models.CharField(
         max_length=255,
-        verbose_name='titulo',
+        verbose_name='nome',
     )
 
     label = models.CharField(
         max_length=255,
-        verbose_name='rotulo'
+        verbose_name='nome do campo'
     )
 
     required = models.BooleanField(
