@@ -24,15 +24,6 @@ class QuestionManager(models.Manager):
 
         return 1
 
-    def adjust_orders(self, pk, survey, order):
-        questions = self.filter(survey=survey).exclude(pk=pk).order_by('order')
-
-        for question in questions:
-            if question.order < order:
-                continue
-
-            question.order += 1
-            question.save()
 
 
 @track_data('order')
@@ -156,9 +147,3 @@ class Question(Entity, models.Model):
             self.order = Question.objects.next_order(self.survey)
 
         super().save(force_insert, force_update, using, update_fields)
-
-        Question.objects.adjust_orders(
-            pk=self.pk,
-            survey=self.survey,
-            order=self.order
-        )
