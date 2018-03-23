@@ -339,6 +339,7 @@
     </script>
 
     <script type="application/javascript">
+
         $(document).ready(function () {
 
 
@@ -349,17 +350,8 @@
                 theme: 'future'
             };
 
-            $('.trigger_required').mousedown(function () {
-                console.log('sdsadasdasd');
-                if (!$(this).is(':checked')) {
-                    this.checked = confirm("Are you sure?");
-                    $(this).trigger("change");
-                }
-            });
-
 
         });
-
 
         $(document).on("click", ".open-AddSimpleQuestionDialog", function () {
             var typeOfField = $(this).data('field-type');
@@ -441,8 +433,50 @@
                     document.getElementById("fields").innerHTML =
                         result;
                     createFieldList();
+                    app.switcheryToggle();
+                },
+                error: function (error) {
+                    Messenger().post({
+                        message: 'Não foi possivel atualizar as perguntas. ',
+                        type: 'danger'
+                    });
                 }
             });
+        }
+
+        function updateRequired(elm) {
+
+            var setTo = null;
+            if(elm.checked){
+                setTo = 'True';
+            } else {
+                setTo = 'False';
+            }
+             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+            $.ajax({
+                type: "POST",
+                url: location.pathname,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: {
+                    action: 'update_required',
+                    setTo: setTo,
+                    question_id: elm.dataset.name
+                },
+                success: function (res) {
+                    updateFields();
+                },
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel atualizar a ' +
+                        'obrigatoriedade da pergunta.',
+                        type: 'danger'
+                    });
+                    updateFields();
+                }
+            });
+
         }
 
         function byId(id) {
@@ -467,42 +501,38 @@
                 },
                 onEnd: function (evt) {
 
-                    console.log(this.toArray());
-                    {#console.log(evt.item.dataset.name);#}
-
-
                     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
-                    {#if (evt.newIndex === evt.oldIndex) {#}
-                    {#    return;#}
-                    {#}#}
-
-                        $.ajax({
-                            type: "POST",
-                            url: location.pathname,
-                            beforeSend: function (request) {
-                                request.setRequestHeader("X-CSRFToken", csrftoken);
-                            },
-                            data: {
-                                action: 'update_order',
-                                new_order: JSON.stringify(this.toArray()),
-                                question_id: evt.item.dataset.name
-                            },
-                            success: function (res) {
-                                updateFields();
-                            },
-                            error: function (err) {
-                                Messenger().post({
-                                    message: 'Não foi possivel atualizar a ' +
-                                    'ordem das perguntas.',
-                                    type: 'danger'
-                                });
-                                updateFields();
-                            }
-                        });
+                    if (evt.newIndex === evt.oldIndex) {
+                        return;
                     }
-                });
-        };
+
+                    $.ajax({
+                        type: "POST",
+                        url: location.pathname,
+                        beforeSend: function (request) {
+                            request.setRequestHeader("X-CSRFToken", csrftoken);
+                        },
+                        data: {
+                            action: 'update_order',
+                            new_order: JSON.stringify(this.toArray()),
+                            question_id: evt.item.dataset.name
+                        },
+                        success: function (res) {
+                            updateFields();
+                        },
+                        error: function (err) {
+                            Messenger().post({
+                                message: 'Não foi possivel atualizar a ' +
+                                'ordem das perguntas.',
+                                type: 'danger'
+                            });
+                            updateFields();
+                        }
+                    });
+                }
+            })
+        }
 
     </script>
 

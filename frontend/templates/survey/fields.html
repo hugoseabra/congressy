@@ -9,11 +9,11 @@
             >
                 <div class="row">
 
+
                     <div class="col-md-10">
-
                         {% render_generic_field field %}
-
                     </div>
+
                     <div class="col-md-2 control-buttons">
 
                         <div class="row">
@@ -25,18 +25,19 @@
                         <div class="row">
                             <div class="checkbox">
                                 <label>
-                                    {% if field.required %}
-                                        <input type="checkbox"
-                                               class="js-switch trigger_required"
-                                               required="required"
-                                               id="switchery_{{ field.name }}"
-                                               value="">Obrigatorio</label>
-                                    {% else %}
-                                        <input type="checkbox"
-                                               class="js-switch trigger_required"
-                                               id="switchery_{{ field.name }}"
-                                               value="">Obrigatorio</label>
-                                    {% endif %}
+
+
+                                    <input type="checkbox"
+                                           class="js-switch"
+                                           data-name="{{ field.name }}"
+                                            {% if field.field.required %}
+                                           checked
+                                            {% endif %}
+                                           onchange="updateRequired(this)"
+                                           id="switchery_{{ field.name }}"
+                                           value="">Obrigatorio
+
+                                </label>
                             </div>
                         </div>
 

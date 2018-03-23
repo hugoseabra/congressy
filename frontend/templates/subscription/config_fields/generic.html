@@ -12,7 +12,7 @@
         {% if autofocus %}
 
             {% if  required  or required == 'True' %}
-                {{ field|add_class:"form-control"|append_attr:"required:required"|append_attr:"autofocus" }}
+                {{ field|add_class:"form-control"|attr:"required:required"|append_attr:"autofocus" }}
             {% else %}
                 {{ field|add_class:"form-control"|append_attr:"autofocus" }}
             {% endif %}
@@ -24,7 +24,7 @@
         {% else %}
 
             {% if  required  or required == 'True' %}
-                {{ field|add_class:"form-control"|append_attr:"required:required" }}
+                {{ field|add_class:"form-control"|attr:"required:required" }}
             {% else %}
                 {{ field|add_class:"form-control" }}
             {% endif %}

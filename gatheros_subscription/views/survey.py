@@ -67,6 +67,23 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
                 except Question.DoesNotExist:
                     return HttpResponse(status=404)
+            elif action == 'update_required':
+                set_to = self.request.POST.get('setTo')
+                try:
+                    question = Question.objects.get(name=question_id)
+                except Question.DoesNotExist:
+                    return HttpResponse(status=404)
+
+                if set_to == "True":
+                    question.required = True
+                elif set_to == "False":
+                    question.required = False
+                else:
+                    return HttpResponse(status=500)
+
+                question.save()
+                return HttpResponse(status=200)
+
             else:
                 return HttpResponse(status=500)
 
