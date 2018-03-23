@@ -37,5 +37,3 @@ class SurveyForm(forms.Form):
         field = SurveyField(question, field_type, initial, required, label,
                             attrs={'data-id': id}, **kwargs)
         self.fields[name] = field.get_django_field()
-
-        print('sdsada')

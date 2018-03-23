@@ -185,6 +185,10 @@ class SurveyListView(EventViewMixin, AccountMixin, generic.ListView, ):
                 "Corrija os erros abaixo."
             )
 
+            context = self.get_queryset()
+            context['form'] = form
+            return self.render_to_response(context=context)
+
         return redirect(reverse_lazy('subscription:survey-list', kwargs={
             'event_pk': self.event.pk,
         }))

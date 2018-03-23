@@ -352,12 +352,6 @@
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
-        <li>
-            <a href="{% url 'subscription:survey-list' event.pk %}"
-               title="Survey">
-                <i class="fa  fa-fw fa-rocket"></i> Questionário
-            </a>
-        </li>
         {% if has_paid_lots %}
             <li>
                 <a href="{% url 'payment:event-payments' event.pk %}"
