@@ -291,6 +291,7 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         all_surveys = EventSurvey.objects.filter(event=self.event).count()
         return all_surveys > 0
 
+
 class LotDeleteView(BaseLotView, DeleteViewMixin):
     model = Lot
     pk_url_kwarg = 'lot_pk'

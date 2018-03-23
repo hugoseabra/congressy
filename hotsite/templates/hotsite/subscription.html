@@ -159,12 +159,12 @@
             }, 300);
 
             $('#id_lot').on('change', function () {
-                //alert(this.value);
 
-                if(this.value in all_lots){
-                    console.log('in lots');
+                if (this.value in all_lots) {
+                    $('.survey_form').hide();
+
                     var survey_id = all_lots[this.value]['survey'];
-                    var lot_survey = $("div[data-survey-id='" +survey_id +"']");
+                    var lot_survey = $("div[data-survey-id='" + survey_id + "']");
                     console.log(lot_survey);
                     lot_survey.show()
                 } else {
