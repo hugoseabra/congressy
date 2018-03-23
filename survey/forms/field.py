@@ -39,7 +39,8 @@ class SurveyField(object):
         FIELD_RADIO_GROUP
     ]
 
-    def __init__(self, field_type, initial=None, required=True, label=None,
+    def __init__(self, question, field_type, initial=None, required=True,
+                 label=None,
                  **kwargs):
 
         if field_type in self.supported_types:
@@ -51,15 +52,20 @@ class SurveyField(object):
                 ', '.join(self.supported_types)
             ))
 
+        options = []
+
+        if question.has_options:
+            options = [(opt.value, opt.name) for opt in question.options.all()]
+
         self.initial = initial
-        self.required = self.has_requirement() and required is True
-        self.label = label
+        self.required = required
+        self.label = label or ''
         self.placeholder = kwargs.get('placeholder', '')
         self.help_text = kwargs.get('help_text', '')
         self.max_length = kwargs.get('max_length', 255)
         self.select_intro = kwargs.get('select_intro', False)
         self.attrs = kwargs.get('attrs', {})
-        self.options = kwargs.get('options', [])
+        self.options = options
 
     def get_django_field(self):
         """ Recupera campo do Django Forms correto de acordo com o tipo. """

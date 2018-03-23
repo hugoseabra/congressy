@@ -1,8 +1,9 @@
 {% load static base_tags queryset_filter form_config_tags %}
-{% if full_survey_form.fields|length > 0  %}
+{% if full_survey_form.fields|length > 0 %}
     <ul id="simpleList" class="list-group">
         {% for field in full_survey_form %}
             <li class="list-group-item"
+                data-id="{{ field.name }}"
                 data-name="{{ field.name }}"
                 data-label="{{ field.label }}"
             >
@@ -23,9 +24,19 @@
 
                         <div class="row">
                             <div class="checkbox">
-                                <label><input type="checkbox"
-                                              class="js-switch"
-                                              value="">Obrigatorio</label>
+                                <label>
+                                    {% if field.required %}
+                                        <input type="checkbox"
+                                               class="js-switch trigger_required"
+                                               required="required"
+                                               id="switchery_{{ field.name }}"
+                                               value="">Obrigatorio</label>
+                                    {% else %}
+                                        <input type="checkbox"
+                                               class="js-switch trigger_required"
+                                               id="switchery_{{ field.name }}"
+                                               value="">Obrigatorio</label>
+                                    {% endif %}
                             </div>
                         </div>
 

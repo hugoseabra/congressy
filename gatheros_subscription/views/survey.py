@@ -1,8 +1,9 @@
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
-
+import json
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.views.mixins import EventViewMixin, AccountMixin
 from gatheros_subscription.forms import SurveyForm
@@ -10,7 +11,6 @@ from gatheros_subscription.models import EventSurvey
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
 from survey.forms import QuestionForm, SurveyForm as FullSurveyForm
 from survey.models import Survey, Question
-from django.http import HttpResponse
 
 
 class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
@@ -41,10 +41,32 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
             question_id = self.request.POST.get('question_id')
 
             if action == 'delete':
-                question = get_object_or_404(Question, pk=question_id)
-                question.delete()
+
+                try:
+                    question = Question.objects.get(name=question_id)
+                    question.delete()
+                except Question.DoesNotExist:
+                    return HttpResponse(status=404)
 
                 return HttpResponse(status=200)
+            elif action == 'update_order':
+
+                new_order = json.loads(self.request.POST.get(
+                    'new_order'))
+
+                counter = 1
+                try:
+                    for question_name in new_order:
+                        question = Question.objects.get(survey=self.survey,
+                                                        name=question_name)
+                        question.order = counter
+                        question.save()
+                        counter += 1
+
+                    return HttpResponse(status=200)
+
+                except Question.DoesNotExist:
+                    return HttpResponse(status=404)
             else:
                 return HttpResponse(status=500)
 
