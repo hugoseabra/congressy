@@ -427,6 +427,13 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
 
 class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
+    """
+        CONDICIONAIS DE GET:
+
+            - Se lote houver um questionario, renderizar questionario.
+
+
+    """
     template_name = 'hotsite/subscription.html'
     form_class = PersonForm
 
