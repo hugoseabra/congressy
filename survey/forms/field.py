@@ -55,7 +55,7 @@ class SurveyField(object):
         options = []
 
         if question.has_options:
-            options = [(opt.value, opt.name) for opt in question.options.all()]
+            options = [(opt.name, opt.value) for opt in question.options.all()]
 
         self.initial = initial
         self.required = required

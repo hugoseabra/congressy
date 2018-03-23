@@ -16,7 +16,8 @@ from django.views.decorators.debug import sensitive_post_parameters
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
-from gatheros_subscription.models import FormConfig, Lot, Subscription
+from gatheros_subscription.models import FormConfig, Lot, Subscription, \
+    EventSurvey
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
@@ -25,6 +26,7 @@ from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.models import Transaction
 from payment.tasks import create_pagarme_transaction
+from survey.forms import SurveyForm as FullSurveyForm
 
 
 class EventMixin(TemplateNameableMixin, generic.View):
@@ -430,7 +432,8 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
     """
         CONDICIONAIS DE GET:
 
-            - Se lote houver um questionario, renderizar questionario.
+            # ITEM 1
+                - Pegar todos os surveys vinculados ao evento.
 
 
     """
@@ -511,6 +514,8 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             config.address = config.ADDRESS_SHOW
 
         cxt['config'] = config
+        # ITEM 1
+        cxt['surveys'] = self._get_survey_forms()
         cxt['remove_preloader'] = True
         cxt['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
@@ -716,6 +721,21 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
         # CONDIÇÃO 5
         return redirect('public:hotsite', slug=self.event.slug)
+
+    def _get_event_surveys(self):
+        return EventSurvey.objects.filter(event=self.event)
+
+    def _get_survey_forms(self):
+
+        surveys = self._get_event_surveys()
+
+        survey_forms = []
+
+        for event_survey in surveys:
+            survey_forms.append(FullSurveyForm(
+                survey=event_survey.survey))
+
+        return survey_forms
 
 
 class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):

@@ -147,6 +147,7 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
         context = super(LotAddFormView, self).get_context_data(**kwargs)
         context['form_title'] = "Novo lote para '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
+        context['has_surveys'] = self._event_has_surveys()
         return context
 
     def form_valid(self, form):
@@ -199,6 +200,10 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
                         return False
 
         return True
+
+    def _event_has_surveys(self):
+        all_surveys = EventSurvey.objects.filter(event=self.event).count()
+        return all_surveys > 0
 
 
 class LotEditFormView(BaseFormLotView, generic.UpdateView):

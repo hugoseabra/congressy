@@ -14,13 +14,13 @@
 
         .loader-box {
             width: 100%;
-            position:absolute;
+            position: absolute;
             top: 5%;
         }
 
         .loader {
             width: 47px;
-            margin:0 auto;
+            margin: 0 auto;
         }
     </style>
 {% endblock %}
@@ -55,7 +55,8 @@
             {% endif %}
             if ($('#id_city').val()) {
                 $.ajax({
-                    url: "/api/cities/" + $('#id_city').val(), success: function (result) {
+                    url: "/api/cities/" + $('#id_city').val(),
+                    success: function (result) {
                         $('#id_city_search').val(result.name + ' - ' + result.uf)
                         //populate the html with result here
                     }
@@ -72,7 +73,7 @@
     <script>
         function load_common_lots() {
             $('#lots-field').html(common_lots_content);
-            $('#id_lot').on('change', function() {
+            $('#id_lot').on('change', function () {
                 var id = $(this).val();
                 $('#id_amount').val(amounts[id]);
             });
@@ -83,37 +84,49 @@
 
         var lots = {};
         var amounts = {};
+        var all_lots = {};
+
         {% for lot in paid_lots %}
             {% if lot.price and lot.price > 0 %}
                 amounts[['{{ lot.pk }}']] = '{{ lot.get_calculated_price|unlocalize|intcomma }}';
                 lots['{{ lot.pk }}'] = {
-                    'allow_installment': {% if lot.allow_installment %}true{% else %}false{% endif %},
-                    'installment_limit': {% if lot.allow_installment %}{{ lot.installment_limit }}{% else %}0{% endif %},
-                    'free_installment': {{ lot.num_install_interest_absortion|default_if_none:0 }}
-                };
-            {% endif %}
-        {% endfor %}
-        {% for lot in private_lots %}
-            {% if lot.price and lot.price > 0 %}
-                amounts[['{{ lot.pk }}']] = '{{ lot.get_calculated_price|unlocalize|intcomma }}';
-                lots['{{ lot.pk }}'] = {
-                    'allow_installment': {% if lot.allow_installment %}true{% else %}false{% endif %},
+                    'allow_installment': {% if lot.allow_installment %}
+                        true{% else %}false{% endif %},
                     'installment_limit': {% if lot.allow_installment %}{{ lot.installment_limit }}{% else %}0{% endif %},
                     'free_installment': {{ lot.num_install_interest_absortion|default_if_none:0 }}
                 };
             {% endif %}
         {% endfor %}
 
+        {% for lot in private_lots %}
+            {% if lot.price and lot.price > 0 %}
+                amounts[['{{ lot.pk }}']] = '{{ lot.get_calculated_price|unlocalize|intcomma }}';
+                lots['{{ lot.pk }}'] = {
+                    'allow_installment': {% if lot.allow_installment %}
+                        true{% else %}false{% endif %},
+                    'installment_limit': {% if lot.allow_installment %}{{ lot.installment_limit }}{% else %}0{% endif %},
+                    'free_installment': {{ lot.num_install_interest_absortion|default_if_none:0 }}
+                };
+            {% endif %}
+        {% endfor %}
+
+        {% for lot in lots %}
+            all_lots['{{ lot.pk }}'] = {
+                'survey': {{ lot.survey.pk }}
+            };
+        {% endfor %}
+
         var allowed_transactions;
+
         {% if request.session.allowed_transaction %}
             allowed_transactions = '{{ request.session.allowed_transaction }}';
         {% else %}
             allowed_transactions = null;
         {% endif %}
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#id_email').attr('readonly', 'readonly');
-            $('#id_lot').on('change', function() {
+            $('#id_lot').on('change', function () {
                 var id = $(this).val();
                 $('#id_amount').val(amounts[id]);
             });
@@ -124,26 +137,43 @@
                     2.29,
                     '{{ event.name }}',
                     lots,
-{#                    allowed_transactions#}
+                    {#                    allowed_transactions#}
                     null
                 );
             });
-            
+
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
-            
-            window.setTimeout(function() {
-            {% if person.city %}
-                uf_el.val('{{ person.city.uf }}');
-                fetch_cities(uf_el, '{{ person.city.pk }}');
-            {% else %}
-                uf_el.val('');
-                city_el.val('');
-                city_el.prop('disabled', true);
-            {% endif %}
 
-            $('#id_lot').trigger('change');
+            window.setTimeout(function () {
+                {% if person.city %}
+                    uf_el.val('{{ person.city.uf }}');
+                    fetch_cities(uf_el, '{{ person.city.pk }}');
+                {% else %}
+                    uf_el.val('');
+                    city_el.val('');
+                    city_el.prop('disabled', true);
+                {% endif %}
+
+                $('#id_lot').trigger('change');
             }, 300);
+
+            $('#id_lot').on('change', function () {
+                //alert(this.value);
+
+                if(this.value in all_lots){
+                    console.log('in lots');
+                    var survey_id = all_lots[this.value]['survey'];
+                    var lot_survey = $("div[data-survey-id='" +survey_id +"']");
+                    console.log(lot_survey);
+                    lot_survey.show()
+                } else {
+                    console.log('not in lots')
+                }
+            });
+
+
         });
+
     </script>
 {% endblock %}
