@@ -26,3 +26,6 @@ class EventSurvey(models.Model):
         verbose_name='formulario',
         related_name='event',
     )
+
+    def __str__(self):
+        return self.survey.name
