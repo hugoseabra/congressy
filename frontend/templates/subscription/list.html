@@ -143,6 +143,12 @@
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
+        <li>
+            <a href="{% url 'subscription:survey-list' event.pk %}"
+               title="Survey">
+                <i class="fa  fa-fw fa-rocket"></i> Questionário
+            </a>
+        </li>
         {% if has_paid_lots %}
             <li>
                 <a href="{% url 'payment:event-payments' event.pk %}"
@@ -159,7 +165,8 @@
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-right">
-                    <button type="button" class="btn btn-primary" onclick="$('#export-form').submit();">
+                    <button type="button" class="btn btn-primary"
+                            onclick="$('#export-form').submit();">
                         <i class="fa fa-download"></i>
                         Exportar
                     </button>
@@ -169,7 +176,8 @@
         </div>
     </div>
     <div style="display:none">
-        <form action="{% url 'subscription:subscriptions-export' event.pk %}" method="post" id="export-form">
+        <form action="{% url 'subscription:subscriptions-export' event.pk %}"
+              method="post" id="export-form">
             {% csrf_token %}
         </form>
     </div>
@@ -251,16 +259,16 @@
                                                     <li>
                                                         <a href="{% url 'subscription:subscription-voucher' event.pk item.pk %}">
                                                             <i class="fas fa-file-pdf"></i>
-                                                           Voucher
+                                                            Voucher
                                                         </a>
                                                     </li>
                                                 {% endif %}
-{#                                                <li>#}
-{#                                                    <a href="{% url 'subscription:subscription-delete' event.pk item.pk %}">#}
-{#                                                        <i class="fas fa-trash-alt"></i>#}
-{#                                                        Cancelar#}
-{#                                                    </a>#}
-{#                                                </li>#}
+                                                {#                                                <li>#}
+                                                {#                                                    <a href="{% url 'subscription:subscription-delete' event.pk item.pk %}">#}
+                                                {#                                                        <i class="fas fa-trash-alt"></i>#}
+                                                {#                                                        Cancelar#}
+                                                {#                                                    </a>#}
+                                                {#                                                </li>#}
                                             </ul>
                                         </div>
                                     </td>
