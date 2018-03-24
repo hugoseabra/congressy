@@ -184,7 +184,7 @@ pipeline:
       - echo $${LAST_TAG} > version
       - cat version
     when:
-      branch: [ master ]
+      branch: [ master, feature/cron-service ]
 
   check-latest-version:
     image: docker
