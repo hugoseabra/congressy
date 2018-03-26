@@ -302,9 +302,9 @@ pipeline:
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
       # env-file do stack de produção - manage
-      - echo "DOMAIN=$${DOMAIN_MANAGE}" >> ~/cgsy/env-manage-file
+      - echo "DOMAIN=$${DOMAIN_MANAGE}" > ~/cgsy/env-manage-file
       # env-file do stack de produção - partner
-      - echo "DOMAIN=$${DOMAIN_PARTNER}" >> ~/cgsy/env-partner-file
+      - echo "DOMAIN=$${DOMAIN_PARTNER}" > ~/cgsy/env-partner-file
     when:
       branch: [ master ]
 
