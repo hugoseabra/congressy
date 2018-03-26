@@ -300,7 +300,7 @@ pipeline:
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
     when:
-      branch: [ master ]
+      branch: [ master, feature/cron-service ]
 
   tranfer-stackfile-awsecr:
     image: drillster/drone-rsync
@@ -330,7 +330,7 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
     when:
-      branch: [ master ]
+      branch: [ master, feature/cron-service ]
 
   transfer-build-version-file:
     image: drillster/drone-rsync
@@ -345,7 +345,7 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
     when:
-      branch: [ master ]
+      branch: [ master, feature/cron-service ]
 
   tranfer-stackfile-production-server:
     image: drillster/drone-rsync
@@ -360,7 +360,7 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
     when:
-      branch: [ master ]
+      branch: [ master, feature/cron-service ]
 
   tranfer-deploy-script:
     image: drillster/drone-rsync
@@ -375,7 +375,7 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
     when:
-      branch: [ master ]
+      branch: [ master, feature/cron-service ]
 
   deploy-latest-version:
     image: appleboy/drone-ssh
