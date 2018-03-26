@@ -5,7 +5,7 @@
 # Não mude as configurações de DATABASES.
 #############################################################################
 
-from project.settings.common import *
+from .common import *
 from fnmatch import fnmatch
 
 # ========================== BASE CONFIGURATION ============================= #

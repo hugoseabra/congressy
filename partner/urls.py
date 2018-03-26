@@ -4,12 +4,12 @@ from partner import views
 
 public_partner_urls = [
     url(
-        r'^partner/add/$',
+        r'^$',
         views.RegistrationView.as_view(),
         name='partner-registration'
     ),
     url(
-        r'^partner/done/$',
+        r'^done/$',
         views.RegistrationDoneView.as_view(),
         name='partner-registration-done'
     ),

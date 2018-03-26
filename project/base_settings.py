@@ -5,9 +5,11 @@ from django.contrib.messages import constants as message_constants
 from django.utils.translation import ugettext_lazy as _
 
 # ========================== BASE CONFIGURATION ============================= #
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+BASE_DIR = os.path.abspath(os.path.join(
+    os.path.dirname(__file__),
+    '..',
+))
 DEBUG = False
-ROOT_URLCONF = 'project.urls'
 # ================================= APPS ==================================== #
 INSTALLED_APPS = [
     # DJANGO_APPS
@@ -41,17 +43,9 @@ INSTALLED_APPS = [
     'kanu_locations',
 
     # CONGRESSY APPS
+    'core',
     'base',
     'frontend',
-    'gatheros_event',
-    'gatheros_subscription',
-    'gatheros_front',
-    'mailer',
-    'payment',
-    'core',
-    'hotsite',
-    'partner',
-    'bitly',
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
@@ -71,7 +65,6 @@ LANGUAGES = (
     ('pt-br', _('Português')),
 )
 # ============================= MIDDLEWARES ================================= #
-
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -97,10 +90,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     )
 }
-
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/manage/'
-LOGOUT_REDIRECT_URL = '/login/'
 # ============================ VALIDATORS =================================== #
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -114,15 +103,6 @@ WSGI_APPLICATION = 'project.wsgi.application'
 ALLOWED_HOSTS = ['*']
 X_FRAME_OPTIONS = 'ALLOWALL'
 XS_SHARING_ALLOWED_METHODS = ['POST', 'GET', 'OPTIONS', 'PUT', 'DELETE']
-
-SITE_ID = 1
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_URL = '/static/'
-
-# @TODO Mudar para /media em produção.
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
 
 # Name of cache backend to cache user agents. If it not specified default
 # cache alias will be used. Set to `None` to disable caching.
@@ -166,7 +146,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'project.context_processors.environment_version',
-                'gatheros_event.context_processors.account',
             ],
             'builtins': [
                 'permission.templatetags.permissionif',
@@ -174,17 +153,6 @@ TEMPLATES = [
         },
     },
 ]
-# ============================== DATABASE =================================== #
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'gatheros_site',
-        'USER': 'MUDAR_USUARIO',
-        'PASSWORD': 'MUDAR_SENHA',
-        'HOST': 'localhost',
-        'PORT': '',
-    },
-}
 # ============================== LOGGING ==================================== #
 # Disable
 # LOGGING_CONFIG = None
@@ -217,9 +185,6 @@ DATABASES = {
 FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'fixtures'),
     os.path.join(BASE_DIR, 'fixtures', 'workflows'),
-    os.path.join(BASE_DIR, 'gatheros_event/tests/fixtures'),
-    os.path.join(BASE_DIR, 'gatheros_subscription/tests/fixtures'),
-    os.path.join(BASE_DIR, 'payment/tests/fixtures'),
 ]
 # ============================= CKEDITOR ==================================== #
 CKEDITOR_CONFIGS = {
@@ -323,15 +288,3 @@ BITLY_API_KEY = 'R_90819c7eac3f4c039e5f9c37f6786dda'
 BITLY_ACCESS_TOKEN = '5e9398fb6cc39e8dee301f9c0192959563b8bd02'
 # Tempo em que o relatório de cada link irá renovar os dados.
 BITLY_TIMEOUT_STATS = 30
-# ============================= PAYMENT ===================================== #
-# Planos da congressy, contemplam percentuais de recebimento em cima das
-# transações
-
-# Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
-# devido for menor do que este, o valor da transaçaõ da parte da congressy será
-# este valor.
-CONGRESSY_MINIMUM_AMOUNT = 4.99
-# ========================== PARTNER ======================================== #
-# Valor maximo em que a soma de todos os parceiros do evento não deve
-# ultrapassar do rateamento do montante da Congressy
-PARTNER_MAX_PERCENTAGE_IN_EVENT = 20.00
