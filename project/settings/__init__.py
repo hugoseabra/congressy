@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'captcha',
     'wkhtmltopdf',
-    'django_bitly',
 
     # KANU_APPS
     'kanu_locations',
@@ -122,7 +121,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 # @TODO Mudar para /media em produção.
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # Name of cache backend to cache user agents. If it not specified default
@@ -313,7 +312,9 @@ WKHTMLTOPDF_CMD = os.path.join(
 # =============================== BITLY ===================================== #
 BITLY_LOGIN = 'congressy'
 BITLY_API_KEY = 'R_90819c7eac3f4c039e5f9c37f6786dda'
-BITLY_TIMEOUT = 5
+BITLY_ACCESS_TOKEN = '5e9398fb6cc39e8dee301f9c0192959563b8bd02'
+# Tempo em que o relatório de cada link irá renovar os dados.
+BITLY_TIMEOUT_STATS = 30
 # ============================= PAYMENT ===================================== #
 # Planos da congressy, contemplam percentuais de recebimento em cima das
 # transações

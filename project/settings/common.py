@@ -4,8 +4,7 @@
 # A configuração de banco de dados é gerada automaticamente pelo deploy.
 # Não mude as configurações de DATABASES.
 #############################################################################
-# ============================== GOOGLE ===================================== #
-GOOGLE_MAPS_API_KEY = 'AIzaSyAPpiE3QALhF_5AhBSZJ9K27eDiJXCtTK0'
+
 from project.settings import *
 
 # ========================== BASE CONFIGURATION ============================= #

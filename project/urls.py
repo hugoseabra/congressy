@@ -19,7 +19,6 @@ from gatheros_front.urls import (
 from hotsite.urls import urlpatterns_public_hotsite
 from partner.urls import urlpatterns_public_partner
 from payment.urls import private_payment_urls, urlpatterns_public_payments_api
-from bitly.urls import urlpatterns_public_bitly
 
 handler500 = 'project.views.handler500'
 
@@ -27,6 +26,7 @@ admin_urlpatterns = [url(r'^cgsy-admin18/', admin.site.urls)]
 
 private_urlpatterns = [
     url(r'^manage/', include('gatheros_subscription.urls', 'subscription')),
+    # url(r'^manage/', include('bitly.urls', 'bitly')),
     url(r'^manage/', include('gatheros_event.urls', 'event')),
     url(r'^manage/', include(gatheros_front_private, 'front')),
     url(r'^manage/', include(private_payment_urls, 'payment')),
@@ -34,7 +34,6 @@ private_urlpatterns = [
 ]
 
 public_urls = gatheros_front_public
-public_urls += urlpatterns_public_bitly
 public_urls += urlpatterns_public_partner
 public_urls += urlpatterns_public_account
 public_urls += urlpatterns_public_password

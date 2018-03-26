@@ -2,12 +2,12 @@ from django.conf.urls import include, url
 
 from bitly import views
 
-public_bitly_urls = [
+urls = [
     url(
-        r'^bitly/$',
+        r'^$',
         views.BitlyView.as_view(),
-        name='bitly'
+        name='lot-list'
     ),
 ]
 
-urlpatterns_public_bitly = [url(r'^', include(public_bitly_urls))]
+urlpatterns = [url(r'^events/(?P<event_pk>[\d]+)/bitly/', include(urls))]
