@@ -7,22 +7,52 @@
 #
 # - o container usa o banco de dados cgsy-postgres criado externamente, que é o
 #   mesmo utilizado para o ambiente de desenvolvimento (local).
-# - IMPORTANTE manter o nome do container como "cgsy-staging" pois outros
+# - IMPORTANTE manter o nome do container como "manage-staging" pois outros
 #   scripts utilizam esta referência.
-# - env-file "env-cgsy-staging" é construído pelo CI dinamicamente por causa
+# - env-file "env-manage-staging" é construído pelo CI dinamicamente por causa
 #   das informações sensíveis.
 ###############################################################################
-version: '2.3'
+version: '3'
 services:
-  cgsy-staging:
+  # Preparação de volumes.
+  volume:
     image: cgsy-staging
-    container_name: cgsy-staging
+    container_name: volume-staging
+    entrypoint:
+      - /services/volume/container-entry.sh
+    env_file: ./env-manage-staging
+    volumes:
+      - "/media:/var/www/cgsy/media"
+
+  cron:
+    image: cgsy-staging
+    container_name: cron-staging
+    depends_on:
+      - volume
+    entrypoint:
+      - /services/cron/container-entry.sh
+    networks:
+      - postgres
+      - mailhog
+    env_file: ./env-manage-staging
+    volumes:
+      - "/media:/var/www/cgsy/media"
+
+  manage:
+    image: cgsy-staging
+    container_name: manage-staging
+    depends_on:
+      - volume
+    entrypoint:
+      - /services/web/manage/container-entry.sh
     networks:
       - postgres
       - mailhog
     ports:
       - "8080:80"
-    env_file: ./env-cgsy-staging
+    env_file: ./env-manage-staging
+    volumes:
+      - "/media:/var/www/cgsy/media"
 
 networks:
   postgres:

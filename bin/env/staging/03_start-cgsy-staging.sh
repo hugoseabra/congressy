@@ -19,15 +19,15 @@ function error_msg() {
     echo ;
 }
 
-docker-compose -f ./bin/env/staging/docker-compose.yml down
+docker-compose -f ./bin/env/staging/docker-compose.yml down --remove-orphans
 docker-compose -f ./bin/env/staging/docker-compose.yml up -d
 sleep 10
 
 echo ;
-docker logs cgsy-staging
+docker logs manage-staging
 echo ;
 
-RUNNING=$(docker inspect -f {{.State.Running}} cgsy-staging)
+RUNNING=$(docker inspect -f {{.State.Running}} manage-staging)
 if [ "$RUNNING" != "true" ]; then
     error_msg "Container não subiu."
     exit 1

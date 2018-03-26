@@ -42,13 +42,14 @@ BKP_FILE_PATH="$BKP_DUMP_DIR/$BKP_FILE_NAME.sql"
 
 if [ ! -f "$BKP_FILE_PATH" ]; then
     # Dump do DB
-    PGPASSWORD=4UnADjyMjeeB7GSc pg_dump \
-          --host congressy.cy6gssymlczu.us-east-1.rds.amazonaws.com \
-          --port 5499 \
-          --username congressy \
-          --format=c \
-          --verbose \
-          cgsyplatform > ${BKP_FILE_PATH}
+    PGPASSWORD=${DBPASS} pg_dump \
+      --host ${DBHOST} \
+      --port ${DBPORT} \
+      --username ${DBUSER} \
+      --schema public \
+      --format=c \
+      --verbose \
+      ${DBNAME} > ${BKP_FILE_PATH}
 
     echo "1" > ${BKP_DUMP_DIR}/recreate.txt
 else

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'kanu_locations',
 
     # CONGRESSY APPS
+    'base',
     'frontend',
     'gatheros_event',
     'gatheros_subscription',
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     'core',
     'hotsite',
     'partner',
+    'bitly',
 ]
 # ================= LOCATION/LANGUAGES/INTERNATIONALIZATION ================= #
 LANGUAGE_CODE = 'pt-br'
@@ -119,7 +121,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 # @TODO Mudar para /media em produção.
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # Name of cache backend to cache user agents. If it not specified default
@@ -152,6 +154,7 @@ TEMPLATES = [
             os.path.join(BASE_DIR, 'gatheros_event', 'templates'),
             os.path.join(BASE_DIR, 'hotsite', 'templates'),
             os.path.join(BASE_DIR, 'mailer', 'templates'),
+            os.path.join(BASE_DIR, 'bitly', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -307,6 +310,19 @@ WKHTMLTOPDF_CMD = os.path.join(
     BASE_DIR, "bin", "wkhtmltox", "bin", 'wkhtmltopdf'
 )
 
+# =========================== CRON CLASSES ================================== #
+ALLOW_PARALLEL_RUNS = True
+FAILED_RUNS_CRONJOB_EMAIL_PREFIX = "[Server check]: "
+
+CRON_CLASSES = [
+    "payment.cron.MyCronJob",
+]
+# =============================== BITLY ===================================== #
+BITLY_LOGIN = 'congressy'
+BITLY_API_KEY = 'R_90819c7eac3f4c039e5f9c37f6786dda'
+BITLY_ACCESS_TOKEN = '5e9398fb6cc39e8dee301f9c0192959563b8bd02'
+# Tempo em que o relatório de cada link irá renovar os dados.
+BITLY_TIMEOUT_STATS = 30
 # ============================= PAYMENT ===================================== #
 # Planos da congressy, contemplam percentuais de recebimento em cima das
 # transações
