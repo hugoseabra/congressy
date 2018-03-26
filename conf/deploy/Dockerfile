@@ -66,7 +66,6 @@ RUN pip install --no-cache-dir --upgrade \
         # Sentry
         raven
 
-
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
 

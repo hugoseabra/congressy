@@ -48,9 +48,6 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
 # -----------------------------------------------------------------------------
 # Pypi packages
 
-# STAGING
-RUN pip install --no-cache-dir --upgrade uwsgi lxml sparkpost s3cmd jinja2
-
 # install uwsgi now because it takes a little while
 RUN pip install --no-cache-dir --upgrade \
         pip setuptools \
@@ -63,7 +60,6 @@ RUN pip install --no-cache-dir --upgrade \
         s3cmd \
         # template engine
         jinja2
-
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
