@@ -2,7 +2,7 @@
 
 source /scripts.sh
 
-# Define settings to be run
+# Define settings
 export DJANGO_SETTINGS_MODULE=project.manage.settings.prod
 
 run_python_script "Configurando WSGI" /configure-wsgi.py

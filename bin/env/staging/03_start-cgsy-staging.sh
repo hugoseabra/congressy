@@ -24,7 +24,7 @@ docker-compose -f ./bin/env/staging/docker-compose.yml up -d
 sleep 10
 
 echo ;
-docker logs manage-staging
+docker-compose -f ./bin/env/staging/docker-compose.yml logs manage
 echo ;
 
 RUNNING=$(docker inspect -f {{.State.Running}} manage-staging)
