@@ -2,6 +2,9 @@
 
 source /scripts.sh
 
+# Define settings
+export DJANGO_SETTINGS_MODULE=project.manage.settings.prod
+
 # Configura dadosde sincronização.
 run_python_script "Configurando SYNC" /configure-sync.py
 
