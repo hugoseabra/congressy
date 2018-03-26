@@ -15,7 +15,8 @@ services:
       - /services/volume/container-entry.sh
     volumes:
       - "./media:/var/www/cgsy/media"
-    env_file: ./env-file
+    env_file:
+      - ./env-file
 
   cron:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -25,7 +26,8 @@ services:
       - /services/cron/container-entry.sh
     volumes:
       - "./media:/var/www/cgsy/media"
-    env_file: ./env-file
+    env_file:
+      - ./env-file
 
   manage:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -39,7 +41,9 @@ services:
       - /services/web/manage/container-entry.sh
     volumes:
       - "./media:/var/www/cgsy/media"
-    env_file: ./env-file
+    env_file:
+      - ./env-file
+      - ./env-manage-file
 
   partner:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
@@ -49,7 +53,9 @@ services:
       - "8001:80"
     entrypoint:
       - /services/web/partner/container-entry.sh
-    env_file: ./env-file
+    env_file:
+      - ./env-file
+      - ./env-partner-file
 
 networks:
   redis:
