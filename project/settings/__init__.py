@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'captcha',
     'wkhtmltopdf',
+    'django_cron',
 
     # KANU_APPS
     'kanu_locations',
@@ -118,8 +119,7 @@ SITE_ID = 1
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
-# @TODO Mudar para /media em produção.
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media_dev')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # Name of cache backend to cache user agents. If it not specified default
@@ -307,6 +307,13 @@ WKHTMLTOPDF_CMD = os.path.join(
     BASE_DIR, "bin", "wkhtmltox", "bin", 'wkhtmltopdf'
 )
 
+# =========================== CRON CLASSES ================================== #
+ALLOW_PARALLEL_RUNS = True
+FAILED_RUNS_CRONJOB_EMAIL_PREFIX = "[Server check]: "
+
+CRON_CLASSES = [
+    "payment.cron.MyCronJob",
+]
 # ============================= PAYMENT ===================================== #
 # Planos da congressy, contemplam percentuais de recebimento em cima das
 # transações

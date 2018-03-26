@@ -8,20 +8,41 @@ services:
     volumes:
       - "redis:/data"
 
-  cgsy:
-    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
-    restart: always
+  # Preparação de volumes.
+  volume:
+    image: cgsy:latest
+    entrypoint:
+      - /services/volume/container-entry.sh
+    volumes:
+      - "./media:/var/www/cgsy/media"
+    env_file: ./env-file
+
+  cron:
+    image: cgsy:latest
+    depends_on:
+      - volume
+    entrypoint:
+      - /services/cron/container-entry.sh
+    volumes:
+      - "./media:/var/www/cgsy/media"
+    env_file: ./env-file
+
+  manage:
+    image: cgsy:latest
+    depends_on:
+      - volume
     networks:
       - redis
-    volumes:
-      - "cgsy_media:/var/www/cgsy/media_dev"
     ports:
       - "8000:80"
+    entrypoint:
+      - /services/web/manage/container-entry.sh
+    volumes:
+      - "./media:/var/www/cgsy/media"
     env_file: ./env-file
 
 networks:
   redis:
 
 volumes:
-  cgsy_media:
   redis:
