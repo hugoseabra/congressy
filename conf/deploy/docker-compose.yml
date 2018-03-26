@@ -10,7 +10,7 @@ services:
 
   # Preparação de volumes.
   volume:
-    image: cgsy:latest
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     entrypoint:
       - /services/volume/container-entry.sh
     volumes:
@@ -18,7 +18,7 @@ services:
     env_file: ./env-file
 
   cron:
-    image: cgsy:latest
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     depends_on:
       - volume
     entrypoint:
@@ -28,7 +28,7 @@ services:
     env_file: ./env-file
 
   manage:
-    image: cgsy:latest
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
     depends_on:
       - volume
     networks:
