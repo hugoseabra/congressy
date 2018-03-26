@@ -7,10 +7,13 @@ from django.db import models
 from django_fake_model import models as f
 from test_plus.test import TestCase
 
-from survey.managers import Manager
-from survey.models.mixins import Entity
-from survey.services import ApplicationServiceMixin, \
-    ManagerClassMissingError, ManagerWrongTypeError
+from base.managers import Manager
+from base.models import Entity
+from base.services import (
+    ApplicationServiceMixin,
+    ManagerClassMissingError,
+    ManagerWrongTypeError,
+)
 
 
 class MyFakeModel(Entity, f.FakeModel):

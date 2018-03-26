@@ -7,10 +7,10 @@ por:
 """
 
 from django import forms
-from django.db.utils import IntegrityError
-from django.forms.utils import ErrorList
 
-from survey.models.mixins import Entity
+from base.models import Entity
+
+__all__ = ['EntityTypeError', 'Manager']
 
 
 class EntityTypeError(TypeError):
@@ -29,7 +29,6 @@ class Manager(forms.ModelForm):
     """
 
     def __init__(self, **kwargs):
-
         model = self.Meta.model
         if not issubclass(model, Entity):
             raise EntityTypeError(model)
