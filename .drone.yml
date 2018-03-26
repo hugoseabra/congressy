@@ -5,7 +5,7 @@
 ###############################################################################
 # Branches added globally
 branches:
-  include: [ master, hotfix/*, release/*, feature/cron-service ]
+  include: [ master, hotfix/*, release/* ]
 
 # Custom definition for cloning, adding tags and depth
 clone:
@@ -173,7 +173,7 @@ pipeline:
       - echo "AWS_ACCOUNT_ID=$${AWS_ACCOUNT_ID}" >> ./bin/env/prod/env-awsecr
       - sh ./bin/env/prod/01_create-awsecr-container.sh
     when:
-      branch: [ master, feature/cron-service ]
+      branch: [ master ]
 
   save-prod-version:
     image: indiehosters/git
@@ -184,7 +184,7 @@ pipeline:
       - echo $${LAST_TAG} > version
       - cat version
     when:
-      branch: [ master, feature/cron-service ]
+      branch: [ master ]
 
   check-latest-version:
     image: docker
@@ -197,7 +197,7 @@ pipeline:
       - python3 ./bin/env/prod/02_check-latest-version.py
       - cat ./bin/env/prod/previous_version
     when:
-      branch: [ master, feature/cron-service ]
+      branch: [ master ]
 
   build-prod-images:
     image: docker
@@ -208,7 +208,7 @@ pipeline:
       - docker build --rm -t $${REPO}:latest -f ./conf/deploy/Dockerfile .
       - docker tag $${REPO}:latest $${REPO}:`cat ./version`
     when:
-      branch: [ master, feature/cron-service ]
+      branch: [ master ]
 
   publish-images:
     image: docker
@@ -218,7 +218,7 @@ pipeline:
     commands:
       - ./bin/env/prod/03_publish-tagged-version.sh
     when:
-      branch: [ master, feature/cron-service ]
+      branch: [ master ]
 
   prepare-production-server:
     image: appleboy/drone-ssh
@@ -300,7 +300,7 @@ pipeline:
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
     when:
-      branch: [ master, feature/cron-service ]
+      branch: [ master ]
 
   tranfer-stackfile-awsecr:
     image: drillster/drone-rsync
@@ -330,7 +330,7 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
     when:
-      branch: [ master, feature/cron-service ]
+      branch: [ master ]
 
   transfer-build-version-file:
     image: drillster/drone-rsync
@@ -345,7 +345,7 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
     when:
-      branch: [ master, feature/cron-service ]
+      branch: [ master ]
 
   tranfer-stackfile-production-server:
     image: drillster/drone-rsync
@@ -360,7 +360,7 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
     when:
-      branch: [ master, feature/cron-service ]
+      branch: [ master ]
 
   tranfer-deploy-script:
     image: drillster/drone-rsync
@@ -375,7 +375,7 @@ pipeline:
       - source: CONGRESSY_DEPLOY
         target: RSYNC_KEY
     when:
-      branch: [ master, feature/cron-service ]
+      branch: [ master ]
 
   deploy-latest-version:
     image: appleboy/drone-ssh
