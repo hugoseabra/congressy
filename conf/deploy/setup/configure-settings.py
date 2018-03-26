@@ -51,14 +51,22 @@ env_dict = {
     'APP_VERSION': read_file('/var/www/cgsy/version'),
 }
 
+# Manage
 setup(
     env_dict,
-    '/var/www/cgsy/project/settings/common.py',
-    '/var/www/cgsy/project/settings/common.py'
+    '/var/www/cgsy/project/manage/settings/common.py',
+    '/var/www/cgsy/project/manage/settings/common.py'
 )
 
 setup(
     env_dict,
-    '/var/www/cgsy/project/settings/prod.py',
-    '/var/www/cgsy/project/settings/prod.py'
+    '/var/www/cgsy/project/manage/settings/prod.py',
+    '/var/www/cgsy/project/manage/settings/prod.py'
+)
+
+# Partner
+setup(
+    env_dict,
+    '/var/www/cgsy/project/partner/settings/prod.py',
+    '/var/www/cgsy/project/partner/settings/prod.py'
 )

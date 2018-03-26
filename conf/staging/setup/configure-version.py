@@ -32,6 +32,6 @@ setup(
 
 setup(
     env_dict,
-    '/var/www/cgsy/project/settings/common.py',
-    '/var/www/cgsy/project/settings/common.py'
+    '/var/www/cgsy/project/manage/settings/common.py',
+    '/var/www/cgsy/project/manage/settings/common.py'
 )

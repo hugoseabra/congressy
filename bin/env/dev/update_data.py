@@ -110,4 +110,3 @@ for i, dict_dates in enumerate(lots_dates):
         except IndexError:
             pass
 
-print('Ok')
