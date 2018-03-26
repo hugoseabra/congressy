@@ -8,9 +8,6 @@ MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# Helps on collecting static and runserver
-ENV DJANGO_SETTINGS_MODULE project.settings.staging
-
 LABEL cgsy.image.name="cgsy-platform-staging"
 
 # -----------------------------------------------------------------------------
@@ -51,9 +48,6 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
 # -----------------------------------------------------------------------------
 # Pypi packages
 
-# STAGING
-RUN pip install --no-cache-dir --upgrade uwsgi lxml sparkpost s3cmd jinja2
-
 # install uwsgi now because it takes a little while
 RUN pip install --no-cache-dir --upgrade \
         pip setuptools \
@@ -66,7 +60,6 @@ RUN pip install --no-cache-dir --upgrade \
         s3cmd \
         # template engine
         jinja2
-
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.

@@ -8,9 +8,6 @@ MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# Helps on collecting static
-ENV DJANGO_SETTINGS_MODULE project.settings.prod
-
 LABEL cgsy.image.name="cgsy-platform-production"
 
 # -----------------------------------------------------------------------------
@@ -69,7 +66,6 @@ RUN pip install --no-cache-dir --upgrade \
         # Sentry
         raven
 
-
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
 
@@ -111,6 +107,7 @@ COPY ./. ./.
 
 RUN chmod 775 /services/volume/container-entry.sh \
               /services/cron/container-entry.sh \
-              /services/web/manage/container-entry.sh
+              /services/web/manage/container-entry.sh \
+              /services/web/partner/container-entry.sh
 
 EXPOSE 80

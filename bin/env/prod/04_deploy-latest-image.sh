@@ -36,7 +36,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     sleep 10
 
     echo ;
-    docker-compose -f ~/cgsy/docker-compose.yml logs cgsy
+    docker-compose -f ~/cgsy/docker-compose.yml logs manage
     echo ;
     docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
 
