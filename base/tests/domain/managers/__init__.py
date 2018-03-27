@@ -1,0 +1,3 @@
+"""
+    Survey domain manager tests
+"""

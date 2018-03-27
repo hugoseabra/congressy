@@ -1,1 +1,5 @@
-*/{{ CRON_SYNC_MINUTES_OUT }} * * * * /usr/local/bin/s3cmd sync --delete-removed /var/www/cgsy/media_dev/ s3://{{ BUCKET_NAME }}/ > /proc/1/fd/1 2> /proc/1/fd/2
+# Todos os dias, as 3am
+0 3 * * * /usr/local/bin/s3cmd sync --delete-removed /var/www/cgsy/media/ s3://{{ BUCKET_NAME }}/ > /proc/1/fd/1 2> /proc/1/fd/2
+
+# A cada 5m, verifica atividades agendadas na plataform.
+*/2 * * * * /usr/local/bin/python /var/www/cgsy/manage.py runcrons > /proc/1/fd/1 2> /proc/1/fd/2

@@ -27,18 +27,9 @@
                                 <ul class="fa-ul text-left">
                                     <li>
                                         <i class="fa-li fa fa-location-arrow"></i>
-                                        {{ event.place.street|default_if_none:'' }}
-                                        {% if event.place.number %}
-                                            , Nº. {{ event.place.number }}
-                                        {% endif %}
-                                        {% if event.place.complement %}
-                                            , {{ event.place.complement }},
-                                        {% endif %}
+                                        {{ event.place.street|default_if_none:'' }}{% if event.place.number %}, Nº. {{ event.place.number }}{% endif %}{% if event.place.complement %}, {{ event.place.complement }},{% endif %}
                                         <br>
-                                        {% if event.place.city %}
-                                            {{event.place.city.name}}-{{ event.place.city.uf }}
-                                        {% endif %}
-                                        .
+                                        {% if event.place.city %}{{event.place.city.name}}-{{ event.place.city.uf }}{% endif %}.
                                         <br>
                                         {% if event.place.zip_code %}
                                             CEP: {{event.place.zip_code.0}}{{event.place.zip_code.1}}{{event.place.zip_code.2}}{{event.place.zip_code.3}}{{event.place.zip_code.4}}-{{event.place.zip_code.5}}{{event.place.zip_code.6}}{{event.place.zip_code.7}}

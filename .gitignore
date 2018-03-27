@@ -3,7 +3,7 @@ __pycache__
 db.sqlite3
 /static/
 *.pyc
-/media_dev/
+/media/
 conf/deploy/env-file
 .coverage
 cover
