@@ -60,6 +60,8 @@ class EventMixin(TemplateNameableMixin, generic.View):
         context['subscription_enabled'] = self.subscription_enabled()
         context['subsciption_finished'] = self.subsciption_finished()
         context['has_paid_lots'] = self.has_paid_lots()
+        context['has_available_lots'] = self.has_available_lots()
+        context['available_lots'] = self.get_available_lots()
         context['has_coupon'] = self.has_coupon()
         context['has_configured_bank_account'] = \
             self.event.organization.is_bank_account_configured()
@@ -114,6 +116,25 @@ class EventMixin(TemplateNameableMixin, generic.View):
 
     def get_private_lots(self):
         return self.event.lots.filter(private=True)
+
+    def has_available_lots(self):
+        available_lots = []
+
+        for lot in self.event.lots.all():
+            if lot.status == lot.LOT_STATUS_RUNNING:
+                available_lots.append(lot)
+
+        return True if len(available_lots) > 0 else False
+
+    def get_available_lots(self):
+        all_lots = self.event.lots.filter(private=False)
+        available_lots = []
+
+        for lot in all_lots:
+            if lot.status == lot.LOT_STATUS_RUNNING:
+                available_lots.append(lot)
+
+        return available_lots
 
 
 class SubscriptionFormMixin(EventMixin, generic.FormView):
