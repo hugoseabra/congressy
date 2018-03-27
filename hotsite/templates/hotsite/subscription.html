@@ -49,6 +49,7 @@
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script>
         $(document).ready(function () {
+            window.setTimeout(function() {
             IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
             {% if config and config.address == config.ADDRESS_SHOW %}
                 $('#id_zip_code').mask("99999-999");
@@ -62,6 +63,7 @@
                 });
             }
             showHideCepLoader();
+            }, 300);
         });
     </script>
 
@@ -72,13 +74,29 @@
     <script>
         function load_common_lots() {
             $('#lots-field').html(common_lots_content);
-            $('#id_lot').on('change', function() {
-                var id = $(this).val();
-                $('#id_amount').val(amounts[id]);
-            });
-            $('#id_lot').trigger('change');
 
-            start_popover();
+           var lot = $('#id_lot');
+           lot.on('change', function () {
+               var id = $(this).val();
+
+               if (!id) {
+                   show_hide_payment_block(false);
+               } else {
+                   if (!amounts.hasOwnProperty(id)) {
+                       show_hide_payment_block(false);
+                   } else {
+                       $('#id_amount').val(amounts[id]);
+                       show_hide_payment_block(true);
+                   }
+               }
+               hide_payment_elements();
+           });
+
+            window.setTimeout(function() {
+
+               lot.trigger('change');
+                start_popover();
+            }, 300);
         }
 
         var lots = {};
@@ -112,10 +130,24 @@
         {% endif %}
 
         $(document).ready(function() {
+            var lot = $('#id_lot');
+            show_hide_payment_block(lot.length > 0 && lot.val());
+
             $('#id_email').attr('readonly', 'readonly');
-            $('#id_lot').on('change', function() {
+            lot.on('change', function() {
                 var id = $(this).val();
-                $('#id_amount').val(amounts[id]);
+
+                if (!id) {
+                    show_hide_payment_block(false);
+                } else {
+                    if (!amounts.hasOwnProperty(id)) {
+                        show_hide_payment_block(false);
+                    } else {
+                        $('#id_amount').val(amounts[id]);
+                        show_hide_payment_block(true);
+                    }
+                }
+                hide_payment_elements();
             });
 
             $('#id_button_pay').on('click', function () {

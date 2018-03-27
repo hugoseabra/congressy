@@ -60,6 +60,8 @@ class EventMixin(TemplateNameableMixin, generic.View):
         context['subscription_enabled'] = self.subscription_enabled()
         context['subsciption_finished'] = self.subsciption_finished()
         context['has_paid_lots'] = self.has_paid_lots()
+        context['has_available_lots'] = self.has_available_lots()
+        context['available_lots'] = self.get_available_lots()
         context['has_coupon'] = self.has_coupon()
         context['has_configured_bank_account'] = \
             self.event.organization.is_bank_account_configured()
@@ -115,12 +117,32 @@ class EventMixin(TemplateNameableMixin, generic.View):
     def get_private_lots(self):
         return self.event.lots.filter(private=True)
 
+    def has_available_lots(self):
+        available_lots = []
+
+        for lot in self.event.lots.all():
+            if lot.status == lot.LOT_STATUS_RUNNING:
+                available_lots.append(lot)
+
+        return True if len(available_lots) > 0 else False
+
+    def get_available_lots(self):
+        all_lots = self.event.lots.filter(private=False)
+        available_lots = []
+
+        for lot in all_lots:
+            if lot.status == lot.LOT_STATUS_RUNNING:
+                available_lots.append(lot)
+
+        return available_lots
+
 
 class SubscriptionFormMixin(EventMixin, generic.FormView):
     form_class = PersonForm
     initial = {}
     object = None
     person = None
+    subscription = None
 
     def get_form_kwargs(self, **kwargs):
         """
@@ -155,8 +177,20 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
         except (ObjectDoesNotExist, AttributeError):
             pass
 
-        context['person'] = self.get_person()
-        context['is_subscribed'] = self.is_subscribed()
+        person = self.get_person()
+
+        if person:
+            try:
+                context['subscription'] = \
+                    Subscription.objects.get(person=person, event=self.event)
+                context['is_subscribed'] = True
+            except Subscription.DoesNotExist:
+                context['is_subscribed'] = False
+
+        else:
+            context['is_subscribed'] = False
+
+        context['person'] = person
 
         return context
 
@@ -623,15 +657,13 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         # Resgata e verifica lote se houver
         if 'lot' in request.POST:
             lot_pk = self.request.POST.get('lot')
+            lot_pk = int(lot_pk) if lot_pk else 0
 
             # Garante que o lote é do evento
             try:
-                lot = self.event.lots.get(pk=lot_pk)
+                lot = self.event.lots.get(pk=int(lot_pk))
             except Lot.DoesNotExist:
-                messages.error(
-                    self.request,
-                    "Este lote não pertence a este evento."
-                )
+                messages.error(request, "Lote inválido.")
                 return self.render_to_response(context)
 
         else:
@@ -641,7 +673,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         # Insere ou edita lote
         subscription.lot = lot
 
-        if self.has_paid_lots():
+        if lot.price is not None and lot.price > 0:
             # CONDIÇÃO 7
             if 'transaction_type' not in request.POST:
                 messages.error(
@@ -700,7 +732,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             'Inscrição realizada com sucesso!'
         )
 
-        if self.has_paid_lots():
+        if lot.price is not None and lot.price > 0:
             # CONDIÇÃO 7
             return redirect(
                 'public:hotsite-subscription-status',

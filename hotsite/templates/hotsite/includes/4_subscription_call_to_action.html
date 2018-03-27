@@ -7,13 +7,9 @@
 
             <!-- IMAGE BACKGROUND -->
             <div class="section-background-image parallax">
-                <img
-                    {% if info.image_main.default %}
-                        src="{{ info.image_main.default.url }}"
-                    {% else %}
-                        src=""
-                    {% endif %}
-                        alt="" style="opacity: 0.2;" class="blurred">
+                {% if info.image_main.default %}
+                <img src="{{ info.image_main.default.url }}" alt="" style="opacity: 0.2;" class="blurred">
+                {% endif %}
             </div>
 
 
