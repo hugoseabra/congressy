@@ -192,3 +192,23 @@ class SurveyListView(EventViewMixin, AccountMixin, generic.ListView, ):
         return redirect(reverse_lazy('subscription:survey-list', kwargs={
             'event_pk': self.event.pk,
         }))
+
+
+class SurveyDeleteView(EventViewMixin, AccountMixin, generic.DeleteView, ):
+    """
+        View responsavel por deletar questionarios.
+    """
+    template_name = 'survey/delete.html'
+    model = EventSurvey
+    success_message = 'Questionario {} removido com sucesso!'
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        msg = self.success_message.format(obj.survey.name)
+        messages.success(self.request, msg)
+        return super().delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('subscription:survey-list', kwargs={
+            'event_pk': self.event.pk,
+        })

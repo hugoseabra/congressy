@@ -10,6 +10,11 @@ urls = [
         name='survey-edit'
     ),
     url(
+        r'^(?P<pk>[\d]+)/delete$',
+        views.SurveyDeleteView.as_view(),
+        name='survey-delete'
+    ),
+    url(
         r'^$',
         views.SurveyListView.as_view(),
         name='survey-list'
