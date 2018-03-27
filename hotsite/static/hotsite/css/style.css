@@ -1126,7 +1126,7 @@ iframe {
 
 /* HERO LAYOUT: FULLSCREEN CTA (SIMPLE) */
 .hero-layout-simple .hero-title {
-	font-size: 64px;
+	font-size: 58px;
 	line-height: 1.2;
 }
 .hero-layout-simple .hero-subtitle {
@@ -1135,18 +1135,18 @@ iframe {
 }
 @media ( max-width: 991px ) {
 	.hero-layout-simple .hero-title {
-		font-size: 56px;
+		font-size: 50px;
 	}
 	.hero-layout-simple .hero-subtitle {
-		font-size: 40px;
+		font-size: 36px;
 	}
 }
 @media ( max-width: 767px ) {
 	.hero-layout-simple .hero-title {
-		font-size: 48px;
+		font-size: 44px;
 	}
 	.hero-layout-simple .hero-subtitle {
-		font-size: 32px;
+		font-size: 28px;
 	}
 	.hero-layout-simple .hero-tagline {
 		font-size: 18px;
@@ -1181,11 +1181,11 @@ iframe {
 	height: auto !important; /* force to disable fullscreen mode */
 }
 .hero-layout-classic .hero-title {
-	font-size: 56px;
+	font-size: 52px;
 	line-height: 1.15;
 }
 .hero-features {
-	margin-top: 60px;
+	margin-top: 52px;
 	text-align: left;
 }
 @media ( min-width: 992px ) {
