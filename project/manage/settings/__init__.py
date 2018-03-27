@@ -10,6 +10,7 @@ INSTALLED_APPS += [
     'gatheros_front',
     'mailer',
     'payment',
+    'partner',
     'hotsite',
     'bitly',
 ]

@@ -16,6 +16,7 @@ function send(url, method, data, success_callback, error_callback) {
         }
         return cookieValue;
     }
+
     var csrftoken = getCookie('csrftoken');
 
     function csrfSafeMethod(method) {
@@ -29,17 +30,33 @@ function send(url, method, data, success_callback, error_callback) {
         data: data || {},
         encode: true,
         crossDomain: false,
-        beforeSend: function(xhr, settings) {
+        beforeSend: function (xhr, settings) {
             if (!csrfSafeMethod(settings.type)) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
         },
-        success: success_callback || function() {},
-        error: error_callback || function() {}
+        success: success_callback || function () {
+        },
+        error: error_callback || function () {
+        }
     });
 }
 
+
+function show_hide_payment_block(action) {
+    action = action === true;
+    var payment_block = $('#payment-block');
+
+    if (action === true) {
+        payment_block.show();
+    } else {
+        payment_block.hide();
+        hide_payment_elements();
+    }
+}
+
 var common_lots_content = null;
+
 function load_coupon() {
     var url = $('#id_coupon_url');
 
@@ -61,10 +78,10 @@ function load_coupon() {
     }
 
     var button = $('#button_coupon');
-        button.addClass('disabled').attr('disabled', 'disabled').text('Aguarde...');
+    button.addClass('disabled').attr('disabled', 'disabled').text('Aguarde...');
 
     var lot_fields = $('#lots-field');
-    common_lots_content = lot_fields.html()
+    common_lots_content = lot_fields.html();
 
     send(
         url,
@@ -72,11 +89,59 @@ function load_coupon() {
         {'coupon': coupon},
         function (response) {
             lot_fields.html(response);
+
+            var lot = $('#id_lot');
+            lot.on('change', function () {
+                var id = $(this).val();
+                console.log(id);
+
+                if (!id) {
+                    show_hide_payment_block(false);
+                } else {
+                    if (!amounts.hasOwnProperty(id)) {
+                        show_hide_payment_block(false);
+                    } else {
+                        $('#id_amount').val(amounts[id]);
+                        show_hide_payment_block(true);
+                    }
+                }
+                hide_payment_elements();
+            });
+
+            window.setTimeout(function () {
+
+                lot.trigger('change');
+                start_popover();
+            }, 300);
         },
-        function() {
+        function () {
             button.removeClass('disabled').removeAttr('disabled').text('Enviar');
             $('#id_coupon').val('');
             alert('Cupom inválido.');
+
+            var lot = $('#id_lot');
+            lot.on('change', function () {
+                var id = $(this).val();
+                console.log(id);
+
+                if (!id) {
+                    show_hide_payment_block(false);
+                } else {
+                    if (!amounts.hasOwnProperty(id)) {
+                        show_hide_payment_block(false);
+                    } else {
+                        $('#id_amount').val(amounts[id]);
+                        show_hide_payment_block(true);
+                    }
+                }
+                hide_payment_elements();
+            });
+
+            window.setTimeout(function () {
+
+                lot.trigger('change');
+                start_popover();
+            }, 300);
         }
     );
 
@@ -90,7 +155,8 @@ function fetch_cities(uf_el, selected_value, callback) {
 
     var city_el = $('#id_city_name');
     $.ajax({
-        url: "/api/cities/?uf=" + $(uf_el).val() + '&length=1000', success: function (result) {
+        url: "/api/cities/?uf=" + $(uf_el).val() + '&length=1000',
+        success: function (result) {
 
             var listitems = [];
             var ids = [];
@@ -101,7 +167,7 @@ function fetch_cities(uf_el, selected_value, callback) {
             });
 
             if (selected_value) {
-                window.setTimeout(function() {
+                window.setTimeout(function () {
                     city_el.val(selected_value);
                     $("#id_city").val(selected_value);
                 }, 500);
@@ -127,36 +193,39 @@ function start_popover() {
     });
 }
 
-(function($) {
+
+(function ($) {
     $(document).ready(function () {
-        $('#id_phone').mask("(99) 99999-9999");
-        $('#id_cpf').mask("999.999.999-99");
+        window.setTimeout(function () {
+            $('#id_phone').mask("(99) 99999-9999");
+            $('#id_cpf').mask("999.999.999-99");
+            start_popover();
 
-        var institution_cnpj = $('#id_institution_cnpj');
-        if (institution_cnpj.length) {
-            institution_cnpj.mask("99.999.999/9999-99");
-        }
+            var institution_cnpj = $('#id_institution_cnpj');
+            if (institution_cnpj.length) {
+                institution_cnpj.mask("99.999.999/9999-99");
+            }
 
-        var city_el = $('#id_city_name');
+            var city_el = $('#id_city_name');
 
-        $('#id_state').change(function () {
-            city_el.empty();
+            $('#id_state').change(function () {
+                city_el.empty();
 
-            var that = $(this);
-            window.setTimeout(function () {
-                city_el.append($('<option>').text('Carregando...'));
-                fetch_cities($(that));
-            }, 500);
-        });
+                var that = $(this);
+                window.setTimeout(function () {
+                    city_el.append($('<option>').text('Carregando...'));
+                    fetch_cities($(that));
+                }, 500);
+            });
 
-        city_el.change(function () {
-            $("#id_city").val($(this).val());
-        });
+            city_el.change(function () {
+                $("#id_city").val($(this).val());
+            });
 
-        $('#id_zip_code').on('keyup', function () {
-            searchByCep();
-        });
+            $('#id_zip_code').on('keyup', function () {
+                searchByCep();
+            });
 
-        start_popover();
+        }, 350);
     });
 })(jQuery);

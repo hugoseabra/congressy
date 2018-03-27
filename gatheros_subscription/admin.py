@@ -38,6 +38,7 @@ class LotAdmin(admin.ModelAdmin):
         }),
         ('Preços e Formas de recebimento', {
             'fields': (
+                'exhibition_code',
                 'promo_code',
                 'price',
                 'tax',
