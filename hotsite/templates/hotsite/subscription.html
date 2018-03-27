@@ -50,9 +50,12 @@
     <script>
         $(document).ready(function () {
             IS_CHROME = {% if request|is_chrome %}true{% else %}false{% endif %}
+
+
             {% if config and config.address == config.ADDRESS_SHOW %}
                 $('#id_zip_code').mask("99999-999");
             {% endif %}
+
             if ($('#id_city').val()) {
                 $.ajax({
                     url: "/api/cities/" + $('#id_city').val(),
@@ -62,8 +65,32 @@
                     }
                 });
             }
+
             showHideCepLoader();
+
+            //Happens only once, after page has finished loading
+            var lots_list_element = $('#id_lot');
+            var lot_id = lots_list_element.val();
+            if (lot_id in all_lots_with_surveys) {
+                console.log('Initial is in lots.');
+                loadSurveyFromLot(all_lots_with_surveys[lot_id].survey)
+            }
+
+            //Happens on every lot change.
+            lots_list_element.on('change', function () {
+                $('.survey_form').hide();
+                var id = $(this).val();
+                if (id in all_lots_with_surveys) {
+                    loadSurveyFromLot(all_lots_with_surveys[id].survey)
+                }
+            });
+
         });
+
+        function loadSurveyFromLot(id) {
+            $('div').filter('[data-survey-id="' + id + '"]').show();
+        }
+
     </script>
 
     <!-- SCRIPT Payment -->
@@ -84,7 +111,7 @@
 
         var lots = {};
         var amounts = {};
-        var all_lots = {};
+        var all_lots_with_surveys = {};
 
         {% for lot in paid_lots %}
             {% if lot.price and lot.price > 0 %}
@@ -111,9 +138,11 @@
         {% endfor %}
 
         {% for lot in lots %}
-            all_lots['{{ lot.pk }}'] = {
-                'survey': {{ lot.survey.pk }}
-            };
+            {% if lot.survey.pk %}
+                all_lots_with_surveys['{{ lot.pk }}'] = {
+                    'survey': {{ lot.survey.pk }}
+                };
+            {% endif %}
         {% endfor %}
 
         var allowed_transactions;
@@ -123,57 +152,6 @@
         {% else %}
             allowed_transactions = null;
         {% endif %}
-
-        $(document).ready(function () {
-            $('#id_email').attr('readonly', 'readonly');
-            $('#id_lot').on('change', function () {
-                var id = $(this).val();
-                $('#id_amount').val(amounts[id]);
-            });
-
-            $('#id_button_pay').on('click', function () {
-                process_payment(
-                    '{{ pagarme_encryption_key }}',
-                    2.29,
-                    '{{ event.name }}',
-                    lots,
-                    {#                    allowed_transactions#}
-                    null
-                );
-            });
-
-            var uf_el = $('#id_state');
-            var city_el = $('#id_city_name');
-
-            window.setTimeout(function () {
-                {% if person.city %}
-                    uf_el.val('{{ person.city.uf }}');
-                    fetch_cities(uf_el, '{{ person.city.pk }}');
-                {% else %}
-                    uf_el.val('');
-                    city_el.val('');
-                    city_el.prop('disabled', true);
-                {% endif %}
-
-                $('#id_lot').trigger('change');
-            }, 300);
-
-            $('#id_lot').on('change', function () {
-
-                if (this.value in all_lots) {
-                    $('.survey_form').hide();
-
-                    var survey_id = all_lots[this.value]['survey'];
-                    var lot_survey = $("div[data-survey-id='" + survey_id + "']");
-                    console.log(lot_survey);
-                    lot_survey.show()
-                } else {
-                    console.log('not in lots')
-                }
-            });
-
-
-        });
 
     </script>
 {% endblock %}

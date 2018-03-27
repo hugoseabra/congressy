@@ -14,7 +14,8 @@ class SurveyForm(forms.Form):
         self.service = SurveyService(**kwargs)
         self.fields.update(self.service.fields)
 
-        self.fields['name'].help_text = 'Nome do seu questionário'
+        self.fields['name'].help_text = 'Nome do seu questionário. Exemplo ' \
+                                        '"Estudantes" '
         self.fields['description'].help_text = 'Uma descrição para te ajudar' \
                                                ' a identificar este ' \
                                                'questionário. '
