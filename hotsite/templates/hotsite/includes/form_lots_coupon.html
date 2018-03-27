@@ -16,8 +16,11 @@
                             <div>
                                 <span style="color:darkgreen;font-weight: bold;">
                                     {{ lot.display_publicly }}
+                                    -
+                                    {% if not lot.price %}
+                                        Gratuito
+                                    {% endif %}
                                 </span>
-
                             </div>
                         </div>
                     </div>

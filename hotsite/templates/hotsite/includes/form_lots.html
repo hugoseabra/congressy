@@ -8,17 +8,12 @@
                 <div class="col-md-12">
 
                     {% if has_available_lots %}
-                        <select class="form-control" name="lot" id="id_lot">
-
+                        <select class="form-control" name="lot" id="id_lot" required>
+                            <option value="">- Selecione -</option>
                             {% if available_lots|length > 0 %}
                                 {% for lot in available_lots %}
                                     <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
-                                {% endfor %}
-                            {% else %}
-                                <option value="">
-                                    --------
-                                </option>
-                            {% endif %}
+                                {% endfor %}                            {% endif %}
 
                         </select>
                     {% else %}
