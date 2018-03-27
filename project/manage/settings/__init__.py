@@ -39,3 +39,11 @@ FIXTURE_DIRS += [
 TEMPLATES[0]['OPTIONS']['context_processors'].append(
     'gatheros_event.context_processors.account',
 )
+# ============================= PAYMENT ===================================== #
+# Planos da congressy, contemplam percentuais de recebimento em cima das
+# transações
+
+# Valor mínimo que a congrssy deve receber por transação. Se o valor do recebi
+# devido for menor do que este, o valor da transaçaõ da parte da congressy será
+# este valor.
+CONGRESSY_MINIMUM_AMOUNT = 4.99
