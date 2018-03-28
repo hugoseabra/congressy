@@ -27,7 +27,7 @@ from payment.helpers import PagarmeTransactionInstanceData
 from payment.models import Transaction
 from payment.tasks import create_pagarme_transaction
 from survey.forms import SurveyForm as FullSurveyForm
-from survey.models import Author
+from survey.models import Author, Answer, Question
 from survey.services import AuthorService
 
 
@@ -690,10 +690,10 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 - caso não exista, crie.
         """
 
-        survey = lot.survey
+        event_survey = lot.event_survey
 
         # verifica se o lote possui formulario(survey)
-        if survey:
+        if event_survey:
             # Se possui survey, ver se esse person que está respondendo já
             # possui autoria, ou seja já respondeu antes, caso de edição.
             # Se não possuir autoria, cria um novo autor, vincula
@@ -702,11 +702,12 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             answered_questions = []
 
             try:
-                author = Author.objects.get(user=user, survey=survey)
+                author = Author.objects.get(user=user,
+                                            survey=event_survey.survey)
             except Author.DoesNotExist:
                 author_service = AuthorService(data={
-                    'survey': survey,
-                    'user': user,
+                    'survey': event_survey.survey.pk,
+                    'user': user.pk,
                     'name': user.get_full_name(),
                 })
 
@@ -719,12 +720,18 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                                             'respostas das perguntas.')
                     return self.render_to_response(context)
 
-            new_form = FullSurveyForm(survey=survey)
+            new_form = FullSurveyForm(survey=event_survey.survey)
 
-            for f_name, gatheros_field in six.iteritems(lot.survey):
+            for f_name in new_form.fields:
+
                 value = request.POST.get(f_name)
 
-                required = f_name.required
+                required = new_form.fields.get(f_name).required
+
+                if not value and required:
+                    new_form.add_error(f_name,
+                                       'Você deve preencher este campo')
+                    continue
 
                 if isinstance(value, str):
                     value = safestring.mark_safe(value.strip())
@@ -732,43 +739,39 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 if value == '':
                     value = None
 
-                if not value and required:
-                    new_form.add_error(f_name,
-                                       'Você deve preencher este campo')
-
                 if value:
                     new_form.data.update({f_name: value})
 
-            # # Temos que saber se temos todas as respostas necessarias dentro
-            # #  do nosso querydict que vem do POST.
-            # required_questions = []
-            #
-            # for question in survey.survey.questions.all():
-            #     if question.required:
-            #         required_questions.append(question)
-            # new_survey_form = FullSurveyForm()
-            # # Temos um autor, agora temos que saber se essas respostas estão
-            # #  sendo respondias pela primeira vez, criação, ou apenas edição.
-            # previously_answered_questions = []
-            #
-            # for question in lot.survey.survey.questions.all():
-            #     try:
-            #         answer = Answer.objects.get(question=question,
-            #                                     author=author)
-            #         previously_answered_questions.append(answer)
-            #     except Answer.DoesNotExist:
-            #         pass
-            #
-            # if len(previously_answered_questions) > 0:
-            #     # Temos respostas já, basta editar.
-            #     for answer in previously_answered_questions:
-            #         pass
-            # else:
-            #     pass
-            #     # Não temos respostas, terei que criar.
-            #
-            # # se possuir survey, pegar o querydict que vem do post, e tentar
-            # # validar o survey.
+            new_form.is_bound = True
+
+            if new_form.is_valid():
+                for question_name in new_form.fields:
+
+                    question_instance = Question.objects.get(
+                        name=question_name)
+
+                    try:
+                        answer = Answer.objects.get(
+                            question=question_instance,
+                            author=author)
+                        answer.value = new_form.cleaned_data[question_name]
+                        answer.save()
+
+                    except Answer.DoesNotExist:
+                        Answer.objects.create(author=author,
+                                              question=question_instance,
+                                              value=new_form.cleaned_data[
+                                                  question_name])
+            else:
+                all_surveys = self._get_survey_forms()
+                all_surveys = [
+                    new_form if survey_form.survey.pk == new_form.survey.pk
+                    else survey_form
+                    for survey_form in all_surveys]
+                context['slug'] = kwargs.get('slug')
+                context['form'] = form
+                context['surveys'] = all_surveys
+                return self.render_to_response(context)
 
         person = form.save()
 
@@ -873,8 +876,34 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         survey_forms = []
 
         for event_survey in surveys:
-            survey_forms.append(FullSurveyForm(
-                survey=event_survey.survey))
+
+            try:
+                author = Author.objects.get(survey=event_survey.survey,
+                                            user=self.request.user)
+
+                answers = {}
+
+                for question in event_survey.survey.questions.all():
+                    try:
+                        answer = Answer.objects.get(question=question,
+                                                    author=author)
+                        answers.update({question.name: answer.value})
+                    except Answer.DoesNotExist:
+                        pass
+
+                if any(answers):
+                    form = FullSurveyForm(
+                        survey=event_survey.survey, initial=answers)
+                else:
+                    form = FullSurveyForm(
+                        survey=event_survey.survey)
+
+                survey_forms.append(form)
+
+            except Author.DoesNotExist:
+
+                survey_forms.append(FullSurveyForm(
+                    survey=event_survey.survey))
 
         return survey_forms
 
