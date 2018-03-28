@@ -7,7 +7,7 @@ from django.db import transaction
 from django.http import HttpResponseNotAllowed, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.utils import six
+from django.utils import safestring, six
 from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.cache import never_cache
@@ -16,8 +16,8 @@ from django.views.decorators.debug import sensitive_post_parameters
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
-from gatheros_subscription.models import FormConfig, Lot, Subscription, \
-    EventSurvey
+from gatheros_subscription.models import FormConfig, EventSurvey, Lot, \
+    Subscription
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
@@ -27,6 +27,8 @@ from payment.helpers import PagarmeTransactionInstanceData
 from payment.models import Transaction
 from payment.tasks import create_pagarme_transaction
 from survey.forms import SurveyForm as FullSurveyForm
+from survey.models import Author
+from survey.services import AuthorService
 
 
 class EventMixin(TemplateNameableMixin, generic.View):
@@ -587,7 +589,18 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             - redireciona para página de status
 
         CONDIÇÂO 8: status da inscrição
-            - verifica o tipo de lotes, caso não tenha lotes pagos, então a inscrição é confirmada
+            - verifica o tipo de lotes, caso não tenha lotes pagos, então a
+              inscrição é confirmada
+        CONDIÇÃO 9:
+            - verifica se lote possui formulario(survey)
+            - se possuir survey, pegar o querydict que vem do post, e tentar
+                validar o survey.
+            - caso não valide redireciona usuário para página de inscrição
+              com mensagem e erro.
+            - caso valide:
+                - verificar se esse usuário já possui autoria deste survey.
+                - caso exista, resgate e atualize.
+                - caso não exista, crie.
         """
         context = self.get_context_data(**kwargs)
         context['remove_preloader'] = True
@@ -638,12 +651,124 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         clear_string('phone')
         clear_string('institution_cnpj')
 
+        # Resgata e verifica lote se houver
+        # È necessario resgatar ele para facilitar as validações dos
+        # possiveis surveys que estão vinculados a ele
+        if 'lot' in request.POST:
+            lot_pk = self.request.POST.get('lot')
+            lot_pk = int(lot_pk) if lot_pk else 0
+
+            # Garante que o lote é do evento
+            try:
+                lot = self.event.lots.get(pk=int(lot_pk))
+            except Lot.DoesNotExist:
+                messages.error(request, "Lote inválido.")
+                return self.render_to_response(context)
+
+        else:
+            # Inscrição simples
+            lot = self.event.lots.first()
+
         form = self.get_form()
 
         if not form.is_valid():
             context['slug'] = kwargs.get('slug')
             context['form'] = form
             return self.render_to_response(context)
+
+        # CONDIÇÃO 9
+        """
+            CONDIÇÃO 9:
+            - verifica se lote possui formulario(survey)
+            - se possuir survey, pegar o querydict que vem do post, e tentar 
+            validar o survey.
+            - caso não valide redireciona usuário para página de inscrição 
+            com mensagem e erro.
+            - caso valide:
+                - verificar se esse usuário já possui autoria deste survey.
+                - caso exista, resgate e atualize.
+                - caso não exista, crie.
+        """
+
+        survey = lot.survey
+
+        # verifica se o lote possui formulario(survey)
+        if survey:
+            # Se possui survey, ver se esse person que está respondendo já
+            # possui autoria, ou seja já respondeu antes, caso de edição.
+            # Se não possuir autoria, cria um novo autor, vincula
+
+            author = None
+            answered_questions = []
+
+            try:
+                author = Author.objects.get(user=user, survey=survey)
+            except Author.DoesNotExist:
+                author_service = AuthorService(data={
+                    'survey': survey,
+                    'user': user,
+                    'name': user.get_full_name(),
+                })
+
+                if author_service.is_valid():
+                    author = author_service.save()
+                else:
+                    context['slug'] = kwargs.get('slug')
+                    context['form'] = form
+                    messages.error(request, 'Não foi possivel salvar suas '
+                                            'respostas das perguntas.')
+                    return self.render_to_response(context)
+
+            new_form = FullSurveyForm(survey=survey)
+
+            for f_name, gatheros_field in six.iteritems(lot.survey):
+                value = request.POST.get(f_name)
+
+                required = f_name.required
+
+                if isinstance(value, str):
+                    value = safestring.mark_safe(value.strip())
+
+                if value == '':
+                    value = None
+
+                if not value and required:
+                    new_form.add_error(f_name,
+                                       'Você deve preencher este campo')
+
+                if value:
+                    new_form.data.update({f_name: value})
+
+            # # Temos que saber se temos todas as respostas necessarias dentro
+            # #  do nosso querydict que vem do POST.
+            # required_questions = []
+            #
+            # for question in survey.survey.questions.all():
+            #     if question.required:
+            #         required_questions.append(question)
+            # new_survey_form = FullSurveyForm()
+            # # Temos um autor, agora temos que saber se essas respostas estão
+            # #  sendo respondias pela primeira vez, criação, ou apenas edição.
+            # previously_answered_questions = []
+            #
+            # for question in lot.survey.survey.questions.all():
+            #     try:
+            #         answer = Answer.objects.get(question=question,
+            #                                     author=author)
+            #         previously_answered_questions.append(answer)
+            #     except Answer.DoesNotExist:
+            #         pass
+            #
+            # if len(previously_answered_questions) > 0:
+            #     # Temos respostas já, basta editar.
+            #     for answer in previously_answered_questions:
+            #         pass
+            # else:
+            #     pass
+            #     # Não temos respostas, terei que criar.
+            #
+            # # se possuir survey, pegar o querydict que vem do post, e tentar
+            # # validar o survey.
 
         person = form.save()
 
@@ -665,22 +790,6 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 created_by=user.id
             )
             new_subscription = True
-
-        # Resgata e verifica lote se houver
-        if 'lot' in request.POST:
-            lot_pk = self.request.POST.get('lot')
-            lot_pk = int(lot_pk) if lot_pk else 0
-
-            # Garante que o lote é do evento
-            try:
-                lot = self.event.lots.get(pk=int(lot_pk))
-            except Lot.DoesNotExist:
-                messages.error(request, "Lote inválido.")
-                return self.render_to_response(context)
-
-        else:
-            # Inscrição simples
-            lot = self.event.lots.first()
 
         # Insere ou edita lote
         subscription.lot = lot

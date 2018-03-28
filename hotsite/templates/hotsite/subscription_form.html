@@ -209,6 +209,31 @@
             </div>
         {% endif %}
 
+        {% for survey_form in surveys %}
+
+            <div class="panel panel-default survey_form"
+                 data-survey-id="{{ survey_form.survey.pk }}"
+                 style="display: none">
+
+                <div class="panel-heading">
+                    <div class="panel-title">{{ survey_form.survey.name }}</div>
+                </div>
+
+                <div class="panel-body">
+
+                    <div class="col-md-9">
+
+                        {% for field in survey_form %}
+                            {% render_generic_field field %}
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+            </div>
+
+        {% endfor %}
+
         {% if has_paid_lots %}
             <div class="panel panel-default" id="payment-block" style="disp">
                 <div class="panel-heading">
@@ -262,30 +287,6 @@
                 </div>
             </div>
         {% endif %}
-
-        {% for survey_form in surveys %}
-
-            <div class="panel panel-default survey_form"
-                 data-survey-id="{{ survey_form.survey.pk }}"
-                 style="display: none">
-
-                <div class="panel-heading">
-                    <div class="panel-title">{{ survey_form.survey.name }}</div>
-                </div>
-
-                <div class="panel-body">
-
-                    <div class="col-md-9">
-
-                        {% for field in survey_form %}
-                            {% render_generic_field field %}
-                        {% endfor %}
-
-                    </div>
-
-                </div>
-            </div>
-        {% endfor %}
 
         <div class="row">
             <div class="col-md-12">

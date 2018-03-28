@@ -39,7 +39,7 @@ class LotForm(forms.ModelForm):
             'allow_installment',
             'installment_limit',
             'num_install_interest_absortion',
-            'survey',
+            'event_survey',
         ]
 
         widgets = {
@@ -70,12 +70,12 @@ class LotForm(forms.ModelForm):
 
         super(LotForm, self).__init__(**kwargs)
 
-        self.fields['survey'] = forms.ModelChoiceField(
+        self.fields['event_survey'] = forms.ModelChoiceField(
             queryset=EventSurvey.objects.filter(event=self.event),
             label='Selecione um questionário',
             required=False,
         )
-        self.fields['survey'].empty_label = '  '
+        self.fields['event_survey'].empty_label = '  '
 
         if self.instance.pk and self.instance.subscriptions.count() > 0:
             self.fields['price'].widget.attrs['disabled'] = 'disabled'

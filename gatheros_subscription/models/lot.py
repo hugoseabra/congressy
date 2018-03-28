@@ -188,7 +188,7 @@ class Lot(models.Model, GatherosModelMixin):
         help_text="Personaliza-lo como quiser."
     )
 
-    survey = models.ForeignKey(
+    event_survey = models.ForeignKey(
         EventSurvey,
         on_delete=models.DO_NOTHING,
         verbose_name='formulario',
