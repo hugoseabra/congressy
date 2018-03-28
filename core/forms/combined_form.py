@@ -82,7 +82,8 @@ class CombinedFormBase(forms.Form):
         cleaned_data = super().clean()
         for name in self.form_classes.keys():
             form = getattr(self, name)
-            cleaned_data.update(form.cleaned_data)
+            if hasattr(form, 'cleaned_data'):
+                cleaned_data.update(form.cleaned_data)
         return cleaned_data
 
     def save(self, commit=True):
