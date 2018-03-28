@@ -16,10 +16,12 @@ class SurveyForm(forms.Form):
                               field_type=question.type,
                               label=question.label,
                               required=question.required,
+                              help_text=question.help_text,
+                              intro=question.intro,
                               question=question)
 
     def create_field(self, question, id, name, field_type, initial=None,
-                     required=False,
+                     required=False, help_text=None, intro=False,
                      label=None, **kwargs):
         """
         Cria um campo para o formulário conforme interface django field:
@@ -34,5 +36,7 @@ class SurveyForm(forms.Form):
         """
 
         field = SurveyField(question, field_type, initial, required, label,
-                            attrs={'data-id': id}, **kwargs)
+                            attrs={'data-id': id}, help_text=help_text,
+                            select_intro=intro,
+                            **kwargs)
         self.fields[name] = field.get_django_field()

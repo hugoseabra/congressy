@@ -46,7 +46,7 @@
         var switcheryElements = {};
 
         var switcheryToggle = function () {
-            console.log('call me rihana');
+            
             var elems = Array.prototype.slice.call(
                 document.querySelectorAll('.js-switch')
             );

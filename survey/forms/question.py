@@ -67,7 +67,7 @@ class QuestionForm(forms.Form):
         help_text='Insira as opções da sua pergunta uma linha de cada vez.'
     )
 
-    empty_intro = forms.BooleanField(
+    intro = forms.BooleanField(
         label='Primeiro campo vazio',
         required=False,
         help_text='Deixar o primeiro item da lista em branco',

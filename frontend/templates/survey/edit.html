@@ -301,7 +301,11 @@
                         {% render_generic_field form.help_text %}
 
                         <hr>
-                        {% render_generic_field form.empty_intro %}
+
+                        <div id="intro">
+                            {% render_generic_field form.intro %}
+                        </div>
+
                         <div id="options">
                             {% render_generic_field form.options %}
                         </div>
@@ -409,6 +413,7 @@
             iconEl.addClass(IconOfField);
             formTypeEl.val('simple');
             $('#options').hide();
+            $('#intro').hide();
             $('#addQuestion').modal('show');
         });
 
@@ -419,13 +424,22 @@
             var typeEl = $('.modal-body .typeOfField');
             var iconEl = $('.modal-body .iconOfField');
             var formTypeEl = $('#id_complex_form-type');
-            $('#id_question_type').val($(this).data('question_type'));
+            var question_type = $(this).data('question_type');
+            $('#id_question_type').val(question_type);
 
             typeEl.text(typeOfField);
             iconEl.attr('class', 'iconOfField');
             iconEl.addClass(IconOfField);
             formTypeEl.val('complex');
             $('#options').show();
+
+            if (question_type === 'select') {
+                console.log('BANANA => ' +  question_type);
+                $('#intro').show();
+            } else {
+                 $('#intro').hide();
+            }
+
             $('#addQuestion').modal('show');
         });
 

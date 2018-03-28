@@ -108,6 +108,7 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
                 'name': request.POST.get('name'),
                 'label': request.POST.get('name'),
                 'help_text': request.POST.get('help_text'),
+                'intro': request.POST.get('intro', False),
                 'options': request.POST.get('options')
             }
 
