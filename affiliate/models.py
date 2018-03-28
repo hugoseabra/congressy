@@ -107,7 +107,8 @@ class Affiliation(EntityMixin, models.Model):
     )
 
     def __str__(self):
-        return self.affiliate.person.name + ' ({0:.2f}%)'.format(self.percent)
+        name = '{} - {}'.format(self.event, self.affiliate.person)
+        return name + ' ({0:.2f}%)'.format(self.percent)
 
     class Meta:
         verbose_name = 'Afiliação'
