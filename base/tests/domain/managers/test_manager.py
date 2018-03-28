@@ -12,10 +12,12 @@ from base.models import EntityMixin
 
 class FakeEntity(EntityMixin, f.FakeModel):
     name = models.CharField(max_length=100)
+    age = models.PositiveIntegerField()
 
 
 class FakeModel(f.FakeModel):
     name = models.CharField(max_length=100)
+    age = models.PositiveIntegerField()
 
 
 @FakeEntity.fake_me
@@ -49,7 +51,7 @@ class ManagerTest(TestCase):
         """
             Testa recuperação de instância do model configurado no Manager.
         """
-        instance = FakeEntity()
+        instance = FakeEntity(name='Albert', age=80)
         instance.save()
 
         class TestManager(Manager):
@@ -65,3 +67,24 @@ class ManagerTest(TestCase):
 
         with self.assertRaises(FakeEntity.DoesNotExist):
             manager.get(pk=1000)
+
+    def test_hide_field(self):
+        """
+            Testa configuração de campo 'hidden' ao chamar método hide_field()
+        """
+        class TestManager(Manager):
+            class Meta:
+                model = FakeEntity
+                fields = '__all__'
+
+        manager = TestManager()
+        content = str(manager)
+
+        self.assertIn('name="name"', content)
+        self.assertIn('type="text"', content)
+
+        manager.hide_field('name')
+        content = str(manager)
+
+        self.assertIn('name="name"', content)
+        self.assertIn('type="hidden"', content)

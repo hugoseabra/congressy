@@ -35,5 +35,11 @@ class Manager(forms.ModelForm):
 
         super().__init__(**kwargs)
 
+    def hide_field(self, field_name):
+        if field_name not in self.fields:
+            return
+
+        self.fields[field_name].widget = forms.HiddenInput()
+
     def get(self, pk):
         return self.Meta.model.objects.get(pk=pk)

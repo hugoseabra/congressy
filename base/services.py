@@ -4,9 +4,12 @@ Service) que rege uma pre-arquitetura de como estabelecer a comunicação
 da aplicação com o domínio através de conectores diretos com Serviços de
 Domínio.
 """
+import collections
 
 from django import forms
 from django.forms.utils import ErrorList
+from django.utils import six
+from django.utils.datastructures import OrderedDict
 
 from base.managers import Manager
 
@@ -25,11 +28,13 @@ class ManagerWrongTypeError(Exception):
     pass
 
 
-class ApplicationServiceMixin(forms.Form):
+class ApplicationService(forms.Form):
     """
     Application Service
     """
     manager_class = None
+    display_fields = None
+    hidden_fields = ()
 
     def __init__(self, **kwargs):
 
@@ -66,8 +71,33 @@ class ApplicationServiceMixin(forms.Form):
 
         manager = manager_class(**self._get_manager_kwargs(**kwargs))
 
+        if isinstance(self.display_fields, collections.Iterable):
+            field_names = manager.fields.keys()
+
+            for field_name in self.display_fields:
+                if field_name not in field_names:
+                    raise Exception(
+                        'O manager "{}" não possui o campo "{}".'
+                        ' As opções são: {}'.format(
+                            manager_class,
+                            field_name,
+                            ', '.join(field_names)
+                        )
+                    )
+
+            new_fields = OrderedDict()
+            for field_name, field in six.iteritems(manager.fields):
+                if field_name in self.display_fields:
+                    new_fields[field_name] = field
+
+            manager.fields = new_fields
+
         if not isinstance(manager, Manager):
             raise ManagerWrongTypeError('Manager inválido')
+
+        if isinstance(self.hidden_fields, collections.Iterable):
+            for hidden_field in self.hidden_fields:
+                manager.hide_field(hidden_field)
 
         return manager
 
@@ -96,6 +126,18 @@ class ApplicationServiceMixin(forms.Form):
     def save(self, commit=True):
         return self.manager.save(commit=commit)
 
-    @staticmethod
-    def _get_manager_kwargs(**kwargs):
+    def _get_manager_kwargs(self, **kwargs):
         return kwargs
+
+    def _build_meta_class(self, manager_class):
+        attrs = {}
+        if isinstance(self.display_fields, collections.Iterable):
+            attrs['fields'] = self.display_fields
+
+        # If parent form class already has an inner Meta, the Meta we're
+        # creating needs to inherit from the parent's inner meta.
+        parent = (object,)
+        if hasattr(manager_class, 'Meta'):
+            parent = (manager_class.Meta, object)
+
+        return type(str('Meta'), parent, attrs)
