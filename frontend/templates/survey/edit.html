@@ -522,7 +522,7 @@
                             question_id: this.dataset.name
                         },
                         success: function (res) {
-                            updateFields();
+                            //updateFields();
                         },
                         error: function (err) {
                             Messenger().post({
@@ -530,7 +530,6 @@
                                 'obrigatoriedade da pergunta.',
                                 type: 'danger'
                             });
-                            updateFields();
                         }
                     });
 
@@ -575,7 +574,7 @@
                             question_id: evt.item.dataset.name
                         },
                         success: function (res) {
-                            updateFields();
+                            //updateFields();
                         },
                         error: function (err) {
                             Messenger().post({
