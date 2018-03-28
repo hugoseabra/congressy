@@ -22,21 +22,25 @@ class AffiliationManager(managers.Manager):
             raise managers.forms.ValidationError(
                 'Você não pode editar este link'
             )
+        return self.cleaned_data.get('link_direct')
 
     def clean_link_whatsapp(self):
         if self.instance.pk:
             raise managers.forms.ValidationError(
                 'Você não pode editar este link'
             )
+        return self.cleaned_data.get('link_whatsapp')
 
     def clean_link_facebook(self):
         if self.instance.pk:
             raise managers.forms.ValidationError(
                 'Você não pode editar este link'
             )
+        return self.cleaned_data.get('link_facebook')
 
     def clean_link_twitter(self):
         if self.instance.pk:
             raise managers.forms.ValidationError(
                 'Você não pode editar este link'
             )
+        return self.cleaned_data.get('link_twitter')
