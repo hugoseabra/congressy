@@ -24,20 +24,17 @@
 
                         <div class="row">
                             <div class="checkbox">
-                                <label>
+                                <label for="switchery_{{ field.name }}">
 
-
-                                    <input type="checkbox"
-                                           class="js-switch"
-                                           data-name="{{ field.name }}"
-                                            {% if field.field.required %}
-                                           checked
-                                            {% endif %}
-                                           onchange="updateRequired(this)"
-                                           id="switchery_{{ field.name }}"
-                                           value="">Obrigatorio
-
+                                    Obrigatorio
                                 </label>
+                                <input type="checkbox"
+                                       class="js-switch update-required"
+                                       data-name="{{ field.name }}"
+                                        {% if field.field.required %}
+                                       checked
+                                        {% endif %}
+                                       id="switchery_{{ field.name }}">
                             </div>
                         </div>
 

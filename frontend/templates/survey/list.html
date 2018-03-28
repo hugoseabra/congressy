@@ -125,7 +125,6 @@
                                         <tr>
                                             <th style="width: 30%">Nome</th>
                                             <th></th>
-                                            <th></th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -136,70 +135,25 @@
 
                                                 </td>
                                                 <td>
-                                                    <a class="btn btn-primary"
+                                                    <a class="
+                                                    btn
+                                                    btn-primary"
                                                        href="
 {% url 'subscription:survey-edit' event.pk event_survey.pk %}">
                                                         <i class="fas fa-pencil-alt"></i>
-                                                        Editar campos
-
+                                                        Gerenciar campos
                                                     </a>
-                                                </td>
-
-                                                <td>
-
+                                                    <br/>
                                                     <button type="button"
                                                             class="btn
                                                             btn-danger
                                                             open-DeleteQuestionDialog"
                                                             data-event="{{ event.pk }}"
                                                             data-survey="{{ event_survey.pk }}">
-                                                        <i class="fa
-                                                        fa-trash"></i>
+                                                        <i class="fas fa-trash-alt"></i>
                                                         Deletar
                                                     </button>
-
-
-                                                    </a>
                                                 </td>
-                                                {#                                                <td>#}
-                                                {#                                                    <div class="btn-group">#}
-                                                {#                                                        <button type="button"#}
-                                                {#                                                                class="btn#}
-                                                {#                                                                btn-primary#}
-                                                {#                                                                btn-xs dropdown-toggle"#}
-                                                {#                                                                data-toggle="dropdown"#}
-                                                {#                                                                aria-haspopup="true"#}
-                                                {#                                                                aria-expanded="false">#}
-                                                {#                                                            <i class="fas fa-cog"></i>#}
-                                                {#                                                        </button>#}
-                                                {#                                                        <ul class="dropdown-menu">#}
-                                                {##}
-                                                {#                                                            <li>#}
-                                                {##}
-                                                {#                                                                <a data-toggle="modal"#}
-                                                {#                                                                   data-id="{{ event_survey.survey.pk }}"#}
-                                                {#                                                                   data-title="{{ event_survey.survey.name }}"#}
-                                                {#                                                                   data-description="{{ event_survey.survey.description }}"#}
-                                                {#                                                                   class="open-editSurvey">#}
-                                                {#                                                                    Editar#}
-                                                {#                                                                    <i class="fas fa-pencil-alt"></i>#}
-                                                {#                                                                </a>#}
-                                                {##}
-                                                {#                                                            </li>#}
-                                                {##}
-                                                {#                                                            <li>#}
-                                                {#                                                                <a data-toggle="modal"#}
-                                                {#                                                                   data-id="{{ event_survey.survey.pk }}"#}
-                                                {#                                                                   data-title="{{ event_survey.survey.name }}"#}
-                                                {#                                                                   data-description="{{ event_survey.survey.description }}"#}
-                                                {#                                                                   class="open-deleteSurvey">#}
-                                                {#                                                                    Deletar#}
-                                                {#                                                                    <i class="fas fa-trash-alt"></i>#}
-                                                {#                                                                </a>#}
-                                                {#                                                            </li>#}
-                                                {#                                                        </ul>#}
-                                                {#                                                    </div>#}
-                                                {#                                                </td>#}
                                             </tr>
                                         {% endfor %}
                                         </tbody>
@@ -233,7 +187,7 @@
                             aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">
-                        Novo questionário</h4>
+                        Novo formulário</h4>
                 </div>
 
                 <form method="post">
@@ -322,7 +276,7 @@
                             <div>
 
 
-                                <textarea cols="40" rows="3"
+                                <textarea cols="20" rows="3"
                                           class="form-control"
                                           id="surveyEditDescription"></textarea>
 
@@ -458,7 +412,6 @@
 
                 $('#deleteSurvey').modal('show');
             });
-
 
             //Disable btn on first click
             $(document).on("click", ".new_survey_save", function () {
