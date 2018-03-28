@@ -1,0 +1,10 @@
+[
+  {
+    "model": "sites.site",
+    "pk": 3,
+    "fields": {
+      "domain": "afiliados.congressy.com",
+      "name": "afiliados.congressy.com"
+    }
+  }
+]
