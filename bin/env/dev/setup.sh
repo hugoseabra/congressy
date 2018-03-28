@@ -3,7 +3,7 @@ set -ex
 
 export DJANGO_SETTINGS_MODULE=project.manage.settings.dev
 
-pip install -r requirements_dev.pip
+pip install -r requirements_dev.pip --upgrade
 
 export BASE_DIR=`python -c "
 import $DJANGO_SETTINGS_MODULE as settings

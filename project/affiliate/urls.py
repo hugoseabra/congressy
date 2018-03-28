@@ -5,9 +5,14 @@ import os
 from django.conf import settings
 from django.conf.urls import include, static, url
 
+from hotsite.urls import urlpatterns_public_hotsite
+
 handler500 = 'project.views.handler500'
 
+public_urls = urlpatterns_public_hotsite
+
 urlpatterns = [
+    url(r'^', include(public_urls, 'public')),
     url(r'^captcha/', include('captcha.urls')),
 ]
 

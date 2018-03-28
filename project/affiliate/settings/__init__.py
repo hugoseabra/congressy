@@ -10,6 +10,7 @@ INSTALLED_APPS += [
     'payment',
     'mailer',
     'affiliate',
+    'hotsite',
 ]
 # ========================= SERVER CONFIGURATION ============================ #
 WSGI_APPLICATION = 'project.wsgi.application'
