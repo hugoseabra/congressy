@@ -301,9 +301,12 @@
                         {% render_generic_field form.help_text %}
 
                         <hr>
+                        {% render_generic_field form.empty_intro %}
                         <div id="options">
                             {% render_generic_field form.options %}
                         </div>
+
+
                         <input type="hidden"
                                id="id_question_type"
                                name="question_type">
@@ -393,7 +396,6 @@
             };
         });
 
-
         $(document).on("click", ".open-AddSimpleQuestionDialog", function () {
             var typeOfField = $(this).data('field-type');
             var IconOfField = $(this).data('field-icon');
@@ -463,29 +465,6 @@
             questionListEl.remove();
         });
 
-
-        function updateFields() {
-
-            $.ajax({
-                url: location.pathname + '?template_name=survey/fields',
-                success: function (result) {
-                    document.getElementById("fields").innerHTML =
-                        result;
-                    createFieldList();
-
-                },
-                error: function (error) {
-                    Messenger().post({
-                        message: 'Não foi possivel atualizar as perguntas. ',
-                        type: 'danger'
-                    });
-                }
-            });
-        }
-
-        function byId(id) {
-            return document.getElementById(id);
-        }
 
         function createFieldList() {
 
@@ -587,6 +566,29 @@
                     });
                 }
             })
+        }
+
+        function updateFields() {
+
+            $.ajax({
+                url: location.pathname + '?template_name=survey/fields',
+                success: function (result) {
+                    document.getElementById("fields").innerHTML =
+                        result;
+                    createFieldList();
+
+                },
+                error: function (error) {
+                    Messenger().post({
+                        message: 'Não foi possivel atualizar as perguntas. ',
+                        type: 'danger'
+                    });
+                }
+            });
+        }
+
+        function byId(id) {
+            return document.getElementById(id);
         }
 
     </script>

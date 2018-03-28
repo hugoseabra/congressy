@@ -7,7 +7,6 @@ from .field import SurveyField
 
 class SurveyForm(forms.Form):
     """ Formulário Dinâmico. """
-    """ Old kanuform """
 
     def __init__(self, survey, *args, **kwargs):
         self.survey = survey

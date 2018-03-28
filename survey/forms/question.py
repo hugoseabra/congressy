@@ -67,6 +67,12 @@ class QuestionForm(forms.Form):
         help_text='Insira as opções da sua pergunta uma linha de cada vez.'
     )
 
+    empty_intro = forms.BooleanField(
+        label='Primeiro campo vazio',
+        required=False,
+        help_text='Deixar o primeiro item da lista em branco',
+    )
+
     def __init__(self, survey, **kwargs):
         self.survey = survey
         super().__init__(**kwargs)
