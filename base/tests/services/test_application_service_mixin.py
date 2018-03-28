@@ -8,7 +8,7 @@ from django_fake_model import models as f
 from test_plus.test import TestCase
 
 from base.managers import Manager
-from base.models import Entity
+from base.models import EntityMixin
 from base.services import (
     ApplicationServiceMixin,
     ManagerClassMissingError,
@@ -16,7 +16,7 @@ from base.services import (
 )
 
 
-class MyFakeModel(Entity, f.FakeModel):
+class MyFakeModel(EntityMixin, f.FakeModel):
     name = models.CharField(max_length=100)
 
 

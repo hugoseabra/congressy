@@ -8,7 +8,7 @@ por:
 
 from django import forms
 
-from base.models import Entity
+from base.models import EntityMixin
 
 __all__ = ['EntityTypeError', 'Manager']
 
@@ -30,7 +30,7 @@ class Manager(forms.ModelForm):
 
     def __init__(self, **kwargs):
         model = self.Meta.model
-        if not issubclass(model, Entity):
+        if not issubclass(model, EntityMixin):
             raise EntityTypeError(model)
 
         super().__init__(**kwargs)
