@@ -6,7 +6,7 @@ from django.db import models
 from django_fake_model import models as f
 from test_plus.test import TestCase
 
-from base.managers import Manager, EntityTypeError
+from base.managers import Manager, EntityTypeError, ManagerException
 from base.models import EntityMixin
 
 
@@ -72,6 +72,7 @@ class ManagerTest(TestCase):
         """
             Testa configuração de campo 'hidden' ao chamar método hide_field()
         """
+
         class TestManager(Manager):
             class Meta:
                 model = FakeEntity
@@ -88,3 +89,19 @@ class ManagerTest(TestCase):
 
         self.assertIn('name="name"', content)
         self.assertIn('type="hidden"', content)
+
+    def test_hide_inexistent_field(self):
+        """
+            Testa configuração configuração de esconder um campo que não
+            existe.
+        """
+
+        class TestManager(Manager):
+            class Meta:
+                model = FakeEntity
+                fields = '__all__'
+
+        manager = TestManager()
+
+        with self.assertRaises(ManagerException):
+            manager.hide_field('inexistent_field')

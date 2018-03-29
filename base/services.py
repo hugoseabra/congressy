@@ -129,15 +129,3 @@ class ApplicationService(forms.Form):
     def _get_manager_kwargs(self, **kwargs):
         return kwargs
 
-    def _build_meta_class(self, manager_class):
-        attrs = {}
-        if isinstance(self.display_fields, collections.Iterable):
-            attrs['fields'] = self.display_fields
-
-        # If parent form class already has an inner Meta, the Meta we're
-        # creating needs to inherit from the parent's inner meta.
-        parent = (object,)
-        if hasattr(manager_class, 'Meta'):
-            parent = (manager_class.Meta, object)
-
-        return type(str('Meta'), parent, attrs)

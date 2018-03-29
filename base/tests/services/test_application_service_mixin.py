@@ -213,6 +213,23 @@ class ApplicationServiceMixinTest(TestCase):
         self.assertNotIn('<label for="id_age">', content)
         self.assertIn('<label for="id_name">', content)
 
+    def test_display_inexistent_fields(self):
+        """
+        Testa configuração de exibição de campo inexistente.
+        """
+        service_class = ApplicationService
+        service_class.manager_class = self.correct_manager
+        service_class.display_fields = None
+        service_class.hidden_fields = None
+
+        service_class.display_fields = ('inexistent_field',)
+
+        with self.assertRaises(Exception) as e:
+            service_class()
+
+        msg = 'não possui o campo "inexistent_field"'
+        self.assertIn(msg, str(e.exception))
+
     def test_hide_field(self):
         """
         Testa campo como 'hidden' se informado em 'hidden_fields' no início
