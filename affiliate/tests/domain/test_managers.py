@@ -2,11 +2,75 @@
 
 from test_plus.test import TestCase
 
-from affiliate import managers
+from affiliate import managers, constants
+from base.tests.test_suites import ManagerPersistenceTestCase
 from ..mock_factory import MockFactory
 
 
+class AffiliateManagerPersistenceTest(ManagerPersistenceTestCase):
+    """ Testes de persistência de dados: criação e edição."""
+    manager_class = managers.AffiliateManager
+    required_fieds = ('person',)
+    data_edit_to = {
+        'recipient_id': 'bbbbbbb',
+        'status': constants.SUSPENDED,
+    }
+
+    def setUp(self):
+        mock_factory = MockFactory()
+        person = mock_factory.create_fake_person()
+
+        self.data = {
+            'person': person.pk,
+            'recipient_id': 'aaaaaaaaaa',
+        }
+
+    def test_create(self):
+        self.create()
+
+    def test_edit(self):
+        self.edit()
+
+
+class AffiliationManagerPersistenceTest(ManagerPersistenceTestCase):
+    """ Testes de persistência de dados: criação e edição."""
+    manager_class = managers.AffiliationManager
+    required_fieds = (
+        'event',
+        'affiliate',
+        'link_whatsapp',
+        'link_facebook',
+        'link_twitter',
+        'link_direct',
+    )
+    data_edit_to = {
+        'percent': 11.0,
+    }
+
+    def setUp(self):
+        mock_factory = MockFactory()
+        event = mock_factory.create_fake_event()
+        affiliate = mock_factory.create_fake_affiliate()
+
+        self.data = {
+            'event': event.pk,
+            'affiliate': affiliate.pk,
+            'percent': 10.0,
+            'link_whatsapp': 'whatsapp.com',
+            'link_facebook': 'facebook.com',
+            'link_twitter': 'twitter.com',
+            'link_direct': 'direct.com',
+        }
+
+    def test_create(self):
+        self.create()
+
+    def test_edit(self):
+        self.edit()
+
+
 class AffiliationManagerTest(TestCase):
+    data = None
     event = None
     affiliate = None
 
@@ -39,10 +103,18 @@ class AffiliationManagerTest(TestCase):
 
         affiliation = manager.save()
 
+        data = self.data.copy()
+        data.update({
+            'link_direct': data['link_direct'] + ' edited',
+            'link_whatsapp': data['link_whatsapp'] + ' edited',
+            'link_facebook': data['link_facebook'] + ' edited',
+            'link_twitter': data['link_twitter'] + ' edited'
+        })
+
         # FALHA: edição de links
         manager = managers.AffiliationManager(
             instance=affiliation,
-            data=self.data
+            data=data
         )
         self.assertFalse(manager.is_valid())
 
