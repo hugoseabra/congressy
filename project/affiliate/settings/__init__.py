@@ -25,6 +25,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 # ============================== FIXTURES =================================== #
 FIXTURE_DIRS += [
+    os.path.join(BASE_DIR, 'gatheros_event', 'tests', 'fixtures'),
+    os.path.join(BASE_DIR, 'payment', 'tests', 'fixtures'),
     os.path.join(BASE_DIR, 'project', 'affiliate', 'fixtures'),
 ]
 # ========================== AFFILIATE ====================================== #

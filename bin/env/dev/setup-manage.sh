@@ -1,24 +1,17 @@
 #!/usr/bin/env bash
 set -ex
 
-export DJANGO_SETTINGS_MODULE=project.manage.settings.dev
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-pip install -r requirements_dev.pip --upgrade
+bash $DIR/base-setup.sh
+
+export DJANGO_SETTINGS_MODULE=project.manage.settings.dev
 
 export BASE_DIR=`python -c "
 import $DJANGO_SETTINGS_MODULE as settings
 print(settings.BASE_DIR)"`
 
 export PYTHONPATH=$BASE_DIR
-
-docker-compose -f $BASE_DIR/bin/env/docker-compose.yml down --remove-orphans
-sleep 1
-
-docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
-sleep 8
-
-# Removes previous media files
-rm -rf $BASE_DIR/media/*
 
 python $BASE_DIR/manage.py migrate
 
