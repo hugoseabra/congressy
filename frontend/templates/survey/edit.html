@@ -38,16 +38,10 @@
                 <i class="fa  fa-fw fa-rocket"></i> Página do evento
             </a>
         </li>
-        <li>
+        <li  class="active">
             <a href="{% url 'subscription:form-config' event.pk %}"
                title="Formulário">
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-        <li class="active">
-            <a href="{% url 'subscription:survey-list' event.pk %}"
-               title="Survey">
-                <i class="fa  fa-fw fa-rocket"></i>Questionários
             </a>
         </li>
         {% if has_paid_lots %}
@@ -75,12 +69,12 @@
 {% endblock messages %}
 
 {% block title %}
-    Editar Questionário |
+    Editar Formulário |
     Congressy
 {% endblock %}
 
 {% block page_title %}
-    Editar questionário
+    Editar formulário
 {% endblock %}
 
 {% block page_sub_title %}
@@ -129,7 +123,7 @@
 
                             <div class="panel-heading">
                                 <h3 class="panel-title">Previsão do
-                                    Questionário</h3>
+                                    Formulário</h3>
                             </div>
 
                             <div class="panel-body">

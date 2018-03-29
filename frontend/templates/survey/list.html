@@ -124,7 +124,6 @@
                                         <thead>
                                         <tr>
                                             <th style="width: 30%">Nome</th>
-                                            <th></th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -132,27 +131,38 @@
                                             <tr>
                                                 <td>
                                                     {{ event_survey.survey.name }}
+                                                    <div class="btn-group">
+                                                        <button
+                                                                type="button"
+                                                                class="btn
+                                        btn-primary btn-trans
+                                        btn-sm dropdown-toggle"
+                                                                data-toggle="dropdown"
+                                                                aria-expanded="false"
+                                                        >
+                                                            <span class="fas fa-cog"></span>
+                                                        </button>
+                                                        <ul
+                                                                class="dropdown-menu dropdown-menu-left"
+                                                            role="menu">
+                                                            <li>
+                                                                <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
+                                                                    <i class="fas fa-pencil-alt"></i>
+                                                                    Gerenciar
+                                                                    campos
+                                                                </a>
+                                                            </li>
 
-                                                </td>
-                                                <td>
-                                                    <a class="
-                                                    btn
-                                                    btn-primary"
-                                                       href="
-{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
-                                                        <i class="fas fa-pencil-alt"></i>
-                                                        Gerenciar campos
-                                                    </a>
-                                                    <br/>
-                                                    <button type="button"
-                                                            class="btn
-                                                            btn-danger
-                                                            open-DeleteQuestionDialog"
-                                                            data-event="{{ event.pk }}"
-                                                            data-survey="{{ event_survey.pk }}">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                        Deletar
-                                                    </button>
+
+                                                            <li>
+                                                                <a class="open-DeleteQuestionDialog" data-event="{{ event.pk }}" data-survey="{{ event_survey.pk }}">
+                                                                    <i class="fas fa-trash-alt"></i>
+                                                                    Excluir
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+
                                                 </td>
                                             </tr>
                                         {% endfor %}
