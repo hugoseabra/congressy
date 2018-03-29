@@ -11,7 +11,7 @@ urls = [
     ),
     url(
         r'^(?P<pk>[\d]+)/delete$',
-        views.SurveyDeleteView.as_view(),
+        views.EventSurveyDeleteView.as_view(),
         name='survey-delete'
     ),
     url(

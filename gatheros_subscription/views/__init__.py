@@ -10,4 +10,4 @@ from .subscription import (
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
 )
-from .survey import SurveyEditView, SurveyListView, SurveyDeleteView
+from .survey import SurveyEditView, SurveyListView, EventSurveyDeleteView
