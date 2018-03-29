@@ -8,6 +8,7 @@ from payment.tasks import create_pagarme_recipient
 
 
 class BankAccountForm(forms.ModelForm):
+    create_pagarme_recipient = True
     type_of_document = forms.BooleanField(label='Tipo de Documento',
                                           required=False)
 
@@ -29,6 +30,7 @@ class BankAccountForm(forms.ModelForm):
         self.bank_account_id = None
         self.document_type = None
         self.date_created = None
+        self.recipient_id = None
 
         super(BankAccountForm, self).__init__(data=data, *args,
                                               **kwargs)
@@ -56,12 +58,14 @@ class BankAccountForm(forms.ModelForm):
         }
 
         try:
-            recipient = create_pagarme_recipient(recipient_dict=recipient_dict)
+            if self.create_pagarme_recipient is True:
+                recipient = \
+                    create_pagarme_recipient(recipient_dict=recipient_dict)
 
-            self.bank_account_id = recipient['bank_account']['id']
-            self.document_type = recipient['bank_account']['document_type']
-            self.recipient_id = recipient['id']
-            self.date_created = recipient['bank_account']['date_created']
+                self.bank_account_id = recipient['bank_account']['id']
+                self.document_type = recipient['bank_account']['document_type']
+                self.recipient_id = recipient['id']
+                self.date_created = recipient['bank_account']['date_created']
 
         except PaymentExceptions.RecipientError as e:
             error_dict = {
