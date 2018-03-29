@@ -15,10 +15,7 @@ class AffiliateForm(forms.CombinedFormBase):
             'name',
             'gender',
             'email',
-            'cpf',
             'birth_date',
         ),
     }
-    hidden_fields = {
-        'person': ('cpf',)
-    }
+

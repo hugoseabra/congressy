@@ -27,7 +27,7 @@ class Affiliate(EntityMixin, models.Model):
 
     bank_account = models.OneToOneField(
         BankAccount,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='affiliate',
         verbose_name='conta bancária',
         blank=True,
@@ -39,6 +39,8 @@ class Affiliate(EntityMixin, models.Model):
         default=constants.ACTIVE,
         max_length=30,
         verbose_name="status",
+        blank=True,
+        null=True,
     )
 
     recipient_id = models.CharField(
