@@ -190,7 +190,7 @@ class Lot(models.Model, GatherosModelMixin):
 
     event_survey = models.ForeignKey(
         EventSurvey,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,
         verbose_name='formulario',
         related_name='lots',
         blank=True,
