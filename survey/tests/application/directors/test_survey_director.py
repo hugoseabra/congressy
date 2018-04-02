@@ -5,14 +5,14 @@
 
 from django.test import TestCase
 
-from hotsite.directors import SurveyDirector
-from hotsite.tests import MockFactory
+from survey.directors import SurveyDirector
+from survey.tests import MockFactory
 from survey.forms import SurveyForm
 
 
 class SurveyDirectorTest(TestCase):
     """
-        Implementação do test;
+        Implementação do test
     """
 
     def setUp(self):

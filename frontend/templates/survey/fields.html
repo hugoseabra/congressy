@@ -32,8 +32,12 @@
 
 
                                 <i class="js-remove far fa-window-close"
-                                   style="margin-left:130px;"></i>
+                                   style="margin-left:130px; padding-bottom:6px"></i>
 
+                                {% if field.field.can_edit %}
+                                    <i class="far fa-edit"
+                                       style="margin-left:130px;"></i>
+                                {% endif %}
 
                                 <div class="checkbox">
 
@@ -49,7 +53,11 @@
 
                                         Obrigatorio
                                     </label>
+
+
                                 </div>
+
+
                             </td>
                         </tr>
                         </tbody>

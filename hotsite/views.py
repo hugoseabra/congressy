@@ -4,7 +4,6 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.forms import ValidationError
 from django.http import HttpResponseNotAllowed, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -19,7 +18,6 @@ from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
 from gatheros_subscription.models import FormConfig, Lot, \
     Subscription
-from hotsite.directors import SurveyDirector
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
@@ -28,6 +26,7 @@ from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.models import Transaction
 from payment.tasks import create_pagarme_transaction
+from survey.directors import SurveyDirector
 
 
 class EventMixin(TemplateNameableMixin, generic.View):
@@ -662,8 +661,6 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             lot = self.event.lots.first()
 
         form = self.get_form()
-
-
 
         # CONDIÇÃO 9
         """
