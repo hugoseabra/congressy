@@ -37,12 +37,14 @@ class SurveyMixin(TemplateNameableMixin, generic.View):
         context['survey'] = self.survey
 
 
-class SurveyEditView(EventViewMixin, AccountMixin,
-                     SurveyMixin):
+class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
+                     TemplateNameableMixin):
     template_name = 'survey/edit.html'
+    survey = None
 
     def dispatch(self, request, *args, **kwargs):
         self.event = self.get_event()
+        self.survey = self.get_survey()
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -152,6 +154,18 @@ class SurveyEditView(EventViewMixin, AccountMixin,
             'event_pk': self.event.pk,
             'survey_pk': self.survey.pk,
         }))
+
+    def get_survey(self):
+        """ Resgata questionário do contexto da view. """
+
+        if self.survey:
+            return self.survey
+
+        self.survey = get_object_or_404(
+            Survey,
+            pk=self.kwargs.get('survey_pk')
+        )
+        return self.survey
 
 
 class SurveyListView(EventViewMixin, AccountMixin, generic.ListView):
