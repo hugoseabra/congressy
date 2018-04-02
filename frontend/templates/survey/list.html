@@ -29,17 +29,21 @@
                 <div class="panel panel-primary">
                     <div class="panel-body">
                         {% if object_list %}
-                            <table class="table">
+                            <table class="table noborder">
                                 <thead>
                                 <tr>
-                                    <th style="width: 30%">Nome</th>
+                                    <th style="width: 90%"></th>
+                                    <th></th>
                                 </tr>
+
                                 </thead>
                                 <tbody>
                                 {% for event_survey in object_list %}
                                     <tr>
                                         <td>
                                             {{ event_survey.survey.name }}
+                                        </td>
+                                        <td>
                                             <div class="btn-group">
                                                 <button
                                                         type="button"
@@ -52,7 +56,8 @@
                                                     <span class="fas fa-cog"></span>
                                                 </button>
                                                 <ul
-                                                        class="dropdown-menu dropdown-menu-left"
+                                                        class="dropdown-menu
+                                                        dropdown-menu-right"
                                                         role="menu">
                                                     <li>
                                                         <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
@@ -73,7 +78,6 @@
                                                     </li>
                                                 </ul>
                                             </div>
-
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -369,6 +373,7 @@
 {% endblock %}
 
 {% block styles %}
+
     <style>
 
         .list-group-item .control-buttons {
@@ -379,8 +384,11 @@
             visibility: visible;
         }
 
-    </style>
+        .noborder td, .noborder th {
+            border: none !important;
+        }
 
+    </style>
 
 {% endblock %}
 
