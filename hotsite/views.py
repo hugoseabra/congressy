@@ -4,6 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.forms import ValidationError
 from django.http import HttpResponseNotAllowed, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -692,15 +693,32 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             survey_director = SurveyDirector(event=self.event,
                                              user=self.request.user)
 
-            # Resgata um form
-            form = survey_director.get_form(
+            # Resgata e poupua um novo form para validação e persistencia.
+            survey_form = survey_director.get_form(
                 survey=event_survey.survey,
                 data=self.request.POST.copy()
             )
 
-            if not form.is_valid():
-                print('sdsadas')
-            form.save()
+            if not survey_form.is_valid():
+
+                all_surveys = survey_director.get_forms()
+
+                surveys = []
+
+                for new_form in all_surveys:
+
+                    if new_form.survey.pk == survey_form.survey.pk:
+                        surveys.append(survey_form)
+                    else:
+                        surveys.append(new_form)
+
+                context['slug'] = kwargs.get('slug')
+                context['form'] = form
+                context['surveys'] = surveys
+                return self.render_to_response(context)
+
+            else:
+                survey_form.save()
 
         person = form.save()
 
