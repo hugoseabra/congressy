@@ -13,6 +13,7 @@ class SurveyField(object):
     help_text = None
     value = None
     max_length = None
+    question = None
 
     # TODO: Remove this use from constants.py
 
@@ -46,6 +47,8 @@ class SurveyField(object):
                  label=None,
                  **kwargs):
 
+        self.question = question
+
         if field_type in self.supported_types:
             self.type = field_type
 
@@ -63,6 +66,7 @@ class SurveyField(object):
 
         self.initial = initial
         self.required = required
+        self.can_edit = True
         self.label = label or ''
         self.placeholder = kwargs.get('placeholder', '')
         self.help_text = kwargs.get('help_text', '')
@@ -99,7 +103,7 @@ class SurveyField(object):
                 required=self.required,
                 initial=self.initial,
                 help_text=self.help_text,
-                widget=self._get_widget()
+                widget=self._get_widget(),
             )
 
         if self.type == self.FIELD_INPUT_DATETIME:
@@ -180,6 +184,9 @@ class SurveyField(object):
 
         if self.options:
             self.django_field.choices = self.options
+
+        if self.question.can_edit:
+            self.django_field.can_edit = True
 
         return self.django_field
 

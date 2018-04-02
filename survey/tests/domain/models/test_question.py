@@ -16,6 +16,7 @@ class QuestionModelTest(TestCase):
     def setUp(self):
         self.fake_factory = MockFactory()
         self.survey = self.fake_factory.fake_survey()
+        self.author = self.fake_factory.fake_author(survey=self.survey)
 
     def test_question_unique_in_survey(self):
         """ Testa se pergunta é única em um formulário. """
@@ -93,17 +94,45 @@ class QuestionModelTest(TestCase):
 
         self.assertTrue(question.has_options)
 
+    def test_question_has_answers(self):
+        """
+            Testa se a propriedade do model "has_options" está retornando o
+            numero correto de opções vinculadas a pergunta.
+        """
+
+        """ Continue from here"""
+
+        question = Question(
+            survey=self.survey,
+            type=Question.FIELD_SELECT,
+            label='label #1',
+            name="Question #1",
+            help_text='Some kind of help_text',
+        )
+        question.save()
+
+        self.assertFalse(question.has_options)
+
+        # Cria três opções vinculadas a essa pergunta
+        for _ in range(3):
+            self.fake_factory.fake_answer(question=question,
+                                          author=self.author)
+
+        question = Question.objects.get(pk=question.pk)
+
+        self.assertTrue(question.has_options)
+
 
 class QuestionManagerTest(TestCase):
     """
         Question Manager test
     """
+
     def setUp(self):
         self.fake_factory = MockFactory()
         self.survey = self.fake_factory.fake_survey()
 
     def test_question_manager_next_order(self):
-
         question_name = self.fake_factory.fake_factory.words(nb=3)
         instance = Question.objects.create(
             survey=self.survey,

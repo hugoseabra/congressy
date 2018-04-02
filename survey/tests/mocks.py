@@ -2,12 +2,15 @@
     Mock factory used during tests to create required survey domain objects.
 """
 
+from datetime import datetime, timedelta
+
 from django.contrib.auth.models import User, AnonymousUser
 from django.db import IntegrityError
 from faker import Faker
 from random import randint
 
-from gatheros_event.models import Person
+from gatheros_event.models import Person, Organization, Event, Category
+from gatheros_subscription.models import EventSurvey
 from survey.models import Survey, Question, Option, Author, Answer
 
 
@@ -93,4 +96,51 @@ class MockFactory:
             question=question,
             author=author,
             value=value
+        )
+
+    def fake_event(self, organization=None):
+
+        if not organization:
+            organization = self.fake_organization()
+
+        return Event.objects.create(
+            organization=organization,
+            name='Event: ' + ' '.join(self.fake_factory.words(nb=3)),
+            date_start=datetime.now() + timedelta(days=3),
+            date_end=datetime.now() + timedelta(days=4),
+            category=Category.objects.first(),
+        )
+
+    def fake_organization(self):
+
+        return Organization.objects.create(
+            name=self.fake_factory.company()
+        )
+
+    def fake_event_survey(self, event=None, survey=None):
+
+        if not event:
+            event = self.fake_event()
+
+        if not survey:
+            survey = self.fake_survey()
+
+        return EventSurvey.objects.create(
+            event=event,
+            survey=survey
+        )
+
+    def fake_answer(self, question=None, author=None):
+
+        if not question:
+            question = self.fake_question(survey=self.fake_survey())
+
+        if not author:
+            author = self.fake_author(survey=question.survey)
+
+        return Answer.objects.create(
+            question=question,
+            author=author,
+            value='42',
+            human_display='42',
         )
