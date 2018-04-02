@@ -663,10 +663,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
         form = self.get_form()
 
-        if not form.is_valid():
-            context['slug'] = kwargs.get('slug')
-            context['form'] = form
-            return self.render_to_response(context)
+
 
         # CONDIÇÃO 9
         """
@@ -699,7 +696,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 data=self.request.POST.copy()
             )
 
-            if not survey_form.is_valid():
+            if not survey_form.is_valid() or not form.is_valid():
 
                 all_surveys = survey_director.get_forms()
 
@@ -717,8 +714,12 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 context['surveys'] = surveys
                 return self.render_to_response(context)
 
-            else:
-                survey_form.save_answers()
+            survey_form.save_answers()
+
+        elif not form.is_valid():
+            context['slug'] = kwargs.get('slug')
+            context['form'] = form
+            return self.render_to_response(context)
 
         person = form.save()
 
