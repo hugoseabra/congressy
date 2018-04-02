@@ -2,12 +2,13 @@
     Mock factory used during tests to create required survey domain objects.
 """
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
+from django.db import IntegrityError
 from faker import Faker
 from random import randint
 
 from gatheros_event.models import Person
-from survey.models import Survey, Question, Option, Author
+from survey.models import Survey, Question, Option, Author, Answer
 
 
 class MockFactory:
@@ -32,23 +33,35 @@ class MockFactory:
 
         return person
 
+    def fake_user(self, is_anon=False):
+
+        if is_anon:
+            return AnonymousUser()
+
+        first_name = self.fake_factory.name().split(' ')[0]
+
+        try:
+            user = User.objects.create_user(first_name,
+                                            self.fake_factory.free_email(),
+                                            '123')
+        except IntegrityError:
+            first_name = self.fake_factory.name().split(' ')[0]
+            user = User.objects.create_user(first_name,
+                                            self.fake_factory.free_email(),
+                                            '123')
+        return user
+
     def fake_survey(self):
-        survey = Survey(
+        return Survey.objects.create(
             name=' '.join(self.fake_factory.words(nb=2)),
         )
-
-        survey.save()
-
-        assert survey is not None
-
-        return survey
 
     def fake_question(self, survey, type=Question.FIELD_INPUT_TEXT,
                       required=False, active=True):
         name = ' '.join(self.fake_factory.words(nb=3))
         help_text = ' '.join(self.fake_factory.words(nb=6))
 
-        question = Question(
+        return Question.objects.create(
             survey=survey,
             type=type,
             name=name,
@@ -58,29 +71,26 @@ class MockFactory:
             active=active,
         )
 
-        question.save()
-
-        return question
-
     def fake_option(self, question):
-        option = Option(
+        return Option.objects.create(
             name=' '.join(self.fake_factory.words(nb=2)),
             value=str(randint(0, 100)),
             question=question,
         )
-        option.save()
-
-        return option
 
     def fake_author(self, survey, user=None):
-
-        author = Author(
+        return Author.objects.create(
             survey=survey,
             user=user,
             name=self.fake_factory.name(),
         )
 
-        author.save()
+    def fake_answer(self, question, author, value=None):
+        if not value:
+            value = self.fake_factory.words(nb=2)
 
-        return author
-
+        return Answer.objects.create(
+            question=question,
+            author=author,
+            value=value
+        )

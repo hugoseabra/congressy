@@ -2,10 +2,27 @@ from django.test import TestCase
 
 from survey.forms.field import SurveyField
 from survey.forms.survey import SurveyForm
+from survey.tests import MockFactory
+from survey.models import Answer
 
 
 class SurveyFormTest(TestCase):
     """ Testa renderização de campos do formulário dinâmico. """
+
+    def setUp(self):
+        fake_factory = MockFactory()
+        self.survey = fake_factory.fake_survey()
+        self.user = fake_factory.fake_user()
+        self.question = fake_factory.fake_question(survey=self.survey)
+        self.author = fake_factory.fake_author(survey=self.survey,
+                                               user=self.user)
+        self.anon_author = fake_factory.fake_author(survey=self.survey)
+
+        self.answer = fake_factory.fake_answer(question=self.question,
+                                               author=self.author)
+        self.non_authored_answer = fake_factory.fake_answer(
+            question=self.question,
+            author=self.anon_author)
 
     def test_render_input_text(self):
         """ Renderização de campo INPUT_TEXT. """
@@ -17,8 +34,8 @@ class SurveyFormTest(TestCase):
             'max_length': 10,
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'input',
@@ -40,8 +57,8 @@ class SurveyFormTest(TestCase):
             'required': True,
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'input',
@@ -62,8 +79,8 @@ class SurveyFormTest(TestCase):
             'required': True,
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'input',
@@ -84,8 +101,8 @@ class SurveyFormTest(TestCase):
             'required': True
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'input',
@@ -106,8 +123,8 @@ class SurveyFormTest(TestCase):
             'required': True
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'input',
@@ -128,8 +145,8 @@ class SurveyFormTest(TestCase):
             'required': True
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'input',
@@ -151,8 +168,8 @@ class SurveyFormTest(TestCase):
             'required': True
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'textarea',
@@ -174,8 +191,8 @@ class SurveyFormTest(TestCase):
             'required': True
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'input',
@@ -203,8 +220,8 @@ class SurveyFormTest(TestCase):
             'options': options
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'select',
@@ -234,8 +251,8 @@ class SurveyFormTest(TestCase):
             'options': options
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'checkbox',
@@ -264,8 +281,8 @@ class SurveyFormTest(TestCase):
             'options': options
         }
 
-        form = SurveyForm()
-        form.create_field(**data)
+        form = SurveyForm(survey=self.survey)
+        form.create_field(question=self.question, **data)
 
         expected_content = [
             'radio',
@@ -278,3 +295,37 @@ class SurveyFormTest(TestCase):
         for option in options:
             self.assertIn(option[0], form.as_ul())
             self.assertIn(option[1], form.as_ul())
+
+    def test_save_new_answer(self):
+        """
+            Testa a persistencia sem passar um usuario.
+        :return:
+        """
+
+        form = SurveyForm(survey=self.survey, data={
+            self.question.name: '41'
+        })
+
+        self.assertTrue(form.is_valid())
+
+        persisted_answer_list = form.save()
+
+        self.assertEqual(len(persisted_answer_list), 1)
+        self.assertNotEqual(persisted_answer_list[0].pk, self.answer.pk)
+
+    def test_save_existing_answer(self):
+        """
+            Testa a persistencia passando um usuario.
+        :return:
+        """
+
+        form = SurveyForm(survey=self.survey, user=self.user, data={
+            self.question.name: '41'
+        })
+
+        self.assertTrue(form.is_valid())
+
+        persisted_answer_list = form.save()
+
+        self.assertEqual(len(persisted_answer_list), 1)
+        self.assertEqual(persisted_answer_list[0].pk, self.answer.pk)
