@@ -85,7 +85,7 @@ class SurveyDirector(object):
 
         return survey_forms_list
 
-    def get_form(self, survey, data={}) -> SurveyForm:
+    def get_form(self, survey, data=None) -> SurveyForm:
         """
 
         Este método é responsável por retornar um objeto do tipo
