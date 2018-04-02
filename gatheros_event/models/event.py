@@ -5,10 +5,10 @@ feita por um organizador de evento, dono de uma organização, e que deseja
 apresentar informações ligadas a ela a pessoa que possam se interessar em
 participar do evento.
 """
-import os
-from collections import Counter
 from datetime import datetime
 
+import os
+from collections import Counter
 from django.db import models
 from django.utils.encoding import force_text
 from stdimage import StdImageField

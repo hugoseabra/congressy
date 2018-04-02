@@ -4,10 +4,29 @@
     ou não, ativo ou não.
 """
 from django.db import models
+from django.db.models import Max
+
+from core.model import track_data
 from survey.models import Survey
 from survey.models.mixins import Entity
 
 
+class QuestionManager(models.Manager):
+
+    def next_order(self, survey):
+        """ Resgata próximo número de da pergunta. """
+
+        order_max = self.filter(survey=survey).aggregate(Max('order'))
+
+        if order_max['order__max']:
+            if order_max['order__max'] >= 0:
+                return order_max['order__max'] + 1
+
+        return 1
+
+
+
+@track_data('order')
 class Question(Entity, models.Model):
     """
         Question domain model implementation.
@@ -64,12 +83,12 @@ class Question(Entity, models.Model):
 
     name = models.CharField(
         max_length=255,
-        verbose_name='titulo',
+        verbose_name='nome',
     )
 
     label = models.CharField(
         max_length=255,
-        verbose_name='rotulo'
+        verbose_name='nome do campo'
     )
 
     required = models.BooleanField(
@@ -94,6 +113,14 @@ class Question(Entity, models.Model):
         verbose_name='primeira entrada vazia.'
     )
 
+    order = models.PositiveIntegerField(
+        default=None,
+        blank=True,
+        verbose_name='ordem da pergunta'
+    )
+
+    objects = QuestionManager()
+
     @property
     def has_options(self):
         return self.options.count() > 0
@@ -112,3 +139,11 @@ class Question(Entity, models.Model):
             return True
 
         return False
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.order:
+            self.order = Question.objects.next_order(self.survey)
+
+        super().save(force_insert, force_update, using, update_fields)

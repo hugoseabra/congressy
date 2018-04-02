@@ -1,4 +1,4 @@
-{% if paid_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+{% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <div class="panel-title">Ingresso</div>
@@ -6,29 +6,40 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-12">
-                    <select class="form-control" name="lot" id="id_lot">
-                        {% for lot in paid_lots %}
-                            <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
-                        {% endfor %}
-                    </select>
-                    <div class="col-md-6 text-muted small" style="padding-left:0">
+
+                    {% if has_available_lots %}
+                        <select class="form-control" name="lot" id="id_lot" required>
+                            <option value="">- Selecione -</option>
+                            {% if available_lots|length > 0 %}
+                                {% for lot in available_lots %}
+                                    <option value="{{ lot.pk }}">{{ lot.display_publicly }}</option>
+                                {% endfor %}                            {% endif %}
+
+                        </select>
+                    {% else %}
+                        Não há nenhum lote disponivel no momento.
+                    {% endif %}
+
+                    <div class="col-md-6 text-muted small"
+                         style="padding-left:0">
                         Escolha o tipo de ingresso.
                     </div>
                     {% if has_coupon %}
-                    <div class="col-md-6 text-right small" style="margin-top: 8px;">
-                        <a id="coupon_link" href="javascript:void(0)"
-                           data-toggle="popover"
-                           title="<strong>Informe o código</strong>"
-                           data-html="true"
-                           data-container="body"
-                           data-content="{% include 'hotsite/includes/coupon.html' %}">
-                            Possui cupom?
-                        </a>
-                    </div>
+                        <div class="col-md-6 text-right small"
+                             style="margin-top: 8px;">
+                            <a id="coupon_link" href="javascript:void(0)"
+                               data-toggle="popover"
+                               title="<strong>Informe o código</strong>"
+                               data-html="true"
+                               data-container="body"
+                               data-content="{% include 'hotsite/includes/coupon.html' %}">
+                                Possui cupom?
+                            </a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    <input type="hidden" name="amount" id="id_amount" value="" />
+    <input type="hidden" name="amount" id="id_amount" value=""/>
 {% endif %}

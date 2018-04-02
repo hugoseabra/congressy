@@ -9,9 +9,11 @@
 
         <!-- IMAGE BACKGROUND -->
         <div class="section-background-image parallax">
+            {% if info.image_main.default %}
             <img
-                src="{% if info.image_main.default %}{{ info.image_main.default.url }}{% endif %}"
+                src="{{ info.image_main.default.url }}"
                 alt="" style="opacity: 0.2;" class="blurred">
+            {% endif %}
         </div>
     </div>
 

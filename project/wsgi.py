@@ -21,6 +21,6 @@ if os.path.exists(VERSION_FILE_PATH):
     version = version.rstrip('\r\n') if version else 'dev'
     os.environ.setdefault("ENVIRONMENT_VERSION", version.rstrip('\r\n'))
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings.env")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings.manage.dev")
 
 application = get_wsgi_application()

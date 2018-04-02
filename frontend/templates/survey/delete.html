@@ -1,0 +1,51 @@
+<form id="deleteSurveyForm">
+    {% csrf_token %}
+    <p>
+        Certeza que deseja deletar "{{ object }}"?
+    </p>
+
+    <input type="button" class="btn btn-danger" value="Confirmar"
+           id="confirmSurveyDelete"/>
+
+</form>
+
+<script>
+
+
+    $(document).ready(function () {
+
+
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom ' +
+            'messenger-on-right',
+            theme: 'flat'
+        };
+
+
+        $("#confirmSurveyDelete").on('click', function (e) {
+
+            $('#deleteSurvey').modal('hide');
+
+            var url = "{% url 'subscription:survey-delete' event.pk object.pk %}";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: $("#deleteSurveyForm").serialize(), // serializes the form's elements.
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel apagar este questionario.',
+                        type: 'danger'
+                    });
+                },
+                success: function (res) {
+                    location.reload();
+                }
+            });
+
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+        });
+    });
+
+
+</script>

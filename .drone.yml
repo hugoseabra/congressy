@@ -22,6 +22,13 @@ pipeline:
   backup-db-staging:
     image: postgres:9.6-alpine
     pull: true
+    secrets: [
+      dbhost,
+      dbuser,
+      dbpass,
+      dbname,
+      dbport
+    ]
     volumes:
       - /tmp/bkp:/tmp/bkp
     commands:
@@ -72,6 +79,7 @@ pipeline:
     pull: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/cgsy-media:/media
     secrets: [
       aws_key,
       aws_secret,
@@ -79,8 +87,6 @@ pipeline:
       force_https_staging,
       bucket_location,
       bucket_name,
-      cron_sync_minutes_out,
-      cron_sync_minutes_in,
       dbhost_staging,
       dbuser_staging,
       dbpass_staging,
@@ -90,21 +96,19 @@ pipeline:
       sentry_private_dsn
     ]
     commands:
-      - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/staging/env-cgsy-staging
-      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DOMAIN=$${DOMAIN_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ./bin/env/staging/env-cgsy-staging
-      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ./bin/env/staging/env-cgsy-staging
+      - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/staging/env-manage-staging
+      - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/staging/env-manage-staging
+      - echo "DOMAIN=$${DOMAIN_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ./bin/env/staging/env-manage-staging
+      - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ./bin/env/staging/env-manage-staging
+      - echo "DBHOST=$${DBHOST_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "DBUSER=$${DBUSER_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "DBPASS=$${DBPASS_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "DBNAME=$${DBNAME_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "DBPORT=$${DBPORT_STAGING}" >> ./bin/env/staging/env-manage-staging
+      - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ./bin/env/staging/env-manage-staging
+      - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ./bin/env/staging/env-manage-staging
       - sh ./bin/env/staging/03_start-cgsy-staging.sh
       - docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-staging'
     when:
@@ -232,18 +236,16 @@ pipeline:
         target: AWS_SECRET
       - source: AWS_ACCOUNT_ID
         target: AWS_ACCOUNT_ID
-      - source: DOMAIN
-        target: DOMAIN
+      - source: DOMAIN_MANAGE
+        target: DOMAIN_MANAGE
+      - source: DOMAIN_PARTNER
+        target: DOMAIN_PARTNER
       - source: FORCE_HTTPS
         target: FORCE_HTTPS
       - source: BUCKET_LOCATION
         target: BUCKET_LOCATION
       - source: BUCKET_NAME
         target: BUCKET_NAME
-      - source: CRON_SYNC_MINUTES_OUT
-        target: CRON_SYNC_MINUTES_OUT
-      - source: CRON_SYNC_MINUTES_IN
-        target: CRON_SYNC_MINUTES_IN
       - source: DBHOST
         target: DBHOST
       - source: DBUSER
@@ -263,12 +265,11 @@ pipeline:
       aws_key,
       aws_secret,
       aws_account_id,
-      domain,
+      domain_manage,
+      domain_partner,
       force_https,
       bucket_location,
       bucket_name,
-      cron_sync_minutes_out,
-      cron_sync_minutes_in,
       dbhost,
       dbuser,
       dbpass,
@@ -287,15 +288,12 @@ pipeline:
       - echo "AWS_FORMAT=json" >> ~/awsecr/env-awsecr
 
       - mkdir -p ~/cgsy
-      # env-file do stack de produção
+      # env-file do stack de produção - common
       - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
-      - echo "DOMAIN=$${DOMAIN}" >> ~/cgsy/env-file
       - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
       - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
       - echo "BUCKET_NAME=$${BUCKET_NAME}" >> ~/cgsy/env-file
-      - echo "CRON_SYNC_MINUTES_OUT=$${CRON_SYNC_MINUTES_OUT}" >> ~/cgsy/env-file
-      - echo "CRON_SYNC_MINUTES_IN=$${CRON_SYNC_MINUTES_IN}" >> ~/cgsy/env-file
       - echo "DBHOST=$${DBHOST}" >> ~/cgsy/env-file
       - echo "DBUSER=$${DBUSER}" >> ~/cgsy/env-file
       - echo "DBPASS=$${DBPASS}" >> ~/cgsy/env-file
@@ -303,6 +301,10 @@ pipeline:
       - echo "DBPORT=$${DBPORT}" >> ~/cgsy/env-file
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
+      # env-file do stack de produção - manage
+      - echo "DOMAIN=$${DOMAIN_MANAGE}" > ~/cgsy/env-manage-file
+      # env-file do stack de produção - partner
+      - echo "DOMAIN=$${DOMAIN_PARTNER}" > ~/cgsy/env-partner-file
     when:
       branch: [ master ]
 

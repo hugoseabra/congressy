@@ -11,7 +11,7 @@ from survey.tests import MockFactory
 
 
 class QuestionModelTest(TestCase):
-    """ Main test implementation """
+    """ Question model test """
 
     def setUp(self):
         self.fake_factory = MockFactory()
@@ -92,3 +92,46 @@ class QuestionModelTest(TestCase):
             self.fake_factory.fake_option(question=question)
 
         self.assertTrue(question.has_options)
+
+
+class QuestionManagerTest(TestCase):
+    """
+        Question Manager test
+    """
+    def setUp(self):
+        self.fake_factory = MockFactory()
+        self.survey = self.fake_factory.fake_survey()
+
+    def test_question_manager_next_order(self):
+
+        question_name = self.fake_factory.fake_factory.words(nb=3)
+        instance = Question.objects.create(
+            survey=self.survey,
+            type=Question.FIELD_INPUT_TEXT,
+            label=question_name,
+            name=question_name,
+            help_text='Some kind of help_text',
+        )
+        self.assertIs(instance.order, 1)
+        self.assertIs(Question.objects.next_order(self.survey), 2)
+
+    def test_question_on_creation_ordering(self):
+        """
+            Testa se o manager está entregando a ordem correta, e se a
+            atualização de ordens está funcionando.
+        """
+
+        for i in range(5):
+            question_name = self.fake_factory.fake_factory.words(nb=3)
+            question = Question(
+                survey=self.survey,
+                type=Question.FIELD_INPUT_TEXT,
+                label=question_name,
+                name=question_name,
+                help_text='Some kind of help_text',
+            )
+
+            question.save()
+
+        self.assertIs(Question.objects.first().order, 1)
+        self.assertIs(Question.objects.last().order, 5)

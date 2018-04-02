@@ -18,7 +18,7 @@ docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
 sleep 10
 
 # Removes previous media files
-rm -rf $BASE_DIR/media_dev/*
+rm -rf $BASE_DIR/media/*
 
 python $BASE_DIR/manage.py migrate
 

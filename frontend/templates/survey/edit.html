@@ -1,0 +1,618 @@
+{% extends "base/base.html" %}
+{% load static base_tags queryset_filter form_config_tags %}
+
+
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+            <li>
+                <a href="{% url 'subscription:lot-list' event.pk %}"
+                   title="Inscrições">
+                    <i class="fa  fa-fw fa-rocket"></i>
+                    Lotes/Categorias
+                </a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+            </a>
+        </li>
+        {#        <li>#}
+        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+        {#               title="Check-in">#}
+        {#                <i class="fa  fa-fw fa-rocket"></i>#}
+        {#                Check-in#}
+        {#            </a>#}
+        {#        </li>#}
+    </ul>
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li  class="active">
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+        {% if has_paid_lots %}
+            <li>
+                <a href="{% url 'payment:event-payments' event.pk %}"
+                   title="Pagamentos">
+                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissable">
+                <button type="button" class="close"
+                        data-dismiss="alert" aria-hidden="true">×
+                </button>
+                {{ message|get_first_item }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock messages %}
+
+{% block title %}
+    Editar Formulário |
+    Congressy
+{% endblock %}
+
+{% block page_title %}
+    Editar formulário
+{% endblock %}
+
+{% block page_sub_title %}
+    {{ survey.name }} - {{ event.name }}
+{% endblock %}
+
+{% block content %}
+
+    <div class="col-12">
+
+        <div class="tab-wrapper tab-primary">
+            <ul class="nav nav-tabs">
+                <li>
+                    <a href="{% url 'subscription:form-config' event.pk %}">
+                        Formulário Padrão
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="{% url 'subscription:survey-list' event.pk %}">
+                        Formulário Personalizado
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="buttonbar">
+                            <div class="float-right">
+
+                                <a href="{% url 'subscription:survey-list' event.pk %}"
+                                   class="btn btn-primary">
+                                    Voltar
+                                    <i class="fas fa-long-arrow-alt-left"></i>
+                                </a>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+                        <div class="panel panel-primary">
+
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Previsão do
+                                    Formulário</h3>
+                            </div>
+
+                            <div class="panel-body">
+
+                                <div id='fields'>
+                                    <strong>Nenhuma questão.</strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+                        <div class="panel panel-primary">
+
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Novo Campo</h3>
+                            </div>
+
+                            <div class="panel-body">
+
+                                <div class="row">
+
+                                    <div class="col-md-6">
+
+                                        <strong style="font-size: 20px">
+                                            Escolha um novo campo:
+                                        </strong>
+                                        <hr/>
+
+                                        <a data-field-type="Data"
+                                           data-field-icon="far fa-calendar-alt"
+                                           data-question_type="input-date"
+                                           title="Data"
+                                           class="open-AddSimpleQuestionDialog btn
+                               btn-primary btn-block">
+                                            <div class="text-left">
+
+                                                <i class="far fa-calendar-alt"></i>
+                                                Data
+                                            </div>
+                                        </a>
+
+                                        <a data-field-type="Text"
+                                           data-field-icon="fas fa-i-cursor"
+                                           data-question_type="input-text"
+                                           title="Text"
+                                           class="open-AddSimpleQuestionDialog btn
+                               btn-primary btn-block">
+                                            <div class="text-left">
+
+                                                <i class="fas fa-i-cursor"></i>
+                                                Text
+                                            </div>
+                                        </a>
+
+                                        <a data-field-type="Parágrafo"
+                                           data-field-icon="fas fa-align-left"
+                                           data-question_type="textarea"
+                                           title="Parágrafo"
+                                           class="open-AddSimpleQuestionDialog btn
+                               btn-primary btn-block">
+                                            <div class="text-left">
+
+                                                <i class="fas fa-align-left"></i>
+                                                Parágrafo
+                                            </div>
+                                        </a>
+
+                                        <a data-field-type="Lista"
+                                           data-field-icon="fas fa-list-ul"
+                                           data-question_type="select"
+                                           title="Lista"
+                                           class="open-AddComplexQuestionDialog btn
+                               btn-primary btn-block">
+                                            <div class="text-left">
+
+                                                <i class="fas fa-list-ul"></i>
+                                                Lista
+                                            </div>
+                                        </a>
+
+                                        <a data-field-type="Múltipla Escolha"
+                                           data-field-icon="far fa-check-circle"
+                                           data-question_type="radio-group"
+                                           title="Múltipla Escolha"
+                                           class="open-AddComplexQuestionDialog btn
+                               btn-primary btn-block">
+                                            <div class="text-left">
+
+                                                <i class="far fa-check-circle"></i>
+                                                Múltipla Escolha
+                                            </div>
+                                        </a>
+
+                                        <a data-field-type="Várias Opções"
+                                           data-field-icon="far fa-check-square"
+                                           data-question_type="checkbox-group"
+                                           title="Várias Opções"
+                                           class="open-AddComplexQuestionDialog btn
+                               btn-primary btn-block">
+                                            <div class="text-left">
+
+                                                <i class="far fa-check-square"></i>
+                                                Várias Opções
+                                            </div>
+                                        </a>
+
+
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modals -->
+    <div class="modal fade" id="addQuestion"
+         tabindex="-1"
+         role="dialog">
+
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <p style="font-size: 15px"
+                       class="modal-title">
+                        Adicionar ao Formulário </p>
+                </div>
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+
+                    <div class="modal-body">
+
+
+                        <strong style="font-size: 25px">
+                            <span class="typeOfField"></span>
+                            <i class="iconOfField"></i>
+                        </strong>
+                        <hr/>
+                        {% render_generic_field form.name autofocus=True %}
+                        {% render_generic_field form.help_text %}
+
+                        <hr>
+
+                        <div id="intro">
+                            {% render_generic_field form.intro %}
+                        </div>
+
+                        <div id="options">
+                            {% render_generic_field form.options %}
+                        </div>
+
+
+                        <input type="hidden"
+                               id="id_question_type"
+                               name="question_type">
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-success new_question_save">Salvar
+                        </button>
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal fade" id="confirmDelete"
+         role="dialog">
+
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <p class="modal-title">
+                        Certeza que deseja deletar essa
+                        pergunta?
+                    </p>
+                    <hr/>
+                    <i id="removingQuestion"></i>
+                    <input type="hidden"
+                           id="removingQuestionId">
+                    <input type="hidden"
+                           id="removingQuestionName">
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-danger"
+                            data-dismiss="modal">Não
+                    </button>
+                    <button type="button"
+                            class="btn btn-success"
+                            id="deleteQuestion"
+                            data-dismiss="modal">
+                        Sim
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+
+
+            updateFields();
+
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom ' +
+                'messenger-on-right',
+                theme: 'flat'
+            };
+        });
+
+        $(document).on("click", ".open-AddSimpleQuestionDialog", function () {
+            var typeOfField = $(this).data('field-type');
+            var IconOfField = $(this).data('field-icon');
+            var typeEl = $('.modal-body .typeOfField');
+            var iconEl = $('.modal-body .iconOfField');
+            var formTypeEl = $('#id_simple_form-type');
+            $('#id_question_type').val($(this).data('question_type'));
+
+            typeEl.text(typeOfField);
+            iconEl.attr('class', 'iconOfField');
+            iconEl.addClass(IconOfField);
+            formTypeEl.val('simple');
+            $('#options').hide();
+            $('#intro').hide();
+            $('#addQuestion').modal('show');
+        });
+
+        $(document).on("click", ".open-AddComplexQuestionDialog", function () {
+
+            var typeOfField = $(this).data('field-type');
+            var IconOfField = $(this).data('field-icon');
+            var typeEl = $('.modal-body .typeOfField');
+            var iconEl = $('.modal-body .iconOfField');
+            var formTypeEl = $('#id_complex_form-type');
+            var question_type = $(this).data('question_type');
+            $('#id_question_type').val(question_type);
+
+            typeEl.text(typeOfField);
+            iconEl.attr('class', 'iconOfField');
+            iconEl.addClass(IconOfField);
+            formTypeEl.val('complex');
+            $('#options').show();
+
+            if (question_type === 'select') {
+                console.log('BANANA => ' +  question_type);
+                $('#intro').show();
+            } else {
+                 $('#intro').hide();
+            }
+
+            $('#addQuestion').modal('show');
+        });
+
+        $('#deleteQuestion').on('click', function () {
+
+            var questionId = $('#removingQuestionId').val();
+            var questionName = $('#removingQuestionName').val();
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            $.ajax({
+                type: "POST",
+                url: location.pathname,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: {
+                    question_id: questionId,
+                    action: 'delete'
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Pergunta removida com sucesso!',
+                        type: 'success'
+                    });
+                    updateFields();
+                },
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel remover sua pergunta.',
+                        type: 'error'
+                    });
+                    updateFields();
+                }
+            });
+            var questionListEl = $("ul").find("[data-name='" + questionName +
+                "']");
+            questionListEl.remove();
+        });
+
+
+        function createFieldList() {
+
+            window.setTimeout(function () {
+                app.switcheryToggle();
+
+                var radios = $('input[type=radio]');
+                radios.iCheck({
+                    checkboxClass: 'icheckbox_flat-grey',
+                    radioClass: 'iradio_flat-grey'
+                });
+
+
+                $('.update-required').on('change', function () {
+
+                    var setTo = null;
+
+                    if (this.checked) {
+                        setTo = 'True';
+                    } else {
+                        setTo = 'False';
+                    }
+                    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+                    $.ajax({
+                        type: "POST",
+                        url: location.pathname,
+                        beforeSend: function (request) {
+                            request.setRequestHeader("X-CSRFToken", csrftoken);
+                        },
+                        data: {
+                            action: 'update_required',
+                            setTo: setTo,
+                            question_id: this.dataset.name
+                        },
+                        success: function (res) {
+                            //updateFields();
+                        },
+                        error: function (err) {
+                            Messenger().post({
+                                message: 'Não foi possivel atualizar a ' +
+                                'obrigatoriedade da pergunta.',
+                                type: 'danger'
+                            });
+                        }
+                    });
+
+
+                });
+
+            }, 200);
+
+
+            return Sortable.create(byId('simpleList'), {
+                animation: 150,
+                filter: '.js-remove',
+                handle: ".my-handle",
+                onFilter: function (evt) {
+                    console.log('removed => ' + evt.item.dataset.name);
+                    var questionEl = $('#removingQuestion');
+                    var questionIdEl = $('#removingQuestionId');
+                    var questionNameEl = $('#removingQuestionName');
+
+                    questionEl.text(evt.item.dataset.label);
+                    questionIdEl.val(evt.item.dataset.name);
+                    questionNameEl.val(evt.item.dataset.name);
+                    $('#confirmDelete').modal('show');
+                },
+                onEnd: function (evt) {
+
+                    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+                    if (evt.newIndex === evt.oldIndex) {
+                        return;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: location.pathname,
+                        beforeSend: function (request) {
+                            request.setRequestHeader("X-CSRFToken", csrftoken);
+                        },
+                        data: {
+                            action: 'update_order',
+                            new_order: JSON.stringify(this.toArray()),
+                            question_id: evt.item.dataset.name
+                        },
+                        success: function (res) {
+                            //updateFields();
+                        },
+                        error: function (err) {
+                            Messenger().post({
+                                message: 'Não foi possivel atualizar a ' +
+                                'ordem das perguntas.',
+                                type: 'danger'
+                            });
+                            updateFields();
+                        }
+                    });
+                }
+            })
+        }
+
+        function updateFields() {
+
+            $.ajax({
+                url: location.pathname + '?template_name=survey/fields',
+                success: function (result) {
+                    document.getElementById("fields").innerHTML =
+                        result;
+                    createFieldList();
+
+                },
+                error: function (error) {
+                    Messenger().post({
+                        message: 'Não foi possivel atualizar as perguntas. ',
+                        type: 'danger'
+                    });
+                }
+            });
+        }
+
+        function byId(id) {
+            return document.getElementById(id);
+        }
+
+    </script>
+
+{% endblock %}
+
+{% block styles %}
+    <style>
+
+        .list-group-item .control-buttons {
+            visibility: hidden;
+        }
+
+        .list-group-item:hover .control-buttons {
+            visibility: visible;
+        }
+
+    </style>
+
+
+{% endblock %}
+
+

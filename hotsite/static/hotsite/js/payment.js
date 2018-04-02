@@ -4,6 +4,10 @@ function hide_payment_elements() {
     $('#id_remove').hide();
     $('#payment_buttons').hide();
     $('#id_button_pay').show();
+
+    $('#id_card_hash').val('');
+    $('#id_installments').val('');
+    $('#id_transaction_type').val('');
 }
 
 function normalize_amount_as_payment(amount) {

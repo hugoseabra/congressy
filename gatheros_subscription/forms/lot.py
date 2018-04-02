@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django import forms
 
 from core.forms import PriceInput, SplitDateTimeWidget
-from gatheros_subscription.models import Lot
+from gatheros_subscription.models import Lot, EventSurvey
 
 INSTALLMENT_CHOICES = (
     (2, 2),
@@ -39,6 +39,7 @@ class LotForm(forms.ModelForm):
             'allow_installment',
             'installment_limit',
             'num_install_interest_absortion',
+            'event_survey',
         ]
 
         widgets = {
@@ -68,6 +69,13 @@ class LotForm(forms.ModelForm):
             kwargs['initial'] = initial
 
         super(LotForm, self).__init__(**kwargs)
+
+        self.fields['event_survey'] = forms.ModelChoiceField(
+            queryset=EventSurvey.objects.filter(event=self.event),
+            label='Selecione um questionário',
+            required=False,
+        )
+        self.fields['event_survey'].empty_label = '  '
 
         if self.instance.pk and self.instance.subscriptions.count() > 0:
             self.fields['price'].widget.attrs['disabled'] = 'disabled'

@@ -4,6 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.forms import ValidationError
 from django.http import HttpResponseNotAllowed, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -16,7 +17,9 @@ from django.views.decorators.debug import sensitive_post_parameters
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info, Member, Organization
-from gatheros_subscription.models import FormConfig, Lot, Subscription
+from gatheros_subscription.models import FormConfig, Lot, \
+    Subscription
+from hotsite.directors import SurveyDirector
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
@@ -60,6 +63,8 @@ class EventMixin(TemplateNameableMixin, generic.View):
         context['subscription_enabled'] = self.subscription_enabled()
         context['subsciption_finished'] = self.subsciption_finished()
         context['has_paid_lots'] = self.has_paid_lots()
+        context['has_available_lots'] = self.has_available_lots()
+        context['available_lots'] = self.get_available_lots()
         context['has_coupon'] = self.has_coupon()
         context['has_configured_bank_account'] = \
             self.event.organization.is_bank_account_configured()
@@ -115,12 +120,32 @@ class EventMixin(TemplateNameableMixin, generic.View):
     def get_private_lots(self):
         return self.event.lots.filter(private=True)
 
+    def has_available_lots(self):
+        available_lots = []
+
+        for lot in self.event.lots.all():
+            if lot.status == lot.LOT_STATUS_RUNNING:
+                available_lots.append(lot)
+
+        return True if len(available_lots) > 0 else False
+
+    def get_available_lots(self):
+        all_lots = self.event.lots.filter(private=False)
+        available_lots = []
+
+        for lot in all_lots:
+            if lot.status == lot.LOT_STATUS_RUNNING:
+                available_lots.append(lot)
+
+        return available_lots
+
 
 class SubscriptionFormMixin(EventMixin, generic.FormView):
     form_class = PersonForm
     initial = {}
     object = None
     person = None
+    subscription = None
 
     def get_form_kwargs(self, **kwargs):
         """
@@ -155,8 +180,20 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
         except (ObjectDoesNotExist, AttributeError):
             pass
 
-        context['person'] = self.get_person()
-        context['is_subscribed'] = self.is_subscribed()
+        person = self.get_person()
+
+        if person:
+            try:
+                context['subscription'] = \
+                    Subscription.objects.get(person=person, event=self.event)
+                context['is_subscribed'] = True
+            except Subscription.DoesNotExist:
+                context['is_subscribed'] = False
+
+        else:
+            context['is_subscribed'] = False
+
+        context['person'] = person
 
         return context
 
@@ -488,6 +525,8 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
 
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
+        survey_director = SurveyDirector(event=self.event,
+                                         user=self.request.user)
 
         try:
             config = self.event.formconfig
@@ -504,6 +543,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             config.address = config.ADDRESS_SHOW
 
         cxt['config'] = config
+        cxt['surveys'] = survey_director.get_forms()
         cxt['remove_preloader'] = True
         cxt['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
@@ -541,7 +581,18 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             - redireciona para página de status
 
         CONDIÇÂO 8: status da inscrição
-            - verifica o tipo de lotes, caso não tenha lotes pagos, então a inscrição é confirmada
+            - verifica o tipo de lotes, caso não tenha lotes pagos, então a
+              inscrição é confirmada
+        CONDIÇÃO 9:
+            - verifica se lote possui formulario(survey)
+            - se possuir survey, pegar o querydict que vem do post, e tentar
+                validar o survey.
+            - caso não valide redireciona usuário para página de inscrição
+              com mensagem e erro.
+            - caso valide:
+                - verificar se esse usuário já possui autoria deste survey.
+                - caso exista, resgate e atualize.
+                - caso não exista, crie.
         """
         context = self.get_context_data(**kwargs)
         context['remove_preloader'] = True
@@ -592,12 +643,82 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
         clear_string('phone')
         clear_string('institution_cnpj')
 
+        # Resgata e verifica lote se houver
+        # È necessario resgatar ele para facilitar as validações dos
+        # possiveis surveys que estão vinculados a ele
+        if 'lot' in request.POST:
+            lot_pk = self.request.POST.get('lot')
+            lot_pk = int(lot_pk) if lot_pk else 0
+
+            # Garante que o lote é do evento
+            try:
+                lot = self.event.lots.get(pk=int(lot_pk))
+            except Lot.DoesNotExist:
+                messages.error(request, "Lote inválido.")
+                return self.render_to_response(context)
+
+        else:
+            # Inscrição simples
+            lot = self.event.lots.first()
+
         form = self.get_form()
 
         if not form.is_valid():
             context['slug'] = kwargs.get('slug')
             context['form'] = form
             return self.render_to_response(context)
+
+        # CONDIÇÃO 9
+        """
+            CONDIÇÃO 9:
+            - verifica se lote possui formulario(survey)
+            - se possuir survey, pegar o querydict que vem do post, e tentar 
+            validar o survey.
+            - caso não valide redireciona usuário para página de inscrição 
+            com mensagem e erro.
+            - caso valide:
+                - verificar se esse usuário já possui autoria deste survey.
+                - caso exista, resgate e atualize.
+                - caso não exista, crie.
+        """
+
+        event_survey = lot.event_survey
+
+        # verifica se o lote possui formulario(survey)
+        if event_survey:
+            # Se possui survey, ver se esse person que está respondendo já
+            # possui autoria, ou seja já respondeu antes, caso de edição.
+            # Se não possuir autoria, cria um novo autor, vincula
+
+            survey_director = SurveyDirector(event=self.event,
+                                             user=self.request.user)
+
+            # Resgata e poupua um novo form para validação e persistencia.
+            survey_form = survey_director.get_form(
+                survey=event_survey.survey,
+                data=self.request.POST.copy()
+            )
+
+            if not survey_form.is_valid():
+
+                all_surveys = survey_director.get_forms()
+
+                surveys = []
+
+                for new_form in all_surveys:
+
+                    if new_form.survey.pk == survey_form.survey.pk:
+                        surveys.append(survey_form)
+                    else:
+                        surveys.append(new_form)
+
+                context['slug'] = kwargs.get('slug')
+                context['form'] = form
+                context['surveys'] = surveys
+                return self.render_to_response(context)
+
+            else:
+                survey_form.save_answers()
 
         person = form.save()
 
@@ -620,28 +741,10 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             )
             new_subscription = True
 
-        # Resgata e verifica lote se houver
-        if 'lot' in request.POST:
-            lot_pk = self.request.POST.get('lot')
-
-            # Garante que o lote é do evento
-            try:
-                lot = self.event.lots.get(pk=lot_pk)
-            except Lot.DoesNotExist:
-                messages.error(
-                    self.request,
-                    "Este lote não pertence a este evento."
-                )
-                return self.render_to_response(context)
-
-        else:
-            # Inscrição simples
-            lot = self.event.lots.first()
-
         # Insere ou edita lote
         subscription.lot = lot
 
-        if self.has_paid_lots():
+        if lot.price is not None and lot.price > 0:
             # CONDIÇÃO 7
             if 'transaction_type' not in request.POST:
                 messages.error(
@@ -700,7 +803,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             'Inscrição realizada com sucesso!'
         )
 
-        if self.has_paid_lots():
+        if lot.price is not None and lot.price > 0:
             # CONDIÇÃO 7
             return redirect(
                 'public:hotsite-subscription-status',

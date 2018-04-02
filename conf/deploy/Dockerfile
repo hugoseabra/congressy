@@ -1,15 +1,12 @@
 # -----------------------------------------------------------------------------
 # Docker IMAGE congressy/cgsy
 # docker build --rm -t cgsy .
-# docker tag catalog <repo_url>/catalog:<tag>
+# docker tag catalog <repo_url>/cgsy:<tag>
 # -----------------------------------------------------------------------------
 FROM python:3.6
 MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
-
-# Helps on collecting static
-ENV DJANGO_SETTINGS_MODULE project.settings.prod
 
 LABEL cgsy.image.name="cgsy-platform-production"
 
@@ -52,7 +49,8 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
 # Pypi packages
 
 # install uwsgi now because it takes a little while
-RUN pip install --no-cache-dir \
+RUN pip install --no-cache-dir --upgrade \
+        pip setuptools \
         # required by celery
         lxml \
         celery[redis] \
@@ -67,7 +65,6 @@ RUN pip install --no-cache-dir \
         jinja2 \
         # Sentry
         raven
-
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
@@ -90,21 +87,27 @@ WORKDIR /var/www/cgsy
 # COPY requirements.txt and RUN pip install BEFORE adding the rest of your code, this will cause Docker's caching mechanism
 # to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
 COPY ./requirements.pip ./.
-RUN pip install --no-cache-dir -r requirements.pip
+RUN pip install --no-cache-dir --upgrade -r requirements.pip
 
 # -----------------------------------------------------------------------------
 # Setup configuration files
+COPY ./conf/deploy/scripts.sh /scripts.sh
+COPY ./conf/deploy/scripts.py /scripts.py
+
+COPY ./conf/deploy/setup/configure-settings.py /configure-settings.py
+COPY ./conf/deploy/setup/configure-sync.py /configure-sync.py
+COPY ./conf/deploy/setup/configure-cron.py /configure-cron.py
+COPY ./conf/deploy/setup/configure-version.py /configure-version.py
 COPY ./conf/deploy/setup/configure-wsgi.py /configure-wsgi.py
 COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
-COPY ./conf/deploy/setup/configure-settings.py /configure-settings.py
-COPY ./conf/deploy/setup/configure-version.py /configure-version.py
-COPY ./conf/deploy/setup/configure-sync.py /configure-sync.py
-COPY ./conf/deploy/container-entry.sh /entry.sh
+COPY ./conf/deploy/services /services
 
 # -----------------------------------------------------------------------------
 COPY ./. ./.
 
-RUN chmod 775 /entry.sh
+RUN chmod 775 /services/volume/container-entry.sh \
+              /services/cron/container-entry.sh \
+              /services/web/manage/container-entry.sh \
+              /services/web/partner/container-entry.sh
 
 EXPOSE 80
-CMD ["/entry.sh"]
