@@ -76,7 +76,7 @@ class Answer(Entity, models.Model):
 
     def get_human_display(self):
         if not self.question.accepts_options:
-            return None
+            return ''
 
         option = self.question.options.get(value=self.value)
         return option.name
