@@ -1,22 +1,23 @@
 from django.test import TestCase
 
-from kanu_form.field import Field
-from kanu_form.forms import KanuForm
+from survey.forms.field import SurveyField
+from survey.forms.survey import SurveyForm
 
 
-class FormRenderTest(TestCase):
+class SurveyFormTest(TestCase):
     """ Testa renderização de campos do formulário dinâmico. """
+
     def test_render_input_text(self):
         """ Renderização de campo INPUT_TEXT. """
         data = {
             'name': 'name',
-            'field_type': Field.FIELD_INPUT_TEXT,
+            'field_type': SurveyField.FIELD_INPUT_TEXT,
             'label': 'nome',
             'required': True,
             'max_length': 10,
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
@@ -34,12 +35,12 @@ class FormRenderTest(TestCase):
         """ Renderização de campo INPUT_NUMBER. """
         data = {
             'name': 'name',
-            'field_type': Field.FIELD_INPUT_NUMBER,
+            'field_type': SurveyField.FIELD_INPUT_NUMBER,
             'label': 'nome',
             'required': True,
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
@@ -56,12 +57,12 @@ class FormRenderTest(TestCase):
         """ Renderização de campo INPUT_DATE. """
         data = {
             'name': 'some_date',
-            'field_type': Field.FIELD_INPUT_DATE,
+            'field_type': SurveyField.FIELD_INPUT_DATE,
             'label': 'date',
             'required': True,
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
@@ -78,12 +79,12 @@ class FormRenderTest(TestCase):
         """ Renderização de campo INPUT_DATETIME. """
         data = {
             'name': 'some_datetime',
-            'field_type': Field.FIELD_INPUT_DATETIME,
+            'field_type': SurveyField.FIELD_INPUT_DATETIME,
             'label': 'datetime',
             'required': True
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
@@ -100,12 +101,12 @@ class FormRenderTest(TestCase):
         """ Renderização de campo INPUT_EMAIL. """
         data = {
             'name': 'some_email',
-            'field_type': Field.FIELD_INPUT_EMAIL,
+            'field_type': SurveyField.FIELD_INPUT_EMAIL,
             'label': 'e-mail',
             'required': True
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
@@ -122,12 +123,12 @@ class FormRenderTest(TestCase):
         """ Renderização de campo INPUT_TEL. """
         data = {
             'name': 'some_tel',
-            'field_type': Field.FIELD_INPUT_PHONE,
+            'field_type': SurveyField.FIELD_INPUT_PHONE,
             'label': 'celular',
             'required': True
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
@@ -145,12 +146,12 @@ class FormRenderTest(TestCase):
         """ Renderização de campo TEXTAREA. """
         data = {
             'name': 'textarea_example',
-            'field_type': Field.FIELD_TEXTAREA,
+            'field_type': SurveyField.FIELD_TEXTAREA,
             'label': 'my textarea',
             'required': True
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
@@ -168,12 +169,12 @@ class FormRenderTest(TestCase):
         """ Renderização de campo BOOLEAN. """
         data = {
             'name': 'boolean-field',
-            'field_type': Field.FIELD_BOOLEAN,
+            'field_type': SurveyField.FIELD_BOOLEAN,
             'label': 'my boolean field',
             'required': True
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
@@ -196,13 +197,13 @@ class FormRenderTest(TestCase):
 
         data = {
             'name': 'select-field',
-            'field_type': Field.FIELD_SELECT,
+            'field_type': SurveyField.FIELD_SELECT,
             'label': 'my select field',
             'required': True,
             'options': options
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
@@ -228,12 +229,12 @@ class FormRenderTest(TestCase):
 
         data = {
             'name': 'checkbox-group',
-            'field_type': Field.FIELD_CHECKBOX_GROUP,
+            'field_type': SurveyField.FIELD_CHECKBOX_GROUP,
             'label': 'my checkobox group',
             'options': options
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
@@ -258,12 +259,12 @@ class FormRenderTest(TestCase):
 
         data = {
             'name': 'radio-group',
-            'field_type': Field.FIELD_RADIO_GROUP,
+            'field_type': SurveyField.FIELD_RADIO_GROUP,
             'label': 'my radio group',
             'options': options
         }
 
-        form = KanuForm()
+        form = SurveyForm()
         form.create_field(**data)
 
         expected_content = [
