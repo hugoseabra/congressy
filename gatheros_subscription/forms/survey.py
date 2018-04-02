@@ -5,7 +5,7 @@ from survey.services import SurveyService
 from gatheros_subscription.models import EventSurvey
 
 
-class SurveyForm(forms.Form):
+class EventSurveyForm(forms.Form):
     """ Formulário de survey. """
 
     def __init__(self, event, **kwargs):

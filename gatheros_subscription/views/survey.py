@@ -1,26 +1,48 @@
+import json
+
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
-import json
+
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.views.mixins import EventViewMixin, AccountMixin
-from gatheros_subscription.forms import SurveyForm
+from gatheros_subscription.forms import EventSurveyForm
 from gatheros_subscription.models import EventSurvey
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
-from survey.forms import QuestionForm, SurveyForm as FullSurveyForm
+from survey.forms import QuestionForm, SurveyForm
 from survey.models import Survey, Question
 
 
-class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
-                     TemplateNameableMixin):
-    template_name = 'survey/edit.html'
+class SurveyMixin(TemplateNameableMixin, generic.View):
     survey = None
 
     def dispatch(self, request, *args, **kwargs):
+        pk = self.kwargs.get('survey_pk')
+
+        if not pk:
+            return redirect('https://congressy.com')
+
+        self.survey = get_object_or_404(
+            Survey,
+            pk=pk
+        )
+
+        response = super().dispatch(request, *args, **kwargs)
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['survey'] = self.survey
+
+
+class SurveyEditView(EventViewMixin, AccountMixin,
+                     SurveyMixin):
+    template_name = 'survey/edit.html'
+
+    def dispatch(self, request, *args, **kwargs):
         self.event = self.get_event()
-        self.survey = self.get_survey()
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -28,7 +50,7 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
         context['event'] = self.event
         context['survey'] = self.survey
         context['form'] = QuestionForm(survey=self.survey)
-        context['full_survey_form'] = FullSurveyForm(
+        context['full_survey_form'] = SurveyForm(
             survey=self.survey)
 
         return context
@@ -131,20 +153,8 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
             'survey_pk': self.survey.pk,
         }))
 
-    def get_survey(self):
-        """ Resgata questionário do contexto da view. """
 
-        if self.survey:
-            return self.survey
-
-        self.survey = get_object_or_404(
-            Survey,
-            pk=self.kwargs.get('survey_pk')
-        )
-        return self.survey
-
-
-class SurveyListView(EventViewMixin, AccountMixin, generic.ListView, ):
+class SurveyListView(EventViewMixin, AccountMixin, generic.ListView):
     """
         View responsavel pela listagens dos formularios pertencentes a um
         evento.
@@ -167,34 +177,27 @@ class SurveyListView(EventViewMixin, AccountMixin, generic.ListView, ):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
-        context['form'] = SurveyForm(event=self.event)
+        context['form'] = EventSurveyForm(event=self.event)
         return context
 
-    def post(self, *args, **kwargs):
 
-        form = SurveyForm(data=self.request.POST, event=self.event)
+class EventSurveyCreateView(EventViewMixin, AccountMixin, generic.View):
+
+    def post(self, request, event_pk):
+        data = request.POST.copy()
+
+        form = EventSurveyForm(data=data, event=self.event)
 
         if form.is_valid():
-
             form.save()
 
-        else:
+            return HttpResponse(status=201)
 
-            messages.error(
-                self.request,
-                "Corrija os erros abaixo."
-            )
-
-            context = self.get_queryset()
-            context['form'] = form
-            return self.render_to_response(context=context)
-
-        return redirect(reverse_lazy('subscription:survey-list', kwargs={
-            'event_pk': self.event.pk,
-        }))
+        return HttpResponse(status=400)
 
 
-class EventSurveyDeleteView(EventViewMixin, AccountMixin, generic.DeleteView, ):
+class EventSurveyDeleteView(EventViewMixin, AccountMixin,
+                            generic.DeleteView, ):
     """
         View responsavel por deletar questionarios.
     """
