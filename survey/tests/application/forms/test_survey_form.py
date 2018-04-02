@@ -308,7 +308,7 @@ class SurveyFormTest(TestCase):
 
         self.assertTrue(form.is_valid())
 
-        persisted_answer_list = form.save()
+        persisted_answer_list = form.save_answers()
 
         self.assertEqual(len(persisted_answer_list), 1)
         self.assertNotEqual(persisted_answer_list[0].pk, self.answer.pk)
@@ -325,7 +325,7 @@ class SurveyFormTest(TestCase):
 
         self.assertTrue(form.is_valid())
 
-        persisted_answer_list = form.save()
+        persisted_answer_list = form.save_answers()
 
         self.assertEqual(len(persisted_answer_list), 1)
         self.assertEqual(persisted_answer_list[0].pk, self.answer.pk)

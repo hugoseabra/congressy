@@ -718,7 +718,7 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
                 return self.render_to_response(context)
 
             else:
-                survey_form.save()
+                survey_form.save_answers()
 
         person = form.save()
 

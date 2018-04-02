@@ -55,7 +55,7 @@ class SurveyForm(forms.Form):
                             help_text=help_text, select_intro=intro, **kwargs)
         self.fields[name] = field.get_django_field()
 
-    def save(self) -> list:
+    def save_answers(self) -> list:
         """
 
         :return: list: uma lista de objetos do tipo Answer que corresponde a
