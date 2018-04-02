@@ -1,186 +1,96 @@
-{% extends "base/base.html" %}
 {% load static base_tags queryset_filter form_config_tags %}
 
 
-{% block nav_aside_itens %}
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
-            <li>
-                <a href="{% url 'subscription:lot-list' event.pk %}"
-                   title="Inscrições">
-                    <i class="fa  fa-fw fa-rocket"></i>
-                    Lotes/Categorias
-                </a>
-            </li>
-        {% endif %}
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
-            </a>
-        </li>
-        {#        <li>#}
-        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fa  fa-fw fa-rocket"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li class="active">
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-        {% if has_paid_lots %}
-            <li>
-                <a href="{% url 'payment:event-payments' event.pk %}"
-                   title="Pagamentos">
-                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
-                </a>
-            </li>
-        {% endif %}
-    </ul>
-{% endblock %}
-
-{% block messages %}
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissable">
-                <button type="button" class="close"
-                        data-dismiss="alert" aria-hidden="true">×
-                </button>
-                {{ message|get_first_item }}
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endblock messages %}
-
-{% block title %}
-    Formulário de Inscrição | Congressy
-{% endblock %}
-
-{% block page_title %}
-    Formulário Personalizados
-{% endblock %}
-
-{% block page_sub_title %}
-    <div>{{ event.name }}</div>
-{% endblock %}
-
 {% block content %}
 
-    <div class="col-12">
 
-        <div class="tab-wrapper tab-primary">
-            <ul class="nav nav-tabs">
-                <li>
-                    <a href="{% url 'subscription:form-config' event.pk %}">
-                        Formulário Padrão
-                    </a>
-                </li>
-                <li class="active">
-                    <a href="{% url 'subscription:survey-list' event.pk %}">
-                        Formulário Personalizado
-                    </a>
-                </li>
-            </ul>
-            <div class="tab-content">
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="buttonbar">
-                            <div class="float-right">
-                                <button type="button" class="btn btn-success"
-                                        data-toggle="modal"
-                                        data-target="#addSurvey">
-                                    <i class="fa fa-plus"></i>
-                                    Adicionar
-                                </button>
-                            </div>
-                            <div class="clearfix"></div>
-                        </div>
+
+    <div class="tab-content">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <button type="button" class="btn btn-success"
+                                data-toggle="modal"
+                                data-target="#addSurvey">
+                            <i class="fa fa-plus"></i>
+                            Adicionar
+                        </button>
                     </div>
+                    <div class="clearfix"></div>
                 </div>
+            </div>
+        </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="panel panel-primary">
-                            <div class="panel-body">
-                                {% if object_list %}
-                                    <table class="table">
-                                        <thead>
-                                        <tr>
-                                            <th style="width: 30%">Nome</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {% for event_survey in object_list %}
-                                            <tr>
-                                                <td>
-                                                    {{ event_survey.survey.name }}
-                                                    <div class="btn-group">
-                                                        <button
-                                                                type="button"
-                                                                class="btn
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        {% if object_list %}
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th style="width: 30%">Nome</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for event_survey in object_list %}
+                                    <tr>
+                                        <td>
+                                            {{ event_survey.survey.name }}
+                                            <div class="btn-group">
+                                                <button
+                                                        type="button"
+                                                        class="btn
                                         btn-primary btn-trans
                                         btn-sm dropdown-toggle"
-                                                                data-toggle="dropdown"
-                                                                aria-expanded="false"
-                                                        >
-                                                            <span class="fas fa-cog"></span>
-                                                        </button>
-                                                        <ul
-                                                                class="dropdown-menu dropdown-menu-left"
-                                                            role="menu">
-                                                            <li>
-                                                                <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
-                                                                    <i class="fas fa-pencil-alt"></i>
-                                                                    Gerenciar
-                                                                    campos
-                                                                </a>
-                                                            </li>
+                                                        data-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                >
+                                                    <span class="fas fa-cog"></span>
+                                                </button>
+                                                <ul
+                                                        class="dropdown-menu dropdown-menu-left"
+                                                        role="menu">
+                                                    <li>
+                                                        <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                            Gerenciar
+                                                            campos
+                                                        </a>
+                                                    </li>
 
 
-                                                            <li>
-                                                                <a class="open-DeleteQuestionDialog" data-event="{{ event.pk }}" data-survey="{{ event_survey.pk }}">
-                                                                    <i class="fas fa-trash-alt"></i>
-                                                                    Excluir
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                                                    <li>
+                                                        <a class="open-DeleteQuestionDialog"
+                                                           data-event="{{ event.pk }}"
+                                                           data-survey="{{ event_survey.pk }}">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                            Excluir
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
 
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
 
-                                {% else %}
-                                    <h3>Nenhum formulário.</h3>
-                                {% endif %}
-                            </div>
-                        </div>
+                        {% else %}
+                            <h3>Nenhum formulário.</h3>
+                        {% endif %}
                     </div>
                 </div>
-
             </div>
         </div>
 
     </div>
+
+
 
 
     <div class="modal fade" id="addSurvey"
@@ -200,10 +110,9 @@
                         Novo formulário</h4>
                 </div>
 
-                <form method="post">
+                <form id="createSurveyForm">
 
                     {% csrf_token %}
-
 
                     <div class="modal-body">
                         {% render_generic_field form.name autofocus=True %}
@@ -216,7 +125,7 @@
                                 class="btn btn-danger"
                                 data-dismiss="modal">Cancelar
                         </button>
-                        <button type="submit"
+                        <button id="createSurvey" type="button"
                                 class="btn btn-success">Salvar
                         </button>
                     </div>
@@ -368,7 +277,6 @@
                 $('#editSurvey').modal('show');
             });
 
-
             $(".open-deleteSurvey").click(function () {
                 $('#surveyDeleteId').val($(this).data('id'));
                 $('#surveyDeleteTitle').val($(this).data('title'));
@@ -426,6 +334,31 @@
             //Disable btn on first click
             $(document).on("click", ".new_survey_save", function () {
                 this.disabled = true;
+            });
+
+            $("#createSurvey").on('click', function (e) {
+
+                $('#addSurvey').modal('hide');
+
+                var url = "{% url 'subscription:survey-create' event.pk %}";
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: $("#createSurveyForm").serialize(), // serializes the form's elements.
+                    error: function (err) {
+                        Messenger().post({
+                            message: 'Não foi possivel criar este ' +
+                            'questionario.',
+                            type: 'danger'
+                        });
+                    },
+                    success: function (res) {
+                        loadList();
+                    }
+                });
+
+                e.preventDefault(); // avoid to execute the actual submit of the form.
             });
 
 
