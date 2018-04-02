@@ -38,7 +38,7 @@
                 <i class="fa  fa-fw fa-rocket"></i> Página do evento
             </a>
         </li>
-        <li  class="active">
+        <li class="active">
             <a href="{% url 'subscription:form-config' event.pk %}"
                title="Formulário">
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
@@ -83,180 +83,164 @@
 
 {% block content %}
 
-    <div class="col-12">
 
-        <div class="tab-wrapper tab-primary">
-            <ul class="nav nav-tabs">
-                <li>
-                    <a href="{% url 'subscription:form-config' event.pk %}">
-                        Formulário Padrão
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+                    <a href="{% url 'subscription:form-config' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-long-arrow-alt-left"></i>
+                        Voltar
                     </a>
-                </li>
-                <li class="active">
-                    <a href="{% url 'subscription:survey-list' event.pk %}">
-                        Formulário Personalizado
-                    </a>
-                </li>
-            </ul>
-            <div class="tab-content">
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="buttonbar">
-                            <div class="float-right">
+    <div class="row">
+        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
 
-                                <a href="{% url 'subscription:survey-list' event.pk %}"
-                                   class="btn btn-primary">
-                                    Voltar
-                                    <i class="fas fa-long-arrow-alt-left"></i>
-                                </a>
-                            </div>
-                            <div class="clearfix"></div>
-                        </div>
-                    </div>
+            <div class="panel panel-primary">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">Previsão do
+                        Formulário</h3>
                 </div>
 
-                <div class="row">
-                    <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="panel-body">
 
-                        <div class="panel panel-primary">
-
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Previsão do
-                                    Formulário</h3>
-                            </div>
-
-                            <div class="panel-body">
-
-                                <div id='fields'>
-                                    <strong>Nenhuma questão.</strong>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
+                    <div id='fields'>
+                        <strong>Nenhuma questão.</strong>
                     </div>
+
                 </div>
 
-                <div class="row">
+            </div>
 
-                    <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
 
-                        <div class="panel panel-primary">
+        </div>
+    </div>
 
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Novo Campo</h3>
-                            </div>
+    <div class="row">
 
-                            <div class="panel-body">
+        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
 
-                                <div class="row">
+            <div class="panel panel-primary">
 
-                                    <div class="col-md-6">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Novo Campo</h3>
+                </div>
 
-                                        <strong style="font-size: 20px">
-                                            Escolha um novo campo:
-                                        </strong>
-                                        <hr/>
+                <div class="panel-body">
 
-                                        <a data-field-type="Data"
-                                           data-field-icon="far fa-calendar-alt"
-                                           data-question_type="input-date"
-                                           title="Data"
-                                           class="open-AddSimpleQuestionDialog btn
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <strong style="font-size: 20px">
+                                Escolha um novo campo:
+                            </strong>
+                            <hr/>
+
+                            <a data-field-type="Data"
+                               data-field-icon="far fa-calendar-alt"
+                               data-question_type="input-date"
+                               title="Data"
+                               class="open-AddSimpleQuestionDialog btn
                                btn-primary btn-block">
-                                            <div class="text-left">
+                                <div class="text-left">
 
-                                                <i class="far fa-calendar-alt"></i>
-                                                Data
-                                            </div>
-                                        </a>
-
-                                        <a data-field-type="Text"
-                                           data-field-icon="fas fa-i-cursor"
-                                           data-question_type="input-text"
-                                           title="Text"
-                                           class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                            <div class="text-left">
-
-                                                <i class="fas fa-i-cursor"></i>
-                                                Text
-                                            </div>
-                                        </a>
-
-                                        <a data-field-type="Parágrafo"
-                                           data-field-icon="fas fa-align-left"
-                                           data-question_type="textarea"
-                                           title="Parágrafo"
-                                           class="open-AddSimpleQuestionDialog btn
-                               btn-primary btn-block">
-                                            <div class="text-left">
-
-                                                <i class="fas fa-align-left"></i>
-                                                Parágrafo
-                                            </div>
-                                        </a>
-
-                                        <a data-field-type="Lista"
-                                           data-field-icon="fas fa-list-ul"
-                                           data-question_type="select"
-                                           title="Lista"
-                                           class="open-AddComplexQuestionDialog btn
-                               btn-primary btn-block">
-                                            <div class="text-left">
-
-                                                <i class="fas fa-list-ul"></i>
-                                                Lista
-                                            </div>
-                                        </a>
-
-                                        <a data-field-type="Múltipla Escolha"
-                                           data-field-icon="far fa-check-circle"
-                                           data-question_type="radio-group"
-                                           title="Múltipla Escolha"
-                                           class="open-AddComplexQuestionDialog btn
-                               btn-primary btn-block">
-                                            <div class="text-left">
-
-                                                <i class="far fa-check-circle"></i>
-                                                Múltipla Escolha
-                                            </div>
-                                        </a>
-
-                                        <a data-field-type="Várias Opções"
-                                           data-field-icon="far fa-check-square"
-                                           data-question_type="checkbox-group"
-                                           title="Várias Opções"
-                                           class="open-AddComplexQuestionDialog btn
-                               btn-primary btn-block">
-                                            <div class="text-left">
-
-                                                <i class="far fa-check-square"></i>
-                                                Várias Opções
-                                            </div>
-                                        </a>
-
-
-                                    </div>
-
-
+                                    <i class="far fa-calendar-alt"></i>
+                                    Data
                                 </div>
+                            </a>
 
-                            </div>
+                            <a data-field-type="Text"
+                               data-field-icon="fas fa-i-cursor"
+                               data-question_type="input-text"
+                               title="Text"
+                               class="open-AddSimpleQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="fas fa-i-cursor"></i>
+                                    Text
+                                </div>
+                            </a>
+
+                            <a data-field-type="Parágrafo"
+                               data-field-icon="fas fa-align-left"
+                               data-question_type="textarea"
+                               title="Parágrafo"
+                               class="open-AddSimpleQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="fas fa-align-left"></i>
+                                    Parágrafo
+                                </div>
+                            </a>
+
+                            <a data-field-type="Lista"
+                               data-field-icon="fas fa-list-ul"
+                               data-question_type="select"
+                               title="Lista"
+                               class="open-AddComplexQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="fas fa-list-ul"></i>
+                                    Lista
+                                </div>
+                            </a>
+
+                            <a data-field-type="Múltipla Escolha"
+                               data-field-icon="far fa-check-circle"
+                               data-question_type="radio-group"
+                               title="Múltipla Escolha"
+                               class="open-AddComplexQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="far fa-check-circle"></i>
+                                    Múltipla Escolha
+                                </div>
+                            </a>
+
+                            <a data-field-type="Várias Opções"
+                               data-field-icon="far fa-check-square"
+                               data-question_type="checkbox-group"
+                               title="Várias Opções"
+                               class="open-AddComplexQuestionDialog btn
+                               btn-primary btn-block">
+                                <div class="text-left">
+
+                                    <i class="far fa-check-square"></i>
+                                    Várias Opções
+                                </div>
+                            </a>
+
 
                         </div>
+
 
                     </div>
 
                 </div>
 
             </div>
+
         </div>
 
     </div>
+
+
+
+
 
     <!-- Modals -->
     <div class="modal fade" id="addQuestion"
@@ -424,10 +408,10 @@
             $('#options').show();
 
             if (question_type === 'select') {
-                console.log('BANANA => ' +  question_type);
+                console.log('BANANA => ' + question_type);
                 $('#intro').show();
             } else {
-                 $('#intro').hide();
+                $('#intro').hide();
             }
 
             $('#addQuestion').modal('show');
