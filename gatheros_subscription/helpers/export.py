@@ -6,8 +6,16 @@ from openpyxl import Workbook
 from six import BytesIO
 
 from payment.models import Transaction
+from survey.models import Answer
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
+
+def get_object_value(obj, attr):
+    if not hasattr(obj, attr):
+        return ''
+
+    return getattr(obj, attr)
 
 
 def export_event_data(event):
@@ -24,7 +32,9 @@ def export_event_data(event):
     ws1 = wb.active
     ws1.title = 'Participantes'
 
-    _export_subscriptions(ws1, event.subscriptions.all())
+    subscriptions = event.subscriptions.all()
+
+    _export_subscriptions(ws1, subscriptions)
 
     has_paid_lots = False
     for lot in event.lots.all():
@@ -34,6 +44,10 @@ def export_event_data(event):
 
     if has_paid_lots:
         _export_payments(wb.create_sheet(title='Pagamentos'), event)
+
+    for ev_survey in event.surveys.all():
+        title = 'Formulário - {}'.format(ev_survey.survey.name)
+        _export_survey_answers(wb.create_sheet(title=title), ev_survey)
 
     wb.save(stream)
 
@@ -65,17 +79,9 @@ def _export_subscriptions(worksheet, subscriptions):
         'CRIADO EM',
     ])
 
-    def get_object_value(obj, attr):
-        if not hasattr(obj, attr):
-            return ''
-
-        return getattr(obj, attr)
-
     collector = {}
-    for row_idx, sub in enumerate(subscriptions):
-        if row_idx == 0:
-            continue
-
+    row_idx = 1
+    for sub in subscriptions:
         if row_idx not in collector:
             collector[row_idx] = []
 
@@ -108,12 +114,15 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(get_object_value(person, 'function'))
         collector[row_idx].append(sub.created.strftime('%d/%m/%Y %H:%M:%S'))
 
+        row_idx += 1
+
     for row in collector.keys():
         worksheet.append(collector[row])
 
 
 def _export_payments(worksheet, event):
     worksheet.append([
+        'CÓDIGO',
         'NOME',
         'TIPO',
         'STATUS',
@@ -125,10 +134,8 @@ def _export_payments(worksheet, event):
     transactions = Transaction.objects.filter(subscription__event=event)
 
     collector = {}
-    for row_idx, transaction in enumerate(transactions):
-        if row_idx == 0:
-            continue
-
+    row_idx = 1
+    for transaction in transactions:
         if row_idx not in collector:
             collector[row_idx] = []
 
@@ -139,12 +146,76 @@ def _export_payments(worksheet, event):
             "%Y-%m-%dT%H:%M:%S.%fZ"
         )
 
+        collector[row_idx].append(get_object_value(sub, 'code'))
         collector[row_idx].append(sub.person.name)
         collector[row_idx].append(transaction.get_type_display())
         collector[row_idx].append(transaction.get_status_display())
         collector[row_idx].append(created.strftime('%d/%m/%Y %H:%M:%S'))
         collector[row_idx].append(transaction.amount)
         collector[row_idx].append(transaction.liquid_amount)
+
+        row_idx += 1
+
+    for row in collector.keys():
+        worksheet.append(collector[row])
+
+
+def _export_survey_answers(worksheet, event_survey):
+    """
+    Exporta as respostas de survey.
+    """
+
+    columns = [
+        'CÓDIGO',
+        'NOME',
+        'E-MAIL',
+    ]
+
+    survey = event_survey.survey
+    subscriptions = event_survey.event.subscriptions.all()
+    questions = survey.questions.all().order_by('order')
+
+    # Lista a ser consultada para pegar a sequência de colunas de perguntas.
+    question_pks = []
+    for question in questions:
+        # Adiciona coluna da pergunta
+        columns.append(str(question.label).upper())
+
+        # Marca coluna da pergunta pelo índice da lista
+        question_pks.append(question.pk)
+
+    worksheet.append(columns)
+
+    collector = {}
+    row_idx = 1
+    for sub in subscriptions:
+        person = sub.person
+
+        if row_idx not in collector:
+            collector[row_idx] = []
+
+        answers = Answer.objects.filter(
+            question__survey=survey,
+            author__user=person.user,
+        ).order_by('question__order')
+
+        if not answers:
+            continue
+
+        collector[row_idx].append(get_object_value(sub, 'code'))
+        collector[row_idx].append(person.name)
+        collector[row_idx].append(person.email)
+
+        for answer in answers:
+            question = answer.question
+
+            # Varrer até achar a coluna da pergunta
+            for question_pk in question_pks:
+                if question_pk == question.pk:
+                    # Se não há resposta, deixar em branco.
+                    collector[row_idx].append(answer.get_human_display())
+
+        row_idx += 1
 
     for row in collector.keys():
         worksheet.append(collector[row])
