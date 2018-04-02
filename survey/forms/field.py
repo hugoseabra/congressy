@@ -1,7 +1,10 @@
-from django.core.exceptions import FieldError
-from django.forms import fields, widgets
+from __future__ import unicode_literals
 
-from core.forms.widgets import DateInput, DateTimeInput, TelephoneInput
+from django.core.exceptions import FieldError
+from django.forms import fields, widgets, SelectDateWidget
+
+from core.forms.widgets import DateTimeInput, TelephoneInput
+from core.util.date import create_years_list
 
 
 class SurveyField(object):
@@ -192,7 +195,10 @@ class SurveyField(object):
             widget = self._configure_widget(widgets.NumberInput)
 
         if self.type == self.FIELD_INPUT_DATE:
-            widget = self._configure_widget(DateInput, format='%d/%m/%Y')
+            widget = SelectDateWidget(
+                attrs=({'style': 'width: 30%; display: inline-block;'}),
+                years=create_years_list(),
+            )
 
         if self.type == self.FIELD_INPUT_DATETIME:
             widget = self._configure_widget(

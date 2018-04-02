@@ -44,10 +44,11 @@ class SurveyDirectorTest(TestCase):
         # Test falhando
         with self.assertRaises(ValueError):
             event = 'não sou um evento, sou uma string'
-            SurveyDirector(event=event)
+            SurveyDirector(event=event, user=self.user)
 
         # Test passando
-        self.assertIsInstance(SurveyDirector(event=self.event), SurveyDirector)
+        self.assertIsInstance(SurveyDirector(event=self.event, user=self.user),
+                              SurveyDirector)
 
     def test_get_forms_user_with_no_authorship(self):
         """
@@ -61,9 +62,9 @@ class SurveyDirectorTest(TestCase):
             perguntas dentro do survey em si.
 
         """
-        director = SurveyDirector(event=self.event)
+        director = SurveyDirector(event=self.event, user=self.unused_user)
 
-        survey_forms_list = director.get_forms(user=self.unused_user)
+        survey_forms_list = director.get_forms()
 
         self.assertIs(1, len(survey_forms_list))
 
@@ -87,36 +88,15 @@ class SurveyDirectorTest(TestCase):
         # Verificando se de fato temos 3 perguntas
         self.assertIs(3, len(self.answers))
 
-        director = SurveyDirector(event=self.event)
+        director = SurveyDirector(event=self.event, user=self.user)
 
-        survey_forms_list = director.get_forms(user=self.user)
+        survey_forms_list = director.get_forms()
 
         # Verificando que só temos uma instancia de event_survey
         self.assertIs(1, len(survey_forms_list))
 
         # Verificando que há 3 respostas no initial.
         self.assertIs(3, len(survey_forms_list[0].initial))
-
-    def test_get_form_no_user(self):
-        """
-            Teste para validação do funcionamento do método 'get_form'.
-
-            Chamar o método sem um usuario deve retornar uma um objeto
-            do tipo 'SurveyForm'
-
-            Esse objeto não  deve vir 'populado' dentro do
-            'inital' pois a ausência de um  usuário passado via parâmetro
-            implica na ausencia de respostas('answers').
-        """
-
-        director = SurveyDirector(event=self.event)
-
-        survey_form = director.get_form(survey=self.survey)
-
-        self.assertIsInstance(survey_form, SurveyForm)
-
-        # Verificando que não há nada no initial.
-        self.assertIs(0, len(survey_form.initial))
 
     def test_get_form_user_with_no_authorship(self):
         """
@@ -130,10 +110,9 @@ class SurveyDirectorTest(TestCase):
             do formulário('survey') em questão.
         """
 
-        director = SurveyDirector(event=self.event)
+        director = SurveyDirector(event=self.event, user=self.unused_user)
 
-        survey_form = director.get_form(survey=self.survey,
-                                        user=self.unused_user)
+        survey_form = director.get_form(survey=self.survey)
 
         self.assertIsInstance(survey_form, SurveyForm)
 
@@ -151,10 +130,9 @@ class SurveyDirectorTest(TestCase):
             usuario possui 3 autorias dentro deste  formulário('survey').
         """
 
-        director = SurveyDirector(event=self.event)
+        director = SurveyDirector(event=self.event, user=self.user)
 
-        survey_form = director.get_form(survey=self.survey,
-                                        user=self.user)
+        survey_form = director.get_form(survey=self.survey)
 
         self.assertIsInstance(survey_form, SurveyForm)
 

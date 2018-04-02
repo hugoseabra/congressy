@@ -6,6 +6,7 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User, AnonymousUser
+from django.db import IntegrityError
 from faker import Faker
 
 from gatheros_event.models import Event, Category, Organization
@@ -28,9 +29,16 @@ class MockFactory:
 
         first_name = self.fake_factory.name().split(' ')[0]
 
-        return User.objects.create_user(first_name,
-                                        self.fake_factory.free_email(),
-                                        '123')
+        try:
+            user = User.objects.create_user(first_name,
+                                            self.fake_factory.free_email(),
+                                            '123')
+        except IntegrityError:
+            first_name = self.fake_factory.name().split(' ')[0]
+            user = User.objects.create_user(first_name,
+                                            self.fake_factory.free_email(),
+                                            '123')
+        return user
 
     def fake_event(self, organization=None):
 

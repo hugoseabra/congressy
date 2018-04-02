@@ -13,13 +13,14 @@ class SurveyDirector(object):
         Implementação principal do diretor conforme as especificações do módulo
     """
 
-    def __init__(self, event) -> None:
+    def __init__(self, event, user) -> None:
         """
 
         Este construtor tem como intenção buscar todos os objetos de survey
         que estão vinculados a um evento.
 
         :param event: uma instância  de um evento.
+        :param user: uma instância de um usuario na plataforma.
         """
 
         if not isinstance(event, Event):
@@ -28,10 +29,12 @@ class SurveyDirector(object):
             raise ValueError(msg)
 
         self.event = event
+        self.user = user
         self.event_surveys = EventSurvey.objects.filter(event=self.event)
+
         super().__init__()
 
-    def get_forms(self, user) -> list:
+    def get_forms(self) -> list:
         """
 
         Este método é responsável por retornar uma lista de objetos do tipo
@@ -40,9 +43,6 @@ class SurveyDirector(object):
         Esses objetos da lista já devem vir 'populados' quando o usuário
         passado via parâmetro possua algum autoria de qualquer respostas(
         'answer') de um formulário('survey').
-
-        :param user: um objeto usuario, normalmente resgatado pela
-        requisição('request')
 
         :return: survey_forms_list: uma lista de formulários de survey
         """
@@ -61,7 +61,7 @@ class SurveyDirector(object):
                     Resgatar a autoria para poder popular as respostas dos
                     objetos de 'survey'
                 """
-                author = Author.objects.get(survey=survey, user=user)
+                author = Author.objects.get(survey=survey, user=self.user)
 
                 answers = {}  # lista que guarda as respostas dessa autoria
 
@@ -85,11 +85,10 @@ class SurveyDirector(object):
 
         return survey_forms_list
 
-    @staticmethod
-    def get_form(survey, user=None) -> SurveyForm:
+    def get_form(self, survey, data={}) -> SurveyForm:
         """
 
-        Este método é responsável por retornar uma lista de objetos do tipo
+        Este método é responsável por retornar um objeto do tipo
         'SurveyForm' este objeto que em si é uma instância de 'forms.Form'.
 
         Esse objeto já deve vir 'populado' quando o usuário
@@ -97,21 +96,19 @@ class SurveyDirector(object):
         'answer') de um formulário('survey').
 
 
-        :param user: um objeto usuario, normalmente resgatado pela
-                        requisição('request')
-        :param survey: uma instância de um formulário
+        :param survey: uma instância de um objeto de formulário
+        :param data: um dict contendo as novas respostas que serão
+                vinculadas ao form
+
         :return SurveyForm: um objeto de SurveyForm
         """
 
-        author = None
+        try:
+            author = Author.objects.get(survey=survey, user=self.user)
+        except Author.DoesNotExist:
+            author = None
 
-        answers = {}  # lista que guarda as respostas dessa autoria
-
-        if user:
-            try:
-                author = Author.objects.get(survey=survey, user=user)
-            except Author.DoesNotExist:
-                pass
+        answers = {}  # lista que guarda as respostas dessa autoria caso haja.
 
         if author:
             try:
@@ -134,6 +131,15 @@ class SurveyDirector(object):
                 pass
 
         if any(answers):
-            return SurveyForm(survey=survey, initial=answers)
+            return SurveyForm(
+                survey=survey,
+                initial=answers,
+                data=data,
+                user=self.user
+            )
 
-        return SurveyForm(survey=survey)
+        return SurveyForm(
+            survey=survey,
+            data=data,
+            user=self.user
+        )
