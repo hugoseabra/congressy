@@ -75,11 +75,10 @@ class Answer(Entity, models.Model):
         super().save(*args, **kwargs)
 
     def get_human_display(self):
-        if not self.question.accepts_options:
+        if not self.question.accepts_options or not self.human_display:
             return ''
 
-        option = self.question.options.get(value=self.value)
-        return option.name
+        return self.human_display
 
     def get_value_display(self):
         """
