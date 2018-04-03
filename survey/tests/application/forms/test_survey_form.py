@@ -2,8 +2,8 @@ from django.test import TestCase
 
 from survey.forms.field import SurveyField
 from survey.forms.survey import SurveyForm
+from survey.models import Option
 from survey.tests import MockFactory
-from survey.models import Answer
 
 
 class SurveyFormTest(TestCase):
@@ -84,9 +84,11 @@ class SurveyFormTest(TestCase):
 
         expected_content = [
             'input',
-            'type="date"',
-            'required',
-            'id="id_some_date"',
+            'Date:',
+            'select',
+            'id="id_some_date_day"',
+            'id="id_some_date_month"',
+            'id="id_some_date_year"',
         ]
 
         for part in expected_content:
@@ -106,7 +108,7 @@ class SurveyFormTest(TestCase):
 
         expected_content = [
             'input',
-            'type="datetime-local"',
+            'type="tel"',
             'required',
             'id="id_some_datetime"',
         ]
@@ -212,12 +214,19 @@ class SurveyFormTest(TestCase):
             ('option 3', 'Option 3'),
         ]
 
+        for option in options:
+            Option.objects.create(
+                question=self.question,
+                value=option[0],
+                name=option[1]
+            )
+
         data = {
             'name': 'select-field',
             'field_type': SurveyField.FIELD_SELECT,
             'label': 'my select field',
             'required': True,
-            'options': options
+            'options': self.question.options
         }
 
         form = SurveyForm(survey=self.survey)
@@ -244,11 +253,18 @@ class SurveyFormTest(TestCase):
             ('option 3', 'Option 3'),
         ]
 
+        for option in options:
+            Option.objects.create(
+                question=self.question,
+                value=option[0],
+                name=option[1]
+            )
+
         data = {
             'name': 'checkbox-group',
             'field_type': SurveyField.FIELD_CHECKBOX_GROUP,
             'label': 'my checkobox group',
-            'options': options
+            'options': self.question.options
         }
 
         form = SurveyForm(survey=self.survey)
@@ -274,11 +290,18 @@ class SurveyFormTest(TestCase):
             ('option 3', 'Option 3'),
         ]
 
+        for option in options:
+            Option.objects.create(
+                question=self.question,
+                value=option[0],
+                name=option[1]
+            )
+
         data = {
             'name': 'radio-group',
             'field_type': SurveyField.FIELD_RADIO_GROUP,
             'label': 'my radio group',
-            'options': options
+            'options': self.question.options
         }
 
         form = SurveyForm(survey=self.survey)
