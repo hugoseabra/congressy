@@ -325,7 +325,7 @@
                 </div>
                 <div class="modal-body">
 
-                    <form>
+                    <form onsubmit="editQuestion(this)">
 
                         <div class="form-group">
 
@@ -419,20 +419,26 @@
                             </div>
                         </div>
 
+                        <input type="hidden" name="question_id"
+                               id="question_id">
+
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-danger"
+                                    data-dismiss="modal">Cancelar
+                            </button>
+                            <button id="#editQuestion"
+                                    type="submit"
+                                    class="btn btn-success ">Salvar
+                            </button>
+                        </div>
+
 
                     </form>
 
+
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-danger"
-                            data-dismiss="modal">Cancelar
-                    </button>
-                    <button type="button"
-                            class="btn btn-success question_edit">Salvar
-                    </button>
-                </div>
 
             </div>
 
@@ -560,11 +566,10 @@
             var question_label = question.find('label').html().replace(':', '');
             var question_help_text = question.find('.help-text').html();
             var question_type = question.find('[data-question-type]').data('question-type');
+            var question_id = question.find('[data-question-id]').data('question-id');
+
             var has_empty = false;
             var has_options = false;
-
-
-            console.log(question_type);
 
             if (complex_question_types.indexOf(question_type) > -1) {
 
@@ -625,6 +630,7 @@
 
 
             $('#editQuestion').modal('show');
+            $('#question_id').val(question_id);
 
             if (has_empty) {
                 $('#id_intro_edit').trigger('click');
@@ -672,6 +678,49 @@
                 "']");
             questionListEl.remove();
         });
+
+        function editQuestion(form) {
+            /*
+                CONTINUE HERE
+             */
+
+
+            console.log($(form));
+
+            var data = JSON.stringify($(form).serializeArray()); //  <-----------
+
+            console.log(data);
+
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            $.ajax({
+                type: "POST",
+                url: location.pathname,
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: {
+                    action: 'edit',
+                    question: data
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Pergunta editada com sucesso!',
+                        type: 'success'
+                    });
+                    updateFields();
+                },
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel editar sua pergunta.',
+                        type: 'error'
+                    });
+                    updateFields();
+                }
+            });
+
+            return false;
+        }
 
 
         function createFieldList() {
