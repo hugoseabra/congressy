@@ -54,8 +54,8 @@ class AnswerModelTest(TestCase):
 
     def test_answer_with_human_display_when_selectable_question(self):
         """
-        Testa se resposta de uma pergunta com suporte a opções sempre possui
-        saída de valor para o usuário (human_display).
+            Testa se resposta de uma pergunta com suporte a opções sempre possui
+            saída de valor para o usuário (human_display).
         """
 
         answer = Answer(

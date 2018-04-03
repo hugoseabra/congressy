@@ -111,7 +111,7 @@ class QuestionModelTest(TestCase):
         )
         question.save()
 
-        self.assertFalse(question.has_options)
+        self.assertFalse(question.has_answers)
 
         # Cria três opções vinculadas a essa pergunta
         for _ in range(3):
@@ -120,7 +120,7 @@ class QuestionModelTest(TestCase):
 
         question = Question.objects.get(pk=question.pk)
 
-        self.assertTrue(question.has_options)
+        self.assertTrue(question.has_answers)
 
 
 class QuestionManagerTest(TestCase):

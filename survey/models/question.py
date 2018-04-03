@@ -143,8 +143,7 @@ class Question(Entity, models.Model):
     @property
     def has_answers(self):
         """ Pergunta só pode ser editado caso não possua nenhuma respostas """
-        return False
-
+        return self.answers.count() > 0
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

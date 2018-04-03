@@ -74,11 +74,22 @@ class Answer(Entity, models.Model):
         self.human_display = self.get_human_display()
         super().save(*args, **kwargs)
 
-    def get_human_display(self):
-        if not self.question.accepts_options or not self.human_display:
-            return ''
+    def get_human_display(self) -> str:
+        """
+            Se a pergunta suporta opções e de fato possui alguma opção em
+            que os valores batem, retorne o nome dessa opção como o nome de
+            humanos.
+        :return: string
+        """
+        if self.question.accepts_options and self.question.has_options:
 
-        return self.human_display
+            options = self.question.options.all().filter(
+                value=self.value)
+
+            if options.count() > 0:
+                return options.first().name
+
+        return ''
 
     def get_value_display(self):
         """
