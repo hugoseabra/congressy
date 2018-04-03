@@ -6,7 +6,9 @@ from django.forms import ValidationError
 from test_plus.test import TestCase
 
 from survey.models import Answer, Question
+from survey.models.answer import SameSurveyRule
 from survey.tests import MockFactory
+from survey.models.mixins import RuleIntegrityError
 
 
 class AnswerModelTest(TestCase):
@@ -74,3 +76,23 @@ class AnswerModelTest(TestCase):
 
         self.assertIsNotNone(answer.human_display)
         self.assertEqual(answer.human_display, self.option.name)
+
+    def test_answer_SameSurveyRule_checker(self):
+
+        checker = SameSurveyRule()
+
+        # Test passando com o author e pergunta do mesmo survey.
+        checker.question = self.question
+        checker.author = self.author
+
+        checker.check()
+
+        # Teste falhando com author e pergunta com diferentes surveys.
+        new_survey = self.faker.fake_survey()
+        new_author = self.faker.fake_author(survey=new_survey)
+
+        checker.question = self.question
+        checker.author = new_author
+
+        with self.assertRaises(RuleIntegrityError):
+            checker.check()
