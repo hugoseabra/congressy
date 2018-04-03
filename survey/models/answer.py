@@ -90,7 +90,7 @@ class Answer(Entity, models.Model):
             if options.count() > 0:
                 return options.first().name
 
-        return ''
+        return self.get_value_display()
 
     def get_value_display(self):
         """
