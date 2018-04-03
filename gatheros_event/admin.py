@@ -23,7 +23,7 @@ class EventAdmin(admin.ModelAdmin):
     """
     Admin para Event
     """
-    search_fields = ('name',)
+    search_fields = ('name', 'organization__name', 'category__name',)
     list_display = (
         'name',
         'get_partner_percents',
