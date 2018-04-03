@@ -75,9 +75,13 @@ class MockFactory:
         )
 
     def fake_option(self, question):
+
+        name = ' '.join(self.fake_factory.words(nb=2))
+        value = name.replace(' ', '-')
+
         return Option.objects.create(
-            name=' '.join(self.fake_factory.words(nb=2)),
-            value=str(randint(0, 100)),
+            name=name,
+            value=value,
             question=question,
         )
 
