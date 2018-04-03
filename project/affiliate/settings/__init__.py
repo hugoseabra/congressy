@@ -11,6 +11,7 @@ INSTALLED_APPS += [
     'mailer',
     'affiliate',
     'hotsite',
+    'bitly',
 ]
 # ========================= SERVER CONFIGURATION ============================ #
 WSGI_APPLICATION = 'project.wsgi.application'

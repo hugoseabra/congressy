@@ -1,0 +1,26 @@
+[
+  {
+    "model": "sites.site",
+    "pk": 1,
+    "fields": {
+      "domain": "ev.congressy.com",
+      "name": "ev.congressy.com"
+    }
+  },
+  {
+    "model": "sites.site",
+    "pk": 2,
+    "fields": {
+      "domain": "parceiros.congressy.com",
+      "name": "parceiros.congressy.com"
+    }
+  },
+  {
+    "model": "sites.site",
+    "pk": 3,
+    "fields": {
+      "domain": "afiliados.congressy.com",
+      "name": "afiliados.congressy.com"
+    }
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "model": "sites.site",
+    "pk": 1,
+    "fields": {
+      "domain": "0.0.0.0:8000",
+      "name": "0.0.0.0:8000"
+    }
+  },
+  {
+    "model": "sites.site",
+    "pk": 2,
+    "fields": {
+      "domain": "0.0.0.0:8001",
+      "name": "0.0.0.0:8001"
+    }
+  },
+  {
+    "model": "sites.site",
+    "pk": 3,
+    "fields": {
+      "domain": "0.0.0.0:8002",
+      "name": "0.0.0.0:8002"
+    }
+  }
+]
