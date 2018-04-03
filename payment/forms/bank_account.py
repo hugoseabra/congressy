@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django import forms
+from django.conf import settings
 from localflavor.br.forms import BRCPFField, BRCNPJField
 
 from core.forms.cleaners import clear_string
@@ -8,7 +11,6 @@ from payment.tasks import create_pagarme_recipient
 
 
 class BankAccountForm(forms.ModelForm):
-    create_pagarme_recipient = True
     type_of_document = forms.BooleanField(label='Tipo de Documento',
                                           required=False)
 
@@ -35,9 +37,14 @@ class BankAccountForm(forms.ModelForm):
         super(BankAccountForm, self).__init__(data=data, *args,
                                               **kwargs)
 
-        banking_required_fields = ['bank_code', 'agency', 'account',
-                                   'account_dv', 'document_number',
-                                   'account_type']
+        banking_required_fields = [
+            'bank_code',
+            'agency',
+            'account',
+            'account_dv',
+            'document_number',
+            'account_type'
+        ]
 
         for field in banking_required_fields:
             self.fields[field].required = True
@@ -57,8 +64,8 @@ class BankAccountForm(forms.ModelForm):
             'type': cleaned_data.get('account_type'),
         }
 
-        try:
-            if self.create_pagarme_recipient is True:
+        if getattr(settings, 'DEBUG', False):
+            try:
                 recipient = \
                     create_pagarme_recipient(recipient_dict=recipient_dict)
 
@@ -67,16 +74,22 @@ class BankAccountForm(forms.ModelForm):
                 self.recipient_id = recipient['id']
                 self.date_created = recipient['bank_account']['date_created']
 
-        except PaymentExceptions.RecipientError as e:
-            error_dict = {
-                "Unknown API error": "Problema ao criar conta. Tente "
-                                     "novamente depois."
-            }
+            except PaymentExceptions.RecipientError as e:
+                error_dict = {
+                    "Unknown API error": "Problema ao criar conta. Tente "
+                                         "novamente depois."
+                }
 
-            if e.message in error_dict:
-                e.message = error_dict[e.message]
+                if e.message in error_dict:
+                    e.message = error_dict[e.message]
 
-            raise forms.ValidationError(e.message)
+                raise forms.ValidationError(e.message)
+
+        else:
+            self.bank_account_id = '17750917'
+            self.document_type = 'cpf'
+            self.recipient_id = 're_cjf8qj7vw04i6uq6evavl3cxn'
+            self.date_created = datetime.now()
 
         return cleaned_data
 
