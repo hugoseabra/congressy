@@ -1,4 +1,5 @@
 from django import forms
+from django.db import transaction
 from django.forms.utils import ErrorList
 from django.utils import six
 from django.utils.datastructures import OrderedDict
@@ -71,15 +72,16 @@ class CombinedFormBase(forms.Form):
         return self.save_all(commit=commit)
 
     def save_all(self, commit=True):
-        for form_name, form in self.form_instances.items():
-            if not callable(form.save):
-                raise Exception(
-                    'O formulário "{}" não possui o método save().'.format(
-                        form_name
+        with transaction.atomic():
+            for form_name, form in self.form_instances.items():
+                if not callable(form.save):
+                    raise Exception(
+                        'O formulário "{}" não possui o método save().'.format(
+                            form_name
+                        )
                     )
-                )
 
-            self.instances[form_name] = form.save(commit=commit)
+                self.instances[form_name] = form.save(commit=commit)
 
         return self.instances
 

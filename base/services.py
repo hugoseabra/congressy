@@ -128,4 +128,3 @@ class ApplicationService(forms.Form):
 
     def _get_manager_kwargs(self, **kwargs):
         return kwargs
-
