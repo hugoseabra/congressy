@@ -43,14 +43,11 @@ class Affiliate(EntityMixin, models.Model):
         null=True,
     )
 
-    recipient_id = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True,
-    )
-
     def __str__(self):
-        return self.person.name
+        return 'Affiliate {} - {}'.format(
+            self.person.name,
+            self.get_status_display()
+        )
 
     class Meta:
         verbose_name = 'Afiliado'

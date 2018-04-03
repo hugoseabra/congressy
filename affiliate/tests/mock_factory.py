@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from faker import Faker
 
-from affiliate.models import Affiliate
+from affiliate.models import Affiliate, Affiliation
 from gatheros_event.models import Person, Event, Organization, Category
 from payment.models import BankAccount
 
@@ -66,4 +66,22 @@ class MockFactory:
         return Affiliate.objects.create(
             person=person,
             bank_account=bank_account
+        )
+
+    def create_fake_affiliation(self, affiliate=None, event=None):
+
+        if not affiliate:
+            affiliate = self.create_fake_affiliate()
+
+        if not event:
+            event = self.create_fake_event()
+
+        return Affiliation.objects.create(
+            affiliate=affiliate,
+            event=event,
+            percent=5,
+            link_whatsapp='link_whatsapp.com',
+            link_facebook='link_facebook.com',
+            link_twitter='link_twitter.com',
+            link_direct='link_direct.com',
         )

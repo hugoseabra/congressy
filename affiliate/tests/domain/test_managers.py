@@ -12,7 +12,6 @@ class AffiliateManagerPersistenceTest(ManagerPersistenceTestCase):
     manager_class = managers.AffiliateManager
     required_fieds = ('person',)
     data_edit_to = {
-        'recipient_id': 'bbbbbbb',
         'status': constants.SUSPENDED,
     }
 
@@ -22,7 +21,6 @@ class AffiliateManagerPersistenceTest(ManagerPersistenceTestCase):
 
         self.data = {
             'person': person.pk,
-            'recipient_id': 'aaaaaaaaaa',
         }
 
     def test_create(self):
