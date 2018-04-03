@@ -40,8 +40,8 @@ class AnswerModelTest(TestCase):
         with self.assertRaises(ValidationError) as e:
             answer.clean()
             self.assertEqual(
-                str(e.msg, 'A pergunta e o autor não pertencem ao mesmo '
-                           'questionário.'))
+                str(e.msg), 'A pergunta e o autor não pertencem ao mesmo '
+                            'questionário.')
 
         # Correct answer cleaning just for peace of mind.
         new_answer = Answer(
@@ -54,31 +54,7 @@ class AnswerModelTest(TestCase):
         new_answer.save()
         self.assertIsInstance(new_answer, Answer)
 
-    def test_answer_with_human_display_when_selectable_question(self):
-        """
-            Testa se resposta de uma pergunta com suporte a opções sempre possui
-            saída de valor para o usuário (human_display).
-        """
-
-        answer = Answer(
-            question=self.question,
-            value=self.option.value,
-            author=self.author,
-        )
-
-        self.assertIsNotNone(answer.get_human_display())
-        self.assertEqual(answer.get_human_display(), self.option.name)
-
-        self.assertIsNotNone(answer.get_value_display())
-        self.assertEqual(answer.get_value_display(), self.option.value)
-
-        answer.save()
-
-        self.assertIsNotNone(answer.human_display)
-        self.assertEqual(answer.human_display, self.option.name)
-
     def test_answer_SameSurveyRule_checker(self):
-
         checker = SameSurveyRule()
 
         # Test passando com o author e pergunta do mesmo survey.
