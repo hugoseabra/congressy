@@ -1,5 +1,7 @@
+import random
 from django.test import TestCase
 
+from survey import constants
 from survey.forms.field import SurveyField
 from survey.forms.survey import SurveyForm
 from survey.models import Option
@@ -10,17 +12,17 @@ class SurveyFormTest(TestCase):
     """ Testa renderização de campos do formulário dinâmico. """
 
     def setUp(self):
-        fake_factory = MockFactory()
-        self.survey = fake_factory.fake_survey()
-        self.user = fake_factory.fake_user()
-        self.question = fake_factory.fake_question(survey=self.survey)
-        self.author = fake_factory.fake_author(survey=self.survey,
-                                               user=self.user)
-        self.anon_author = fake_factory.fake_author(survey=self.survey)
+        self.fake_factory = MockFactory()
+        self.survey = self.fake_factory.fake_survey()
+        self.user = self.fake_factory.fake_user()
+        self.question = self.fake_factory.fake_question(survey=self.survey)
+        self.author = self.fake_factory.fake_author(survey=self.survey,
+                                                    user=self.user)
+        self.anon_author = self.fake_factory.fake_author(survey=self.survey)
 
-        self.answer = fake_factory.fake_answer(question=self.question,
-                                               author=self.author)
-        self.non_authored_answer = fake_factory.fake_answer(
+        self.answer = self.fake_factory.fake_answer(question=self.question,
+                                                    author=self.author)
+        self.non_authored_answer = self.fake_factory.fake_answer(
             question=self.question,
             author=self.anon_author)
 
@@ -352,3 +354,141 @@ class SurveyFormTest(TestCase):
 
         self.assertEqual(len(persisted_answer_list), 1)
         self.assertEqual(persisted_answer_list[0].pk, self.answer.pk)
+
+    def test_save_input_date(self):
+
+        input_date_survey = self.fake_factory.fake_survey()
+        input_date_question = self.fake_factory.fake_question(
+            survey=input_date_survey,
+            type=constants.FIELD_INPUT_DATE
+        )
+
+        form = SurveyForm(survey=input_date_survey, user=self.user, data={
+            input_date_question.name: self.fake_factory.fake_factory.date(
+                pattern="%Y-%m-%d", end_datetime=None)
+        })
+
+        self.assertTrue(form.is_valid())
+
+        form.save_answers()
+
+    def test_save_input_text(self):
+
+        input_text_survey = self.fake_factory.fake_survey()
+        input_text_question = self.fake_factory.fake_question(
+            survey=input_text_survey,
+            type=constants.FIELD_INPUT_TEXT
+        )
+
+        form = SurveyForm(survey=input_text_survey, user=self.user, data={
+            input_text_question.name: self.fake_factory.fake_factory.words(
+                nb=2)
+        })
+
+        self.assertTrue(form.is_valid())
+
+        form.save_answers()
+
+    def test_save_input_textarea(self):
+
+        input_textarea_survey = self.fake_factory.fake_survey()
+        input_textarea_question = self.fake_factory.fake_question(
+            survey=input_textarea_survey,
+            type=constants.FIELD_TEXTAREA
+        )
+
+        form = SurveyForm(survey=input_textarea_survey, user=self.user, data={
+            input_textarea_question.name: self.fake_factory.fake_factory.words(
+                nb=15)
+        })
+
+        self.assertTrue(form.is_valid())
+
+        form.save_answers()
+
+    def test_save_input_select(self):
+
+        input_select_survey = self.fake_factory.fake_survey()
+        input_select_question = self.fake_factory.fake_question(
+            survey=input_select_survey,
+            type=constants.FIELD_SELECT
+        )
+
+        option_list = []
+
+        for _ in range(5):
+            option = self.fake_factory.fake_option(
+                question=input_select_question)
+            option_list.append(option)
+
+        selected_option = random.choice(option_list)
+
+        form = SurveyForm(survey=input_select_survey, user=self.user, data={
+            input_select_question.name: selected_option.name
+        })
+
+        form.is_valid()
+
+        self.assertTrue(form.is_valid())
+
+        form.save_answers()
+
+    def test_save_input_radio_group(self):
+
+        input_radio_group_survey = self.fake_factory.fake_survey()
+        input_radio_group_question = self.fake_factory.fake_question(
+            survey=input_radio_group_survey,
+            type=constants.FIELD_RADIO_GROUP
+        )
+
+        option_list = []
+
+        for _ in range(5):
+            option = self.fake_factory.fake_option(
+                question=input_radio_group_question)
+            option_list.append(option)
+
+        selected_option = random.choice(option_list)
+
+        form = SurveyForm(survey=input_radio_group_survey, user=self.user,
+                          data={
+                              input_radio_group_question.name:
+                                  selected_option.name
+                          })
+
+        form.is_valid()
+
+        self.assertTrue(form.is_valid())
+
+        form.save_answers()
+
+    def test_save_input_checkbox_group(self):
+
+        input_checkbox_group_survey = self.fake_factory.fake_survey()
+        input_checkbox_group_question = self.fake_factory.fake_question(
+            survey=input_checkbox_group_survey,
+            type=constants.FIELD_CHECKBOX_GROUP
+        )
+
+        option_value_list = []
+        option_name_list = []
+
+        for _ in range(5):
+            option = self.fake_factory.fake_option(
+                question=input_checkbox_group_question)
+            option_value_list.append(option.value)
+            option_name_list.append(option.name)
+
+        form = SurveyForm(survey=input_checkbox_group_survey, user=self.user,
+                          data={
+                              input_checkbox_group_question.name: option_value_list})
+
+        self.assertTrue(form.is_valid())
+
+        persisted_list = form.save_answers()
+
+        self.assertEqual(len(persisted_list), 1)
+
+        self.assertEqual(persisted_list[0].value, str(option_value_list))
+        self.assertEqual(persisted_list[0].human_display,
+                         str(option_name_list))

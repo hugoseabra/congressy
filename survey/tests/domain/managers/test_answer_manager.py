@@ -7,6 +7,7 @@ from test_plus.test import TestCase
 
 from survey.managers import AnswerManager
 from survey.models import Answer
+from survey import constants
 from survey.tests import MockFactory
 
 
@@ -16,7 +17,8 @@ class AnswerManagerTest(TestCase):
     def setUp(self):
         self.faker = MockFactory()
         self.survey = self.faker.fake_survey()
-        self.question = self.faker.fake_question(survey=self.survey)
+        self.question = self.faker.fake_question(survey=self.survey,
+                                                 type=constants.FIELD_SELECT)
         self.person = self.faker.fake_person()
         self.author = self.faker.fake_author(survey=self.survey)
 
@@ -210,3 +212,48 @@ class AnswerManagerTest(TestCase):
                               forms.ValidationError)
         self.assertEqual(error_dict['author'][0].message,
                          'A resposta não pertence a este autor')
+
+    def test_answer_cleaning_set_human_display_com_option(self):
+        """
+            Testa se o metodo clean está setando o campo 'human_display'
+            corretamente na existencia de options na pergunta.
+        """
+
+        # Criando uma instancia de option.
+        created_option = self.faker.fake_option(self.question)
+
+        manager = AnswerManager(
+            data={
+                'value': created_option.value,
+                'question': self.question.pk,
+                'author': self.author.pk,
+            },
+        )
+
+        self.assertTrue(manager.is_valid())
+
+        answer = manager.save()
+
+        self.assertEqual(answer.human_display, created_option.name)
+
+    def test_answer_cleaning_set_human_display_sem_option(self):
+        """
+            Testa se o metodo clean está setando o campo 'human_display'
+            corretamente sem opções vinculadas a pergunta
+        """
+
+        value = 'Um valor qualquer'
+
+        manager = AnswerManager(
+            data={
+                'value': value,
+                'question': self.question.pk,
+                'author': self.author.pk,
+            },
+        )
+
+        self.assertTrue(manager.is_valid())
+
+        answer = manager.save()
+
+        self.assertEqual(answer.human_display, value)
