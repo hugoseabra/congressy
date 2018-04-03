@@ -185,8 +185,7 @@ class SurveyField(object):
         if self.options:
             self.django_field.choices = self.options
 
-        if self.question.can_edit:
-            self.django_field.can_edit = True
+        self.django_field.can_edit = not self.question.has_answers
 
         return self.django_field
 
