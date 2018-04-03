@@ -306,6 +306,139 @@
         </div>
 
     </div>
+
+    <div class="modal fade" id="editQuestion" tabindex="-1" role="dialog">
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <p style="font-size: 15px"
+                       class="modal-title">
+                        Editar pergunta
+                    </p>
+                </div>
+                <div class="modal-body">
+
+                    <form>
+
+                        <div class="form-group">
+
+                            <label>Nome do campo:</label>
+
+                            <small style="color:#C9302C">*</small>
+
+
+                            <div>
+                                <input autofocus="" required=""
+                                       class="form-control form-control"
+                                       id="id_name_edit" type="text">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <label>Texto de ajuda:</label>
+
+                            <div>
+                                <input class="form-control"
+                                       id="id_help_text_edit" type="text">
+
+                                <div>
+                                    <small class="text-muted">Uma instrução
+                                        similar a está para ajudar seu
+                                        participante a entender melhor a
+                                        pergunta.
+                                    </small>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <hr>
+
+                        <div id="intro_edit" style="display: none">
+
+
+                            <div class="form-group">
+
+                                <label for="id_intro">Primeiro campo
+                                    vazio:</label>
+
+
+                                <div>
+
+                                    <input class="js-switch" id="id_intro_edit"
+                                           type="checkbox">
+
+
+                                    <div>
+                                        <small class="text-muted help-text">
+                                            Deixar o primeiro item da lista em
+                                            branco
+                                        </small>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="options_edit" style="display: none">
+
+
+                            <div class="form-group">
+
+                                <label>Opções:</label>
+
+
+                                <div>
+
+                                    <textarea cols="40" rows="10"
+                                              class="form-control"
+                                              id="id_options_edit">
+
+                                    </textarea>
+
+
+                                    <div>
+                                        <small class="text-muted help-text">
+                                            Insira as opções da sua pergunta uma
+                                            linha de cada vez.
+                                        </small>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-danger"
+                            data-dismiss="modal">Cancelar
+                    </button>
+                    <button type="button"
+                            class="btn btn-success question_edit">Salvar
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
     <div class="modal fade" id="confirmDelete"
          role="dialog">
 
@@ -355,8 +488,13 @@
 
     <script type="application/javascript">
 
-        $(document).ready(function () {
+        var complex_question_types = [
+            'select',
+            'checkbox-group',
+            'radio-group'
+        ];
 
+        $(document).ready(function () {
 
             updateFields();
 
@@ -401,13 +539,102 @@
             $('#options').show();
 
             if (question_type === 'select') {
-                console.log('BANANA => ' + question_type);
                 $('#intro').show();
             } else {
                 $('#intro').hide();
             }
 
             $('#addQuestion').modal('show');
+        });
+
+        $(document).on("click", ".js-edit", function () {
+
+
+            var intro_edit = $('#intro_edit');
+            var options_edit = $('#options_edit');
+
+            intro_edit.hide();
+            options_edit.hide();
+
+            var question = $(this).closest('tr');
+            var question_label = question.find('label').html().replace(':', '');
+            var question_help_text = question.find('.help-text').html();
+            var question_type = question.find('[data-question-type]').data('question-type');
+            var has_empty = false;
+            var has_options = false;
+
+
+            console.log(question_type);
+
+            if (complex_question_types.indexOf(question_type) > -1) {
+
+                has_options = true;
+
+                var vals = [];
+                var question_field;
+
+                if (question_type === 'select') {
+
+                    question_field = question.find('select');
+
+                    intro_edit.show();
+
+                    question_field.find('option').each(function () {
+
+
+                        var val = $(this).text();
+
+                        if (val === '- Selecione -') {
+                            has_empty = true
+                        } else {
+                            vals.push(val);
+                        }
+
+
+                    });
+
+                } else if (question_type === 'radio-group') {
+
+                    question_field = question.find('input[type=radio]');
+
+                    question_field.each(function () {
+                        vals.push($(this).val());
+                    });
+                } else if (question_type === 'checkbox-group') {
+
+                    question_field = question.find('input[name=options]');
+
+                    question_field.each(function () {
+                        vals.push($(this).val());
+                    });
+                } else {
+                    throw "cgsy: unknown question type"
+                }
+
+            }
+
+            if (!question_label) {
+                throw 'cgsy-manage: Can\'t find the question field element.'
+            }
+
+            $('#id_name_edit').val(question_label);
+
+            if (question_help_text) {
+                $('#id_help_text_edit').val(question_help_text);
+            }
+
+
+            $('#editQuestion').modal('show');
+
+            if (has_empty) {
+                $('#id_intro_edit').trigger('click');
+            }
+
+            if (has_options) {
+                options_edit.show();
+                $('#id_options_edit').text(vals.join('\n'));
+            }
+
         });
 
         $('#deleteQuestion').on('click', function () {
@@ -504,7 +731,6 @@
                 filter: '.js-remove',
                 handle: ".my-handle",
                 onFilter: function (evt) {
-                    console.log('removed => ' + evt.item.dataset.name);
                     var questionEl = $('#removingQuestion');
                     var questionIdEl = $('#removingQuestionId');
                     var questionNameEl = $('#removingQuestionName');

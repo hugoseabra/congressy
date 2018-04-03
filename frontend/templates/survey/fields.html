@@ -8,7 +8,7 @@
                 data-label="{{ field.label }}">
 
 
-                <div class="table-responsive">
+                <div class="table">
                     <table class="table noborder">
                         <thead>
                         <tr>
@@ -19,25 +19,57 @@
                         </thead>
                         <tbody>
                         <tr>
-                            <td class="col-sm-1 text-center control-buttons my-handle"
-                                style="font-size:2em;">
+                            <td class="col-xs-1 text-center control-buttons
+                            my-handle"
+                                style="background-color:
+                                #f8f8f8;width: 5%">
                                 <i class=" fas fa-arrows-alt"></i>
                             </td>
 
-                            <td class="col-md-8">
+                            <td class="col-md-8"
+                                data-question-type="{{ field.field.field_type }}">
                                 {% render_generic_field field %}
                             </td>
 
                             <td class="col-md-3 control-buttons text-center">
 
 
-                                <i class="js-remove far fa-window-close"
-                                   style="margin-left:130px; padding-bottom:6px"></i>
+                                <div class="btn-group">
+                                    <button
+                                            type="button"
+                                            class="btn
+                                        btn-primary btn-trans
+                                        btn-sm dropdown-toggle"
+                                            data-toggle="dropdown"
+                                            aria-expanded="false"
+                                    >
+                                        <span class="fas fa-cog"></span>
+                                    </button>
+                                    <ul class="dropdown-menu
+                                    dropdown-menu-right"
+                                        role="menu">
 
-                                {% if field.field.can_edit %}
-                                    <i class="far fa-edit"
-                                       style="margin-left:130px;"></i>
-                                {% endif %}
+                                        <li class="js-edit">
+                                            <a href="#">
+
+                                                <i class="fas fa-pencil-alt"
+                                                        {% if field.field.can_edit %}
+                                                   data-has-answers="true"
+                                                        {% endif %}></i>
+                                                Editar
+                                            </a>
+                                        </li>
+
+
+                                        <li class="js-remove">
+                                            <a href="#">
+                                                <i class="fas fa-trash-alt"></i>
+                                                Excluir
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </div>
 
                                 <div class="checkbox">
 
