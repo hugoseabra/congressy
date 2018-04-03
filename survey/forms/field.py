@@ -61,7 +61,7 @@ class SurveyField(object):
         options = []
 
         if question.has_options:
-            options = [(opt.name, opt.value) for opt in
+            options = [(opt.value, opt.name) for opt in
                        question.options.all().order_by('pk')]
 
         self.initial = initial

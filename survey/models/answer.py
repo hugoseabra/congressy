@@ -70,32 +70,3 @@ class Answer(Entity, models.Model):
         auto_now=True,
         verbose_name='criado em'
     )
-
-    def save(self, *args, **kwargs):
-        self.human_display = self.get_human_display()
-        super().save(*args, **kwargs)
-
-    def get_human_display(self) -> str:
-        """
-            Se a pergunta suporta opções e de fato possui alguma opção em
-            que os valores batem, retorne o nome dessa opção como o nome de
-            humanos.
-        :return: string
-        """
-        if self.question.accepts_options and self.question.has_options:
-
-            options = self.question.options.all().filter(
-                value=self.value)
-
-            if options.count() > 0:
-                return options.first().name
-
-        return self.get_value_display()
-
-    def get_value_display(self):
-        """
-        Resgata valor da resposta conforme a sua pergunta: se possui um
-        display humanizado ou não.
-        """
-
-        return self.value

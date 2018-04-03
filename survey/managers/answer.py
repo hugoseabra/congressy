@@ -9,7 +9,7 @@ por:
 from django import forms
 
 from survey.managers import Manager
-from survey.models import Answer
+from survey.models import Answer, Option
 
 
 class AnswerManager(Manager):
@@ -80,6 +80,40 @@ class AnswerManager(Manager):
 
         return author
 
+    def clean(self):
+        """
+            Método responsavel pela limpeza do manager, aplicando a regra
+            que sempre haverá algo no campo 'human_display'
+        """
+
+        cleaned_data = super().clean()
+
+        question = cleaned_data.get('question', None)
+        value = cleaned_data.get('value', None)
+
+        is_list = eval(value)
+
+        if question and value:
+
+            if question.accepts_options and question.has_options:
+
+                if isinstance(is_list, list):
+
+                    values = []
+
+                    for item in is_list:
+
+                        values.append(self._retrieve_option(
+                            question=question, value=item))
+
+                    value = values
+            else:
+                value = self._retrieve_option(value=value, question=question)
+
+            cleaned_data['human_display'] = value
+
+        return cleaned_data
+
     @staticmethod
     def _retrieve_author_answer(question_id, author_id):
         """
@@ -95,3 +129,15 @@ class AnswerManager(Manager):
             pass
 
         return found
+
+    @staticmethod
+    def _retrieve_option(value, question):
+
+        try:
+            option = question.options.get(
+                value=value)
+
+            return option.name
+
+        except Option.DoesNotExist:
+            return value
