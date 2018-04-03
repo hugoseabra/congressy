@@ -186,6 +186,7 @@ class SurveyField(object):
             self.django_field.choices = self.options
 
         self.django_field.can_edit = not self.question.has_answers
+        self.django_field.field_type = self.type
 
         return self.django_field
 
