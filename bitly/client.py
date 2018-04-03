@@ -6,6 +6,7 @@ from django.conf import settings
 
 from .exceptions import BitlyClientException
 
+DEBUG = settings.DEBUG is True
 
 class BitlyClient(object):
     """ Cliente bitly, delegando as ações necessários para SDK do bitly. """
@@ -24,12 +25,27 @@ class BitlyClient(object):
 
     def shorten(self, link):
         """ Shortens url. """
+        if DEBUG is True:
+            split_link = link.split('/')
+            path = split_link[-1]
+
+            return {
+                'url': 'https://link.to/shorten/{}'.format(path),
+                'hash': path,
+            }
+
         return self.bitly.shorten(uri=link)
 
     def clicks(self, link, **kwargs):
         """ Gets all clicks of hash an already shortened link. """
+        if DEBUG is True:
+            return {}
+
         return self.bitly.link_clicks(link=link, **kwargs)
 
     def referrers(self, link, **kwargs):
         """ Gets all referrers of hash an already shortened link. """
+        if DEBUG is True:
+            return {}
+
         return self.bitly.link_referrers_by_domain(link, **kwargs)

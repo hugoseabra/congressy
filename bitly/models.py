@@ -20,14 +20,6 @@ class BittleManager(models.Manager):
     Bit.ly links to local objects.
     """
 
-    def filter_for_instance(self, obj):
-        app_label = obj._meta.app_label
-        model = obj._meta.model_name
-        return self.filter(
-            content_type__app_label=app_label,
-            content_type__model=model, object_id=obj.pk,
-        )
-
     def bitlify(self, link):
         """
         Creates a new ``Bittle`` object based on the object passed to it.
@@ -78,7 +70,7 @@ class BittleManager(models.Manager):
         try:
             bittle = self.get(absolute_url=url)
 
-        except self.model.DoesNotExist:
+        except Bittle.DoesNotExist:
             client = BitlyClient()
             results = client.shorten(url)
 
@@ -87,7 +79,7 @@ class BittleManager(models.Manager):
 
             bittle = Bittle.objects.create(
                 absolute_url=url,
-                shortUrl=results.get('url'),
+                short_url=results.get('url'),
                 hash=results.get('hash'),
             )
 
@@ -98,14 +90,15 @@ class Bittle(models.Model):
     """An object representing a Bit.ly link to a local object."""
 
     absolute_url = models.URLField(max_length=1024)
-    hash = models.CharField(max_length=10)
+    hash = models.CharField(max_length=50)
     short_url = models.URLField()
     _clicks = models.PositiveIntegerField(
         blank=True,
+        null=True,
         editable=False,
         db_column='click',
     )
-    _referrers = JSONField(blank=True, editable=False)
+    _referrers = JSONField(blank=True, null=True, editable=False)
     check_stamp = models.DateTimeField(blank=True, null=True, editable=False)
 
     # Timestamps
