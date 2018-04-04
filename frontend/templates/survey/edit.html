@@ -701,8 +701,6 @@
 
             $('#editQuestion').modal('hide');
 
-            console.log(JSON.stringify($(form).serializeArray()));
-
             var values = {};
 
             $.each($(form).serializeArray(), function (i, field) {
@@ -848,8 +846,6 @@
         }
 
         function updateFields() {
-
-            console.log('GARBAGE COLLECTOR COMING THRU CHO CHO MF')
 
             $.ajax({
                 url: location.pathname + '?template_name=survey/fields',
