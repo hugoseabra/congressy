@@ -325,7 +325,7 @@
                 </div>
                 <div class="modal-body">
 
-                    <form onsubmit="editQuestion(this)">
+                    <form onsubmit="editQuestion(this); return false;">
 
                         <div class="form-group">
 
@@ -564,9 +564,19 @@
 
             var intro_edit = $('#intro_edit');
             var options_edit = $('#options_edit');
+            var name_field = $('#id_name_edit');
+            var help_text_field = $('#id_help_text_edit');
+            var option_field = $('#id_options_edit');
+            var question_id_field = $('#question_id');
+            var intro_field = $('#id_intro_edit');
 
+            //Reset state
             intro_edit.hide();
             options_edit.hide();
+            name_field.val('');
+            help_text_field.val('');
+            option_field.text('');
+            question_id_field.val('');
 
             var question = $(this).closest('tr');
             var question_label = question.find('label').html().replace(':', '');
@@ -628,23 +638,25 @@
                 throw 'cgsy-manage: Can\'t find the question field element.'
             }
 
-            $('#id_name_edit').val(question_label);
+            name_field.val(question_label);
 
             if (question_help_text) {
-                $('#id_help_text_edit').val(question_help_text);
+                help_text_field.val(question_help_text);
             }
 
 
             $('#editQuestion').modal('show');
-            $('#question_id').val(question_id);
+            question_id_field.val(question_id);
 
             if (has_empty) {
-                $('#id_intro_edit').trigger('click');
+                if(!intro_field.is(':checked')){
+                    intro_field.trigger('click');
+                }
             }
 
             if (has_options) {
                 options_edit.show();
-                $('#id_options_edit').text(vals.join('\n'));
+                option_field.text(vals.join('\n'));
             }
 
         });
@@ -686,16 +698,25 @@
         });
 
         function editQuestion(form) {
-            /*
-                CONTINUE HERE
-             */
 
+            $('#editQuestion').modal('hide');
 
-            console.log($(form));
+            console.log(JSON.stringify($(form).serializeArray()));
 
-            var data = JSON.stringify($(form).serializeArray()); //  <-----------
+            var values = {};
 
-            console.log(data);
+            $.each($(form).serializeArray(), function (i, field) {
+                values[field.name] = field.value;
+            });
+
+            var payload = {
+                    action: 'edit',
+                    question_id: values['question_id'],
+                    question: JSON.stringify(values)
+                };
+
+            console.log(payload);
+
 
             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
@@ -705,10 +726,7 @@
                 beforeSend: function (request) {
                     request.setRequestHeader("X-CSRFToken", csrftoken);
                 },
-                data: {
-                    action: 'edit',
-                    question: data
-                },
+                data: payload,
                 success: function (res) {
                     Messenger().post({
                         message: 'Pergunta editada com sucesso!',
@@ -716,18 +734,17 @@
                     });
                     updateFields();
                 },
-                error: function (err) {
+                error: function () {
+
                     Messenger().post({
                         message: 'Não foi possivel editar sua pergunta.',
                         type: 'error'
                     });
-                    updateFields();
                 }
             });
 
             return false;
         }
-
 
         function createFieldList() {
 
@@ -831,6 +848,8 @@
         }
 
         function updateFields() {
+
+            console.log('GARBAGE COLLECTOR COMING THRU CHO CHO MF')
 
             $.ajax({
                 url: location.pathname + '?template_name=survey/fields',

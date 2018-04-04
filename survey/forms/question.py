@@ -5,9 +5,10 @@
 
 from django import forms
 from django.utils.text import slugify
-from django.contrib import messages
-from survey.models import Question
+
+from survey.models import Question, Option
 from survey.services import QuestionService, OptionService
+from django.db import IntegrityError
 
 
 class QuestionModelForm(forms.ModelForm):
@@ -73,10 +74,10 @@ class QuestionForm(forms.Form):
         help_text='Deixar o primeiro item da lista em branco',
     )
 
-    def __init__(self, survey, **kwargs):
+    def __init__(self, survey, instance=None, **kwargs):
         self.survey = survey
         super().__init__(**kwargs)
-        self.service = QuestionService(**kwargs)
+        self.service = QuestionService(instance=instance, **kwargs)
 
     def is_valid(self):
         form_is_valid = super().is_valid()
@@ -89,20 +90,35 @@ class QuestionForm(forms.Form):
         options = self.cleaned_data.get('options', None)
 
         if options:
+
+            all_existing_options = question.options.all()
+
             option_list = options.splitlines()
+
+            for option in all_existing_options:
+
+                if option.value not in option_list:
+                    option.delete()
+
             for option in option_list:
-                option_data = {
-                    'question': question.pk,
-                    'name': option,
-                    'value': option
-                }
-                option_service = OptionService(data=option_data)
-                if option_service.is_valid():
-                    option_service.save()
-                else:
-                    messages.error(
-                        self.request,
-                        "Não foi possivel salvar a opção: {}".format(option)
-                    )
+
+                try:
+                    Option.objects.get(question=question, value=option)
+                except Option.DoesNotExist:
+
+                    option_data = {
+                        'question': question.pk,
+                        'name': option,
+                        'value': option
+                    }
+                    option_service = OptionService(data=option_data)
+                    if option_service.is_valid():
+                        try:
+                            option_service.save()
+                        except IntegrityError:
+                            pass
+                    else:
+                        raise Exception("Não foi possivel salvar a opção: {}"
+                                        .format(option))
 
         return question

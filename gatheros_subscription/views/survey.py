@@ -1,4 +1,5 @@
 import json
+from ast import literal_eval
 
 from django.contrib import messages
 from django.http import HttpResponse
@@ -13,6 +14,7 @@ from gatheros_subscription.models import EventSurvey
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
 from survey.forms import QuestionForm, SurveyForm
 from survey.models import Survey, Question
+from survey.services import QuestionService
 
 
 class SurveyMixin(TemplateNameableMixin, generic.View):
@@ -67,12 +69,14 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
             if action == 'delete':
 
                 try:
-                    question = Question.objects.get(name=question_id)
+                    question = Question.objects.get(name=question_id,
+                                                    survey=self.survey)
                     question.delete()
                 except Question.DoesNotExist:
                     return HttpResponse(status=404)
 
                 return HttpResponse(status=200)
+
             elif action == 'update_order':
 
                 new_order = json.loads(self.request.POST.get(
@@ -91,10 +95,13 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
                 except Question.DoesNotExist:
                     return HttpResponse(status=404)
+
             elif action == 'update_required':
+
                 set_to = self.request.POST.get('setTo')
                 try:
-                    question = Question.objects.get(name=question_id)
+                    question = Question.objects.get(name=question_id,
+                                                    survey=self.survey)
                 except Question.DoesNotExist:
                     return HttpResponse(status=404)
 
@@ -107,6 +114,39 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
                 question.save()
                 return HttpResponse(status=200)
+
+            elif action == 'edit':
+
+                try:
+                    question = Question.objects.get(pk=question_id,
+                                                    survey=self.survey)
+                except Question.DoesNotExist:
+                    return HttpResponse(status=404)
+
+                data = literal_eval(request.POST.get('question'))
+
+                question_data = {
+                    'name': data.get('name_edit', question.name),
+                    'label': data.get('name_edit', question.label),
+                    'help_text': data.get('help_text_edit',
+                                          question.help_text),
+                    'intro': bool(data.get('intro_edit', False)),
+                    'options': data.get('options_edit', question.options),
+                    'survey': self.survey.pk,
+                    'type': question.type,
+                }
+
+                question_form = QuestionForm(
+                    data=question_data,
+                    instance=question,
+                    survey=self.survey,
+                )
+
+                if question_form.is_valid():
+                    question_form.save()
+                    return HttpResponse(status=200)
+
+                return HttpResponse(status=500)
             else:
                 return HttpResponse(status=500)
 
