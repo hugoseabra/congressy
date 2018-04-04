@@ -19,7 +19,7 @@ class OptionManager(Manager):
     class Meta:
         """ Meta """
         model = Option
-        fields = '__all__'
+        fields = ('question', 'name',)
 
     def clean_question(self):
         """
@@ -37,7 +37,11 @@ class OptionManager(Manager):
 
         return question
 
-    def clean_name(self):
+    def save(self, commit=True):
+        self.instance.value = self._create_slug()
+        return super().save(commit)
+
+    def _create_slug(self):
         """
         Slugify deve garantir que o nome de Question em um survey seja único.
         """
