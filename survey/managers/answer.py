@@ -10,8 +10,8 @@ from django import forms
 
 from survey.managers import Manager
 from survey.models import Answer, Option
-from ast import literal_eval
 
+from ast import literal_eval
 
 class AnswerManager(Manager):
     """
