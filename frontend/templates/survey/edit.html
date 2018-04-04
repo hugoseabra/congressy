@@ -337,6 +337,7 @@
                             <div>
                                 <input autofocus="" required=""
                                        class="form-control form-control"
+                                       name="name_edit"
                                        id="id_name_edit" type="text">
                             </div>
                         </div>
@@ -347,7 +348,9 @@
 
                             <div>
                                 <input class="form-control"
-                                       id="id_help_text_edit" type="text">
+                                       id="id_help_text_edit"
+                                       name="help_text_edit"
+                                       type="text">
 
                                 <div>
                                     <small class="text-muted">Uma instrução
@@ -368,13 +371,15 @@
 
                             <div class="form-group">
 
-                                <label for="id_intro">Primeiro campo
+                                <label>Primeiro campo
                                     vazio:</label>
 
 
                                 <div>
 
-                                    <input class="js-switch" id="id_intro_edit"
+                                    <input class="js-switch"
+                                           id="id_intro_edit"
+                                           name="intro_edit"
                                            type="checkbox">
 
 
@@ -402,6 +407,7 @@
 
                                     <textarea cols="40" rows="10"
                                               class="form-control"
+                                              name="options_edit"
                                               id="id_options_edit">
 
                                     </textarea>
