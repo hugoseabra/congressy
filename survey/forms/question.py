@@ -93,32 +93,23 @@ class QuestionForm(forms.Form):
 
             all_existing_options = question.options.all()
 
-            option_list = options.splitlines()
-
             for option in all_existing_options:
+                option.delete()
 
-                if option.value not in option_list:
-                    option.delete()
+            option_list = options.splitlines()
 
             for option in option_list:
 
-                try:
-                    Option.objects.get(question=question, value=option)
-                except Option.DoesNotExist:
-
-                    option_data = {
-                        'question': question.pk,
-                        'name': option,
-                        'value': option
-                    }
-                    option_service = OptionService(data=option_data)
-                    if option_service.is_valid():
-                        try:
-                            option_service.save()
-                        except IntegrityError:
-                            pass
-                    else:
-                        raise Exception("Não foi possivel salvar a opção: {}"
-                                        .format(option))
+                option_data = {
+                    'question': question.pk,
+                    'name': option,
+                    'value': option
+                }
+                option_service = OptionService(data=option_data)
+                if option_service.is_valid():
+                    option_service.save()
+                else:
+                    raise Exception("Não foi possivel salvar a opção: {}"
+                                    .format(option))
 
         return question
