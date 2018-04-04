@@ -213,7 +213,7 @@ def _export_survey_answers(worksheet, event_survey):
             for question_pk in question_pks:
                 if question_pk == question.pk:
                     # Se não há resposta, deixar em branco.
-                    collector[row_idx].append(answer.get_human_display())
+                    collector[row_idx].append(answer.human_display)
 
         row_idx += 1
 
