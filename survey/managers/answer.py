@@ -10,7 +10,7 @@ from django import forms
 
 from survey.managers import Manager
 from survey.models import Answer, Option
-
+from ast import literal_eval
 
 class AnswerManager(Manager):
     """
@@ -91,7 +91,10 @@ class AnswerManager(Manager):
         question = cleaned_data.get('question', None)
         value = cleaned_data.get('value', None)
 
-        is_list = eval(value)
+        try:
+            is_list = literal_eval(str(value))
+        except(ValueError, SyntaxError):
+            is_list = False
 
         if question and value:
 
