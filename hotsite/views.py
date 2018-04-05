@@ -508,7 +508,9 @@ class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
             required_fields.append('zip_code')
             required_fields.append('city')
 
-        if not has_paid_lots and not config.address_show:
+        if not has_paid_lots \
+                and not config.address_show \
+                and config.city is True:
             required_fields.append('city')
 
         if has_paid_lots or config.cpf_required:
