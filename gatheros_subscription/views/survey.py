@@ -16,6 +16,7 @@ from survey.forms import QuestionForm, SurveyForm
 from survey.models import Survey, Question
 
 
+
 class SurveyMixin(TemplateNameableMixin, generic.View):
     survey = None
 
@@ -273,3 +274,33 @@ class EventSurveyDeleteAjaxView(EventViewMixin, AccountMixin,
         return reverse_lazy('subscription:survey-list', kwargs={
             'event_pk': self.event.pk,
         })
+
+
+class EventSurveyEditAjaxView(EventViewMixin, AccountMixin):
+    """
+        View responsavel por editar questionarios.
+    """
+
+    def post(self, request, *args, **kwargs):
+
+        event_survey_id = request.POST.get('event_survey_id')
+
+        edited_title = request.POST.get('survey_edit_title')
+        edited_description = request.POST.get('survey_edit_description')
+
+        if event_survey_id:
+            event_survey = get_object_or_404(EventSurvey, pk=event_survey_id)
+
+            survey = event_survey.survey
+
+            if edited_title:
+                survey.name = edited_title
+
+            if edited_description:
+                survey.description = edited_description
+
+            survey.save()
+
+            return HttpResponse(status=200)
+
+        return HttpResponse(status=500)

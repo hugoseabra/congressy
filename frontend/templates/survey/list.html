@@ -3,9 +3,6 @@
 
 {% block content %}
 
-
-
-
     <div class="tab-content">
 
         <div class="row">
@@ -163,7 +160,7 @@
                         Editar questionário</h4>
                 </div>
 
-                <form method="post">
+                <form onsubmit="editEventSurvey(this); return false;">
 
                     {% csrf_token %}
 
@@ -182,6 +179,7 @@
                                 <input type="text" maxlength="255"
                                        autofocus="" required=""
                                        class="form-control form-control"
+                                       name="survey_edit_title"
                                        id="surveyEditTitle">
 
 
@@ -199,14 +197,12 @@
 
                             <label>Descrição:</label>
 
-
                             <div>
-
 
                                 <textarea cols="20" rows="3"
                                           class="form-control"
+                                          name="survey_edit_description"
                                           id="surveyEditDescription"></textarea>
-
 
                                 <div>
                                     <small class="text-muted">Uma descrição para
@@ -220,6 +216,8 @@
                         </div>
 
                         <input type="hidden" name="action">
+                        <input type="hidden" name="event_survey_id"
+                               id="edit_event_survey_id">
 
                     </div>
 
@@ -271,6 +269,7 @@
                 $('#surveyEditId').val($(this).data('id'));
                 $('#surveyEditTitle').val($(this).data('title'));
                 $('#surveyEditDescription').val($(this).data('description'));
+                $('#edit_event_survey_id').val($(this).data('id'));
                 $('input.action').val('edit');
                 $('#editSurvey').modal('show');
             });
@@ -370,6 +369,65 @@
                 e.preventDefault(); // avoid to execute the actual submit of the form.
             });
         });
+
+
+        function editEventSurvey(form) {
+
+            $('#editSurvey').modal('hide');
+
+            var values = {};
+
+            $.each($(form).serializeArray(), function (i, field) {
+                values[field.name] = field.value;
+            });
+
+            var payload = {
+                action: 'edit',
+                event_survey_id: values['event_survey_id'],
+                survey_edit_title: values['survey_edit_title'],
+                survey_edit_description: values['survey_edit_description']
+            };
+
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            $.ajax({
+                type: "POST",
+                url: '{% url 'subscription:survey-ajax-edit' event.pk%}',
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: payload,
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Formulário editado com sucesso!',
+                        type: 'success'
+                    });
+                    updateSurveyList();
+                },
+                error: function () {
+
+                    Messenger().post({
+                        message: 'Não foi possivel editar seu formulário.',
+                        type: 'error'
+                    });
+                }
+            });
+
+            return false;
+
+
+        }
+
+        function updateSurveyList() {
+            $.ajax({
+                url: '{% url 'subscription:survey-list' event.pk %}', success:
+                    function
+                        (result) {
+                        $("#survey-list").html(result);
+                        $("#survey-list-panel").show();
+                    }
+            });
+        }
 
     </script>
 
