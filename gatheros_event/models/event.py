@@ -248,6 +248,8 @@ class Event(models.Model, GatherosModelMixin):
         if not self.slug:
             self._create_unique_slug()
 
+        self.subscription_type = self.SUBSCRIPTION_BY_LOTS
+
         super(Event, self).save(*args, **kwargs)
 
     def __str__(self):
