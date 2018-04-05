@@ -123,13 +123,19 @@ $(document).ready(function() {
 </script>
 {% endif %}
 <script>
-$(document).ready(function() {
-    $('input[type=email]').on('keyup', function() {
-        $(this).val($(this).val().toLowerCase());
-    })
-});
-</script>
+    $(document).ready(function () {
 
+        $('input[type=email]').on('keyup', function () {
+            $(this).val($(this).val().toLowerCase());
+        });
+
+
+        $('.cgsy-date-input').mask("99/99/9999");
+        $('.cgsy-time-input').mask("99:99");
+
+
+    });
+</script>
 
 
 {% include 'sentry-javascript-sdk.html' %}

@@ -369,6 +369,13 @@
 <script src="{% static "assets/js/cgsy.js" %}"></script>
 
 <script type="application/javascript">
+
+    $(document).ready(function () {
+        $('.cgsy-date-input').mask("99/99/9999");
+        $('.cgsy-time-input').mask("99:99");
+    });
+
+
     function cgsy_submit(value) {
         console.log(typeof(value));
         console.log(value);
