@@ -88,9 +88,9 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
             <div class="buttonbar">
-                <div class="float-left">
+                <div class="float-right">
                     <a href="{% url 'subscription:form-config' event.pk %}"
                        class="btn btn-primary">
                         <i class="fas fa-long-arrow-alt-left"></i>
@@ -653,7 +653,7 @@
             question_id_field.val(question_id);
 
             if (has_empty) {
-                if(!intro_field.is(':checked')){
+                if (!intro_field.is(':checked')) {
                     intro_field.trigger('click');
                 }
             }
@@ -712,10 +712,10 @@
             });
 
             var payload = {
-                    action: 'edit',
-                    question_id: values['question_id'],
-                    question: JSON.stringify(values)
-                };
+                action: 'edit',
+                question_id: values['question_id'],
+                question: JSON.stringify(values)
+            };
 
             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
