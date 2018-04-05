@@ -115,7 +115,8 @@
                         Novo formulário</h4>
                 </div>
 
-                <form id="createSurveyForm">
+                <form id="createSurveyForm" onsubmit="createEventSurvey(this); 
+                return false;">
 
                     {% csrf_token %}
 
@@ -130,7 +131,7 @@
                                 class="btn btn-danger"
                                 data-dismiss="modal">Cancelar
                         </button>
-                        <button id="createSurvey" type="button"
+                        <button type="submit"
                                 class="btn btn-success">Salvar
                         </button>
                     </div>
@@ -344,30 +345,6 @@
                 this.disabled = true;
             });
 
-            $("#createSurvey").on('click', function (e) {
-
-                $('#addSurvey').modal('hide');
-
-                var url = "{% url 'subscription:survey-create' event.pk %}";
-
-                $.ajax({
-                    type: "POST",
-                    url: url,
-                    data: $("#createSurveyForm").serialize(), // serializes the form's elements.
-                    error: function (err) {
-                        Messenger().post({
-                            message: 'Não foi possivel criar este ' +
-                            'questionario.',
-                            type: 'danger'
-                        });
-                    },
-                    success: function (res) {
-                        loadList();
-                    }
-                });
-
-                e.preventDefault(); // avoid to execute the actual submit of the form.
-            });
         });
 
 
@@ -426,6 +403,40 @@
                         $("#survey-list").html(result);
                         $("#survey-list-panel").show();
                     }
+            });
+        }
+
+        function createEventSurvey(form) {
+
+            $('#addSurvey').modal('hide');
+
+            var url = "{% url 'subscription:survey-create' event.pk %}";
+
+            var values = {};
+            $.each($(form).serializeArray(), function (i, field) {
+                values[field.name] = field.value;
+            });
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: values, // serializes the form's elements.
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel criar este ' +
+                        'formulário.',
+                        type: 'danger'
+                    });
+
+                    throw err.textField;
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Formulário criado com sucesso!',
+                        type: 'success'
+                    });
+                    updateSurveyList();
+                }
             });
         }
 
