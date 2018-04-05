@@ -65,16 +65,19 @@
                                                         dropdown-menu-right"
                                                         role="menu">
                                                     <li>
-                                                        <a href="#">
+                                                        <a class="open-editSurvey"
+                                                           data-id="{{ event_survey.pk }}"
+                                                           data-title="{{ event_survey.survey.name }}"
+                                                           data-description="{{ event_survey.survey.description }}">
                                                             <i class="fas fa-pencil-alt"></i>
                                                             Editar
                                                         </a>
                                                     </li>
 
-
                                                     <li>
                                                         <a class="open-DeleteQuestionDialog"
                                                            data-event="{{ event.pk }}"
+                                                           data-survey-name="{{ event_survey.survey.name }}"
                                                            data-survey="{{ event_survey.pk }}">
                                                             <i class="fas fa-trash-alt"></i>
                                                             Excluir
@@ -243,7 +246,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
 
-                 <div id="question_delete_modal"></div>
+                <div id="question_delete_modal"></div>
 
             </div>
         </div>
@@ -258,8 +261,13 @@
 
         $(document).ready(function () {
 
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom ' +
+                'messenger-on-right',
+                theme: 'flat'
+            };
+
             $(".open-editSurvey").click(function () {
-                console.log($(this).data('title'));
                 $('#surveyEditId').val($(this).data('id'));
                 $('#surveyEditTitle').val($(this).data('title'));
                 $('#surveyEditDescription').val($(this).data('description'));
@@ -271,6 +279,7 @@
                 $('#surveyDeleteId').val($(this).data('id'));
                 $('#surveyDeleteTitle').val($(this).data('title'));
                 $('#surveyDeleteDescription').val($(this).data('description'));
+                $('#delete_event_survey_id').val($(this).data('id'));
                 $('input.action').val('delete');
                 $('#deleteSurvey').modal('show');
             });
@@ -309,19 +318,29 @@
             $(document).on("click", ".open-DeleteQuestionDialog", function () {
 
                 var survey_id = $(this).data('survey');
-                var event_id = $(this).data('event');
+                var survey_name = $(this).data('survey-name');
 
-                $.get("/manage/events/" + event_id + "/survey/" + survey_id +
-                    "/delete",
-                    function
-                        (data, status) {
+                $.get('{% url 'subscription:survey-ajax-delete' event.pk%}',
+                    function (data) {
                         $('#question_delete_modal').html(data);
-                    });
+                        $('#deleteSurvey').modal('show');
+                        $("#survey_name").text(survey_name);
+                        $("#delete_event_survey_id").val(survey_id);
+                    })
+                    .fail(function (err) {
 
-                $('#deleteSurvey').modal('show');
+                        Messenger().post({
+                            message: 'Não foi possivel realizar essa ação ' +
+                            'nesse momento.',
+                            type: 'error'
+                        });
+
+                        throw err.responseText;
+
+                    });
             });
 
-            //Disable btn on first click
+            //Disable btn save on first click
             $(document).on("click", ".new_survey_save", function () {
                 this.disabled = true;
             });
@@ -350,8 +369,6 @@
 
                 e.preventDefault(); // avoid to execute the actual submit of the form.
             });
-
-
         });
 
     </script>

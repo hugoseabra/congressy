@@ -4,14 +4,19 @@
     </button>
     <h4 class="modal-title">Apagar questionário</h4>
 </div>
-<form id="deleteSurveyForm">
+<form id="deleteSurveyForm" action="{% url 'subscription:survey-ajax-delete' event.pk%}">
     <div class="modal-body">
 
         {% csrf_token %}
 
         <strong style="font-size: 25px">
-            Certeza que deseja deletar "{{ object }}"?
+            Certeza que deseja deletar?
         </strong>
+
+        <div style="font-size: 25px" id="survey_name"></div>
+
+        <input type="hidden" name="event_survey_id" id="delete_event_survey_id">
+
     </div>
     <div class="modal-footer">
         <input type="button" class="btn btn-danger" value="Confirmar"
@@ -38,7 +43,7 @@
 
             $('#deleteSurvey').modal('hide');
 
-            var url = "{% url 'subscription:survey-delete' event.pk object.pk %}";
+            var url = "{% url 'subscription:survey-ajax-delete' event.pk  %}";
 
             $.ajax({
                 type: "POST",

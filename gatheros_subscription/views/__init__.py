@@ -10,5 +10,6 @@ from .subscription import (
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
 )
-from .survey import SurveyEditView, SurveyListView, EventSurveyDeleteView, \
-   EventSurveyCreateView
+from .survey import SurveyEditView, SurveyListView, \
+    EventSurveyDeleteAjaxView, \
+    EventSurveyCreateView
