@@ -15,9 +15,14 @@ urls = [
         name='survey-edit'
     ),
     url(
-        r'^(?P<pk>[\d]+)/delete$',
-        views.EventSurveyDeleteView.as_view(),
-        name='survey-delete'
+        r'^delete$',
+        views.EventSurveyDeleteAjaxView.as_view(),
+        name='survey-ajax-delete'
+    ),
+    url(
+        r'^event-survey/edit$',
+        views.EventSurveyEditAjaxView.as_view(),
+        name='survey-ajax-edit'
     ),
     url(
         r'^$',
@@ -29,4 +34,3 @@ urls = [
 urlpatterns_survey = [
     url(r'^events/(?P<event_pk>[\d]+)/survey/', include(urls)),
 ]
-

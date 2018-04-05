@@ -332,7 +332,7 @@
 
 
         var loadList = function () {
-                        $.ajax({
+            $.ajax({
                 url: '{% url 'subscription:survey-list' event.pk %}', success:
                     function
                         (result) {

@@ -3,9 +3,6 @@
 
 {% block content %}
 
-
-
-
     <div class="tab-content">
 
         <div class="row">
@@ -41,7 +38,12 @@
                                 {% for event_survey in object_list %}
                                     <tr>
                                         <td>
-                                            {{ event_survey.survey.name }}
+
+                                            <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
+                                                <strong>
+                                                    {{ event_survey.survey.name }}
+                                                </strong>
+                                            </a>
                                         </td>
                                         <td>
                                             <div class="btn-group">
@@ -60,17 +62,19 @@
                                                         dropdown-menu-right"
                                                         role="menu">
                                                     <li>
-                                                        <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
+                                                        <a class="open-editSurvey"
+                                                           data-id="{{ event_survey.pk }}"
+                                                           data-title="{{ event_survey.survey.name }}"
+                                                           data-description="{{ event_survey.survey.description }}">
                                                             <i class="fas fa-pencil-alt"></i>
-                                                            Gerenciar
-                                                            campos
+                                                            Editar
                                                         </a>
                                                     </li>
-
 
                                                     <li>
                                                         <a class="open-DeleteQuestionDialog"
                                                            data-event="{{ event.pk }}"
+                                                           data-survey-name="{{ event_survey.survey.name }}"
                                                            data-survey="{{ event_survey.pk }}">
                                                             <i class="fas fa-trash-alt"></i>
                                                             Excluir
@@ -94,9 +98,6 @@
 
     </div>
 
-
-
-
     <div class="modal fade" id="addSurvey"
          role="dialog">
 
@@ -114,7 +115,8 @@
                         Novo formulário</h4>
                 </div>
 
-                <form id="createSurveyForm">
+                <form id="createSurveyForm" onsubmit="createEventSurvey(this); 
+                return false;">
 
                     {% csrf_token %}
 
@@ -129,7 +131,7 @@
                                 class="btn btn-danger"
                                 data-dismiss="modal">Cancelar
                         </button>
-                        <button id="createSurvey" type="button"
+                        <button type="submit"
                                 class="btn btn-success">Salvar
                         </button>
                     </div>
@@ -159,7 +161,7 @@
                         Editar questionário</h4>
                 </div>
 
-                <form method="post">
+                <form onsubmit="editEventSurvey(this); return false;">
 
                     {% csrf_token %}
 
@@ -178,6 +180,7 @@
                                 <input type="text" maxlength="255"
                                        autofocus="" required=""
                                        class="form-control form-control"
+                                       name="survey_edit_title"
                                        id="surveyEditTitle">
 
 
@@ -195,14 +198,12 @@
 
                             <label>Descrição:</label>
 
-
                             <div>
-
 
                                 <textarea cols="20" rows="3"
                                           class="form-control"
+                                          name="survey_edit_description"
                                           id="surveyEditDescription"></textarea>
-
 
                                 <div>
                                     <small class="text-muted">Uma descrição para
@@ -216,6 +217,8 @@
                         </div>
 
                         <input type="hidden" name="action">
+                        <input type="hidden" name="event_survey_id"
+                               id="edit_event_survey_id">
 
                     </div>
 
@@ -238,29 +241,14 @@
         </div>
 
     </div>
-    <div class="modal fade" id="deleteSurvey"
-         role="dialog">
-
-        <div class="modal-dialog " role="document">
-
+    <div class="modal fade" id="deleteSurvey" role="dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-
-                <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal"
-                            aria-label="Close"><span
-                            aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">
-                        Apagar questionário</h4>
-                </div>
 
                 <div id="question_delete_modal"></div>
 
             </div>
-
         </div>
-
     </div>
 
 
@@ -272,11 +260,17 @@
 
         $(document).ready(function () {
 
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom ' +
+                'messenger-on-right',
+                theme: 'flat'
+            };
+
             $(".open-editSurvey").click(function () {
-                console.log($(this).data('title'));
                 $('#surveyEditId').val($(this).data('id'));
                 $('#surveyEditTitle').val($(this).data('title'));
                 $('#surveyEditDescription').val($(this).data('description'));
+                $('#edit_event_survey_id').val($(this).data('id'));
                 $('input.action').val('edit');
                 $('#editSurvey').modal('show');
             });
@@ -285,6 +279,7 @@
                 $('#surveyDeleteId').val($(this).data('id'));
                 $('#surveyDeleteTitle').val($(this).data('title'));
                 $('#surveyDeleteDescription').val($(this).data('description'));
+                $('#delete_event_survey_id').val($(this).data('id'));
                 $('input.action').val('delete');
                 $('#deleteSurvey').modal('show');
             });
@@ -323,50 +318,127 @@
             $(document).on("click", ".open-DeleteQuestionDialog", function () {
 
                 var survey_id = $(this).data('survey');
-                var event_id = $(this).data('event');
+                var survey_name = $(this).data('survey-name');
 
-                $.get("/manage/events/" + event_id + "/survey/" + survey_id +
-                    "/delete",
-                    function
-                        (data, status) {
+                $.get('{% url 'subscription:survey-ajax-delete' event.pk%}',
+                    function (data) {
                         $('#question_delete_modal').html(data);
-                    });
+                        $('#deleteSurvey').modal('show');
+                        $("#survey_name").text(survey_name);
+                        $("#delete_event_survey_id").val(survey_id);
+                    })
+                    .fail(function (err) {
 
-                $('#deleteSurvey').modal('show');
+                        Messenger().post({
+                            message: 'Não foi possivel realizar essa ação ' +
+                            'nesse momento.',
+                            type: 'error'
+                        });
+
+                        throw err.responseText;
+
+                    });
             });
 
-            //Disable btn on first click
+            //Disable btn save on first click
             $(document).on("click", ".new_survey_save", function () {
                 this.disabled = true;
             });
 
-            $("#createSurvey").on('click', function (e) {
+        });
 
-                $('#addSurvey').modal('hide');
 
-                var url = "{% url 'subscription:survey-create' event.pk %}";
+        function editEventSurvey(form) {
 
-                $.ajax({
-                    type: "POST",
-                    url: url,
-                    data: $("#createSurveyForm").serialize(), // serializes the form's elements.
-                    error: function (err) {
-                        Messenger().post({
-                            message: 'Não foi possivel criar este ' +
-                            'questionario.',
-                            type: 'danger'
-                        });
-                    },
-                    success: function (res) {
-                        loadList();
-                    }
-                });
+            $('#editSurvey').modal('hide');
 
-                e.preventDefault(); // avoid to execute the actual submit of the form.
+            var values = {};
+
+            $.each($(form).serializeArray(), function (i, field) {
+                values[field.name] = field.value;
             });
 
+            var payload = {
+                action: 'edit',
+                event_survey_id: values['event_survey_id'],
+                survey_edit_title: values['survey_edit_title'],
+                survey_edit_description: values['survey_edit_description']
+            };
 
-        });
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            $.ajax({
+                type: "POST",
+                url: '{% url 'subscription:survey-ajax-edit' event.pk%}',
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: payload,
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Formulário editado com sucesso!',
+                        type: 'success'
+                    });
+                    updateSurveyList();
+                },
+                error: function () {
+
+                    Messenger().post({
+                        message: 'Não foi possivel editar seu formulário.',
+                        type: 'error'
+                    });
+                }
+            });
+
+            return false;
+
+
+        }
+
+        function updateSurveyList() {
+            $.ajax({
+                url: '{% url 'subscription:survey-list' event.pk %}', success:
+                    function
+                        (result) {
+                        $("#survey-list").html(result);
+                        $("#survey-list-panel").show();
+                    }
+            });
+        }
+
+        function createEventSurvey(form) {
+
+            $('#addSurvey').modal('hide');
+
+            var url = "{% url 'subscription:survey-create' event.pk %}";
+
+            var values = {};
+            $.each($(form).serializeArray(), function (i, field) {
+                values[field.name] = field.value;
+            });
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: values, // serializes the form's elements.
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel criar este ' +
+                        'formulário.',
+                        type: 'danger'
+                    });
+
+                    throw err.textField;
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Formulário criado com sucesso!',
+                        type: 'success'
+                    });
+                    updateSurveyList();
+                }
+            });
+        }
 
     </script>
 

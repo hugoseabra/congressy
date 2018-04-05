@@ -1,16 +1,33 @@
-<form id="deleteSurveyForm">
-    {% csrf_token %}
-    <p>
-        Certeza que deseja deletar "{{ object }}"?
-    </p>
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">
+        &times;
+    </button>
+    <h4 class="modal-title">Apagar questionário</h4>
+</div>
+<form id="deleteSurveyForm" action="{% url 'subscription:survey-ajax-delete' event.pk%}">
+    <div class="modal-body">
 
-    <input type="button" class="btn btn-danger" value="Confirmar"
-           id="confirmSurveyDelete"/>
+        {% csrf_token %}
 
+        <strong style="font-size: 25px">
+            Certeza que deseja deletar?
+        </strong>
+
+        <div style="font-size: 25px" id="survey_name"></div>
+
+        <input type="hidden" name="event_survey_id" id="delete_event_survey_id">
+
+    </div>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-danger" value="Confirmar"
+               id="confirmSurveyDelete"/>
+        <button type="button" class="btn btn-default"
+                data-dismiss="modal">Cancelar
+        </button>
+    </div>
 </form>
 
 <script>
-
 
     $(document).ready(function () {
 
@@ -26,7 +43,7 @@
 
             $('#deleteSurvey').modal('hide');
 
-            var url = "{% url 'subscription:survey-delete' event.pk object.pk %}";
+            var url = "{% url 'subscription:survey-ajax-delete' event.pk  %}";
 
             $.ajax({
                 type: "POST",
@@ -46,6 +63,5 @@
             e.preventDefault(); // avoid to execute the actual submit of the form.
         });
     });
-
 
 </script>

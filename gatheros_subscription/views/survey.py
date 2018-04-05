@@ -14,7 +14,7 @@ from gatheros_subscription.models import EventSurvey
 from survey.constants import TYPE_LIST as QUESTION_TYPE_LIST
 from survey.forms import QuestionForm, SurveyForm
 from survey.models import Survey, Question
-from survey.services import QuestionService
+
 
 
 class SurveyMixin(TemplateNameableMixin, generic.View):
@@ -250,15 +250,57 @@ class EventSurveyCreateView(EventViewMixin, AccountMixin, generic.View):
         return HttpResponse(status=400)
 
 
-class EventSurveyDeleteView(EventViewMixin, AccountMixin,
-                            generic.DeleteView, ):
+class EventSurveyDeleteAjaxView(EventViewMixin, AccountMixin,
+                                generic.TemplateView):
     """
         View responsavel por deletar questionarios.
     """
     template_name = 'survey/delete.html'
-    model = EventSurvey
+
+    def post(self, request, *args, **kwargs):
+
+        event_survey_id = request.POST.get('event_survey_id')
+
+        if event_survey_id:
+            event_survey = get_object_or_404(EventSurvey, pk=event_survey_id)
+            event_survey.delete()
+            return HttpResponse(status=204)
+        else:
+            return HttpResponse(status=400)
+
+        return HttpResponse(status=500)
 
     def get_success_url(self):
         return reverse_lazy('subscription:survey-list', kwargs={
             'event_pk': self.event.pk,
         })
+
+
+class EventSurveyEditAjaxView(EventViewMixin, AccountMixin):
+    """
+        View responsavel por editar questionarios.
+    """
+
+    def post(self, request, *args, **kwargs):
+
+        event_survey_id = request.POST.get('event_survey_id')
+
+        edited_title = request.POST.get('survey_edit_title')
+        edited_description = request.POST.get('survey_edit_description')
+
+        if event_survey_id:
+            event_survey = get_object_or_404(EventSurvey, pk=event_survey_id)
+
+            survey = event_survey.survey
+
+            if edited_title:
+                survey.name = edited_title
+
+            if edited_description:
+                survey.description = edited_description
+
+            survey.save()
+
+            return HttpResponse(status=200)
+
+        return HttpResponse(status=500)
