@@ -12,6 +12,7 @@ INSTALLED_APPS += [
     'payment',
     'partner',
     'hotsite',
+    'survey',
     'bitly',
 ]
 # =========================== AUTH BACKENDS ================================= #

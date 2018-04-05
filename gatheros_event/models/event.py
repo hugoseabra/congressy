@@ -5,10 +5,10 @@ feita por um organizador de evento, dono de uma organização, e que deseja
 apresentar informações ligadas a ela a pessoa que possam se interessar em
 participar do evento.
 """
-import os
-from collections import Counter
 from datetime import datetime
 
+import os
+from collections import Counter
 from django.db import models
 from django.utils.encoding import force_text
 from stdimage import StdImageField
@@ -148,7 +148,10 @@ class Event(models.Model, GatherosModelMixin):
         verbose_name='imagem principal',
         variations={'default': (480, 638), 'thumbnail': (200, 233, True)},
         validators=[MinSizeValidator(480, 638), MaxSizeValidator(1400, 1400)],
-        help_text="Imagem única da descrição do evento: 480px x 638px"
+        help_text="Imagem única da descrição do evento: 480px x 638px. "
+                  "<a  target='_blank'"
+                  "href='http://via.placeholder.com/480x638'>Exemplo"
+                  "</a>"
     )
 
     website = models.CharField(max_length=255, null=True, blank=True)
@@ -244,6 +247,8 @@ class Event(models.Model, GatherosModelMixin):
     def save(self, *args, **kwargs):
         if not self.slug:
             self._create_unique_slug()
+
+        self.subscription_type = self.SUBSCRIPTION_BY_LOTS
 
         super(Event, self).save(*args, **kwargs)
 

@@ -6,95 +6,11 @@
 {% endblock %}
 
 {% block page_title %}
-    Configuração de Formulário
+    Formulários Padrão e Personalizados
 {% endblock %}
 
 {% block page_sub_title %}
     <div>{{ event.name }}</div>
-{% endblock %}
-
-{% block scripts %}
-    <script>
-        // Se algum lote pago.
-        var setLotPaiedStatus = function () {
-            var radios = $('input[type=radio]');
-            radios.iCheck({
-                checkboxClass: 'icheckbox_flat-grey',
-                radioClass: 'iradio_flat-grey'
-            });
-            radios.prop('disabled', 'disabled');
-
-            window.setTimeout(function () {
-                app.switcheryElements['id_email'].disable();
-                app.switcheryElements['id_phone'].disable();
-                app.switcheryElements['id_city'].disable();
-            }, 200);
-
-            // Fields which are not influenced by paied lotes.
-            var fields_not_required = [
-                'institution',
-                'institution_cnpj',
-                'function'
-            ];
-
-            $.each(fields_not_required, function(i, f_name) {
-                for (var ii = 0; ii < 3; ii++) {
-                    var el = $('#id_'+f_name+'_'+ii);
-                    if (el.length) {
-                        el.removeAttr('disabled');
-                        el.iCheck({
-                            checkboxClass: 'icheckbox_flat-grey',
-                            radioClass: 'iradio_flat-blue'
-                        });
-                    }
-                }
-            });
-        };
-
-        // @TODO é o que vier da edição, se houver valor
-        var city_checked = {% if object and object.city %}true{% else %}false{% endif %};
-        var enableDisableCityButton = function (enabled) {
-            // @TODO inserir constate do model
-            if (enabled === true) {
-                app.switcheryElements['id_city'].enable();
-                window.setTimeout(function () {
-                    app.setSwitchery('#id_city', city_checked);
-                }, 200);
-            } else {
-                app.setSwitchery('#id_city', true);
-                window.setTimeout(function () {
-                    app.switcheryElements['id_city'].disable();
-                }, 200);
-            }
-        };
-
-        $(document).ready(function () {
-
-            $('#id_city').on('change', function () {
-                var address_required_el = $('input[value=address-show]');
-                // Seta flag somente se endereço não for obrigatório.
-                if (address_required_el.prop('checked') === false) {
-                    city_checked = $(this).prop('checked');
-                }
-            });
-
-            {% if object and object.address == object.ADDRESS_SHOW %}
-                enableDisableCityButton(false);
-            {% endif %}
-
-            {% if has_paid_lots %}
-                setLotPaiedStatus();
-            {% endif %}
-
-            $('input[type=radio]').on('ifChecked', function () {
-                var el = $(this);
-                if (el.prop('name') == 'address') {
-                    // @TODO inserir constate do model
-                    enableDisableCityButton(el.val() == 'address-hide');
-                }
-            });
-        });
-    </script>
 {% endblock %}
 
 {% block nav_aside_itens %}
@@ -151,9 +67,12 @@
 {% endblock %}
 
 {% block content %}
+
     {% if has_paid_lots %}
         <div class="well well-info">
-            Este evento possui um de seus lotes pagos, portanto os seguintes campos
+            Este evento possui um de seus lotes pagos, portanto os
+            seguintes
+            campos
             serão sempre obrigatórios:
 
             <ul style="margin-top: 8px;">
@@ -166,7 +85,8 @@
         </div>
     {% endif %}
 
-    <form action="" method="post" class="form-horizontal form-border"
+    <form action="" method="post"
+          class="form-horizontal form-border"
           role="form" name="event_form">
         {% csrf_token %}
 
@@ -192,7 +112,8 @@
                                 aria-hidden="true">
                             ×
                         </button>
-                        (Hidden field {{ hidden_field.name }}) {{ error }}
+                        (Hidden
+                        field {{ hidden_field.name }}) {{ error }}
                     </div>
                 {% endfor %}
             {% endif %}
@@ -213,7 +134,9 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
+
             <div class="col-md-6">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
@@ -223,19 +146,23 @@
                     </div>
                     <div class="panel-body">
                         <div class="well text-info small">
-                            Campos que não fazem parte do formulário padrão
+                            Campos que não fazem parte do formulário
+                            padrão
                             e são pré-definidos pelo sistema.
                         </div>
                         {% for field in form %}
                             {% if field.field.widget.input_type == 'radio' %}
-                                <div class="form-group" class="col-md-3">
+                                <div class="form-group"
+                                     class="col-md-3">
                                     <label for="{{ field.id_for_label }}">
                                         {{ field.label }}
                                         {% if field.field.required %}
-                                            <small style="color:#C9302C">*</small>
+                                            <small style="color:#C9302C">
+                                                *
+                                            </small>
                                         {% endif %}
                                     </label>
-                                    {{ field |add_class:"icheck"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                    {{ field |add_class:"icheck"|attr:"style:display:none" }}
                                     {% if field.errors %}
                                         {% for error in field.errors %}
                                             <div class="alert alert-danger
@@ -262,8 +189,10 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-md-6">
-                <div class="panel panel-primary">
+
+                <div class="panel panel-primary ">
                     <div class="panel-heading">
                         <div class="panel-title">
                             Campos pré-definidos
@@ -271,7 +200,8 @@
                     </div>
                     <div class="panel-body">
                         <div class="well text-info small">
-                            Campos que já existem no formulário e não podem ser
+                            Campos que já existem no formulário e
+                            não podem ser
                             removidos.
                         </div>
                         {% for field in form %}
@@ -280,7 +210,7 @@
                                     <label for="{{ field.id_for_label }}">
                                         {{ field.label }}
                                     </label>
-                                    {{ field |add_class:"js-switch"|attr:"style:display:none"|attr:"data-switchery:true" }}
+                                    {{ field |add_class:"js-switch"|attr:"style:display:none" }}
                                     {% if field.errors %}
                                         {% for error in field.errors %}
                                             <div class="alert alert-danger
@@ -305,8 +235,25 @@
                         {% endfor %}
                     </div>
                 </div>
+
+                <div class="panel panel-primary"
+                     id="survey-list-panel"
+                     style="display: none">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Formulários Personalizados
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div id="survey-list">
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
         </div>
+
         <div class="row">
             <div class="col-md-12">
                 <div class="buttonbar">
@@ -321,6 +268,109 @@
                 </div>
             </div>
         </div>
+
     </form>
 
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Se algum lote pago.
+        var setLotPaiedStatus = function () {
+            var radios = $('input[type=radio]');
+            radios.iCheck({
+                checkboxClass: 'icheckbox_flat-grey',
+                radioClass: 'iradio_flat-grey'
+            });
+            radios.prop('disabled', 'disabled');
+
+            window.setTimeout(function () {
+                app.switcheryElements['id_email'].disable();
+                app.switcheryElements['id_phone'].disable();
+                app.switcheryElements['id_city'].disable();
+            }, 200);
+
+            // Fields which are not influenced by paied lotes.
+            var fields_not_required = [
+                'institution',
+                'institution_cnpj',
+                'function'
+            ];
+
+            $.each(fields_not_required, function (i, f_name) {
+                for (var ii = 0; ii < 3; ii++) {
+                    var el = $('#id_' + f_name + '_' + ii);
+                    if (el.length) {
+                        el.removeAttr('disabled');
+                        el.iCheck({
+                            checkboxClass: 'icheckbox_flat-grey',
+                            radioClass: 'iradio_flat-blue'
+                        });
+                    }
+                }
+            });
+        };
+
+        // @TODO é o que vier da edição, se houver valor
+        var city_checked = {% if object and object.city %}true{% else %}
+            false{% endif %};
+        var enableDisableCityButton = function (enabled) {
+            // @TODO inserir constate do model
+            if (enabled === true) {
+                app.switcheryElements['id_city'].enable();
+                window.setTimeout(function () {
+                    app.setSwitchery('#id_city', city_checked);
+                }, 200);
+            } else {
+                app.setSwitchery('#id_city', true);
+                window.setTimeout(function () {
+                    app.switcheryElements['id_city'].disable();
+                }, 200);
+            }
+        };
+
+
+        var loadList = function () {
+            $.ajax({
+                url: '{% url 'subscription:survey-list' event.pk %}', success:
+                    function
+                        (result) {
+                        $("#survey-list").html(result);
+                        $("#survey-list-panel").show();
+
+                    }
+            });
+        };
+
+        $(document).ready(function () {
+
+            loadList();
+
+            $('#id_city').on('change', function () {
+                var address_required_el = $('input[value=address-show]');
+                // Seta flag somente se endereço não for obrigatório.
+                if (address_required_el.prop('checked') === false) {
+                    city_checked = $(this).prop('checked');
+                }
+            });
+
+            {% if object and object.address == object.ADDRESS_SHOW %}
+                enableDisableCityButton(false);
+            {% endif %}
+
+            {% if has_paid_lots %}
+                setLotPaiedStatus();
+            {% endif %}
+
+            $('input[type=radio]').on('ifChecked', function () {
+                var el = $(this);
+                if (el.prop('name') == 'address') {
+                    // @TODO inserir constate do model
+                    enableDisableCityButton(el.val() == 'address-hide');
+                }
+            });
+
+        });
+    </script>
 {% endblock %}
