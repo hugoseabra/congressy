@@ -69,9 +69,11 @@ class EventPaymentView(AccountMixin, ListView):
         return context
 
     def get_queryset(self):
+
         all_transactions = Transaction.objects.filter(
             subscription__event=self.event
-        ).order_by('subscription__person__name')
+        ).order_by('subscription__lot__date_start',
+                   'subscription__person__name')
 
         return all_transactions
 
