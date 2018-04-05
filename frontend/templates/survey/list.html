@@ -41,7 +41,12 @@
                                 {% for event_survey in object_list %}
                                     <tr>
                                         <td>
-                                            {{ event_survey.survey.name }}
+
+                                            <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
+                                                <strong>
+                                                    {{ event_survey.survey.name }}
+                                                </strong>
+                                            </a>
                                         </td>
                                         <td>
                                             <div class="btn-group">
@@ -60,10 +65,9 @@
                                                         dropdown-menu-right"
                                                         role="menu">
                                                     <li>
-                                                        <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
+                                                        <a href="#">
                                                             <i class="fas fa-pencil-alt"></i>
-                                                            Gerenciar
-                                                            campos
+                                                            Editar
                                                         </a>
                                                     </li>
 
