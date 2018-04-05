@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.db.models import Q
 from django.views.generic import ListView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -83,7 +84,9 @@ class EventPaymentView(AccountMixin, ListView):
         }
 
         transactions = \
-            Transaction.objects.filter(subscription__event=self.event)
+            Transaction.objects.filter(Q(subscription__event=self.event) & (Q(
+                status=Transaction.PAID) | Q(
+                status=Transaction.WAITING_PAYMENT)))
 
         for transaction in transactions:
             totals['total'] += transaction.liquid_amount or Decimal(0.00)
