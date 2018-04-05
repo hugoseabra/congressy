@@ -174,7 +174,7 @@ class SurveyField(object):
             self.django_field = fields.MultipleChoiceField(
                 label=self.label.title(),
                 initial=self.initial,
-                required=False,
+                required=self.required,
                 help_text=self.help_text,
                 widget=self._get_widget()
             )

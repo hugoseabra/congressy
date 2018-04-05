@@ -77,14 +77,13 @@
 
 
                                     <input type="checkbox"
-                                           class="js-switch update-required"
+                                           class="update_required"
                                            data-name="{{ field.name }}"
                                             {% if field.field.required %}
-                                           checked
+                                           checked="checked"
                                             {% endif %}
-                                           id="switchery_{{ field.name }}">
-                                    <label for="switchery_{{ field.name }}">
-
+                                           id="{{ field.name }}">
+                                    <label>
                                         Obrigatorio
                                     </label>
 

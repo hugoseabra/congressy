@@ -133,6 +133,19 @@ $(document).ready(function() {
         $('.cgsy-date-input').mask("99/99/9999");
         $('.cgsy-time-input').mask("99:99");
 
+        var radios = $('input[type=radio]');
+        var checkboxes = $('input[type=checkbox]');
+
+        radios.iCheck({
+            checkboxClass: 'icheckbox_flat-grey',
+            radioClass: 'iradio_flat-grey'
+        });
+
+        checkboxes.iCheck({
+            checkboxClass: 'icheckbox_flat-grey',
+            radioClass: 'iradio_flat-grey'
+        });
+
 
     });
 </script>

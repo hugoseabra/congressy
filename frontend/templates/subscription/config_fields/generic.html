@@ -19,7 +19,11 @@
 
         {% elif field.field.widget.input_type == "checkbox" %}
 
-            {{ field|add_class:"js-switch"|attr:"style:display:none" }}
+            {% if  required  or required == 'True' %}
+                {{ field|attr:"style:display:none"|attr:"required:required" }}
+            {% else %}
+                {{ field|attr:"style:display:none" }}
+            {% endif %}
 
         {% else %}
 
