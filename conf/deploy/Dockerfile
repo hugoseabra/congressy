@@ -18,7 +18,7 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
     locales \
         && apt-get purge -y --auto-remove \
         && apt-get clean \
-        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Locales
 ENV LC_ALL pt_BR.UTF-8
@@ -43,7 +43,7 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
     supervisor \
         && apt-get purge -y --auto-remove \
         && apt-get clean \
-        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # -----------------------------------------------------------------------------
 # Pypi packages
