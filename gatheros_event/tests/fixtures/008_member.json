@@ -130,5 +130,16 @@
       "created": "2018-01-25T14:14:06.544",
       "active": true
     }
+  },
+  {
+    "model": "gatheros_event.member",
+    "pk": 13,
+    "fields": {
+      "organization": 9,
+      "person": "c8671745-27b6-46b9-a61a-545e9be8f597",
+      "group": "admin",
+      "created": "2018-03-21T14:35:55.690",
+      "active": true
+    }
   }
 ]

@@ -122,3 +122,9 @@ class SplitDateTimeWidget(forms.MultiWidget):
             date = value.date()
 
         return [date, value.time().replace(microsecond=0)]
+
+
+class DateTimeInput(forms.DateTimeInput):
+    input_type = 'tel'
+
+

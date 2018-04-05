@@ -3,16 +3,42 @@
 <div class="form-group">
 
     {{ label_tag|safe|capfirst }}
-    <small style="color:#C9302C" {% if not required %}class="hidden"{% endif %}>
-        *
-    </small>
+    {% if  required  or required == 'True' %}
+        <small style="color:#C9302C">*</small>
+    {% endif %}
 
     <div>
-        {% include 'subscription/config_fields/render_field.html' with field=field required=required autofocus=autofocus %}
+
+        {% if autofocus %}
+
+            {% if  required  or required == 'True' %}
+                {{ field|add_class:"form-control"|attr:"required:required"|append_attr:"autofocus" }}
+            {% else %}
+                {{ field|add_class:"form-control"|append_attr:"autofocus" }}
+            {% endif %}
+
+        {% elif field.field.widget.input_type == "checkbox" %}
+
+            {% if  required  or required == 'True' %}
+                {{ field|attr:"style:display:none"|attr:"required:required" }}
+            {% else %}
+                {{ field|attr:"style:display:none" }}
+            {% endif %}
+
+        {% else %}
+
+            {% if  required  or required == 'True' %}
+                {{ field|add_class:"form-control"|attr:"required:required" }}
+            {% else %}
+                {{ field|add_class:"form-control" }}
+            {% endif %}
+
+        {% endif %}
+
 
         {% if help_text %}
             <div>
-                <small class="text-muted">{{ help_text|safe }}</small>
+                <small class="text-muted help-text">{{ help_text|safe }}</small>
             </div>
         {% endif %}
         {% if errors %}

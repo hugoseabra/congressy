@@ -1,0 +1,467 @@
+{% load static base_tags queryset_filter form_config_tags %}
+
+
+{% block content %}
+
+    <div class="tab-content">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <button type="button" class="btn btn-success"
+                                data-toggle="modal"
+                                data-target="#addSurvey">
+                            <i class="fa fa-plus"></i>
+                            Adicionar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        {% if object_list %}
+                            <table class="table noborder">
+                                <thead>
+                                <tr>
+                                    <th style="width: 90%"></th>
+                                    <th></th>
+                                </tr>
+
+                                </thead>
+                                <tbody>
+                                {% for event_survey in object_list %}
+                                    <tr>
+                                        <td>
+
+                                            <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
+                                                <strong>
+                                                    {{ event_survey.survey.name }}
+                                                </strong>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button
+                                                        type="button"
+                                                        class="btn
+                                        btn-primary btn-trans
+                                        btn-sm dropdown-toggle"
+                                                        data-toggle="dropdown"
+                                                        aria-expanded="false"
+                                                >
+                                                    <span class="fas fa-cog"></span>
+                                                </button>
+                                                <ul
+                                                        class="dropdown-menu
+                                                        dropdown-menu-right"
+                                                        role="menu">
+                                                    <li>
+                                                        <a class="open-editSurvey"
+                                                           data-id="{{ event_survey.pk }}"
+                                                           data-title="{{ event_survey.survey.name }}"
+                                                           data-description="{{ event_survey.survey.description }}">
+                                                            <i class="fas fa-pencil-alt"></i>
+                                                            Editar
+                                                        </a>
+                                                    </li>
+
+                                                    <li>
+                                                        <a class="open-DeleteQuestionDialog"
+                                                           data-event="{{ event.pk }}"
+                                                           data-survey-name="{{ event_survey.survey.name }}"
+                                                           data-survey="{{ event_survey.pk }}">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                            Excluir
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+
+                        {% else %}
+                            <h3>Nenhum formulário.</h3>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="addSurvey"
+         role="dialog">
+
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">
+                        Novo formulário</h4>
+                </div>
+
+                <form id="createSurveyForm" onsubmit="createEventSurvey(this); 
+                return false;">
+
+                    {% csrf_token %}
+
+                    <div class="modal-body">
+                        {% render_generic_field form.name autofocus=True %}
+                        {% render_generic_field form.description %}
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-success">Salvar
+                        </button>
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal fade" id="editSurvey"
+         role="dialog">
+
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">
+                        Editar questionário</h4>
+                </div>
+
+                <form onsubmit="editEventSurvey(this); return false;">
+
+                    {% csrf_token %}
+
+
+                    <div class="modal-body">
+
+                        <div class="form-group">
+
+                            <label>Nome:</label>
+
+                            <small style="color:#C9302C">*</small>
+
+
+                            <div>
+
+                                <input type="text" maxlength="255"
+                                       autofocus="" required=""
+                                       class="form-control form-control"
+                                       name="survey_edit_title"
+                                       id="surveyEditTitle">
+
+
+                                <div>
+                                    <small class="text-muted">Nome do seu
+                                        questionário
+                                    </small>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <label>Descrição:</label>
+
+                            <div>
+
+                                <textarea cols="20" rows="3"
+                                          class="form-control"
+                                          name="survey_edit_description"
+                                          id="surveyEditDescription"></textarea>
+
+                                <div>
+                                    <small class="text-muted">Uma descrição para
+                                        te ajudar a identificar este
+                                        questionário.
+                                    </small>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="action">
+                        <input type="hidden" name="event_survey_id"
+                               id="edit_event_survey_id">
+
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-success new_survey_save ">Salvar
+                        </button>
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal fade" id="deleteSurvey" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div id="question_delete_modal"></div>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script type="application/javascript">
+
+        $(document).ready(function () {
+
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom ' +
+                'messenger-on-right',
+                theme: 'flat'
+            };
+
+            $(".open-editSurvey").click(function () {
+                $('#surveyEditId').val($(this).data('id'));
+                $('#surveyEditTitle').val($(this).data('title'));
+                $('#surveyEditDescription').val($(this).data('description'));
+                $('#edit_event_survey_id').val($(this).data('id'));
+                $('input.action').val('edit');
+                $('#editSurvey').modal('show');
+            });
+
+            $(".open-deleteSurvey").click(function () {
+                $('#surveyDeleteId').val($(this).data('id'));
+                $('#surveyDeleteTitle').val($(this).data('title'));
+                $('#surveyDeleteDescription').val($(this).data('description'));
+                $('#delete_event_survey_id').val($(this).data('id'));
+                $('input.action').val('delete');
+                $('#deleteSurvey').modal('show');
+            });
+
+            $(document).on("click", ".open-AddSimpleQuestionDialog", function () {
+                var typeOfField = $(this).data('field-type');
+                var IconOfField = $(this).data('field-icon');
+                var typeEl = $('.modal-body .typeOfField');
+                var iconEl = $('.modal-body .iconOfField');
+                var formTypeEl = $('#id_simple_form-type');
+
+                typeEl.text(typeOfField);
+                iconEl.attr('class', 'iconOfField');
+                iconEl.addClass(IconOfField);
+                formTypeEl.val('simple');
+                $('#options').hide();
+                $('#addQuestion').modal('show');
+            });
+
+            $(document).on("click", ".open-AddComplexQuestionDialog", function () {
+
+                var typeOfField = $(this).data('field-type');
+                var IconOfField = $(this).data('field-icon');
+                var typeEl = $('.modal-body .typeOfField');
+                var iconEl = $('.modal-body .iconOfField');
+                var formTypeEl = $('#id_complex_form-type');
+
+                typeEl.text(typeOfField);
+                iconEl.attr('class', 'iconOfField');
+                iconEl.addClass(IconOfField);
+                formTypeEl.val('complex');
+                $('#options').show();
+                $('#addQuestion').modal('show');
+            });
+
+            $(document).on("click", ".open-DeleteQuestionDialog", function () {
+
+                var survey_id = $(this).data('survey');
+                var survey_name = $(this).data('survey-name');
+
+                $.get('{% url 'subscription:survey-ajax-delete' event.pk%}',
+                    function (data) {
+                        $('#question_delete_modal').html(data);
+                        $('#deleteSurvey').modal('show');
+                        $("#survey_name").text(survey_name);
+                        $("#delete_event_survey_id").val(survey_id);
+                    })
+                    .fail(function (err) {
+
+                        Messenger().post({
+                            message: 'Não foi possivel realizar essa ação ' +
+                            'nesse momento.',
+                            type: 'error'
+                        });
+
+                        throw err.responseText;
+
+                    });
+            });
+
+            //Disable btn save on first click
+            $(document).on("click", ".new_survey_save", function () {
+                this.disabled = true;
+            });
+
+        });
+
+
+        function editEventSurvey(form) {
+
+            $('#editSurvey').modal('hide');
+
+            var values = {};
+
+            $.each($(form).serializeArray(), function (i, field) {
+                values[field.name] = field.value;
+            });
+
+            var payload = {
+                action: 'edit',
+                event_survey_id: values['event_survey_id'],
+                survey_edit_title: values['survey_edit_title'],
+                survey_edit_description: values['survey_edit_description']
+            };
+
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            $.ajax({
+                type: "POST",
+                url: '{% url 'subscription:survey-ajax-edit' event.pk%}',
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: payload,
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Formulário editado com sucesso!',
+                        type: 'success'
+                    });
+                    updateSurveyList();
+                },
+                error: function () {
+
+                    Messenger().post({
+                        message: 'Não foi possivel editar seu formulário.',
+                        type: 'error'
+                    });
+                }
+            });
+
+            return false;
+
+
+        }
+
+        function updateSurveyList() {
+            $.ajax({
+                url: '{% url 'subscription:survey-list' event.pk %}', success:
+                    function
+                        (result) {
+                        $("#survey-list").html(result);
+                        $("#survey-list-panel").show();
+                    }
+            });
+        }
+
+        function createEventSurvey(form) {
+
+            $('#addSurvey').modal('hide');
+
+            var url = "{% url 'subscription:survey-create' event.pk %}";
+
+            var values = {};
+            $.each($(form).serializeArray(), function (i, field) {
+                values[field.name] = field.value;
+            });
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: values, // serializes the form's elements.
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel criar este ' +
+                        'formulário.',
+                        type: 'danger'
+                    });
+
+                    throw err.textField;
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Formulário criado com sucesso!',
+                        type: 'success'
+                    });
+                    updateSurveyList();
+                }
+            });
+        }
+
+    </script>
+
+{% endblock %}
+
+{% block styles %}
+
+    <style>
+
+        .list-group-item .control-buttons {
+            visibility: hidden;
+        }
+
+        .list-group-item:hover .control-buttons {
+            visibility: visible;
+        }
+
+        .noborder td, .noborder th {
+            border: none !important;
+        }
+
+    </style>
+
+{% endblock %}
+
+
