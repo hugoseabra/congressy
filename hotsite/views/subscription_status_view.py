@@ -14,7 +14,7 @@ from hotsite.views import EventMixin
 from payment.models import Transaction
 
 
-class HotsiteSubscriptionStatusView(EventMixin, generic.TemplateView):
+class SubscriptionStatusView(EventMixin, generic.TemplateView):
     template_name = 'hotsite/subscription_status.html'
     person = None
     subscription = None

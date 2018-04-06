@@ -19,7 +19,7 @@ from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
 
-class HotsiteSubscriptionView(SubscriptionFormMixin, generic.View):
+class SubscriptionView(SubscriptionFormMixin, generic.View):
     template_name = 'hotsite/subscription.html'
     form_class = PersonForm
 
