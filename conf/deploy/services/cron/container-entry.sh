@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
+# Define settings
+export DJANGO_SETTINGS_MODULE=project.manage.settings.prod
+
 # Export all enviorment varibales to file which cron can see it
 printenv | grep -v "no_proxy" >> /etc/environment
 
 source /scripts.sh
-
-# Define settings
-export DJANGO_SETTINGS_MODULE=project.manage.settings.prod
 
 # Configura dadosde sincronização.
 run_python_script "Configurando SYNC" /configure-sync.py
