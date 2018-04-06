@@ -1,0 +1,47 @@
+{% extends 'hotsite/base.html' %}
+{% load static user_agents user_agent_tag %}
+{% load l10n humanize %}
+
+{% block styles %}
+    <style>
+        .form-group {
+            margin: 4px 0;
+        }
+
+        input#id_city, input#id_city_search {
+            text-transform: uppercase;
+        }
+
+        .loader-box {
+            width: 100%;
+            position: absolute;
+            top: 5%;
+        }
+
+        .loader {
+            width: 47px;
+            margin: 0 auto;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    {% include 'hotsite/includes/2_cover_no_form.html' %}
+
+    <!-- FORM
+    ================================= -->
+    <section id="about" class="about-section section">
+        <div class="container">
+            <h2 class="section-heading text-center">Inscrição</h2>
+            <div class="about-row row">
+                <div class="col-md-9 col-md-offset-2">
+                    <h1>Hi nathan.</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

@@ -369,3 +369,9 @@ class SubscriptionView(SubscriptionFormMixin, generic.View):
 
         # CONDIÇÃO 5
         return redirect('public:hotsite', slug=self.event.slug)
+
+
+class SubscriptionLotFormView(SubscriptionFormMixin, generic.FormView):
+    template_name = 'hotsite/subscription_lot_form.html'
+    form_class = PersonForm
+

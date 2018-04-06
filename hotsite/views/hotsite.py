@@ -198,7 +198,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             user.last_login = None
             user.save()
 
-        return redirect('public:hotsite-subscription', slug=self.event.slug)
+        return redirect('public:hotsite-subscription-lot-form', slug=self.event.slug)
 
     def _configure_brand_person(self, person):
         """ Configura nova pessoa cadastrada. """

@@ -27,7 +27,8 @@
 
     <!-- FAVICONS -->
     <link rel="icon" href="{% static 'hotsite/images/favicons/favicon.ico' %}">
-    <link rel="apple-touch-icon" href="{% static 'hotsite/images/favicons/apple-touch-icon.png' %}">
+    <link rel="apple-touch-icon"
+          href="{% static 'hotsite/images/favicons/apple-touch-icon.png' %}">
 
     <!-- CSS
     ================================= -->
@@ -40,14 +41,16 @@
 
     <!-- LIBRARIES CSS -->
     <link rel="stylesheet" href="{% static 'hotsite/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'hotsite/css/fontawesome-all.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'hotsite/css/fontawesome-all.min.css' %}">
     <link rel="stylesheet" href="{% static 'hotsite/css/animate.min.css' %}">
 
     <!-- SPECIFIC CSS -->
     <link rel="stylesheet" href="{% static 'hotsite/css/style.css' %}">
 
     <!-- COLOR -->
-    <link id="color-css" rel="stylesheet" href="{% static 'hotsite/css/colors/blue.css' %}">
+    <link id="color-css" rel="stylesheet"
+          href="{% static 'hotsite/css/colors/blue.css' %}">
     <style>
         img.blurred {
             -webkit-filter: blur(18px);
@@ -69,11 +72,11 @@
 
 <div id="document" class="document">
 
-{% include 'hotsite/includes/1_top_menu.html' %}
+    {% include 'hotsite/includes/1_top_menu.html' %}
 
-{% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 
-{% include 'hotsite/includes/7_footer.html' %}
+    {% include 'hotsite/includes/7_footer.html' %}
 </div>
 
 <!-- LIBRARIES JS
@@ -89,6 +92,7 @@
 <script src="{% static 'hotsite/js/jquery.stellar.min.js' %}"></script>
 <script src="{% static 'hotsite/js/responsiveslides.min.js' %}"></script>
 <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+<script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
 
 <!-- MAIN SCRIPT
 ================================= -->
@@ -97,34 +101,31 @@
 
 {% block scripts %}{% endblock %}
 
-{% if event.place and event.place.show_location is True and event.place.lat and event.place.long %}
-<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}"></script>
 <script>
-var MAP_POINTER = "{% static 'hotsite/images/contents/map-1.png'%}";
-</script>
-<script src="{% static 'hotsite/js/map.js' %}"></script>
-<script src="{% static 'hotsite/js/maplace-0.2.10.min.js' %}"></script>
-<script>
-$(document).ready(function() {
-    window.setTimeout(function() {
-        show_map(
-            '{{ event.place.lat }}',
-            '{{ event.place.long }}',
-            '{{ event.place.zoom|default_if_none:18 }}',
-            '<strong>{{ event.name }}</strong>'
-        );
-    }, 300);
-});
-</script>
-{% endif %}
-<script>
-$(document).ready(function() {
-    window.setTimeout(function() {
-        $('input[type=email]').on('keyup', function() {
-            $(this).val($(this).val().toLowerCase());
-        })
-    }, 300);
-});
+    $(document).ready(function () {
+        window.setTimeout(function () {
+            $('input[type=email]').on('keyup', function () {
+                $(this).val($(this).val().toLowerCase());
+            }, 300);
+
+            $('.cgsy-date-input').mask("99/99/9999");
+            $('.cgsy-time-input').mask("99:99");
+
+            var radios = $('input[type=radio]');
+            var checkboxes = $('input[type=checkbox]');
+
+            radios.iCheck({
+                checkboxClass: 'icheckbox_flat-grey',
+                radioClass: 'iradio_flat-grey'
+            });
+
+            checkboxes.iCheck({
+                checkboxClass: 'icheckbox_flat-grey',
+                radioClass: 'iradio_flat-grey'
+            });
+
+        });
+    });
 </script>
 
 {% include 'sentry-javascript-sdk.html' %}
