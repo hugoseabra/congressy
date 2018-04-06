@@ -16,7 +16,6 @@ from survey.forms import QuestionForm, SurveyForm
 from survey.models import Survey, Question
 
 
-
 class SurveyMixin(TemplateNameableMixin, generic.View):
     survey = None
 
@@ -68,13 +67,10 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
 
             if action == 'delete':
 
-                try:
-                    question = Question.objects.get(name=question_id,
-                                                    survey=self.survey)
-                    question.delete()
-                except Question.DoesNotExist:
-                    return HttpResponse(status=404)
-
+                question = get_object_or_404(Question,
+                                             survey=self.survey,
+                                             pk=int(question_id))
+                question.delete()
                 return HttpResponse(status=200)
 
             elif action == 'update_order':
@@ -147,8 +143,8 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
                     return HttpResponse(status=200)
 
                 return HttpResponse(status=500)
-            else:
-                return HttpResponse(status=500)
+
+            return HttpResponse(status=500)
 
         question_type = self.request.POST.get('question_type', None)
 

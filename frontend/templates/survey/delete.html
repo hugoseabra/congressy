@@ -2,18 +2,19 @@
     <button type="button" class="close" data-dismiss="modal">
         &times;
     </button>
-    <h4 class="modal-title">Apagar questionário</h4>
+    <p class="modal-title">
+        <strong>
+            Certeza que deseja deletar essa formulário?
+        </strong>
+    </p>
 </div>
-<form id="deleteSurveyForm" action="{% url 'subscription:survey-ajax-delete' event.pk%}">
+<form id="deleteSurveyForm"
+      action="{% url 'subscription:survey-ajax-delete' event.pk %}">
     <div class="modal-body">
 
         {% csrf_token %}
 
-        <strong style="font-size: 25px">
-            Certeza que deseja deletar?
-        </strong>
-
-        <div style="font-size: 25px" id="survey_name"></div>
+        <i id="survey_name"></i>
 
         <input type="hidden" name="event_survey_id" id="delete_event_survey_id">
 

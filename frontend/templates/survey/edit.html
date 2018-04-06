@@ -90,7 +90,7 @@
     <div class="row">
         <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
             <div class="buttonbar">
-                <div class="float-right">
+                <div class="float-left">
                     <a href="{% url 'subscription:form-config' event.pk %}"
                        class="btn btn-primary">
                         <i class="fas fa-long-arrow-alt-left"></i>
@@ -259,7 +259,7 @@
                         Adicionar ao Formulário </p>
                 </div>
 
-                <form method="post">
+                <form method="post" id="addQuestionForm">
 
                     {% csrf_token %}
 
@@ -381,8 +381,7 @@
 
                                 <div>
 
-                                    <input class="js-switch"
-                                           id="id_intro_edit"
+                                    <input id="id_intro_edit"
                                            name="intro_edit"
                                            type="checkbox">
 
@@ -469,8 +468,9 @@
                             aria-hidden="true">&times;</span>
                     </button>
                     <p class="modal-title">
-                        Certeza que deseja deletar essa
-                        pergunta?
+                        <strong>
+                            Certeza que deseja deletar essa pergunta?
+                        </strong>
                     </p>
                     <hr/>
                     <i id="removingQuestion"></i>
@@ -654,7 +654,7 @@
 
             if (has_empty) {
                 if (!intro_field.is(':checked')) {
-                    intro_field.trigger('click');
+                    intro_field.iCheck('check');
                 }
             }
 
@@ -668,7 +668,6 @@
         $('#deleteQuestion').on('click', function () {
 
             var questionId = $('#removingQuestionId').val();
-            var questionName = $('#removingQuestionName').val();
             var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
 
             $.ajax({
@@ -693,13 +692,15 @@
                         message: 'Não foi possivel remover sua pergunta.',
                         type: 'error'
                     });
-                    updateFields();
                 }
             });
-            var questionListEl = $("ul").find("[data-name='" + questionName +
-                "']");
-            questionListEl.remove();
         });
+
+        $('#addQuestionForm').submit(function () {
+            $(this).find(':submit').attr('disabled', 'disabled');
+            $(this).submit();
+        });
+
 
         function editQuestion(form) {
 
@@ -748,7 +749,6 @@
         function createFieldList() {
 
             window.setTimeout(function () {
-                app.switcheryToggle();
 
                 var radios = $('input[type=radio]');
                 var checkboxes = $('input[type=checkbox]');
@@ -823,9 +823,12 @@
                     var questionIdEl = $('#removingQuestionId');
                     var questionNameEl = $('#removingQuestionName');
 
-                    questionEl.text(evt.item.dataset.label);
-                    questionIdEl.val(evt.item.dataset.name);
-                    questionNameEl.val(evt.item.dataset.name);
+                    var trElement = $(evt.item).closest('tr');
+                    var question = $(trElement).find('td:eq(1)').data();
+
+                    questionEl.text(question.questionLabel);
+                    questionIdEl.val(question.questionId);
+                    questionNameEl.val(question.questionLabel);
                     $('#confirmDelete').modal('show');
                 },
                 onEnd: function (evt) {
