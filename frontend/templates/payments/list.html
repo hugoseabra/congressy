@@ -173,7 +173,8 @@
                                         <div data-toggle="popover"
                                                 title="Histórico"
                                                 data-html="true"
-                                                data-content='{% for status in transaction.statuses.all %}
+                                                data-content='
+                                            {% for status in transaction.statuses.all|dictsort:"pk"  %}
                                                 {% if status.status == status.AUTHORIZED or status.status == status.PAID %}
                                                     <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
                                                 {% elif status.status == status.PROCESSING or status.status == status.WAITING_PAYMENT or status.status == status.PENDING_REFUND or status.status == status.CHARGEDBACK %}
