@@ -8,7 +8,7 @@ public_hotsite_urls = [
     url(r'^(?P<slug>[\w-]+)/subscription/$',
         views.SubscriptionView.as_view(), name='hotsite-subscription'),
     url(r'^(?P<slug>[\w-]+)/beta-subscription/$',
-        views.SubscriptionLotFormView.as_view(),
+        views.SubscriptionFormWizardView.as_view(),
         name='hotsite-subscription-lot-form'),
     url(r'^(?P<slug>[\w-]+)/subscription/status/$',
         views.SubscriptionStatusView.as_view(),

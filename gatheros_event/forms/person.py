@@ -76,8 +76,9 @@ class PersonForm(forms.ModelForm):
     def __init__(self, is_chrome=False, **kwargs):
 
         uf = None
-        if 'instance' in kwargs:
-            instance = kwargs.get('instance')
+
+        instance = kwargs.get('instance')
+        if instance:
             if instance.city:
                 uf = instance.city.uf
 

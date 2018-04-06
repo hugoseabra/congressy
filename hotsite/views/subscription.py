@@ -1,14 +1,18 @@
+import os
 from django.conf import settings
 from django.contrib import messages
+from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.views import generic
+from formtools.wizard.views import SessionWizardView
 
 from gatheros_event.forms import PersonForm
 from gatheros_subscription.models import FormConfig, Lot, \
     Subscription
-from hotsite.views import SubscriptionFormMixin
+from hotsite.forms import LotsForm, SubscriptionPersonForm
+from hotsite.views import SubscriptionFormMixin, EventMixin
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
@@ -17,6 +21,10 @@ from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
+
+TEMPLATES = {"lot": "hotsite/subscription_lot_form.html",
+             "person": "hotsite/subscription_person_form.html",
+             }
 
 
 class SubscriptionView(SubscriptionFormMixin, generic.View):
@@ -371,7 +379,52 @@ class SubscriptionView(SubscriptionFormMixin, generic.View):
         return redirect('public:hotsite', slug=self.event.slug)
 
 
-class SubscriptionLotFormView(SubscriptionFormMixin, generic.FormView):
-    template_name = 'hotsite/subscription_lot_form.html'
-    form_class = PersonForm
+class SubscriptionFormWizardView(EventMixin, SessionWizardView):
+    form_list = [
+        ("lot", LotsForm),
+        ("person", SubscriptionPersonForm),
+    ]
 
+    file_storage = FileSystemStorage(
+        location=os.path.join(settings.MEDIA_ROOT, 'photos'))
+
+    def get_template_names(self):
+        return [TEMPLATES[self.steps.current]]
+
+    def done(self, form_list, form_dict, **kwargs):
+        print('hi')
+        return redirect(
+            'public:hotsite-subscription-status',
+            slug=self.event.slug
+        )
+
+    def get_form_list(self):
+        form_list = super().get_form_list()
+        form_list['lot'].event = self.event
+        form_list['person'].event = self.event
+        return form_list
+
+    def process_step(self, form):
+
+        step_data = super().process_step(form)
+
+        return step_data
+
+    def get_form(self, step=None, data=None, files=None):
+
+        if step == 'person':
+
+            lot_data = self.get_cleaned_data_for_step('lot')
+            data.up
+            data={
+                'lot': '1'
+            }
+
+        form = super(SubscriptionFormWizardView, self).get_form(step, data,
+                                                                files)
+
+        # determine the step if not given
+        if step is None:
+            step = self.steps.current
+
+        return form
