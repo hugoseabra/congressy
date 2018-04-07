@@ -87,12 +87,13 @@ class ApplicationServiceMixin(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
+        if hasattr(self.manager_class, 'cleaned_data'):
+            self.manager.cleaned_data.update(cleaned_data)
         cleaned_data.update(self.manager.cleaned_data)
         return cleaned_data
 
     def save(self, commit=True):
         return self.manager.save(commit=commit)
 
-    @staticmethod
-    def _get_manager_kwargs(**kwargs):
+    def _get_manager_kwargs(self, **kwargs):
         return kwargs
