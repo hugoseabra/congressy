@@ -1,16 +1,16 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
-from django.conf import settings
 
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription import forms
-from gatheros_subscription.models import Lot
+from gatheros_subscription.models import Lot, EventSurvey
 
 
 class BaseLotView(AccountMixin, View):
@@ -147,6 +147,7 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
         context = super(LotAddFormView, self).get_context_data(**kwargs)
         context['form_title'] = "Novo lote para '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
+        context['has_surveys'] = self._event_has_surveys()
         return context
 
     def form_valid(self, form):
@@ -200,6 +201,10 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
 
         return True
 
+    def _event_has_surveys(self):
+        all_surveys = EventSurvey.objects.filter(event=self.event).count()
+        return all_surveys > 0
+
 
 class LotEditFormView(BaseFormLotView, generic.UpdateView):
     show_not_allowed_message = True
@@ -213,6 +218,7 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         context = super(LotEditFormView, self).get_context_data(**kwargs)
         context['form_title'] = "Editar lote de '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
+        context['has_surveys'] = self._event_has_surveys()
 
         return context
 
@@ -280,6 +286,10 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
                         return False
 
         return True
+
+    def _event_has_surveys(self):
+        all_surveys = EventSurvey.objects.filter(event=self.event).count()
+        return all_surveys > 0
 
 
 class LotDeleteView(BaseLotView, DeleteViewMixin):

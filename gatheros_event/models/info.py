@@ -40,8 +40,9 @@ class Info(models.Model, GatherosModelMixin):
 
     description = models.TextField(verbose_name='descrição (texto)')
     description_html = models.TextField(
-        verbose_name='descrição',
-        help_text="Descreva sobre o que se trata o seu evento"
+        verbose_name='descrição do evento',
+        help_text="Descreva as normas de seu evento, como a programação, "
+                  "regras, reembolsos, palestrantes, atrações"
     )
     event = models.OneToOneField(
         Event,
@@ -60,7 +61,7 @@ class Info(models.Model, GatherosModelMixin):
         max_length=255,
         null=True,
         blank=True,
-        verbose_name='descrição rápida',
+        verbose_name='descrição breve',
         help_text="Inspire aos visitantes a permanecerem no website do seu"
                   " evento"
     )
@@ -71,7 +72,11 @@ class Info(models.Model, GatherosModelMixin):
         verbose_name='imagem principal',
         variations={'default': (480, 638), 'thumbnail': (200, 266, True)},
         validators=[MinSizeValidator(480, 638), MaxSizeValidator(1400, 1861)],
-        help_text="Imagem única da descrição do evento: 480px x 638px"
+        help_text="Banner do evento, mínimo de: 480px largura x "
+                  "640px altura.(png/jpg) " 
+                  "<a  target='_blank'"
+                  "href='http://via.placeholder.com/480x638'>Exemplo"
+                  "</a>"
     )
     image1 = StdImageField(
         upload_to=get_image_path,

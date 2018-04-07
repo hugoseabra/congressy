@@ -25,7 +25,6 @@ class EventForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
-            'subscription_type',
         ]
 
         widgets = {

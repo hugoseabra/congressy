@@ -1,0 +1,68 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">
+        &times;
+    </button>
+    <p class="modal-title">
+        <strong>
+            Certeza que deseja deletar essa formulário?
+        </strong>
+    </p>
+</div>
+<form id="deleteSurveyForm"
+      action="{% url 'subscription:survey-ajax-delete' event.pk %}">
+    <div class="modal-body">
+
+        {% csrf_token %}
+
+        <i id="survey_name"></i>
+
+        <input type="hidden" name="event_survey_id" id="delete_event_survey_id">
+
+    </div>
+    <div class="modal-footer">
+        <input type="button" class="btn btn-danger" value="Confirmar"
+               id="confirmSurveyDelete"/>
+        <button type="button" class="btn btn-default"
+                data-dismiss="modal">Cancelar
+        </button>
+    </div>
+</form>
+
+<script>
+
+    $(document).ready(function () {
+
+
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom ' +
+            'messenger-on-right',
+            theme: 'flat'
+        };
+
+
+        $("#confirmSurveyDelete").on('click', function (e) {
+
+            $('#deleteSurvey').modal('hide');
+
+            var url = "{% url 'subscription:survey-ajax-delete' event.pk  %}";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: $("#deleteSurveyForm").serialize(), // serializes the form's elements.
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel apagar este questionario.',
+                        type: 'danger'
+                    });
+                },
+                success: function (res) {
+                    loadList();
+                }
+            });
+
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+        });
+    });
+
+</script>

@@ -15,6 +15,7 @@ from gatheros_event.models.constants import (
     CONGRESSY_PERCENT_10_0,
 )
 from gatheros_event.models.mixins import GatherosModelMixin
+from survey.models import Author
 from . import Lot
 from .rules import subscription as rule
 
@@ -138,6 +139,15 @@ class Subscription(models.Model, GatherosModelMixin):
         default=CONGRESSY_PERCENT_10_0,
         verbose_name='percentual congressy',
         help_text="Valor percentual da congressy."
+    )
+
+    author = models.OneToOneField(
+        Author,
+        on_delete=models.DO_NOTHING,
+        verbose_name='autor de resposta',
+        related_name='subscription',
+        blank=True,
+        null=True,
     )
 
     objects = SubscriptionManager()

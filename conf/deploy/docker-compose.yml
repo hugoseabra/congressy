@@ -14,6 +14,7 @@ services:
     entrypoint:
       - /services/volume/container-entry.sh
     volumes:
+      - "/etc/localtime:/etc/localtime"
       - "./media:/var/www/cgsy/media"
     env_file:
       - ./env-file
@@ -25,6 +26,7 @@ services:
     entrypoint:
       - /services/cron/container-entry.sh
     volumes:
+      - "/etc/localtime:/etc/localtime"
       - "./media:/var/www/cgsy/media"
     env_file:
       - ./env-file
@@ -40,6 +42,7 @@ services:
     entrypoint:
       - /services/web/manage/container-entry.sh
     volumes:
+      - "/etc/localtime:/etc/localtime"
       - "./media:/var/www/cgsy/media"
     env_file:
       - ./env-file
@@ -51,6 +54,8 @@ services:
       - redis
     ports:
       - "8001:80"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
     entrypoint:
       - /services/web/partner/container-entry.sh
     env_file:
