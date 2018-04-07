@@ -73,8 +73,21 @@ class SurveyDirector(object):
                     try:
                         answer = Answer.objects.get(question=question,
                                                     author=author)
-                        if answer.value:
-                            answers.update({question.name: answer.value.split(',')})
+
+                        if not answer.value:
+                            continue
+
+                        question = answer.question
+                        is_multiple = \
+                            question.type == question.FIELD_CHECKBOX_GROUP
+
+                        if is_multiple:
+                            value = answer.value.split(',')
+                        else:
+                            value = answer.value
+
+                        answers.update({question.name: value})
+
                     except Answer.DoesNotExist:
                         pass
 
