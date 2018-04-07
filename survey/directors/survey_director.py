@@ -2,6 +2,7 @@
     Intenção: Este diretor tem a intenção de integrar o módulo neste módulo
     'survey' neste módulo de hotsite.
 """
+from ast import literal_eval
 from gatheros_event.models import Event
 from gatheros_subscription.models import EventSurvey
 from survey.forms import SurveyForm
@@ -72,7 +73,8 @@ class SurveyDirector(object):
                     try:
                         answer = Answer.objects.get(question=question,
                                                     author=author)
-                        answers.update({question.name: answer.value})
+                        if answer.value:
+                            answers.update({question.name: answer.value.split(',')})
                     except Answer.DoesNotExist:
                         pass
 
