@@ -272,7 +272,6 @@
                 $('#installment_price_to_receive').html(items2.join(''));
             }
 
-
             $(document).ready(function () {
                 {% if LANGUAGE_CODE == 'pt-br' %}
                     $('#id_date_start_0').mask("99/99/9999");
@@ -291,6 +290,18 @@
                     $('#id_date_end_1').mask("99:99");
                 {% endif %}
 
+                var radios = $('input[type=radio]');
+                var checkboxes = $('input[type=checkbox]');
+                radios.iCheck({
+                    checkboxClass: 'icheckbox_flat-grey',
+                    radioClass: 'iradio_flat-grey'
+                });
+
+                checkboxes.iCheck({
+                    checkboxClass: 'icheckbox_flat-grey',
+                    radioClass: 'iradio_flat-grey'
+                });
+
 
                 $('#id_price').mask('#.##0,00', {reverse: true});
 
@@ -301,20 +312,20 @@
                 showHideInstallmentFields();
                 calcInstallments();
 
-                $('#limit_switch').on('change', function () {
+                $('#limit_switch').on('ifChanged', function () {
                     showHideLimit();
                 });
 
-                $('#id_private').on('change', function () {
+                $('#id_private').on('ifChanged', function () {
                     showHideExihibitionCode();
                 });
 
-                $('#id_transfer_tax').on('change', function () {
+                $('#id_transfer_tax').on('ifChanged', function () {
                     calculatePrices();
                     calcInstallments();
                 });
 
-                $('#id_allow_installment').on('change', function () {
+                $('#id_allow_installment').on('ifChanged', function () {
                     showHideInstallmentFields();
                     calcInstallments();
                 });
@@ -492,13 +503,8 @@
                                 <div class="form-group">
                                     <label>Limitar vagas</label>
                                     <div>
-                                        <input name="limit_switch"
-                                               class="js-switch"
-                                               id="limit_switch"
-                                               data-switchery="true"
-                                               style="display:none"
-                                               type="checkbox"
-                                               {% if object and object.limit > 0 %}checked{% endif %}
+                                        <input name="limit_switch" id="limit_switch"
+                                               type="checkbox" {% if object and object.limit > 0 %}checked{% endif %}
                                         />
                                     </div>
                                 </div>
@@ -664,7 +670,7 @@
 
                         {% if has_surveys %}
 
-                             {% render_generic_field form.event_survey %}
+                            {% render_generic_field form.event_survey %}
 
                         {% else %}
 
