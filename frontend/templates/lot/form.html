@@ -320,21 +320,21 @@
                     showHideExihibitionCode();
                 });
 
-                $('#id_transfer_tax').on('change', function () {
+                $('#id_transfer_tax').on('ifChanged', function () {
                     calculatePrices();
                     calcInstallments();
                 });
 
-                $('#id_allow_installment').on('change', function () {
+                $('#id_allow_installment').on('ifChanged', function () {
                     showHideInstallmentFields();
                     calcInstallments();
                 });
 
-                $('#id_installment_limit').on('change', function () {
+                $('#id_installment_limit').on('ifChanged', function () {
                     calcInstallments();
                 });
 
-                $('#id_num_install_interest_absortion').on('change', function () {
+                $('#id_num_install_interest_absortion').on('ifChanged', function () {
                     calcInstallments();
                 });
 
