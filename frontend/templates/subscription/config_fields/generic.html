@@ -20,9 +20,9 @@
         {% elif field.field.widget.input_type == "checkbox" %}
 
             {% if  required  or required == 'True' %}
-                {{ field|attr:"style:display:none"|attr:"required:required" }}
+                {{ field|attr:"required:required" }}
             {% else %}
-                {{ field|attr:"style:display:none" }}
+                {{ field }}
             {% endif %}
 
         {% else %}
