@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from django.db.utils import IntegrityError
 from django.forms import ValidationError
 
-__all__ = ['Entity', 'RuleChecker']
+__all__ = ['EntityMixin', 'RuleChecker']
 
 
 class RuleIntegrityError(IntegrityError):
@@ -35,16 +35,16 @@ class RuleChecker(ABC):
     """
 
     @abstractmethod
-    def check(self, *args, **kwargs):  # pragma: no cover
+    def check(self, model_instance, *args, **kwargs):  # pragma: no cover
         pass
 
 
-class Entity(object):
+class EntityMixin(object):
     """
         Answer domain model implementation.
     """
     # Rule instances
-    rule_instances = []
+    rule_instances = dict()
 
     def __init__(self, *args, **kwargs):
 
@@ -68,6 +68,9 @@ class Entity(object):
         """ Verifica as regras de integridade de domínio. """
 
         for rule in self.rule_instances:
+            if not isinstance(rule, RuleChecker):
+                rule = rule()
+
             try:
                 rule.check(self)
             except RuleIntegrityError as e:
