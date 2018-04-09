@@ -3,10 +3,12 @@
 Associado de uma organização.
 """
 from django.db import models
+
+from base.models import EntityMixin
 from gatheros_event.models import Organization
 
 
-class Associate(models.Model):
+class Associate(EntityMixin, models.Model):
     """ Associado de Organzação. """
 
     name = models.CharField(max_length=255, verbose_name='nome')
