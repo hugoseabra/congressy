@@ -57,7 +57,23 @@ class PersonForm(forms.ModelForm):
         """ Meta """
         model = Person
         # fields = '__all__'
-        exclude = ('user', 'occupation')
+        exclude = (
+            'user',
+            'occupation',
+            'skype',
+            'linkedin',
+            'twitter',
+            'facebook',
+            'website',
+            'avatar',
+            'synchronized',
+            'rg',
+            'orgao_expedidor',
+            'pne',
+            'politics_version',
+            'term_version',
+            'institution_cnpj'
+        )
 
         widgets = {
             # CPF como telefone para aparecer como número no mobile

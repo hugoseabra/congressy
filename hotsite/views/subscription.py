@@ -3,8 +3,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
-from django.http import HttpResponseNotAllowed
-from django.shortcuts import redirect
+from django.http import HttpResponseNotAllowed, HttpResponseBadRequest
+from django.shortcuts import redirect, render
 from django.views import generic
 from formtools.wizard.views import SessionWizardView
 
@@ -22,9 +22,19 @@ from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
-TEMPLATES = {"lot": "hotsite/subscription_lot_form.html",
-             "person": "hotsite/subscription_person_form.html",
-             }
+
+def step_1(request, event, *args, **kwargs):
+    form = LotsForm(event=event)
+    context = {'form': form, 'event': event}
+    response = render(request, 'hotsite/lot_form.html', context)
+    return response
+
+def step_2(request):
+    pass
+
+
+def step_3(request):
+    pass
 
 
 class SubscriptionView(SubscriptionFormMixin, generic.View):
@@ -379,52 +389,23 @@ class SubscriptionView(SubscriptionFormMixin, generic.View):
         return redirect('public:hotsite', slug=self.event.slug)
 
 
-class SubscriptionFormWizardView(EventMixin, SessionWizardView):
-    form_list = [
-        ("lot", LotsForm),
-        ("person", SubscriptionPersonForm),
-    ]
+class SubscriptionFormIndexView(EventMixin, generic.View):
+    """
+        View responsavel por decidir onde se inicia o process de inscrição
+    """
 
-    file_storage = FileSystemStorage(
-        location=os.path.join(settings.MEDIA_ROOT, 'photos'))
+    def get(self, request, *args, **kwargs):
+        return step_1(request, event=self.event)
 
-    def get_template_names(self):
-        return [TEMPLATES[self.steps.current]]
+    def post(self, request, *args, **kwargs):
 
-    def done(self, form_list, form_dict, **kwargs):
-        print('hi')
-        return redirect(
-            'public:hotsite-subscription-status',
-            slug=self.event.slug
-        )
+        next_step = request.POST.get('next_step')
 
-    def get_form_list(self):
-        form_list = super().get_form_list()
-        form_list['lot'].event = self.event
-        form_list['person'].event = self.event
-        return form_list
-
-    def process_step(self, form):
-
-        step_data = super().process_step(form)
-
-        return step_data
-
-    def get_form(self, step=None, data=None, files=None):
-
-        if step == 'person':
-
-            lot_data = self.get_cleaned_data_for_step('lot')
-            data.up
-            data={
-                'lot': '1'
-            }
-
-        form = super(SubscriptionFormWizardView, self).get_form(step, data,
-                                                                files)
-
-        # determine the step if not given
-        if step is None:
-            step = self.steps.current
-
-        return form
+        if next_step == 1:
+            return step_1(request, event=self.event)
+        elif next_step == 2:
+            return step_2(request)
+        elif next_step == 3:
+            return step_3(request)
+        else:
+            return HttpResponseBadRequest()

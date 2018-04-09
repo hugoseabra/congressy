@@ -10,10 +10,12 @@ from gatheros_subscription.models import Lot
 
 
 class LotsForm(forms.Form):
-    event = None
-    def __init__(self, **kwargs):
 
-        self.event = self.event
+    event = None
+
+    def __init__(self, event, **kwargs):
+
+        self.event = event
 
         super().__init__(**kwargs)
         self.fields['lots'] = forms.ModelChoiceField(
@@ -25,8 +27,14 @@ class LotsForm(forms.Form):
             empty_label="- Selecione -",
             required=True
         )
+        self.order_fields(['lots', 'coupon_code', 'next_step'])
 
     coupon_code = forms.CharField(
         max_length=15,
         required=False,
     )
+
+    next_step = forms.IntegerField(
+        widget=forms.HiddenInput()
+    )
+

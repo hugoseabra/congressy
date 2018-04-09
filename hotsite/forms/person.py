@@ -22,7 +22,7 @@ class SubscriptionPersonForm(forms.Form, PersonForm):
 
         required_fields = ['gender']
 
-        has_paid_lots = self.has_paid_lots()
+        has_paid_lots = lot.price > 0
 
         if has_paid_lots or config.phone:
             required_fields.append('phone')
@@ -47,15 +47,4 @@ class SubscriptionPersonForm(forms.Form, PersonForm):
         for field_name in required_fields:
             self.setAsRequired(field_name)
 
-    def has_paid_lots(self):
-        """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
-            price = lot.price
-            if price is None:
-                continue
-
-            if lot.price > 0:
-                return True
-
-        return False
-
+        print('sdsadas')
