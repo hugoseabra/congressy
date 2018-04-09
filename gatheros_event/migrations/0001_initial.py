@@ -43,7 +43,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True,
                                         serialize=False, verbose_name='ID')),
                 (
-                'name', models.CharField(max_length=255, verbose_name='nome')),
+                    'name',
+                    models.CharField(max_length=255, verbose_name='nome')),
                 ('active',
                  models.BooleanField(default=True, verbose_name='ativo')),
                 ('description', models.TextField(blank=True, null=True,
@@ -61,7 +62,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True,
                                         serialize=False, verbose_name='ID')),
                 (
-                'name', models.CharField(max_length=255, verbose_name='nome')),
+                    'name',
+                    models.CharField(max_length=255, verbose_name='nome')),
                 ('subscription_type', models.CharField(
                     choices=[('simple', 'Simples (gratuitas)')],
                     default='simple',
@@ -113,17 +115,7 @@ class Migration(migrations.Migration):
                                                                      4096,
                                                                      1920)],
                                                              verbose_name='banner topo do site')),
-                ('image_main', stdimage.models.StdImageField(blank=True,
-                                                             help_text='Imagem única da descrição do evento: 480px x 638px',
-                                                             null=True,
-                                                             upload_to=gatheros_event.models.event.get_image_path,
-                                                             validators=[
-                                                                 stdimage.validators.MinSizeValidator(
-                                                                     480, 638),
-                                                                 stdimage.validators.MaxSizeValidator(
-                                                                     1400,
-                                                                     1400)],
-                                                             verbose_name='imagem principal')),
+                ('image_main', stdimage.models.StdImageField(blank=True, help_text="Imagem única da descrição do evento: 480px x 638px. <a  target='_blank' href='http://via.placeholder.com/480x638'>Exemplo </a>", null=True, upload_to=gatheros_event.models.event.get_image_path, validators=[stdimage.validators.MinSizeValidator(480, 638), stdimage.validators.MaxSizeValidator(1400, 1400)], verbose_name='imagem principal')),
                 ('website',
                  models.CharField(blank=True, max_length=255, null=True)),
                 ('facebook',
@@ -141,8 +133,9 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'evento',
                 'permissions': (
-                ('view_lots', 'Can view lots'), ('can_add_lot', 'Can add lot'),
-                ('can_manage_subscriptions', 'Can manage subscriptions')),
+                    ('view_lots', 'Can view lots'),
+                    ('can_add_lot', 'Can add lot'),
+                    ('can_manage_subscriptions', 'Can manage subscriptions')),
                 'ordering': ('name', 'pk', 'category__name'),
                 'verbose_name_plural': 'eventos',
             },
@@ -212,7 +205,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True,
                                         serialize=False, verbose_name='ID')),
                 (
-                'name', models.CharField(max_length=100, verbose_name='nome')),
+                    'name',
+                    models.CharField(max_length=100, verbose_name='nome')),
                 ('description', models.TextField(blank=True, null=True,
                                                  verbose_name='descrição (texto)')),
                 ('description_html', models.TextField(blank=True, null=True,
@@ -255,12 +249,13 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'organização',
                 'permissions': (
-                ('can_invite', 'Can invite members'), ('can_view', 'Can view'),
-                ('can_add_event', 'Can add event'),
-                ('can_view_members', 'Can view members'),
-                ('can_manage_members', 'Can manage members'),
-                ('can_manage_places', 'Can manage places'),
-                ('can_manage_fields', 'Can manage form fields')),
+                    ('can_invite', 'Can invite members'),
+                    ('can_view', 'Can view'),
+                    ('can_add_event', 'Can add event'),
+                    ('can_view_members', 'Can view members'),
+                    ('can_manage_members', 'Can manage members'),
+                    ('can_manage_places', 'Can manage places'),
+                    ('can_manage_fields', 'Can manage form fields')),
                 'ordering': ['name'],
                 'verbose_name_plural': 'organizações',
             },
@@ -273,7 +268,8 @@ class Migration(migrations.Migration):
                                           primary_key=True, serialize=False,
                                           unique=True)),
                 (
-                'name', models.CharField(max_length=255, verbose_name='nome')),
+                    'name',
+                    models.CharField(max_length=255, verbose_name='nome')),
                 ('gender', models.CharField(blank=True,
                                             choices=[('M', 'Masculino'),
                                                      ('F', 'Feminino')],
@@ -317,7 +313,8 @@ class Migration(migrations.Migration):
                  models.CharField(blank=True, max_length=255, null=True,
                                   verbose_name='orgão expedidor')),
                 (
-                'created', models.DateTimeField(auto_now_add=True, null=True)),
+                    'created',
+                    models.DateTimeField(auto_now_add=True, null=True)),
                 ('modified', models.DateTimeField(auto_now=True, null=True)),
                 ('synchronized', models.NullBooleanField(default=False)),
                 ('term_version', models.IntegerField(blank=True, null=True,
@@ -363,7 +360,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True,
                                         serialize=False, verbose_name='ID')),
                 (
-                'name', models.CharField(max_length=255, verbose_name='nome')),
+                    'name',
+                    models.CharField(max_length=255, verbose_name='nome')),
                 ('phone',
                  models.CharField(blank=True, max_length=12, null=True,
                                   verbose_name='telefone')),
@@ -416,7 +414,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True,
                                         serialize=False, verbose_name='ID')),
                 (
-                'name', models.CharField(max_length=255, verbose_name='nome')),
+                    'name',
+                    models.CharField(max_length=255, verbose_name='nome')),
                 ('active',
                  models.BooleanField(default=True, verbose_name='ativo')),
                 ('description', models.TextField(blank=True, null=True,
@@ -434,7 +433,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True,
                                         serialize=False, verbose_name='ID')),
                 (
-                'name', models.CharField(max_length=255, verbose_name='nome')),
+                    'name',
+                    models.CharField(max_length=255, verbose_name='nome')),
                 ('active',
                  models.BooleanField(default=True, verbose_name='ativo')),
                 ('description', models.TextField(blank=True, null=True,
@@ -449,11 +449,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Info',
             fields=[
-                ('description',
-                 models.TextField(verbose_name='descrição (texto)')),
-                ('description_html', models.TextField(
-                    help_text='Descreva sobre o que se trata o seu evento',
-                    verbose_name='descrição')),
+                ('description', models.TextField(
+                    verbose_name='descrição (texto)'
+                )),
+                ('description_html', models.TextField(help_text='Descreva as normas de seu evento, como a programação, regras, reembolsos, palestrantes, atrações', verbose_name='descrição do evento'),),
                 ('event', models.OneToOneField(
                     on_delete=django.db.models.deletion.CASCADE,
                     primary_key=True, serialize=False,
@@ -466,21 +465,8 @@ class Migration(migrations.Migration):
                              ('video', 'Vídeo (Youtube)')],
                     default='text_only', max_length=15,
                     verbose_name='Exibição')),
-                ('lead', models.CharField(blank=True,
-                                          help_text='Inspire aos visitantes a permanecerem no website do seu evento',
-                                          max_length=255, null=True,
-                                          verbose_name='descrição rápida')),
-                ('image_main', stdimage.models.StdImageField(blank=True,
-                                                             help_text='Imagem única da descrição do evento: 480px x 638px',
-                                                             null=True,
-                                                             upload_to=gatheros_event.models.info.get_image_path,
-                                                             validators=[
-                                                                 stdimage.validators.MinSizeValidator(
-                                                                     480, 638),
-                                                                 stdimage.validators.MaxSizeValidator(
-                                                                     1400,
-                                                                     1861)],
-                                                             verbose_name='imagem principal')),
+                ('lead', models.CharField(blank=True, help_text='Inspire aos visitantes a permanecerem no website do seu evento', max_length=255, null=True, verbose_name='descrição breve')),
+                ('image_main', stdimage.models.StdImageField(blank=True, help_text="Banner do evento, mínimo de: 480px largura x 640px altura.(png/jpg) <a target='_blank' href='http://via.placeholder.com/480x638'>Exemplo </a>", null=True, upload_to=gatheros_event.models.info.get_image_path, validators=[stdimage.validators.MinSizeValidator(480, 638), stdimage.validators.MaxSizeValidator(1400, 1861)], verbose_name='imagem principal'),),
                 ('image1', stdimage.models.StdImageField(blank=True,
                                                          help_text='Tamanho: 350px x 350px',
                                                          null=True,
