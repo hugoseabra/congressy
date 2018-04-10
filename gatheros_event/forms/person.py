@@ -118,10 +118,13 @@ class PersonForm(forms.ModelForm):
         return phone
 
     def clean_city(self):
-        if 'city' not in self.data:
+
+        city_pk = self.cleaned_data.get('city', None)
+
+        if not city_pk or not isinstance(int(city_pk), int):
             return None
 
-        return City.objects.get(pk=self.data['city'])
+        return City.objects.get(pk=int(city_pk))
 
     def clean_email(self):
         try:
