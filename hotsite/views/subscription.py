@@ -1,16 +1,18 @@
-import os
 from django.conf import settings
 from django.contrib import messages
-from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.http import HttpResponseNotAllowed, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.views import generic
-from formtools.wizard.views import SessionWizardView
 
+from base.form_step import StepBootstrapper, Step
 from gatheros_event.forms import PersonForm
+from gatheros_event.models import Event, Person
 from gatheros_subscription.models import FormConfig, Lot, \
     Subscription
+
+from gatheros_subscription.forms import SubscriptionForm
+
 from hotsite.forms import LotsForm, SubscriptionPersonForm
 from hotsite.views import SubscriptionFormMixin, EventMixin
 from mailer.services import (
@@ -23,19 +25,244 @@ from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
 
-def step_1(request, event, *args, **kwargs):
-    form = LotsForm(event=event)
-    context = {'form': form, 'event': event}
-    response = render(request, 'hotsite/lot_form.html', context)
-    return response
+class LotBootstrapper(StepBootstrapper):
+    fallback_step = 'step_1'
+    artifact_type = Lot
 
-def step_2(request):
-    pass
+    def __init__(self, **kwargs) -> None:
+
+        self.event = kwargs.get('event')
+        self.lot_pk = kwargs.get('lot_pk', None)
+        super().__init__()
+
+    def retrieve_artifact(self):
+
+        lot = None
+
+        if self.lot_pk:
+            try:
+                lot = Lot.objects.get(pk=int(self.lot_pk), event=self.event)
+            except Lot.DoesNotExist:
+                pass
+
+        return lot
 
 
-def step_3(request):
-    pass
+class PersonBootstrapper(StepBootstrapper):
+    fallback_step = 'step_2'
+    artifact_type = Lot
 
+    def __init__(self, **kwargs) -> None:
+        self.person_pk = kwargs.get('person_pk', None)
+        super().__init__()
+
+    def retrieve_artifact(self):
+
+        person = None
+
+        if self.person_pk:
+            try:
+                person = Person.objects.get(pk=self.person_pk)
+            except Person.DoesNotExist:
+                pass
+
+        return person
+
+
+class StepOne(Step):
+    template = 'hotsite/lot_form.html'
+
+    def __init__(self, request, event, form=None, context=None,
+                 dependency_artifacts=None, **kwargs) -> None:
+        self.event = event
+
+        super().__init__(request, form, context, dependency_artifacts,
+                         **kwargs)
+
+    def get_context(self):
+        context = super().get_context()
+
+        if not self.form_instance:
+            self.form_instance = LotsForm(event=self.event,
+                                          initial={'next_step': 1})
+
+        context['form'] = self.form_instance
+
+        return context
+
+
+class StepTwo(Step):
+    dependes_on = ('lot',)
+    dependency_bootstrap_map = {'lot': LotBootstrapper}
+    template = 'hotsite/person_form.html'
+
+    def __init__(self, request, event, form=None, context=None,
+                 dependency_artifacts=None, **kwargs) -> None:
+
+        self.event = event
+
+        lot_pk = None
+
+        if form and form.is_valid():
+            lot = form.cleaned_data['lot']
+            lot_pk = lot.pk
+
+        super().__init__(request, form, context, dependency_artifacts,
+                         event=self.event, lot_pk=lot_pk, **kwargs)
+
+    def get_context(self):
+
+        context = super().get_context()
+
+        lot = self.dependency_artifacts['lot']
+
+        if not self.form_instance:
+            self.form_instance = SubscriptionPersonForm(
+                lot=lot,
+                initial={
+                    'next_step': 2,
+                    'lot': lot.pk},
+                event=self.event
+            )
+
+        context['form'] = self.form_instance
+        context['event'] = self.event
+        context['remove_preloader'] = True
+
+        try:
+            config = lot.event.formconfig
+        except AttributeError:
+            config = FormConfig()
+
+        if lot.price > 0:
+            config.email = True
+            config.phone = True
+            config.city = True
+
+            config.cpf = config.CPF_REQUIRED
+            config.birth_date = config.BIRTH_DATE_REQUIRED
+            config.address = config.ADDRESS_SHOW
+
+        context['config'] = config
+        context['has_lots'] = lot.event.lots.count() > 1
+
+        return context
+
+
+class StepThree(Step):
+
+    dependes_on = ('lot', 'person')
+
+    dependency_bootstrap_map = {'lot': LotBootstrapper,
+                                'person': PersonBootstrapper}
+
+    template = 'hotsite/survey_form.html'
+
+    def __init__(self, request, event, form=None, context=None,
+                 dependency_artifacts=None, **kwargs) -> None:
+        self.event = event
+
+        super().__init__(request, form, context, dependency_artifacts,
+                         **kwargs)
+
+
+#
+# # Survey (Se existir)
+# def step_3(request, event, person, lot):
+#     if not lot:
+#         return step_1(request, event=event)
+#
+#     if not isinstance(lot, Lot) and isinstance(int(lot), Lot):
+#
+#         if isinstance(int(lot), int):
+#             try:
+#                 lot = Lot.objects.get(pk=int(lot), event=self.event)
+#             except Lot.DoesNotExist:
+#                 pass
+#
+#     if not person:
+#         return step_2(request, event=event)
+
+
+# # Dados pessoais
+# def step_2(request, event, lot=None, form=None):
+#     if not lot and not form:
+#         step_1 = StepOne(
+#             request=request,
+#             event=event,
+#             context={
+#                 'event': event,
+#                 'remove_preloader': True
+#             })
+#
+#         return step_1.render()
+#
+#     if not lot:
+#
+#         lot = form.event_lot
+#
+#         if not isinstance(lot, Lot):
+#             return step_1(request, event=event)
+#
+#     if not form:
+#         form = SubscriptionPersonForm(lot=lot,
+#                                       initial={
+#                                           'next_step': 2,
+#                                           'lot': lot.pk},
+#                                       event=event
+#                                       )
+#
+#     context = {'form': form, 'event': lot.event}
+#
+#     try:
+#         config = lot.event.formconfig
+#     except AttributeError:
+#         config = FormConfig()
+#
+#     if lot.price > 0:
+#         config.email = True
+#         config.phone = True
+#         config.city = True
+#
+#         config.cpf = config.CPF_REQUIRED
+#         config.birth_date = config.BIRTH_DATE_REQUIRED
+#         config.address = config.ADDRESS_SHOW
+#
+#     context['config'] = config
+#     context['remove_preloader'] = True
+#     context['has_lots'] = lot.event.lots.count() > 1
+#
+#     response = render(request, 'hotsite/person_form.html', context)
+#
+#     return response
+
+
+#
+# # Survey (Se existir)
+# def step_3(request, event, person, lot):
+#     if not lot:
+#         return step_1(request, event=event)
+#
+#     if not isinstance(lot, Lot) and isinstance(int(lot), Lot):
+#
+#         if isinstance(int(lot), int):
+#             try:
+#                 lot = Lot.objects.get(pk=int(lot), event=self.event)
+#             except Lot.DoesNotExist:
+#                 pass
+#
+#     if not person:
+#         return step_2(request, event=event)
+#
+#
+# # Pagamentos (Se existir)
+# def step_4(request, person, lot, survey=None):
+#     pass
+#
+#
+# # Salva inscrição e redireciona para pagina de status.
+# def step_5(request):
+#     pass
 
 class SubscriptionView(SubscriptionFormMixin, generic.View):
     template_name = 'hotsite/subscription.html'
@@ -395,17 +622,121 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
     """
 
     def get(self, request, *args, **kwargs):
-        return step_1(request, event=self.event)
+
+        """
+            Se for evento com inscrição por lotes, ir para o step 1,
+            caso contrario pode pular direto para o step 2.
+        """
+        if self.event.subscription_type == Event.SUBSCRIPTION_BY_LOTS:
+
+            step_1 = StepOne(
+                request=request,
+                event=self.event,
+                context={
+                    'event': self.event,
+                    'remove_preloader': True
+                })
+
+            return step_1.render()
+
+        elif self.event.subscription_type == Event.SUBSCRIPTION_SIMPLE:
+
+            lot = self.event.lots.first()
+
+            step_2 = StepTwo(request=request, event=self.event,
+                             dependency_artifacts={'lot': lot},)
+
+            return step_2.render()
 
     def post(self, request, *args, **kwargs):
 
-        next_step = request.POST.get('next_step')
+        next_step = int(request.POST.get('next_step', 0))
 
-        if next_step == 1:
-            return step_1(request, event=self.event)
+        if next_step == 0:
+
+            step_1 = StepOne(
+                request=request,
+                event=self.event,
+                context={
+                    'event': self.event,
+                    'remove_preloader': True
+                })
+
+            return step_1.render()
+
+        elif next_step == 1:
+
+            form = LotsForm(event=self.event, data=request.POST)
+
+            if form.is_valid():
+                lot = form.cleaned_data['lots']
+
+                step_2 = StepTwo(request=request, event=self.event,
+                                 dependency_artifacts={'lot': lot})
+
+                return step_2.render()
+
+            # Form did not validate, re-render step #1 and retrieve a lot
+            # correctly.
+            step_1 = StepOne(
+                request=request,
+                event=self.event,
+                context={
+                    'event': self.event,
+                    'remove_preloader': True
+                },
+                form=form,
+            )
+
+            return step_1.render()
+
         elif next_step == 2:
-            return step_2(request)
-        elif next_step == 3:
-            return step_3(request)
+
+            lot_pk = request.POST.get('lot', None)
+            lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk, event=self.event)
+
+            lot = lot_bootstrapper.retrieve_artifact()
+
+            if not lot:
+                step_1 = StepOne(
+                    request=request,
+                    event=self.event,
+                    context={
+                        'event': self.event,
+                        'remove_preloader': True
+                    })
+                return step_1.render()
+
+            form = SubscriptionPersonForm(event=self.event,
+                                          lot=lot,
+                                          data=request.POST)
+
+            if form.is_valid():
+                person = form.save()
+                # TO BE CONTINUED FROM HERE >>> GOT TO HERE
+                # Create subscription here.
+
+                """
+                    Se o lote possuir surveys, ir para step 3, se não
+                    podemos ir direto para o step 4.
+                """
+                # if lot.event_survey:
+                #     return step_3(request, person, lot)
+                # else:
+                #     return step_4(request, person, lot, )
+                #
+
+
+            # Form did not validate, re-render step 2, with a form.
+            step_2 = StepTwo(request=request, event=self.event,
+                             dependency_artifacts={'lot': lot}, form=form)
+            return step_2.render()
+
+
+        #
+        # elif next_step == 3:
+        #     raise Exception('not there yet bucko')
+        # elif next_step == 4:
+        #     raise Exception('not there yet bucko')
         else:
             return HttpResponseBadRequest()

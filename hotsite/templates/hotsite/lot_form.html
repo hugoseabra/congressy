@@ -68,45 +68,42 @@
 
                         <div class="form-validation alert"></div>
 
-                        <div style="margin-bottom: 20px" id="lots-field">
-                            {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <div class="panel-title">Ingresso</div>
-                                    </div>
-                                    <div class="panel-body">
-                                        <div class="row">
-                                            <div class="col-md-12">
+                        <div style="margin-bottom: 20px">
 
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="panel-title">Ingresso</div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
                                                 {% for field in form %}
                                                     {% render_generic_field field %}
                                                 {% endfor %}
 
-                                                <div class="col-md-6 text-muted small"
-                                                     style="padding-left:0">
-                                                    Escolha o tipo de ingresso.
-                                                </div>
-                                                {% if has_coupon %}
-                                                    <div class="col-md-6 text-right small"
-                                                         style="margin-top: 8px;">
-                                                        <a id="coupon_link"
-                                                           href="javascript:void(0)"
-                                                           data-toggle="popover"
-                                                           title="<strong>Informe o código</strong>"
-                                                           data-html="true"
-                                                           data-container="body"
-                                                           data-content="{% include 'hotsite/includes/coupon.html' %}">
-                                                            Possui cupom?
-                                                        </a>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
+                                                <button style="margin-top: 5px;"
+                                                        class="btn
+                                                        btn-primary pull-right"
+                                                        type="submit">
+                                                    Próximo
+                                                </button>
+
+
+                                            {% else %}
+                                                Evento não possui lotes.
+                                            {% endif %}
+                                            <a href="{% url 'public:hotsite' event.slug %}"
+                                               class="btn btn-primary pull-left"
+                                               style="margin-top: 5px;">
+                                                Voltar
+                                            </a>
+
                                         </div>
                                     </div>
                                 </div>
-                                <input type="hidden" name="amount"
-                                       id="id_amount" value=""/>
-                            {% endif %}
+                            </div>
                         </div>
 
                     </form>

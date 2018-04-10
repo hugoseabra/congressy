@@ -2,17 +2,42 @@
     Formulário usado para pegar os dados da pessoa durante inscrições no
     hotsite
 """
+from datetime import datetime
+
 from django import forms
 
 from gatheros_event.forms import PersonForm
-from gatheros_subscription.models import FormConfig
+from gatheros_subscription.models import FormConfig, Lot
 
 
 class SubscriptionPersonForm(forms.Form, PersonForm):
 
-    def __init__(self, is_chrome=False, **kwargs):
+    event = None
+    event_lot = None
+
+    next_step = forms.IntegerField(
+        widget=forms.HiddenInput()
+    )
+
+    def __init__(self, lot, event, is_chrome=False, **kwargs):
+
+        if not isinstance(lot, Lot):
+            raise TypeError('lot não é do tipo Lot')
+
+        self.event = event
+        self.event_lot = lot
 
         super().__init__(is_chrome, **kwargs)
+
+        self.fields['lot'] = forms.ModelChoiceField(
+            queryset=Lot.objects.filter(event=self.event,
+                                        date_start__lte=datetime.now(),
+                                        date_end__gte=datetime.now(),
+                                        private=False,
+                                        ),
+
+            widget=forms.HiddenInput(),
+        )
 
         try:
             config = self.event.formconfig
@@ -22,7 +47,7 @@ class SubscriptionPersonForm(forms.Form, PersonForm):
 
         required_fields = ['gender']
 
-        has_paid_lots = lot.price > 0
+        has_paid_lots = self.event_lot.price > 0
 
         if has_paid_lots or config.phone:
             required_fields.append('phone')
@@ -46,5 +71,3 @@ class SubscriptionPersonForm(forms.Form, PersonForm):
 
         for field_name in required_fields:
             self.setAsRequired(field_name)
-
-        print('sdsadas')
