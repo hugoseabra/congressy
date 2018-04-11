@@ -12,6 +12,7 @@ class Associate(EntityMixin, models.Model):
     """ Associado de Organzação. """
 
     name = models.CharField(max_length=255, verbose_name='nome')
+    email = models.EmailField(verbose_name='e-mail')
     active = models.BooleanField(default=True, verbose_name='ativo')
 
     organization = models.ForeignKey(
