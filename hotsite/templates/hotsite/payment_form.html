@@ -49,10 +49,17 @@
             <input type="hidden" id="id_card_hash" name="card_hash">
             <input type="hidden" id="id_transaction_type"
                    name="transaction_type">
+            <input type="hidden" id="id_lot_as_json"
+                   name="lot_as_json" value="{{ lot }}">
 
             <div class="text-center">
                 <img style="width: 80%; margin-top: 20px"
                      src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
+
+
+                <pre>
+                    {{ lot }}
+                </pre>
             </div>
 
         </div>
@@ -71,9 +78,12 @@
     <script src="{% static "hotsite/js/payment.js" %}"></script>
     <script>
 
-
         $(document).ready(function () {
-            var lot = $('#id_lot');
+
+
+            var lot = JSON.parse($('#id_lot_as_json').val());
+            console.log(lot);
+            console.log('-------');
             show_hide_payment_block(lot.length > 0 && lot.val());
 
             $('#id_email').attr('readonly', 'readonly');
@@ -119,7 +129,11 @@
 
                 $('#id_lot').trigger('change');
             }, 300);
+
+
         });
+
+
     </script>
 {% endblock %}
 

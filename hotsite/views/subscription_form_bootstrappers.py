@@ -1,6 +1,6 @@
 from base.form_step import StepBootstrapper
 from gatheros_event.models import Person
-from gatheros_subscription.models import Lot, Subscription
+from gatheros_subscription.models import Lot, Subscription, EventSurvey
 
 
 class LotBootstrapper(StepBootstrapper):
@@ -67,3 +67,26 @@ class SubscriptionBootstrapper(StepBootstrapper):
                 pass
 
         return subscription
+
+
+class EventSurveyBootstrapper(StepBootstrapper):
+    fallback_step = 'step_2'
+    artifact_type = EventSurvey
+
+    def __init__(self, **kwargs) -> None:
+        self.event_survey_pk = kwargs.get('event_survey_pk', None)
+        super().__init__()
+
+    def retrieve_artifact(self):
+
+        event_survey = None
+
+        if self.event_survey_pk:
+            try:
+                event_survey = EventSurvey.objects.get(
+                    pk=self.event_survey_pk)
+            except EventSurvey.DoesNotExist:
+                pass
+
+        return event_survey
+
