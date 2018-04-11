@@ -6,6 +6,7 @@ from base.exceptions import FormStepMissingBootstrapMappingError, \
 
 
 class Step(object):
+
     dependes_on = ()
     dependency_bootstrap_map = {}
     request = None
@@ -56,7 +57,7 @@ class Step(object):
                     .format(dependency)
                 raise FormStepMissingBootstrapMappingError(message)
 
-            if isinstance(self.dependency_bootstrap_map[dependency],
+            if not issubclass(self.dependency_bootstrap_map[dependency],
                           StepBootstrapper):
                 message = "Dependency bootstrapper mapping {} is not an " \
                           "instance of StepBootstrapper" \
@@ -71,7 +72,7 @@ class Step(object):
 
                 bootstrapper = self.dependency_bootstrap_map[dependency]
 
-                new_artifact = bootstrapper.reretrieve_artifact(kwargs)
+                new_artifact = bootstrapper.retrieve_artifact(kwargs)
 
                 if not new_artifact:
                     message = "{} did not return a dependency artifact "
