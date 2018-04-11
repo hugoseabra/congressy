@@ -31,6 +31,7 @@ class LotForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
+            'rsvp_restrict',
             'limit',
             'price',
             'private',
