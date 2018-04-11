@@ -58,6 +58,16 @@ class Event(models.Model, GatherosModelMixin):
         (EVENT_STATUS_FINISHED, 'finalizado'),
     )
 
+    RSVP_DISABLED = 'rsvp-disabled'
+    RSVP_RESTRICTED = 'rsvp-restricted'
+    RSVP_OPEN = 'rsvp-open'
+
+    RSVP = (
+        (RSVP_DISABLED, 'Aberto'),
+        (RSVP_OPEN, 'Convidados associados terão um lote especial.'),
+        (RSVP_RESTRICTED, 'Somente associados poderão se inscrever.'),
+    )
+
     name = models.CharField(max_length=255, verbose_name='nome')
 
     organization = models.ForeignKey(
@@ -166,6 +176,15 @@ class Event(models.Model, GatherosModelMixin):
                   ' rascunhos.'
     )
 
+    rsvp_type = models.CharField(
+        max_length=20,
+        choices=RSVP,
+        default=RSVP_DISABLED,
+        verbose_name='Distribuição de Público',
+        help_text="Se há associados vinculados à organização, o evento poderá"
+                  " exibir um lote especial para eles, com um valor especial."
+    )
+
     congressy_percent = models.CharField(
         max_length=5,
         choices=CONGRESSY_PERCENTS,
@@ -236,6 +255,11 @@ class Event(models.Model, GatherosModelMixin):
             return Event.EVENT_STATUS_RUNNING
 
         return Event.EVENT_STATUS_NOT_STARTED
+
+    @property
+    def has_rsvp(self):
+        """ Verifica se organização possui associados. """
+        return self.organization.associates.count() > 0
 
     def get_status_display(self):
         """ Recupera o status do evento de acordo com a propriedade 'status'"""
