@@ -111,9 +111,25 @@
                                         {% render_generic_field form.date_end %}
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if object.has_rsvp %}
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Restrição de público</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-6">
-
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.rsvp_type %}
                                     </div>
                                 </div>
                             </div>
@@ -122,6 +138,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
         <div class="row">
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar bottom">
