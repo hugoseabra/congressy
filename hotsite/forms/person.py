@@ -5,12 +5,13 @@
 from datetime import datetime
 
 from django import forms
+from django.forms import BaseModelForm
 
 from gatheros_event.forms import PersonForm
 from gatheros_subscription.models import FormConfig, Lot
 
 
-class SubscriptionPersonForm(forms.Form, PersonForm):
+class SubscriptionPersonForm(PersonForm):
 
     event = None
     event_lot = None

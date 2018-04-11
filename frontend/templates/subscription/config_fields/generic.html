@@ -19,9 +19,10 @@
             {% if autofocus %}
 
                 {% if  required  or required == 'True' %}
-                    {{ field|add_class:"form-control"|attr:"required:required"|append_attr:"autofocus" }}
+
+                    {% render_field field class="form-control" required="required" autofocus="autofocus" %}
                 {% else %}
-                    {{ field|add_class:"form-control"|append_attr:"autofocus" }}
+                    {% render_field field class="form-control"  autofocus="autofocus" %}
                 {% endif %}
 
             {% elif field.field.widget.input_type == "checkbox" %}
@@ -35,9 +36,9 @@
             {% else %}
 
                 {% if  required  or required == 'True' %}
-                    {{ field|add_class:"form-control"|attr:"required:required" }}
+                     {% render_field field class="form-control" required="required" %}
                 {% else %}
-                    {{ field|add_class:"form-control" }}
+                     {% render_field field class="form-control" %}
                 {% endif %}
 
             {% endif %}
@@ -45,7 +46,9 @@
 
             {% if help_text %}
                 <div>
-                    <small class="text-muted help-text">{{ help_text|safe }}</small>
+                    <small class="text-muted help-text">
+                        {{ help_text|safe }}
+                    </small>
                 </div>
             {% endif %}
             {% if errors %}

@@ -1,0 +1,126 @@
+{% extends 'hotsite/base.html' %}
+{% load l10n humanize static form_config_tags user_agents user_agent_tag %}
+
+{% block content %}
+
+    {% include 'hotsite/includes/2_cover_no_form.html' %}
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <div class="panel-title">Pagamento</div>
+        </div>
+        <div class="panel-body">
+
+            <div id="payment_buttons" class="text-center"
+                 style="display: none">
+                <button id="id_boleto" type="button"
+                        style="text-align: center;display: none">
+                    Boleto
+                    <br/>
+                    <img class="img-responsive"
+                         style="height: 153px; height: 153px"
+                         src="{% static 'hotsite/logos/boleto.svg' %}">
+                </button>
+                <button id="id_credit_card" type="button"
+                        style="display: none">
+                    Cartão de Credito
+                    <br/>
+                    <img class="img-responsive"
+                         src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
+                </button>
+
+                <br/>
+
+                <a id="id_remove"
+                   style="margin-top: 11px; font-size: 12px;display: none">
+                    Remover
+                </a>
+            </div>
+            <div class="text-center">
+                <button id="id_button_pay" class="btn btn-default"
+                        type="button">
+                    Escolha meio de pagamento
+                </button>
+            </div>
+
+            <input type="hidden" id="id_installments"
+                   name="installments">
+            <input type="hidden" id="id_card_hash" name="card_hash">
+            <input type="hidden" id="id_transaction_type"
+                   name="transaction_type">
+
+            <div class="text-center">
+                <img style="width: 80%; margin-top: 20px"
+                     src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+
+
+
+{% block scripts %}
+    <!-- SCRIPT Payment -->
+    <!-- SCRIPT PAGAR.ME -->
+    <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
+    <script src="{% static "hotsite/js/payment.js" %}"></script>
+    <script>
+
+
+        $(document).ready(function () {
+            var lot = $('#id_lot');
+            show_hide_payment_block(lot.length > 0 && lot.val());
+
+            $('#id_email').attr('readonly', 'readonly');
+            lot.on('change', function () {
+                var id = $(this).val();
+
+                if (!id) {
+                    show_hide_payment_block(false);
+                } else {
+                    if (!amounts.hasOwnProperty(id)) {
+                        show_hide_payment_block(false);
+                    } else {
+                        $('#id_amount').val(amounts[id]);
+                        show_hide_payment_block(true);
+                    }
+                }
+                hide_payment_elements();
+            });
+
+            $('#id_button_pay').on('click', function () {
+                process_payment(
+                    '{{ pagarme_encryption_key }}',
+                    2.29,
+                    '{{ event.name }}',
+                    lots,
+                    {#                    allowed_transactions#}
+                    null
+                );
+            });
+
+            var uf_el = $('#id_state');
+            var city_el = $('#id_city_name');
+
+            window.setTimeout(function () {
+                {% if person.city %}
+                    uf_el.val('{{ person.city.uf }}');
+                    fetch_cities(uf_el, '{{ person.city.pk }}');
+                {% else %}
+                    uf_el.val('');
+                    city_el.val('');
+                    city_el.prop('disabled', true);
+                {% endif %}
+
+                $('#id_lot').trigger('change');
+            }, 300);
+        });
+    </script>
+{% endblock %}
+
+

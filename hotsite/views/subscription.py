@@ -1,20 +1,20 @@
+from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseNotAllowed, HttpResponseBadRequest
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views import generic
 
-from base.form_step import StepBootstrapper, Step
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Person
 from gatheros_subscription.models import FormConfig, Lot, \
     Subscription
-
-from gatheros_subscription.forms import SubscriptionForm
-
 from hotsite.forms import LotsForm, SubscriptionPersonForm
-from hotsite.views import SubscriptionFormMixin, EventMixin
+from hotsite.views.mixins import SubscriptionFormMixin, EventMixin
+from hotsite.views.subscription_form_bootstrappers import LotBootstrapper
+from hotsite.views.subscription_form_steps import StepOne, StepTwo, \
+    StepThree, StepFour
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
@@ -23,147 +23,6 @@ from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
-
-
-class LotBootstrapper(StepBootstrapper):
-    fallback_step = 'step_1'
-    artifact_type = Lot
-
-    def __init__(self, **kwargs) -> None:
-
-        self.event = kwargs.get('event')
-        self.lot_pk = kwargs.get('lot_pk', None)
-        super().__init__()
-
-    def retrieve_artifact(self):
-
-        lot = None
-
-        if self.lot_pk:
-            try:
-                lot = Lot.objects.get(pk=int(self.lot_pk), event=self.event)
-            except Lot.DoesNotExist:
-                pass
-
-        return lot
-
-
-class PersonBootstrapper(StepBootstrapper):
-    fallback_step = 'step_2'
-    artifact_type = Lot
-
-    def __init__(self, **kwargs) -> None:
-        self.person_pk = kwargs.get('person_pk', None)
-        super().__init__()
-
-    def retrieve_artifact(self):
-
-        person = None
-
-        if self.person_pk:
-            try:
-                person = Person.objects.get(pk=self.person_pk)
-            except Person.DoesNotExist:
-                pass
-
-        return person
-
-
-class StepOne(Step):
-    template = 'hotsite/lot_form.html'
-
-    def __init__(self, request, event, form=None, context=None,
-                 dependency_artifacts=None, **kwargs) -> None:
-        self.event = event
-
-        super().__init__(request, form, context, dependency_artifacts,
-                         **kwargs)
-
-    def get_context(self):
-        context = super().get_context()
-
-        if not self.form_instance:
-            self.form_instance = LotsForm(event=self.event,
-                                          initial={'next_step': 1})
-
-        context['form'] = self.form_instance
-
-        return context
-
-
-class StepTwo(Step):
-    dependes_on = ('lot',)
-    dependency_bootstrap_map = {'lot': LotBootstrapper}
-    template = 'hotsite/person_form.html'
-
-    def __init__(self, request, event, form=None, context=None,
-                 dependency_artifacts=None, **kwargs) -> None:
-
-        self.event = event
-
-        lot_pk = None
-
-        if form and form.is_valid():
-            lot = form.cleaned_data['lot']
-            lot_pk = lot.pk
-
-        super().__init__(request, form, context, dependency_artifacts,
-                         event=self.event, lot_pk=lot_pk, **kwargs)
-
-    def get_context(self):
-
-        context = super().get_context()
-
-        lot = self.dependency_artifacts['lot']
-
-        if not self.form_instance:
-            self.form_instance = SubscriptionPersonForm(
-                lot=lot,
-                initial={
-                    'next_step': 2,
-                    'lot': lot.pk},
-                event=self.event
-            )
-
-        context['form'] = self.form_instance
-        context['event'] = self.event
-        context['remove_preloader'] = True
-
-        try:
-            config = lot.event.formconfig
-        except AttributeError:
-            config = FormConfig()
-
-        if lot.price > 0:
-            config.email = True
-            config.phone = True
-            config.city = True
-
-            config.cpf = config.CPF_REQUIRED
-            config.birth_date = config.BIRTH_DATE_REQUIRED
-            config.address = config.ADDRESS_SHOW
-
-        context['config'] = config
-        context['has_lots'] = lot.event.lots.count() > 1
-
-        return context
-
-
-class StepThree(Step):
-
-    dependes_on = ('lot', 'person')
-
-    dependency_bootstrap_map = {'lot': LotBootstrapper,
-                                'person': PersonBootstrapper}
-
-    template = 'hotsite/survey_form.html'
-
-    def __init__(self, request, event, form=None, context=None,
-                 dependency_artifacts=None, **kwargs) -> None:
-        self.event = event
-
-        super().__init__(request, form, context, dependency_artifacts,
-                         **kwargs)
 
 
 #
@@ -621,6 +480,18 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
         View responsavel por decidir onde se inicia o process de inscrição
     """
 
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+
+        if not request.user.is_authenticated:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        enabled = self.subscription_enabled()
+        if not enabled:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        return response
+
     def get(self, request, *args, **kwargs):
 
         """
@@ -644,13 +515,18 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
             lot = self.event.lots.first()
 
             step_2 = StepTwo(request=request, event=self.event,
-                             dependency_artifacts={'lot': lot},)
+                             dependency_artifacts={'lot': lot}, )
 
             return step_2.render()
 
     def post(self, request, *args, **kwargs):
 
-        next_step = int(request.POST.get('next_step', 0))
+        incoming_step = request.POST.get('next_step', 0)
+
+        if not incoming_step:
+            incoming_step = 0
+
+        next_step = int(incoming_step)
 
         if next_step == 0:
 
@@ -671,7 +547,23 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
             if form.is_valid():
                 lot = form.cleaned_data['lots']
 
+                form = None
+
+                try:
+
+                    person = Person.objects.get(user=self.request.user)
+                    form = SubscriptionPersonForm(instance=person,
+                                                  event=self.event,
+                                                  lot=lot,
+                                                  initial={
+                                                      'next_step': 2,
+                                                      'lot': lot.pk}
+                                                  )
+                except Person.DoesNotExist:
+                    pass
+
                 step_2 = StepTwo(request=request, event=self.event,
+                                 form=form,
                                  dependency_artifacts={'lot': lot})
 
                 return step_2.render()
@@ -694,7 +586,6 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
 
             lot_pk = request.POST.get('lot', None)
             lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk, event=self.event)
-
             lot = lot_bootstrapper.retrieve_artifact()
 
             if not lot:
@@ -707,30 +598,138 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                     })
                 return step_1.render()
 
-            form = SubscriptionPersonForm(event=self.event,
-                                          lot=lot,
-                                          data=request.POST)
+            # Pre-form cleaning
+            # This is a hack. Please don't do this.
+            # Ref: https://stackoverflow.com/questions/12611345/django-why-is-the-request-post-object-immutable
+            mutable = self.request.POST._mutable
+            self.request.POST._mutable = True
+
+            self.clear_string('cpf')
+            self.clear_string('zip_code')
+            self.clear_string('phone')
+            self.clear_string('institution_cnpj')
+
+            self.request.POST._mutable = mutable
+
+            try:
+                person = Person.objects.get(user=self.request.user)
+                form = SubscriptionPersonForm(instance=person,
+                                              event=self.event,
+                                              data=request.POST,
+                                              lot=lot)
+            except Person.DoesNotExist:
+                form = SubscriptionPersonForm(event=self.event,
+                                              lot=lot,
+                                              data=request.POST)
 
             if form.is_valid():
+
                 person = form.save()
-                # TO BE CONTINUED FROM HERE >>> GOT TO HERE
-                # Create subscription here.
+
+                if not person.user:
+                    person.user = self.request.user
+                    person.save()
+
+                try:
+                    subscription = Subscription.objects.get(
+                        person=person,
+                        event=self.event
+                    )
+                except Subscription.DoesNotExist:
+                    subscription = Subscription(
+                        person=person,
+                        event=self.event,
+                        created_by=self.request.user.id
+                    )
+
+                subscription.lot = lot
+                subscription.save()
 
                 """
-                    Se o lote possuir surveys, ir para step 3, se não
-                    podemos ir direto para o step 4.
+                    Se o lote possuir surveys, ir para step 3.
+                    
+                    Se o lote não possuir surveys, e possuir pagamento ir para 
+                    step 4
+                    
+                    Se o lote não possuir surveys, e não possuir pagamento ir 
+                    para step 5.
+                    
                 """
+                event_survey = lot.event_survey
+                lot_price = lot.price
+
+                if event_survey:
+                    survey_director = SurveyDirector(event=self.event,
+                                                     user=self.request.user)
+
+                    survey_form = survey_director.get_form(
+                        survey=event_survey.survey)
+
+                    survey_form.fields['next_step'] = forms.IntegerField(
+                        initial=3,
+                        widget=forms.HiddenInput()
+                    )
+                    survey_form.fields['subscription'] = forms.CharField(
+                        initial=str(subscription.pk),
+                        max_length=60,
+                        widget=forms.HiddenInput()
+                    )
+
+                    # Se o lote possuir surveys, ir para step 3.
+                    step_3 = StepThree(request=request, event=self.event,
+                                       form=survey_form)
+
+                    return step_3.render()
+
+                if lot_price > 0:
+                    # Se o lote não possuir surveys, e possuir pagamentos ir
+                    # para step 4.
+                    step_4 = StepFour(request=request, event=self.event,
+                                      dependency_artifacts={'subscription':
+                                                                subscription})
+                    return step_4.render()
+
+                # # verifica se o lote possui formulario(survey)
+                # if event_survey:
+                #     # Se possui survey, ver se esse person que está respondendo já
+                #     # possui autoria, ou seja já respondeu antes, caso de edição.
+                #     # Se não possuir autoria, cria um novo autor, vincula
+                #
+
+                #
+                #     if not survey_form.is_valid() or not form.is_valid():
+                #
+                #         all_surveys = survey_director.get_forms()
+                #
+                #         surveys = []
+                #
+                #         for new_form in all_surveys:
+                #
+                #             if new_form.survey.pk == survey_form.survey.pk:
+                #                 surveys.append(survey_form)
+                #             else:
+                #                 surveys.append(new_form)
+                #
+                #         context['slug'] = kwargs.get('slug')
+                #         context['form'] = form
+                #         context['surveys'] = surveys
+                #         return self.render_to_response(context)
+                #
+                #     survey_form.save_answers()
+
                 # if lot.event_survey:
                 #     return step_3(request, person, lot)
                 # else:
                 #     return step_4(request, person, lot, )
                 #
 
-
-            # Form did not validate, re-render step 2, with a form.
+            # Form is not valid, re-render step 2, person form.
             step_2 = StepTwo(request=request, event=self.event,
-                             dependency_artifacts={'lot': lot}, form=form)
+                             form=form, dependency_artifacts={'lot': lot})
             return step_2.render()
+
+        elif next_step == 3:
+            print('sdasdas')
 
 
         #
@@ -740,3 +739,23 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
         #     raise Exception('not there yet bucko')
         else:
             return HttpResponseBadRequest()
+
+    def clear_string(self, field_name):
+
+        if field_name not in self.request.POST:
+            return
+
+        value = self.request.POST.get(field_name)
+
+        if not value:
+            return ''
+
+        value = value \
+            .replace('.', '') \
+            .replace('-', '') \
+            .replace('/', '') \
+            .replace('(', '') \
+            .replace(')', '') \
+            .replace(' ', '')
+
+        self.request.POST[field_name] = value
