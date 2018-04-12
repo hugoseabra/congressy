@@ -136,7 +136,8 @@ function process_single_lot_payment(
     }
 
     var billing_title = 'Inscrição do evento: ' + event_name;
-    var amount = normalize_amount_as_payment($('#id_amount').val());
+    var amount = normalize_amount_as_payment(lot.price);
+
 
     var allow_installment = lot.allow_installment === true;
     var installment_limit = lot.installment_limit;
