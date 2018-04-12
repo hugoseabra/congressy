@@ -19,7 +19,6 @@
             {% if autofocus %}
 
                 {% if  required  or required == 'True' %}
-
                     {% render_field field class="form-control" required="required" autofocus="autofocus" %}
                 {% else %}
                     {% render_field field class="form-control"  autofocus="autofocus" %}
@@ -28,9 +27,9 @@
             {% elif field.field.widget.input_type == "checkbox" %}
 
                 {% if  required  or required == 'True' %}
-                    {{ field|attr:"style:display:none"|attr:"required:required" }}
+                    {{ field|attr:"required:required" }}
                 {% else %}
-                    {{ field|attr:"style:display:none" }}
+                    {{ field }}
                 {% endif %}
 
             {% else %}

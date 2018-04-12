@@ -47,6 +47,37 @@ def render_generic_field(
     }
 
 
+@register.inclusion_tag('subscription/config_fields/switchery.html')
+def render_switchery_field(
+        field,
+        required=False,
+        use_required_field=True,
+        autofocus=False,
+        label=None,
+        help_text=None):
+    if required is False and use_required_field is True:
+        required = field.field.required
+
+    if label is not None:
+        field.label_tag = "<label for='id_{name}'>{label}:</label>".format(
+            name=field.name,
+            label=label
+        )
+
+    if not help_text:
+        help_text = field.help_text
+
+    return {
+        'field': field,
+        'label_tag': field.label_tag,
+        'name': field.name,
+        'help_text': help_text,
+        'errors': field.errors,
+        'required': required,
+        'autofocus': autofocus,
+    }
+
+
 @register.inclusion_tag('subscription/config_fields/typeahead.html')
 def render_typeahead_field(
         field,

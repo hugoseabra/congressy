@@ -6,12 +6,13 @@ por:
 - Exigir a preexistência de objetos de dependência;
 """
 
+from ast import literal_eval
+
 from django import forms
 
 from survey.managers import Manager
-from survey.models import Answer, Option
+from survey.models import Answer
 
-from ast import literal_eval
 
 class AnswerManager(Manager):
     """
@@ -81,41 +82,22 @@ class AnswerManager(Manager):
 
         return author
 
-    def clean(self):
-        """
-            Método responsavel pela limpeza do manager, aplicando a regra
-            que sempre haverá algo no campo 'human_display'
-        """
+    def clean_value(self):
+        value = self.cleaned_data.get('value')
 
-        cleaned_data = super().clean()
+        if not value:
+            return None
 
-        question = cleaned_data.get('question', None)
-        value = cleaned_data.get('value', None)
+        try:
+            value = literal_eval(str(value))
 
-        if question and value:
+            if isinstance(value, list):
+                value = ",".join(value)
 
-            try:
-                is_list = literal_eval(str(value))
-            except(ValueError, SyntaxError):
-                is_list = False
+        except(ValueError, SyntaxError):
+            pass
 
-            if question.accepts_options and question.has_options:
-
-                if isinstance(is_list, list):
-
-                    values = []
-
-                    for item in is_list:
-                        values.append(self._retrieve_option(
-                            question=question, value=item))
-
-                    value = values
-            else:
-                value = self._retrieve_option(value=value, question=question)
-
-            cleaned_data['human_display'] = value
-
-        return cleaned_data
+        return value
 
     @staticmethod
     def _retrieve_author_answer(question_id, author_id):
@@ -132,15 +114,3 @@ class AnswerManager(Manager):
             pass
 
         return found
-
-    @staticmethod
-    def _retrieve_option(value, question):
-
-        try:
-            option = question.options.get(
-                value=value)
-
-            return option.name
-
-        except Option.DoesNotExist:
-            return value
