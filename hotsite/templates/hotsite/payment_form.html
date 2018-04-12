@@ -55,11 +55,6 @@
             <div class="text-center">
                 <img style="width: 80%; margin-top: 20px"
                      src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
-
-
-                <pre>
-                    {{ lot }}
-                </pre>
             </div>
 
         </div>
@@ -76,63 +71,23 @@
     <!-- SCRIPT PAGAR.ME -->
     <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
     <script src="{% static "hotsite/js/payment.js" %}"></script>
+    <script src="{% static "hotsite/js/subscription.js" %}"></script>
     <script>
 
         $(document).ready(function () {
 
-
             var lot = JSON.parse($('#id_lot_as_json').val());
-            console.log(lot);
-            console.log('-------');
-            show_hide_payment_block(lot.length > 0 && lot.val());
-
-            $('#id_email').attr('readonly', 'readonly');
-            lot.on('change', function () {
-                var id = $(this).val();
-
-                if (!id) {
-                    show_hide_payment_block(false);
-                } else {
-                    if (!amounts.hasOwnProperty(id)) {
-                        show_hide_payment_block(false);
-                    } else {
-                        $('#id_amount').val(amounts[id]);
-                        show_hide_payment_block(true);
-                    }
-                }
-                hide_payment_elements();
-            });
 
             $('#id_button_pay').on('click', function () {
-                process_payment(
+                process_single_lot_payment(
                     '{{ pagarme_encryption_key }}',
                     2.29,
                     '{{ event.name }}',
-                    lots,
-                    {#                    allowed_transactions#}
+                    lot,
                     null
                 );
             });
-
-            var uf_el = $('#id_state');
-            var city_el = $('#id_city_name');
-
-            window.setTimeout(function () {
-                {% if person.city %}
-                    uf_el.val('{{ person.city.uf }}');
-                    fetch_cities(uf_el, '{{ person.city.pk }}');
-                {% else %}
-                    uf_el.val('');
-                    city_el.val('');
-                    city_el.prop('disabled', true);
-                {% endif %}
-
-                $('#id_lot').trigger('change');
-            }, 300);
-
-
         });
-
 
     </script>
 {% endblock %}

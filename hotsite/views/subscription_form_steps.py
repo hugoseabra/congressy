@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.core import serializers
 
 from base.form_step import Step
@@ -145,6 +146,7 @@ class StepFour(Step):
 
         context['lot'] = lot_obj_as_json
         context['person'] = subscription.person
+        context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
         if not self.form_instance:
             self.form_instance = PaymentForm(
