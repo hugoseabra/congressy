@@ -211,15 +211,10 @@
                             </button>
 
                             <a
-                                    {% if has_lots %}
-                                        href="{% url 'public:hotsite-subscription' event.slug %}"
-                                    {% else %}
-                                        href="{% url 'public:hotsite' event.slug %}"
-                                    {% endif %}
-
-                                class="btn btn-primary pull-left"
-                                style="margin-top: 5px;">
-                            Voltar
+                                    href="{% url 'public:hotsite' event.slug %}"
+                                    class="btn btn-primary pull-left"
+                                    style="margin-top: 5px;">
+                                Voltar
                             </a>
 
                         </div>
@@ -231,6 +226,9 @@
             </div>
         </div>
     </section>
+
+
+
 {% endblock %}
 
 {% block scripts %}

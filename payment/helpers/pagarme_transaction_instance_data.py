@@ -178,10 +178,16 @@ class PagarmeTransactionInstanceData:
             self.installments = int(self.extra_data.get('installments'))
 
     def _set_organization(self):
-        if 'organization' not in self.extra_data:
+
+        if self.event:
+            self.organization = self.event.organization
+
+        if not self.organization and 'organization' not in self.extra_data:
             raise TransactionError(message="No organization")
-        self.organization = Organization.objects.get(
-            pk=self.extra_data['organization'])
+
+        if not self.organization:
+            self.organization = Organization.objects.get(
+                pk=self.extra_data['organization'])
 
         if not self.organization.bank_account_id:
             raise TransactionError(message="Organization has no bank account")
@@ -295,7 +301,8 @@ class PagarmeTransactionInstanceData:
 
         congressy_rule = {
             "recipient_id": CONGRESSY_RECIPIENT_ID,
-            "amount": self.as_payment_format(congressy_amount - partners_amount),
+            "amount": self.as_payment_format(
+                congressy_amount - partners_amount),
             "liable": True,
             "charge_processing_fee": True,
             "charge_remainder_fee": True

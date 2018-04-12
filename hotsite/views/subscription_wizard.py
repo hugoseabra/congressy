@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib import messages
+from django.db import transaction
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views import generic
@@ -11,6 +13,9 @@ from hotsite.views.subscription_form_bootstrappers import LotBootstrapper, \
     SubscriptionBootstrapper, EventSurveyBootstrapper
 from hotsite.views.subscription_form_steps import StepOne, StepTwo, \
     StepThree, StepFour, StepFive
+from payment.exception import TransactionError
+from payment.helpers import PagarmeTransactionInstanceData
+from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
 
@@ -227,7 +232,7 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
 
                     # Se o lote possuir surveys, ir para step 3.
                     step_3 = StepThree(request=request, event=self.event,
-                                       form=survey_form)
+                                       form=survey_form, lot=lot)
 
                     return step_3.render()
 
@@ -257,8 +262,8 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
             if subscription_pk:
                 subscription_bootstrapper = SubscriptionBootstrapper(
                     subscription_pk=subscription_pk)
-
                 subscription = subscription_bootstrapper.retrieve_artifact()
+
             if event_survey_pk:
                 event_survey_bootstrapper = EventSurveyBootstrapper(
                     event_survey_pk=event_survey_pk)
@@ -322,14 +327,15 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                     # Form did not validate so we go back to step 3
                     step_3 = StepThree(request=request,
                                        event=self.event,
+                                       lot=lot,
                                        form=form)
-                    step_3.render()
+                    return step_3.render()
 
             # Missing one of the three required objects so we go back a step
             if lot:
                 step_2 = StepTwo(request=request, event=self.event,
                                  dependency_artifacts={'lot': lot})
-                step_2.render()
+                return step_2.render()
 
             # Does not have a lot, restart whole process
             step_1 = StepOne(
@@ -341,6 +347,94 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                 })
             return step_1.render()
 
+        elif next_step == 4:
+
+            subscription_pk = request.POST.get('subscription', None)
+            subscription = None
+
+            lot_pk = request.POST.get('lot', None)
+            lot = None
+
+            if subscription_pk:
+                subscription_bootstrapper = SubscriptionBootstrapper(
+                    subscription_pk=subscription_pk)
+                subscription = subscription_bootstrapper.retrieve_artifact()
+                lot_pk = subscription.lot.pk
+
+            if lot_pk:
+                lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk,
+                                                   event=self.event.pk)
+
+                lot = lot_bootstrapper.retrieve_artifact()
+
+            if subscription:
+
+                # if lot needs payments, so we validate if we have some stuff
+                # from step 4.
+                if subscription.lot.price > 0:
+
+                    try:
+                        with transaction.atomic():
+
+                            transaction_data = PagarmeTransactionInstanceData(
+                                subscription=subscription,
+                                extra_data=request.POST.copy(),
+                                event=self.event
+                            )
+
+                            create_pagarme_transaction(
+                                transaction_data=transaction_data,
+                                subscription=subscription
+                            )
+
+                            step_5 = StepFive(request=request,
+                                              event=self.event,
+                                              dependency_artifacts={
+                                                  'subscription': subscription})
+                            return step_5.render()
+
+                    except TransactionError as e:
+                        error_dict = {
+                            'No transaction type': \
+                                'Por favor escolher uma forma de pagamento.',
+                            'Transaction type not allowed': \
+                                'Forma de pagamento não permitida.',
+                            'Organization has no bank account': \
+                                'Organização não está podendo receber pagamentos no'
+                                ' momento.',
+                            'No organization': 'Evento não possui organizador.',
+                        }
+                        if e.message in error_dict:
+                            e.message = error_dict[e.message]
+
+                            messages.error(request, message=e.message)
+                            step_4 = StepFour(request=request,
+                                              event=self.event,
+                                              dependency_artifacts={
+                                                  'subscription': subscription})
+                            return step_4.render()
+
+                else:
+                    step_5 = StepFive(request=request, event=self.event,
+                                      dependency_artifacts={
+                                          'subscription': subscription})
+                    return step_5.render()
+
+            # Missing one of the required objects so we go back a step
+            if lot:
+                step_2 = StepTwo(request=request, event=self.event,
+                                 dependency_artifacts={'lot': lot})
+                return step_2.render()
+
+            # Does not have a lot, restart whole process
+            step_1 = StepOne(
+                request=request,
+                event=self.event,
+                context={
+                    'event': self.event,
+                    'remove_preloader': True
+                })
+            return step_1.render()
 
         else:
             return HttpResponseBadRequest()

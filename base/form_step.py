@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from base.exceptions import FormStepMissingBootstrapMappingError, \
     FormStepCannotBootstrapMissingDependency
@@ -87,7 +87,11 @@ class Step(object):
     def render(self):
 
         if not self.template:
-            raise AttributeError('Step is missing a template')
+
+            if self.redirect_to:
+                return redirect(self.redirect_to)
+
+            raise AttributeError('Step is missing a template and redirect_to url')
 
         context = self.get_context()
 

@@ -5,60 +5,143 @@
 
     {% include 'hotsite/includes/2_cover_no_form.html' %}
 
-    <div class="panel panel-default">
 
-        <div class="panel-heading">
-            <div class="panel-title">Pagamento</div>
-        </div>
-        <div class="panel-body">
+    <!-- FORM
+================================= -->
+    <section id="about" class="about-section section">
+        <div class="container">
+            <h2 class="section-heading text-center">Inscrição</h2>
+            <div class="about-row row">
+                <div class="col-md-9 col-md-offset-2">
 
-            <div id="payment_buttons" class="text-center"
-                 style="display: none">
-                <button id="id_boleto" type="button"
-                        style="text-align: center;display: none">
-                    Boleto
-                    <br/>
-                    <img class="img-responsive"
-                         style="height: 153px; height: 153px"
-                         src="{% static 'hotsite/logos/boleto.svg' %}">
-                </button>
-                <button id="id_credit_card" type="button"
-                        style="display: none">
-                    Cartão de Credito
-                    <br/>
-                    <img class="img-responsive"
-                         src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
-                </button>
+                    <div class="panel panel-default">
 
-                <br/>
+                        <div class="panel-heading">
+                            <div class="panel-title">Pagamento</div>
+                        </div>
 
-                <a id="id_remove"
-                   style="margin-top: 11px; font-size: 12px;display: none">
-                    Remover
-                </a>
+                        <div class="panel-body">
+
+                            {% block messages %}
+                                {% if messages %}
+                                    <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                    {% for message in messages %}
+
+                                        {% if message.tags %}
+                                            <div class="alert alert-{{ message.tags }} alert-dismissible"
+                                                 role="alert">
+
+                                        {% else %}
+                                            <div class="alert alert-warning alert-dismissible"
+                                                 role="alert">
+                                        {% endif %}
+
+                                    <button type="button" class="close"
+                                            data-dismiss="alert"
+                                            aria-label="Close"><span
+                                            aria-hidden="true">&times;</span>
+                                    </button>
+                                    {{ message|capfirst }}
+                                    </div>
+
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            {% endblock messages %}
+
+                            <div id="payment_buttons" class="text-center"
+                                 style="display: none">
+                                <button id="id_boleto" type="button"
+                                        style="text-align: center;display: none">
+                                    Boleto
+                                    <br/>
+                                    <img class="img-responsive"
+                                         style="height: 153px; height: 153px"
+                                         src="{% static 'hotsite/logos/boleto.svg' %}">
+                                </button>
+                                <button id="id_credit_card" type="button"
+                                        style="display: none">
+                                    Cartão de Credito
+                                    <br/>
+                                    <img class="img-responsive"
+                                         src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
+                                </button>
+
+                                <br/>
+
+                                <a id="id_remove"
+                                   style="margin-top: 11px; font-size: 12px;display: none">
+                                    Remover
+                                </a>
+                            </div>
+                            <div class="text-center">
+                                <button id="id_button_pay"
+                                        class="btn btn-default"
+                                        type="button">
+                                    Escolha meio de pagamento
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <img style="width: 80%; margin-top: 20px"
+                                     src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
+                            </div>
+
+                            <form action="" method="post">
+                                {% csrf_token %}
+
+                                <input type="hidden" id="id_installments"
+                                       name="installments">
+                                <input type="hidden" id="id_amount"
+                                       name="amount">
+                                <input type="hidden" id="id_card_hash"
+                                       name="card_hash">
+                                <input type="hidden" id="id_transaction_type"
+                                       name="transaction_type">
+                                <input type="hidden" id="id_lot_as_json"
+                                       name="lot_as_json" value="{{ lot }}">
+                                <input type="hidden" id="id_subscription"
+                                       name="subscription"
+                                       value="{{ subscription_id }}">
+                                <input type="hidden" id="id_lot"
+                                       name="lot"
+                                       value="{{ lot_id }}">
+
+                                {% for hidden in form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
+
+
+                                <button style="margin-top: 5px;"
+                                        class="btn btn-primary pull-right"
+                                        id="next_btn"
+                                        disabled
+                                        type="submit">
+                                    Finalizar
+                                </button>
+                            </form>
+
+                            <a
+                                    href="{% url 'public:hotsite' event.slug %}"
+                                    class="btn btn-primary pull-left"
+                                    style="margin-top: 5px;">
+                                Voltar
+                            </a>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+                </div>
             </div>
-            <div class="text-center">
-                <button id="id_button_pay" class="btn btn-default"
-                        type="button">
-                    Escolha meio de pagamento
-                </button>
-            </div>
+    </section>
 
-            <input type="hidden" id="id_installments"
-                   name="installments">
-            <input type="hidden" id="id_card_hash" name="card_hash">
-            <input type="hidden" id="id_transaction_type"
-                   name="transaction_type">
-            <input type="hidden" id="id_lot_as_json"
-                   name="lot_as_json" value="{{ lot }}">
 
-            <div class="text-center">
-                <img style="width: 80%; margin-top: 20px"
-                     src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
-            </div>
 
-        </div>
-    </div>
 
 
 {% endblock %}

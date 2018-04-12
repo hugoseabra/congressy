@@ -1,7 +1,10 @@
 import json
 
 from django.conf import settings
+from django.contrib import messages
 from django.core import serializers
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
 
 from base.form_step import Step
 from gatheros_subscription.models import FormConfig
@@ -92,9 +95,10 @@ class StepTwo(Step):
 class StepThree(Step):
     template = 'hotsite/survey_form.html'
 
-    def __init__(self, request, event, form=None, context=None,
+    def __init__(self, request, event, lot, form=None, context=None,
                  dependency_artifacts=None, **kwargs) -> None:
         self.event = event
+        self.lot = lot
 
         super().__init__(request, form, context, dependency_artifacts,
                          **kwargs)
@@ -108,6 +112,9 @@ class StepThree(Step):
 
         context['form'] = self.form_instance
         context['event'] = self.event
+        context['has_payments'] = False
+        if self.lot.price > 0:
+            context['has_payments'] = True
 
         return context
 
@@ -145,8 +152,11 @@ class StepFour(Step):
         lot_obj_as_json = json.dumps(json_obj)
 
         context['lot'] = lot_obj_as_json
+        context['subscription_id'] = subscription.pk
+        context['lot_id'] = subscription.lot.pk
         context['person'] = subscription.person
         context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
+        context['remove_preloader'] = True
 
         if not self.form_instance:
             self.form_instance = PaymentForm(
@@ -161,7 +171,6 @@ class StepFour(Step):
 
 
 class StepFive(Step):
-    template = 'hotsite/lot_form.html'
 
     def __init__(self, request, event, form=None, context=None,
                  dependency_artifacts=None, **kwargs) -> None:
@@ -170,13 +179,18 @@ class StepFive(Step):
         super().__init__(request, form, context, dependency_artifacts,
                          **kwargs)
 
-    def get_context(self):
-        context = super().get_context()
+        messages.success(
+            self.request,
+            'Inscrição realizada com sucesso!'
+        )
 
-        if not self.form_instance:
-            self.form_instance = LotsForm(event=self.event,
-                                          initial={'next_step': 1})
+        subscription = self.dependency_artifacts['subscription']
 
-        context['form'] = self.form_instance
+        if subscription.lot.price is not None and subscription.lot.price > 0:
+            self.redirect_to = reverse_lazy(
+                'public:hotsite-subscription-status', kwargs={
+                    'slug': self.event.slug})
 
-        return context
+        else:
+            self.redirect_to = reverse_lazy('public:hotsite',
+                                            kwargs={'slug': self.event.slug})

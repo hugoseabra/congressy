@@ -3,6 +3,7 @@ function hide_payment_elements() {
     $('#id_credit_card').hide();
     $('#id_remove').hide();
     $('#payment_buttons').hide();
+    $('#next_btn').attr("disabled", true);
     $('#id_button_pay').show();
 
     $('#id_card_hash').val('');
@@ -169,6 +170,7 @@ function process_single_lot_payment(
         $('#payment_buttons').show();
         $('#id_button_pay').hide();
         $('#id_remove').show();
+        $('#next_btn').attr("disabled", false);
         $('#id_transaction_type').val(data.payment_method);
         $('#id_amount').val(data.amount);
         $('#id_card_hash').val(data.card_hash);
@@ -224,4 +226,6 @@ function process_single_lot_payment(
     checkout.open(params);
 }
 
-$('#id_remove').on('click', function () { hide_payment_elements(); });
+$('#id_remove').on('click', function () {
+    hide_payment_elements();
+});
