@@ -209,18 +209,25 @@
                                     type="submit">
                                 Próximo
                             </button>
-
-                            <a
-                                    href="{% url 'public:hotsite' event.slug %}"
-                                    class="btn btn-primary pull-left"
-                                    style="margin-top: 5px;">
-                                Voltar
-                            </a>
-
                         </div>
-
                     </form>
 
+                    <form method="post" action="">
+
+                        {% csrf_token %}
+
+                        {% render_generic_field form.previous_step %}
+                        {% render_generic_field form.coupon_code %}
+                        {% render_generic_field form.lots %}
+
+
+
+                        <button class="btn btn-primary pull-left"
+                                type="submit">
+                            Voltar
+                        </button>
+
+                    </form>
 
                 </div>
             </div>

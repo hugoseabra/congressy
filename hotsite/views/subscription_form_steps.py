@@ -40,9 +40,9 @@ class StepTwo(Step):
     dependency_bootstrap_map = {'lot': LotBootstrapper}
     template = 'hotsite/person_form.html'
 
-    def __init__(self, request, event, form=None, context=None,
+    def __init__(self, request, event, coupon_code='', form=None, context=None,
                  dependency_artifacts=None, **kwargs) -> None:
-
+        self.coupon_code = coupon_code
         self.event = event
 
         lot_pk = None
@@ -64,6 +64,8 @@ class StepTwo(Step):
                 lot=lot,
                 initial={
                     'next_step': 2,
+                    'previous_step': 1,
+                    'coupon_code': self.coupon_code,
                     'lot': lot.pk},
                 event=self.event
             )

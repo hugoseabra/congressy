@@ -36,6 +36,12 @@ class LotsForm(forms.Form):
     )
 
     next_step = forms.IntegerField(
-        widget=forms.HiddenInput()
+        widget=forms.HiddenInput(),
+        required=False,
+    )
+
+    previous_step = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        required=False,
     )
 

@@ -20,6 +20,14 @@ class SubscriptionPersonForm(PersonForm):
         widget=forms.HiddenInput()
     )
 
+    previous_step = forms.IntegerField(
+        widget=forms.HiddenInput()
+    )
+
+    coupon_code = forms.IntegerField(
+        widget=forms.HiddenInput()
+    )
+
     def __init__(self, lot, event, is_chrome=False, **kwargs):
 
         if not isinstance(lot, Lot):
@@ -30,7 +38,7 @@ class SubscriptionPersonForm(PersonForm):
 
         super().__init__(is_chrome, **kwargs)
 
-        self.fields['lot'] = forms.ModelChoiceField(
+        self.fields['lots'] = forms.ModelChoiceField(
             queryset=Lot.objects.filter(event=self.event,
                                         date_start__lte=datetime.now(),
                                         date_end__gte=datetime.now(),

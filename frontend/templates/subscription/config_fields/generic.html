@@ -3,7 +3,7 @@
 
 {% if field.field.widget.input_type == "hidden" %}
 
-    {{ field }}
+    {% render_field field %}
 
 {% else %}
 

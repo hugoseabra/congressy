@@ -66,73 +66,330 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
     def post(self, request, *args, **kwargs):
 
         incoming_step = request.POST.get('next_step', 0)
+        previous_step = request.POST.get('previous_step', 0)
 
         if not incoming_step:
             incoming_step = 0
 
+        if not previous_step:
+            previous_step = 0
+
         next_step = int(incoming_step)
+        previous_step = int(previous_step)
 
-        if next_step == 0:
+        if previous_step:
 
-            step_1 = StepOne(
-                request=request,
-                event=self.event,
-                context={
-                    'event': self.event,
-                    'remove_preloader': True
-                })
+            if previous_step == 1:
 
-            return step_1.render()
+                form = LotsForm(event=self.event, data=request.POST)
 
-        elif next_step == 1:
+                if form.is_valid():
 
-            form = LotsForm(event=self.event, data=request.POST)
+                    unbound_form = LotsForm(event=self.event, initial={
+                        'coupon_code': form.cleaned_data['coupon_code'],
+                        'lots': form.cleaned_data['lots'],
+                        'next_step': 1,
+                    })
 
-            if form.is_valid():
-                lot = form.cleaned_data['lots']
+                    step_1 = StepOne(
+                        request=request,
+                        event=self.event,
+                        form=unbound_form,
+                        context={
+                            'event': self.event,
+                            'remove_preloader': True,
+                        })
 
-                form = None
+                    return step_1.render()
+                else:
+                    step_1 = StepOne(
+                        request=request,
+                        event=self.event,
+                        context={
+                            'event': self.event,
+                            'remove_preloader': True,
+                        })
+
+                    return step_1.render()
+            else:
+                return HttpResponseBadRequest()
+
+        else:
+
+            if next_step == 0:
+
+                step_1 = StepOne(
+                    request=request,
+                    event=self.event,
+                    context={
+                        'event': self.event,
+                        'remove_preloader': True
+                    })
+
+                return step_1.render()
+
+            elif next_step == 1:
+
+                form = LotsForm(event=self.event, data=request.POST)
+
+                if form.is_valid():
+                    lot = form.cleaned_data['lots']
+                    coupon_code = form.cleaned_data['coupon_code']
+
+                    form = None
+
+                    try:
+
+                        person = Person.objects.get(user=self.request.user)
+                        form = SubscriptionPersonForm(instance=person,
+                                                      event=self.event,
+                                                      lot=lot,
+                                                      initial={
+                                                          'next_step': 2,
+                                                          'previous_step': 1,
+                                                          'coupon_code': coupon_code,
+                                                          'lots': lot.pk}
+                                                      )
+                    except Person.DoesNotExist:
+                        pass
+
+                    step_2 = StepTwo(request=request, event=self.event,
+                                     form=form,
+                                     dependency_artifacts={'lot': lot})
+
+                    return step_2.render()
+
+                # Form did not validate, re-render step #1 and retrieve a lot
+                # correctly.
+
+                form = form.initial = {'next_step': 1}
+                step_1 = StepOne(
+                    request=request,
+                    event=self.event,
+                    form=form,
+                    context={
+                        'event': self.event,
+                        'remove_preloader': True
+                    },
+                )
+
+                return step_1.render()
+
+            elif next_step == 2:
+
+                lot_pk = request.POST.get('lot', None)
+                lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk,
+                                                   event=self.event)
+                lot = lot_bootstrapper.retrieve_artifact()
+
+                if not lot:
+                    step_1 = StepOne(
+                        request=request,
+                        event=self.event,
+                        context={
+                            'event': self.event,
+                            'remove_preloader': True
+                        })
+                    return step_1.render()
+
+                # Pre-form cleaning
+                # This is a hack. Please don't do this.
+                # Ref: https://stackoverflow.com/questions/12611345/django-why-is-the-request-post-object-immutable
+                mutable = self.request.POST._mutable
+                self.request.POST._mutable = True
+
+                self.clear_string('cpf')
+                self.clear_string('zip_code')
+                self.clear_string('phone')
+                self.clear_string('institution_cnpj')
+
+                self.request.POST._mutable = mutable
 
                 try:
-
                     person = Person.objects.get(user=self.request.user)
                     form = SubscriptionPersonForm(instance=person,
                                                   event=self.event,
-                                                  lot=lot,
-                                                  initial={
-                                                      'next_step': 2,
-                                                      'lot': lot.pk}
-                                                  )
+                                                  data=request.POST,
+                                                  lot=lot)
                 except Person.DoesNotExist:
-                    pass
+                    form = SubscriptionPersonForm(event=self.event,
+                                                  lot=lot,
+                                                  data=request.POST)
 
+                if form.is_valid():
+
+                    person = form.save()
+
+                    if not person.user:
+                        person.user = self.request.user
+                        person.save()
+
+                    try:
+                        subscription = Subscription.objects.get(
+                            person=person,
+                            event=self.event
+                        )
+                    except Subscription.DoesNotExist:
+                        subscription = Subscription(
+                            person=person,
+                            event=self.event,
+                            created_by=self.request.user.id
+                        )
+
+                    subscription.lot = lot
+                    subscription.save()
+
+                    """
+                        Se o lote possuir surveys, ir para step 3.
+                        
+                        Se o lote não possuir surveys, e possuir pagamento ir para 
+                        step 4
+                        
+                        Se o lote não possuir surveys, e não possuir pagamento ir 
+                        para step 5.
+                        
+                    """
+                    event_survey = lot.event_survey
+                    lot_price = lot.price
+
+                    if event_survey:
+                        survey_director = SurveyDirector(event=self.event,
+                                                         user=self.request.user)
+
+                        survey_form = survey_director.get_form(
+                            survey=event_survey.survey)
+
+                        survey_form.fields['next_step'] = forms.IntegerField(
+                            initial=3,
+                            widget=forms.HiddenInput()
+                        )
+
+                        survey_form.fields[
+                            'event_survey'] = forms.IntegerField(
+                            initial=event_survey.pk,
+                            widget=forms.HiddenInput()
+                        )
+
+                        survey_form.fields['lot'] = forms.IntegerField(
+                            initial=lot.pk,
+                            widget=forms.HiddenInput()
+                        )
+
+                        survey_form.fields['subscription'] = forms.CharField(
+                            initial=str(subscription.pk),
+                            max_length=60,
+                            widget=forms.HiddenInput()
+                        )
+
+                        # Se o lote possuir surveys, ir para step 3.
+                        step_3 = StepThree(request=request, event=self.event,
+                                           form=survey_form, lot=lot)
+
+                        return step_3.render()
+
+                    if lot_price > 0:
+                        # Se o lote não possuir surveys, e possuir pagamentos ir
+                        # para step 4.
+                        step_4 = StepFour(request=request, event=self.event,
+                                          dependency_artifacts={'subscription':
+                                                                    subscription})
+                        return step_4.render()
+
+                # Form is not valid, re-render step 2, person form.
                 step_2 = StepTwo(request=request, event=self.event,
-                                 form=form,
-                                 dependency_artifacts={'lot': lot})
-
+                                 form=form, dependency_artifacts={'lot': lot})
                 return step_2.render()
 
-            # Form did not validate, re-render step #1 and retrieve a lot
-            # correctly.
-            step_1 = StepOne(
-                request=request,
-                event=self.event,
-                context={
-                    'event': self.event,
-                    'remove_preloader': True
-                },
-                form=form,
-            )
+            elif next_step == 3:
 
-            return step_1.render()
+                subscription_pk = request.POST.get('subscription', None)
+                lot_pk = request.POST.get('lot', None)
+                event_survey_pk = request.POST.get('event_survey', None)
 
-        elif next_step == 2:
+                subscription = None
+                event_survey = None
+                lot = None
 
-            lot_pk = request.POST.get('lot', None)
-            lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk, event=self.event)
-            lot = lot_bootstrapper.retrieve_artifact()
+                if subscription_pk:
+                    subscription_bootstrapper = SubscriptionBootstrapper(
+                        subscription_pk=subscription_pk)
+                    subscription = subscription_bootstrapper.retrieve_artifact()
 
-            if not lot:
+                if event_survey_pk:
+                    event_survey_bootstrapper = EventSurveyBootstrapper(
+                        event_survey_pk=event_survey_pk)
+
+                    event_survey = event_survey_bootstrapper.retrieve_artifact()
+                if lot_pk:
+                    lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk,
+                                                       event=self.event.pk)
+
+                    lot = lot_bootstrapper.retrieve_artifact()
+
+                if event_survey and subscription and lot:
+
+                    survey_director = SurveyDirector(event=self.event,
+                                                     user=self.request.user)
+                    form = survey_director.get_form(
+                        survey=event_survey.survey,
+                        data=request.POST)
+
+                    if form.is_valid():
+                        form.save_answers()
+
+                        # Do we have a payments step?
+                        if lot.price > 0:
+                            step_4 = StepFour(request=request,
+                                              event=self.event,
+                                              dependency_artifacts={
+                                                  'subscription': subscription})
+                            return step_4.render()
+
+                        # We don't have a payment step so we can go straight to
+                        # step 5
+                        step_5 = StepFive(request=request, event=self.event,
+                                          dependency_artifacts={
+                                              'subscription': subscription})
+                        return step_5.render()
+
+                    else:
+
+                        form.fields['next_step'] = forms.IntegerField(
+                            initial=3,
+                            widget=forms.HiddenInput()
+                        )
+
+                        form.fields[
+                            'event_survey'] = forms.IntegerField(
+                            initial=event_survey,
+                            widget=forms.HiddenInput()
+                        )
+
+                        form.fields['subscription'] = forms.CharField(
+                            initial=str(subscription.pk),
+                            max_length=60,
+                            widget=forms.HiddenInput()
+                        )
+
+                        form.fields['lot'] = forms.IntegerField(
+                            initial=lot.pk,
+                            widget=forms.HiddenInput()
+                        )
+
+                        # Form did not validate so we go back to step 3
+                        step_3 = StepThree(request=request,
+                                           event=self.event,
+                                           lot=lot,
+                                           form=form)
+                        return step_3.render()
+
+                # Missing one of the three required objects so we go back a step
+                if lot:
+                    step_2 = StepTwo(request=request, event=self.event,
+                                     dependency_artifacts={'lot': lot})
+                    return step_2.render()
+
+                # Does not have a lot, restart whole process
                 step_1 = StepOne(
                     request=request,
                     event=self.event,
@@ -142,302 +399,97 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                     })
                 return step_1.render()
 
-            # Pre-form cleaning
-            # This is a hack. Please don't do this.
-            # Ref: https://stackoverflow.com/questions/12611345/django-why-is-the-request-post-object-immutable
-            mutable = self.request.POST._mutable
-            self.request.POST._mutable = True
+            elif next_step == 4:
 
-            self.clear_string('cpf')
-            self.clear_string('zip_code')
-            self.clear_string('phone')
-            self.clear_string('institution_cnpj')
+                subscription_pk = request.POST.get('subscription', None)
+                subscription = None
 
-            self.request.POST._mutable = mutable
+                lot_pk = request.POST.get('lot', None)
+                lot = None
 
-            try:
-                person = Person.objects.get(user=self.request.user)
-                form = SubscriptionPersonForm(instance=person,
-                                              event=self.event,
-                                              data=request.POST,
-                                              lot=lot)
-            except Person.DoesNotExist:
-                form = SubscriptionPersonForm(event=self.event,
-                                              lot=lot,
-                                              data=request.POST)
+                if subscription_pk:
+                    subscription_bootstrapper = SubscriptionBootstrapper(
+                        subscription_pk=subscription_pk)
+                    subscription = subscription_bootstrapper.retrieve_artifact()
+                    lot_pk = subscription.lot.pk
 
-            if form.is_valid():
+                if lot_pk:
+                    lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk,
+                                                       event=self.event.pk)
 
-                person = form.save()
+                    lot = lot_bootstrapper.retrieve_artifact()
 
-                if not person.user:
-                    person.user = self.request.user
-                    person.save()
+                if subscription:
 
-                try:
-                    subscription = Subscription.objects.get(
-                        person=person,
-                        event=self.event
-                    )
-                except Subscription.DoesNotExist:
-                    subscription = Subscription(
-                        person=person,
-                        event=self.event,
-                        created_by=self.request.user.id
-                    )
+                    # if lot needs payments, so we validate if we have some stuff
+                    # from step 4.
+                    if subscription.lot.price > 0:
 
-                subscription.lot = lot
-                subscription.save()
+                        try:
+                            with transaction.atomic():
 
-                """
-                    Se o lote possuir surveys, ir para step 3.
-                    
-                    Se o lote não possuir surveys, e possuir pagamento ir para 
-                    step 4
-                    
-                    Se o lote não possuir surveys, e não possuir pagamento ir 
-                    para step 5.
-                    
-                """
-                event_survey = lot.event_survey
-                lot_price = lot.price
+                                transaction_data = PagarmeTransactionInstanceData(
+                                    subscription=subscription,
+                                    extra_data=request.POST.copy(),
+                                    event=self.event
+                                )
 
-                if event_survey:
-                    survey_director = SurveyDirector(event=self.event,
-                                                     user=self.request.user)
+                                create_pagarme_transaction(
+                                    transaction_data=transaction_data,
+                                    subscription=subscription
+                                )
 
-                    survey_form = survey_director.get_form(
-                        survey=event_survey.survey)
+                                step_5 = StepFive(request=request,
+                                                  event=self.event,
+                                                  dependency_artifacts={
+                                                      'subscription': subscription})
+                                return step_5.render()
 
-                    survey_form.fields['next_step'] = forms.IntegerField(
-                        initial=3,
-                        widget=forms.HiddenInput()
-                    )
+                        except TransactionError as e:
+                            error_dict = {
+                                'No transaction type': \
+                                    'Por favor escolher uma forma de pagamento.',
+                                'Transaction type not allowed': \
+                                    'Forma de pagamento não permitida.',
+                                'Organization has no bank account': \
+                                    'Organização não está podendo receber pagamentos no'
+                                    ' momento.',
+                                'No organization': 'Evento não possui organizador.',
+                            }
+                            if e.message in error_dict:
+                                e.message = error_dict[e.message]
 
-                    survey_form.fields['event_survey'] = forms.IntegerField(
-                        initial=event_survey.pk,
-                        widget=forms.HiddenInput()
-                    )
+                                messages.error(request, message=e.message)
+                                step_4 = StepFour(request=request,
+                                                  event=self.event,
+                                                  dependency_artifacts={
+                                                      'subscription': subscription})
+                                return step_4.render()
 
-                    survey_form.fields['lot'] = forms.IntegerField(
-                        initial=lot.pk,
-                        widget=forms.HiddenInput()
-                    )
-
-                    survey_form.fields['subscription'] = forms.CharField(
-                        initial=str(subscription.pk),
-                        max_length=60,
-                        widget=forms.HiddenInput()
-                    )
-
-                    # Se o lote possuir surveys, ir para step 3.
-                    step_3 = StepThree(request=request, event=self.event,
-                                       form=survey_form, lot=lot)
-
-                    return step_3.render()
-
-                if lot_price > 0:
-                    # Se o lote não possuir surveys, e possuir pagamentos ir
-                    # para step 4.
-                    step_4 = StepFour(request=request, event=self.event,
-                                      dependency_artifacts={'subscription':
-                                                                subscription})
-                    return step_4.render()
-
-            # Form is not valid, re-render step 2, person form.
-            step_2 = StepTwo(request=request, event=self.event,
-                             form=form, dependency_artifacts={'lot': lot})
-            return step_2.render()
-
-        elif next_step == 3:
-
-            subscription_pk = request.POST.get('subscription', None)
-            lot_pk = request.POST.get('lot', None)
-            event_survey_pk = request.POST.get('event_survey', None)
-
-            subscription = None
-            event_survey = None
-            lot = None
-
-            if subscription_pk:
-                subscription_bootstrapper = SubscriptionBootstrapper(
-                    subscription_pk=subscription_pk)
-                subscription = subscription_bootstrapper.retrieve_artifact()
-
-            if event_survey_pk:
-                event_survey_bootstrapper = EventSurveyBootstrapper(
-                    event_survey_pk=event_survey_pk)
-
-                event_survey = event_survey_bootstrapper.retrieve_artifact()
-            if lot_pk:
-                lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk,
-                                                   event=self.event.pk)
-
-                lot = lot_bootstrapper.retrieve_artifact()
-
-            if event_survey and subscription and lot:
-
-                survey_director = SurveyDirector(event=self.event,
-                                                 user=self.request.user)
-                form = survey_director.get_form(
-                    survey=event_survey.survey,
-                    data=request.POST)
-
-                if form.is_valid():
-                    form.save_answers()
-
-                    # Do we have a payments step?
-                    if lot.price > 0:
-                        step_4 = StepFour(request=request, event=self.event,
+                    else:
+                        step_5 = StepFive(request=request, event=self.event,
                                           dependency_artifacts={
                                               'subscription': subscription})
-                        return step_4.render()
+                        return step_5.render()
 
-                    # We don't have a payment step so we can go straight to
-                    # step 5
-                    step_5 = StepFive(request=request, event=self.event,
-                                      dependency_artifacts={
-                                          'subscription': subscription})
-                    return step_5.render()
+                # Missing one of the required objects so we go back a step
+                if lot:
+                    step_2 = StepTwo(request=request, event=self.event,
+                                     dependency_artifacts={'lot': lot})
+                    return step_2.render()
 
-                else:
+                # Does not have a lot, restart whole process
+                step_1 = StepOne(
+                    request=request,
+                    event=self.event,
+                    context={
+                        'event': self.event,
+                        'remove_preloader': True
+                    })
+                return step_1.render()
 
-                    form.fields['next_step'] = forms.IntegerField(
-                        initial=3,
-                        widget=forms.HiddenInput()
-                    )
-
-                    form.fields[
-                        'event_survey'] = forms.IntegerField(
-                        initial=event_survey,
-                        widget=forms.HiddenInput()
-                    )
-
-                    form.fields['subscription'] = forms.CharField(
-                        initial=str(subscription.pk),
-                        max_length=60,
-                        widget=forms.HiddenInput()
-                    )
-
-                    form.fields['lot'] = forms.IntegerField(
-                        initial=lot.pk,
-                        widget=forms.HiddenInput()
-                    )
-
-                    # Form did not validate so we go back to step 3
-                    step_3 = StepThree(request=request,
-                                       event=self.event,
-                                       lot=lot,
-                                       form=form)
-                    return step_3.render()
-
-            # Missing one of the three required objects so we go back a step
-            if lot:
-                step_2 = StepTwo(request=request, event=self.event,
-                                 dependency_artifacts={'lot': lot})
-                return step_2.render()
-
-            # Does not have a lot, restart whole process
-            step_1 = StepOne(
-                request=request,
-                event=self.event,
-                context={
-                    'event': self.event,
-                    'remove_preloader': True
-                })
-            return step_1.render()
-
-        elif next_step == 4:
-
-            subscription_pk = request.POST.get('subscription', None)
-            subscription = None
-
-            lot_pk = request.POST.get('lot', None)
-            lot = None
-
-            if subscription_pk:
-                subscription_bootstrapper = SubscriptionBootstrapper(
-                    subscription_pk=subscription_pk)
-                subscription = subscription_bootstrapper.retrieve_artifact()
-                lot_pk = subscription.lot.pk
-
-            if lot_pk:
-                lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk,
-                                                   event=self.event.pk)
-
-                lot = lot_bootstrapper.retrieve_artifact()
-
-            if subscription:
-
-                # if lot needs payments, so we validate if we have some stuff
-                # from step 4.
-                if subscription.lot.price > 0:
-
-                    try:
-                        with transaction.atomic():
-
-                            transaction_data = PagarmeTransactionInstanceData(
-                                subscription=subscription,
-                                extra_data=request.POST.copy(),
-                                event=self.event
-                            )
-
-                            create_pagarme_transaction(
-                                transaction_data=transaction_data,
-                                subscription=subscription
-                            )
-
-                            step_5 = StepFive(request=request,
-                                              event=self.event,
-                                              dependency_artifacts={
-                                                  'subscription': subscription})
-                            return step_5.render()
-
-                    except TransactionError as e:
-                        error_dict = {
-                            'No transaction type': \
-                                'Por favor escolher uma forma de pagamento.',
-                            'Transaction type not allowed': \
-                                'Forma de pagamento não permitida.',
-                            'Organization has no bank account': \
-                                'Organização não está podendo receber pagamentos no'
-                                ' momento.',
-                            'No organization': 'Evento não possui organizador.',
-                        }
-                        if e.message in error_dict:
-                            e.message = error_dict[e.message]
-
-                            messages.error(request, message=e.message)
-                            step_4 = StepFour(request=request,
-                                              event=self.event,
-                                              dependency_artifacts={
-                                                  'subscription': subscription})
-                            return step_4.render()
-
-                else:
-                    step_5 = StepFive(request=request, event=self.event,
-                                      dependency_artifacts={
-                                          'subscription': subscription})
-                    return step_5.render()
-
-            # Missing one of the required objects so we go back a step
-            if lot:
-                step_2 = StepTwo(request=request, event=self.event,
-                                 dependency_artifacts={'lot': lot})
-                return step_2.render()
-
-            # Does not have a lot, restart whole process
-            step_1 = StepOne(
-                request=request,
-                event=self.event,
-                context={
-                    'event': self.event,
-                    'remove_preloader': True
-                })
-            return step_1.render()
-
-        else:
-            return HttpResponseBadRequest()
+            else:
+                return HttpResponseBadRequest()
 
     def clear_string(self, field_name):
 
