@@ -181,6 +181,49 @@ function fetch_cities(uf_el, selected_value, callback) {
             if (callback) {
                 callback(result.results)
             }
+        },
+        error: function (err) {
+            throw err;
+        }
+    });
+}
+
+function repopulate_cities(uf_el, selected_value, callback) {
+    selected_value = selected_value || '';
+
+    city_el = $('#id_city_name');
+
+
+    $.ajax({
+        url: "/api/cities/?uf=" + uf_el + '&length=1000',
+        success: function (result) {
+
+            var listitems = [];
+            var ids = [];
+
+            $.each(result.results, function (key, value) {
+                listitems.push('<option value=' + value.id + '>' + value.name + '</option>');
+                ids.push(value.id)
+            });
+
+            if (selected_value) {
+                window.setTimeout(function () {
+                    city_el.val(selected_value);
+                    city_el.val(selected_value);
+                }, 500);
+            } else {
+                city_el.val(ids[0]);
+            }
+
+            city_el.html(listitems.join(''));
+            city_el.prop('disabled', false);
+
+            if (callback) {
+                callback(result.results)
+            }
+        },
+        error: function (err) {
+            throw err;
         }
     });
 }

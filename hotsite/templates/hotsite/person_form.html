@@ -254,13 +254,14 @@
                     $.ajax({
                         url: "/api/cities/" + id_city.val(),
                         success: function (result) {
-                            $('#id_city_search').val(result.name + ' - ' +
-                                result.uf) //populate the html with result here
-
+                            repopulate_cities(result.uf, result.id);
+                        },
+                        error: function (err) {
+                            throw err;
                         }
                     });
-
                 }
+
                 showHideCepLoader();
 
                 let radios = $('input[type=radio]');
