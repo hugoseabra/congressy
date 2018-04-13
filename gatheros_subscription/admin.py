@@ -1,9 +1,15 @@
 from django.contrib import admin
 
 from .models import (
+    LotCategory,
     Lot,
     Subscription,
 )
+
+
+@admin.register(LotCategory)
+class LotCategoryAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(Lot)
@@ -14,6 +20,7 @@ class LotAdmin(admin.ModelAdmin):
     )
     list_display = (
         'name',
+        'category',
         'event',
         'price',
         'date_start',
@@ -27,6 +34,7 @@ class LotAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
+                'category',
                 'name',
                 'event',
                 'date_start',

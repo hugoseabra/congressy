@@ -19,6 +19,7 @@ from gatheros_subscription.models import LotCategory
 from gatheros_event.models.mixins import GatherosModelMixin
 from .event_survey import EventSurvey
 from .rules import lot as rule
+from django.core.exceptions import ValidationError
 
 
 class LotManager(models.Manager):
@@ -96,7 +97,7 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='categoria',
         related_name='lots',
         null=True,
-        blank=True
+        blank=False
     )
 
     date_start = models.DateTimeField(verbose_name='data inicial')
@@ -326,6 +327,11 @@ class Lot(models.Model, GatherosModelMixin):
         """ Limpa valores dos campos. """
         if self.private and not self.promo_code:
             self.promo_code = Lot.objects.generate_promo_code()
+
+        if self.category and self.category.event.pk != self.event.pk:
+            raise ValidationError({'category': [
+                'A categoria do lote e o lote não estão no mesmo evento.'
+            ]})
 
     def check_rules(self):
         """ Verifica regras de negócio. """
