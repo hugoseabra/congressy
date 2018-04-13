@@ -77,7 +77,14 @@
 
                                             {% csrf_token %}
 
-                                            {% for field in form %}
+                                            {% render_generic_field form.next_step %}
+                                            {% render_generic_field form.event_survey %}
+                                            {% render_generic_field form.lot %}
+                                            {% render_generic_field form.person %}
+
+
+
+                                            {% for field in form.visible_fields %}
                                                 {% render_generic_field field %}
                                             {% endfor %}
 
@@ -94,11 +101,22 @@
 
                                         </form>
 
-                                        <a href="{% url 'public:hotsite' event.slug %}"
-                                           class="btn btn-primary pull-left"
-                                           style="margin-top: 5px;">
-                                            Voltar
-                                        </a>
+
+                                        <form method="post" action="">
+
+                                            {% csrf_token %}
+
+                                            {% render_generic_field form.previous_step %}
+                                             {% render_generic_field form.lot %}
+                                            {% render_generic_field form.person %}
+
+
+                                            <button class="btn btn-primary pull-left"
+                                                    type="submit">
+                                                Voltar
+                                            </button>
+
+                                        </form>
 
                                     </div>
 

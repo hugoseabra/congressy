@@ -3,14 +3,13 @@ import json
 from django.conf import settings
 from django.contrib import messages
 from django.core import serializers
-from django.shortcuts import redirect
 from django.urls import reverse_lazy
 
 from base.form_step import Step
 from gatheros_subscription.models import FormConfig
 from hotsite.forms import LotsForm, SubscriptionPersonForm, PaymentForm
 from hotsite.views.subscription_form_bootstrappers import LotBootstrapper, \
-    SubscriptionBootstrapper
+    PersonBootstrapper
 
 
 class StepOne(Step):
@@ -126,7 +125,7 @@ class StepThree(Step):
 class StepFour(Step):
     template = 'hotsite/payment_form.html'
     dependes_on = ('subscription',)
-    dependency_bootstrap_map = {'subscription': SubscriptionBootstrapper}
+    dependency_bootstrap_map = {'person': PersonBootstrapper}
 
     def __init__(self, request, event, form=None, context=None,
                  dependency_artifacts=None, **kwargs) -> None:

@@ -1,8 +1,8 @@
 from datetime import datetime
+
 from django import forms
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-
 from django.db import transaction
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -13,7 +13,7 @@ from gatheros_subscription.models import Subscription
 from hotsite.forms import LotsForm, SubscriptionPersonForm
 from hotsite.views.mixins import EventMixin
 from hotsite.views.subscription_form_bootstrappers import LotBootstrapper, \
-    SubscriptionBootstrapper, EventSurveyBootstrapper
+    SubscriptionBootstrapper, EventSurveyBootstrapper, PersonBootstrapper
 from hotsite.views.subscription_form_steps import StepOne, StepTwo, \
     StepThree, StepFour, StepFive
 from payment.exception import TransactionError
@@ -114,6 +114,49 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                         })
 
                     return step_1.render()
+            elif previous_step == 2:
+
+                person_pk = request.POST.get('person')
+                lot_pk = request.POST.get('lot')
+                person_bootstrapper = PersonBootstrapper(
+                    person_pk=person_pk)
+                lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk,
+                                                   event=self.event)
+
+                person = person_bootstrapper.retrieve_artifact()
+                lot = lot_bootstrapper.retrieve_artifact()
+
+                if person and lot:
+                    form = SubscriptionPersonForm(instance=person,
+                                                  event=self.event,
+                                                  lot=lot,
+                                                  initial={
+                                                      'next_step': 2,
+                                                      'previous_step': 1,
+                                                      'lots': lot.pk}
+                                                  )
+
+                    step_2 = StepTwo(request=request, event=self.event,
+                                     form=form,
+                                     dependency_artifacts={'lot': lot})
+                    return step_2.render()
+                elif lot:
+                    step_2 = StepTwo(request=request, event=self.event,
+                                     dependency_artifacts={'lot': lot})
+                    return step_2.render()
+
+                else:
+
+                    step_1 = StepOne(
+                        request=request,
+                        event=self.event,
+                        context={
+                            'event': self.event,
+                            'remove_preloader': True,
+                        })
+
+                    return step_1.render()
+
             else:
                 return HttpResponseBadRequest()
 
@@ -244,20 +287,20 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                         person.user = self.request.user
                         person.save()
 
-                    try:
-                        subscription = Subscription.objects.get(
-                            person=person,
-                            event=self.event
-                        )
-                    except Subscription.DoesNotExist:
-                        subscription = Subscription(
-                            person=person,
-                            event=self.event,
-                            created_by=self.request.user.id
-                        )
-
-                    subscription.lot = lot
-                    subscription.save()
+                    # try:
+                    #     subscription = Subscription.objects.get(
+                    #         person=person,
+                    #         event=self.event
+                    #     )
+                    # except Subscription.DoesNotExist:
+                    #     subscription = Subscription(
+                    #         person=person,
+                    #         event=self.event,
+                    #         created_by=self.request.user.id
+                    #     )
+                    #
+                    # subscription.lot = lot
+                    # subscription.save()
 
                     """
                         Se o lote possuir surveys, ir para step 3.
@@ -295,8 +338,14 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                             widget=forms.HiddenInput()
                         )
 
-                        survey_form.fields['subscription'] = forms.CharField(
-                            initial=str(subscription.pk),
+                        survey_form.fields[
+                            'previous_step'] = forms.IntegerField(
+                            initial=2,
+                            widget=forms.HiddenInput()
+                        )
+
+                        survey_form.fields['person'] = forms.CharField(
+                            initial=str(person.pk),
                             max_length=60,
                             widget=forms.HiddenInput()
                         )
@@ -311,8 +360,8 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                         # Se o lote não possuir surveys, e possuir pagamentos ir
                         # para step 4.
                         step_4 = StepFour(request=request, event=self.event,
-                                          dependency_artifacts={'subscription':
-                                                                    subscription})
+                                          dependency_artifacts={
+                                              'person': person})
                         return step_4.render()
 
                 # Form is not valid, re-render step 2, person form.
@@ -388,6 +437,12 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                         form.fields['subscription'] = forms.CharField(
                             initial=str(subscription.pk),
                             max_length=60,
+                            widget=forms.HiddenInput()
+                        )
+
+                        form.fields[
+                            'previous_step'] = forms.IntegerField(
+                            initial=2,
                             widget=forms.HiddenInput()
                         )
 
