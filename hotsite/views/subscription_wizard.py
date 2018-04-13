@@ -361,7 +361,7 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                         # para step 4.
                         step_4 = StepFour(request=request, event=self.event,
                                           dependency_artifacts={
-                                              'person': person})
+                                              'person': person, 'lot': lot})
                         return step_4.render()
 
                 # Form is not valid, re-render step 2, person form.
@@ -371,18 +371,18 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
 
             elif next_step == 3:
 
-                subscription_pk = request.POST.get('subscription', None)
+                person_pk = request.POST.get('person', None)
                 lot_pk = request.POST.get('lot', None)
                 event_survey_pk = request.POST.get('event_survey', None)
 
-                subscription = None
+                person = None
                 event_survey = None
                 lot = None
 
-                if subscription_pk:
-                    subscription_bootstrapper = SubscriptionBootstrapper(
-                        subscription_pk=subscription_pk)
-                    subscription = subscription_bootstrapper.retrieve_artifact()
+                if person_pk:
+                    person_bootstrapper = PersonBootstrapper(
+                        person_pk=person_pk)
+                    person = person_bootstrapper.retrieve_artifact()
 
                 if event_survey_pk:
                     event_survey_bootstrapper = EventSurveyBootstrapper(
@@ -395,7 +395,7 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
 
                     lot = lot_bootstrapper.retrieve_artifact()
 
-                if event_survey and subscription and lot:
+                if event_survey and person and lot:
 
                     survey_director = SurveyDirector(event=self.event,
                                                      user=self.request.user)
@@ -411,14 +411,15 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                             step_4 = StepFour(request=request,
                                               event=self.event,
                                               dependency_artifacts={
-                                                  'subscription': subscription})
+                                                  'person': person,
+                                                  'lot': lot})
                             return step_4.render()
 
                         # We don't have a payment step so we can go straight to
                         # step 5
                         step_5 = StepFive(request=request, event=self.event,
                                           dependency_artifacts={
-                                              'subscription': subscription})
+                                              'person': person})
                         return step_5.render()
 
                     else:
@@ -538,7 +539,9 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                                 step_4 = StepFour(request=request,
                                                   event=self.event,
                                                   dependency_artifacts={
-                                                      'subscription': subscription})
+                                                      'subscription':
+                                                          subscription,
+                                                      'lot': lot})
                                 return step_4.render()
 
                     else:

@@ -124,8 +124,9 @@ class StepThree(Step):
 
 class StepFour(Step):
     template = 'hotsite/payment_form.html'
-    dependes_on = ('subscription',)
-    dependency_bootstrap_map = {'person': PersonBootstrapper}
+    dependes_on = ('person', 'lot')
+    dependency_bootstrap_map = {'person': PersonBootstrapper,
+                                'lot': LotBootstrapper}
 
     def __init__(self, request, event, form=None, context=None,
                  dependency_artifacts=None, **kwargs) -> None:
@@ -140,10 +141,11 @@ class StepFour(Step):
 
     def get_context(self):
 
-        subscription = self.dependency_artifacts['subscription']
+        person = self.dependency_artifacts['person']
+        lot = self.dependency_artifacts['lot']
 
         context = super().get_context()
-        lot_obj_as_json = serializers.serialize('json', [subscription.lot, ])
+        lot_obj_as_json = serializers.serialize('json', [lot,])
 
         json_obj = json.loads(lot_obj_as_json)
         json_obj = json_obj[0]
@@ -155,9 +157,8 @@ class StepFour(Step):
         lot_obj_as_json = json.dumps(json_obj)
 
         context['lot'] = lot_obj_as_json
-        context['subscription_id'] = subscription.pk
-        context['lot_id'] = subscription.lot.pk
-        context['person'] = subscription.person
+        context['lot_id'] = lot.pk
+        context['person'] = person
         context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
         context['remove_preloader'] = True
 
