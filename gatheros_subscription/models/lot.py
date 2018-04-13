@@ -4,19 +4,20 @@ Lotes são importantes para agrupar as inscrições de um evento, para separar
 os critérios de inscrições: se gratuitas, se limitadas, se privados, etc.
 """
 
+import locale
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-import locale
 from django.conf import settings
 from django.db import models
 from django.utils.encoding import force_text
 
 from core.model import track_data
 from gatheros_event.models import Event
-from .event_survey import EventSurvey
+from gatheros_subscription.models import LotCategory
 from gatheros_event.models.mixins import GatherosModelMixin
+from .event_survey import EventSurvey
 from .rules import lot as rule
 
 
@@ -89,6 +90,15 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='evento',
         related_name='lots'
     )
+    category = models.ForeignKey(
+        LotCategory,
+        on_delete=models.PROTECT,
+        verbose_name='categoria',
+        related_name='lots',
+        null=True,
+        blank=True
+    )
+
     date_start = models.DateTimeField(verbose_name='data inicial')
     date_end = models.DateTimeField(
         verbose_name='data final',
@@ -377,7 +387,7 @@ class Lot(models.Model, GatherosModelMixin):
             return 0
 
         minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
-        congressy_plan_percent= \
+        congressy_plan_percent = \
             Decimal(self.event.congressy_percent) / 100
 
         congressy_amount = self.price * congressy_plan_percent
