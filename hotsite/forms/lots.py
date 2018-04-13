@@ -32,6 +32,7 @@ class LotsForm(forms.Form):
     coupon_code = forms.CharField(
         max_length=15,
         required=False,
+        label="Código de Cupom"
     )
 
     next_step = forms.IntegerField(
