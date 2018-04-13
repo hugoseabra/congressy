@@ -1,5 +1,8 @@
+from datetime import datetime
 from django import forms
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
+
 from django.db import transaction
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -118,9 +121,26 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
 
             if next_step == 0:
 
+                form = None
+
+                try:
+                    person = Person.objects.get(user=self.request.user)
+                    subscription = Subscription.objects.get(person=person,
+                                                            event=self.event,
+                                                            status=Subscription.AWAITING_STATUS)
+                    if subscription.lot.date_end < datetime.now():
+                        form = LotsForm(event=self.event, initial={
+                            'lots': subscription.lot,
+                            'next_step': 1,
+                        })
+
+                except ObjectDoesNotExist:
+                    pass
+
                 step_1 = StepOne(
                     request=request,
                     event=self.event,
+                    form=form,
                     context={
                         'event': self.event,
                         'remove_preloader': True
@@ -177,7 +197,7 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
 
             elif next_step == 2:
 
-                lot_pk = request.POST.get('lot', None)
+                lot_pk = request.POST.get('lots', None)
                 lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk,
                                                    event=self.event)
                 lot = lot_bootstrapper.retrieve_artifact()

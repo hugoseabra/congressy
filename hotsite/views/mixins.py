@@ -170,7 +170,9 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
         if person:
             try:
                 context['subscription'] = \
-                    Subscription.objects.get(person=person, event=self.event)
+                    Subscription.objects.get(person=person,
+                                             event=self.event,
+                                             status=Subscription.CONFIRMED_STATUS)
                 context['is_subscribed'] = True
             except Subscription.DoesNotExist:
                 context['is_subscribed'] = False

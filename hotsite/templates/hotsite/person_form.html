@@ -26,9 +26,11 @@
                             {% if hidden_field.errors %}
                                 {% render_errors hidden_field.errors %}
                             {% endif %}
-                            {{ hidden_field }}
                         {% endfor %}
 
+                        {% render_generic_field form.next_step %}
+                        {% render_generic_field form.city %}
+                        {% render_generic_field form.lots %}
 
                         {% block messages %}
                             {% if messages %}

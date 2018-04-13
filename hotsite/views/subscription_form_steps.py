@@ -115,6 +115,8 @@ class StepThree(Step):
         context['form'] = self.form_instance
         context['event'] = self.event
         context['has_payments'] = False
+        context['remove_preloader'] = True
+
         if self.lot.price > 0:
             context['has_payments'] = True
 

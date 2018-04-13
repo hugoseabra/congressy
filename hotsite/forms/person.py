@@ -21,11 +21,13 @@ class SubscriptionPersonForm(PersonForm):
     )
 
     previous_step = forms.IntegerField(
-        widget=forms.HiddenInput()
+        widget=forms.HiddenInput(),
+        required=False,
     )
 
     coupon_code = forms.IntegerField(
-        widget=forms.HiddenInput()
+        widget=forms.HiddenInput(),
+        required=False,
     )
 
     def __init__(self, lot, event, is_chrome=False, **kwargs):
