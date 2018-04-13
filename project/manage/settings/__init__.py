@@ -13,7 +13,8 @@ INSTALLED_APPS += [
     'partner',
     'hotsite',
     'survey',
-    'bitly',
+    # 'bitly',
+    'associate',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'

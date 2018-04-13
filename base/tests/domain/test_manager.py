@@ -6,16 +6,18 @@ from django.db import models
 from django_fake_model import models as f
 from test_plus.test import TestCase
 
-from base.managers import Manager, EntityTypeError
-from base.models import Entity
+from base.managers import Manager, EntityTypeError, ManagerException
+from base.models import EntityMixin
 
 
-class FakeEntity(Entity, f.FakeModel):
+class FakeEntity(EntityMixin, f.FakeModel):
     name = models.CharField(max_length=100)
+    age = models.PositiveIntegerField()
 
 
 class FakeModel(f.FakeModel):
     name = models.CharField(max_length=100)
+    age = models.PositiveIntegerField()
 
 
 @FakeEntity.fake_me
@@ -49,7 +51,7 @@ class ManagerTest(TestCase):
         """
             Testa recuperação de instância do model configurado no Manager.
         """
-        instance = FakeEntity()
+        instance = FakeEntity(name='Albert', age=80)
         instance.save()
 
         class TestManager(Manager):
@@ -65,3 +67,41 @@ class ManagerTest(TestCase):
 
         with self.assertRaises(FakeEntity.DoesNotExist):
             manager.get(pk=1000)
+
+    def test_hide_field(self):
+        """
+            Testa configuração de campo 'hidden' ao chamar método hide_field()
+        """
+
+        class TestManager(Manager):
+            class Meta:
+                model = FakeEntity
+                fields = '__all__'
+
+        manager = TestManager()
+        content = str(manager)
+
+        self.assertIn('name="name"', content)
+        self.assertIn('type="text"', content)
+
+        manager.hide_field('name')
+        content = str(manager)
+
+        self.assertIn('name="name"', content)
+        self.assertIn('type="hidden"', content)
+
+    def test_hide_inexistent_field(self):
+        """
+            Testa configuração configuração de esconder um campo que não
+            existe.
+        """
+
+        class TestManager(Manager):
+            class Meta:
+                model = FakeEntity
+                fields = '__all__'
+
+        manager = TestManager()
+
+        with self.assertRaises(ManagerException):
+            manager.hide_field('inexistent_field')

@@ -207,6 +207,12 @@ class Lot(models.Model, GatherosModelMixin):
         null=True
     )
 
+    rsvp_restrict = models.BooleanField(
+        default=False,
+        verbose_name='restrito a associados',
+        help_text='Somente associados podem se inscrever neste lote.'
+    )
+
     objects = LotManager()
 
     class Meta:
@@ -240,8 +246,13 @@ class Lot(models.Model, GatherosModelMixin):
         """ Exibição pública de infomações do lote. """
 
         if self.price and self.price > 0:
+            if self.rsvp_restrict is True:
+                content = '{} - R$ {} (para convidados)'
+            else:
+                content = '{} - R$ {}'
+
             # display = '{} - R$ {} ({} vagas restantes)'.format(
-            display = '{} - R$ {}'.format(
+            display = content.format(
                 self.name,
                 locale.format(
                     percent='%.2f',
@@ -252,7 +263,13 @@ class Lot(models.Model, GatherosModelMixin):
             )
         else:
             # display = '{} vagas restantes'.format(self.places_remaining)
-            display = self.name
+            # display = self.name
+            if self.rsvp_restrict is True:
+                content = '{} (para convidados)'
+            else:
+                content = '{}'
+
+            display = content.format(self.name)
 
         return display
 

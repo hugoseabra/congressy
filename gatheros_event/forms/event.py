@@ -25,6 +25,7 @@ class EventForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
+            'rsvp_type',
         ]
 
         widgets = {
