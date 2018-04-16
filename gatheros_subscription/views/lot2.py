@@ -116,15 +116,13 @@ class LotListView(BaseLotView, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
     model = Lot
     # template_name = 'gatheros_subscription/lot/list.html'
-    template_name = 'lot/manage.html'
+    template_name = 'lot/list.html'
     ordering = ['name']
 
     def get_queryset(self):
         """Lotes a exibir são de acordo com o evento e não-interno"""
         query_set = super(LotListView, self).get_queryset()
-        return query_set.filter(event=self.event, internal=False).order_by(
-            'date_start', 'date_end'
-        )
+        return query_set.filter(event=self.event, internal=False)
 
     def get_context_data(self, **kwargs):
         context = super(LotListView, self).get_context_data(**kwargs)
