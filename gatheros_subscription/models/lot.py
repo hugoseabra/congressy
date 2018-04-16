@@ -97,7 +97,7 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='categoria',
         related_name='lots',
         null=True,
-        blank=False
+        blank=True,
     )
 
     date_start = models.DateTimeField(verbose_name='data inicial')
