@@ -292,14 +292,26 @@
 
                 var radios = $('input[type=radio]');
                 var checkboxes = $('input[type=checkbox]');
-                radios.iCheck({
-                    checkboxClass: 'icheckbox_flat-grey',
-                    radioClass: 'iradio_flat-grey'
-                });
 
-                checkboxes.iCheck({
-                    checkboxClass: 'icheckbox_flat-grey',
-                    radioClass: 'iradio_flat-grey'
+                radios.each(function () {
+
+                    if (!$(this).hasClass('js-switch')) {
+                        if (!$(this).hasClass('js-switch')) {
+                            $(this).iCheck({
+                                checkboxClass: 'icheckbox_flat-grey',
+                                radioClass: 'iradio_flat-grey'
+                            });
+                        }
+                    }
+                });
+                checkboxes.each(function () {
+
+                    if (!$(this).hasClass('js-switch')) {
+                        $(this).iCheck({
+                            checkboxClass: 'icheckbox_flat-grey',
+                            radioClass: 'iradio_flat-grey'
+                        });
+                    }
                 });
 
 
@@ -312,11 +324,11 @@
                 showHideInstallmentFields();
                 calcInstallments();
 
-                $('#limit_switch').on('ifChanged', function () {
+                $('#limit_switch').on('change', function () {
                     showHideLimit();
                 });
 
-                $('#id_private').on('ifChanged', function () {
+                $('#id_private').on('change', function () {
                     showHideExihibitionCode();
                 });
 
@@ -503,8 +515,12 @@
                                 <div class="form-group">
                                     <label>Limitar vagas</label>
                                     <div>
-                                        <input name="limit_switch" id="limit_switch"
-                                               type="checkbox" {% if object and object.limit > 0 %}checked{% endif %}
+                                        <input name="limit_switch"
+                                               class="js-switch"
+                                               id="limit_switch"
+                                               style="display:none"
+                                               type="checkbox"
+                                               {% if object and object.limit > 0 %}checked{% endif %}
                                         />
                                     </div>
                                 </div>
@@ -532,13 +548,13 @@
                                 </div>
                                 <div class="col-md-5 col-xl-6 col-lg-5">
                                     <div style="display: none">
-                                        {% render_generic_field form.transfer_tax %}
+                                        {% render_switchery_field form.transfer_tax %}
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-lg-3 col-xl-3">
-                                    {% render_generic_field form.allow_installment %}
+                                    {% render_switchery_field form.allow_installment %}
                                 </div>
                                 <div class="col-lg-3 col-xl-3">
                                     {% render_generic_field form.installment_limit %}
@@ -546,7 +562,7 @@
                                 <div class="col-xs-11 col-lg-5 col-xl-5">
                                     <div>
                                         <div class="float-left">
-                                            {% render_generic_field form.num_install_interest_absortion %}
+                                            {% render_switchery_field form.num_install_interest_absortion %}
                                         </div>
                                         <div class="float-left">
                                             <button style="position: absolute;top: 32px;"
@@ -651,7 +667,7 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-md-6">
-                                {% render_generic_field form.private %}
+                                {% render_switchery_field form.private %}
                             </div>
                             <div class="col-md-3">
                                 {% render_generic_field form.exhibition_code %}
@@ -684,7 +700,7 @@
                                     </div>
                                     <p>
                                         <a href="
-                                        {% url 'subscription:survey-list' event.pk %}">
+                                        {% url 'subscription:form-config' event.pk %}">
                                             Clique aqui para configurar estes
                                             dados.</a></p>
                                 </div>
