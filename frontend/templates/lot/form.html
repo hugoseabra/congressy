@@ -332,12 +332,12 @@
                     showHideExihibitionCode();
                 });
 
-                $('#id_transfer_tax').on('ifChanged', function () {
+                $('#id_transfer_tax').on('change', function () {
                     calculatePrices();
                     calcInstallments();
                 });
 
-                $('#id_allow_installment').on('ifChanged', function () {
+                $('#id_allow_installment').on('change', function () {
                     showHideInstallmentFields();
                     calcInstallments();
                 });
