@@ -1,84 +1,3 @@
-from datetime import datetime
-
-from django import forms
-from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
-from django.http import HttpResponseBadRequest
-from django.shortcuts import redirect
-from django.views import generic
-
-from gatheros_event.models import Event, Person
-from gatheros_subscription.models import Subscription
-from hotsite.forms import LotsForm, SubscriptionPersonForm
-from hotsite.views.mixins import EventMixin
-from hotsite.views.subscription_form_bootstrappers import LotBootstrapper, \
-    SubscriptionBootstrapper, EventSurveyBootstrapper, PersonBootstrapper
-from hotsite.views.subscription_form_steps import StepOne, StepTwo, \
-    StepThree, StepFour, StepFive
-from payment.exception import TransactionError
-from payment.helpers import PagarmeTransactionInstanceData
-from payment.tasks import create_pagarme_transaction
-from survey.directors import SurveyDirector
-
-
-class SubscriptionFormIndexView(EventMixin, generic.View):
-    """
-        View responsavel por decidir onde se inicia o process de inscrição
-    """
-
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
-
-        if not request.user.is_authenticated:
-            return redirect('public:hotsite', slug=self.event.slug)
-
-        enabled = self.subscription_enabled()
-        if not enabled:
-            return redirect('public:hotsite', slug=self.event.slug)
-
-        return response
-
-    def get(self, request, *args, **kwargs):
-
-        """
-            Se for evento com inscrição por lotes, ir para o step 1,
-            caso contrario pode pular direto para o step 2.
-        """
-        if self.event.subscription_type == Event.SUBSCRIPTION_BY_LOTS:
-
-            step_1 = StepOne(
-                request=request,
-                event=self.event,
-                context={
-                    'event': self.event,
-                    'remove_preloader': True
-                })
-
-            return step_1.render()
-
-        elif self.event.subscription_type == Event.SUBSCRIPTION_SIMPLE:
-
-            lot = self.event.lots.first()
-
-            step_2 = StepTwo(request=request, event=self.event,
-                             dependency_artifacts={'lot': lot}, )
-
-            return step_2.render()
-
-    def post(self, request, *args, **kwargs):
-
-        incoming_step = request.POST.get('next_step', 0)
-        previous_step = request.POST.get('previous_step', 0)
-
-        if not incoming_step:
-            incoming_step = 0
-
-        if not previous_step:
-            previous_step = 0
-
-        next_step = int(incoming_step)
-        previous_step = int(previous_step)
 
         if previous_step:
 
@@ -127,6 +46,51 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                 lot = lot_bootstrapper.retrieve_artifact()
 
                 if person and lot:
+                    form = SubscriptionPersonForm(instance=person,
+                                                  event=self.event,
+                                                  lot=lot,
+                                                  initial={
+                                                      'next_step': 2,
+                                                      'previous_step': 1,
+                                                      'lots': lot.pk}
+                                                  )
+
+                    step_2 = StepTwo(request=request, event=self.event,
+                                     form=form,
+                                     dependency_artifacts={'lot': lot})
+                    return step_2.render()
+                elif lot:
+                    step_2 = StepTwo(request=request, event=self.event,
+                                     dependency_artifacts={'lot': lot})
+                    return step_2.render()
+
+                else:
+
+                    step_1 = StepOne(
+                        request=request,
+                        event=self.event,
+                        context={
+                            'event': self.event,
+                            'remove_preloader': True,
+                        })
+
+                    return step_1.render()
+
+            elif previous_step == 3:
+
+                person_pk = request.POST.get('person')
+                lot_pk = request.POST.get('lot')
+                person_bootstrapper = PersonBootstrapper(
+                    person_pk=person_pk)
+                lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk,
+                                                   event=self.event)
+
+                person = person_bootstrapper.retrieve_artifact()
+                lot = lot_bootstrapper.retrieve_artifact()
+
+                if person and lot:
+
+                    event_survey = lot.event_survey
                     form = SubscriptionPersonForm(instance=person,
                                                   event=self.event,
                                                   lot=lot,
@@ -287,21 +251,6 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                         person.user = self.request.user
                         person.save()
 
-                    # try:
-                    #     subscription = Subscription.objects.get(
-                    #         person=person,
-                    #         event=self.event
-                    #     )
-                    # except Subscription.DoesNotExist:
-                    #     subscription = Subscription(
-                    #         person=person,
-                    #         event=self.event,
-                    #         created_by=self.request.user.id
-                    #     )
-                    #
-                    # subscription.lot = lot
-                    # subscription.save()
-
                     """
                         Se o lote possuir surveys, ir para step 3.
                         
@@ -419,7 +368,7 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                         # step 5
                         step_5 = StepFive(request=request, event=self.event,
                                           dependency_artifacts={
-                                              'person': person})
+                                              'person': person, 'lot': lot})
                         return step_5.render()
 
                     else:
@@ -432,12 +381,6 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                         form.fields[
                             'event_survey'] = forms.IntegerField(
                             initial=event_survey,
-                            widget=forms.HiddenInput()
-                        )
-
-                        form.fields['subscription'] = forms.CharField(
-                            initial=str(subscription.pk),
-                            max_length=60,
                             widget=forms.HiddenInput()
                         )
 
@@ -477,17 +420,16 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
 
             elif next_step == 4:
 
-                subscription_pk = request.POST.get('subscription', None)
-                subscription = None
-
-                lot_pk = request.POST.get('lot', None)
                 lot = None
+                person = None
 
-                if subscription_pk:
-                    subscription_bootstrapper = SubscriptionBootstrapper(
-                        subscription_pk=subscription_pk)
-                    subscription = subscription_bootstrapper.retrieve_artifact()
-                    lot_pk = subscription.lot.pk
+                person_pk = request.POST.get('person', None)
+                lot_pk = request.POST.get('lot', None)
+
+                if person_pk:
+                    person_bootstrapper = PersonBootstrapper(
+                        person_pk=person_pk)
+                    person = person_bootstrapper.retrieve_artifact()
 
                 if lot_pk:
                     lot_bootstrapper = LotBootstrapper(lot_pk=lot_pk,
@@ -495,17 +437,23 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
 
                     lot = lot_bootstrapper.retrieve_artifact()
 
-                if subscription:
+                if person and lot:
 
-                    # if lot needs payments, so we validate if we have some stuff
-                    # from step 4.
-                    if subscription.lot.price > 0:
+                    subscription_form = SubscriptionForm(data=request.POST,
+                                                         event=self.event,
+                                                         lot=lot,
+                                                         person=person)
+
+                    if subscription_form.is_valid():
+
+                        subscription = subscription_form.save()
 
                         try:
                             with transaction.atomic():
 
                                 transaction_data = PagarmeTransactionInstanceData(
-                                    subscription=subscription,
+                                    person=person,
+                                    lot=lot,
                                     extra_data=request.POST.copy(),
                                     event=self.event
                                 )
@@ -518,7 +466,10 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                                 step_5 = StepFive(request=request,
                                                   event=self.event,
                                                   dependency_artifacts={
-                                                      'subscription': subscription})
+                                                      'lot': lot,
+                                                      'subscription':
+                                                          subscription,
+                                                      'person': person})
                                 return step_5.render()
 
                         except TransactionError as e:
@@ -539,52 +490,69 @@ class SubscriptionFormIndexView(EventMixin, generic.View):
                                 step_4 = StepFour(request=request,
                                                   event=self.event,
                                                   dependency_artifacts={
-                                                      'subscription':
-                                                          subscription,
+                                                      'person':
+                                                          person,
                                                       'lot': lot})
                                 return step_4.render()
-
                     else:
-                        step_5 = StepFive(request=request, event=self.event,
-                                          dependency_artifacts={
-                                              'subscription': subscription})
-                        return step_5.render()
+                        step_4 = StepFour(request=request,
+                                          event=self.event,
+                                          dependency_artifacts={'lot': lot,
+                                                                'person':
+                                                                    person})
+                        return step_4.render()
 
-                # Missing one of the required objects so we go back a step
-                if lot:
+                elif person:
+
+                    survey_director = SurveyDirector(event=self.event,
+                                                     user=self.request.user)
+                    form = survey_director.get_form(
+                        survey=lot.event_survey.survey,
+                        data=request.POST)
+
+                    form.fields['next_step'] = forms.IntegerField(
+                        initial=3,
+                        widget=forms.HiddenInput()
+                    )
+
+                    form.fields[
+                        'event_survey'] = forms.IntegerField(
+                        initial=lot.event_survey,
+                        widget=forms.HiddenInput()
+                    )
+
+                    form.fields[
+                        'previous_step'] = forms.IntegerField(
+                        initial=2,
+                        widget=forms.HiddenInput()
+                    )
+
+                    form.fields['lot'] = forms.IntegerField(
+                        initial=lot.pk,
+                        widget=forms.HiddenInput()
+                    )
+
+                    step_3 = StepThree(request=request,
+                                       event=self.event,
+                                       lot=lot,
+                                       form=form)
+                    return step_3.render()
+
+                elif lot:
+
                     step_2 = StepTwo(request=request, event=self.event,
                                      dependency_artifacts={'lot': lot})
                     return step_2.render()
 
-                # Does not have a lot, restart whole process
-                step_1 = StepOne(
-                    request=request,
-                    event=self.event,
-                    context={
-                        'event': self.event,
-                        'remove_preloader': True
-                    })
-                return step_1.render()
+                else:
+                    # Does not have a lot, restart whole process
+                    step_1 = StepOne(
+                        request=request,
+                        event=self.event,
+                        context={
+                            'event': self.event,
+                            'remove_preloader': True
+                        })
+                    return step_1.render()
 
             else:
-                return HttpResponseBadRequest()
-
-    def clear_string(self, field_name):
-
-        if field_name not in self.request.POST:
-            return
-
-        value = self.request.POST.get(field_name)
-
-        if not value:
-            return ''
-
-        value = value \
-            .replace('.', '') \
-            .replace('-', '') \
-            .replace('/', '') \
-            .replace('(', '') \
-            .replace(')', '') \
-            .replace(' ', '')
-
-        self.request.POST[field_name] = value

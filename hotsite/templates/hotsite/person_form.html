@@ -14,220 +14,228 @@
                 <div class="col-md-9 col-md-offset-2">
 
 
-                    <form method="post" action="">
+                    <div id="app">
+                        <div>
+                            <form-wizard shape="square"
+                                         color="#3498db"    >
+                                <tab-content title="Dados Pessoais"
+                                             icon="fas fa-user-circle"
+                                             :before-change="beforeTabSwitch">
+                                    <form method="post" action=""
+                                          id="next_form">
 
-                        {% csrf_token %}
+                                        {% csrf_token %}
 
-                        {% if form.non_field_errors %}
-                            {% render_errors form.non_field_errors %}
-                        {% endif %}
-
-                        {% for hidden_field in form.hidden_fields %}
-                            {% if hidden_field.errors %}
-                                {% render_errors hidden_field.errors %}
-                            {% endif %}
-                        {% endfor %}
-
-                        {% render_generic_field form.next_step %}
-                        {% render_generic_field form.city %}
-                        {% render_generic_field form.lots %}
-
-                        {% block messages %}
-                            {% if messages %}
-                                <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                                {% for message in messages %}
-
-                                    {% if message.tags %}
-                                        <div class="alert alert-{{ message.tags }} alert-dismissible"
-                                             role="alert">
-
-                                    {% else %}
-                                        <div class="alert alert-warning alert-dismissible"
-                                             role="alert">
-                                    {% endif %}
-
-                                <button type="button" class="close"
-                                        data-dismiss="alert"
-                                        aria-label="Close"><span
-                                        aria-hidden="true">&times;</span>
-                                </button>
-                                {{ message|capfirst }}
-                                </div>
-
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        {% endblock messages %}
-
-                        <div class="form-validation alert"></div>
-
-                        <div style="margin-bottom: 20px">
-
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <div class="panel-title">
-                                        Dados pessoais
-                                    </div>
-                                </div>
-                                <div class="panel-body">
-
-                                    <div class="row">
-                                        <div class="col-md-9">
-                                            {% render_generic_field form.name autofocus=True %}
-
-                                        </div>
-                                        <div class="col-md-3">
-                                            {% render_generic_field form.gender required=True %}
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-9">
-                                            {% if config %}
-                                                {% render_generic_field form.email config.email False %}
-                                            {% else %}
-                                                {% render_generic_field form.email %}
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-md-3">
-                                            {% if config and config.cpf != config.CPF_HIDE %}
-                                                {% if config.cpf == config.CPF_REQUIRED %}
-                                                    {% render_generic_field form.cpf required=True %}
-                                                {% else %}
-                                                    {% render_generic_field form.cpf %}
-                                                {% endif %}
-                                            {% endif %}
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-
-                                        {% if config and config.birth_date != config.BIRTH_DATE_HIDE %}
-
-                                            <div class="col-md-6">
-                                                {% if config.birth_date == config.BIRTH_DATE_REQUIRED %}
-                                                    {% render_generic_field form.birth_date required=True %}
-                                                {% else %}
-                                                    {% render_generic_field form.birth_date %}
-                                                {% endif %}
-
-
-                                            </div>
+                                        {% if form.non_field_errors %}
+                                            {% render_errors form.non_field_errors %}
                                         {% endif %}
-                                        <div class="col-md-6">
-                                            {% if config %}
-                                                {% render_generic_field form.phone config.phone False %}
-                                            {% else %}
-                                                {% render_generic_field form.phone %}
-                                            {% endif %}
-                                        </div>
-                                    </div>
 
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            {% if config and config.address == config.ADDRESS_HIDE %}
-                                                <div class="row">
-                                                    <div class="col-md-3 address-row">
-                                                        {% render_generic_field form.state required=config.city %}
+                                        {% for hidden_field in form.hidden_fields %}
+                                            {% if hidden_field.errors %}
+                                                {% render_errors hidden_field.errors %}
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        {% render_generic_field form.next_step %}
+                                        {% render_generic_field form.city %}
+                                        {% render_generic_field form.lots %}
+
+                                        {% block messages %}
+                                            {% if messages %}
+                                                <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                                {% for message in messages %}
+
+                                                    {% if message.tags %}
+                                                        <div class="alert alert-{{ message.tags }} alert-dismissible"
+                                                             role="alert">
+
+                                                    {% else %}
+                                                        <div class="alert alert-warning alert-dismissible"
+                                                             role="alert">
+                                                    {% endif %}
+
+                                                <button type="button"
+                                                        class="close"
+                                                        data-dismiss="alert"
+                                                        aria-label="Close"><span
+                                                        aria-hidden="true">&times;</span>
+                                                </button>
+                                                {{ message|capfirst }}
+                                                </div>
+
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        {% endblock messages %}
+
+                                        <div class="form-validation alert"></div>
+
+                                        <div style="margin-bottom: 20px">
+
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <div class="panel-title">
+                                                        Dados pessoais
                                                     </div>
-                                                    <div class="col-md-9 address-row">
-                                                        {% render_generic_field form.city_name required=config.city %}
+                                                </div>
+                                                <div class="panel-body">
+
+                                                    <div class="row">
+                                                        <div class="col-md-9">
+                                                            {% render_generic_field form.name autofocus=True %}
+
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            {% render_generic_field form.gender required=True %}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-9">
+                                                            {% if config %}
+                                                                {% render_generic_field form.email config.email False %}
+                                                            {% else %}
+                                                                {% render_generic_field form.email %}
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            {% if config and config.cpf != config.CPF_HIDE %}
+                                                                {% if config.cpf == config.CPF_REQUIRED %}
+                                                                    {% render_generic_field form.cpf required=True %}
+                                                                {% else %}
+                                                                    {% render_generic_field form.cpf %}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+
+                                                        {% if config and config.birth_date != config.BIRTH_DATE_HIDE %}
+
+                                                            <div class="col-md-6">
+                                                                {% if config.birth_date == config.BIRTH_DATE_REQUIRED %}
+                                                                    {% render_generic_field form.birth_date required=True %}
+                                                                {% else %}
+                                                                    {% render_generic_field form.birth_date %}
+                                                                {% endif %}
+
+
+                                                            </div>
+                                                        {% endif %}
+                                                        <div class="col-md-6">
+                                                            {% if config %}
+                                                                {% render_generic_field form.phone config.phone False %}
+                                                            {% else %}
+                                                                {% render_generic_field form.phone %}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            {% if config and config.address == config.ADDRESS_HIDE %}
+                                                                <div class="row">
+                                                                    <div class="col-md-3 address-row">
+                                                                        {% render_generic_field form.state required=config.city %}
+                                                                    </div>
+                                                                    <div class="col-md-9 address-row">
+                                                                        {% render_generic_field form.city_name required=config.city %}
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        {% if config and config.institution_show is True %}
+                                                            <div class="col-md-4">
+                                                                {% render_generic_field form.institution required=config.institution_required %}
+                                                            </div>
+                                                        {% endif %}
+                                                        {% if config and config.institution_cnpj_show is True %}
+                                                            <div class="col-md-4">
+                                                                {% render_generic_field form.institution_cnpj required=config.institution_cnpj_required %}
+                                                            </div>
+                                                        {% endif %}
+                                                        {% if config and config.function_show is True %}
+                                                            <div class="col-md-4">
+                                                                {% render_generic_field form.function required=config.function_required %}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            {% if config and config.address == config.ADDRESS_SHOW %}
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading">
+                                                        <div class="panel-title">
+                                                            Endereço
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="panel-body">
+                                                        <div class="row">
+                                                            <div class="col-md-3">
+                                                                {% render_generic_field form.zip_code required=True %}
+                                                                <div id="cep_loader"
+                                                                     style="width: 22px;position: absolute;top: 40px;right: 24px;">
+                                                                    <img src="{% static 'assets/img/loader.gif' %}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row address-row">
+                                                            <div class="col-md-9">
+                                                                {% render_generic_field form.street %}
+                                                            </div>
+                                                            <div class="col-md-3 address-row">
+                                                                {% render_generic_field form.number %}
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6 address-row">
+                                                                {% render_generic_field form.complement %}
+                                                            </div>
+                                                            <div class="col-md-6 address-row">
+                                                                {% render_generic_field form.village %}
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-3 address-row">
+                                                                {% render_generic_field form.state required=True %}
+                                                            </div>
+                                                            <div class="col-md-9 address-row">
+                                                                {% render_generic_field form.city_name required=True %}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             {% endif %}
                                         </div>
-                                    </div>
-
-                                    <div class="row">
-                                        {% if config and config.institution_show is True %}
-                                            <div class="col-md-4">
-                                                {% render_generic_field form.institution required=config.institution_required %}
-                                            </div>
-                                        {% endif %}
-                                        {% if config and config.institution_cnpj_show is True %}
-                                            <div class="col-md-4">
-                                                {% render_generic_field form.institution_cnpj required=config.institution_cnpj_required %}
-                                            </div>
-                                        {% endif %}
-                                        {% if config and config.function_show is True %}
-                                            <div class="col-md-4">
-                                                {% render_generic_field form.function required=config.function_required %}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            {% if config and config.address == config.ADDRESS_SHOW %}
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <div class="panel-title">
-                                            Endereço
-                                        </div>
-                                    </div>
-
-                                    <div class="panel-body">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                {% render_generic_field form.zip_code required=True %}
-                                                <div id="cep_loader"
-                                                     style="width: 22px;position: absolute;top: 40px;right: 24px;">
-                                                    <img src="{% static 'assets/img/loader.gif' %}"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row address-row">
-                                            <div class="col-md-9">
-                                                {% render_generic_field form.street %}
-                                            </div>
-                                            <div class="col-md-3 address-row">
-                                                {% render_generic_field form.number %}
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 address-row">
-                                                {% render_generic_field form.complement %}
-                                            </div>
-                                            <div class="col-md-6 address-row">
-                                                {% render_generic_field form.village %}
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-3 address-row">
-                                                {% render_generic_field form.state required=True %}
-                                            </div>
-                                            <div class="col-md-9 address-row">
-                                                {% render_generic_field form.city_name required=True %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-
-                            <button style="margin-top: 5px;"
-                                    class="btn
-                                                        btn-primary pull-right"
-                                    type="submit">
-                                Próximo
-                            </button>
+                                    </form>
+                                </tab-content>
+                                <tab-content title="Additional Info"
+                                             icon="ti-settings">
+                                    My second tab content
+                                </tab-content>
+                                <tab-content title="Last step"
+                                             icon="ti-check">
+                                    Yuhuuu! This seems pretty damn simple
+                                </tab-content>
+                            </form-wizard>
                         </div>
-                    </form>
+                    </div>
 
-                    <form method="post" action="">
+
+                    <form method="post" action="" id="back_form">
 
                         {% csrf_token %}
 
                         {% render_generic_field form.previous_step %}
                         {% render_generic_field form.coupon_code %}
                         {% render_generic_field form.lots %}
-
-
-
-                        <button class="btn btn-primary pull-left"
-                                type="submit">
-                            Voltar
-                        </button>
 
                     </form>
 
@@ -240,11 +248,19 @@
 
 {% endblock %}
 
+{% block styles %}
+    <link rel="stylesheet"
+          href="https://unpkg.com/vue-form-wizard/dist/vue-form-wizard.min.css">
+{% endblock %}
+
 {% block scripts %}
 
     <!-- SCRIPT Subscription -->
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
+    <script src="https://unpkg.com/vue-form-wizard/dist/vue-form-wizard.js"></script>
+
     <script>
+
         $(document).ready(function () {
 
 
@@ -282,13 +298,27 @@
 
 
             }, 300);
+
+            Vue.use(VueFormWizard);
+
+            new Vue({
+                el: '#app',
+                methods: {
+                    beforeTabSwitch: function () {
+
+                        var next_form = $("#next_form");
+
+
+                        next_form.submit();
+                        return true;
+                    }
+                }
+            })
+
+
         });
 
-
     </script>
-
-
-
 
 {% endblock %}
 

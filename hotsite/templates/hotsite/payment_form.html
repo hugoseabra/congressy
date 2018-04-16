@@ -100,17 +100,9 @@
                                        name="transaction_type">
                                 <input type="hidden" id="id_lot_as_json"
                                        name="lot_as_json" value="{{ lot }}">
-                                <input type="hidden" id="id_subscription"
-                                       name="subscription"
-                                       value="{{ subscription_id }}">
                                 <input type="hidden" id="id_lot"
                                        name="lot"
                                        value="{{ lot_id }}">
-
-                                {% for hidden in form.hidden_fields %}
-                                    {{ hidden }}
-                                {% endfor %}
-
 
                                 <button style="margin-top: 5px;"
                                         class="btn btn-primary pull-right"
@@ -121,12 +113,23 @@
                                 </button>
                             </form>
 
-                            <a
-                                    href="{% url 'public:hotsite' event.slug %}"
-                                    class="btn btn-primary pull-left"
-                                    style="margin-top: 5px;">
-                                Voltar
-                            </a>
+
+                            <form method="post" action="">
+
+                                {% csrf_token %}
+
+                                {% render_generic_field form.previous_step %}
+                                {% render_generic_field form.lot %}
+                                {% render_generic_field form.person %}
+
+
+
+                                <button class="btn btn-primary pull-left"
+                                        type="submit">
+                                    Voltar
+                                </button>
+
+                            </form>
 
 
                             </div>

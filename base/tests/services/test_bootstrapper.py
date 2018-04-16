@@ -3,7 +3,7 @@
 """
 
 from test_plus.test import TestCase
-from base.form_step import StepBootstrapper
+from base.step import StepBootstrapper
 
 
 class StepBootstrapperTest(TestCase):

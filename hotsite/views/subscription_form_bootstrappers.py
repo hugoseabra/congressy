@@ -1,4 +1,4 @@
-from base.form_step import StepBootstrapper
+from base.step import StepBootstrapper
 from gatheros_event.models import Person
 from gatheros_subscription.models import Lot, Subscription, EventSurvey
 

@@ -24,9 +24,8 @@ def render_generic_field(
         autofocus=False,
         label=None,
         help_text=None):
-
     if required is False and use_required_field is True:
-        required = True
+        required = field.field.required
 
     if label is not None:
         field.label_tag = "<label for='id_{name}'>{label}:</label>".format(

@@ -13,11 +13,15 @@ class LotsForm(forms.Form):
 
     event = None
 
-    def __init__(self, event, **kwargs):
+    def __init__(self, event, post_data=None, **kwargs):
 
         self.event = event
 
+        if post_data:
+            kwargs.update({'initial': post_data})
+
         super().__init__(**kwargs)
+
         self.fields['lots'] = forms.ModelChoiceField(
             queryset=Lot.objects.filter(event=self.event,
                                         date_start__lte=datetime.now(),
@@ -38,10 +42,6 @@ class LotsForm(forms.Form):
     next_step = forms.IntegerField(
         widget=forms.HiddenInput(),
         required=False,
-    )
-
-    previous_step = forms.IntegerField(
-        widget=forms.HiddenInput(),
-        required=False,
+        initial=1,
     )
 

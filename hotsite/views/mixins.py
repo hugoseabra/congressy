@@ -16,6 +16,7 @@ from gatheros_subscription.models import Lot, \
 
 
 class EventMixin(TemplateNameableMixin, generic.View):
+
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -24,7 +25,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
         if not slug:
             return redirect('https://congressy.com')
 
-        self.event = get_object_or_404(Event, slug=self.kwargs.get('slug'))
+        self.event = get_object_or_404(Event, slug=slug)
         response = super().dispatch(request, *args, **kwargs)
         return response
 

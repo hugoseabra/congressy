@@ -12,7 +12,6 @@ from gatheros_subscription.models import FormConfig, Lot
 
 
 class SubscriptionPersonForm(PersonForm):
-
     event = None
     event_lot = None
 
@@ -58,7 +57,8 @@ class SubscriptionPersonForm(PersonForm):
 
         required_fields = ['gender']
 
-        has_paid_lots = self.event_lot.price > 0
+        has_paid_lots = self.event_lot.price > 0 if self.event_lot.price \
+            else False
 
         if has_paid_lots or config.phone:
             required_fields.append('phone')

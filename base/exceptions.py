@@ -15,4 +15,8 @@ class FormStepCannotBootstrapMissingDependency(Exception):
     pass
 
 
+class InvalidFormWizardStep(Exception):
+    """ Exceção acontece quando um step não pertence a um wizard"""
+    pass
+
 
