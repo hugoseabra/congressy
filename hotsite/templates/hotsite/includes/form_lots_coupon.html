@@ -1,5 +1,5 @@
 {% load l10n humanize %}
-{% if paid_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+{% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
     <div class="panel panel-default">
         <div class="panel-heading">
             <div class="panel-title">Ingresso</div>
@@ -16,8 +16,10 @@
                             <div>
                                 <span style="color:darkgreen;font-weight: bold;">
                                     {{ lot.display_publicly }}
+                                    {% if not lot.price %}
+                                    - Gratuito
+                                    {% endif %}
                                 </span>
-
                             </div>
                         </div>
                     </div>

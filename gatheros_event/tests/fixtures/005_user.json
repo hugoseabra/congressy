@@ -3,8 +3,8 @@
     "model": "auth.user",
     "pk": 1,
     "fields": {
-      "password": "pbkdf2_sha256$30000$WhZopiVWOWGt$kD5+F8MK7XpY/l09OZ2WYMXnj1pN1xX2FAbB03f+Ys4=",
-      "last_login": null,
+      "password": "pbkdf2_sha256$36000$CTHs3rwIYVlu$0azdQjwfgO8WB/Yzxt4WWonP895MF4xIABu6Lsmb/Tk=",
+      "last_login": "2018-03-21T15:14:57.795",
       "is_superuser": true,
       "username": "admin",
       "first_name": "Admin",
@@ -157,6 +157,24 @@
       "is_staff": false,
       "is_active": true,
       "date_joined": "2018-01-25T14:14:06.211",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 10,
+    "fields": {
+      "password": "pbkdf2_sha256$36000$1l7qphmt0q5v$RyTB85yRyvFczbftAXpG0P8OllIU5rfsv1URMSgQZjo=",
+      "last_login": "2018-03-21T15:16:01.951",
+      "is_superuser": false,
+      "username": "nathan@congressy.com",
+      "first_name": "Nathan",
+      "last_name": "Martins",
+      "email": "nathan@congressy.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2018-03-21T14:35:55.213",
       "groups": [],
       "user_permissions": []
     }

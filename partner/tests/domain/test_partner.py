@@ -17,5 +17,6 @@ class PartnerModelTest(TestCase):
 
     def test_partner_creation(self):
         partner = Partner(person=self.person)
+        partner.save()
         self.assertIsNotNone(partner)
         self.assertEqual(partner.__str__(), self.person.name)

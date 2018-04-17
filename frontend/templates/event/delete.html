@@ -30,7 +30,8 @@
                         {% csrf_token %}
                         <div>
                             <!--suppress HtmlUnknownAttribute -->
-                            <input class="btn btn-primary" type="submit" value="{% trans "Yes, I'm sure" %}"/>
+                            <input class="btn btn-danger" type="submit"
+                                   value="Sim, tenho certeza"/>
                             {% if next_path %}
                                 <a class="btn btn-default" href="{{ next_path|urlencode }}">Não, leve-me de volta</a>
                             {% else %}

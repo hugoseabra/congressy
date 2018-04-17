@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-export DJANGO_SETTINGS_MODULE=project.settings.dev
+export DJANGO_SETTINGS_MODULE=project.manage.settings.dev
 
 pip install -r requirements_dev.pip
 
@@ -18,7 +18,7 @@ docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
 sleep 8
 
 # Removes previous media files
-rm -rf $BASE_DIR/media_dev/*
+rm -rf $BASE_DIR/media/*
 
 python $BASE_DIR/manage.py migrate
 
@@ -38,3 +38,5 @@ python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
 
 # Atualizando a data dos eventos
 python $BASE_DIR/bin/env/dev/update_data.py
+
+echo "OK"

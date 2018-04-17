@@ -2,5 +2,5 @@
     <div class="input-group-addon">
         <i class="glyphicon glyphicon-time"></i>
     </div>
-    <input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value }}"{% endif %}{% include "django/forms/widgets/attrs.html" %} />
+    <input type="{{ widget.type }}" class="cgsy-time-input" placeholder="hh:mm" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value }}"{% endif %}{% include "django/forms/widgets/attrs.html" %} />
 </div>

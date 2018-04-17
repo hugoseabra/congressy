@@ -3,13 +3,12 @@
 {% if has_paid_lots and has_configured_bank_account and not has_active_bank_account %}
 
     <div class="alert alert-danger alert-dismissible" role="alert">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <button type="button" class="close" data-dismiss="alert"
+                aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         Evento está sendo configurado. Volte em breve.
     </div>
-
-    <h4 class="form-heading"
 
 {% else %}
     <!-- FORM -->
@@ -55,7 +54,8 @@
                     {% endif %}
 
                 <button type="button" class="close" data-dismiss="alert"
-                        aria-label="Close"><span aria-hidden="true">&times;</span>
+                        aria-label="Close"><span
+                        aria-hidden="true">&times;</span>
                 </button>
                 {{ message|capfirst }}
                 </div>
@@ -76,6 +76,7 @@
                 <div class="panel-title">Dados pessoais</div>
             </div>
             <div class="panel-body">
+
                 <div class="row">
                     <div class="col-md-9">
                         {% render_generic_field form.name autofocus=True %}
@@ -85,6 +86,7 @@
                         {% render_generic_field form.gender required=True %}
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-9">
                         {% if config %}
@@ -103,6 +105,7 @@
                         {% endif %}
                     </div>
                 </div>
+
                 <div class="row">
 
                     {% if config and config.birth_date != config.BIRTH_DATE_HIDE %}
@@ -125,20 +128,22 @@
                         {% endif %}
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-md-12">
                         {% if config and config.address == config.ADDRESS_HIDE %}
-                        <div class="row">
-                            <div class="col-md-3 address-row">
-                                {% render_generic_field form.state required=config.city %}
+                            <div class="row">
+                                <div class="col-md-3 address-row">
+                                    {% render_generic_field form.state required=config.city %}
+                                </div>
+                                <div class="col-md-9 address-row">
+                                    {% render_generic_field form.city_name required=config.city %}
+                                </div>
                             </div>
-                            <div class="col-md-9 address-row">
-                                {% render_generic_field form.city_name required=config.city %}
-                            </div>
-                        </div>
                         {% endif %}
                     </div>
                 </div>
+
                 <div class="row">
                     {% if config and config.institution_show is True %}
                         <div class="col-md-4">
@@ -156,8 +161,10 @@
                         </div>
                     {% endif %}
                 </div>
+
             </div>
         </div>
+
         {% if config and config.address == config.ADDRESS_SHOW %}
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -168,7 +175,8 @@
                     <div class="row">
                         <div class="col-md-3">
                             {% render_generic_field form.zip_code required=True %}
-                            <div id="cep_loader" style="width: 22px;position: absolute;top: 40px;right: 24px;">
+                            <div id="cep_loader"
+                                 style="width: 22px;position: absolute;top: 40px;right: 24px;">
                                 <img src="{% static 'assets/img/loader.gif' %}"/>
                             </div>
                         </div>
@@ -201,22 +209,50 @@
             </div>
         {% endif %}
 
+        {% for survey_form in surveys %}
+
+            <div class="panel panel-default survey_form"
+                 data-survey-id="{{ survey_form.survey.pk }}"
+                 style="display: none">
+
+                <div class="panel-heading">
+                    <div class="panel-title">{{ survey_form.survey.name }}</div>
+                </div>
+
+                <div class="panel-body">
+
+                    <div class="col-md-9">
+
+                        {% for field in survey_form %}
+                            {% render_generic_field field %}
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+            </div>
+
+        {% endfor %}
+
         {% if has_paid_lots %}
-            <div class="panel panel-default">
+            <div class="panel panel-default" id="payment-block" style="disp">
                 <div class="panel-heading">
                     <div class="panel-title">Pagamento</div>
                 </div>
                 <div class="panel-body">
 
-                    <div id="payment_buttons" class="text-center" style="display: none">
-                        <button id="id_boleto" type="button" style="text-align: center;display: none">
+                    <div id="payment_buttons" class="text-center"
+                         style="display: none">
+                        <button id="id_boleto" type="button"
+                                style="text-align: center;display: none">
                             Boleto
                             <br/>
                             <img class="img-responsive"
                                  style="height: 153px; height: 153px"
                                  src="{% static 'hotsite/logos/boleto.svg' %}">
                         </button>
-                        <button id="id_credit_card" type="button" style="display: none">
+                        <button id="id_credit_card" type="button"
+                                style="display: none">
                             Cartão de Credito
                             <br/>
                             <img class="img-responsive"
@@ -231,14 +267,17 @@
                         </a>
                     </div>
                     <div class="text-center">
-                        <button id="id_button_pay" class="btn btn-default" type="button">
+                        <button id="id_button_pay" class="btn btn-default"
+                                type="button">
                             Escolha meio de pagamento
                         </button>
                     </div>
 
-                    <input type="hidden" id="id_installments" name="installments">
+                    <input type="hidden" id="id_installments"
+                           name="installments">
                     <input type="hidden" id="id_card_hash" name="card_hash">
-                    <input type="hidden" id="id_transaction_type" name="transaction_type">
+                    <input type="hidden" id="id_transaction_type"
+                           name="transaction_type">
 
                     <div class="text-center">
                         <img style="width: 80%; margin-top: 20px"
@@ -248,24 +287,33 @@
                 </div>
             </div>
         {% endif %}
+
         <div class="row">
             <div class="col-md-12">
                 <div class="form-group form-group-submit">
-                    <input type="hidden" id="id_organization" name="organization" value={{ event.organization.pk }}>
-                    <button type="submit" class="btn btn-primary btn-lg btn-block"
+                    <input type="hidden" id="id_organization"
+                           name="organization"
+                           value={{ event.organization.pk }}>
+                    <button type="submit"
+                            class="btn btn-primary btn-lg btn-block"
                             data-loading-text="Enviar">
                         Aceitar e Realizar inscrição
                     </button>
-                    <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
+                    <div class="help-block text-center"
+                         style="padding: 0 20px;font-size: 13px;">
                         Ao realizar sua inscrição, você declara ter aceitado os
-                        <a href="https://www.congressy.com/termos-de-uso/" style="font-weight: bold;" target="_blank">termos de uso</a>.
+                        <a href="https://www.congressy.com/termos-de-uso/"
+                           style="font-weight: bold;" target="_blank">termos de
+                            uso</a>.
                     </div>
                 </div>
             </div>
         </div>
+
     </form>
 
-    <section class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
+    <section class="text-right cgsy-footer footer-wrapper text-muted"
+             style="font-size:12px;color:lightgrey">
         {% include "base/footer.html" %}
     </section>
 {% endif %}

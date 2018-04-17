@@ -1,15 +1,12 @@
 # -----------------------------------------------------------------------------
 # Docker IMAGE congressy/cgsy
 # docker build --rm -t cgsy .
-# docker tag catalog <repo_url>/catalog:<tag>
+# docker tag catalog <repo_url>/cgsy:<tag>
 # -----------------------------------------------------------------------------
 FROM python:3.6
 MAINTAINER Hugo Seabra <hugoseabra19@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
-
-# Helps on collecting static and runserver
-ENV DJANGO_SETTINGS_MODULE project.settings.staging
 
 LABEL cgsy.image.name="cgsy-platform-staging"
 
@@ -21,7 +18,7 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
     locales \
         && apt-get purge -y --auto-remove \
         && apt-get clean \
-        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Locales
 ENV LC_ALL pt_BR.UTF-8
@@ -46,16 +43,14 @@ RUN apt-get update -q && apt-get install -qy --no-install-recommends \
     supervisor \
         && apt-get purge -y --auto-remove \
         && apt-get clean \
-        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # -----------------------------------------------------------------------------
 # Pypi packages
 
-# STAGING
-RUN pip install --no-cache-dir uwsgi lxml sparkpost s3cmd jinja2
-
 # install uwsgi now because it takes a little while
-RUN pip install --no-cache-dir \
+RUN pip install --no-cache-dir --upgrade \
+        pip setuptools \
         # required by celery
         lxml \
         # send email
@@ -65,7 +60,6 @@ RUN pip install --no-cache-dir \
         s3cmd \
         # template engine
         jinja2
-
 
 RUN mkdir -p /root/.pip
 COPY ./conf/deploy/pip.conf /root/.pip/.
@@ -89,23 +83,29 @@ WORKDIR /var/www/cgsy
 # to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
 COPY ./requirements.pip ./.
 COPY ./requirements_dev.pip ./.
-RUN pip install --no-cache-dir -r requirements_dev.pip
+RUN pip install --no-cache-dir --upgrade -r requirements_dev.pip
 
 # -----------------------------------------------------------------------------
-# Setup
+# Setup configuration files
+COPY ./conf/deploy/scripts.sh /scripts.sh
+COPY ./conf/deploy/scripts.py /scripts.py
+
+COPY ./conf/deploy/setup/configure-settings.py /configure-settings.py
+COPY ./conf/deploy/setup/configure-sync.py /configure-sync.py
+COPY ./conf/deploy/setup/configure-cron.py /configure-cron.py
 COPY ./conf/deploy/setup/configure-nginx.py /configure-nginx.py
+COPY ./conf/deploy/services /services
 
 # Setup STAGING
-COPY ./conf/staging/setup/configure-wsgi.py /configure-wsgi.py
-COPY ./conf/staging/setup/configure-settings.py /configure-settings.py
 COPY ./conf/staging/setup/configure-version.py /configure-version.py
-COPY ./conf/staging/setup/configure-sync.py /configure-sync.py
-COPY ./conf/staging/container-entry.sh /entry.sh
+COPY ./conf/staging/setup/configure-wsgi.py /configure-wsgi.py
+COPY ./conf/staging/services /services
 
 # -----------------------------------------------------------------------------
 COPY ./. ./.
 
-RUN chmod 775 /entry.sh
+RUN chmod 775 /services/volume/container-entry.sh \
+              /services/cron/container-entry.sh \
+              /services/web/manage/container-entry.sh
 
 EXPOSE 80
-CMD ["/entry.sh"]

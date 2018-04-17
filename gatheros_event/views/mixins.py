@@ -5,23 +5,27 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.forms.models import model_to_dict
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import ugettext as _
+from django.views import generic
 from django.views.generic import DeleteView
 from django.views.generic.base import View
 from django.views.generic.edit import FormMixin
 from django.views.generic.list import ListView
 
 from core.model.deletable import DeletableModelMixin
-
-from gatheros_event.models import Member
 from gatheros_event.helpers.account import (
     get_member,
     get_organization,
     get_organizations,
     is_manager,
 )
+from gatheros_event.helpers.account import update_account
+from gatheros_event.models import Event
+from gatheros_event.models import Member
 
 
 class AccountMixin(LoginRequiredMixin, View):
@@ -275,3 +279,60 @@ class FormListViewMixin(FormMixin, ListView):
 
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)
+
+
+class EventViewMixin(AccountMixin, generic.View):
+    """ Mixin de view para vincular com informações de event. """
+    event = None
+
+    def dispatch(self, request, *args, **kwargs):
+        event = self.get_event()
+
+        update_account(
+            request=self.request,
+            organization=event.organization,
+            force=True
+        )
+
+        self.permission_denied_url = reverse(
+            'event:event-panel',
+            kwargs={'pk': self.kwargs.get('event_pk')}
+        )
+        return super(EventViewMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # noinspection PyUnresolvedReferences
+        context = super(EventViewMixin, self).get_context_data(**kwargs)
+        context['event'] = self.get_event()
+        context['has_paid_lots'] = self.has_paid_lots()
+
+        return context
+
+    def get_event(self):
+        """ Resgata organização do contexto da view. """
+
+        if self.event:
+            return self.event
+
+        self.event = get_object_or_404(
+            Event,
+            pk=self.kwargs.get('event_pk')
+        )
+        return self.event
+
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+
+            price = lot.price
+
+            if price and price > 0:
+                return True
+
+        return False
+
+    def can_access(self):
+        return self.get_event().organization == self.organization
+
+    def get_permission_denied_url(self):
+        return reverse('event:event-list')

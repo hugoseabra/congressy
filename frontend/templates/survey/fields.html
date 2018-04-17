@@ -1,0 +1,114 @@
+{% load static base_tags queryset_filter form_config_tags %}
+{% if full_survey_form.fields|length > 0 %}
+    <ul id="simpleList" class="list-group">
+        {% for field in full_survey_form %}
+            <li class="list-group-item"
+                data-id="{{ field.name }}"
+                data-name="{{ field.name }}"
+                data-label="{{ field.label }}">
+
+
+                <div class="table">
+                    <table class="table noborder">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="col-xs-1 text-center control-buttons
+                            my-handle"
+                                style="background-color:
+                                #f8f8f8;width: 5%">
+                                <i class=" fas fa-arrows-alt"></i>
+                            </td>
+
+                            <td class="col-md-8"
+                                data-question-type="{{ field.field.field_type }}"
+                                data-question-label="{{ field.field.label }}"
+                                data-question-name="{{ field.field.question_name }}"
+                                data-question-id="{{ field.field.question_id }}">
+
+                                {% render_generic_field field %}
+                            </td>
+
+                            <td class="col-md-3 control-buttons text-center">
+
+
+                                <div class="btn-group">
+                                    <button
+                                            type="button"
+                                            class="btn
+                                        btn-primary btn-trans
+                                        btn-sm dropdown-toggle"
+                                            data-toggle="dropdown"
+                                            aria-expanded="false"
+                                    >
+                                        <span class="fas fa-cog"></span>
+                                    </button>
+                                    <ul class="dropdown-menu
+                                    dropdown-menu-right"
+                                        role="menu">
+
+                                        <li class="js-edit">
+                                            <a href="#">
+
+                                                <i class="fas fa-pencil-alt"
+                                                        {% if field.field.can_edit %}
+                                                   data-has-answers="true"
+                                                        {% endif %}></i>
+                                                Editar
+                                            </a>
+                                        </li>
+
+
+                                        <li class="js-remove">
+                                            <a href="#">
+                                                <i class="fas fa-trash-alt"></i>
+                                                Excluir
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+
+                                <div class="checkbox">
+                                    <input type="checkbox"
+                                           class="update_required"
+                                           data-name="{{ field.name }}"
+                                            {% if field.field.required %}
+                                           checked="checked"
+                                            {% endif %}
+                                           id="{{ field.name }}">
+                                    <label for="{{ field.name }}">
+                                        Obrigatório
+                                    </label>
+
+
+                                </div>
+
+
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <strong>Nenhuma questão.</strong>
+{% endif %}
+
+{% block style %}
+    <style>
+        .noborder td, .noborder th {
+            border: none !important;
+        }
+    </style>
+{% endblock %}
+
+

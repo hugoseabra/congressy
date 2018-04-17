@@ -8,20 +8,62 @@ services:
     volumes:
       - "redis:/data"
 
-  cgsy:
+  # Preparação de volumes.
+  volume:
     image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
-    restart: always
+    entrypoint:
+      - /services/volume/container-entry.sh
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "./media:/var/www/cgsy/media"
+    env_file:
+      - ./env-file
+
+  cron:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    depends_on:
+      - volume
+    entrypoint:
+      - /services/cron/container-entry.sh
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "./media:/var/www/cgsy/media"
+    env_file:
+      - ./env-file
+
+  manage:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    depends_on:
+      - volume
     networks:
       - redis
-    volumes:
-      - "cgsy_media:/var/www/cgsy/media_dev"
     ports:
       - "8000:80"
-    env_file: ./env-file
+    entrypoint:
+      - /services/web/manage/container-entry.sh
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "./media:/var/www/cgsy/media"
+    env_file:
+      - ./env-file
+      - ./env-manage-file
+
+  partner:
+    image: 871800672816.dkr.ecr.us-east-1.amazonaws.com/cgsy:latest
+    networks:
+      - redis
+    ports:
+      - "8001:80"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+    entrypoint:
+      - /services/web/partner/container-entry.sh
+    env_file:
+      - ./env-file
+      - ./env-partner-file
 
 networks:
   redis:
 
 volumes:
-  cgsy_media:
   redis:
