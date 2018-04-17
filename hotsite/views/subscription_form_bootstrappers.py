@@ -6,11 +6,11 @@ from gatheros_subscription.models import Lot, Subscription, EventSurvey
 class LotBootstrapper(StepBootstrapper):
 
     @staticmethod
-    def retrieve_artifact(antecessor_form=None, dirty_antecessor_data=None,
+    def retrieve_artifact(validated_antecessor_form=None, dirty_antecessor_data=None,
                           **kwargs):
 
-        if antecessor_form:
-            lot = antecessor_form.cleaned_data.get('lots')
+        if validated_antecessor_form:
+            lot = validated_antecessor_form.cleaned_data.get('lots')
         elif dirty_antecessor_data:
             lot = dirty_antecessor_data.get('lot')
         else:
@@ -21,10 +21,10 @@ class LotBootstrapper(StepBootstrapper):
         if not event:
             raise Exception('Event not in kwargs')
 
-        if lot and not isinstance(lot, Lot):
+        if not isinstance(lot, Lot):
             try:
                 lot = Lot.objects.get(pk=lot, event=event)
-            except Person.DoesNotExist:
+            except Lot.DoesNotExist:
                 pass
 
         return lot
@@ -33,7 +33,7 @@ class LotBootstrapper(StepBootstrapper):
 class LotCouponCodeBootstrapper(StepBootstrapper):
 
     @staticmethod
-    def retrieve_artifact(antecessor_form=None, dirty_antecessor_data=None,
+    def retrieve_artifact(validated_antecessor_form=None, dirty_antecessor_data=None,
                           **kwargs):
 
         if dirty_antecessor_data:
@@ -45,13 +45,24 @@ class LotCouponCodeBootstrapper(StepBootstrapper):
 
 
 class PersonBootstrapper(StepBootstrapper):
-    artifact_type = Person
 
-    def retrieve_artifact(self, antecessor_form):
+    @staticmethod
+    def retrieve_artifact(validated_antecessor_form=None, dirty_antecessor_data=None,
+                          **kwargs):
 
-        person = antecessor_form.get('person')
+        if validated_antecessor_form:
 
-        if person and not isinstance(person, self.artifact_type):
+            if validated_antecessor_form.instance:
+                person = validated_antecessor_form.instance
+            else:
+                person = validated_antecessor_form.cleaned_data.get('person')
+
+        elif dirty_antecessor_data:
+            person = dirty_antecessor_data.get('person')
+        else:
+            person = None
+
+        if not isinstance(person, Person):
             try:
                 person = Person.objects.get(pk=person)
             except Person.DoesNotExist:
@@ -60,20 +71,20 @@ class PersonBootstrapper(StepBootstrapper):
         return person
 
 
-class SubscriptionBootstrapper(StepBootstrapper):
-    artifact_type = Subscription
-
-    def retrieve_artifact(self, antecessor_form):
-
-        subscription = antecessor_form.get('subscription')
-
-        if subscription and not isinstance(subscription, self.artifact_type):
-            try:
-                subscription = Subscription.objects.get(pk=subscription)
-            except Subscription.DoesNotExist:
-                pass
-
-        return subscription
+# class SubscriptionBootstrapper(StepBootstrapper):
+#     artifact_type = Subscription
+#
+#     def retrieve_artifact(self, antecessor_form):
+#
+#         subscription = antecessor_form.get('subscription')
+#
+#         if subscription and not isinstance(subscription, self.artifact_type):
+#             try:
+#                 subscription = Subscription.objects.get(pk=subscription)
+#             except Subscription.DoesNotExist:
+#                 pass
+#
+#         return subscription
 # 
 # 
 # class EventSurveyBootstrapper(StepBootstrapper):

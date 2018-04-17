@@ -5,5 +5,5 @@ from .subscription import SubscriptionView
 from .subscription_form_steps import StepOne, StepTwo, StepFive
 from .subscription_form_wizard import SubscriptionFormWizard
 from .subscription_form_bootstrappers import LotBootstrapper, \
-    PersonBootstrapper, SubscriptionBootstrapper
+    PersonBootstrapper
 from .subscription_status_view import SubscriptionStatusView

@@ -9,42 +9,37 @@ from gatheros_subscription.models import Lot, Subscription
 
 
 class SubscriptionForm(forms.Form):
+    event = forms.IntegerField(
+        widget=forms.HiddenInput()
+    )
 
-    event = None
-    event_lot = None
-    person = None
+    lot = forms.IntegerField(
+        widget=forms.HiddenInput()
+    )
 
-    def __init__(self, lot, person, event, **kwargs):
-
-        if not isinstance(lot, Lot):
-            raise TypeError('lot não é um objeto do tipo Lot')
-
-        if not isinstance(person, Person):
-            raise TypeError('person não é um objeto do tipo Person')
-
-        if not isinstance(event, Event):
-            raise TypeError('event não é um objeto do tipo Event')
-
-        self.event = event
-        self.event_lot = lot
-        self.person = Person
-
-        super().__init__(**kwargs)
+    person = forms.CharField(
+        widget=forms.HiddenInput(),
+        max_length=60,
+    )
 
     def save(self):
 
+        person = self.cleaned_data['person']
+        event = self.cleaned_data['event']
+        lot = self.cleaned_data['lot']
+
         try:
             subscription = Subscription.objects.get(
-                person=self.person,
-                event=self.event
+                person=person,
+                event=event
             )
         except Subscription.DoesNotExist:
             subscription = Subscription(
-                person=self.person,
-                event=self.event,
-                created_by=self.person.user.pk
+                person=person,
+                event=event,
+                created_by=person.user.pk
             )
 
-        subscription.lot = self.lot
+        subscription.lot = lot
 
         return subscription.save()

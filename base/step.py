@@ -11,6 +11,7 @@ class Step(object):
     validated_antecessor_form = None
     dirty_antecessor_data = None
     form_class = None
+    redirect_url = None
 
     post_data_dict = {}
     dependency_artifacts = {}
@@ -22,9 +23,10 @@ class Step(object):
     def __init__(self, validated_antecessor_form=None,
                  dirty_antecessor_data=None, **kwargs):
 
-        if self.template_name is None:
+        if self.template_name is None and self.redirect_url is None:
             raise ImproperlyConfigured(
-                "Step requires either a definition of 'template_name'")
+                "Step requires either a definition of 'template_name' "
+                "'redirect_url'. ")
 
         if self.form_class is None:
             raise ImproperlyConfigured(
@@ -84,25 +86,22 @@ class Step(object):
 
                 if not self.dirty_antecessor_data and not \
                         self.validated_antecessor_form:
-
-                        message = 'Validated antecessor form or antecessor' \
-                                  'data required for bootstrapping the {}' \
-                                  'dependency in the {} step.' \
-                                  ''.format(dependency,
-                                            self.__class__.__name__)
-                        raise FormStepCannotBootstrapMissingDependency(message)
+                    message = 'Validated antecessor form or antecessor ' \
+                              'data required for bootstrapping the {} ' \
+                              'dependency in the {} step.' \
+                              ''.format(dependency,
+                                        self.__class__.__name__)
+                    raise FormStepCannotBootstrapMissingDependency(message)
 
                 bootstrapper = self._dependency_bootstrap_map[dependency]
 
                 new_artifact = bootstrapper.retrieve_artifact(
                     validated_antecessor_form=self.validated_antecessor_form,
-                    dirty_antecessor_data=self.dirty_antecessor_data,
-                    **kwargs)
+                    dirty_antecessor_data=self.dirty_antecessor_data, **kwargs)
 
                 if not new_artifact:
-                    message = "{} did not return a missing dependency " \
-                              "artifact " \
-                              "".format(bootstrapper.__class__.__name__)
+                    message = "Bootstrapper did not return a missing {} " \
+                              "dependency artifact.".format(dependency)
                     raise FormStepCannotBootstrapMissingDependency(message)
 
                 self.dependency_artifacts.update({dependency: new_artifact})
@@ -112,5 +111,5 @@ class StepBootstrapper(ABC):
 
     @abstractmethod
     def retrieve_artifact(self, validated_antecessor_form,
-                          dirty_antecessor_data, **kwargs):
+                          dirty_antecessor_data):
         pass

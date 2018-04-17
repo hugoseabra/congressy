@@ -1,3 +1,5 @@
+import absoluteuri
+
 from base.step import Step
 from hotsite.forms import LotsForm, SubscriptionPersonForm, SubscriptionForm
 from hotsite.views.subscription_form_bootstrappers import LotBootstrapper, \
@@ -31,13 +33,12 @@ class StepTwo(Step):
     def get_step_context_data(self, event):
 
         lot = self.dependency_artifacts['lot']
-        coupon_code = self.dependency_artifacts['coupon_code']
 
         context = {}
 
         context['event'] = event
-        context['form'] = SubscriptionPersonForm(event=event, lot=lot,
-                                                 coupon_code=coupon_code)
+        context['form'] = SubscriptionPersonForm(
+            dependencies=self.dependency_artifacts)
 
         if lot.price and lot.price > 0:
             context['has_payments'] = True
@@ -55,37 +56,32 @@ class StepTwo(Step):
 
 
 class StepFive(Step):
-    template_name = 'hotsite/person_form.html'
+    redirect_url = None
     form_class = SubscriptionForm
     _dependes_on = ('lot', 'person')
     _dependency_bootstrap_map = {'lot': LotBootstrapper,
                                  'person': PersonBootstrapper}
 
-    def get_step_context_data(self, event, form=None):
+    def __init__(self, validated_antecessor_form=None,
+                 dirty_antecessor_data=None, **kwargs):
+        self.event = kwargs.get('event')
+
+        super().__init__(validated_antecessor_form, dirty_antecessor_data,
+                         **kwargs)
 
         lot = self.dependency_artifacts['lot']
 
-        context = {}
-
-        context['event'] = event
-
-        if not form:
-            context['form'] = SubscriptionPersonForm(event=event,
-                                                     lot=lot)
-
         if lot.price and lot.price > 0:
-            context['has_payments'] = True
+            self.redirect_url = absoluteuri.reverse(
+                'public:hotsite-subscription-status', kwargs={
+                    'slug': self.event.pk,
+                })
         else:
-            context['has_payments'] = False
+            self.redirect_url = absoluteuri.reverse('public:hotsite', kwargs={
+                'slug': self.event.pk,
+            })
 
-        if lot.event_survey:
-            context['has_surveys'] = True
-        else:
-            context['has_surveys'] = False
-
-        context['remove_preloader'] = True
-
-        return context
+        # NSM CONTINUE HERE: FIND A WAY TO SAVE A FORM IN 3 SEPERATE PLACES.
 
 # class StepThree(Step):
 #     template = 'hotsite/survey_form.html'

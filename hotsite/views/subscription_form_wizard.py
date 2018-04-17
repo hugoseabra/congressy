@@ -17,7 +17,7 @@ class SubscriptionFormWizard(FormWizard):
         5: StepFive,
     }
 
-    persisting_steps = [2, 3, 4, 5]
+    persisting_steps = [StepTwo, StepFive]
 
     event = None
 
@@ -88,12 +88,22 @@ class SubscriptionFormWizard(FormWizard):
             if self.current_step in self.persisting_steps:
                 current_form.save()
 
-            next_step = self.next_step(antecessor_form=current_form,
-                                       event=self.event)
-            return render(request=request,
-                          template_name=next_step.template_name,
-                          context=next_step.get_step_context_data(
-                              event=self.event))
+            if self.next_step:
+
+                next_step = self.next_step(
+                    validated_antecessor_form=current_form,
+                    event=self.event)
+
+                if self.next_step == StepFive:
+
+
+
+                    return redirect(next_step.redirect_url)
+
+                return render(request=request,
+                              template_name=next_step.template_name,
+                              context=next_step.get_step_context_data(
+                                  event=self.event))
 
         messages.error(request, 'Por favor corrigir os erros abaixo.')
         return render(request=request,
