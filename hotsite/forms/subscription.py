@@ -9,14 +9,10 @@ from gatheros_subscription.models import Lot, Subscription
 
 
 class SubscriptionForm(forms.Form):
+
     event = None
     event_lot = None
     person = None
-
-    previous_step = forms.IntegerField(
-        widget=forms.HiddenInput(),
-        required=False,
-    )
 
     def __init__(self, lot, person, event, **kwargs):
 

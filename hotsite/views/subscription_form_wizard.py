@@ -76,10 +76,12 @@ class SubscriptionFormWizard(FormWizard):
         post_data = request.POST.copy()
 
         super().post(request, *args, **kwargs)
+        self.current_step(dirty_antecessor_data=post_data, event=self.event)
 
-        current_form = self.current_step.form_class
+        form_class = self.current_step.form_class
 
-        current_form = current_form(event=self.event, data=post_data)
+        current_form = form_class(data=post_data,
+                                  dependencies=self.current_step.dependency_artifacts)
 
         if current_form.is_valid():
 
@@ -91,7 +93,7 @@ class SubscriptionFormWizard(FormWizard):
             return render(request=request,
                           template_name=next_step.template_name,
                           context=next_step.get_step_context_data(
-                              event=self.event, extra_data=current_form))
+                              event=self.event))
 
         messages.error(request, 'Por favor corrigir os erros abaixo.')
         return render(request=request,

@@ -8,7 +8,8 @@ from base.exceptions import FormStepMissingBootstrapMappingError, \
 class Step(object):
     # Class attributes
     template_name = None
-    antecessor_form = None
+    validated_antecessor_form = None
+    dirty_antecessor_data = None
     form_class = None
 
     post_data_dict = {}
@@ -18,7 +19,8 @@ class Step(object):
     _dependes_on = ()
     _dependency_bootstrap_map = {}
 
-    def __init__(self, antecessor_form=None, **kwargs):
+    def __init__(self, validated_antecessor_form=None,
+                 dirty_antecessor_data=None, **kwargs):
 
         if self.template_name is None:
             raise ImproperlyConfigured(
@@ -27,8 +29,12 @@ class Step(object):
         if self.form_class is None:
             raise ImproperlyConfigured(
                 "Step requires either a definition of 'form_class'")
-        if antecessor_form:
-            self.antecessor_form = antecessor_form
+
+        if validated_antecessor_form:
+            self.validated_antecessor_form = validated_antecessor_form
+
+        if dirty_antecessor_data:
+            self.dirty_antecessor_data = dirty_antecessor_data
 
         data_dict = kwargs.get('post_data_dict')
         dependency_artifacts = kwargs.get('dependency_artifacts')
@@ -76,33 +82,35 @@ class Step(object):
 
             if dependency not in self.dependency_artifacts:
 
-                if not self.antecessor_form:
-                    message = 'Missing antecessor form required for ' \
-                           'bootstrapping the missing {} ' \
-                           'dependency in the {} ' \
-                           'step.'.format(dependency, self.__class__.__name__)
-                    raise FormStepCannotBootstrapMissingDependency(message)
+                if not self.dirty_antecessor_data and not \
+                        self.validated_antecessor_form:
+
+                        message = 'Validated antecessor form or antecessor' \
+                                  'data required for bootstrapping the {}' \
+                                  'dependency in the {} step.' \
+                                  ''.format(dependency,
+                                            self.__class__.__name__)
+                        raise FormStepCannotBootstrapMissingDependency(message)
 
                 bootstrapper = self._dependency_bootstrap_map[dependency]
 
                 new_artifact = bootstrapper.retrieve_artifact(
-                    antecessor_form=self.antecessor_form, **kwargs)
+                    validated_antecessor_form=self.validated_antecessor_form,
+                    dirty_antecessor_data=self.dirty_antecessor_data,
+                    **kwargs)
 
                 if not new_artifact:
-                    message = "{} did not return a dependency artifact " \
+                    message = "{} did not return a missing dependency " \
+                              "artifact " \
                               "".format(bootstrapper.__class__.__name__)
                     raise FormStepCannotBootstrapMissingDependency(message)
 
                 self.dependency_artifacts.update({dependency: new_artifact})
 
-    def get_next_step(self, **kwargs):
-        raise ImproperlyConfigured(
-            "Step requires an override of 'get_next_step' method to use "
-            "it.")
-
 
 class StepBootstrapper(ABC):
 
     @abstractmethod
-    def retrieve_artifact(self, antecessor_form, **kwargs):
+    def retrieve_artifact(self, validated_antecessor_form,
+                          dirty_antecessor_data, **kwargs):
         pass

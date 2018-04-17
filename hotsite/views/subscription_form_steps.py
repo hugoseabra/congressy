@@ -1,7 +1,7 @@
 from base.step import Step
 from hotsite.forms import LotsForm, SubscriptionPersonForm, SubscriptionForm
 from hotsite.views.subscription_form_bootstrappers import LotBootstrapper, \
-    PersonBootstrapper
+    PersonBootstrapper, LotCouponCodeBootstrapper
 
 
 class StepOne(Step):
@@ -24,16 +24,16 @@ class StepOne(Step):
 class StepTwo(Step):
     template_name = 'hotsite/person_form.html'
     form_class = SubscriptionPersonForm
-    _dependes_on = ('lot',)
-    _dependency_bootstrap_map = {'lot': LotBootstrapper}
+    _dependes_on = ('lot', 'coupon_code',)
+    _dependency_bootstrap_map = {'lot': LotBootstrapper,
+                                 'coupon_code': LotCouponCodeBootstrapper}
 
-    def get_step_context_data(self, event, extra_data, **kwargs):
+    def get_step_context_data(self, event):
 
         lot = self.dependency_artifacts['lot']
+        coupon_code = self.dependency_artifacts['coupon_code']
 
         context = {}
-
-        coupon_code = extra_data.cleaned_data.get('coupon_code')
 
         context['event'] = event
         context['form'] = SubscriptionPersonForm(event=event, lot=lot,
@@ -86,7 +86,6 @@ class StepFive(Step):
         context['remove_preloader'] = True
 
         return context
-
 
 # class StepThree(Step):
 #     template = 'hotsite/survey_form.html'

@@ -29,14 +29,16 @@ class SubscriptionPersonForm(PersonForm):
         required=False,
     )
 
-    def __init__(self, lot,  event, coupon_code=None, is_chrome=False, **kwargs):
+    def __init__(self, dependencies, is_chrome=False, **kwargs):
+
+        lot = dependencies['lot']
 
         if not isinstance(lot, Lot):
             raise TypeError('lot não é do tipo Lot')
 
-        self.event = event
         self.event_lot = lot
-        self.coupon_code = coupon_code
+        self.event = lot.event
+        self.coupon_code = dependencies['coupon_code']
 
         super().__init__(is_chrome, **kwargs)
 

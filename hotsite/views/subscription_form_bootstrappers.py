@@ -6,10 +6,20 @@ from gatheros_subscription.models import Lot, Subscription, EventSurvey
 class LotBootstrapper(StepBootstrapper):
 
     @staticmethod
-    def retrieve_artifact(antecessor_form, **kwargs):
+    def retrieve_artifact(antecessor_form=None, dirty_antecessor_data=None,
+                          **kwargs):
 
-        lot = antecessor_form.cleaned_data.get('lots')
+        if antecessor_form:
+            lot = antecessor_form.cleaned_data.get('lots')
+        elif dirty_antecessor_data:
+            lot = dirty_antecessor_data.get('lot')
+        else:
+            lot = None
+
         event = kwargs.get('event')
+
+        if not event:
+            raise Exception('Event not in kwargs')
 
         if lot and not isinstance(lot, Lot):
             try:
@@ -18,6 +28,20 @@ class LotBootstrapper(StepBootstrapper):
                 pass
 
         return lot
+
+
+class LotCouponCodeBootstrapper(StepBootstrapper):
+
+    @staticmethod
+    def retrieve_artifact(antecessor_form=None, dirty_antecessor_data=None,
+                          **kwargs):
+
+        if dirty_antecessor_data:
+            coupon_code = dirty_antecessor_data.get('coupon_code')
+        else:
+            coupon_code = None
+
+        return coupon_code
 
 
 class PersonBootstrapper(StepBootstrapper):
@@ -72,4 +96,3 @@ class SubscriptionBootstrapper(StepBootstrapper):
 #                 pass
 # 
 #         return event_survey
-
