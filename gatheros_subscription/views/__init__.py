@@ -1,4 +1,5 @@
 from .form_config import FormConfigView
+from .category import LotCategoryListView
 from .lot import LotAddFormView, LotDeleteView, LotEditFormView, LotListView
 from .subscription import (
     MySubscriptionsListView,

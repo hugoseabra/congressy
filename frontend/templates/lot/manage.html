@@ -47,14 +47,14 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="buttonbar">
-                        <div class="float-right">
+                        <div class="float-left">
                             <a href="{% url 'subscription:lot-add' event.pk %}"
-                                class="btn btn-success"
+                                class="btn btn-primary"
                                 data-toggle="modal"
                                 data-backdrop="static"
                                 data-target="#lot-form">
-                                <i class="fa fa-plus"></i>
-                                Adicionar
+                                <i class="fab fa-stack-exchange"></i>
+                                Gerenciar Categorias
                             </a>
                         </div>
                         <div class="clearfix"></div>
@@ -67,147 +67,181 @@
                     <div class="panel panel-primary">
                         <div class="panel-heading">
                             <div class="panel-title">
-                                Gerenciamento de Lotes por Categorias
+                                Gerenciamento de Lotes por Categoria
                             </div>
                         </div>
                         <div class="panel-body">
-                            <div class="tab-wrapper tab-left ">
-                                <ul class="nav nav-tabs">
-                                    <li class="active" style="width:180px;overflow: hidden">
-                                        <a href="#home3" data-toggle="tab" aria-expanded="true">
-                                            Para residentes do hospital
-                                        </a>
-                                    </li>
-                                    <li class="" style="width:180px;overflow: hidden">
-                                        <a href="#profile3" data-toggle="tab" aria-expanded="false">Categoria 2</a>
-                                    </li>
-                                </ul>
-                                <div class="tab-content">
-                                    <div class="tab-pane active" id="home3">
-                                        <h3 style="font-weight: bold;padding: 10px 0">Para residentes do hospital</h3>
-                                        {% if object_list %}
-                                            <ul class="list-group block-list">
-                                                {% for lot in object_list %}
-                                                    <li class="list-group-item">
-                                                        <div class="row tooltip-wrapper">
-                                                            <div class="col-md-9" style="word-wrap: break-word">
-                                                                <div class="panel-title">
-                                                                    {{ lot.get_period }}
-                                                                </div>
-                                                                <hr />
-                                                                <div style="margin-bottom:3px;">
-                                                                    {{ lot.name }} adssd fsadfasdf asdfasfdas d
-                                                                </div>
-                                                                {% if lot.status == lot.LOT_STATUS_RUNNING %}
-                                                                    <div class="badge badge-success">Andamento</div>
-                                                                {% elif lot.status == lot.LOT_STATUS_FINISHED %}
-                                                                    <div class="badge badge-warning">Finalizado</div>
-                                                                {% else %}
-                                                                    <div class="badge">Não-iniciado</div>
-                                                                {% endif %}
-                                                                {% if lot.private %}
-                                                                    <div class="badge badge-primary">Privado</div>
-                                                                {% endif %}
-{#                                                                <br />#}
-{#                                                                <a href="#" class="btn btn-link btn-sm btn-danger">#}
-{#                                                                    <i class="fas fa-exclamation-triangle"></i>#}
-{#                                                                    Você não inseriu dados bancários.#}
-{#                                                                </a>#}
-                                                                {% if lot.private %}
-                                                                <hr />
-                                                                <div style="margin-bottom:3px;">
-                                                                    Cupom: <span style="font-weight: bold;">{{ lot.exhibition_code|default_if_none:'-' }}</span>
-                                                                </div>
-                                                                {% endif %}
-                                                            </div>
-                                                            <div class="col-md-2">
-                                                                <div
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="left"
-                                                                    title=""
-                                                                    data-original-title="Gerenciar valores, taxas e parcelamentos">
-                                                                    <button
-                                                                        class="btn btn-sm btn-info btn-trans btn-block"
-                                                                        data-toggle="modal"
-                                                                        data-backdrop="static"
-                                                                        data-target="#lot-form">
-                                                                        <i class="far fa-money-bill-alt"></i>
-                                                                        Valor
-                                                                    </button>
-                                                                </div>
-                                                                <div
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="left"
-                                                                    title=""
-                                                                    data-original-title="Gerenciar limite de vagas">
-                                                                    <button
-                                                                        class="btn btn-sm btn-info btn-trans btn-block"
-                                                                        data-toggle="modal"
-                                                                        data-backdrop="static"
-                                                                        data-target="#lot-form">
-                                                                        <i class="fas fa-users"></i>
-                                                                        Vagas
-                                                                    </button>
-                                                                </div>
-                                                                <div
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="left"
-                                                                    title=""
-                                                                    data-original-title="Gerenciar Formulário personalizado">
-                                                                    <button
-                                                                        class="btn btn-sm btn-info btn-trans btn-block"
-                                                                        data-toggle="modal"
-                                                                        data-backdrop="static"
-                                                                        data-target="#lot-form">
-                                                                        <i class="fas fa-list"></i>
-                                                                        Formulário
-                                                                    </button>
-                                                                </div>
-                                                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="tab-wrapper tab-left ">
+                                        <ul class="nav nav-tabs">
+                                            <li class="active" style="width:180px;overflow: hidden">
+                                                <a href="#home3" data-toggle="tab" aria-expanded="true">
+                                                    Para residentes do hospital
+                                                </a>
+                                            </li>
+                                            <li class="" style="width:180px;overflow: hidden">
+                                                <a href="#profile3" data-toggle="tab" aria-expanded="false">Categoria 2</a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content">
+                                            <div class="tab-pane active" id="home3">
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <h3 style="font-weight: bold;padding: 10px 0">Para residentes do hospital</h3>
+                                                    </div>
+                                                    <div class="col-md-4 text-right">
+                                                        <a href="{% url 'subscription:lot-add' event.pk %}"
+                                                            class="btn btn-success"
+                                                            data-toggle="modal"
+                                                            data-backdrop="static"
+                                                            data-target="#lot-form">
+                                                            <i class="fa fa-plus"></i>
+                                                            Novo Lote
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <hr />
+                                                {% if object_list %}
+                                                    <ul class="list-group block-list">
+                                                        {% for lot in object_list %}
+                                                            <li class="list-group-item">
+                                                                <div class="row tooltip-wrapper">
+                                                                    <div class="col-md-8 col-lg-7 col-xl-8" style="word-wrap: break-word">
+                                                                        <div class="panel-title">
+                                                                            {{ lot.get_period }}
+                                                                        </div>
+                                                                        <hr />
+                                                                        <div style="margin-bottom:3px;">
+                                                                            {{ lot.name }}
+                                                                        </div>
+                                                                        {% if lot.status == lot.LOT_STATUS_RUNNING %}
+                                                                            <div class="badge badge-success">Andamento</div>
+                                                                        {% elif lot.status == lot.LOT_STATUS_FINISHED %}
+                                                                            <div class="badge badge-warning">Finalizado</div>
+                                                                        {% else %}
+                                                                            <div class="badge">Não-iniciado</div>
+                                                                        {% endif %}
+                                                                        {% if lot.private %}
+                                                                            <div class="badge badge-primary">Privado</div>
+                                                                        {% endif %}
+        {#                                                                <br />#}
+        {#                                                                <a href="#" class="btn btn-link btn-sm btn-danger">#}
+        {#                                                                    <i class="fas fa-exclamation-triangle"></i>#}
+        {#                                                                    Você não inseriu dados bancários.#}
+        {#                                                                </a>#}
+                                                                        {% if lot.private %}
+                                                                        <hr />
+                                                                        <div style="margin-bottom:3px;">
+                                                                            Cupom: <span style="font-weight: bold;">{{ lot.exhibition_code|default_if_none:'-' }}</span>
+                                                                        </div>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                    <div class="col-md-2 col-lg-3 col-xl-2">
+                                                                        <div
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="left"
+                                                                            title=""
+                                                                            data-original-title="Gerenciar valores, taxas e parcelamentos">
+                                                                            <button
+                                                                                class="btn btn-sm btn-info btn-trans btn-block"
+                                                                                data-toggle="modal"
+                                                                                data-backdrop="static"
+                                                                                data-target="#lot-form">
+                                                                                <i class="far fa-money-bill-alt"></i>
+                                                                                <span class="hidden-md">Valor</span>
+                                                                            </button>
+                                                                        </div>
+                                                                        <div
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="left"
+                                                                            title=""
+                                                                            data-original-title="Gerenciar limite de vagas">
+                                                                            <button
+                                                                                class="btn btn-sm btn-info btn-trans btn-block"
+                                                                                data-toggle="modal"
+                                                                                data-backdrop="static"
+                                                                                data-target="#lot-form">
+                                                                                <i class="fas fa-users"></i>
+                                                                                <span class="hidden-md">Vagas</span>
+                                                                            </button>
+                                                                        </div>
+                                                                        <div
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="left"
+                                                                            title=""
+                                                                            data-original-title="Gerenciar Formulário personalizado">
+                                                                            <button
+                                                                                class="btn btn-sm btn-info btn-trans btn-block"
+                                                                                data-toggle="modal"
+                                                                                data-backdrop="static"
+                                                                                data-target="#lot-form">
+                                                                                <i class="fas fa-list"></i>
+                                                                                <span class="hidden-md">Formulário</span>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
 
-                                                            <div class="col-md-1">
-                                                                <div
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="left"
-                                                                    title=""
-                                                                    data-original-title="Desativar">
-                                                                    <button
-                                                                        class="btn btn-sm btn-warning btn-trans btn-block"
-                                                                        data-toggle="modal"
-                                                                        data-backdrop="static"
-                                                                        data-target="#lot-form">
-                                                                        <i class="fa fa-exclamation-circle"></i>
-                                                                    </button>
+                                                                    <div class="col-md-2">
+                                                                        <div
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="left"
+                                                                            title=""
+                                                                            data-original-title="Desativar">
+                                                                            <button
+                                                                                class="btn btn-sm btn-warning btn-trans btn-block"
+                                                                                data-toggle="modal"
+                                                                                data-backdrop="static"
+                                                                                data-target="#lot-form">
+                                                                                <i class="fa fa-exclamation-circle"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                        <div
+                                                                            data-toggle="tooltip"
+                                                                            data-placement="left"
+                                                                            title=""
+                                                                            data-original-title="Excluir">
+                                                                            <button class="btn btn-sm btn-default btn-trans btn-block"
+                                                                                data-toggle="modal"
+                                                                                data-backdrop="static"
+                                                                                data-target="#lot-form">
+                                                                                <i class="fas fa-trash-alt"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <div
-                                                                    data-toggle="tooltip"
-                                                                    data-placement="left"
-                                                                    title=""
-                                                                    data-original-title="Excluir">
-                                                                    <button class="btn btn-sm btn-default btn-trans btn-block"
-                                                                        data-toggle="modal"
-                                                                        data-backdrop="static"
-                                                                        data-target="#lot-form">
-                                                                        <i class="fas fa-trash-alt"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            <h3>Nenhum lote.</h3>
-                                        {% endif %}
-                                    </div>
-                                    <div class="tab-pane" id="profile3">
-                                        <h3 style="font-weight: bold;padding: 10px 0">Categoria 2</h3>
-                                        <p>
-                                            Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo
-                                            enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica VHS salvia yr, vero magna velit sapiente labore
-                                            stumptown. Vegan fanny pack odio cillum wes anderson 8-bit, sustainable jean shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester stumptown, tumblr butcher vero sint qui sapiente
-                                            accusamus tattooed echo park.
-                                        </p>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <h3>Nenhum lote.</h3>
+                                                {% endif %}
+                                            </div>
+                                            <div class="tab-pane" id="profile3">
+                                                 <div class="row">
+                                                    <div class="col-md-8">
+                                                        <h3 style="font-weight: bold;padding: 10px 0">Categoria 2</h3>
+                                                    </div>
+                                                    <div class="col-md-4 text-right">
+                                                        <a href="{% url 'subscription:lot-add' event.pk %}"
+                                                            class="btn btn-success"
+                                                            data-toggle="modal"
+                                                            data-backdrop="static"
+                                                            data-target="#lot-form">
+                                                            <i class="fa fa-plus"></i>
+                                                            Novo Lote
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <hr />
+                                                <p>
+                                                    Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo
+                                                    enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica VHS salvia yr, vero magna velit sapiente labore
+                                                    stumptown. Vegan fanny pack odio cillum wes anderson 8-bit, sustainable jean shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester stumptown, tumblr butcher vero sint qui sapiente
+                                                    accusamus tattooed echo park.
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
