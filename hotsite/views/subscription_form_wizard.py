@@ -1,10 +1,9 @@
 from django.contrib import messages
-from django.http.response import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 
 from base.views import FormWizard
 from gatheros_event.models import Event
-from hotsite.views import StepOne, StepTwo
+from hotsite.views import StepOne, StepTwo, StepFive
 
 
 class SubscriptionFormWizard(FormWizard):
@@ -15,12 +14,19 @@ class SubscriptionFormWizard(FormWizard):
     wizard_steps = {
         1: StepOne,
         2: StepTwo,
+        5: StepFive,
     }
+
+    persisting_steps = [2, 3, 4, 5]
 
     event = None
 
     def dispatch(self, request, *args, **kwargs):
-        self.pre_flight(request=request)
+        pre_flight = self.pre_flight(request=request)
+
+        if pre_flight:
+            return pre_flight
+
         response = super().dispatch(request, *args, **kwargs)
         return response
 
@@ -62,28 +68,36 @@ class SubscriptionFormWizard(FormWizard):
 
     def post(self, request, *args, **kwargs):
 
-        self.pre_flight(request=request)
+        pre_flight = self.pre_flight(request=request)
 
-        super().post(request, *args, **kwargs)
-
-        if not self.step:
-            raise Exception('YOU AINT GOT NO STEP, STEP THE FUCK BACK')
+        if pre_flight:
+            return pre_flight
 
         post_data = request.POST.copy()
 
-        form = self.step.form_class(event=self.event, data=post_data)
+        super().post(request, *args, **kwargs)
 
-        if form.is_valid():
-            next_step = self.step.get_next_step(valid_form=form)
+        current_form = self.current_step.form_class
+
+        current_form = current_form(event=self.event, data=post_data)
+
+        if current_form.is_valid():
+
+            if self.current_step in self.persisting_steps:
+                current_form.save()
+
+            next_step = self.next_step(antecessor_form=current_form,
+                                       event=self.event)
             return render(request=request,
                           template_name=next_step.template_name,
                           context=next_step.get_step_context_data(
-                              event=self.event))
+                              event=self.event, extra_data=current_form))
 
-        messages.error(request, 'Por favor corriga os erros abaixo.')
-        return render(request=request, template_name=self.step.template_name,
-                      context=self.step.get_step_context_data(
-                          event=self.event, form=form))
+        messages.error(request, 'Por favor corrigir os erros abaixo.')
+        return render(request=request,
+                      template_name=self.current_step.template_name,
+                      context=self.current_step.get_step_context_data(
+                          event=self.event, form=current_form))
 
     def pre_flight(self, request):
 
@@ -101,3 +115,5 @@ class SubscriptionFormWizard(FormWizard):
 
         if not enabled:
             return redirect('public:hotsite', slug=self.event.slug)
+
+        return None

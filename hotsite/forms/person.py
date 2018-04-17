@@ -19,9 +19,9 @@ class SubscriptionPersonForm(PersonForm):
         widget=forms.HiddenInput()
     )
 
-    previous_step = forms.IntegerField(
+    current_step = forms.IntegerField(
         widget=forms.HiddenInput(),
-        required=False,
+        initial=2,
     )
 
     coupon_code = forms.IntegerField(
@@ -29,25 +29,33 @@ class SubscriptionPersonForm(PersonForm):
         required=False,
     )
 
-    def __init__(self, lot, event, is_chrome=False, **kwargs):
+    def __init__(self, lot,  event, coupon_code=None, is_chrome=False, **kwargs):
 
         if not isinstance(lot, Lot):
             raise TypeError('lot não é do tipo Lot')
 
         self.event = event
         self.event_lot = lot
+        self.coupon_code = coupon_code
 
         super().__init__(is_chrome, **kwargs)
 
-        self.fields['lots'] = forms.ModelChoiceField(
-            queryset=Lot.objects.filter(event=self.event,
-                                        date_start__lte=datetime.now(),
-                                        date_end__gte=datetime.now(),
-                                        private=False,
-                                        ),
-
+        self.fields['lot'] = forms.IntegerField(
+            initial=self.event_lot.pk,
             widget=forms.HiddenInput(),
         )
+
+        if self.coupon_code:
+            self.fields['coupon_code'].initial = self.coupon_code
+        else:
+            self.fields['coupon_code'].inital = ''
+
+        if self.event_lot.event_survey:
+            self.fields['next_step'].initial = 3
+        elif self.event_lot.price and self.event_lot.price > 0:
+            self.fields['next_step'].initial = 4
+        else:
+            self.fields['next_step'].initial = 5
 
         try:
             config = self.event.formconfig

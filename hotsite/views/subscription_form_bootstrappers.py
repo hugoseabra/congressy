@@ -4,43 +4,32 @@ from gatheros_subscription.models import Lot, Subscription, EventSurvey
 
 
 class LotBootstrapper(StepBootstrapper):
-    fallback_step = 'step_1'
-    artifact_type = Lot
 
-    def __init__(self, **kwargs) -> None:
+    @staticmethod
+    def retrieve_artifact(antecessor_form, **kwargs):
 
-        self.event = kwargs.get('event')
-        self.lot_pk = kwargs.get('lot_pk', None)
-        super().__init__()
+        lot = antecessor_form.cleaned_data.get('lots')
+        event = kwargs.get('event')
 
-    def retrieve_artifact(self):
-
-        lot = None
-
-        if self.lot_pk:
+        if lot and not isinstance(lot, Lot):
             try:
-                lot = Lot.objects.get(pk=int(self.lot_pk), event=self.event)
-            except Lot.DoesNotExist:
+                lot = Lot.objects.get(pk=lot, event=event)
+            except Person.DoesNotExist:
                 pass
 
         return lot
 
 
 class PersonBootstrapper(StepBootstrapper):
-    fallback_step = 'step_2'
-    artifact_type = Lot
+    artifact_type = Person
 
-    def __init__(self, **kwargs) -> None:
-        self.person_pk = kwargs.get('person_pk', None)
-        super().__init__()
+    def retrieve_artifact(self, antecessor_form):
 
-    def retrieve_artifact(self):
+        person = antecessor_form.get('person')
 
-        person = None
-
-        if self.person_pk:
+        if person and not isinstance(person, self.artifact_type):
             try:
-                person = Person.objects.get(pk=self.person_pk)
+                person = Person.objects.get(pk=person)
             except Person.DoesNotExist:
                 pass
 
@@ -48,45 +37,39 @@ class PersonBootstrapper(StepBootstrapper):
 
 
 class SubscriptionBootstrapper(StepBootstrapper):
-    fallback_step = 'step_2'
     artifact_type = Subscription
 
-    def __init__(self, **kwargs) -> None:
-        self.subscription_pk = kwargs.get('subscription_pk', None)
-        super().__init__()
+    def retrieve_artifact(self, antecessor_form):
 
-    def retrieve_artifact(self):
+        subscription = antecessor_form.get('subscription')
 
-        subscription = None
-
-        if self.subscription_pk:
+        if subscription and not isinstance(subscription, self.artifact_type):
             try:
-                subscription = Subscription.objects.get(
-                    pk=self.subscription_pk)
+                subscription = Subscription.objects.get(pk=subscription)
             except Subscription.DoesNotExist:
                 pass
 
         return subscription
-
-
-class EventSurveyBootstrapper(StepBootstrapper):
-    fallback_step = 'step_2'
-    artifact_type = EventSurvey
-
-    def __init__(self, **kwargs) -> None:
-        self.event_survey_pk = kwargs.get('event_survey_pk', None)
-        super().__init__()
-
-    def retrieve_artifact(self):
-
-        event_survey = None
-
-        if self.event_survey_pk:
-            try:
-                event_survey = EventSurvey.objects.get(
-                    pk=self.event_survey_pk)
-            except EventSurvey.DoesNotExist:
-                pass
-
-        return event_survey
+# 
+# 
+# class EventSurveyBootstrapper(StepBootstrapper):
+#     fallback_step = 'step_2'
+#     artifact_type = EventSurvey
+# 
+#     def __init__(self, **kwargs) -> None:
+#         self.event_survey_pk = kwargs.get('event_survey_pk', None)
+#         super().__init__()
+# 
+#     def retrieve_artifact(self):
+# 
+#         event_survey = None
+# 
+#         if self.event_survey_pk:
+#             try:
+#                 event_survey = EventSurvey.objects.get(
+#                     pk=self.event_survey_pk)
+#             except EventSurvey.DoesNotExist:
+#                 pass
+# 
+#         return event_survey
 

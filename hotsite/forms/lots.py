@@ -13,6 +13,23 @@ class LotsForm(forms.Form):
 
     event = None
 
+    current_step = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        initial=1
+    )
+
+    next_step = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        required=False,
+        initial=2,
+    )
+
+    coupon_code = forms.CharField(
+        max_length=15,
+        required=False,
+        label="Código de Cupom"
+    )
+
     def __init__(self, event, post_data=None, **kwargs):
 
         self.event = event
@@ -33,15 +50,5 @@ class LotsForm(forms.Form):
         )
         self.order_fields(['lots', 'coupon_code', 'next_step'])
 
-    coupon_code = forms.CharField(
-        max_length=15,
-        required=False,
-        label="Código de Cupom"
-    )
 
-    next_step = forms.IntegerField(
-        widget=forms.HiddenInput(),
-        required=False,
-        initial=1,
-    )
 

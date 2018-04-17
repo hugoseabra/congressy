@@ -1,6 +1,7 @@
 from base.step import Step
-from hotsite.forms import LotsForm, SubscriptionPersonForm
-from hotsite.views.subscription_form_bootstrappers import LotBootstrapper
+from hotsite.forms import LotsForm, SubscriptionPersonForm, SubscriptionForm
+from hotsite.views.subscription_form_bootstrappers import LotBootstrapper, \
+    PersonBootstrapper
 
 
 class StepOne(Step):
@@ -8,7 +9,7 @@ class StepOne(Step):
     form_class = LotsForm
 
     @staticmethod
-    def get_step_context_data(event, form=None, **kwargs):
+    def get_step_context_data(event, form=None):
         context = {}
 
         context['event'] = event
@@ -19,10 +20,6 @@ class StepOne(Step):
         context['remove_preloader'] = True
         return context
 
-    def get_next_step(self, valid_form):
-        return StepTwo(dependency_artifacts={'lot': valid_form.cleaned_data[
-            'lots']})
-
 
 class StepTwo(Step):
     template_name = 'hotsite/person_form.html'
@@ -30,80 +27,67 @@ class StepTwo(Step):
     _dependes_on = ('lot',)
     _dependency_bootstrap_map = {'lot': LotBootstrapper}
 
-    def get_step_context_data(self, event, form=None, **kwargs):
+    def get_step_context_data(self, event, extra_data, **kwargs):
+
+        lot = self.dependency_artifacts['lot']
+
+        context = {}
+
+        coupon_code = extra_data.cleaned_data.get('coupon_code')
+
+        context['event'] = event
+        context['form'] = SubscriptionPersonForm(event=event, lot=lot,
+                                                 coupon_code=coupon_code)
+
+        if lot.price and lot.price > 0:
+            context['has_payments'] = True
+        else:
+            context['has_payments'] = False
+
+        if lot.event_survey:
+            context['has_surveys'] = True
+        else:
+            context['has_surveys'] = False
+
+        context['remove_preloader'] = True
+
+        return context
+
+
+class StepFive(Step):
+    template_name = 'hotsite/person_form.html'
+    form_class = SubscriptionForm
+    _dependes_on = ('lot', 'person')
+    _dependency_bootstrap_map = {'lot': LotBootstrapper,
+                                 'person': PersonBootstrapper}
+
+    def get_step_context_data(self, event, form=None):
+
+        lot = self.dependency_artifacts['lot']
+
         context = {}
 
         context['event'] = event
 
         if not form:
             context['form'] = SubscriptionPersonForm(event=event,
-                                                     lot=
-                                                     self.dependency_artifacts[
-                                                         'lot'])
+                                                     lot=lot)
+
+        if lot.price and lot.price > 0:
+            context['has_payments'] = True
+        else:
+            context['has_payments'] = False
+
+        if lot.event_survey:
+            context['has_surveys'] = True
+        else:
+            context['has_surveys'] = False
 
         context['remove_preloader'] = True
+
         return context
 
-#
-# class StepTwo(Step):
-#     dependes_on = ('lot',)
-#     dependency_bootstrap_map = {'lot': LotBootstrapper}
-#     template = 'hotsite/person_form.html'
-#
-#     def __init__(self, request, event, coupon_code='', form=None, context=None,
-#                  dependency_artifacts=None, **kwargs) -> None:
-#         self.coupon_code = coupon_code
-#         self.event = event
-#
-#         lot_pk = None
-#
-#         if form:
-#             self.form_instance = form
-#
-#         super().__init__(request, form, context, dependency_artifacts,
-#                          event=self.event, lot_pk=lot_pk, **kwargs)
-#
-#     def get_context(self):
-#
-#         context = super().get_context()
-#
-#         lot = self.dependency_artifacts['lot']
-#
-#         if not self.form_instance:
-#             self.form_instance = SubscriptionPersonForm(
-#                 lot=lot,
-#                 initial={
-#                     'next_step': 2,
-#                     'previous_step': 1,
-#                     'coupon_code': self.coupon_code,
-#                     'lot': lot.pk},
-#                 event=self.event
-#             )
-#
-#         context['form'] = self.form_instance
-#         context['event'] = self.event
-#         context['remove_preloader'] = True
-#
-#         try:
-#             config = lot.event.formconfig
-#         except AttributeError:
-#             config = FormConfig()
-#
-#         if lot.price > 0:
-#             config.email = True
-#             config.phone = True
-#             config.city = True
-#
-#             config.cpf = config.CPF_REQUIRED
-#             config.birth_date = config.BIRTH_DATE_REQUIRED
-#             config.address = config.ADDRESS_SHOW
-#
-#         context['config'] = config
-#         context['has_lots'] = lot.event.lots.count() > 1
-#
-#         return context
-#
-#
+
 # class StepThree(Step):
 #     template = 'hotsite/survey_form.html'
 #
