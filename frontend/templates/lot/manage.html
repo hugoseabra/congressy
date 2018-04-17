@@ -48,11 +48,8 @@
                 <div class="col-md-12">
                     <div class="buttonbar">
                         <div class="float-left">
-                            <a href="{% url 'subscription:lot-add' event.pk %}"
-                                class="btn btn-primary"
-                                data-toggle="modal"
-                                data-backdrop="static"
-                                data-target="#lot-form">
+                            <a href="{% url 'subscription:category-list' event.pk %}"
+                                class="btn btn-primary">
                                 <i class="fab fa-stack-exchange"></i>
                                 Gerenciar Categorias
                             </a>

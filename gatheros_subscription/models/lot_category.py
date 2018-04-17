@@ -5,11 +5,11 @@ que se assemelham e ajudar a estruturar a apresentação do lote para
 o organizador, além de centralizar diversas características do evento.
 """
 from django.db import models
-
+from gatheros_event.models.mixins import GatherosModelMixin
 from gatheros_event.models import Event
 
 
-class LotCategory(models.Model):
+class LotCategory(models.Model, GatherosModelMixin):
     """ Categoria de lote """
 
     event = models.ForeignKey(
