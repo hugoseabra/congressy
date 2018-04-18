@@ -135,11 +135,15 @@ class PersonForm(forms.ModelForm):
         return phone
 
     def clean_email(self):
-        try:
-            email = self.data['email']
-        except MultiValueDictKeyError:
-            email = self.initial['email']
-        return email.lower()
+
+        if self.data.get('email') or self.initial.get('email'):
+            try:
+                email = self.data.get('email')
+            except MultiValueDictKeyError:
+                email = self.initial.get('email')
+            return email.lower()
+
+        return ''
 
     def clean_occupation(self):
         return Occupation.objects.get(pk=self.data['occupation'])

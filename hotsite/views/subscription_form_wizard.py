@@ -39,9 +39,16 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         return [TEMPLATES[self.steps.current]]
 
     def done(self, form_list, **kwargs):
+
+        # Process non-payment subscriptions here:
+        # We have a person in storage.
+        # We have the lot data in storage.
+        # Survey has already been processed.
+
+
         raise Exception('fuck me its 02:04 AM')
 
-        # this runs for the step it's on as well as for the step before
+    # this runs for the step it's on as well as for the step before
     def get_form_initial(self, step):
 
             if step == 'lot':
@@ -57,6 +64,20 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 })
 
             return self.initial_dict.get(step, {})
+
+    def process_step(self, form):
+
+        form_data = self.get_form_step_data(form)
+
+        # Persisting person
+        if isinstance(form, forms.SubscriptionPersonForm):
+            person = form.save()
+            self.storage.person = person
+
+        # Process payment subscriptions here:
+        # Create a subscription if the payment works, else re-render the step.
+
+        return form_data
 
 
 # class SubscriptionFormWizard(FormWizard):
