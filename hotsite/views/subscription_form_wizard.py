@@ -1,12 +1,14 @@
 from django.conf import settings
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, QueryDict
 from django.urls import reverse_lazy
 from formtools.wizard.views import SessionWizardView
 
 from gatheros_subscription.models import Lot, Subscription
+from gatheros_event.models import Person
 from hotsite import forms
 from hotsite.views.mixins import EventMixin
+from survey.directors import SurveyDirector
 
 FORMS = [("lot", forms.LotsForm),
          ("person", forms.SubscriptionPersonForm),
@@ -76,6 +78,14 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             - We have the lot data in storage.
             - Survey has already been processed.
         """
+
+        # Assert that we have a person in storage
+        if not hasattr(self.storage, 'person'):
+            person_data = self.storage.get_step_data('person')
+            person_email = person_data.get('person-email')
+
+            person = Person.objects.get(email=person_email)
+            self.storage.person = person
 
         # If we already have a subscription in storage, if this is the case,
         # then it was created by the payment step.
@@ -183,7 +193,40 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             person.save()
             self.storage.person = person
 
-        # Process payment subscriptions here:
-        # Create a subscription if the payment works, else re-render the step.
+        # Persisting survey
+        if isinstance(form, forms.SurveyForm):
+
+            survey_director = SurveyDirector(event=self.event,
+                                             user=self.request.user)
+
+            lot_data = self.storage.get_step_data('lot')
+            lot = lot_data.get('lot-lots')
+            try:
+                lot = Lot.objects.get(pk=lot, event=self.event)
+            except Lot.DoesNotExist:
+                message = 'Não foi possivel resgatar um Lote ' \
+                          'a partir das referencias: lot<{}> e evento<{}>.' \
+                    .format(lot, self.event)
+                raise TypeError(message)
+
+            survey_response = QueryDict('', mutable=True)
+            for form_question, form_response in form_data.items():
+                if form_question == 'csrfmiddlewaretoken':
+                    survey_response.update({form_question: form_response})
+
+                if 'survey-' in form_question:
+                    survey_response.update(
+                        {form_question.replace('survey-', ''): form_response})
+
+            survey_form = survey_director.get_form(
+                survey=lot.event_survey.survey,
+                data=survey_response
+            )
+
+            if survey_form.is_valid():
+                survey_form.save_answers()
+            else:
+                raise Exception('SurveyForm was invalid: {}'.format(
+                    survey_form.errors))
 
         return form_data

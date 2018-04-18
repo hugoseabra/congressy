@@ -76,47 +76,30 @@
                                         <form method="post" action="">
 
                                             {% csrf_token %}
-
-                                            {% render_generic_field form.next_step %}
-                                            {% render_generic_field form.event_survey %}
-                                            {% render_generic_field form.lot %}
-                                            {% render_generic_field form.person %}
-
-
+                                            {{ wizard.management_form }}
 
                                             {% for field in form.visible_fields %}
                                                 {% render_generic_field field %}
                                             {% endfor %}
 
-                                            <button style="margin-top: 5px;"
-                                                    class="btn
-                                                        btn-primary pull-right"
-                                                    type="submit">
-                                                {% if has_payments %}
-                                                    Próximo
-                                                {% else %}
-                                                    Finalizar
-                                                {% endif %}
-                                            </button>
+
+                                            {% if wizard.steps.prev %}
+                                                <button name="wizard_goto_step"
+                                                        type="submit"
+                                                        value="{{ wizard.steps.first }}">
+                                                    first step
+                                                </button>
+                                                <button name="wizard_goto_step"
+                                                        type="submit"
+                                                        value="{{ wizard.steps.prev }}">
+                                                    prev step
+                                                </button>
+                                            {% endif %}
+                                            <input type="submit"
+                                                   value="submit"/>
 
                                         </form>
 
-
-                                        <form method="post" action="">
-
-                                            {% csrf_token %}
-
-                                            {% render_generic_field form.previous_step %}
-                                             {% render_generic_field form.lot %}
-                                            {% render_generic_field form.person %}
-
-
-                                            <button class="btn btn-primary pull-left"
-                                                    type="submit">
-                                                Voltar
-                                            </button>
-
-                                        </form>
 
                                     </div>
 
