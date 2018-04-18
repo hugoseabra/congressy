@@ -2,62 +2,34 @@
     Formulário usado para pegar os dados da pessoa durante inscrições no
     hotsite
 """
-from datetime import datetime
 
 from django import forms
-from django.forms import BaseModelForm
 
 from gatheros_event.forms import PersonForm
 from gatheros_subscription.models import FormConfig, Lot
 
 
 class SubscriptionPersonForm(PersonForm):
-    event = None
-    event_lot = None
-
-    next_step = forms.IntegerField(
-        widget=forms.HiddenInput()
-    )
-
-    current_step = forms.IntegerField(
-        widget=forms.HiddenInput(),
-        initial=2,
-    )
-
     coupon_code = forms.IntegerField(
         widget=forms.HiddenInput(),
         required=False,
     )
 
-    def __init__(self, dependencies, is_chrome=False, **kwargs):
+    def __init__(self, is_chrome=False, **kwargs):
 
-        lot = dependencies['lot']
+        self.lot = kwargs.get('initial').get('lot')
+        self.event = kwargs.get('initial').get('event')
 
-        if not isinstance(lot, Lot):
-            raise TypeError('lot não é do tipo Lot')
-
-        self.event_lot = lot
-        self.event = lot.event
-        self.coupon_code = dependencies['coupon_code']
+        if not isinstance(self.lot, Lot):
+            try:
+                self.lot = Lot.objects.get(pk=self.lot, event=self.event)
+            except Lot.DoesNotExist:
+                message = 'Não foi possivel resgatar um Lote ' \
+                          'a partir das referencias: lot<{}> e evento<{}>.' \
+                    .format(self.lot, self.event)
+                raise TypeError(message)
 
         super().__init__(is_chrome, **kwargs)
-
-        self.fields['lot'] = forms.IntegerField(
-            initial=self.event_lot.pk,
-            widget=forms.HiddenInput(),
-        )
-
-        if self.coupon_code:
-            self.fields['coupon_code'].initial = self.coupon_code
-        else:
-            self.fields['coupon_code'].inital = ''
-
-        if self.event_lot.event_survey:
-            self.fields['next_step'].initial = 3
-        elif self.event_lot.price and self.event_lot.price > 0:
-            self.fields['next_step'].initial = 4
-        else:
-            self.fields['next_step'].initial = 5
 
         try:
             config = self.event.formconfig
@@ -67,8 +39,7 @@ class SubscriptionPersonForm(PersonForm):
 
         required_fields = ['gender']
 
-        has_paid_lots = self.event_lot.price > 0 if self.event_lot.price \
-            else False
+        has_paid_lots = self.lot.price > 0 if self.lot.price else False
 
         if has_paid_lots or config.phone:
             required_fields.append('phone')

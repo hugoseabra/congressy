@@ -79,6 +79,7 @@
                                             <form method="post" action="">
 
                                                 {% csrf_token %}
+                                                {{ wizard.management_form }}
 
                                                 {% for field in form %}
                                                     {% render_generic_field field %}
@@ -109,11 +110,11 @@
                     </div>
 
 
+                    </div>
+
                 </div>
 
             </div>
-
-        </div>
 
     </section>
 

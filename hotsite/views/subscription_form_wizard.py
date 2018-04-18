@@ -17,11 +17,12 @@ TEMPLATES = {"lot": "hotsite/lot_form.html",
 
 def is_paid_lot(wizard):
     """Return true if user opts for  a paid lot"""
-    # Get cleaned data from payment step
-    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lot': 'none'}
+
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
 
     # Return true if lot has price and price > 0
-    lot = cleaned_data['lot']
+    lot = cleaned_data['lots']
 
     if isinstance(lot, Lot):
         if lot.price and lot.price > 0:
@@ -42,18 +43,18 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         # this runs for the step it's on as well as for the step before
     def get_form_initial(self, step):
-            # steps are named 'step1', 'step2', 'step3'
-            current_step = self.storage.current_step
 
             if step == 'lot':
                 return self.initial_dict.get(step, {'event': self.event})
 
-            # get the data for step 1 on step 3
-            if current_step == 'step3':
-                prev_data = self.storage.get_step_data('step1')
-                some_var = prev_data.get('step1-some_var', '')
-
-                return self.initial_dict.get(step, {'some_var': some_var})
+            # get the data for step person from  step lot
+            if step == 'person':
+                prev_data = self.storage.get_step_data('lot')
+                lot = prev_data.get('lot-lots', '')
+                return self.initial_dict.get(step, {
+                    'lot': lot,
+                    'event': self.event,
+                })
 
             return self.initial_dict.get(step, {})
 
