@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect, QueryDict
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from formtools.wizard.views import SessionWizardView
 
-from gatheros_subscription.models import Lot, Subscription
 from gatheros_event.models import Person
+from gatheros_subscription.models import Lot, Subscription
 from hotsite import forms
 from hotsite.views.mixins import EventMixin
 from survey.directors import SurveyDirector
@@ -56,6 +57,19 @@ def has_survey(wizard):
 
 class SubscriptionWizardView(EventMixin, SessionWizardView):
     condition_dict = {'payment': is_paid_lot, 'survey': has_survey, }
+
+    def dispatch(self, request, *args, **kwargs):
+
+        response = super().dispatch(request, *args, **kwargs)
+
+        if not request.user.is_authenticated:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        enabled = self.subscription_enabled()
+        if not enabled:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        return response
 
     def get_context_data(self, **kwargs):
 
@@ -177,6 +191,25 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 'user': self.request.user,
             })
 
+        if step == 'payment':
+
+            lot_data = self.storage.get_step_data('lot')
+
+            lot = lot_data.get('lot-lots')
+
+            try:
+                lot = Lot.objects.get(pk=lot, event=self.event)
+            except Lot.DoesNotExist:
+                message = 'Não foi possivel resgatar um Lote ' \
+                          'a partir das referencias: lot<{}> e evento<{}>.' \
+                    .format(lot, self.event)
+                raise TypeError(message)
+
+            return self.initial_dict.get(step, {
+                'lot': lot,
+                'event': self.event,
+            })
+
         return self.initial_dict.get(step, {})
 
     def process_step(self, form):
@@ -228,5 +261,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             else:
                 raise Exception('SurveyForm was invalid: {}'.format(
                     survey_form.errors))
+
+        # Persisting payments
 
         return form_data

@@ -11,12 +11,11 @@ from django.views import generic
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Event, Info
-from gatheros_subscription.models import Lot, \
+from gatheros_subscription.models import FormConfig, Lot, \
     Subscription
 
 
 class EventMixin(TemplateNameableMixin, generic.View):
-
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -31,6 +30,22 @@ class EventMixin(TemplateNameableMixin, generic.View):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        try:
+            config = self.event.formconfig
+        except AttributeError:
+            config = FormConfig()
+
+        if self.has_paid_lots():
+            config.email = True
+            config.phone = True
+            config.city = True
+
+            config.cpf = config.CPF_REQUIRED
+            config.birth_date = config.BIRTH_DATE_REQUIRED
+            config.address = config.ADDRESS_SHOW
+
+        context['config'] = config
 
         context['event'] = self.event
         context['info'] = get_object_or_404(Info, event=self.event)

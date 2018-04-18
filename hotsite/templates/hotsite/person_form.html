@@ -241,14 +241,14 @@
         $(document).ready(function () {
 
 
-            var id_city = $('#id_city');
+            var id_city = $('#id_person-city');
 
 
             window.setTimeout(function () {
 
 
                 {% if config and config.address == config.ADDRESS_SHOW %}
-                    $('#id_zip_code').mask("99999-999");
+                    $('#id_person-zip_code').mask("99999-999");
                 {% endif %}
 
                 if (id_city.val()) {
@@ -256,7 +256,8 @@
                     $.ajax({
                         url: "/api/cities/" + id_city.val(),
                         success: function (result) {
-                            repopulate_cities(result.uf, result.id);
+                            console.log(result);
+                            hotsiteRepopulate_cities(result.uf, result.id);
                         },
                         error: function (err) {
                             throw err;
@@ -264,7 +265,7 @@
                     });
                 }
 
-                showHideCepLoader();
+                hotsiteShowHideCepLoader();
 
                 let radios = $('input[type=radio]');
 

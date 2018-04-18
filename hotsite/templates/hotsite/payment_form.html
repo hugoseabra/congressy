@@ -89,52 +89,13 @@
 
                             <form action="" method="post">
                                 {% csrf_token %}
+                                {{ wizard.management_form }}
 
-                                <input type="hidden" id="id_installments"
-                                       name="installments">
-                                <input type="hidden" id="id_amount"
-                                       name="amount">
-                                <input type="hidden" id="id_card_hash"
-                                       name="card_hash">
-                                <input type="hidden" id="id_transaction_type"
-                                       name="transaction_type">
-                                <input type="hidden" id="id_lot_as_json"
-                                       name="lot_as_json" value="{{ lot }}">
-                                <input type="hidden" id="id_lot"
-                                       name="lot"
-                                       value="{{ lot_id }}">
-
-                                <button style="margin-top: 5px;"
-                                        class="btn btn-primary pull-right"
-                                        id="next_btn"
-                                        disabled
-                                        type="submit">
-                                    Finalizar
-                                </button>
+                                {% for hidden in form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
                             </form>
-
-
-                            <form method="post" action="">
-
-                                {% csrf_token %}
-
-                                {% render_generic_field form.previous_step %}
-                                {% render_generic_field form.lot %}
-                                {% render_generic_field form.person %}
-
-
-
-                                <button class="btn btn-primary pull-left"
-                                        type="submit">
-                                    Voltar
-                                </button>
-
-                            </form>
-
-
                             </div>
-
-
                         </div>
 
 
