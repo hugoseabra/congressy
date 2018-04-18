@@ -90,6 +90,7 @@
                                                         btn-primary pull-right"
                                                         type="submit">
                                                     Próximo
+                                                    <i class="fas fa-chevron-circle-right"></i>
                                                 </button>
                                             </form>
 
@@ -100,6 +101,7 @@
                                         <a href="{% url 'public:hotsite' event.slug %}"
                                            class="btn btn-primary pull-left"
                                            style="margin-top: 5px;">
+                                            <i class="fas fa-chevron-circle-left"></i>
                                             Voltar
                                         </a>
 
@@ -123,4 +125,7 @@
 {% endblock %}
 
 
+{% block scripts %}
+
+{% endblock %}
 

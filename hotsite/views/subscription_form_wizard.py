@@ -190,8 +190,15 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         if step == 'payment':
 
             lot_data = self.storage.get_step_data('lot')
-
             lot = lot_data.get('lot-lots')
+
+            # Assert that we have a person in storage
+            if not hasattr(self.storage, 'person'):
+                person_data = self.storage.get_step_data('person')
+                person_email = person_data.get('person-email')
+
+                person = Person.objects.get(email=person_email)
+                self.storage.person = person
 
             try:
                 lot = Lot.objects.get(pk=lot, event=self.event)
@@ -204,6 +211,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             return self.initial_dict.get(step, {
                 'choosen_lot': lot,
                 'event': self.event,
+                'person': self.storage.person
             })
 
         return self.initial_dict.get(step, {})

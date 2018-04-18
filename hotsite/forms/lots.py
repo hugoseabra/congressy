@@ -11,12 +11,6 @@ from gatheros_subscription.models import Lot
 
 class LotsForm(forms.Form):
 
-    next_step = forms.IntegerField(
-        widget=forms.HiddenInput(),
-        required=False,
-        initial=2,
-    )
-
     coupon_code = forms.CharField(
         max_length=15,
         required=False,

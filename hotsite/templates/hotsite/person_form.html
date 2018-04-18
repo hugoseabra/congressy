@@ -204,12 +204,19 @@
                             {% endif %}
 
                             {% if wizard.steps.prev %}
-                                <button name="wizard_goto_step" type="submit"
-                                        value="{{ wizard.steps.first }}">first step</button>
-                                <button name="wizard_goto_step" type="submit"
-                                        value="{{ wizard.steps.prev }}">prev step</button>
+                                <button name="wizard_goto_step"
+                                        type="submit"
+                                        class="btn btn-primary"
+                                        value="{{ wizard.steps.prev }}">
+                                    <i class="fas fa-chevron-circle-left"></i>
+                                    Voltar
+                                </button>
                             {% endif %}
-                            <input type="submit" value="submit"/>
+
+                            <button type="submit" class="btn btn-primary pull-right">
+                                Próximo
+                                 <i class="fas fa-chevron-circle-right"></i>
+                            </button>
 
                         </div>
                     </form>

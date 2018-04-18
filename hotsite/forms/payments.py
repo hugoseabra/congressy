@@ -44,6 +44,7 @@ class PaymentForm(forms.Form):
 
         self.lot_instance = kwargs.get('initial').get('choosen_lot')
         self.event = kwargs.get('initial').get('event')
+        self.person = kwargs.get('initial').get('person')
 
         if not isinstance(self.lot_instance, Lot):
             try:
@@ -77,14 +78,14 @@ class PaymentForm(forms.Form):
 
         try:
             subscription = Subscription.objects.get(
-                person=self.storage.person,
+                person=self.person,
                 event=self.event
             )
         except Subscription.DoesNotExist:
             subscription = Subscription(
-                person=self.storage.person,
+                person=self.person,
                 event=self.event,
-                created_by=self.request.user.id
+                created_by=self.person.user.id
             )
 
         try:
@@ -92,7 +93,6 @@ class PaymentForm(forms.Form):
                 # Insere ou edita lote
                 subscription.lot = self.lot_instance
                 subscription.save()
-                self.storage.subscription = subscription
 
                 transaction_data = PagarmeTransactionInstanceData(
                     subscription=subscription,
