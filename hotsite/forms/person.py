@@ -3,22 +3,28 @@
     hotsite
 """
 
-from django import forms
+from django.utils.datastructures import MultiValueDictKeyError
 
 from gatheros_event.forms import PersonForm
+from gatheros_event.models import Person
 from gatheros_subscription.models import FormConfig, Lot
 
 
 class SubscriptionPersonForm(PersonForm):
-    coupon_code = forms.IntegerField(
-        widget=forms.HiddenInput(),
-        required=False,
-    )
 
     def __init__(self, is_chrome=False, **kwargs):
 
         self.lot = kwargs.get('initial').get('lot')
         self.event = kwargs.get('initial').get('event')
+
+        user = kwargs.get('initial').get('user')
+
+        if user:
+            try:
+                person = Person.objects.get(user=user)
+                kwargs.update({'instance': person})
+            except Person.DoesNotExist:
+                pass
 
         if not isinstance(self.lot, Lot):
             try:
@@ -63,3 +69,18 @@ class SubscriptionPersonForm(PersonForm):
 
         for field_name in required_fields:
             self.setAsRequired(field_name)
+
+    def clean_email(self):
+
+        if self.data.get('email') or self.initial.get('email'):
+            try:
+                email = self.data.get('email')
+                if not email:
+                    email = self.data.get('person-email')
+            except MultiValueDictKeyError:
+                email = self.initial.get('email')
+                if not email:
+                    email = self.data.get('person-email')
+            return email.lower()
+
+        return None

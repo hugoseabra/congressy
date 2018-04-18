@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -53,6 +54,16 @@ def has_survey(wizard):
 
 class SubscriptionWizardView(EventMixin, SessionWizardView):
     condition_dict = {'payment': is_paid_lot, 'survey': has_survey, }
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+        context['remove_preloader'] = True
+
+        if self.storage.current_step == 'payment':
+            context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
+
+        return context
 
     def get_template_names(self):
         return [TEMPLATES[self.steps.current]]
@@ -133,6 +144,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             return self.initial_dict.get(step, {
                 'lot': lot,
                 'event': self.event,
+                'user': self.request.user,
             })
 
         # get the data for step survey from  step lot
@@ -164,6 +176,11 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
             person = form.save()
+
+            if not person.user:
+                person.user = self.request.user
+
+            person.save()
             self.storage.person = person
 
         # Process payment subscriptions here:
