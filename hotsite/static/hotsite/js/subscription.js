@@ -55,105 +55,12 @@ function show_hide_payment_block(action) {
     }
 }
 
-var common_lots_content = null;
-
-function load_coupon() {
-    var url = $('#id_coupon_url');
-
-    if (!url) {
-        return;
-    }
-    url = url.val();
-    if (!url) {
-        return;
-    }
-
-    var coupon = $('#id_coupon');
-    if (!coupon) {
-        return;
-    }
-    coupon = coupon.val();
-    if (!coupon) {
-        return;
-    }
-
-    var button = $('#button_coupon');
-    button.addClass('disabled').attr('disabled', 'disabled').text('Aguarde...');
-
-    var lot_fields = $('#lots-field');
-    common_lots_content = lot_fields.html();
-
-    send(
-        url,
-        'POST',
-        {'coupon': coupon},
-        function (response) {
-            lot_fields.html(response);
-
-            var lot = $('#id_lot');
-            lot.on('change', function () {
-                var id = $(this).val();
-                console.log(id);
-
-                if (!id) {
-                    show_hide_payment_block(false);
-                } else {
-                    if (!amounts.hasOwnProperty(id)) {
-                        show_hide_payment_block(false);
-                    } else {
-                        $('#id_amount').val(amounts[id]);
-                        show_hide_payment_block(true);
-                    }
-                }
-                hide_payment_elements();
-            });
-
-            window.setTimeout(function () {
-
-                lot.trigger('change');
-                start_popover();
-            }, 300);
-        },
-        function () {
-            button.removeClass('disabled').removeAttr('disabled').text('Enviar');
-            $('#id_coupon').val('');
-            alert('Cupom inválido.');
-
-            var lot = $('#id_lot');
-            lot.on('change', function () {
-                var id = $(this).val();
-                console.log(id);
-
-                if (!id) {
-                    show_hide_payment_block(false);
-                } else {
-                    if (!amounts.hasOwnProperty(id)) {
-                        show_hide_payment_block(false);
-                    } else {
-                        $('#id_amount').val(amounts[id]);
-                        show_hide_payment_block(true);
-                    }
-                }
-                hide_payment_elements();
-            });
-
-            window.setTimeout(function () {
-
-                lot.trigger('change');
-                start_popover();
-            }, 300);
-        }
-    );
-
-    $('#coupon_link').popover('hide');
-}
-
 function fetch_cities(uf_el, selected_value, callback) {
     uf_el = $(uf_el);
     selected_value = selected_value || '';
     callback = callback || null;
 
-    var city_el = $('#id_city_name');
+    var city_el = $('#id_person-city_name');
     $.ajax({
         url: "/api/cities/?uf=" + $(uf_el).val() + '&length=1000',
         success: function (result) {
@@ -169,10 +76,10 @@ function fetch_cities(uf_el, selected_value, callback) {
             if (selected_value) {
                 window.setTimeout(function () {
                     city_el.val(selected_value);
-                    $("#id_city").val(selected_value);
+                    $("#id_person-city").val(selected_value);
                 }, 500);
             } else {
-                $("#id_city").val(ids[0]);
+                $("#id_person-city").val(ids[0]);
             }
 
             city_el.html(listitems.join(''));
@@ -181,9 +88,94 @@ function fetch_cities(uf_el, selected_value, callback) {
             if (callback) {
                 callback(result.results)
             }
+        },
+        error: function (err) {
+            throw err;
         }
     });
 }
+
+function repopulate_cities(uf_el, selected_value, callback) {
+    selected_value = selected_value || '';
+
+    city_el = $('#id_city_name');
+
+
+    $.ajax({
+        url: "/api/cities/?uf=" + uf_el + '&length=1000',
+        success: function (result) {
+
+            var listitems = [];
+            var ids = [];
+
+            $.each(result.results, function (key, value) {
+                listitems.push('<option value=' + value.id + '>' + value.name + '</option>');
+                ids.push(value.id)
+            });
+
+            if (selected_value) {
+                window.setTimeout(function () {
+                    city_el.val(selected_value);
+                    city_el.val(selected_value);
+                }, 500);
+            } else {
+                city_el.val(ids[0]);
+            }
+
+            city_el.html(listitems.join(''));
+            city_el.prop('disabled', false);
+
+            if (callback) {
+                callback(result.results)
+            }
+        },
+        error: function (err) {
+            throw err;
+        }
+    });
+}
+
+function hotsiteRepopulate_cities(uf_el, selected_value, callback) {
+    selected_value = selected_value || '';
+
+    city_el = $('#id_person-city_name');
+
+
+    $.ajax({
+        url: "/api/cities/?uf=" + uf_el + '&length=1000',
+        success: function (result) {
+
+            var listitems = [];
+            var ids = [];
+
+            $.each(result.results, function (key, value) {
+                listitems.push('<option value=' + value.id + '>' + value.name + '</option>');
+                ids.push(value.id)
+            });
+
+            if (selected_value) {
+                window.setTimeout(function () {
+                    city_el.val(selected_value);
+                    city_el.val(selected_value);
+                }, 500);
+            } else {
+                city_el.val(ids[0]);
+            }
+
+            city_el.html(listitems.join(''));
+            city_el.prop('disabled', false);
+
+            if (callback) {
+                callback(result.results)
+            }
+        },
+        error: function (err) {
+            throw err;
+        }
+    });
+}
+
+
 
 function start_popover() {
     $('[data-toggle="popover"]').popover({
@@ -197,18 +189,18 @@ function start_popover() {
 (function ($) {
     $(document).ready(function () {
         window.setTimeout(function () {
-            $('#id_phone').mask("(99) 99999-9999");
-            $('#id_cpf').mask("999.999.999-99");
+            $('#id_person-phone').mask("(99) 99999-9999");
+            $('#id_person-cpf').mask("999.999.999-99");
             start_popover();
 
-            var institution_cnpj = $('#id_institution_cnpj');
+            var institution_cnpj = $('#id_person-institution_cnpj');
             if (institution_cnpj.length) {
                 institution_cnpj.mask("99.999.999/9999-99");
             }
 
-            var city_el = $('#id_city_name');
+            var city_el = $('#id_person-city_name');
 
-            $('#id_state').change(function () {
+            $('#id_person-state').change(function () {
                 city_el.empty();
 
                 var that = $(this);
@@ -219,11 +211,11 @@ function start_popover() {
             });
 
             city_el.change(function () {
-                $("#id_city").val($(this).val());
+                $("#id_person-city").val($(this).val());
             });
 
-            $('#id_zip_code').on('keyup', function () {
-                searchByCep();
+            $('#id_person-zip_code').on('keyup', function () {
+                hotsiteSearchByCep();
             });
 
         }, 350);

@@ -67,6 +67,24 @@ function showHideCepLoader(show) {
     }
 }
 
+function hotsiteShowHideCepLoader(show) {
+
+    var cep_el = $('#id_person-zip_code');
+    if (!cep_el.length) {
+        return;
+    }
+    var el = $('#cep_loader');
+    if (show === true) {
+        el.fadeIn();
+        cep_el.attr('disabled', 'disabled').addClass('disabled');
+        cep_el.css('background-color', '#fff');
+    } else {
+        el.fadeOut();
+        cep_el.removeAttr('disabled').removeClass('disabled');
+        cep_el.removeAttr('style');
+    }
+}
+
 /**
  * Remove acentos de strings
  * @param  {String} string acentuada
@@ -200,6 +218,89 @@ function searchByCep() {
         }, 100);
     });
 }
+
+function hotsiteSearchByCep() {
+
+    var zip_code_el = $('#id_person-zip_code');
+    var zip_code_initial_value = zip_code_el.val();
+
+
+    var el = $('#id_person-zip_code');
+    var cep = el.val().replace(/\D/g, '');
+
+    if (cep.length < 8) {
+        return;
+    }
+
+    zip_code_initial_value = cep;
+
+    //Expressão regular para validar o CEP.
+    var validacep = /^[0-9]{8}$/;
+
+    //Valida o formato do CEP.
+    if (!validacep.test(cep)) {
+        alert("Formato de CEP inválido.");
+        showHideCepLoader(false);
+        window.setTimeout(function () {
+            $('#id_person-zip_code').focus();
+        }, 100);
+        return;
+    }
+
+    var street = $('#id_person-street');
+    var number = $('#id_person-number');
+    var complement = $('#id_person-complement');
+    var village = $('#id_person-village');
+    var state = $('#id_person-state');
+    var city = $('#id_person-city');
+
+    street.val('');
+    number.val('');
+    complement.val('');
+    village.val('');
+    // city.val('');
+
+    var url = "https://viacep.com.br/ws/" + cep + "/json/?callback=?";
+
+    //Consulta o webservice viacep.com.br/
+    hotsiteShowHideCepLoader(true);
+    console.log('going to fetch CEP')
+    $.getJSON(url, function (response) {
+
+
+
+        if ('erro' in response) {
+            alert("CEP não encontrado.");
+            hotsiteSearchByCep(false);
+            window.setTimeout(function () {
+                $('#id_person-zip_code').focus();
+            }, 100);
+            return;
+        }
+
+        street.val(response.logradouro);
+        village.val(response.bairro);
+        state.val(response.uf);
+
+        var cep_city = removerAcentos(response.localidade).toUpperCase();
+
+        fetch_cities(state, null, function (cities) {
+            $.each(cities, function (i, city) {
+                if (cep_city === removerAcentos(city.name)) {
+                    $('#id_person-city_name').val(city.id);
+                    $('#id_person-city').val(city.id);
+                }
+            });
+        });
+
+        hotsiteShowHideCepLoader(false);
+        window.setTimeout(function () {
+            $('#id_person-street').focus();
+        }, 100);
+    });
+}
+
+
 
 (function ($) {
 //========================= MOBILE TOP MENU =================================//

@@ -62,6 +62,7 @@
         <div class="form-validation alert"></div>
 
         {% if is_subscribed %}
+
             <div class="text-center">
                 <p style="font-size: 18px">
                     Você já está inscrito(a) neste evento.
@@ -81,7 +82,10 @@
                        aria-hidden="true"></i>
                 </div>
             </div>
+
         {% else %}
+
+
             {% if not person or not person.email or not person.name or not person.phone %}
                 <p class="text-muted">
                     Preencha os dados seguintes para inicar sua inscrição.
