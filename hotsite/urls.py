@@ -6,7 +6,7 @@ from . import views
 
 public_hotsite_urls = [
     url(r'^(?P<slug>[\w-]+)/$', views.HotsiteView.as_view(), name='hotsite'),
-    url(r'^(?P<slug>[\w-]+)/beta-subscription/$',
+    url(r'^(?P<slug>[\w-]+)/subscription/$',
         views.SubscriptionWizardView.as_view(FORMS),
         name='hotsite-subscription'),
     url(r'^(?P<slug>[\w-]+)/subscription/status/$',

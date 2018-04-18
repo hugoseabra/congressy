@@ -6,7 +6,8 @@ from django.urls import reverse_lazy
 from formtools.wizard.views import SessionWizardView
 
 from gatheros_event.models import Person
-from gatheros_subscription.models import Lot, Subscription
+from gatheros_subscription.models import Lot, \
+    Subscription
 from hotsite import forms
 from hotsite.views.mixins import EventMixin
 from survey.directors import SurveyDirector
@@ -101,41 +102,36 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             person = Person.objects.get(email=person_email)
             self.storage.person = person
 
-        # If we already have a subscription in storage, if this is the case,
-        # then it was created by the payment step.
-        if not hasattr(self.storage, 'subscription'):
+        lot_data = self.storage.get_step_data('lot')
+        lot = lot_data.get('lot-lots', '')
 
-            lot_data = self.storage.get_step_data('lot')
-            lot = lot_data.get('lot-lots', '')
-
-            # Get a lot object.
-            if not isinstance(lot, Lot):
-                try:
-                    lot = Lot.objects.get(pk=lot, event=self.event)
-                except Lot.DoesNotExist:
-                    message = 'Não foi possivel resgatar um Lote ' \
-                              'a partir das referencias: lot<{}> e evento<{}>.' \
-                        .format(lot, self.event)
-                    raise TypeError(message)
-
-            subscription = None
-
+        # Get a lot object.
+        if not isinstance(lot, Lot):
             try:
-                subscription = Subscription.objects.get(
-                    person=self.storage.person,
-                    event=self.event
-                )
-            except Subscription.DoesNotExist:
-                subscription = Subscription(
-                    person=self.storage.person,
-                    event=self.event,
-                    created_by=self.request.user.id
-                )
+                lot = Lot.objects.get(pk=lot, event=self.event)
+            except Lot.DoesNotExist:
+                message = 'Não foi possivel resgatar um Lote ' \
+                          'a partir das referencias: lot<{}> e evento<{}>.' \
+                    .format(lot, self.event)
+                raise TypeError(message)
 
-            # Insere ou edita lote
-            subscription.lot = lot
-            subscription.save()
-            self.storage.subscription = subscription
+        subscription = None
+
+        try:
+            subscription = Subscription.objects.get(
+                person=self.storage.person,
+                event=self.event
+            )
+        except Subscription.DoesNotExist:
+            subscription = Subscription(
+                person=self.storage.person,
+                event=self.event,
+                created_by=self.request.user.id
+            )
+
+        # Insere ou edita lote
+        subscription.lot = lot
+        subscription.save()
 
         subscription = self.storage.subscription
 
@@ -261,9 +257,5 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             else:
                 raise Exception('SurveyForm was invalid: {}'.format(
                     survey_form.errors))
-
-        # Persisting payments
-        if isinstance(form, forms.PaymentForm):
-            print('sad')
 
         return form_data

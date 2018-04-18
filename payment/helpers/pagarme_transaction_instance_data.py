@@ -16,10 +16,11 @@ CONGRESSY_RECIPIENT_ID = settings.PAGARME_RECIPIENT_ID
 class PagarmeTransactionInstanceData:
     # @TODO add international phone number capability
 
-    def __init__(self, lot, person, extra_data, event):
+    def __init__(self, subscription, extra_data, event):
 
-        self.lot = lot
-        self.person = person
+        self.subscription = subscription
+        self.lot = subscription.lot
+        self.person = subscription.person
         self.extra_data = extra_data
         self.event = event
 

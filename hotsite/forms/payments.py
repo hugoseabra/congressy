@@ -2,10 +2,18 @@
     Formulário usado para pegar os dados de pagamento
 """
 
+import json
+
 from django import forms
 from django.core import serializers
-from gatheros_subscription.models import Lot
-import json
+from django.db import transaction
+from django.forms import ValidationError
+
+from gatheros_subscription.models import Lot, \
+    Subscription
+from payment.exception import TransactionError
+from payment.helpers import PagarmeTransactionInstanceData
+from payment.tasks import create_pagarme_transaction
 
 
 class PaymentForm(forms.Form):
@@ -39,7 +47,8 @@ class PaymentForm(forms.Form):
 
         if not isinstance(self.lot_instance, Lot):
             try:
-                self.lot_instance = Lot.objects.get(pk=self.lot_instance, event=self.event)
+                self.lot_instance = Lot.objects.get(pk=self.lot_instance,
+                                                    event=self.event)
             except Lot.DoesNotExist:
                 message = 'Não foi possivel resgatar um Lote ' \
                           'a partir das referencias: lot<{}> e evento<{}>.' \
@@ -59,3 +68,57 @@ class PaymentForm(forms.Form):
         lot_obj_as_json = json.dumps(json_obj)
 
         self.fields['lot_as_json'].initial = lot_obj_as_json
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        subscription = None
+
+        try:
+            subscription = Subscription.objects.get(
+                person=self.storage.person,
+                event=self.event
+            )
+        except Subscription.DoesNotExist:
+            subscription = Subscription(
+                person=self.storage.person,
+                event=self.event,
+                created_by=self.request.user.id
+            )
+
+        try:
+            with transaction.atomic():
+                # Insere ou edita lote
+                subscription.lot = self.lot_instance
+                subscription.save()
+                self.storage.subscription = subscription
+
+                transaction_data = PagarmeTransactionInstanceData(
+                    subscription=subscription,
+                    extra_data=cleaned_data,
+                    event=self.event
+                )
+
+                create_pagarme_transaction(
+                    transaction_data=transaction_data,
+                    subscription=subscription
+                )
+
+        except TransactionError as e:
+            error_dict = {
+                'No transaction type': \
+                    'Por favor escolher uma forma de pagamento.',
+                'Transaction type not allowed': \
+                    'Forma de pagamento não permitida.',
+                'Organization has no bank account': \
+                    'Organização não está podendo receber pagamentos no'
+                    ' momento.',
+                'No organization': 'Evento não possui organizador.',
+            }
+            if e.message in error_dict:
+                e.message = error_dict[e.message]
+
+            raise ValidationError({'transaction': e.message})
+
+        return cleaned_data
