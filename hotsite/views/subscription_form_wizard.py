@@ -3,6 +3,7 @@ from formtools.wizard.views import SessionWizardView
 from django.http import HttpResponseRedirect
 from hotsite.views.mixins import EventMixin
 from hotsite import forms
+from gatheros_subscription.models import Lot
 
 
 FORMS = [("lot", forms.LotsForm),
@@ -22,14 +23,16 @@ def is_paid_lot(wizard):
     # Return true if lot has price and price > 0
     lot = cleaned_data['lot']
 
-    return True if lot and lot.price > 0 else False
+    if isinstance(lot, Lot):
+        if lot.price and lot.price > 0:
+            return True
+
+    return False
 
 
 class SubscriptionWizardView(EventMixin, SessionWizardView):
 
     condition_dict = {'payment': is_paid_lot}
-
-
 
     def get_template_names(self):
         return [TEMPLATES[self.steps.current]]
@@ -42,11 +45,10 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             # steps are named 'step1', 'step2', 'step3'
             current_step = self.storage.current_step
 
+            if step == 'lot':
+                return self.initial_dict.get(step, {'event': self.event})
+
             # get the data for step 1 on step 3
-
-
-
-
             if current_step == 'step3':
                 prev_data = self.storage.get_step_data('step1')
                 some_var = prev_data.get('step1-some_var', '')

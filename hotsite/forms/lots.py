@@ -25,6 +25,7 @@ class LotsForm(forms.Form):
 
     def __init__(self, **kwargs):
 
+        self.event = kwargs.get('initial').get('event')
         super().__init__(**kwargs)
 
         self.fields['lots'] = forms.ModelChoiceField(
