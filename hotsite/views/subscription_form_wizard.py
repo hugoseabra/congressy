@@ -9,10 +9,12 @@ from hotsite.views.mixins import EventMixin
 
 FORMS = [("lot", forms.LotsForm),
          ("person", forms.SubscriptionPersonForm),
+         ("survey", forms.SurveyForm),
          ("payment", forms.PaymentForm)]
 
 TEMPLATES = {"lot": "hotsite/lot_form.html",
              "person": "hotsite/person_form.html",
+             "survey": "hotsite/survey_form.html",
              "payment": "hotsite/payment_form.html"}
 
 
@@ -32,8 +34,25 @@ def is_paid_lot(wizard):
     return False
 
 
+def has_survey(wizard):
+    """ Return true if user opts for a lot with survey"""
+
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+
+    # Return true if lot has price and price > 0
+    lot = cleaned_data['lots']
+
+    if isinstance(lot, Lot):
+
+        if lot.event_survey:
+            return True
+
+    return False
+
+
 class SubscriptionWizardView(EventMixin, SessionWizardView):
-    condition_dict = {'payment': is_paid_lot}
+    condition_dict = {'payment': is_paid_lot, 'survey': has_survey, }
 
     def get_template_names(self):
         return [TEMPLATES[self.steps.current]]
@@ -97,9 +116,9 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 }))
 
         return HttpResponseRedirect(reverse_lazy(
-                'public:hotsite', kwargs={
-                    'slug': self.event.slug,
-                }))
+            'public:hotsite', kwargs={
+                'slug': self.event.slug,
+            }))
 
     # this runs for the step it's on as well as for the step before
     def get_form_initial(self, step):
@@ -114,6 +133,26 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             return self.initial_dict.get(step, {
                 'lot': lot,
                 'event': self.event,
+            })
+
+        # get the data for step survey from  step lot
+        if step == 'survey':
+            prev_data = self.storage.get_step_data('lot')
+
+            lot = prev_data.get('lot-lots')
+
+            try:
+                lot = Lot.objects.get(pk=lot, event=self.event)
+            except Lot.DoesNotExist:
+                message = 'Não foi possivel resgatar um Lote ' \
+                          'a partir das referencias: lot<{}> e evento<{}>.' \
+                    .format(lot, self.event)
+                raise TypeError(message)
+
+            return self.initial_dict.get(step, {
+                'event_survey': lot.event_survey,
+                'event': self.event,
+                'user': self.request.user,
             })
 
         return self.initial_dict.get(step, {})
@@ -131,5 +170,3 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         # Create a subscription if the payment works, else re-render the step.
 
         return form_data
-
-
