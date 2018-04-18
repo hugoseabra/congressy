@@ -6,9 +6,9 @@ function hide_payment_elements() {
     $('#next_btn').attr("disabled", true);
     $('#id_button_pay').show();
 
-    $('#id_card_hash').val('');
-    $('#id_installments').val('');
-    $('#id_transaction_type').val('');
+    $('#id_payment-card_hash').val('');
+    $('#id_payment-installments').val('');
+    $('#id_payment-transaction_type').val('');
 }
 
 function normalize_amount_as_payment(amount) {
@@ -34,10 +34,10 @@ function process_payment(
     }
 
     var billing_title = 'Inscrição do evento: ' + event_name;
-    var amount = normalize_amount_as_payment($('#id_amount').val());
+    var amount = normalize_amount_as_payment($('#id_payment-amount').val());
 
-    var lot_id = $('#id_lot').val().toString();
-    var lot = lots[lot_id];
+
+    var lot = JSON.parse($('#id_payment-lot_as_json').val());
     var allow_installment = lot.allow_installment === true;
     var installment_limit = lot.installment_limit;
     var free_installment = parseInt(lot.free_installment);
@@ -68,10 +68,10 @@ function process_payment(
         $('#payment_buttons').show();
         $('#id_button_pay').hide();
         $('#id_remove').show();
-        $('#id_transaction_type').val(data.payment_method);
-        $('#id_amount').val(data.amount);
-        $('#id_card_hash').val(data.card_hash);
-        $('#id_installments').val(data.installments);
+        $('#id_payment-transaction_type').val(data.payment_method);
+        $('#id_payment-amount').val(data.amount);
+        $('#id_payment-card_hash').val(data.card_hash);
+        $('#id_payment-installments').val(data.installments);
     }
 
     function handleError(data) {
@@ -171,10 +171,10 @@ function process_single_lot_payment(
         $('#id_button_pay').hide();
         $('#id_remove').show();
         $('#next_btn').attr("disabled", false);
-        $('#id_transaction_type').val(data.payment_method);
-        $('#id_amount').val(data.amount);
-        $('#id_card_hash').val(data.card_hash);
-        $('#id_installments').val(data.installments);
+        $('#id_payment-transaction_type').val(data.payment_method);
+        $('#id_payment-amount').val(data.amount);
+        $('#id_payment-card_hash').val(data.card_hash);
+        $('#id_payment-installments').val(data.installments);
     }
 
     function handleError(data) {

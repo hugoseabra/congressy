@@ -5,7 +5,6 @@
 
     {% include 'hotsite/includes/2_cover_no_form.html' %}
 
-
     <!-- FORM
 ================================= -->
     <section id="about" class="about-section section">
@@ -48,6 +47,16 @@
                                 </div>
                                 {% endif %}
                             {% endblock messages %}
+
+                            {% if form.non_field_errors %}
+                                {% render_errors form.non_field_errors %}
+                            {% endif %}
+
+                            {% for field in form.hidden_fields   %}
+                                {% if field.error %}
+                                    {% render_errors field.error %}
+                                {% endif %}
+                            {% endfor %}
 
                             <div id="payment_buttons" class="text-center"
                                  style="display: none">
@@ -94,6 +103,20 @@
                                 {% for hidden in form.hidden_fields %}
                                     {{ hidden }}
                                 {% endfor %}
+
+                                {% if wizard.steps.prev %}
+                                    <button name="wizard_goto_step"
+                                            type="submit"
+                                            value="{{ wizard.steps.first }}">
+                                        first step
+                                    </button>
+                                    <button name="wizard_goto_step"
+                                            type="submit"
+                                            value="{{ wizard.steps.prev }}">prev
+                                        step
+                                    </button>
+                                {% endif %}
+                                <input type="submit" value="submit"/>
                             </form>
                             </div>
                         </div>
@@ -104,14 +127,7 @@
             </div>
     </section>
 
-
-
-
-
 {% endblock %}
-
-
-
 
 {% block scripts %}
     <!-- SCRIPT Payment -->
@@ -123,7 +139,7 @@
 
         $(document).ready(function () {
 
-            var lot = JSON.parse($('#id_lot_as_json').val());
+            var lot = JSON.parse($('#id_payment-lot_as_json').val());
 
             $('#id_button_pay').on('click', function () {
                 process_single_lot_payment(
@@ -138,5 +154,3 @@
 
     </script>
 {% endblock %}
-
-

@@ -206,7 +206,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 raise TypeError(message)
 
             return self.initial_dict.get(step, {
-                'lot': lot,
+                'choosen_lot': lot,
                 'event': self.event,
             })
 
@@ -263,5 +263,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                     survey_form.errors))
 
         # Persisting payments
+        if isinstance(form, forms.PaymentForm):
+            print('sad')
 
         return form_data
