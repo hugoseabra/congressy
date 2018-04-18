@@ -1,12 +1,13 @@
 """ Urls do hotsite """
 from django.conf.urls import include, url
 
+from hotsite.views.subscription_form_wizard import FORMS
 from . import views
 
 public_hotsite_urls = [
     url(r'^(?P<slug>[\w-]+)/$', views.HotsiteView.as_view(), name='hotsite'),
     url(r'^(?P<slug>[\w-]+)/beta-subscription/$',
-        views.SubscriptionFormWizard.as_view(),
+        views.SubscriptionWizardView.as_view(FORMS),
         name='hotsite-subscription'),
     url(r'^(?P<slug>[\w-]+)/subscription/status/$',
         views.SubscriptionStatusView.as_view(),

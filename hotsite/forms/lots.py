@@ -11,13 +11,6 @@ from gatheros_subscription.models import Lot
 
 class LotsForm(forms.Form):
 
-    event = None
-
-    current_step = forms.IntegerField(
-        widget=forms.HiddenInput(),
-        initial=1
-    )
-
     next_step = forms.IntegerField(
         widget=forms.HiddenInput(),
         required=False,
@@ -30,12 +23,7 @@ class LotsForm(forms.Form):
         label="Código de Cupom"
     )
 
-    def __init__(self, event, post_data=None, **kwargs):
-
-        self.event = event
-
-        if post_data:
-            kwargs.update({'initial': post_data})
+    def __init__(self, **kwargs):
 
         super().__init__(**kwargs)
 
@@ -48,6 +36,7 @@ class LotsForm(forms.Form):
             empty_label="- Selecione -",
             required=True
         )
+
         self.order_fields(['lots', 'coupon_code', 'next_step'])
 
 
