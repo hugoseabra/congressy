@@ -133,7 +133,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         subscription.lot = lot
         subscription.save()
 
-        subscription = self.storage.subscription
+        self.storage.subscription = subscription
 
         messages.success(
             self.request,
