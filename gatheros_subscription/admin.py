@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import (
+    EventSurvey,
     LotCategory,
     Lot,
     Subscription,
@@ -42,6 +43,7 @@ class LotAdmin(admin.ModelAdmin):
                 'limit',
                 'private',
                 'internal',
+                'event_survey',
             ),
         }),
         ('Preços e Formas de recebimento', {
@@ -56,6 +58,15 @@ class LotAdmin(admin.ModelAdmin):
             ),
         }),
     )
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        path = request.META['PATH_INFO']
+        if db_field.name == "event_survey" and 'change' in path:
+            lot_id = request.META['PATH_INFO'].split('/')[-3]
+            lot = Lot.objects.get(pk=int(lot_id))
+            kwargs["queryset"] = EventSurvey.objects.filter(event=lot.event)
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_percent_completed(self, instance):
         if not instance.limit:
