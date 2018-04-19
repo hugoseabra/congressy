@@ -85,6 +85,21 @@
                                                     {% render_generic_field field %}
                                                 {% endfor %}
 
+                                                {% if has_coupon %}
+                                                    <div class="col-md-6 text-right small"
+                                                         style="margin-top: 8px;">
+                                                        <a id="coupon_link"
+                                                           href="javascript:void(0)"
+                                                           data-toggle="popover"
+                                                           title="<strong>Informe o código</strong>"
+                                                           data-html="true"
+                                                           data-container="body"
+                                                           data-content="{% include 'hotsite/includes/coupon.html' %}">
+                                                            Possui cupom?
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+
                                                 <button style="margin-top: 5px;"
                                                         class="btn
                                                         btn-primary pull-right"

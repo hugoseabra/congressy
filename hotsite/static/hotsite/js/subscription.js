@@ -176,6 +176,66 @@ function hotsiteRepopulate_cities(uf_el, selected_value, callback) {
 }
 
 
+var common_lots_content = null;
+
+function load_coupon() {
+    var url = $('#id_coupon_url');
+
+    if (!url) {
+        return;
+    }
+    url = url.val();
+    if (!url) {
+        return;
+    }
+
+    var coupon = $('#id_coupon');
+    if (!coupon) {
+        return;
+    }
+    coupon = coupon.val();
+    if (!coupon) {
+        return;
+    }
+
+    var button = $('#button_coupon');
+    button.addClass('disabled').attr('disabled', 'disabled').text('Aguarde...');
+
+    var lot_fields = $('#lots-field');
+    common_lots_content = lot_fields.html();
+
+    send(
+        url,
+        'POST',
+        {'coupon': coupon},
+        function (response) {
+            lot_fields.html(response);
+
+            var lot = $('#id_lot');
+            console.log(lot);
+
+            window.setTimeout(function () {
+
+                lot.trigger('change');
+                start_popover();
+            }, 300);
+        },
+        function () {
+            button.removeClass('disabled').removeAttr('disabled').text('Enviar');
+            $('#id_coupon').val('');
+            alert('Cupom inválido.');
+            var lot = $('#id_lot');
+            console.log(lot);
+            window.setTimeout(function () {
+                lot.trigger('change');
+                start_popover();
+            }, 300);
+        }
+    );
+
+    $('#coupon_link').popover('hide');
+}
+
 
 function start_popover() {
     $('[data-toggle="popover"]').popover({
