@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django import forms
 
 from core.forms import PriceInput, SplitDateTimeWidget
-from gatheros_subscription.models import Lot, EventSurvey
+from gatheros_subscription.models import LotCategory, Lot, EventSurvey
 
 INSTALLMENT_CHOICES = (
     (2, 2),
@@ -28,19 +28,15 @@ class LotForm(forms.ModelForm):
         model = Lot
         fields = [
             'event',
+            'category',
             'name',
             'date_start',
             'date_end',
-            'rsvp_restrict',
-            'limit',
             'price',
-            'private',
-            'exhibition_code',
             'transfer_tax',
             'allow_installment',
             'installment_limit',
             'num_install_interest_absortion',
-            'event_survey',
         ]
 
         widgets = {
@@ -56,27 +52,16 @@ class LotForm(forms.ModelForm):
             ),
         }
 
-    def __init__(self, lang='pt-br', **kwargs):
-        self.lang = lang
-
-        self.event = kwargs.get('initial').get('event')
-
-        instance = kwargs.get('instance')
-        if not instance or instance and not instance.exhibition_code:
-            initial = kwargs.get('initial', {})
-            initial.update(
-                {'exhibition_code': Lot.objects.generate_promo_code()}
-            )
-            kwargs['initial'] = initial
-
+    def __init__(self, **kwargs):
         super(LotForm, self).__init__(**kwargs)
 
-        self.fields['event_survey'] = forms.ModelChoiceField(
-            queryset=EventSurvey.objects.filter(event=self.event),
-            label='Selecione um questionário',
-            required=False,
+        initial = kwargs.get('initial')
+        event_pk = initial.get('event')
+
+        self.fields['category'] = forms.ModelChoiceField(
+            queryset=LotCategory.objects.filter(event_id=event_pk),
+            label='Categoria',
         )
-        self.fields['event_survey'].empty_label = '- Selecione -'
 
         if self.instance.pk and self.instance.subscriptions.count() > 0:
             self.fields['price'].widget.attrs['disabled'] = 'disabled'
@@ -113,8 +98,3 @@ class LotForm(forms.ModelForm):
 
         return price
 
-    def clean_exhibition_code(self):
-        code = self.cleaned_data.get('exhibition_code')
-        if code:
-            code = ''.join(code.split()).upper()
-        return code

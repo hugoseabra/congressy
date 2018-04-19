@@ -19,7 +19,7 @@ class LotCategory(models.Model, GatherosModelMixin):
         related_name='lot_categories'
     )
 
-    name = models.CharField(max_length=255, verbose_name='nome')
+    name = models.CharField(max_length=50, verbose_name='nome')
     active = models.BooleanField(default=True, verbose_name='ativo')
     description = models.TextField(
         blank=True,

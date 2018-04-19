@@ -214,13 +214,17 @@ class Lot(models.Model, GatherosModelMixin):
         help_text='Somente associados podem se inscrever neste lote.'
     )
 
+    active = models.BooleanField(
+        default=True,
+        verbose_name='ativo',
+    )
+
     objects = LotManager()
 
     class Meta:
         verbose_name = 'lote'
         verbose_name_plural = 'lotes'
         ordering = ['date_start', 'date_end', 'pk', 'name']
-        unique_together = (("name", "event"),)
 
     @property
     def percent_completed(self):
