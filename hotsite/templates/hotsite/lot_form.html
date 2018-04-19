@@ -76,54 +76,52 @@
                                     <div class="col-md-12">
 
 
-                                        <div style="margin-bottom: 20px"
-                                             id="lots-field">
-                                            {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+                                        {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
 
-                                                <form method="post" action="">
+                                            <form method="post" action="">
 
-                                                    {% csrf_token %}
-                                                    {{ wizard.management_form }}
-
+                                                {% csrf_token %}
+                                                {{ wizard.management_form }}
+                                                <div id="lots-field">
                                                     {% for field in form %}
                                                         {% render_generic_field field %}
                                                     {% endfor %}
+                                                </div>
 
-                                                    {% if has_coupon %}
-                                                        <div class="text-right small"
-                                                             style="margin-top: 8px;">
-                                                            <a id="coupon_link"
-                                                               href="javascript:void(0)"
-                                                               data-toggle="popover"
-                                                               title="<strong>Informe o código</strong>"
-                                                               data-html="true"
-                                                               data-container="body"
-                                                               data-content="{% include 'hotsite/includes/coupon.html' %}">
-                                                                Possui cupom?
-                                                            </a>
-                                                        </div>
+                                                {% if has_coupon %}
+                                                    <div class="text-right small"
+                                                         style="margin-top: 8px;">
+                                                        <a id="coupon_link"
+                                                           href="javascript:void(0)"
+                                                           data-toggle="popover"
+                                                           title="<strong>Informe o código</strong>"
+                                                           data-html="true"
+                                                           data-container="body"
+                                                           data-content="{% include 'hotsite/includes/coupon.html' %}">
+                                                            Possui cupom?
+                                                        </a>
+                                                    </div>
 
-                                                    {% endif %}
-                                                    <a href="{% url 'public:hotsite' event.slug %}"
-                                                       class="btn btn-primary pull-left"
-                                                       style="margin-top: 5px;">
-                                                        <i class="fas fa-chevron-circle-left"></i>
-                                                        Voltar
-                                                    </a>
-                                                    <button style="margin-top: 5px;"
-                                                            class="btn
+                                                {% endif %}
+                                                <a href="{% url 'public:hotsite' event.slug %}"
+                                                   class="btn btn-primary pull-left"
+                                                   style="margin-top: 5px;">
+                                                    <i class="fas fa-chevron-circle-left"></i>
+                                                    Voltar
+                                                </a>
+                                                <button style="margin-top: 5px;"
+                                                        class="btn
                                                         btn-primary pull-right"
-                                                            type="submit">
-                                                        Próximo
-                                                        <i class="fas fa-chevron-circle-right"></i>
-                                                    </button>
-                                                </form>
+                                                        type="submit">
+                                                    Próximo
+                                                    <i class="fas fa-chevron-circle-right"></i>
+                                                </button>
+                                            </form>
 
 
-                                            {% else %}
-                                                Evento não possui lotes.
-                                            {% endif %}
-                                        </div>
+                                        {% else %}
+                                            Evento não possui lotes.
+                                        {% endif %}
 
 
                                     </div>
