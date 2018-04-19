@@ -210,8 +210,9 @@ function load_coupon() {
         {'coupon': coupon},
         function (response) {
             lot_fields.html(response);
+            console.log(response);
 
-            var lot = $('#id_lot');
+            var lot = $('#id_lot-lots');
             console.log(lot);
 
             window.setTimeout(function () {
@@ -224,7 +225,7 @@ function load_coupon() {
             button.removeClass('disabled').removeAttr('disabled').text('Enviar');
             $('#id_coupon').val('');
             alert('Cupom inválido.');
-            var lot = $('#id_lot');
+            var lot = $('#id_lot-lots');
             console.log(lot);
             window.setTimeout(function () {
                 lot.trigger('change');
