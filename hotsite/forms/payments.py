@@ -119,6 +119,6 @@ class PaymentForm(forms.Form):
                 if e.message in error_dict:
                     e.message = error_dict[e.message]
 
-                raise ValidationError({'transaction': e.message})
+                raise ValidationError(e.message)
 
         return cleaned_data
