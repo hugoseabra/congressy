@@ -83,26 +83,30 @@
                                                 {% csrf_token %}
                                                 {{ wizard.management_form }}
                                                 <div id="lots-field">
+                                                </div>
+                                                <div id="original-lots-field">
                                                     {% for field in form %}
                                                         {% render_generic_field field %}
                                                     {% endfor %}
+
+
+                                                    {% if has_coupon %}
+                                                        <div class="text-right small"
+                                                             style="margin-top: 8px;">
+                                                            <a id="coupon_link"
+                                                               href="javascript:void(0)"
+                                                               data-toggle="popover"
+                                                               title="<strong>Informe o código</strong>"
+                                                               data-html="true"
+                                                               data-container="body"
+                                                               data-content="{% include 'hotsite/includes/coupon.html' %}">
+                                                                Possui cupom?
+                                                            </a>
+                                                        </div>
+
+                                                    {% endif %}
                                                 </div>
 
-                                                {% if has_coupon %}
-                                                    <div class="text-right small"
-                                                         style="margin-top: 8px;">
-                                                        <a id="coupon_link"
-                                                           href="javascript:void(0)"
-                                                           data-toggle="popover"
-                                                           title="<strong>Informe o código</strong>"
-                                                           data-html="true"
-                                                           data-container="body"
-                                                           data-content="{% include 'hotsite/includes/coupon.html' %}">
-                                                            Possui cupom?
-                                                        </a>
-                                                    </div>
-
-                                                {% endif %}
                                                 <a href="{% url 'public:hotsite' event.slug %}"
                                                    class="btn btn-primary pull-left"
                                                    style="margin-top: 5px;">

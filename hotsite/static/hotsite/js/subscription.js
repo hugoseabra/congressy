@@ -202,18 +202,18 @@ function load_coupon() {
     button.addClass('disabled').attr('disabled', 'disabled').text('Aguarde...');
 
     var lot_fields = $('#lots-field');
+    var original_lots_field = $('#original-lots-field');
     common_lots_content = lot_fields.html();
-
+    lot_fields.show();
     send(
         url,
         'POST',
         {'coupon': coupon},
         function (response) {
             lot_fields.html(response);
-            console.log(response);
+            original_lots_field.hide();
 
             var lot = $('#id_lot-lots');
-            console.log(lot);
 
             window.setTimeout(function () {
 
@@ -223,10 +223,14 @@ function load_coupon() {
         },
         function () {
             button.removeClass('disabled').removeAttr('disabled').text('Enviar');
+
             $('#id_coupon').val('');
+
             alert('Cupom inválido.');
+
             var lot = $('#id_lot-lots');
-            console.log(lot);
+
+
             window.setTimeout(function () {
                 lot.trigger('change');
                 start_popover();
@@ -237,6 +241,14 @@ function load_coupon() {
     $('#coupon_link').popover('hide');
 }
 
+function hide_coupon() {
+
+    var lot_fields = $('#lots-field');
+    var original_lots_field = $('#original-lots-field');
+
+    lot_fields.hide();
+    original_lots_field.show();
+}
 
 function start_popover() {
     $('[data-toggle="popover"]').popover({
