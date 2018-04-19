@@ -88,19 +88,16 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
     def done(self, form_list, **kwargs):
 
-        """
-          Process non-payment subscriptions here:
-            - We have a person in storage.
-            - We have the lot data in storage.
-            - Survey has already been processed.
-        """
-
         # Assert that we have a person in storage
         if not hasattr(self.storage, 'person'):
-            person_data = self.storage.get_step_data('person')
-            person_email = person_data.get('person-email')
 
-            person = Person.objects.get(email=person_email)
+            try:
+                person = Person.objects.get(user=self.request.user)
+            except Person.DoesNotExist:
+                person_data = self.storage.get_step_data('person')
+                person_email = person_data.get('person-email')
+
+                person = Person.objects.get(email=person_email)
             self.storage.person = person
 
         lot_data = self.storage.get_step_data('lot')
