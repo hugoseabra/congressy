@@ -26,7 +26,7 @@ class PagarmeTransactionInstanceData:
 
         self._set_amount()
         self._set_organization()
-        self._check_lot()
+        #self._check_lot()
         self._set_transaction_type()
         self._set_installments()
 
@@ -182,12 +182,8 @@ class PagarmeTransactionInstanceData:
         if self.event:
             self.organization = self.event.organization
 
-        if not self.organization and 'organization' not in self.extra_data:
-            raise TransactionError(message="No organization")
-
         if not self.organization:
-            self.organization = Organization.objects.get(
-                pk=self.extra_data['organization'])
+            raise TransactionError(message="No organization")
 
         if not self.organization.bank_account_id:
             raise TransactionError(message="Organization has no bank account")

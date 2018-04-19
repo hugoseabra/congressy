@@ -26,7 +26,7 @@ class PaymentForm(forms.Form):
         widget=forms.HiddenInput()
     )
 
-    card_hash = forms.IntegerField(
+    card_hash = forms.CharField(
         widget=forms.HiddenInput(),
         required=False,
     )
@@ -74,51 +74,51 @@ class PaymentForm(forms.Form):
 
         cleaned_data = super().clean()
 
-        subscription = None
-
-        try:
-            subscription = Subscription.objects.get(
-                person=self.person,
-                event=self.event
-            )
-        except Subscription.DoesNotExist:
-            subscription = Subscription(
-                person=self.person,
-                event=self.event,
-                created_by=self.person.user.id
-            )
-
-        try:
-            with transaction.atomic():
-                # Insere ou edita lote
-                subscription.lot = self.lot_instance
-                subscription.save()
-
-                transaction_data = PagarmeTransactionInstanceData(
-                    subscription=subscription,
-                    extra_data=cleaned_data,
+        if self.is_valid():
+            subscription = None
+            try:
+                subscription = Subscription.objects.get(
+                    person=self.person,
                     event=self.event
                 )
-
-                create_pagarme_transaction(
-                    transaction_data=transaction_data,
-                    subscription=subscription
+            except Subscription.DoesNotExist:
+                subscription = Subscription(
+                    person=self.person,
+                    event=self.event,
+                    created_by=self.person.user.id
                 )
 
-        except TransactionError as e:
-            error_dict = {
-                'No transaction type': \
-                    'Por favor escolher uma forma de pagamento.',
-                'Transaction type not allowed': \
-                    'Forma de pagamento não permitida.',
-                'Organization has no bank account': \
-                    'Organização não está podendo receber pagamentos no'
-                    ' momento.',
-                'No organization': 'Evento não possui organizador.',
-            }
-            if e.message in error_dict:
-                e.message = error_dict[e.message]
+            try:
+                with transaction.atomic():
+                    # Insere ou edita lote
+                    subscription.lot = self.lot_instance
+                    subscription.save()
 
-            raise ValidationError({'transaction': e.message})
+                    transaction_data = PagarmeTransactionInstanceData(
+                        subscription=subscription,
+                        extra_data=cleaned_data,
+                        event=self.event
+                    )
+
+                    create_pagarme_transaction(
+                        transaction_data=transaction_data,
+                        subscription=subscription
+                    )
+
+            except TransactionError as e:
+                error_dict = {
+                    'No transaction type': \
+                        'Por favor escolher uma forma de pagamento.',
+                    'Transaction type not allowed': \
+                        'Forma de pagamento não permitida.',
+                    'Organization has no bank account': \
+                        'Organização não está podendo receber pagamentos no'
+                        ' momento.',
+                    'No organization': 'Evento não possui organizador.',
+                }
+                if e.message in error_dict:
+                    e.message = error_dict[e.message]
+
+                raise ValidationError({'transaction': e.message})
 
         return cleaned_data
