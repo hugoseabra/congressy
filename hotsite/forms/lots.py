@@ -12,11 +12,10 @@ from gatheros_subscription.models import Lot
 class LotsForm(forms.Form):
 
     def __init__(self, **kwargs):
-
         self.event = kwargs.get('initial').get('event')
         super().__init__(**kwargs)
 
-        self.fields['lot'] = forms.ModelChoiceField(
+        self.fields['lots'] = forms.ModelChoiceField(
             queryset=Lot.objects.filter(event=self.event,
                                         date_start__lte=datetime.now(),
                                         date_end__gte=datetime.now(),
@@ -25,3 +24,8 @@ class LotsForm(forms.Form):
             required=True,
             label='lote',
         )
+
+        if self.is_bound:
+            self.fields['lots'].queryset = Lot.objects.filter(event=self.event,
+                                                             date_start__lte=datetime.now(),
+                                                             date_end__gte=datetime.now())

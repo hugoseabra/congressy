@@ -217,7 +217,13 @@ function load_coupon() {
             response = JSON.parse(response);
 
             var lot = response.lot;
+            var lot_select = $('#id_lot-lots');
 
+            lot_select.append(lot.option);
+            lot_select.val(lot.id);
+            lot_select.attr("style", "pointer-events: none;");
+            $('#lot_display_publicly').text(lot.public_display + lot.is_free);
+            $('#lot_exhibition_code').text(lot.exhibition_code);
 
             window.setTimeout(function () {
                 start_popover();

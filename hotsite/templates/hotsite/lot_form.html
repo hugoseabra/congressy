@@ -78,48 +78,14 @@
 
                                         {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
 
-                                            <form method="post" action=""
-                                                  novalidate>
+                                            <form method="post" action="">
 
                                                 {% csrf_token %}
                                                 {{ wizard.management_form }}
-                                                <div id="lots-field"
-                                                     style="display: none">
-                                                    <div class="col-md-10">
-                                                        <div class="row">
-                                                            <div class="col-md-12">
-                                                                <h4 style="font-weight: bold;padding-bottom:0;margin-bottom:0">
-                                                                    CUPOM
-                                                                    VÁLIDO</h4>
-                                                                <div>
-                                                                    <span style="color:darkgreen;font-weight: bold;" id="lot_display_publicly">
 
-                                                                        {% if not lot.price %}
-                                                                            -
-                                                                            Gratuito
-                                                                        {% endif %}
-                                                                        </span>
-                                                                    <div class="small"
-                                                                         style="margin-top: 10px;">
-                                                                        <a onclick='hide_coupon()'
-                                                                           style='margin-top:2px'>
-                                                                            Retirar
-                                                                            cupom
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-muted text-right"
-                                                         style="padding-right:20px"
-                                                         id="lot_exhibition_code"></div>
-                                                </div>
                                                 <div id="original-lots-field">
 
-                                                    {% render_generic_field form.lot %}
+                                                    {% render_generic_field form.lots %}
 
                                                     {% if has_coupon %}
                                                         <div class="text-right small"
@@ -131,13 +97,44 @@
                                                                data-html="true"
                                                                data-container="body"
                                                                data-content="{% include 'hotsite/includes/coupon.html' %}">
-                                                                Possui cupom?
+                                                                Possui
+                                                                cupom?
                                                             </a>
                                                         </div>
 
                                                     {% endif %}
 
+
                                                 </div>
+
+                                                <div id="lots-field"
+                                                     style="display: none">
+
+                                                    <h4 style="font-weight: bold;padding-bottom:0;margin-bottom:0">
+                                                        CUPOM
+                                                        VÁLIDO</h4>
+                                                    <div class="text-muted"
+                                                         style="padding-right:20px"
+                                                         id="lot_exhibition_code"></div>
+
+                                                    <div class="small"
+                                                         style="margin-top: 10px;">
+                                                        <a onclick='hide_coupon()'
+                                                           style='margin-top:2px'>
+                                                            Retirar
+                                                            cupom
+                                                        </a>
+
+                                                    </div>
+                                                    <div>
+                                                                    <span style="color:darkgreen;font-weight: bold;"
+                                                                          id="lot_display_publicly">
+                                                                        </span>
+
+                                                    </div>
+
+                                                </div>
+
 
                                                 <a href="{% url 'public:hotsite' event.slug %}"
                                                    class="btn btn-primary pull-left"
