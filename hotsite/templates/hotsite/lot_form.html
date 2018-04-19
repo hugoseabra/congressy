@@ -78,7 +78,7 @@
 
                                         {% if event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
 
-                                            <form method="post" action="">
+                                            <form method="post" action="" novalidate>
 
                                                 {% csrf_token %}
                                                 {{ wizard.management_form }}

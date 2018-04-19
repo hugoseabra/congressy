@@ -18,7 +18,7 @@
                 <div class="col-md-9 col-md-offset-2">
 
                     <form method="post" action=""
-                          id="person_form">
+                          id="person_form" novalidate>
 
                         {% csrf_token %}
                         {{ wizard.management_form }}

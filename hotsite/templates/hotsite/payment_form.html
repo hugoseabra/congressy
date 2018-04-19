@@ -96,7 +96,7 @@
                                      src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
                             </div>
 
-                            <form action="" method="post">
+                            <form action="" method="post" novalidate>
                                 {% csrf_token %}
                                 {{ wizard.management_form }}
 
