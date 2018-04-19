@@ -61,6 +61,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
     def dispatch(self, request, *args, **kwargs):
 
+        # TODO: Add a check for session here
+
         response = super().dispatch(request, *args, **kwargs)
 
         if not request.user.is_authenticated:

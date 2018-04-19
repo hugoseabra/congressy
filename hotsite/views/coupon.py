@@ -10,7 +10,7 @@ from hotsite.views import EventMixin
 
 
 class CouponView(EventMixin, generic.TemplateView):
-    template_name = 'hotsite/includes/form_lots_coupon.html'
+    template_name = 'hotsite/includes/form_lots_coupon.json'
     http_method_names = ['post']
 
     def post(self, request, *args, **kwargs):

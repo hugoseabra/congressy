@@ -16,12 +16,12 @@ class LotsForm(forms.Form):
         self.event = kwargs.get('initial').get('event')
         super().__init__(**kwargs)
 
-        self.fields['lots'] = forms.ModelChoiceField(
+        self.fields['lot'] = forms.ModelChoiceField(
             queryset=Lot.objects.filter(event=self.event,
                                         date_start__lte=datetime.now(),
                                         date_end__gte=datetime.now(),
-                                        private=False,
-                                        ),
+                                        private=False),
             empty_label="- Selecione -",
-            required=True
+            required=True,
+            label='lote',
         )

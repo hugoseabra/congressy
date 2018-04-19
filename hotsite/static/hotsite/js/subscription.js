@@ -203,36 +203,33 @@ function load_coupon() {
 
     var lot_fields = $('#lots-field');
     var original_lots_field = $('#original-lots-field');
+
     common_lots_content = lot_fields.html();
+
     lot_fields.show();
+
     send(
         url,
         'POST',
         {'coupon': coupon},
         function (response) {
-            lot_fields.html(response);
-            original_lots_field.hide();
 
-            var lot = $('#id_lot-lots');
+            response = JSON.parse(response);
+
+            var lot = response.lot;
+
 
             window.setTimeout(function () {
-
-                lot.trigger('change');
                 start_popover();
             }, 300);
         },
         function () {
-            button.removeClass('disabled').removeAttr('disabled').text('Enviar');
 
             $('#id_coupon').val('');
 
             alert('Cupom inválido.');
 
-            var lot = $('#id_lot-lots');
-
-
             window.setTimeout(function () {
-                lot.trigger('change');
                 start_popover();
             }, 300);
         }
