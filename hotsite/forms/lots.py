@@ -5,8 +5,18 @@
 from datetime import datetime
 
 from django import forms
+from django.forms import ModelChoiceField
 
 from gatheros_subscription.models import Lot
+
+
+class LotFormModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+
+        if obj.price and obj.price > 0:
+            return "{} - R${}".format(obj.name, obj.price)
+
+        return "{}".format(obj.name)
 
 
 class LotsForm(forms.Form):
@@ -15,7 +25,7 @@ class LotsForm(forms.Form):
         self.event = kwargs.get('initial').get('event')
         super().__init__(**kwargs)
 
-        self.fields['lots'] = forms.ModelChoiceField(
+        self.fields['lots'] = LotFormModelChoiceField(
             queryset=Lot.objects.filter(event=self.event,
                                         date_start__lte=datetime.now(),
                                         date_end__gte=datetime.now(),
@@ -27,5 +37,5 @@ class LotsForm(forms.Form):
 
         if self.is_bound:
             self.fields['lots'].queryset = Lot.objects.filter(event=self.event,
-                                                             date_start__lte=datetime.now(),
-                                                             date_end__gte=datetime.now())
+                                                              date_start__lte=datetime.now(),
+                                                              date_end__gte=datetime.now())
