@@ -15,7 +15,7 @@
       "promo_code": null,
       "transfer_tax": false,
       "private": false,
-      "internal": true,
+      "internal": false,
       "created": "2017-04-24T16:04:56.288",
       "exhibition_code": null
     }
@@ -57,7 +57,7 @@
       "promo_code": null,
       "transfer_tax": false,
       "private": false,
-      "internal": true,
+      "internal": false,
       "created": "2017-04-24T17:08:09.050",
       "exhibition_code": null
     }
@@ -78,7 +78,7 @@
       "promo_code": null,
       "transfer_tax": false,
       "private": false,
-      "internal": true,
+      "internal": false,
       "created": "2017-04-24T17:09:57.449",
       "exhibition_code": null
     }
@@ -99,7 +99,7 @@
       "promo_code": null,
       "transfer_tax": false,
       "private": false,
-      "internal": true,
+      "internal": false,
       "created": "2017-04-24T17:15:15.185",
       "exhibition_code": null
     }
@@ -110,6 +110,7 @@
     "fields": {
       "name": "default",
       "event": 9,
+      "category": 3,
       "date_start": "2018-01-15T00:00:00.655",
       "date_end": "2018-02-13T07:59:59.655",
       "limit": 0,
@@ -120,7 +121,7 @@
       "promo_code": null,
       "transfer_tax": false,
       "private": false,
-      "internal": true,
+      "internal": false,
       "created": "2017-04-24T17:16:30.449",
       "exhibition_code": null
     }
@@ -141,7 +142,7 @@
       "promo_code": null,
       "transfer_tax": false,
       "private": false,
-      "internal": true,
+      "internal": false,
       "created": "2017-04-24T17:18:03.992",
       "exhibition_code": null
     }
@@ -162,7 +163,7 @@
       "promo_code": "9773419C",
       "transfer_tax": false,
       "private": true,
-      "internal": true,
+      "internal": false,
       "created": "2017-04-24T17:22:16.594",
       "exhibition_code": null
     }
@@ -185,6 +186,28 @@
       "private": false,
       "internal": false,
       "created": "2018-01-19T02:29:28.044",
+      "exhibition_code": null
+    }
+  },
+  {
+    "model": "gatheros_subscription.lot",
+    "pk": 14,
+    "fields": {
+      "name": "Lote 2",
+      "event": 9,
+      "category": 3,
+      "date_start": "2018-01-15T00:00:00.655",
+      "date_end": "2018-02-13T07:59:59.655",
+      "limit": 0,
+      "price": null,
+      "tax": null,
+      "discount_type": "percent",
+      "discount": null,
+      "promo_code": null,
+      "transfer_tax": false,
+      "private": false,
+      "internal": false,
+      "created": "2017-04-24T17:16:30.449",
       "exhibition_code": null
     }
   }

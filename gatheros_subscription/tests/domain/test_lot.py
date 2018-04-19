@@ -14,7 +14,7 @@ class LotModelTest(GatherosTestCase):
         '007_organization',
         '009_place',
         '010_event',
-        '006_lot',
+        '007_lot',
     ]
 
     def setUp(self):

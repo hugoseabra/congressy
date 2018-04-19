@@ -1,0 +1,1 @@
+[{"model": "gatheros_subscription.lotcategory", "pk": 1, "fields": {"event": 9, "name": "Categoria com nome graaande demais", "active": true, "description": ""}}, {"model": "gatheros_subscription.lotcategory", "pk": 3, "fields": {"event": 9, "name": "Categoria 2 - tamb\u00e9m com nome graande pacas", "active": true, "description": null}}]
