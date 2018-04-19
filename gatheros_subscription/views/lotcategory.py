@@ -46,7 +46,7 @@ class LotCategoryListView(AccountMixin, generic.ListView):
     def get_queryset(self):
         """Lotes a exibir são de acordo com o evento e não-interno"""
         query_set = super().get_queryset()
-        return query_set.filter(event=self.event)
+        return query_set.filter(event=self.event).order_by('pk')
 
 
 class LotCategoryAddView(generic.CreateView):
