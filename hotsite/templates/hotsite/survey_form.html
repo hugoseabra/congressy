@@ -87,19 +87,17 @@
                                                 <button name="wizard_goto_step"
                                                         type="submit"
                                                         class="btn btn-primary"
-                                                        value="{{ wizard.steps.first }}">
-                                                    Lotes
-                                                </button>
-                                                <button name="wizard_goto_step"
-                                                        type="submit"
-                                                        class="btn btn-primary"
                                                         value="{{ wizard.steps.prev }}">
+                                                    <i class="fas fa-chevron-circle-left"></i>
                                                     Voltar
                                                 </button>
                                             {% endif %}
-                                            <input type="submit"
-                                                   class="btn btn-primary"
-                                                   value="Finalizar"/>
+
+                                            <button type="submit"
+                                                    class="btn btn-primary pull-right">
+                                                Próximo
+                                                <i class="fas fa-chevron-circle-right"></i>
+                                            </button>
                                         </form>
 
 
