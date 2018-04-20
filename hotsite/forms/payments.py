@@ -6,14 +6,8 @@ import json
 
 from django import forms
 from django.core import serializers
-from django.db import transaction
-from django.forms import ValidationError
 
-from gatheros_subscription.models import Lot, \
-    Subscription
-from payment.exception import TransactionError
-from payment.helpers import PagarmeTransactionInstanceData
-from payment.tasks import create_pagarme_transaction
+from gatheros_subscription.models import Lot
 
 
 class PaymentForm(forms.Form):
@@ -23,7 +17,8 @@ class PaymentForm(forms.Form):
     )
 
     amount = forms.IntegerField(
-        widget=forms.HiddenInput()
+        widget=forms.HiddenInput(),
+        required=True,
     )
 
     card_hash = forms.CharField(
@@ -32,7 +27,8 @@ class PaymentForm(forms.Form):
     )
 
     transaction_type = forms.CharField(
-        widget=forms.HiddenInput()
+        widget=forms.HiddenInput(),
+        required=True,
     )
 
     lot_as_json = forms.CharField(
@@ -69,4 +65,3 @@ class PaymentForm(forms.Form):
         lot_obj_as_json = json.dumps(json_obj)
 
         self.fields['lot_as_json'].initial = lot_obj_as_json
-

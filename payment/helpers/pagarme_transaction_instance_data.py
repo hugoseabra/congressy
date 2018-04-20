@@ -26,7 +26,6 @@ class PagarmeTransactionInstanceData:
 
         self._set_amount()
         self._set_organization()
-        #self._check_lot()
         self._set_transaction_type()
         self._set_installments()
 
@@ -114,13 +113,13 @@ class PagarmeTransactionInstanceData:
 
         if self.transaction_type == 'credit_card':
             transaction_data['payment_method'] = 'credit_card'
-            transaction_data['card_hash'] = self.extra_data['card_hash']
+            transaction_data['card_hash'] = self.extra_data['payment-card_hash']
 
             if self.subscription.lot.allow_installment is True \
-                    and self.extra_data.get('installments') \
-                    and int(self.extra_data.get('installments')) > 1:
+                    and self.extra_data.get('payment-installments') \
+                    and int(self.extra_data.get('payment-installments')) > 1:
                 transaction_data['installments'] = \
-                    int(self.extra_data.get('installments'))
+                    int(self.extra_data.get('payment-installments'))
 
         if self.transaction_type == 'boleto':
             transaction_data['installments'] = ''
@@ -154,18 +153,12 @@ class PagarmeTransactionInstanceData:
         # Setado no _create_split_rules()
         self.liquid_amount = 0
 
-        if self.extra_data.get('amount'):
+        if self.extra_data.get('payment-amount'):
             self.amount = \
-                round(Decimal(self.extra_data.get('amount')), 2) / 100
+                round(Decimal(self.extra_data.get('payment-amount')), 2) / 100
         else:
             raise TransactionError(
                 message="Transação sem valor."
-            )
-
-    def _check_lot(self):
-        if int(self.lot.pk) != int(self.extra_data.get('lot')):
-            raise TransactionError(
-                message="Inscrição não pertence ao lote informado."
             )
 
     def _set_installments(self):
@@ -173,9 +166,9 @@ class PagarmeTransactionInstanceData:
 
         if self.transaction_type == 'credit_card' \
                 and self.lot.allow_installment is True \
-                and self.extra_data.get('installments') \
-                and int(self.extra_data.get('installments')) > 1:
-            self.installments = int(self.extra_data.get('installments'))
+                and self.extra_data.get('payment-installments') \
+                and int(self.extra_data.get('payment-installments')) > 1:
+            self.installments = int(self.extra_data.get('payment-installments'))
 
     def _set_organization(self):
 
@@ -192,15 +185,16 @@ class PagarmeTransactionInstanceData:
 
         allowed_payment_methods = ['boleto', 'credit_card']
 
-        if 'transaction_type' not in self.extra_data:
+        if 'payment-transaction_type' not in self.extra_data:
             raise TransactionError(
                 message='Nenhum tipo de transação informado.'
             )
 
-        if self.extra_data['transaction_type'] not in allowed_payment_methods:
+        if self.extra_data[
+            'payment-transaction_type'] not in allowed_payment_methods:
             raise TransactionError(message='Tipo de transação não permitido.')
 
-        self.transaction_type = self.extra_data['transaction_type']
+        self.transaction_type = self.extra_data['payment-transaction_type']
 
     def _create_split_rules(self):
         """
