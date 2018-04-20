@@ -68,6 +68,7 @@ class PersonForm(forms.ModelForm):
             'avatar',
             'synchronized',
             'rg',
+            ' zip_code',
             'orgao_expedidor',
             'pne',
             'politics_version',
@@ -115,7 +116,8 @@ class PersonForm(forms.ModelForm):
         self.fields[field_name].required = True
 
     def clean_zip_code(self):
-        zip_code = self.data.get('zip_code')
+        zip_code = self.cleaned_data.get('zip_code')
+
         if zip_code:
             zip_code = clear_string(zip_code)
 
