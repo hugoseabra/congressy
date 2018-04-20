@@ -235,7 +235,9 @@
         {% endfor %}
 
         {% if has_paid_lots %}
-            <div class="panel panel-default" id="payment-block" style="disp">
+            <div class="panel panel-default" id="payment-block"
+                 style="display: none">
+
                 <div class="panel-heading">
                     <div class="panel-title">Pagamento</div>
                 </div>
@@ -317,5 +319,3 @@
         {% include "base/footer.html" %}
     </section>
 {% endif %}
-
-

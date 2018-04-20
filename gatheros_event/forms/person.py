@@ -57,7 +57,24 @@ class PersonForm(forms.ModelForm):
         """ Meta """
         model = Person
         # fields = '__all__'
-        exclude = ('user', 'occupation')
+        exclude = (
+            'user',
+            'occupation',
+            'skype',
+            'linkedin',
+            'twitter',
+            'facebook',
+            'website',
+            'avatar',
+            'synchronized',
+            'rg',
+            ' zip_code',
+            'orgao_expedidor',
+            'pne',
+            'politics_version',
+            'term_version',
+            'institution_cnpj'
+        )
 
         widgets = {
             # CPF como telefone para aparecer como número no mobile
@@ -76,8 +93,9 @@ class PersonForm(forms.ModelForm):
     def __init__(self, is_chrome=False, **kwargs):
 
         uf = None
-        if 'instance' in kwargs:
-            instance = kwargs.get('instance')
+
+        instance = kwargs.get('instance')
+        if instance:
             if instance.city:
                 uf = instance.city.uf
 
@@ -98,7 +116,8 @@ class PersonForm(forms.ModelForm):
         self.fields[field_name].required = True
 
     def clean_zip_code(self):
-        zip_code = self.data.get('zip_code')
+        zip_code = self.cleaned_data.get('zip_code')
+
         if zip_code:
             zip_code = clear_string(zip_code)
 
@@ -117,18 +136,16 @@ class PersonForm(forms.ModelForm):
             phone = phone_cleaner(phone)
         return phone
 
-    def clean_city(self):
-        if 'city' not in self.data:
-            return None
-
-        return City.objects.get(pk=self.data['city'])
-
     def clean_email(self):
-        try:
-            email = self.data['email']
-        except MultiValueDictKeyError:
-            email = self.initial['email']
-        return email.lower()
+
+        if self.data.get('email') or self.initial.get('email'):
+            try:
+                email = self.data.get('email')
+            except MultiValueDictKeyError:
+                email = self.initial.get('email')
+            return email.lower()
+
+        return ''
 
     def clean_occupation(self):
         return Occupation.objects.get(pk=self.data['occupation'])

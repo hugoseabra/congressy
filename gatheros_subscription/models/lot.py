@@ -51,6 +51,10 @@ class LotManager(models.Manager):
             except Lot.DoesNotExist:
                 return code
 
+class RunningLots(models.Manager):
+    def all_running_lots(self):
+        return
+
 
 @track_data('price')
 class Lot(models.Model, GatherosModelMixin):

@@ -13,6 +13,7 @@ INSTALLED_APPS += [
     'partner',
     'hotsite',
     'survey',
+    'formtools',
     # 'bitly',
     # 'associate',
 ]
