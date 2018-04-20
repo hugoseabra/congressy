@@ -3,8 +3,8 @@
     subscriptions)
 """
 
-from django.db import models
+from .subscription_optional_interface import SubscriptionOptionalInterface
 
 
-class SubscriptionOptionalService(models.Model):
+class SubscriptionOptionalService(SubscriptionOptionalInterface):
     pass

@@ -2,8 +2,8 @@
     Representação dos opcionais(add ons) de inscrições(subscriptions)
 """
 
-from django.db import models
+from .subscription_optional_interface import SubscriptionOptionalInterface
 
 
-class SubscriptionOptional(models.Model):
+class SubscriptionOptional(SubscriptionOptionalInterface):
     pass
