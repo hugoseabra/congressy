@@ -12,7 +12,7 @@ class SubscriptionOptionalInterface(models.Model):
 
     subscription = models.ForeignKey(
         Subscription,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
     )
     created = models.DateTimeField()
     price = models.TextField()
