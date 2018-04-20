@@ -14,10 +14,21 @@ class SubscriptionOptionalInterface(object):
         Subscription,
         on_delete=models.CASCADE,
         related_name='optionals',
-        verbose_name='inscrição'
+        verbose_name='inscrição',
     )
-    created = models.DateTimeField(auto_now_add=True)
-    price = models.DecimalField()
+    created = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="data de criação",
+    )
+    price = models.DecimalField(
+        verbose_name='preço',
+        decimal_places=2,
+        max_digits=10,
+    )
 
-    count = models.PositiveIntegerField()
-    total_allowed = models.PositiveIntegerField()
+    count = models.PositiveIntegerField(
+        verbose_name="quantidade até agora",
+    )
+    total_allowed = models.PositiveIntegerField(
+        verbose_name="total permitido",
+    )
