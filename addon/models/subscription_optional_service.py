@@ -5,13 +5,13 @@
 
 from django.db import models
 
-from .optional import Optional
+from .optional_service import OptionalService
 from .subscription_optional_interface import SubscriptionOptionalInterface
 
 
 class SubscriptionOptionalService(models.Model, SubscriptionOptionalInterface):
     optional = models.ForeignKey(
-        Optional,
+        OptionalService,
         on_delete=models.DO_NOTHING,
         verbose_name='opcional de serviço',
         related_name='services'

@@ -7,5 +7,5 @@ from django.db import models
 from .optional_interface import OptionalInterface
 
 
-class Optional(models.Model, OptionalInterface):
+class OptionalProduct(models.Model, OptionalInterface):
     pass
