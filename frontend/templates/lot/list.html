@@ -179,6 +179,12 @@
                                 {% endif %}
 
                             <td>
+                                {% if lot.rsvp_restrict %}
+                                    <div>
+                                        <span class="badge badge-primary">Associados</span>
+                                    </div>
+                                {% endif %}
+
                                 {% if user has 'gatheros_subscription.change_lot' of lot %}
                                     <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">{{ lot.name }}</a>
                                 {% else %}
@@ -211,6 +217,7 @@
                                 {% endif %}
                             </td>
                             <td class="hidden-xs">
+
                                 {% if lot.private %}
                                     <div>
                                         <span class="badge badge-primary">Privado</span>

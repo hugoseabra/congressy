@@ -4,20 +4,22 @@ Lotes são importantes para agrupar as inscrições de um evento, para separar
 os critérios de inscrições: se gratuitas, se limitadas, se privados, etc.
 """
 
+import locale
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-import locale
 from django.conf import settings
 from django.db import models
 from django.utils.encoding import force_text
 
 from core.model import track_data
 from gatheros_event.models import Event
-from .event_survey import EventSurvey
+from gatheros_subscription.models import LotCategory
 from gatheros_event.models.mixins import GatherosModelMixin
+from .event_survey import EventSurvey
 from .rules import lot as rule
+from django.core.exceptions import ValidationError
 
 
 class LotManager(models.Manager):
@@ -93,6 +95,15 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='evento',
         related_name='lots'
     )
+    category = models.ForeignKey(
+        LotCategory,
+        on_delete=models.PROTECT,
+        verbose_name='categoria',
+        related_name='lots',
+        null=True,
+        blank=True,
+    )
+
     date_start = models.DateTimeField(verbose_name='data inicial')
     date_end = models.DateTimeField(
         verbose_name='data final',
@@ -201,6 +212,12 @@ class Lot(models.Model, GatherosModelMixin):
         null=True
     )
 
+    rsvp_restrict = models.BooleanField(
+        default=False,
+        verbose_name='restrito a associados',
+        help_text='Somente associados podem se inscrever neste lote.'
+    )
+
     objects = LotManager()
 
     class Meta:
@@ -234,8 +251,13 @@ class Lot(models.Model, GatherosModelMixin):
         """ Exibição pública de infomações do lote. """
 
         if self.price and self.price > 0:
+            if self.rsvp_restrict is True:
+                content = '{} - R$ {} (para convidados)'
+            else:
+                content = '{} - R$ {}'
+
             # display = '{} - R$ {} ({} vagas restantes)'.format(
-            display = '{} - R$ {}'.format(
+            display = content.format(
                 self.name,
                 locale.format(
                     percent='%.2f',
@@ -246,7 +268,13 @@ class Lot(models.Model, GatherosModelMixin):
             )
         else:
             # display = '{} vagas restantes'.format(self.places_remaining)
-            display = self.name
+            # display = self.name
+            if self.rsvp_restrict is True:
+                content = '{} (para convidados)'
+            else:
+                content = '{}'
+
+            display = content.format(self.name)
 
         return display
 
@@ -303,6 +331,11 @@ class Lot(models.Model, GatherosModelMixin):
         """ Limpa valores dos campos. """
         if self.private and not self.promo_code:
             self.promo_code = Lot.objects.generate_promo_code()
+
+        if self.category and self.category.event.pk != self.event.pk:
+            raise ValidationError({'category': [
+                'A categoria do lote e o lote não estão no mesmo evento.'
+            ]})
 
     def check_rules(self):
         """ Verifica regras de negócio. """
@@ -381,7 +414,7 @@ class Lot(models.Model, GatherosModelMixin):
             return 0
 
         minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
-        congressy_plan_percent= \
+        congressy_plan_percent = \
             Decimal(self.event.congressy_percent) / 100
 
         congressy_amount = self.price * congressy_plan_percent
