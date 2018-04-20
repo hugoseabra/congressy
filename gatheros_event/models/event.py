@@ -180,6 +180,8 @@ class Event(models.Model, GatherosModelMixin):
         max_length=20,
         choices=RSVP,
         default=RSVP_DISABLED,
+        null=True,
+        blank=True,
         verbose_name='Distribuição de Público',
         help_text="Se há associados vinculados à organização, o evento poderá"
                   " exibir um lote especial para eles, com um valor especial."
