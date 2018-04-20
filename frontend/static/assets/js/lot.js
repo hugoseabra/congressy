@@ -1,3 +1,20 @@
+function selectFromHash() {
+    var hash = window.location.hash.substring(1)
+    var cat_id = hash.replace('cat=', '');
+    if (cat_id) {
+        select(cat_id)
+    }
+}
+
+function select(cat_id) {
+    $('.nav-tabs').find('li').removeClass('active');
+    $('.tab-pane').removeClass('active');
+
+    $('#cat-super-' + cat_id).addClass('active');
+    $('#cat-' + cat_id).addClass('active');
+    window.location.hash='#cat='+cat_id;
+}
+
 function send(url, method, data, success_callback, error_callback) {
     // CSRF code
     function getCookie(name) {
@@ -42,6 +59,36 @@ function send(url, method, data, success_callback, error_callback) {
     });
 }
 
+function render_lot_list(selected_cat) {
+    send(
+        '/manage/events/9/lots/?template_name=lot/categories-lots-list',
+        'GET',
+        null,
+        function(response) {
+            $('#lot-list-main-block').html(response);
+
+            $('.tooltip').remove();
+            app.tooltips();
+            createAnchorEvents();
+
+            if (parseInt(selected_cat) > 0) {
+                select(parseInt(selected_cat));
+            } else {
+                selectFromHash();
+            }
+        },
+        function() {
+            $('.tooltip').remove();
+            app.tooltips();
+            createAnchorEvents();
+            Messenger().post({
+                message: 'Não foi possivel carregar lista de lotes.',
+                type: 'error'
+            });
+        }
+    );
+}
+
 function save_lot(url, data, msg) {
     send(
         url,
@@ -52,12 +99,43 @@ function save_lot(url, data, msg) {
                 message: msg,
                 type: 'success'
             });
+            render_lot_list();
         },
-        function () {
+        function (response) {
+            console.error(response.responseJSON);
             Messenger().post({
                 message: 'Não foi possivel processar salvamento de lote.',
                 type: 'error'
             });
         }
     );
+}
+
+function createAnchorEvents() {
+    $('.cat-tab-link').on('click', function() {
+        window.location.hash='#cat='+$(this).data('cat-id');
+    });
+}
+
+function publishLot(lot_id) {
+     if (!confirm(
+         'Tem certeza que deseja publicar o lote? Ele será exibido' +
+             ' conforme as configurações de data inicial e final.'
+         )) {
+         return;
+     }
+     var data = {'active': true};
+     save_lot('/api/lots/' + lot_id + '/', data, 'Lote publicado com sucesso!');
+
+}
+
+function unpublishLot(lot_id) {
+     if (!confirm(
+         'Tem certeza que deseja despublicar o lote?.'
+         )) {
+         return;
+     }
+     var data = {'active': false};
+     save_lot('/api/lots/' + lot_id + '/', data, 'Lote despublicado com sucesso!');
+
 }

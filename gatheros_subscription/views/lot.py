@@ -11,6 +11,7 @@ from gatheros_event.models import Event, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot, EventSurvey
+from core.views.mixins import TemplateNameableMixin
 
 
 class BaseLotView(AccountMixin, View):
@@ -112,7 +113,7 @@ class BaseFormLotView(BaseLotView, generic.FormView):
         return kwargs
 
 
-class LotListView(BaseLotView, generic.TemplateView):
+class LotListView(TemplateNameableMixin, BaseLotView, generic.TemplateView):
     """Lista de lotes de acordo com o evento do contexto"""
     template_name = 'lot/manage.html'
 
@@ -130,6 +131,7 @@ class LotListView(BaseLotView, generic.TemplateView):
         context['subscription_stats'] = self.get_subscription_stats()
         context['full_banking'] = self._get_full_banking()
         context['exhibition_code'] = Lot.objects.generate_exhibition_code()
+        context['categories'] = self.event.lot_categories.all().order_by('pk')
 
         return context
 
@@ -148,7 +150,10 @@ class LotListView(BaseLotView, generic.TemplateView):
                 num = sub_queryset.count()
                 stats['num'][lot.pk] = num
                 if lot.limit is not None:
-                    stats['remaining'][lot.pk] = int(lot.limit) - num
+                    if num > int(lot.limit):
+                        stats['remaining'][lot.pk] = 0
+                    else:
+                        stats['remaining'][lot.pk] = int(lot.limit) - num
 
         return stats
 
