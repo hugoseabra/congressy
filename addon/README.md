@@ -50,3 +50,10 @@ em "N" opcionais com o tema "X";
 1. Se um **opcional de serviço** for limitado por **Horário**: um participante
 poderá ser inscrever em 1 opcional dentro da hora inicial e hora final (baseada
 na duração) do opcional;
+
+
+
+### TODO: 
+
+    * Adicionar documentação nos models. 
+

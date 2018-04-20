@@ -1,15 +1,18 @@
+# pylint: disable=W5101
+
 """
     Representação dos opcionais(add ons) de inscrições(subscriptions)
 """
 
 from django.db import models
 
+from base.models import EntityMixin
 from .optional_product import OptionalProduct
 from .subscription_optional_interface import SubscriptionOptionalInterface
 
 
-class SubscriptionOptionalProduct(models.Model, SubscriptionOptionalInterface):
-
+class SubscriptionOptionalProduct(EntityMixin, models.Model,
+                                  SubscriptionOptionalInterface):
     optional_product = models.ForeignKey(
         OptionalProduct,
         on_delete=models.CASCADE,
