@@ -1,5 +1,8 @@
+from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.db import transaction
+from django.forms import ValidationError
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -10,6 +13,9 @@ from gatheros_subscription.models import Lot, \
     Subscription
 from hotsite import forms
 from hotsite.views.mixins import EventMixin
+from payment.exception import TransactionError
+from payment.helpers import PagarmeTransactionInstanceData
+from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
 FORMS = [("lot", forms.LotsForm),
@@ -263,5 +269,78 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             else:
                 raise Exception('SurveyForm was invalid: {}'.format(
                     survey_form.errors))
+
+        # Persisting payments:
+        if isinstance(form, forms.PaymentForm):
+
+            # Assert that we have a person in storage
+            if not hasattr(self.storage, 'person'):
+
+                try:
+                    person = Person.objects.get(user=self.request.user)
+                except Person.DoesNotExist:
+                    person_data = self.storage.get_step_data('person')
+                    person_email = person_data.get('person-email')
+
+                    person = Person.objects.get(email=person_email)
+                self.storage.person = person
+
+            lot_data = self.storage.get_step_data('lot')
+            lot = lot_data.get('lot-lots', '')
+
+            # Get a lot object.
+            if not isinstance(lot, Lot):
+                try:
+                    lot = Lot.objects.get(pk=lot, event=self.event)
+                except Lot.DoesNotExist:
+                    message = 'Não foi possivel resgatar um Lote ' \
+                              'a partir das referencias: lot<{}> e evento<{}>.' \
+                        .format(lot, self.event)
+                    raise TypeError(message)
+
+            try:
+                subscription = Subscription.objects.get(
+                    person=self.storage.person,
+                    event=self.event
+                )
+            except Subscription.DoesNotExist:
+                subscription = Subscription(
+                    person=self.storage.person,
+                    event=self.event,
+                    created_by=self.storage.person.user.id
+                )
+
+            try:
+                with transaction.atomic():
+                    # Insere ou edita lote
+                    subscription.lot = lot
+                    subscription.save()
+
+                    transaction_data = PagarmeTransactionInstanceData(
+                        subscription=subscription,
+                        extra_data=form_data,
+                        event=self.event
+                    )
+
+                    create_pagarme_transaction(
+                        transaction_data=transaction_data,
+                        subscription=subscription
+                    )
+
+            except TransactionError as e:
+                error_dict = {
+                    'No transaction type': \
+                        'Por favor escolher uma forma de pagamento.',
+                    'Transaction type not allowed': \
+                        'Forma de pagamento não permitida.',
+                    'Organization has no bank account': \
+                        'Organização não está podendo receber pagamentos no'
+                        ' momento.',
+                    'No organization': 'Evento não possui organizador.',
+                }
+                if e.message in error_dict:
+                    e.message = error_dict[e.message]
+
+                raise ValidationError(e.message)
 
         return form_data

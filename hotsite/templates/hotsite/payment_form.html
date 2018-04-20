@@ -141,6 +141,10 @@
 
         $(document).ready(function () {
 
+            $('form').submit(function () {
+                $(this).find(':submit').attr('disabled', 'disabled');
+            });
+
             var lot = JSON.parse($('#id_payment-lot_as_json').val());
 
             $('#id_button_pay').on('click', function () {
