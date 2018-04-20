@@ -8,8 +8,10 @@ from .optional_service import OptionalService
 from .subscription_optional_interface import SubscriptionOptionalInterface
 
 
-class SubscriptionOptional(SubscriptionOptionalInterface):
+class SubscriptionOptional(models.Model, SubscriptionOptionalInterface):
     optional_service = models.ForeignKey(
         OptionalService,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
+        verbose_name='opcional de produto',
+        related_name='products'
     )

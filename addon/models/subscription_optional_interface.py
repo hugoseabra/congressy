@@ -8,14 +8,16 @@ from django.db import models
 from gatheros_subscription.models import Subscription
 
 
-class SubscriptionOptionalInterface(models.Model):
+class SubscriptionOptionalInterface(object):
 
     subscription = models.ForeignKey(
         Subscription,
         on_delete=models.CASCADE,
+        related_name='optionals',
+        verbose_name='inscrição'
     )
-    created = models.DateTimeField()
-    price = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    price = models.DecimalField()
 
     count = models.PositiveIntegerField()
     total_allowed = models.PositiveIntegerField()

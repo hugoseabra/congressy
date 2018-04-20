@@ -7,3 +7,4 @@ from django.db import models
 
 class OptionalType(models.Model):
     pass
+    # NAME

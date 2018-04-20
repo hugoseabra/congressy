@@ -7,9 +7,9 @@ from django.db import models
 
 from gatheros_subscription.models import LotCategory
 from .optional_type import OptionalType
-from .price import Price
 
-class OptionalInterface(models.Model):
+
+class OptionalInterface(object):
     date_end = models.DateTimeField()
 
     description = models.TextField()
@@ -20,27 +20,24 @@ class OptionalInterface(models.Model):
 
     has_cost = models.BooleanField()
 
-    lot_categories = models.ManyToManyField(LotCategory)
+    lot_categories = models.ManyToManyField(
+        LotCategory,
+        verbose_name='categorias',
+        related_name='optionals'
+    )
 
     optional_type = models.ForeignKey(
         OptionalType,
-        on_delete=models.DO_NOTHING,
-        blank=True,
-        null=True,
+        on_delete=models.PROTECT,
+        verbose_name='tipo',
+        related_name='optionals'
     )
 
-    price = models.ForeignKey(
-        Price,
-        on_delete=models.DO_NOTHING,
-        blank=True,
-        null=True,
-    )
-
-    datetime_created = models.DateTimeField(
+    created = models.DateTimeField(
         auto_now_add=True
     )
 
-    datetime_modified = models.DateTimeField(
+    modified = models.DateTimeField(
         auto_now=True
     )
 

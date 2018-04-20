@@ -7,3 +7,4 @@ from django.db import models
 
 class Theme(models.Model):
     pass
+    # name

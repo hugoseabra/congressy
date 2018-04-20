@@ -12,8 +12,6 @@ class Price(models.Model):
         LotCategory,
         on_delete=models.DO_NOTHING,
         related_name='prices',
-        null=True,
-        blank=True,
     )
 
     price = models.DecimalField(
@@ -23,5 +21,6 @@ class Price(models.Model):
     )
 
     release_days = models.PositiveIntegerField(
-        verbose_name=''
+        verbose_name='dias para liberação',
+        help_text='Número de dias para liberar as vagas de opcionais.'
     )
