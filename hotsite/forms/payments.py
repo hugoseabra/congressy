@@ -54,7 +54,10 @@ class PaymentForm(forms.Form):
 
         super().__init__(**kwargs)
 
-        lot_obj_as_json = serializers.serialize('json', [self.lot_instance, ])
+        lot = self.lot_instance
+        lot.price = lot.get_calculated_price()
+
+        lot_obj_as_json = serializers.serialize('json', [lot, ])
         json_obj = json.loads(lot_obj_as_json)
         json_obj = json_obj[0]
         json_obj = json_obj['fields']
