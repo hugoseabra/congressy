@@ -60,11 +60,10 @@
                     },
                     {
                         "targets": 0,
-                        "className": "nowrap"
+                        "className": "nowrap",
+                        "orderable": false
                     }
-                ],
-                // Default order
-                "order": [[0, 'asc']]
+                ]
             });
         });
     </script>
@@ -78,15 +77,19 @@
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
+                <div class="float-left">
+                    <a href="{% url 'subscription:lot-list' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-angle-left"></i>
+                        Lotes
+                    </a>
+                </div>
                 <div class="float-right">
-{#                    {% if can_add %}#}
-                        <a href="{% url 'subscription:lot-add' event.pk %}"
-                           class="btn
-                        btn-success">
-                            <i class="fa fa-plus"></i>
-                            Adicionar
-                        </a>
-{#                    {% endif %}#}
+                    <a href="{% url 'subscription:category-add' event.pk %}"
+                       class="btn btn-success">
+                        <i class="fa fa-plus"></i>
+                        Adicionar
+                    </a>
                 </div>
                 <div class="clearfix"></div>
             </div>

@@ -4,18 +4,18 @@ from gatheros_subscription import views
 
 urls = [
     url(
-        r'^(?P<category_pk>[\d]+)/delete/$',
-        views.LotDeleteView.as_view(),
+        r'^(?P<pk>[\d]+)/delete/$',
+        views.LotCategoryDeleteView.as_view(),
         name='category-delete'
     ),
     url(
-        r'^(?P<category_pk>[\d]+)/edit/$',
-        views.LotEditFormView.as_view(),
+        r'^(?P<pk>[\d]+)/edit/$',
+        views.LotCategoryEditView.as_view(),
         name='category-edit'
     ),
     url(
         r'^add/$',
-        views.LotAddFormView.as_view(),
+        views.LotCategoryAddView.as_view(),
         name='category-add'
     ),
     url(
