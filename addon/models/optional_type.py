@@ -6,5 +6,5 @@ from django.db import models
 
 
 class OptionalType(models.Model):
-    pass
-    # NAME
+
+    name = models.CharField(max_length=255, verbose_name='nome')
