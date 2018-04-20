@@ -1,4 +1,6 @@
 {% extends 'hotsite/base.html' %}
+{% load i18n static base_tags %}
+
 
 {% block content %}
     {% include 'hotsite/includes/2_cover.html' %}
@@ -6,4 +8,28 @@
     {% include 'hotsite/includes/4_subscription_call_to_action.html' %}
     {% include 'hotsite/includes/5_map.html' %}
     {% include 'hotsite/includes/6_event_owner.html' %}
+{% endblock %}
+
+
+{% block scripts %}
+    {% if event.place and event.place.show_location is True and event.place.lat and event.place.long %}
+        <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}"></script>
+        <script>
+            var MAP_POINTER = "{% static 'hotsite/images/contents/map-1.png'%}";
+        </script>
+        <script src="{% static 'hotsite/js/map.js' %}"></script>
+        <script src="{% static 'hotsite/js/maplace-0.2.10.min.js' %}"></script>
+        <script>
+            $(document).ready(function () {
+                window.setTimeout(function () {
+                    show_map(
+                        '{{ event.place.lat }}',
+                        '{{ event.place.long }}',
+                        '{{ event.place.zoom|default_if_none:18 }}',
+                        '<strong>{{ event.name }}</strong>'
+                    );
+                }, 300);
+            });
+        </script>
+    {% endif %}
 {% endblock %}
