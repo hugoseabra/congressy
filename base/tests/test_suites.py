@@ -22,7 +22,7 @@ class ManagerPersistenceTestCase(TestCase):
          alterados.
     """
 
-    required_fieds = ()
+    required_fields = ()
     """
     :type: tuple
     Campos obrigatórios a serem mantidos na edição.
@@ -68,7 +68,7 @@ class ManagerPersistenceTestCase(TestCase):
         instance = self._create_instance()
 
         data = {}
-        for field_name in self.required_fieds:
+        for field_name in self.required_fields:
             if field_name not in self.data:
                 self.fail(
                     'O campo "{}" em "required_fields" não existe em'
@@ -124,7 +124,7 @@ class ApplicationServicePersistenceTestCase(TestCase):
          alterados.
     """
 
-    required_fieds = ()
+    required_fields = ()
     """
     :type: tuple
     Campos obrigatórios a serem mantidos na edição.
@@ -173,7 +173,7 @@ class ApplicationServicePersistenceTestCase(TestCase):
         instance = self._create_instance()
 
         data = {}
-        for field_name in self.required_fieds:
+        for field_name in self.required_fields:
             if field_name not in self.data:
                 self.fail(
                     'O campo "{}" em "required_fields" não existe em'

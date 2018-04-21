@@ -8,7 +8,7 @@ from .mock_factory import MockFactory
 class AssociateServicePersistenceTest(ApplicationServicePersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     application_service_class = services.AssociateService
-    required_fieds = ('organization', 'name', 'email',)
+    required_fields = ('organization', 'name', 'email',)
     data_edit_to = {
         'name': 'another name edited',
     }
