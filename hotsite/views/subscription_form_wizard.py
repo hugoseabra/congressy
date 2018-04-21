@@ -202,7 +202,11 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 person_data = self.storage.get_step_data('person')
                 person_email = person_data.get('person-email')
 
-                person = Person.objects.get(email=person_email)
+                try:
+                    person = Person.objects.get(email=person_email)
+                except Person.DoesNotExist:
+                    person = Person.objects.get(email=self.request.user.email)
+
                 self.storage.person = person
 
             try:
