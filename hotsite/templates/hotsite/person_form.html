@@ -246,14 +246,8 @@
     <script>
 
         $(document).ready(function () {
-
-
             var id_city = $('#id_person-city');
-
-
             window.setTimeout(function () {
-
-
                 {% if config and config.address == config.ADDRESS_SHOW %}
                     $('#id_person-zip_code').mask("99999-999");
                 {% endif %}
@@ -274,7 +268,7 @@
 
                 hotsiteShowHideCepLoader();
 
-                let radios = $('input[type=radio]');
+                var radios = $('input[type=radio]');
 
                 radios.iCheck({
                     checkboxClass: 'icheckbox_flat-grey',
