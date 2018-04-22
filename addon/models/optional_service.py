@@ -6,12 +6,12 @@
 
 from django.db import models
 
-from base.models import EntityMixin
 from .optional_interface import OptionalInterface
 from .theme import Theme
 
 
-class OptionalService(EntityMixin, models.Model, OptionalInterface):
+class OptionalService(OptionalInterface):
+
     start_on = models.DateTimeField(
         verbose_name="data de inicio",
     )

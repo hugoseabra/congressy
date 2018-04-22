@@ -4,11 +4,8 @@
     Representação do opcional(add ons)
 """
 
-from django.db import models
-
-from base.models import EntityMixin
 from .optional_interface import OptionalInterface
 
 
-class OptionalProduct(models.Model, EntityMixin, OptionalInterface):
+class OptionalProduct(OptionalInterface):
     pass
