@@ -2,7 +2,6 @@
     Representação da interface de opcionais(add ons)
 """
 
-from django.contrib.auth.models import User
 from django.db import models
 
 from base.models import EntityMixin
@@ -59,17 +58,15 @@ class OptionalInterface(EntityMixin, models.Model):
         editable=False,
     )
 
-    created_by = models.ForeignKey(
-        User,
+    created_by = models.CharField(
         null=True,
         editable=False,
+        max_length=255,
         verbose_name="criado por",
-        related_name="%(class)s_user_created",
     )
-    modified_by = models.ForeignKey(
-        User,
+
+    modified_by = models.CharField(
         null=True,
-        editable=False,
+        max_length=255,
         verbose_name="modificado por",
-        related_name="%(class)s_user_modified",
     )
