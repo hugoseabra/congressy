@@ -3,6 +3,7 @@
 """
 from .price import Price
 from .theme import Theme
+from .optional_type import OptionalType
 from .optional_product import OptionalProduct
 from .optional_service import OptionalService
 from .subscription_optional_product import SubscriptionOptionalProduct

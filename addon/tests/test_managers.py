@@ -68,3 +68,26 @@ class PriceManagerPersistenceTest(ManagerPersistenceTestCase):
 
     def test_edit(self):
         self.edit()
+
+
+class OptionalTypePersistenceTest(ManagerPersistenceTestCase):
+    """ Testes de persistência de dados: criação e edição."""
+    manager_class = managers.OptionalTypeManager
+    required_fields = ('name',)
+
+    data_edit_to = {
+        'name': 'edited name',
+    }
+
+    def setUp(self):
+
+        self.fake_factory = MockFactory()
+        self.data = {
+            'name': 'original name',
+        }
+
+    def test_create(self):
+        self.create()
+
+    def test_edit(self):
+        self.edit()
