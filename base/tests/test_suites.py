@@ -69,7 +69,7 @@ class ManagerPersistenceTestCase(TestCase):
 
         data = {}
         for field_name in self.required_fields:
-            if field_name not in self.data:
+            if field_name not in self.data and field_name is not 'created':
                 self.fail(
                     'O campo "{}" em "required_fields" não existe em'
                     ' "data".'.format(field_name)

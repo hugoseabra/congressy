@@ -10,5 +10,5 @@ from base.models import EntityMixin
 from .optional_interface import OptionalInterface
 
 
-class OptionalProduct(EntityMixin, models.Model, OptionalInterface):
+class OptionalProduct(models.Model, EntityMixin, OptionalInterface):
     pass

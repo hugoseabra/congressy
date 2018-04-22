@@ -8,6 +8,7 @@ from faker import Faker
 
 from gatheros_event.models import Event, Organization, Category
 from gatheros_subscription.models import LotCategory
+from addon.models import OptionalType
 
 
 class MockFactory:
@@ -43,4 +44,10 @@ class MockFactory:
             date_start=datetime.now() + timedelta(days=3),
             date_end=datetime.now() + timedelta(days=4),
             category=Category.objects.first(),
+        )
+
+    def fake_optional_type(self):
+
+        return OptionalType.objects.create(
+            name=self.fake_factory.words(nb=3, ext_word_list=None),
         )

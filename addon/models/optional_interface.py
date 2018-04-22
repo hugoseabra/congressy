@@ -51,6 +51,8 @@ class OptionalInterface(object):
     modified = models.DateTimeField(
         auto_now=True,
         verbose_name="modificado",
+        null=True,
+        editable=False,
     )
 
     created_by = models.ForeignKey(
