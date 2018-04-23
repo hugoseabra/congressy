@@ -392,7 +392,17 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 self.storage.set_step_files(self.steps.current,
                                             self.process_step_files(form))
             except ValidationError as e:
-                form.add_error('__all__', e.message)
+
+                if hasattr(e, 'message'):
+                    form.add_error('__all__', e.message)
+                elif hasattr(e, 'error_dict'):
+                    for field, err in e.error_dict:
+                        form.add_error(field, err)
+                elif hasattr(e, 'error_list'):
+                    for err in e.error_list:
+                        form.add_error('__all__', err)
+                else:
+                    raise Exception('Unknown ValidationError message.')
                 break
 
             # check if the current step is the last step
