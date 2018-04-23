@@ -8,4 +8,6 @@ from .base_optional import AbstractOptional
 
 
 class OptionalProduct(AbstractOptional):
-    pass
+
+    def __str__(self):
+        return self.description
