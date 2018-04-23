@@ -280,75 +280,77 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
 
-            # Assert that we have a person in storage
-            if not hasattr(self.storage, 'person'):
+            if form.is_valid():
+
+                # Assert that we have a person in storage
+                if not hasattr(self.storage, 'person'):
+
+                    try:
+                        person = Person.objects.get(user=self.request.user)
+                    except Person.DoesNotExist:
+                        person_data = self.storage.get_step_data('person')
+                        person_email = person_data.get('person-email')
+
+                        person = Person.objects.get(email=person_email)
+                    self.storage.person = person
+
+                lot_data = self.storage.get_step_data('lot')
+                lot = lot_data.get('lot-lots', '')
+
+                # Get a lot object.
+                if not isinstance(lot, Lot):
+                    try:
+                        lot = Lot.objects.get(pk=lot, event=self.event)
+                    except Lot.DoesNotExist:
+                        message = 'Não foi possivel resgatar um Lote ' \
+                                  'a partir das referencias: lot<{}> e evento<{}>.' \
+                            .format(lot, self.event)
+                        raise TypeError(message)
 
                 try:
-                    person = Person.objects.get(user=self.request.user)
-                except Person.DoesNotExist:
-                    person_data = self.storage.get_step_data('person')
-                    person_email = person_data.get('person-email')
-
-                    person = Person.objects.get(email=person_email)
-                self.storage.person = person
-
-            lot_data = self.storage.get_step_data('lot')
-            lot = lot_data.get('lot-lots', '')
-
-            # Get a lot object.
-            if not isinstance(lot, Lot):
-                try:
-                    lot = Lot.objects.get(pk=lot, event=self.event)
-                except Lot.DoesNotExist:
-                    message = 'Não foi possivel resgatar um Lote ' \
-                              'a partir das referencias: lot<{}> e evento<{}>.' \
-                        .format(lot, self.event)
-                    raise TypeError(message)
-
-            try:
-                subscription = Subscription.objects.get(
-                    person=self.storage.person,
-                    event=self.event
-                )
-            except Subscription.DoesNotExist:
-                subscription = Subscription(
-                    person=self.storage.person,
-                    event=self.event,
-                    created_by=self.storage.person.user.id
-                )
-
-            try:
-                with transaction.atomic():
-                    # Insere ou edita lote
-                    subscription.lot = lot
-                    subscription.save()
-
-                    transaction_data = PagarmeTransactionInstanceData(
-                        subscription=subscription,
-                        extra_data=form_data,
+                    subscription = Subscription.objects.get(
+                        person=self.storage.person,
                         event=self.event
                     )
-
-                    create_pagarme_transaction(
-                        transaction_data=transaction_data,
-                        subscription=subscription
+                except Subscription.DoesNotExist:
+                    subscription = Subscription(
+                        person=self.storage.person,
+                        event=self.event,
+                        created_by=self.storage.person.user.id
                     )
 
-            except TransactionError as e:
-                error_dict = {
-                    'No transaction type': \
-                        'Por favor escolher uma forma de pagamento.',
-                    'Transaction type not allowed': \
-                        'Forma de pagamento não permitida.',
-                    'Organization has no bank account': \
-                        'Organização não está podendo receber pagamentos no'
-                        ' momento.',
-                    'No organization': 'Evento não possui organizador.',
-                }
-                if e.message in error_dict:
-                    e.message = error_dict[e.message]
+                try:
+                    with transaction.atomic():
+                        # Insere ou edita lote
+                        subscription.lot = lot
+                        subscription.save()
 
-                raise ValidationError(e.message)
+                        transaction_data = PagarmeTransactionInstanceData(
+                            subscription=subscription,
+                            extra_data=form_data,
+                            event=self.event
+                        )
+
+                        create_pagarme_transaction(
+                            transaction_data=transaction_data,
+                            subscription=subscription
+                        )
+
+                except TransactionError as e:
+                    error_dict = {
+                        'No transaction type': \
+                            'Por favor escolher uma forma de pagamento.',
+                        'Transaction type not allowed': \
+                            'Forma de pagamento não permitida.',
+                        'Organization has no bank account': \
+                            'Organização não está podendo receber pagamentos no'
+                            ' momento.',
+                        'No organization': 'Evento não possui organizador.',
+                    }
+                    if e.message in error_dict:
+                        e.message = error_dict[e.message]
+
+                    raise ValidationError(e.message)
 
         return form_data
 
@@ -382,15 +384,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         # contains a valid step name. If one was found, render the requested
         # form. (This makes stepping back a lot easier).
 
-        # @TODO: Fix this ugly hack for pre-form cleaning
-        # Copy is needed, QueryDict is immutable
-        post_data = self.request.POST.copy()
-        post_data = self.clear_string('person-institution_cnpj',
-                                      data=post_data)
-        post_data = self.clear_string('person-cpf', data=post_data)
-        post_data = self.clear_string('person-zip_code', data=post_data)
-        post_data = self.clear_string('person-phone', data=post_data)
-
         wizard_goto_step = self.request.POST.get('wizard_goto_step', None)
         if wizard_goto_step and wizard_goto_step in self.get_form_list():
             return self.render_goto_step(wizard_goto_step)
@@ -408,6 +401,15 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
+
+        # @TODO: Fix this ugly hack for pre-form cleaning
+        # Copy is needed, QueryDict is immutable
+        post_data = self.request.POST.copy()
+        post_data = self.clear_string('person-institution_cnpj',
+                                      data=post_data)
+        post_data = self.clear_string('person-cpf', data=post_data)
+        post_data = self.clear_string('person-zip_code', data=post_data)
+        post_data = self.clear_string('person-phone', data=post_data)
 
         # get the form for the current step
         # @TODO: Fix this ugly hack for pre-form cleaning
