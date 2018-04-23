@@ -1,7 +1,7 @@
 """ Testes de managers do módulo de opcionais. """
 
 import decimal
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import random
 
@@ -33,10 +33,14 @@ class ThemeManagerPersistenceTest(ManagerPersistenceTestCase):
 class PriceManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     manager_class = managers.PriceManager
-    required_fields = ('price', 'lot_category', 'release_days')
+    required_fields = (
+        'lot_category',
+        'date_start',
+        'date_end',
+        'price',
+    )
 
     data_edit_to = {
-        'release_days': 42,
         'price': decimal.Decimal(random.randrange(155, 389)) / 100,
     }
 
@@ -58,8 +62,13 @@ class PriceManagerPersistenceTest(ManagerPersistenceTestCase):
     def setUp(self):
 
         self.fake_factory = MockFactory()
+
+        date_start = datetime.now()
+        date_end = date_start + timedelta(days=15)
+
         self.data = {
-            'release_days': 1,
+            'date_start': date_start.strftime("%d/%m/%Y %H:%M"),
+            'date_end': date_end.strftime("%d/%m/%Y %H:%M"),
             'price': decimal.Decimal(random.randrange(155, 389)) / 100,
             'lot_category': self.fake_factory.fake_lot_category().pk,
         }
