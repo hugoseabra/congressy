@@ -8,4 +8,6 @@ from .optional_interface import OptionalInterface
 
 
 class OptionalProduct(OptionalInterface):
-    pass
+
+    def __str__(self):
+        return self.description

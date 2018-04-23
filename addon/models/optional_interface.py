@@ -67,6 +67,7 @@ class OptionalInterface(EntityMixin, models.Model):
 
     modified_by = models.CharField(
         null=True,
+        blank=True,
         max_length=255,
         verbose_name="modificado por",
     )

@@ -105,7 +105,10 @@ class OptionalProductManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
 
     temp_faker = MockFactory()
-
+    event = temp_faker.fake_event()
+    lot_category = temp_faker.fake_lot_category(event=event)
+    print(lot_category.pk)
+    print(event.name)
     manager_class = managers.OptionalProductManager
     required_fields = (
         'date_end',
@@ -115,18 +118,15 @@ class OptionalProductManagerPersistenceTest(ManagerPersistenceTestCase):
         'has_cost',
         'lot_categories',
         'optional_type',
-        'created',
     )
 
     data_edit_to = {
         'description': 'edited description',
-        'date_end': gen_random_datetime().strftime(
-            '%d/%m/%Y %Hh%M'),
+        'date_end': gen_random_datetime(),
         'quantity': random.randint(5, 10000),
         'published': False,
         'has_cost': False,
-        'lot_categories': temp_faker.fake_lot_category().pk,
-        'optional_type': temp_faker.fake_optional_type().pk,
+        'modified_by': 'test user',
     }
 
     def _create_manager(self, instance=None, data=None):
@@ -134,11 +134,13 @@ class OptionalProductManagerPersistenceTest(ManagerPersistenceTestCase):
         if not data:
             data = self.data
 
-        if 'lot_category' not in data:
-            data['lot_category'] = self.fake_factory.fake_lot_category()
+        if 'lot_categories' not in data:
+            data['lot_categories'] = (self.fake_factory.fake_lot_category(
+
+            ).pk,)
 
         if 'optional_type' not in data:
-            data['optional_type'] = self.fake_factory.fake_optional_type()
+            data['optional_type'] = self.fake_factory.fake_optional_type().pk
 
         if instance is not None:
             manager = self.manager_class(instance=instance, data=data)
@@ -151,13 +153,12 @@ class OptionalProductManagerPersistenceTest(ManagerPersistenceTestCase):
 
         self.fake_factory = MockFactory()
         self.data = {
-            'date_end': datetime(1990, 1, 1, 00, 00, 00).strftime(
-                '%d/%m/%Y %Hh%M'),
+            'date_end': datetime(1990, 1, 1, 00, 00, 00),
             'description': 'original description',
             'quantity': 3,
             'published': True,
             'has_cost': True,
-            'lot_categories': self.fake_factory.fake_lot_category().pk,
+            'lot_categories': (self.fake_factory.fake_lot_category().pk,),
             'optional_type': self.fake_factory.fake_optional_type().pk,
         }
 
