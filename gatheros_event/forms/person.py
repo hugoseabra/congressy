@@ -68,7 +68,6 @@ class PersonForm(forms.ModelForm):
             'avatar',
             'synchronized',
             'rg',
-            'zip_code',
             'orgao_expedidor',
             'pne',
             'politics_version',

@@ -136,6 +136,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         # Insere ou edita lote
         subscription.lot = lot
+        if not lot.price or lot.price == 0:
+            subscription.status = Subscription.CONFIRMED_STATUS
         subscription.save()
 
         self.storage.subscription = subscription
