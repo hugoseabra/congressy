@@ -18,7 +18,7 @@ class PaymentForm(forms.Form):
 
     amount = forms.IntegerField(
         widget=forms.HiddenInput(),
-        required=True,
+        required=False,
     )
 
     card_hash = forms.CharField(
@@ -28,7 +28,7 @@ class PaymentForm(forms.Form):
 
     transaction_type = forms.CharField(
         widget=forms.HiddenInput(),
-        required=True,
+        required=False,
     )
 
     lot_as_json = forms.CharField(
