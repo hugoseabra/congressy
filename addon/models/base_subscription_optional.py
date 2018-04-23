@@ -10,11 +10,13 @@ from gatheros_subscription.models import Subscription
 
 
 class AbstractSubscriptionOptional(EntityMixin, models.Model):
+    class Meta:
+        abstract = True
 
     subscription = models.ForeignKey(
         Subscription,
         on_delete=models.CASCADE,
-        related_name='optionals',
+        related_name='%(class)s_optionals',
         verbose_name='inscrição',
     )
     created = models.DateTimeField(
@@ -29,6 +31,8 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
 
     count = models.PositiveIntegerField(
         verbose_name="quantidade até agora",
+        default=0,
+        blank=True,
     )
     total_allowed = models.PositiveIntegerField(
         verbose_name="total permitido",

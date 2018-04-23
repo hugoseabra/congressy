@@ -7,7 +7,6 @@
 
 from django.db import models
 
-from base.models import EntityMixin
 from .optional_service import OptionalService
 from .base_subscription_optional import AbstractSubscriptionOptional
 

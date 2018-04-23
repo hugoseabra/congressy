@@ -6,7 +6,6 @@
 
 from django.db import models
 
-from base.models import EntityMixin
 from .optional_product import OptionalProduct
 from .base_subscription_optional import AbstractSubscriptionOptional
 

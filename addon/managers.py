@@ -51,7 +51,7 @@ class SubscriptionOptionalServiceManager(managers.Manager):
         fields = '__all__'
 
 
-class SubscriptionOptionalProducteManager(managers.Manager):
+class SubscriptionOptionalProductManager(managers.Manager):
     """ Manager de produtos opcionais de inscrições """
 
     class Meta:

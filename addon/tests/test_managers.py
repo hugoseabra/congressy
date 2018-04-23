@@ -1,21 +1,13 @@
 """ Testes de managers do módulo de opcionais. """
 
 import decimal
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import random
 
 from addon import managers
 from base.tests.test_suites import ManagerPersistenceTestCase
-from .mock_factory import MockFactory
-
-
-def gen_random_datetime(min_year=1900, max_year=datetime.now().year):
-    # generate a datetime in format yyyy-mm-dd hh:mm:ss.000000
-    start = datetime(min_year, 1, 1, 00, 00, 00)
-    years = max_year - min_year + 1
-    end = start + timedelta(days=365 * years)
-    return start + (end - start) * random.random()
+from .mock_factory import MockFactory, gen_random_datetime
 
 
 class ThemeManagerPersistenceTest(ManagerPersistenceTestCase):
@@ -229,6 +221,59 @@ class OptionalServiceManagerPersistenceTest(ManagerPersistenceTestCase):
             'start_on': datetime(1991, 1, 1, 00, 00, 00),
             'duration': 3,
             'theme': self.fake_factory.fake_theme().pk
+        }
+
+    def test_create(self):
+        self.create()
+
+    def test_edit(self):
+        self.edit()
+
+
+class SubscriptionProductManagerPersistenceTest(ManagerPersistenceTestCase):
+    """ Testes de persistência de dados: criação e edição."""
+
+    manager_class = managers.SubscriptionOptionalProductManager
+    required_fields = (
+        'subscription',
+        'price',
+        'total_allowed',
+        'optional_product',
+    )
+
+    data_edit_to = {
+        'price': decimal.Decimal(42),
+        'total_allowed': 42,
+        'count': 3,
+    }
+
+    def _create_manager(self, instance=None, data=None):
+
+        if not data:
+            data = self.data
+
+        if 'subscription' not in data:
+            data['subscription'] = self.fake_factory.fake_subscription().pk
+
+        if 'optional_product' not in data:
+            data['optional_product'] = \
+                self.fake_factory.fake_optional_product().pk
+
+        if instance is not None:
+            manager = self.manager_class(instance=instance, data=data)
+        else:
+            manager = self.manager_class(data=data)
+
+        return manager
+
+    def setUp(self):
+
+        self.fake_factory = MockFactory()
+        self.data = {
+            'subscription': self.fake_factory.fake_subscription().pk,
+            'optional_product': self.fake_factory.fake_optional_product().pk,
+            'price': decimal.Decimal(random.randrange(155, 389)) / 100,
+            'total_allowed': 3
         }
 
     def test_create(self):
