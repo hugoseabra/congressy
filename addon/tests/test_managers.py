@@ -281,3 +281,56 @@ class SubscriptionProductManagerPersistenceTest(ManagerPersistenceTestCase):
 
     def test_edit(self):
         self.edit()
+
+
+class SubscriptionServiceManagerPersistenceTest(ManagerPersistenceTestCase):
+    """ Testes de persistência de dados: criação e edição."""
+
+    manager_class = managers.SubscriptionOptionalServiceManager
+    required_fields = (
+        'subscription',
+        'price',
+        'total_allowed',
+        'optional_service',
+    )
+
+    data_edit_to = {
+        'price': decimal.Decimal(42),
+        'total_allowed': 42,
+        'count': 3,
+    }
+
+    def _create_manager(self, instance=None, data=None):
+
+        if not data:
+            data = self.data
+
+        if 'subscription' not in data:
+            data['subscription'] = self.fake_factory.fake_subscription().pk
+
+        if 'optional_service' not in data:
+            data['optional_service'] = \
+                self.fake_factory.fake_optional_service().pk
+
+        if instance is not None:
+            manager = self.manager_class(instance=instance, data=data)
+        else:
+            manager = self.manager_class(data=data)
+
+        return manager
+
+    def setUp(self):
+
+        self.fake_factory = MockFactory()
+        self.data = {
+            'subscription': self.fake_factory.fake_subscription().pk,
+            'optional_service': self.fake_factory.fake_optional_service().pk,
+            'price': decimal.Decimal(random.randrange(155, 389)) / 100,
+            'total_allowed': 3
+        }
+
+    def test_create(self):
+        self.create()
+
+    def test_edit(self):
+        self.edit()

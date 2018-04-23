@@ -8,7 +8,7 @@ import random
 from django.contrib.auth.models import User
 from faker import Faker
 
-from addon.models import OptionalType, Theme, OptionalProduct
+from addon.models import OptionalType, Theme, OptionalProduct, OptionalService
 from gatheros_event.models import Person, Organization, Event, Category
 from gatheros_subscription.models import LotCategory, Subscription
 
@@ -105,6 +105,36 @@ class MockFactory:
         op.save()
 
         return op
+
+    def fake_optional_service(self, lot_categories=None, optional_type=None,
+                              theme=None):
+
+        if not lot_categories:
+            lot_categories = self.fake_lot_category()
+
+        if not optional_type:
+            optional_type = self.fake_optional_type()
+
+        if not theme:
+            theme = self.fake_theme()
+
+        os = OptionalService(
+            date_end=gen_random_datetime(),
+            description='original description',
+            quantity=3,
+            published=True,
+            has_cost=True,
+            theme=theme,
+            start_on=gen_random_datetime(),
+            duration=random.randint(10, 10000),
+            optional_type=optional_type,
+        )
+
+        os.save()
+        os.lot_categories.add(lot_categories)
+        os.save()
+
+        return os
 
     def fake_theme(self):
         return Theme.objects.create(

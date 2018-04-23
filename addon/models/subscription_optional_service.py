@@ -12,7 +12,7 @@ from .base_subscription_optional import AbstractSubscriptionOptional
 
 
 class SubscriptionOptionalService(AbstractSubscriptionOptional):
-    optional = models.ForeignKey(
+    optional_service = models.ForeignKey(
         OptionalService,
         on_delete=models.DO_NOTHING,
         verbose_name='opcional de serviço',
