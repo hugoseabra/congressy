@@ -14,6 +14,7 @@ INSTALLED_APPS += [
     'hotsite',
     'survey',
     'formtools',
+    # 'addon',
     'associate',
     # 'bitly',
 ]
