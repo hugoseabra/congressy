@@ -86,13 +86,17 @@ class MockFactory:
     def fake_optional_product(self, lot_categories=None, optional_type=None):
 
         if not lot_categories:
-            lot_categories = self.fake_lot_category()
+            lot_categories = [self.fake_lot_category()]
 
         if not optional_type:
             optional_type = self.fake_optional_type()
 
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+
         op = OptionalProduct(
-            date_end=gen_random_datetime(),
+            date_start=date_start,
+            date_end=date_end,
             description='original description',
             quantity=3,
             published=True,
@@ -101,7 +105,10 @@ class MockFactory:
         )
 
         op.save()
-        op.lot_categories.add(lot_categories)
+
+        for lot_category in lot_categories:
+            op.lot_categories.add(lot_category)
+
         op.save()
 
         return op
@@ -110,7 +117,7 @@ class MockFactory:
                               theme=None):
 
         if not lot_categories:
-            lot_categories = self.fake_lot_category()
+            lot_categories = [self.fake_lot_category()]
 
         if not optional_type:
             optional_type = self.fake_optional_type()
@@ -118,8 +125,12 @@ class MockFactory:
         if not theme:
             theme = self.fake_theme()
 
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+
         os = OptionalService(
-            date_end=gen_random_datetime(),
+            date_start=date_start,
+            date_end=date_end,
             description='original description',
             quantity=3,
             published=True,
@@ -131,7 +142,10 @@ class MockFactory:
         )
 
         os.save()
-        os.lot_categories.add(lot_categories)
+
+        for lot_category in lot_categories:
+            os.lot_categories.add(lot_category)
+
         os.save()
 
         return os
