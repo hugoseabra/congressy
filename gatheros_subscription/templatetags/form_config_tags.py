@@ -38,7 +38,7 @@ def render_generic_field(
 
     return {
         'field': field,
-        'label_tag': label,
+        'label_tag': field.label_tag,
         'name': field.name,
         'help_text': help_text,
         'errors': field.errors,
