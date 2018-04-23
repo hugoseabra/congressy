@@ -6,11 +6,11 @@
 
 from django.db import models
 
-from .optional_interface import OptionalInterface
+from .base_optional import AbstractOptional
 from .theme import Theme
 
 
-class OptionalService(OptionalInterface):
+class OptionalService(AbstractOptional):
 
     start_on = models.DateTimeField(
         verbose_name="data de inicio",
