@@ -1,14 +1,14 @@
 from base import managers
-from .models import Price, Theme, OptionalProduct, OptionalService, \
-    SubscriptionOptionalService, SubscriptionOptionalProduct, OptionalType
-
-
-class PriceManager(managers.Manager):
-    """ Manager de preços. """
-
-    class Meta:
-        model = Price
-        fields = '__all__'
+from .models import (
+    OptionalProduct,
+    OptionalService,
+    OptionalType,
+    ProductPrice,
+    ServicePrice,
+    SubscriptionOptionalService,
+    SubscriptionOptionalProduct,
+    Theme,
+)
 
 
 class ThemeManager(managers.Manager):
@@ -40,6 +40,22 @@ class OptionalServiceManager(managers.Manager):
 
     class Meta:
         model = OptionalService
+        fields = '__all__'
+
+
+class ProductPriceManager(managers.Manager):
+    """ Manager de preços. """
+
+    class Meta:
+        model = ProductPrice
+        fields = '__all__'
+
+
+class ServicePriceManager(managers.Manager):
+    """ Manager de preços. """
+
+    class Meta:
+        model = ServicePrice
         fields = '__all__'
 
 

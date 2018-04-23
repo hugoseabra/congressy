@@ -29,9 +29,8 @@ class AbstractOptional(EntityMixin, models.Model):
         verbose_name="nome",
     )
 
-    date_end = models.DateTimeField(
-        verbose_name="data final",
-    )
+    date_start = models.DateTimeField(verbose_name="data inicial",)
+    date_end = models.DateTimeField(verbose_name="data final",)
 
     description = models.TextField(
         verbose_name="descrição",
@@ -39,14 +38,18 @@ class AbstractOptional(EntityMixin, models.Model):
 
     quantity = models.PositiveIntegerField(
         verbose_name="quantidade",
+        null=True,
+        blank=True,
     )
 
     published = models.BooleanField(
         verbose_name="publicado",
+        default=True,
     )
 
     has_cost = models.BooleanField(
         verbose_name="possui custo",
+        default=False,
     )
 
     lot_categories = models.ManyToManyField(
