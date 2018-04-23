@@ -352,6 +352,24 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         return form_data
 
+    def clear_string(self, field_name, data):
+        if data and field_name in data:
+
+            value = data.get(field_name)
+
+            if value:
+                value = value \
+                    .replace('.', '') \
+                    .replace('-', '') \
+                    .replace('/', '') \
+                    .replace('(', '') \
+                    .replace(')', '') \
+                    .replace(' ', '')
+
+                data[field_name] = value
+
+        return data
+
     def post(self, *args, **kwargs):
         """
         This method handles POST requests.
@@ -363,6 +381,16 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         # Look for a wizard_goto_step element in the posted data which
         # contains a valid step name. If one was found, render the requested
         # form. (This makes stepping back a lot easier).
+
+        # @TODO: Fix this ugly hack for pre-form cleaning
+        # Copy is needed, QueryDict is immutable
+        post_data = self.request.POST.copy()
+        post_data = self.clear_string('person-institution_cnpj',
+                                      data=post_data)
+        post_data = self.clear_string('person-cpf', data=post_data)
+        post_data = self.clear_string('person-zip_code', data=post_data)
+        post_data = self.clear_string('person-phone', data=post_data)
+
         wizard_goto_step = self.request.POST.get('wizard_goto_step', None)
         if wizard_goto_step and wizard_goto_step in self.get_form_list():
             return self.render_goto_step(wizard_goto_step)
@@ -382,10 +410,11 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             self.storage.current_step = form_current_step
 
         # get the form for the current step
-        form = self.get_form(data=self.request.POST, files=self.request.FILES)
+        # @TODO: Fix this ugly hack for pre-form cleaning
+        # This should be receiving self.request.POST no post_data
+        form = self.get_form(data=post_data, files=self.request.FILES)
 
         # and try to validate
-
         while form.is_valid():
             # if the form is valid, store the cleaned data and files.
             try:
@@ -414,4 +443,5 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             else:
                 # proceed to the next step
                 return self.render_next_step(form)
+
         return self.render(form)
