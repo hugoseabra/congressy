@@ -9,11 +9,10 @@ from django.db import models
 
 from base.models import EntityMixin
 from .optional_service import OptionalService
-from .subscription_optional_interface import SubscriptionOptionalInterface
+from .base_subscription_optional import AbstractSubscriptionOptional
 
 
-class SubscriptionOptionalService(EntityMixin, models.Model,
-                                  SubscriptionOptionalInterface):
+class SubscriptionOptionalService(AbstractSubscriptionOptional):
     optional = models.ForeignKey(
         OptionalService,
         on_delete=models.DO_NOTHING,

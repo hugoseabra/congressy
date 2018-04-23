@@ -5,10 +5,11 @@
 
 from django.db import models
 
+from base.models import EntityMixin
 from gatheros_subscription.models import Subscription
 
 
-class SubscriptionOptionalInterface(object):
+class AbstractSubscriptionOptional(EntityMixin, models.Model):
 
     subscription = models.ForeignKey(
         Subscription,

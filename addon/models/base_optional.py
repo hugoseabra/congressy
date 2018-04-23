@@ -9,7 +9,7 @@ from gatheros_subscription.models import LotCategory
 from .optional_type import OptionalType
 
 
-class OptionalInterface(EntityMixin, models.Model):
+class AbstractOptional(EntityMixin, models.Model):
     class Meta:
         abstract = True
 

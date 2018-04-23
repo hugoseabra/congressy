@@ -4,10 +4,10 @@
     Representação do opcional(add ons)
 """
 
-from .optional_interface import OptionalInterface
+from .base_optional import AbstractOptional
 
 
-class OptionalProduct(OptionalInterface):
+class OptionalProduct(AbstractOptional):
 
     def __str__(self):
         return self.description

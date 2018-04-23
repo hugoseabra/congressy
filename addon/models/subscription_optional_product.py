@@ -8,11 +8,10 @@ from django.db import models
 
 from base.models import EntityMixin
 from .optional_product import OptionalProduct
-from .subscription_optional_interface import SubscriptionOptionalInterface
+from .base_subscription_optional import AbstractSubscriptionOptional
 
 
-class SubscriptionOptionalProduct(EntityMixin, models.Model,
-                                  SubscriptionOptionalInterface):
+class SubscriptionOptionalProduct(AbstractSubscriptionOptional):
     optional_product = models.ForeignKey(
         OptionalProduct,
         on_delete=models.CASCADE,
