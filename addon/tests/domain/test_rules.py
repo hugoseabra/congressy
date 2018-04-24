@@ -20,13 +20,12 @@ class OptionalPriceRulesTest(TestCase):
         self.mocker = MockFactory()
         self.rule = rules.MustDateEndAfterDateStart()
 
-    def test_optional_service_must_date_end_after_date_start(self):
+    def test_session_must_date_end_after_date_start(self):
         """
-            Testa regra de opcional de serviço na qual data inicial antes da
-            data final.
+            Testa regra de session com data inicial antes da data final.
         """
         # Failure
-        instance = self.mocker.fake_optional_service()
+        instance = self.mocker.fake_session()
 
         instance.date_end = instance.date_start - timedelta(days=3)
 
@@ -39,29 +38,7 @@ class OptionalPriceRulesTest(TestCase):
         )
 
         # Success
-        instance = self.mocker.fake_optional_service()
-        self.rule.check(model_instance=instance)
-
-    def test_optional_product_must_date_end_after_date_start(self):
-        """
-            Testa regra de opcional de produto na qual data inicial antes da
-            data final.
-        """
-        # Failure
-        instance = self.mocker.fake_optional_product()
-
-        instance.date_end = instance.date_start - timedelta(days=3)
-
-        with self.assertRaises(RuleIntegrityError) as e:
-            self.rule.check(model_instance=instance)
-
-        self.assertIn(
-            'Data inicial deve ser anterior a data final',
-            str(e.exception)
-        )
-
-        # Success
-        instance = self.mocker.fake_optional_product()
+        instance = self.mocker.fake_session()
         self.rule.check(model_instance=instance)
 
     def test_service_price_must_date_end_after_date_start(self):

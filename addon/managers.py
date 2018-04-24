@@ -7,6 +7,7 @@ from .models import (
     OptionalType,
     ProductPrice,
     ServicePrice,
+    Session,
     SubscriptionOptionalService,
     SubscriptionOptionalProduct,
     Theme,
@@ -26,6 +27,14 @@ class OptionalTypeManager(managers.Manager):
 
     class Meta:
         model = OptionalType
+        fields = '__all__'
+
+
+class SessionManager(managers.Manager):
+    """ Manager de session. """
+
+    class Meta:
+        model = Session
         fields = '__all__'
 
 
@@ -109,16 +118,17 @@ class SubscriptionOptionalServiceManager(managers.Manager):
 
         # Regra 1:
         num_subs = optional_service.subscription_services.count()
-        if num_subs >= optional_service.quantity:
+        quantity = optional_service.quantity or 0
+        if 0 < quantity <= num_subs:
             raise ValidationError(
                 'Quantidade de inscrições já foi atingida, novas inscrições '
-                'não poderão ser realizadas')
+                'não poderão ser realizadas'
+            )
 
         # Regra 2:
-        if optional_service.session_restriction:
-            raise NotImplementedError('Continue from here. This is not '
-                                      'implemeted.')
-
+        # if optional_service.session_restriction:
+        #     raise NotImplementedError('Continue from here. This is not '
+        #                               'implemented.')
 
         return cleaned_data
 
@@ -142,7 +152,8 @@ class SubscriptionOptionalProductManager(managers.Manager):
 
         optional_product = cleaned_data['optional_product']
         num_subs = optional_product.subscription_products.count()
-        if num_subs >= optional_product.quantity:
+        quantity = optional_product.quantity or 0
+        if 0 < quantity <= num_subs:
             raise ValidationError(
                 'Quantidade de inscrições já foi atingida, '
                 'novas inscrições não poderão ser realizadas')

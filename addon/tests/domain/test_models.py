@@ -3,7 +3,57 @@
 """
 from test_plus.test import TestCase
 
+from addon import models, rules
 from addon.tests.mock_factory import MockFactory
+
+
+class ModelsConfiguredTest(TestCase):
+    """ Testes de configuração de afiliação. """
+
+    def test_has_rules(self):
+        # Session
+        self.assertIn(
+            rules.MustDateEndAfterDateStart,
+            models.Session.rule_instances
+        )
+
+        # Price
+        self.assertIn(
+            rules.MustDateEndAfterDateStart,
+            models.ProductPrice.rule_instances
+        )
+        self.assertIn(
+            rules.MustDateEndAfterDateStart,
+            models.ServicePrice.rule_instances
+        )
+
+        self.assertIn(
+            rules.MustLotCategoryBeAmongOptionalLotCategories,
+            models.ProductPrice.rule_instances
+        )
+        self.assertIn(
+            rules.MustLotCategoryBeAmongOptionalLotCategories,
+            models.ServicePrice.rule_instances
+        )
+
+        self.assertIn(
+            rules.MustHaveUniqueDatetimeInterval,
+            models.ProductPrice.rule_instances
+        )
+        self.assertIn(
+            rules.MustHaveUniqueDatetimeInterval,
+            models.ServicePrice.rule_instances
+        )
+
+        # SubscriptionOptional
+        self.assertIn(
+            rules.MustBeSameOptionalLotCategory,
+            models.SubscriptionOptionalProduct.rule_instances
+        )
+        self.assertIn(
+            rules.MustBeSameOptionalLotCategory,
+            models.SubscriptionOptionalService.rule_instances
+        )
 
 
 class ManageOptionalCostFlagTest(TestCase):

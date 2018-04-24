@@ -2,9 +2,9 @@
     Mock factory used during tests to create required objects
 """
 
-from decimal import Decimal
 import random
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from django.contrib.auth.models import User
 from faker import Faker
@@ -15,6 +15,7 @@ from addon.models import (
     OptionalType,
     ProductPrice,
     ServicePrice,
+    Session,
     SubscriptionOptionalProduct,
     SubscriptionOptionalService,
     Theme,
@@ -108,8 +109,20 @@ class MockFactory:
             name=self.fake_factory.words(nb=3, ext_word_list=None),
         )
 
-    def fake_optional_product(self, lot_categories=None, optional_type=None,
-                              quantity=3):
+    def fake_session(self):
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+
+        return Session.objects.create(
+            date_start=date_start,
+            date_end=date_end,
+            restrict_unique=False,
+        )
+
+    def fake_optional_product(self,
+                              optional_type=None,
+                              session=None,
+                              lot_categories=None):
 
         if not lot_categories:
             lot_categories = [self.fake_lot_category()]
@@ -117,16 +130,14 @@ class MockFactory:
         if not optional_type:
             optional_type = self.fake_optional_type()
 
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
+        if not session:
+            session = self.fake_session()
 
         op = OptionalProduct(
             name='optional product',
-            date_start=date_start,
-            date_end=date_end,
-            description='original description',
-            quantity=quantity,
+            session=session,
             optional_type=optional_type,
+            description='original description',
         )
 
         op.save()
@@ -138,8 +149,11 @@ class MockFactory:
 
         return op
 
-    def fake_optional_service(self, lot_categories=None, optional_type=None,
-                              theme=None, quantity=3):
+    def fake_optional_service(self,
+                              optional_type=None,
+                              session=None,
+                              theme=None,
+                              lot_categories=None):
 
         if not lot_categories:
             lot_categories = [self.fake_lot_category()]
@@ -150,17 +164,15 @@ class MockFactory:
         if not theme:
             theme = self.fake_theme()
 
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
+        if not session:
+            session = self.fake_session()
 
         os = OptionalService(
             name='optional service',
-            date_start=date_start,
-            date_end=date_end,
-            description='original description',
-            quantity=quantity,
-            theme=theme,
             optional_type=optional_type,
+            session=session,
+            theme=theme,
+            description='original description',
         )
 
         os.save()

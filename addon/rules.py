@@ -5,7 +5,7 @@ Rules: Módulo afiliados
 from base.models import RuleChecker, RuleIntegrityError
 
 
-# ========================== OPTIONAL e PRICE =============================== #
+# ========================== SESSION e PRICE ================================ #
 class MustDateEndAfterDateStart(RuleChecker):
     """
     Regra: a data final deve ser posterior à data inicial.
