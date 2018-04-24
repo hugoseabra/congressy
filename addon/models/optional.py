@@ -6,6 +6,7 @@
 
 from django.db import models
 
+from addon import rules
 from base.models import EntityMixin
 from gatheros_subscription.models import LotCategory
 from .optional_type import OptionalType
@@ -21,6 +22,9 @@ class AbstractOptional(EntityMixin, models.Model):
         a inscrição, separando a compra, pois a inscrição em sua venda própria
         e separada.
     """
+    rule_instances = (
+        rules.MustDateEndAfterDateStart,
+    )
 
     class Meta:
         abstract = True
