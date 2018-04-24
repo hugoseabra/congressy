@@ -21,6 +21,7 @@ class AbstractOptional(EntityMixin, models.Model):
         a inscrição, separando a compra, pois a inscrição em sua venda própria
         e separada.
     """
+
     class Meta:
         abstract = True
 
@@ -29,8 +30,8 @@ class AbstractOptional(EntityMixin, models.Model):
         verbose_name="nome",
     )
 
-    date_start = models.DateTimeField(verbose_name="data inicial",)
-    date_end = models.DateTimeField(verbose_name="data final",)
+    date_start = models.DateTimeField(verbose_name="data inicial", )
+    date_end = models.DateTimeField(verbose_name="data final", )
 
     description = models.TextField(
         verbose_name="descrição",
@@ -97,6 +98,7 @@ class OptionalProduct(AbstractOptional):
         Opcional de produto é um adicional de produto a ser comprado no ato da
         inscrição de um evento. Exemplo: camiseta, caneca, kit, dentre outros.
     """
+
     def __str__(self):
         return self.name
 
@@ -106,17 +108,32 @@ class OptionalService(AbstractOptional):
         Opcional de Serviço é um serviço a ser adquirido no ato da inscrição
         de um evento. Exemplo: curso, workshop, treinamento, dentre outros.
     """
-    start_on = models.DateTimeField(
-        verbose_name="data de inicio",
-    )
-
-    duration = models.PositiveIntegerField(
-        verbose_name="duração",
-    )
-
     theme = models.ForeignKey(
         Theme,
         on_delete=models.PROTECT,
         verbose_name="themas",
         related_name="services",
+    )
+
+    place = models.CharField(
+        max_length=255,
+        verbose_name='local',
+        null=True,
+        blank=True,
+    )
+
+    session_restriction = models.NullBooleanField(
+        default=False,
+        verbose_name='restringir por sessão',
+        null=True,
+        blank=True,
+        help_text='Participante poderá participar de apenas um sessão por vez.'
+    )
+
+    theme_limit = models.PositiveIntegerField(
+        verbose_name='limitar por tema',
+        help_text='Participante poderá adquirir opcionais dentro de um limite'
+                  ' por tema.',
+        null=True,
+        blank=True,
     )

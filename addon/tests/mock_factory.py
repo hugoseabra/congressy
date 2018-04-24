@@ -2,13 +2,23 @@
     Mock factory used during tests to create required objects
 """
 
+from decimal import Decimal
+import random
 from datetime import datetime, timedelta
 
-import random
 from django.contrib.auth.models import User
 from faker import Faker
 
-from addon.models import OptionalType, Theme, OptionalProduct, OptionalService
+from addon.models import (
+    OptionalProduct,
+    OptionalService,
+    OptionalType,
+    ProductPrice,
+    ServicePrice,
+    SubscriptionOptionalProduct,
+    SubscriptionOptionalService,
+    Theme,
+)
 from gatheros_event.models import Person, Organization, Event, Category
 from gatheros_subscription.models import LotCategory, Subscription
 
@@ -70,8 +80,12 @@ class MockFactory:
         if not person:
             person = self.fake_person()
 
+        lot = event.lots.first()
+        lot.category = self.fake_lot_category(event=lot.event)
+        lot.save()
+
         return Subscription.objects.create(
-            lot=event.lots.first(),
+            lot=lot,
             event=event,
             person=person,
             created_by=0,
@@ -136,8 +150,6 @@ class MockFactory:
             published=True,
             has_cost=True,
             theme=theme,
-            start_on=gen_random_datetime(),
-            duration=random.randint(10, 10000),
             optional_type=optional_type,
         )
 
@@ -149,6 +161,84 @@ class MockFactory:
         os.save()
 
         return os
+
+    def fake_service_price(self, lot_category=None, optional_service=None):
+        if not lot_category:
+            lot_category = self.fake_lot_category()
+
+        if not optional_service:
+            optional_service = self.fake_optional_service(
+                lot_categories=[lot_category]
+            )
+
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+
+        return ServicePrice.objects.create(
+            date_start=date_start,
+            date_end=date_end,
+            price=Decimal(20.00),
+            lot_category=lot_category,
+            optional_service=optional_service,
+        )
+
+    def fake_product_price(self, lot_category=None, optional_product=None):
+        if not lot_category:
+            lot_category = self.fake_lot_category()
+
+        if not optional_product:
+            optional_product = self.fake_optional_product(
+                lot_categories=[lot_category]
+            )
+
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+
+        return ProductPrice.objects.create(
+            date_start=date_start,
+            date_end=date_end,
+            price=Decimal(20.00),
+            lot_category=lot_category,
+            optional_product=optional_product,
+        )
+
+    def fake_subscription_optional_service(self,
+                                           subscription=None,
+                                           optional_service=None):
+        if not subscription:
+            subscription = self.fake_subscription()
+
+        if not optional_service:
+            optional_service = self.fake_optional_service(
+                lot_categories=[subscription.lot.category]
+            )
+
+        return SubscriptionOptionalService.objects.create(
+            subscription=subscription,
+            optional_service=optional_service,
+            price=Decimal(20.00),
+            count=1,
+            total_allowed=20,
+        )
+
+    def fake_subscription_optional_product(self,
+                                           subscription=None,
+                                           optional_product=None):
+        if not subscription:
+            subscription = self.fake_subscription()
+
+        if not optional_product:
+            optional_product = self.fake_optional_product(
+                lot_categories=[subscription.lot.category]
+            )
+
+        return SubscriptionOptionalProduct.objects.create(
+            subscription=subscription,
+            optional_product=optional_product,
+            price=Decimal(20.00),
+            count=1,
+            total_allowed=20,
+        )
 
     def fake_theme(self):
         return Theme.objects.create(
