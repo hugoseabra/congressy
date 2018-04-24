@@ -227,8 +227,6 @@ class MockFactory:
             subscription=subscription,
             optional_service=optional_service,
             price=Decimal(20.00),
-            count=1,
-            total_allowed=20,
         )
 
     def fake_subscription_optional_product(self,
@@ -246,8 +244,6 @@ class MockFactory:
             subscription=subscription,
             optional_product=optional_product,
             price=Decimal(20.00),
-            count=1,
-            total_allowed=20,
         )
 
     def fake_theme(self):
