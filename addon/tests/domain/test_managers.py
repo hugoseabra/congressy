@@ -6,9 +6,8 @@ from datetime import datetime, timedelta
 import random
 from test_plus.test import TestCase
 
-from addon import managers, models as addon_models
-from addon import managers
-from addon.tests.mock_factory import MockFactory, gen_random_datetime
+from addon import models as addon_models, managers
+from addon.tests.mock_factory import MockFactory
 from base.tests.test_suites import ManagerPersistenceTestCase
 
 
@@ -123,6 +122,187 @@ class OptionalProductManagerPersistenceTest(ManagerPersistenceTestCase):
 
     def test_edit(self):
         self.edit()
+
+
+class OptionalProductPriceManagerRulesTest(TestCase):
+    """Testes com a intenção de validar as regras dos managers normalmente
+    colocadas dentro dos cleans"""
+
+    def setUp(self):
+        self.fake_factory = MockFactory()
+
+    def test_setting_optional_product_has_cost_to_true(self):
+        """ Regra: se tiver "prices", o campo has_cost deve ser True """
+        new_optional_product = self.fake_factory.fake_optional_product()
+
+        # Validando que o produto possui a flag correta
+        self.assertFalse(new_optional_product.has_cost)
+
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+
+        price_manager = managers.ProductPriceManager(
+            data={
+                'lot_category': new_optional_product.lot_categories.first().pk,
+                'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
+                'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional_product': new_optional_product.pk,
+            }
+        )
+
+        self.assertTrue(price_manager.is_valid())
+
+        # Buscando o objeto OptionalProduct da persistência para validar se
+        # o flag foi definido corretamente.
+
+        persisted = addon_models.OptionalProduct.objects.get(
+            pk=new_optional_product.pk)
+        # Validando que o produto possui a flag correta
+        self.assertTrue(persisted.has_cost)
+
+    def test_setting_optional_service_has_cost_to_true(self):
+        """ Regra: se tiver "prices", o campo has_cost deve ser True """
+        new_optional_service = self.fake_factory.fake_optional_service()
+
+        # Validando que o produto possui a flag correta
+        self.assertFalse(new_optional_service.has_cost)
+
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+
+        price_manager = managers.ServicePriceManager(
+            data={
+                'lot_category': new_optional_service.lot_categories.first().pk,
+                'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
+                'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional_service': new_optional_service.pk,
+            }
+        )
+
+        self.assertTrue(price_manager.is_valid())
+
+        # Buscando o objeto OptionalProduct da persistência para validar se
+        # o flag foi definido corretamente.
+
+        persisted = addon_models.OptionalService.objects.get(
+            pk=new_optional_service.pk)
+        # Validando que o produto possui a flag correta
+        self.assertTrue(persisted.has_cost)
+
+
+class SubscriptionOptionalProductManagerRulesTest(TestCase):
+    """Testes com a intenção de validar as regras dos managers normalmente
+    colocadas dentro dos cleans"""
+
+    def setUp(self):
+        self.fake_factory = MockFactory()
+
+    def test_max_quantity_reached(self):
+        """
+            Testando a seguinte regra: Se quantidade de
+            inscrições já foi atingida, novas inscrições não poderão ser
+            realizadas
+        """
+
+        subscription = self.fake_factory.fake_subscription()
+        failing_subscription = self.fake_factory.fake_subscription(
+            lot=subscription.lot)
+
+        lot_category = subscription.lot.category
+
+        optional_product = self.fake_factory.fake_optional_product(
+            lot_categories=(lot_category,),
+            quantity=1,
+        )
+
+        price = self.fake_factory.fake_product_price(
+            lot_category=lot_category, optional_product=optional_product)
+
+        product_manager = managers.SubscriptionOptionalProductManager(
+            data={
+                'subscription': subscription.pk,
+                'optional_product': optional_product.pk,
+                'price': price.price,
+            }
+        )
+
+        self.assertTrue(product_manager.is_valid())
+        product_manager.save()
+        self.assertEqual(
+            addon_models.SubscriptionOptionalProduct.objects.all().count(), 1)
+
+        failing_product_manager = managers.SubscriptionOptionalProductManager(
+            data={
+                'subscription': failing_subscription.pk,
+                'optional_product': optional_product.pk,
+                'price': price.price,
+            }
+        )
+
+        self.assertFalse(failing_product_manager.is_valid())
+        self.assertIn('Quantidade de inscrições já foi atingida, '
+                      'novas inscrições não poderão ser realizadas',
+                      failing_product_manager.errors['__all__'])
+
+
+class SubscriptionOptionalServiceManagerRulesTest(TestCase):
+    """Testes com a intenção de validar as regras dos managers normalmente
+    colocadas dentro dos cleans"""
+
+    def setUp(self):
+        self.fake_factory = MockFactory()
+
+    def test_max_quantity_reached(self):
+        """
+            Testando a seguinte regra: Se quantidade de
+            inscrições já foi atingida, novas inscrições não poderão ser
+            realizadas
+        """
+
+        subscription = self.fake_factory.fake_subscription()
+        failing_subscription = self.fake_factory.fake_subscription(
+            lot=subscription.lot)
+
+        lot_category = subscription.lot.category
+
+        optional_service = self.fake_factory.fake_optional_service(
+            lot_categories=(lot_category,),
+            quantity=1,
+        )
+
+        price = self.fake_factory.fake_service_price(
+            lot_category=lot_category,
+            optional_service=optional_service
+
+        )
+
+        service_manager = managers.SubscriptionOptionalServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional_service': optional_service.pk,
+                'price': price.price,
+            }
+        )
+
+        self.assertTrue(service_manager.is_valid())
+        service_manager.save()
+        self.assertEqual(
+            addon_models.SubscriptionOptionalService.objects.all().count(), 1)
+
+        failing_product_manager = managers.SubscriptionOptionalServiceManager(
+            data={
+                'subscription': failing_subscription.pk,
+                'optional_service': optional_service.pk,
+                'price': price.price,
+            }
+        )
+
+        self.assertFalse(failing_product_manager.is_valid())
+        self.assertIn('Quantidade de inscrições já foi atingida, '
+                      'novas inscrições não poderão ser realizadas',
+                      failing_product_manager.errors['__all__'])
 
 
 class OptionalServiceManagerPersistenceTest(ManagerPersistenceTestCase):
@@ -287,14 +467,11 @@ class SubscriptionProductManagerPersistenceTest(ManagerPersistenceTestCase):
     required_fields = (
         'subscription',
         'price',
-        'total_allowed',
         'optional_product',
     )
 
     data_edit_to = {
         'price': decimal.Decimal(42),
-        'total_allowed': 42,
-        'count': 3,
     }
     fake_factory = None
 
@@ -311,7 +488,6 @@ class SubscriptionProductManagerPersistenceTest(ManagerPersistenceTestCase):
             'optional_product': optional.pk,
             'subscription': subscription.pk,
             'price': decimal.Decimal(random.randrange(155, 389)) / 100,
-            'total_allowed': 3
         }
 
     def test_create(self):
@@ -328,14 +504,11 @@ class SubscriptionServiceManagerPersistenceTest(ManagerPersistenceTestCase):
     required_fields = (
         'subscription',
         'price',
-        'total_allowed',
         'optional_service',
     )
 
     data_edit_to = {
         'price': decimal.Decimal(42),
-        'total_allowed': 42,
-        'count': 3,
     }
     fake_factory = None
 
@@ -361,78 +534,3 @@ class SubscriptionServiceManagerPersistenceTest(ManagerPersistenceTestCase):
 
     def test_edit(self):
         self.edit()
-
-
-class OptionalProductManagerRule(TestCase):
-    """Testes com a intenção de validar as regras dos managers normalmente
-    colocadas dentro dos cleans"""
-    pass
-
-
-class ProductPriceManagerRule(TestCase):
-    """Testes com a intenção de validar as regras dos managers normalmente
-    colocadas dentro dos cleans"""
-
-    def setUp(self):
-        self.fake_factory = MockFactory()
-
-    def test_setting_optional_product_has_cost_to_true(self):
-        """ Regra: se tiver "prices", o campo has_cost deve ser True """
-        new_optional_product = self.fake_factory.fake_optional_product()
-
-        # Validando que o produto possui a flag correta
-        self.assertFalse(new_optional_product.has_cost)
-
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
-
-        price_manager = managers.ProductPriceManager(
-            data={
-                'lot_category': new_optional_product.lot_categories.first().pk,
-                'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
-                'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
-                'price': format(decimal.Decimal(42.42), '.2f'),
-                'optional_product': new_optional_product.pk,
-            }
-        )
-
-        self.assertTrue(price_manager.is_valid())
-
-        # Buscando o objeto OptionalProduct da persistência para validar se
-        # o flag foi definido corretamente.
-
-        persisted = addon_models.OptionalProduct.objects.get(
-            pk=new_optional_product.pk)
-        # Validando que o produto possui a flag correta
-        self.assertTrue(persisted.has_cost)
-
-    def test_setting_optional_service_has_cost_to_true(self):
-        """ Regra: se tiver "prices", o campo has_cost deve ser True """
-        new_optional_service = self.fake_factory.fake_optional_service()
-
-        # Validando que o produto possui a flag correta
-        self.assertFalse(new_optional_service.has_cost)
-
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
-
-        price_manager = managers.ServicePriceManager(
-            data={
-                'lot_category': new_optional_service.lot_categories.first().pk,
-                'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
-                'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
-                'price': format(decimal.Decimal(42.42), '.2f'),
-                'optional_service': new_optional_service.pk,
-            }
-        )
-
-        self.assertTrue(price_manager.is_valid())
-
-        # Buscando o objeto OptionalProduct da persistência para validar se
-        # o flag foi definido corretamente.
-
-        persisted = addon_models.OptionalService.objects.get(
-            pk=new_optional_service.pk)
-        # Validando que o produto possui a flag correta
-        self.assertTrue(persisted.has_cost)
-

@@ -31,23 +31,16 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
         related_name='%(class)s_optionals',
         verbose_name='inscrição',
     )
-    created = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="data de criação",
-    )
+
     price = models.DecimalField(
         verbose_name='preço',
         decimal_places=2,
         max_digits=10,
     )
 
-    count = models.PositiveIntegerField(
-        verbose_name="quantidade até agora",
-        default=0,
-        blank=True,
-    )
-    total_allowed = models.PositiveIntegerField(
-        verbose_name="total permitido",
+    created = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="data de criação",
     )
 
 
@@ -59,7 +52,7 @@ class SubscriptionOptionalProduct(AbstractSubscriptionOptional):
         OptionalProduct,
         on_delete=models.CASCADE,
         verbose_name='opcional de produto',
-        related_name='products'
+        related_name='subscription_products'
     )
 
 
@@ -71,5 +64,5 @@ class SubscriptionOptionalService(AbstractSubscriptionOptional):
         OptionalService,
         on_delete=models.DO_NOTHING,
         verbose_name='opcional de serviço',
-        related_name='services'
+        related_name='subscription_services'
     )
