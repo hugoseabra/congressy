@@ -7,8 +7,8 @@
 from django.db import models
 
 from addon import rules
-from core.model import track_data
 from base.models import EntityMixin
+from core.model import track_data
 from gatheros_subscription.models import LotCategory
 from .optional import OptionalProduct, OptionalService
 
@@ -18,6 +18,7 @@ class AbstractPrice(EntityMixin, models.Model):
     """
         Opcionais pagos possuem preços que passar a assumi
     """
+
     class Meta:
         abstract = True
 
@@ -58,5 +59,3 @@ class ServicePrice(AbstractPrice):
         related_name='prices',
     )
 
-def my_callback(sender, **kwargs):
-    print("Request finished!")

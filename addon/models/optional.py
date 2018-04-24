@@ -6,10 +6,10 @@
 
 from django.db import models
 
-from addon import rules
 from base.models import EntityMixin
 from gatheros_subscription.models import LotCategory
 from .optional_type import OptionalType
+from .session import Session
 from .theme import Theme
 
 
@@ -22,20 +22,34 @@ class AbstractOptional(EntityMixin, models.Model):
         a inscrição, separando a compra, pois a inscrição em sua venda própria
         e separada.
     """
-    rule_instances = (
-        rules.MustDateEndAfterDateStart,
-    )
 
     class Meta:
         abstract = True
+
+    lot_categories = models.ManyToManyField(
+        LotCategory,
+        verbose_name='categorias',
+        related_name='%(class)s_optionals'
+    )
+
+    optional_type = models.ForeignKey(
+        OptionalType,
+        on_delete=models.PROTECT,
+        verbose_name='tipo',
+        related_name='%(class)s_optionals',
+    )
+
+    session = models.ForeignKey(
+        Session,
+        on_delete=models.PROTECT,
+        verbose_name='sessão',
+        related_name='%(class)s_optionals',
+    )
 
     name = models.CharField(
         max_length=255,
         verbose_name="nome",
     )
-
-    date_start = models.DateTimeField(verbose_name="data inicial", )
-    date_end = models.DateTimeField(verbose_name="data final", )
 
     description = models.TextField(
         verbose_name="descrição",
@@ -55,19 +69,6 @@ class AbstractOptional(EntityMixin, models.Model):
     has_cost = models.BooleanField(
         verbose_name="possui custo",
         default=False,
-    )
-
-    lot_categories = models.ManyToManyField(
-        LotCategory,
-        verbose_name='categorias',
-        related_name='%(class)s_optionals'
-    )
-
-    optional_type = models.ForeignKey(
-        OptionalType,
-        on_delete=models.PROTECT,
-        verbose_name='tipo',
-        related_name='%(class)s_optionals',
     )
 
     created = models.DateTimeField(
@@ -96,6 +97,9 @@ class AbstractOptional(EntityMixin, models.Model):
         verbose_name="modificado por",
     )
 
+    def __str__(self):
+        return self.name
+
 
 class OptionalProduct(AbstractOptional):
     """
@@ -103,17 +107,12 @@ class OptionalProduct(AbstractOptional):
         inscrição de um evento. Exemplo: camiseta, caneca, kit, dentre outros.
     """
 
-    def __str__(self):
-        return self.name
-
 
 class OptionalService(AbstractOptional):
     """
         Opcional de Serviço é um serviço a ser adquirido no ato da inscrição
         de um evento. Exemplo: curso, workshop, treinamento, dentre outros.
     """
-    def __str__(self):
-        return self.name
 
     theme = models.ForeignKey(
         Theme,
@@ -125,22 +124,6 @@ class OptionalService(AbstractOptional):
     place = models.CharField(
         max_length=255,
         verbose_name='local',
-        null=True,
-        blank=True,
-    )
-
-    session_restriction = models.NullBooleanField(
-        default=False,
-        verbose_name='restringir por sessão',
-        null=True,
-        blank=True,
-        help_text='Participante poderá participar de apenas um sessão por vez.'
-    )
-
-    theme_limit = models.PositiveIntegerField(
-        verbose_name='limitar por tema',
-        help_text='Participante poderá adquirir opcionais dentro de um limite'
-                  ' por tema.',
         null=True,
         blank=True,
     )

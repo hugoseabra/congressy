@@ -43,6 +43,9 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
         verbose_name="data de criação",
     )
 
+    def __str__(self):
+        return '{}: {}'.format(__name__, self.subscription.person.name)
+
 
 class SubscriptionOptionalProduct(AbstractSubscriptionOptional):
     """
