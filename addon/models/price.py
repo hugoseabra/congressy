@@ -6,6 +6,7 @@
 
 from django.db import models
 
+from addon import rules
 from base.models import EntityMixin
 from gatheros_subscription.models import LotCategory
 from .optional import OptionalProduct, OptionalService
@@ -17,6 +18,12 @@ class AbstractPrice(EntityMixin, models.Model):
     """
     class Meta:
         abstract = True
+
+    rule_instances = (
+        rules.MustDateEndAfterDateStart,
+        rules.MustLotCategoryBeAmongOptionalLotCategories,
+        rules.MustHaveUniqueDatetimeInterval,
+    )
 
     lot_category = models.ForeignKey(
         LotCategory,

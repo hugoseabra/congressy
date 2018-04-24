@@ -6,6 +6,7 @@
 
 from django.db import models
 
+from addon import rules
 from base.models import EntityMixin
 from gatheros_subscription.models import Subscription
 from .optional import OptionalProduct, OptionalService
@@ -17,6 +18,10 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
         redundantemente, informações da Opcional informada para fins de
         auditoria.
     """
+    rule_instances = (
+        rules.MustBeSameOptionalLotCategory,
+    )
+
     class Meta:
         abstract = True
 

@@ -7,8 +7,9 @@ import random
 from test_plus.test import TestCase
 
 from addon import managers, models as addon_models
+from addon import managers
+from addon.tests.mock_factory import MockFactory, gen_random_datetime
 from base.tests.test_suites import ManagerPersistenceTestCase
-from .mock_factory import MockFactory, gen_random_datetime
 
 
 class ThemeManagerPersistenceTest(ManagerPersistenceTestCase):
