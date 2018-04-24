@@ -94,22 +94,31 @@ class SubscriptionOptionalServiceManager(managers.Manager):
 
     def clean(self):
         """
-        Implementação da regra:
+        Implementação da regras:
 
-            Se quantidade de inscrições já foi atingida, novas inscrições
-            não poderão ser realizadas
+            Regra #1: Se quantidade de inscrições já foi atingida,
+                novas inscrições não poderão ser realizadas
+            Regra #2: validar restrição de sessão se há restrição por Sessão,
+                ou seja, se há outro Optional dentro do mesmo intervalo de
+                data e hora final e inicial do Optional informado.
 
         """
         cleaned_data = super().clean()
 
         optional_service = cleaned_data['optional_service']
 
+        # Regra 1:
         num_subs = optional_service.subscription_services.count()
-
         if num_subs >= optional_service.quantity:
             raise ValidationError(
                 'Quantidade de inscrições já foi atingida, novas inscrições '
                 'não poderão ser realizadas')
+
+        # Regra 2:
+        if optional_service.session_restriction:
+            raise NotImplementedError('Continue from here. This is not '
+                                      'implemeted.')
+
 
         return cleaned_data
 
