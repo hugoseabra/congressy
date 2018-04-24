@@ -1,10 +1,12 @@
 """ Testes de managers do módulo de opcionais. """
 
 import decimal
-import random
 from datetime import datetime, timedelta
 
-from addon import managers
+import random
+from test_plus.test import TestCase
+
+from addon import managers, models as addon_models
 from base.tests.test_suites import ManagerPersistenceTestCase
 from .mock_factory import MockFactory, gen_random_datetime
 
@@ -418,3 +420,47 @@ class SubscriptionServiceManagerPersistenceTest(ManagerPersistenceTestCase):
 
     def test_edit(self):
         self.edit()
+
+
+class OptionalProductManagerRule(TestCase):
+    """Testes com a intenção de validar as regras dos managers normalmente
+    colocadas dentro dos cleans"""
+    pass
+
+
+class ProductPriceManagerRule(TestCase):
+    """Testes com a intenção de validar as regras dos managers normalmente
+    colocadas dentro dos cleans"""
+
+    def setUp(self):
+        self.fake_factory = MockFactory()
+
+    def test_setting_optional_product_has_cost_to_true(self):
+        """ Regra: se tiver "prices", o campo has_cost deve ser True """
+        new_optional_product = self.fake_factory.fake_optional_product()
+
+        # Validando que o produto possui a flag correta
+        self.assertFalse(new_optional_product.has_cost)
+
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+
+        price_manager = managers.ProductPriceManager(
+            data={
+                'lot_category': new_optional_product.lot_categories.first().pk,
+                'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
+                'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional_product': new_optional_product.pk,
+            }
+        )
+
+        self.assertTrue(price_manager.is_valid())
+
+        # Buscando o objeto OptionalProduct da persistência para validar se
+        # o flag foi definido corretamente.
+
+        persisted = addon_models.OptionalProduct.objects.get(
+            pk=new_optional_product.pk)
+        # Validando que o produto possui a flag correta
+        self.assertTrue(persisted.has_cost)
