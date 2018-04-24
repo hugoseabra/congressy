@@ -1,3 +1,5 @@
+from django.forms import ValidationError
+
 from base import managers
 from .models import (
     OptionalProduct,
@@ -90,6 +92,27 @@ class SubscriptionOptionalServiceManager(managers.Manager):
         model = SubscriptionOptionalService
         fields = '__all__'
 
+    def clean(self):
+        """
+        Implementação da regra:
+
+            Se quantidade de inscrições já foi atingida, novas inscrições
+            não poderão ser realizadas
+
+        """
+        cleaned_data = super().clean()
+
+        optional_service = cleaned_data['optional_service']
+
+        num_subs = optional_service.subscription_services.count()
+
+        if num_subs >= optional_service.quantity:
+            raise ValidationError(
+                'Quantidade de inscrições já foi atingida, novas inscrições '
+                'não poderão ser realizadas')
+
+        return cleaned_data
+
 
 class SubscriptionOptionalProductManager(managers.Manager):
     """ Manager de produtos opcionais de inscrições """
@@ -97,3 +120,22 @@ class SubscriptionOptionalProductManager(managers.Manager):
     class Meta:
         model = SubscriptionOptionalProduct
         fields = '__all__'
+
+    def clean(self):
+        """
+        Implementação da regra:
+
+            Se quantidade de inscrições já foi atingida, novas inscrições
+            não poderão ser realizadas
+
+        """
+        cleaned_data = super().clean()
+
+        optional_product = cleaned_data['optional_product']
+        num_subs = optional_product.subscription_products.count()
+        if num_subs >= optional_product.quantity:
+            raise ValidationError(
+                'Quantidade de inscrições já foi atingida, '
+                'novas inscrições não poderão ser realizadas')
+
+        return cleaned_data

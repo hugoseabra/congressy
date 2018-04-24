@@ -108,7 +108,8 @@ class MockFactory:
             name=self.fake_factory.words(nb=3, ext_word_list=None),
         )
 
-    def fake_optional_product(self, lot_categories=None, optional_type=None):
+    def fake_optional_product(self, lot_categories=None, optional_type=None,
+                              quantity=3):
 
         if not lot_categories:
             lot_categories = [self.fake_lot_category()]
@@ -124,7 +125,7 @@ class MockFactory:
             date_start=date_start,
             date_end=date_end,
             description='original description',
-            quantity=3,
+            quantity=quantity,
             optional_type=optional_type,
         )
 
@@ -138,7 +139,7 @@ class MockFactory:
         return op
 
     def fake_optional_service(self, lot_categories=None, optional_type=None,
-                              theme=None):
+                              theme=None, quantity=3):
 
         if not lot_categories:
             lot_categories = [self.fake_lot_category()]
@@ -157,7 +158,7 @@ class MockFactory:
             date_start=date_start,
             date_end=date_end,
             description='original description',
-            quantity=3,
+            quantity=quantity,
             theme=theme,
             optional_type=optional_type,
         )
