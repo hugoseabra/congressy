@@ -70,7 +70,6 @@ class OptionalProductManagerPersistenceTest(ManagerPersistenceTestCase):
 
     data_edit_to = {
         'description': 'edited description',
-        'date_end': gen_random_datetime(),
         'quantity': random.randint(5, 10000),
         'published': False,
         'has_cost': False,
@@ -144,13 +143,10 @@ class OptionalServiceManagerPersistenceTest(ManagerPersistenceTestCase):
 
     data_edit_to = {
         'description': 'edited description',
-        'date_end': gen_random_datetime(),
         'quantity': random.randint(5, 10000),
         'published': False,
         'has_cost': False,
         'modified_by': 'test user',
-        'start_on': gen_random_datetime(),
-        'duration': random.randint(5, 10000)
     }
 
     def setUp(self):
@@ -221,36 +217,20 @@ class ProductPriceManagerPersistenceTest(ManagerPersistenceTestCase):
         'price': decimal.Decimal(random.randrange(155, 389)) / 100,
     }
 
-    def _create_manager(self, instance=None, data=None):
-
-        fake_factory = MockFactory()
-
-        if not data:
-            data = self.data
-
-        if 'lot_category' not in data:
-            data['lot_category'] = fake_factory.fake_lot_category()
-
-        if instance is not None:
-            manager = self.manager_class(instance=instance, data=data)
-        else:
-            manager = self.manager_class(data=data)
-
-        return manager
-
     def setUp(self):
-
         fake_factory = MockFactory()
 
         date_start = datetime.now()
         date_end = date_start + timedelta(days=15)
 
+        optional = fake_factory.fake_optional_product()
+
         self.data = {
-            'optional_product': fake_factory.fake_optional_product().pk,
+            'optional_product': optional.pk,
             'date_start': date_start.strftime("%d/%m/%Y %H:%M"),
             'date_end': date_end.strftime("%d/%m/%Y %H:%M"),
             'price': decimal.Decimal(random.randrange(155, 389)) / 100,
-            'lot_category': fake_factory.fake_lot_category().pk,
+            'lot_category': optional.lot_categories.first().pk,
         }
 
     def test_create(self):
@@ -275,36 +255,20 @@ class ServicePriceManagerPersistenceTest(ManagerPersistenceTestCase):
         'price': decimal.Decimal(random.randrange(155, 389)) / 100,
     }
 
-    def _create_manager(self, instance=None, data=None):
-
-        fake_factory = MockFactory()
-
-        if not data:
-            data = self.data
-
-        if 'lot_category' not in data:
-            data['lot_category'] = fake_factory.fake_lot_category()
-
-        if instance is not None:
-            manager = self.manager_class(instance=instance, data=data)
-        else:
-            manager = self.manager_class(data=data)
-
-        return manager
-
     def setUp(self):
-
         fake_factory = MockFactory()
 
         date_start = datetime.now()
         date_end = date_start + timedelta(days=15)
 
+        optional = fake_factory.fake_optional_service()
+
         self.data = {
-            'optional_service': fake_factory.fake_optional_service().pk,
+            'optional_service': optional.pk,
             'date_start': date_start.strftime("%d/%m/%Y %H:%M"),
             'date_end': date_end.strftime("%d/%m/%Y %H:%M"),
             'price': decimal.Decimal(random.randrange(155, 389)) / 100,
-            'lot_category': fake_factory.fake_lot_category().pk,
+            'lot_category': optional.lot_categories.first().pk,
         }
 
     def test_create(self):
@@ -330,32 +294,20 @@ class SubscriptionProductManagerPersistenceTest(ManagerPersistenceTestCase):
         'total_allowed': 42,
         'count': 3,
     }
-
-    def _create_manager(self, instance=None, data=None):
-
-        if not data:
-            data = self.data
-
-        if 'subscription' not in data:
-            data['subscription'] = self.fake_factory.fake_subscription().pk
-
-        if 'optional_product' not in data:
-            data['optional_product'] = \
-                self.fake_factory.fake_optional_product().pk
-
-        if instance is not None:
-            manager = self.manager_class(instance=instance, data=data)
-        else:
-            manager = self.manager_class(data=data)
-
-        return manager
+    fake_factory = None
 
     def setUp(self):
-
         self.fake_factory = MockFactory()
+        subscription = self.fake_factory.fake_subscription()
+        lot_category = subscription.lot.category
+
+        optional = self.fake_factory.fake_optional_product(lot_categories=[
+            lot_category
+        ])
+
         self.data = {
-            'subscription': self.fake_factory.fake_subscription().pk,
-            'optional_product': self.fake_factory.fake_optional_product().pk,
+            'optional_product': optional.pk,
+            'subscription': subscription.pk,
             'price': decimal.Decimal(random.randrange(155, 389)) / 100,
             'total_allowed': 3
         }
@@ -383,32 +335,21 @@ class SubscriptionServiceManagerPersistenceTest(ManagerPersistenceTestCase):
         'total_allowed': 42,
         'count': 3,
     }
-
-    def _create_manager(self, instance=None, data=None):
-
-        if not data:
-            data = self.data
-
-        if 'subscription' not in data:
-            data['subscription'] = self.fake_factory.fake_subscription().pk
-
-        if 'optional_service' not in data:
-            data['optional_service'] = \
-                self.fake_factory.fake_optional_service().pk
-
-        if instance is not None:
-            manager = self.manager_class(instance=instance, data=data)
-        else:
-            manager = self.manager_class(data=data)
-
-        return manager
+    fake_factory = None
 
     def setUp(self):
-
         self.fake_factory = MockFactory()
+
+        subscription = self.fake_factory.fake_subscription()
+        lot_category = subscription.lot.category
+
+        optional = self.fake_factory.fake_optional_service(lot_categories=[
+            lot_category
+        ])
+
         self.data = {
-            'subscription': self.fake_factory.fake_subscription().pk,
-            'optional_service': self.fake_factory.fake_optional_service().pk,
+            'optional_service': optional.pk,
+            'subscription': subscription.pk,
             'price': decimal.Decimal(random.randrange(155, 389)) / 100,
             'total_allowed': 3
         }

@@ -24,6 +24,9 @@ class MustLotCategoryBeAmongOptionalLotCategories(RuleChecker):
     """
 
     def check(self, model_instance, *args, **kwargs):
+        if model_instance._state.adding is False:
+            return
+
         if hasattr(model_instance, 'optional_product'):
             optional = model_instance.optional_product
         else:
@@ -46,6 +49,9 @@ class MustHaveUniqueDatetimeInterval(RuleChecker):
     """
 
     def check(self, model_instance, *args, **kwargs):
+        if model_instance._state.adding is False:
+            return
+
         if hasattr(model_instance, 'optional_product'):
             optional = model_instance.optional_product
         else:
@@ -79,6 +85,9 @@ class MustBeSameOptionalLotCategory(RuleChecker):
     """
 
     def check(self, model_instance, *args, **kwargs):
+        if model_instance._state.adding is False:
+            return
+
         if hasattr(model_instance, 'optional_product'):
             optional = model_instance.optional_product
         else:

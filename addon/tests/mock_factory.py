@@ -20,7 +20,7 @@ from addon.models import (
     Theme,
 )
 from gatheros_event.models import Person, Organization, Event, Category
-from gatheros_subscription.models import LotCategory, Subscription
+from gatheros_subscription.models import Lot, LotCategory, Subscription
 
 
 class MockFactory:
@@ -58,6 +58,22 @@ class MockFactory:
             category=Category.objects.first(),
         )
 
+    def fake_lot(self, event=None, lot_category=None):
+
+        if not event:
+            event = self.fake_event()
+
+        if not lot_category:
+            lot_category = self.fake_lot_category(event=event)
+
+        return Lot.objects.create(
+            event=event,
+            name='Lot: ' + ' '.join(self.fake_factory.words(nb=3)),
+            date_start=datetime.now() + timedelta(days=3),
+            date_end=datetime.now() + timedelta(days=4),
+            category=lot_category,
+        )
+
     def fake_person(self):
         person = Person(name=self.fake_factory.name())
         first_name = person.name.split(' ')[0]
@@ -72,21 +88,16 @@ class MockFactory:
 
         return person
 
-    def fake_subscription(self, event=None, person=None):
-
-        if not event:
-            event = self.fake_event()
+    def fake_subscription(self, lot=None, person=None):
 
         if not person:
             person = self.fake_person()
 
-        lot = event.lots.first()
-        lot.category = self.fake_lot_category(event=lot.event)
-        lot.save()
+        if not lot:
+            lot = self.fake_lot()
 
         return Subscription.objects.create(
             lot=lot,
-            event=event,
             person=person,
             created_by=0,
         )
@@ -109,6 +120,7 @@ class MockFactory:
         date_end = datetime.now() + timedelta(days=3)
 
         op = OptionalProduct(
+            name='optional product',
             date_start=date_start,
             date_end=date_end,
             description='original description',
@@ -143,6 +155,7 @@ class MockFactory:
         date_end = datetime.now() + timedelta(days=3)
 
         os = OptionalService(
+            name='optional service',
             date_start=date_start,
             date_end=date_end,
             description='original description',
