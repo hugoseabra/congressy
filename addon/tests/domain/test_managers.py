@@ -5,8 +5,8 @@ import random
 from datetime import datetime, timedelta
 
 from addon import managers
+from addon.tests.mock_factory import MockFactory, gen_random_datetime
 from base.tests.test_suites import ManagerPersistenceTestCase
-from .mock_factory import MockFactory, gen_random_datetime
 
 
 class ThemeManagerPersistenceTest(ManagerPersistenceTestCase):

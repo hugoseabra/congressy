@@ -2,11 +2,12 @@
     Testes de integridade de dados, para regras de domínio.
 """
 from datetime import timedelta
+
 from test_plus.test import TestCase
 
+from addon import rules
+from addon.tests.mock_factory import MockFactory
 from base.models import RuleIntegrityError
-from .. import rules
-from .mock_factory import MockFactory
 
 
 class OptionalPriceRulesTest(TestCase):
