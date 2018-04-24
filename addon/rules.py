@@ -13,7 +13,9 @@ class MustDateEndAfterDateStart(RuleChecker):
 
     def check(self, model_instance, *args, **kwargs):
         if model_instance.date_start >= model_instance.date_end:
-            raise RuleIntegrityError('Data inicial deve ser anterior a data final.')
+            raise RuleIntegrityError(
+                'Data inicial deve ser anterior a data final.'
+            )
 
 
 # =============================== PRICE ===================================== #
@@ -24,9 +26,6 @@ class MustLotCategoryBeAmongOptionalLotCategories(RuleChecker):
     """
 
     def check(self, model_instance, *args, **kwargs):
-        if model_instance._state.adding is False:
-            return
-
         if hasattr(model_instance, 'optional_product'):
             optional = model_instance.optional_product
         else:
@@ -50,7 +49,11 @@ class MustHaveUniqueDatetimeInterval(RuleChecker):
 
     def check(self, model_instance, *args, **kwargs):
         if model_instance._state.adding is False:
-            return
+            date_start_changed = model_instance.has_changed('date_start')
+            date_end_changed = model_instance.has_changed('date_end')
+
+            if not date_start_changed and not date_end_changed:
+                return
 
         if hasattr(model_instance, 'optional_product'):
             optional = model_instance.optional_product
@@ -65,10 +68,13 @@ class MustHaveUniqueDatetimeInterval(RuleChecker):
                 price.date_end.strftime('%d/%m/%Y %H:%M'),
             )
 
-            if model_instance.date_start >= price.date_start \
-                    and model_instance.date_end <= price.date_end:
+            dt_start_conflicts = \
+                price.date_start <= model_instance.date_start <= price.date_end
+            dt_end_conflicts = \
+                price.date_start <= model_instance.date_end <= price.date_end
+
+            if dt_start_conflicts or dt_end_conflicts:
                 conflict_prices.append(price_str)
-                continue
 
         if conflict_prices:
             raise RuleIntegrityError(
@@ -85,9 +91,6 @@ class MustBeSameOptionalLotCategory(RuleChecker):
     """
 
     def check(self, model_instance, *args, **kwargs):
-        if model_instance._state.adding is False:
-            return
-
         if hasattr(model_instance, 'optional_product'):
             optional = model_instance.optional_product
         else:

@@ -1,14 +1,13 @@
 """ Testes de managers do módulo de opcionais. """
 
 import decimal
+import random
 from datetime import datetime, timedelta
 
-import random
 from test_plus.test import TestCase
 
-from addon import managers, models as addon_models
-from addon import managers
-from addon.tests.mock_factory import MockFactory, gen_random_datetime
+from addon import models as addon_models, managers
+from addon.tests.mock_factory import MockFactory
 from base.tests.test_suites import ManagerPersistenceTestCase
 
 

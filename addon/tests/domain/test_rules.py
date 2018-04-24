@@ -186,6 +186,9 @@ class PriceRulesTest(TestCase):
         price2 = \
             self.mocker.fake_product_price(lot_category=price1.lot_category)
 
+        # força mesmas datas
+        price2.date_start = price1.date_start + timedelta(minutes=30)
+
         with self.assertRaises(RuleIntegrityError) as e:
             rule.check(model_instance=price2)
 
@@ -206,6 +209,9 @@ class PriceRulesTest(TestCase):
         # Já existe um preço será criado com o mesmo período
         price2 = \
             self.mocker.fake_service_price(lot_category=price1.lot_category)
+
+        # força mesmas datas
+        price2.date_start = price1.date_start + timedelta(minutes=30)
 
         with self.assertRaises(RuleIntegrityError) as e:
             rule.check(model_instance=price2)

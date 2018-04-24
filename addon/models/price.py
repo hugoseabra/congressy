@@ -7,11 +7,13 @@
 from django.db import models
 
 from addon import rules
+from core.model import track_data
 from base.models import EntityMixin
 from gatheros_subscription.models import LotCategory
 from .optional import OptionalProduct, OptionalService
 
 
+@track_data('date_start', 'date_end')
 class AbstractPrice(EntityMixin, models.Model):
     """
         Opcionais pagos possuem preços que passar a assumi
@@ -55,3 +57,6 @@ class ServicePrice(AbstractPrice):
         on_delete=models.CASCADE,
         related_name='prices',
     )
+
+def my_callback(sender, **kwargs):
+    print("Request finished!")
