@@ -101,10 +101,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             try:
                 person = Person.objects.get(user=self.request.user)
             except Person.DoesNotExist:
-                person_data = self.storage.get_step_data('person')
-                person_email = person_data.get('person-email')
-
-                person = Person.objects.get(email=person_email)
+                raise Exception('User com email {} não possui '
+                                'person'.format(self.request.user.email))
             self.storage.person = person
 
         lot_data = self.storage.get_step_data('lot')
@@ -201,13 +199,12 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
             # Assert that we have a person in storage
             if not hasattr(self.storage, 'person'):
-                person_data = self.storage.get_step_data('person')
-                person_email = person_data.get('person-email')
 
                 try:
-                    person = Person.objects.get(email=person_email)
+                    person = Person.objects.get(user=self.request.user)
                 except Person.DoesNotExist:
-                    person = Person.objects.get(email=self.request.user.email)
+                    raise Exception('User com email {} não possui '
+                                    'person'.format(self.request.user.email))
 
                 self.storage.person = person
 
