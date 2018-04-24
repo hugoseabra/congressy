@@ -73,7 +73,6 @@ class OptionalProductManagerPersistenceTest(ManagerPersistenceTestCase):
 
     data_edit_to = {
         'description': 'edited description',
-        'date_end': gen_random_datetime(),
         'quantity': random.randint(5, 10000),
         'published': False,
         'has_cost': False,
@@ -140,20 +139,18 @@ class OptionalServiceManagerPersistenceTest(ManagerPersistenceTestCase):
         'has_cost',
         'lot_categories',
         'optional_type',
-        'start_on',
-        'duration',
         'theme'
     )
 
+    date_start = datetime.now() - timedelta(days=3)
+    date_end = datetime.now() + timedelta(days=3)
+
     data_edit_to = {
         'description': 'edited description',
-        'date_end': gen_random_datetime(),
         'quantity': random.randint(5, 10000),
         'published': False,
-        'has_cost': False,
+        'has_cost': True,
         'modified_by': 'test user',
-        'start_on': gen_random_datetime(),
-        'duration': random.randint(5, 10000)
     }
 
     def setUp(self):
@@ -173,8 +170,6 @@ class OptionalServiceManagerPersistenceTest(ManagerPersistenceTestCase):
             'has_cost': True,
             'lot_categories': (fake_factory.fake_lot_category().pk,),
             'optional_type': fake_factory.fake_optional_type().pk,
-            'start_on': datetime(1991, 1, 1, 00, 00, 00),
-            'duration': 3,
             'theme': fake_factory.fake_theme().pk
         }
 
