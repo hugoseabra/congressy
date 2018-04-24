@@ -275,7 +275,6 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         price = self.fake_factory.fake_service_price(
             lot_category=lot_category,
             optional_service=optional_service
-
         )
 
         service_manager = managers.SubscriptionOptionalServiceManager(
@@ -303,6 +302,63 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         self.assertIn('Quantidade de inscrições já foi atingida, '
                       'novas inscrições não poderão ser realizadas',
                       failing_product_manager.errors['__all__'])
+
+    def test_validation_by_session_with_flag_on(self):
+
+        # Crie uma única Subscription para ser usada para criar o
+        # SubscriptionOptionalService
+        subscription = self.fake_factory.fake_subscription()
+
+        # Crie dois OptionalServices
+        service_1 = self.fake_factory.fake_optional_service(
+            lot_categories=(subscription.lot.category,))
+        service_2 = self.fake_factory.fake_optional_service(
+            lot_categories=(subscription.lot.category,))
+
+        # Definindo datas conflitantes, ambas começam ao mesmo tempo.
+        now = datetime.now()
+
+        service_1.date_start = now
+        service_2.date_start = now
+
+        service_1.date_end = now + timedelta(days=1)
+        service_2.date_end = now + timedelta(days=1)
+
+        # Configurando os dois serviços para usar a flag de sessão
+        service_1.session_restriction = True
+        service_2.session_restriction = True
+
+        service_1.save()
+        service_2.save()
+
+        # Criando os gerenciadores de serviços
+        service_1_manager = managers.SubscriptionOptionalServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional_service': service_1.pk,
+                'price': format(decimal.Decimal(42.42), '.2f'),
+            }
+        )
+
+        service_2_manager = managers.SubscriptionOptionalServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional_service': service_2.pk,
+                'price': format(decimal.Decimal(42.42), '.2f'),
+            }
+        )
+
+        # Validações
+        self.assertTrue(service_1_manager.is_valid())
+        service_1_manager.save()
+        self.assertFalse(service_2_manager.is_valid())
+
+
+    def test_validation_by_session_with_flag_off(self):
+        self.fail('Not implemented')
+
+    def test_validation_by_theme(self):
+        self.fail('Not implemented')
 
 
 class OptionalServiceManagerPersistenceTest(ManagerPersistenceTestCase):
