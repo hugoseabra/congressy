@@ -13,7 +13,7 @@ class MustDateEndAfterDateStart(RuleChecker):
 
     def check(self, model_instance, *args, **kwargs):
         if model_instance.date_start >= model_instance.date_end:
-            raise RuleIntegrityError('Data inicial deve ser após data final.')
+            raise RuleIntegrityError('Data inicial deve ser anterior a data final.')
 
 
 # =============================== PRICE ===================================== #

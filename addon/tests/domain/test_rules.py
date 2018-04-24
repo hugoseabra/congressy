@@ -34,7 +34,7 @@ class OptionalPriceRulesTest(TestCase):
             self.rule.check(model_instance=instance)
 
         self.assertIn(
-            'Data inicial deve ser após data final',
+            'Data inicial deve ser anterior a data final',
             str(e.exception)
         )
 
@@ -56,7 +56,7 @@ class OptionalPriceRulesTest(TestCase):
             self.rule.check(model_instance=instance)
 
         self.assertIn(
-            'Data inicial deve ser após data final',
+            'Data inicial deve ser anterior a data final',
             str(e.exception)
         )
 
@@ -77,7 +77,7 @@ class OptionalPriceRulesTest(TestCase):
             self.rule.check(model_instance=instance)
 
         self.assertIn(
-            'Data inicial deve ser após data final',
+            'Data inicial deve ser anterior a data final',
             str(e.exception)
         )
 
@@ -98,7 +98,7 @@ class OptionalPriceRulesTest(TestCase):
             self.rule.check(model_instance=instance)
 
         self.assertIn(
-            'Data inicial deve ser após data final',
+            'Data inicial deve ser anterior a data final',
             str(e.exception)
         )
 

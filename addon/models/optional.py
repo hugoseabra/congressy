@@ -112,6 +112,9 @@ class OptionalService(AbstractOptional):
         Opcional de Serviço é um serviço a ser adquirido no ato da inscrição
         de um evento. Exemplo: curso, workshop, treinamento, dentre outros.
     """
+    def __str__(self):
+        return self.name
+
     theme = models.ForeignKey(
         Theme,
         on_delete=models.PROTECT,

@@ -125,8 +125,6 @@ class MockFactory:
             date_end=date_end,
             description='original description',
             quantity=3,
-            published=True,
-            has_cost=True,
             optional_type=optional_type,
         )
 
@@ -160,8 +158,6 @@ class MockFactory:
             date_end=date_end,
             description='original description',
             quantity=3,
-            published=True,
-            has_cost=True,
             theme=theme,
             optional_type=optional_type,
         )

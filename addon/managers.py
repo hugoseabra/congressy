@@ -50,6 +50,18 @@ class ProductPriceManager(managers.Manager):
         model = ProductPrice
         fields = '__all__'
 
+    def clean(self):
+        cleaned_data = super().clean()
+        """
+            Optional: se tiver "prices", o campo has_cost deve ser True
+        """
+
+        optional_product = cleaned_data['optional_product']
+        optional_product.has_cost = True
+        optional_product.save()
+
+        return cleaned_data
+
 
 class ServicePriceManager(managers.Manager):
     """ Manager de preços. """
@@ -57,6 +69,18 @@ class ServicePriceManager(managers.Manager):
     class Meta:
         model = ServicePrice
         fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        """
+            Optional: se tiver "prices", o campo has_cost deve ser True
+        """
+
+        optional_service = cleaned_data['optional_service']
+        optional_service.has_cost = True
+        optional_service.save()
+
+        return cleaned_data
 
 
 class SubscriptionOptionalServiceManager(managers.Manager):
