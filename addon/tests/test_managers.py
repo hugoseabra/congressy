@@ -464,3 +464,34 @@ class ProductPriceManagerRule(TestCase):
             pk=new_optional_product.pk)
         # Validando que o produto possui a flag correta
         self.assertTrue(persisted.has_cost)
+
+    def test_setting_optional_service_has_cost_to_true(self):
+        """ Regra: se tiver "prices", o campo has_cost deve ser True """
+        new_optional_service = self.fake_factory.fake_optional_service()
+
+        # Validando que o produto possui a flag correta
+        self.assertFalse(new_optional_service.has_cost)
+
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+
+        price_manager = managers.ServicePriceManager(
+            data={
+                'lot_category': new_optional_service.lot_categories.first().pk,
+                'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
+                'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional_service': new_optional_service.pk,
+            }
+        )
+
+        self.assertTrue(price_manager.is_valid())
+
+        # Buscando o objeto OptionalProduct da persistência para validar se
+        # o flag foi definido corretamente.
+
+        persisted = addon_models.OptionalService.objects.get(
+            pk=new_optional_service.pk)
+        # Validando que o produto possui a flag correta
+        self.assertTrue(persisted.has_cost)
+

@@ -70,6 +70,18 @@ class ServicePriceManager(managers.Manager):
         model = ServicePrice
         fields = '__all__'
 
+    def clean(self):
+        cleaned_data = super().clean()
+        """
+            Optional: se tiver "prices", o campo has_cost deve ser True
+        """
+
+        optional_service = cleaned_data['optional_service']
+        optional_service.has_cost = True
+        optional_service.save()
+
+        return cleaned_data
+
 
 class SubscriptionOptionalServiceManager(managers.Manager):
     """ Manager de serviços opcionais de inscrições"""
