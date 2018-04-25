@@ -177,7 +177,6 @@ class Subscription(models.Model, GatherosModelMixin):
 
     def save(self, *args, **kwargs):
         """ Salva entidade. """
-        self.full_clean()
         self.check_rules()
         self.congressy_percent = self.event.congressy_percent
         super(Subscription, self).save(*args, **kwargs)
