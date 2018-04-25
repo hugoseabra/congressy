@@ -28,7 +28,7 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
     subscription = models.ForeignKey(
         Subscription,
         on_delete=models.CASCADE,
-        related_name='%(class)s_optionals',
+        related_name='%(class)s',
         verbose_name='inscrição',
     )
 

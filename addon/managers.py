@@ -1,6 +1,7 @@
 from django.forms import ValidationError
 
 from base import managers
+from core.util.date import DateTimeRange
 from .models import (
     OptionalProduct,
     OptionalService,
@@ -115,6 +116,7 @@ class SubscriptionOptionalServiceManager(managers.Manager):
         cleaned_data = super().clean()
 
         optional_service = cleaned_data['optional_service']
+        subscription = cleaned_data['subscription']
 
         # Regra 1:
         num_subs = optional_service.subscription_services.count()
@@ -126,9 +128,25 @@ class SubscriptionOptionalServiceManager(managers.Manager):
             )
 
         # Regra 2:
-        # if optional_service.session_restriction:
-        #     raise NotImplementedError('Continue from here. This is not '
-        #                               'implemented.')
+        # Buscar inscrição e verificar que não possui nenhuma
+        if optional_service.session.restrict_unique:
+
+            new_start = optional_service.session.date_start
+            new_end = optional_service.session.date_end
+
+            for optional in subscription.subscriptionoptionalservice.all():
+
+                start = optional.optional_service.session.date_start
+                stop = optional.optional_service.session.date_end
+
+                session_range = DateTimeRange(start=start, stop=stop)
+
+                if new_start in session_range or new_end in session_range:
+                    raise ValidationError(
+                        'Conflito de horário: o inicio do opcional {} '
+                        'está dentro da sessão do opcional {}.'.format(
+                            optional_service.name,
+                            optional.optional_service.name))
 
         return cleaned_data
 
