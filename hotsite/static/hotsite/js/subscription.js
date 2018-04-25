@@ -42,7 +42,6 @@ function send(url, method, data, success_callback, error_callback) {
     });
 }
 
-
 function show_hide_payment_block(action) {
     action = action === true;
     var payment_block = $('#payment-block');
@@ -174,7 +173,6 @@ function hotsiteRepopulate_cities(uf_el, selected_value, callback) {
         }
     });
 }
-
 
 var common_lots_content = null;
 
