@@ -426,10 +426,10 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 if hasattr(e, 'message'):
                     form.add_error('__all__', e.message)
                 elif hasattr(e, 'error_dict'):
-                    for field, err in e.error_dict:
+                    for field, err in e:
                         form.add_error(field, err)
                 elif hasattr(e, 'error_list'):
-                    for err in e.error_list:
+                    for err in e:
                         form.add_error('__all__', err)
                 else:
                     raise Exception('Unknown ValidationError message.')
