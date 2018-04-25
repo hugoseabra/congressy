@@ -17,6 +17,9 @@ class SubscriptionPersonForm(PersonForm):
         self.lot = kwargs.get('initial').get('lot')
         self.event = kwargs.get('initial').get('event')
 
+        self.fields['email'].widget.attrs['disabled'] = 'disabled'
+        self.fields['email'].disabled = True
+
         user = kwargs.get('initial').get('user')
 
         if user:

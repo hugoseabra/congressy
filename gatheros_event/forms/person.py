@@ -136,7 +136,6 @@ class PersonForm(forms.ModelForm):
 
         return cnpj
 
-
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
         if phone:
