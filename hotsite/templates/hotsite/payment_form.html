@@ -92,7 +92,7 @@
                                 <img style="width: 80%; margin-top: 20px"
                                      src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
                             </div>
-
+                            <br />
                             <form action="" method="post" novalidate>
                                 {% csrf_token %}
                                 {{ wizard.management_form }}
@@ -107,6 +107,7 @@
                                     <i class="fas fa-chevron-circle-right"></i>
                                 </button>
                             </form>
+
                             <form action="" method="post" novalidate>
                                 {{ wizard.management_form }}
                                 {% if wizard.steps.prev %}
@@ -121,6 +122,11 @@
                             </form>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-9 col-md-offset-2">
+                    <div class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
+                        {% include "base/footer.html" %}
                     </div>
                 </div>
             </div>

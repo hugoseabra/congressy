@@ -14,6 +14,10 @@ from gatheros_subscription.models import Lot, \
     Subscription
 from hotsite import forms
 from hotsite.views.mixins import EventMixin
+from mailer.services import (
+    notify_new_free_subscription,
+    notify_new_user_and_free_subscription,
+)
 from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
@@ -111,6 +115,9 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                     .format(lot, self.event)
                 raise TypeError(message)
 
+        new_subscription = False
+        new_account = self.request.user.last_login is None
+
         try:
             subscription = Subscription.objects.get(
                 person=self.storage.person,
@@ -122,11 +129,19 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 event=self.event,
                 created_by=self.request.user.id
             )
+            new_subscription = True
 
         # Insere ou edita lote
         subscription.lot = lot
         if not lot.price or lot.price == 0:
+
             subscription.status = Subscription.CONFIRMED_STATUS
+
+            if new_account and new_subscription:
+                notify_new_user_and_free_subscription(self.event, subscription)
+            else:
+                notify_new_free_subscription(self.event, subscription)
+
         subscription.save()
 
         messages.success(

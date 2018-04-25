@@ -1,5 +1,5 @@
 {% extends 'hotsite/base.html' %}
-{% load static base_tags %}
+{% load static base_tags humanize l10n %}
 
 {% block content %}
 
@@ -66,7 +66,7 @@
                                             Pagamento
                                         </th>
                                         <th class="col-xs-2 hidden-xs">
-                                            Lote
+                                            Valor (R$)
                                         </th>
                                         <th class="col-xs-1">Voucher</th>
                                     </tr>
@@ -123,7 +123,7 @@
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                {{ transaction.subscription.lot.name }} - R$ {{ transaction.subscription.lot.get_calculated_price }}
+                                                R$ {{ transaction.amount|money_divide|intcomma }}
                                             </td>
                                             <td>
                                                 {% if transaction.status == transaction.PAID %}
@@ -173,6 +173,11 @@
                             </a>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
+                        {% include "base/footer.html" %}
                     </div>
                 </div>
             </div>
