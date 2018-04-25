@@ -131,24 +131,30 @@ class SubscriptionOptionalServiceManager(managers.Manager):
             )
 
         # Regra 2:
-        if optional_service.session.restrict_unique:
+        new_start = optional_service.session.date_start
+        new_end = optional_service.session.date_end
 
-            new_start = optional_service.session.date_start
-            new_end = optional_service.session.date_end
+        is_restricted = optional_service.session.restrict_unique
 
-            for optional in subscription.subscriptionoptionalservice.all():
+        for sub_optional in subscription.subscriptionoptionalservice.all():
 
-                start = optional.optional_service.session.date_start
-                stop = optional.optional_service.session.date_end
+            start = sub_optional.optional_service.session.date_start
+            stop = sub_optional.optional_service.session.date_end
+            is_sub_restricted = \
+                sub_optional.optional_service.session.restrict_unique
 
-                session_range = DateTimeRange(start=start, stop=stop)
+            session_range = DateTimeRange(start=start, stop=stop)
+            has_conflict = (new_start in session_range or new_end in
+                            session_range)
 
-                if new_start in session_range or new_end in session_range:
-                    raise ValidationError(
-                        'Conflito de horário: o inicio do opcional {} '
-                        'está dentro da sessão do opcional {}.'.format(
-                            optional_service.name,
-                            optional.optional_service.name))
+            if has_conflict is True and (is_restricted or is_sub_restricted):
+                raise ValidationError(
+                    'Conflito de horário: o opcional "{}" '
+                    'está em conflito com o opcional "{}".'.format(
+                        optional_service.name,
+                        sub_optional.optional_service.name
+                    )
+                )
 
         # Regra 3:
         if optional_service.theme.limit:
