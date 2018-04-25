@@ -12,19 +12,17 @@ from gatheros_subscription.models import FormConfig, Lot
 
 class SubscriptionPersonForm(PersonForm):
 
-    def __init__(self, is_chrome=False, **kwargs):
+    def __init__(self, user, is_chrome=False, **kwargs):
 
+        self.user = user
         self.lot = kwargs.get('initial').get('lot')
         self.event = kwargs.get('initial').get('event')
 
-        user = kwargs.get('initial').get('user')
-
-        if user:
-            try:
-                person = Person.objects.get(user=user)
-                kwargs.update({'instance': person})
-            except Person.DoesNotExist:
-                pass
+        try:
+            person = Person.objects.get(user=user)
+            kwargs.update({'instance': person})
+        except Person.DoesNotExist:
+            pass
 
         if not isinstance(self.lot, Lot):
             try:
@@ -87,3 +85,7 @@ class SubscriptionPersonForm(PersonForm):
             return email.lower()
 
         return None
+
+    def save(self, commit=True):
+        self.instance.user = self.user
+        return super().save(commit=commit)

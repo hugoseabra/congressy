@@ -95,15 +95,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
     def done(self, form_list, **kwargs):
 
-        # Assert that we have a person in storage
         if not hasattr(self.storage, 'person'):
-
-            try:
-                person = Person.objects.get(user=self.request.user)
-            except Person.DoesNotExist:
-                raise Exception('User com email {} não possui '
-                                'person'.format(self.request.user.email))
-            self.storage.person = person
+            raise Exception('Não possuimos uma person no storage do wizard')
 
         lot_data = self.storage.get_step_data('lot')
         lot = lot_data.get('lot-lots', '')
@@ -117,8 +110,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                           'a partir das referencias: lot<{}> e evento<{}>.' \
                     .format(lot, self.event)
                 raise TypeError(message)
-
-        subscription = None
 
         try:
             subscription = Subscription.objects.get(
@@ -137,8 +128,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         if not lot.price or lot.price == 0:
             subscription.status = Subscription.CONFIRMED_STATUS
         subscription.save()
-
-        self.storage.subscription = subscription
 
         messages.success(
             self.request,
@@ -163,13 +152,13 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             return self.initial_dict.get(step, {'event': self.event})
 
         # get the data for step person from  step lot
+        # @TODO pass artifacts as kwargs instead of inital_dict
         if step == 'person':
             prev_data = self.storage.get_step_data('lot')
             lot = prev_data.get('lot-lots', '')
             return self.initial_dict.get(step, {
                 'lot': lot,
                 'event': self.event,
-                'user': self.request.user,
             })
 
         # get the data for step survey from  step lot
@@ -231,11 +220,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
             person = form.save()
-
-            if not person.user:
-                person.user = self.request.user
-
-            person.save()
             self.storage.person = person
 
         # Persisting survey
@@ -368,6 +352,14 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 data[field_name] = value
 
         return data
+
+    def get_form_kwargs(self, step=None):
+        kwargs = super().get_form_kwargs(step)
+
+        if step == 'person':
+            kwargs.update({'user': self.request.user})
+
+        return kwargs
 
     def post(self, *args, **kwargs):
         """
