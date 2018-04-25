@@ -17,9 +17,6 @@ class SubscriptionPersonForm(PersonForm):
         self.lot = kwargs.get('initial').get('lot')
         self.event = kwargs.get('initial').get('event')
 
-        self.fields['email'].widget.attrs['disabled'] = 'disabled'
-        self.fields['email'].disabled = True
-
         user = kwargs.get('initial').get('user')
 
         if user:
@@ -39,6 +36,9 @@ class SubscriptionPersonForm(PersonForm):
                 raise TypeError(message)
 
         super().__init__(is_chrome, **kwargs)
+
+        self.fields['email'].widget.attrs['disabled'] = 'disabled'
+        self.fields['email'].disabled = True
 
         try:
             config = self.event.formconfig
