@@ -134,14 +134,15 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         # Insere ou edita lote
         subscription.lot = lot
         if not lot.price or lot.price == 0:
+
             subscription.status = Subscription.CONFIRMED_STATUS
+
+            if new_account and new_subscription:
+                notify_new_user_and_free_subscription(self.event, subscription)
+            else:
+                notify_new_free_subscription(self.event, subscription)
+
         subscription.save()
-
-        if new_account and new_subscription:
-            notify_new_user_and_free_subscription(self.event, subscription)
-
-        else:
-            notify_new_free_subscription(self.event, subscription)
 
         messages.success(
             self.request,
