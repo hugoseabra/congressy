@@ -271,7 +271,7 @@ function hotsiteSearchByCep() {
 
         if ('erro' in response) {
             alert("CEP não encontrado.");
-            hotsiteSearchByCep(false);
+            hotsiteShowHideCepLoader(false);
             window.setTimeout(function () {
                 $('#id_person-zip_code').focus();
             }, 100);

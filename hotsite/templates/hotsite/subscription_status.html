@@ -65,6 +65,9 @@
                                         <th class="col-xs-3">Forma de
                                             Pagamento
                                         </th>
+                                        <th class="col-xs-2 hidden-xs">
+                                            Lote
+                                        </th>
                                         <th class="col-xs-1">Voucher</th>
                                     </tr>
                                     </thead>
@@ -91,8 +94,6 @@
                                                 {% endif %}
                                                 {{ transaction.get_status_display }}
                                             </td>
-
-
                                             <td class="hidden-xs">
                                                 {% to_datetime transaction.data.date_created as created_date %}
                                                 {{ created_date }}h
@@ -120,6 +121,9 @@
                                                 {% else %}
                                                     Error
                                                 {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ transaction.subscription.lot.name }} - R$ {{ transaction.subscription.lot.get_calculated_price }}
                                             </td>
                                             <td>
                                                 {% if transaction.status == transaction.PAID %}
@@ -165,7 +169,7 @@
 
 
                             <a href="{% url 'public:hotsite-subscription' event.slug %}"
-                                class="btn btn-success btn-xs">Novo pagamento
+                               class="btn btn-success btn-xs">Novo pagamento
                             </a>
                             </div>
                         </div>
