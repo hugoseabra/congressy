@@ -336,6 +336,7 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         )
 
     def test_validation_by_session_with_flag_on(self):
+
         # Crie uma única Subscription para ser usada para criar o
         # SubscriptionOptionalService
         subscription = self.fake_factory.fake_subscription()
@@ -380,6 +381,7 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         self.assertFalse(service_2_manager.is_valid())
 
     def test_validation_by_session_with_flag_on(self):
+
         # Crie uma única Subscription para ser usada para criar o
         # SubscriptionOptionalService
         subscription = self.fake_factory.fake_subscription()
@@ -424,8 +426,79 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         self.assertTrue(service_2_manager.is_valid())
         service_2_manager.save()
 
-    def test_validation_by_theme(self):
-        self.fail('Not implemented')
+    def test_validation_by_theme_with_flag_on(self):
+
+        # Crie uma única Subscription para ser usada para criar o
+        # SubscriptionOptionalService
+        subscription = self.fake_factory.fake_subscription()
+
+        # Criando um tema e configurando seu limite para uma unica inscrição
+        theme = self.fake_factory.fake_theme()
+        theme.limit = 1
+        theme.save()
+
+
+        # Crie OptionalServices com tema.
+        service = self.fake_factory.fake_optional_service(
+            lot_categories=(subscription.lot.category,), theme=theme)
+
+        # Criando os gerenciadores de serviços
+        service_manager_1 = managers.SubscriptionOptionalServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional_service': service.pk,
+                'price': format(decimal.Decimal(42.42), '.2f'),
+            }
+        )
+
+        service_manager_2 = managers.SubscriptionOptionalServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional_service': service.pk,
+                'price': format(decimal.Decimal(42.42), '.2f'),
+            }
+        )
+
+        self.assertTrue(service_manager_1.is_valid())
+        service_manager_1.save()
+        self.assertFalse(service_manager_2.is_valid())
+
+    def test_validation_by_theme_with_flag_off(self):
+
+        # Crie uma única Subscription para ser usada para criar o
+        # SubscriptionOptionalService
+        subscription = self.fake_factory.fake_subscription()
+
+        # Criando um tema e configurando seu limite como infinito
+        theme = self.fake_factory.fake_theme()
+        theme.limit = None
+        theme.save()
+
+        # Crie OptionalServices com tema.
+        service = self.fake_factory.fake_optional_service(
+            lot_categories=(subscription.lot.category,), theme=theme)
+
+        # Criando os gerenciadores de serviços
+        service_manager_1 = managers.SubscriptionOptionalServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional_service': service.pk,
+                'price': format(decimal.Decimal(42.42), '.2f'),
+            }
+        )
+
+        service_manager_2 = managers.SubscriptionOptionalServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional_service': service.pk,
+                'price': format(decimal.Decimal(42.42), '.2f'),
+            }
+        )
+
+        self.assertTrue(service_manager_1.is_valid())
+        service_manager_1.save()
+        self.assertTrue(service_manager_2.is_valid())
+        service_manager_2.save()
 
 
 class OptionalServiceManagerPersistenceTest(ManagerPersistenceTestCase):
