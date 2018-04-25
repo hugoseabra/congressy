@@ -65,6 +65,9 @@
                                         <th class="col-xs-3">Forma de
                                             Pagamento
                                         </th>
+                                        <th class="col-xs-1 hidden-xs">
+                                            Lot
+                                        </th>
                                         <th class="col-xs-1">Voucher</th>
                                     </tr>
                                     </thead>
@@ -122,6 +125,9 @@
                                                 {% endif %}
                                             </td>
                                             <td>
+                                                {{ transaction.subscription.lot.name }} - {{ transaction.subscription.lot.price }}
+                                            </td>
+                                            <td>
                                                 {% if transaction.status == transaction.PAID %}
 
                                                     <a href="{% url 'subscription:subscription-voucher' transaction.subscription.event.pk transaction.subscription.pk %}">
@@ -165,7 +171,7 @@
 
 
                             <a href="{% url 'public:hotsite-subscription' event.slug %}"
-                                class="btn btn-success btn-xs">Novo pagamento
+                               class="btn btn-success btn-xs">Novo pagamento
                             </a>
                             </div>
                         </div>
