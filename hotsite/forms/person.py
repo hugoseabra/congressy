@@ -71,21 +71,6 @@ class SubscriptionPersonForm(PersonForm):
         for field_name in required_fields:
             self.setAsRequired(field_name)
 
-    def clean_email(self):
-
-        if self.data.get('email') or self.initial.get('email'):
-            try:
-                email = self.data.get('email')
-                if not email:
-                    email = self.data.get('person-email')
-            except MultiValueDictKeyError:
-                email = self.initial.get('email')
-                if not email:
-                    email = self.data.get('person-email')
-            return email.lower()
-
-        return None
-
     def save(self, commit=True):
         self.instance.user = self.user
         return super().save(commit=commit)
