@@ -174,12 +174,13 @@ class ApplicationServicePersistenceTestCase(TestCase):
 
         data = {}
         for field_name in self.required_fields:
-            if field_name not in self.data:
-                self.fail(
-                    'O campo "{}" em "required_fields" não existe em'
-                    ' "data".'.format(field_name)
-                )
-            data[field_name] = self.data.get(field_name)
+            if self.data:
+                if field_name not in self.data:
+                    self.fail(
+                        'O campo "{}" em "required_fields" não existe em'
+                        ' "data".'.format(field_name)
+                    )
+                data[field_name] = self.data.get(field_name)
 
         data.update(self.data_edit_to)
 

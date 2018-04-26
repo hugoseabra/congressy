@@ -161,3 +161,114 @@ class ServiceServicePersistenceTest(TestCase):
     def test_edit(self):
         self.edit()
 
+
+class SubscriptionProductServicePersistenceTest(TestCase):
+    """ Testes de persistência de dados: criação e edição."""
+    application_service_class = services.SubscriptionProductService
+    required_fields = (
+        'subscription',
+        'optional',
+    )
+
+    def setUp(self):
+        fake_factory = MockFactory()
+        self.event = fake_factory.fake_event()
+        self.lot_category = fake_factory.fake_lot_category(event=self.event)
+        self.lot = fake_factory.fake_lot(lot_category=self.lot_category,
+                                         event=self.event)
+        self.data = {
+            'subscription': fake_factory.fake_subscription(lot=self.lot).pk,
+            'optional': fake_factory.fake_product(
+                lot_category=self.lot_category).pk,
+        }
+
+    def _create_service(self, instance=None, data=None):
+
+        if not data:
+            data = self.data
+
+        fake_factory = MockFactory()
+
+        if not data:
+            data = {}
+
+        if 'subscription' not in data:
+            data['subscription'] = fake_factory.fake_subscription(
+                lot=self.lot).pk
+
+        if 'optional' not in data:
+            data['optional'] = fake_factory.fake_product(
+                lot_category=self.lot_category).pk
+
+        if instance is not None:
+            service = self.application_service_class(
+                instance=instance,
+                data=data
+            )
+        else:
+            service = self.application_service_class(data=data)
+
+        return service
+
+    def test_create(self):
+        self.create()
+
+    def test_edit(self):
+        self.data = None
+        self.edit()
+
+
+class SubscriptionServiceServicePersistenceTest(TestCase):
+    """ Testes de persistência de dados: criação e edição."""
+    application_service_class = services.SubscriptionServiceService
+    required_fields = (
+        'subscription',
+        'optional',
+    )
+
+    def setUp(self):
+        fake_factory = MockFactory()
+        self.event = fake_factory.fake_event()
+        self.lot_category = fake_factory.fake_lot_category(event=self.event)
+        self.lot = fake_factory.fake_lot(lot_category=self.lot_category,
+                                         event=self.event)
+        self.data = {
+            'subscription': fake_factory.fake_subscription(lot=self.lot).pk,
+            'optional': fake_factory.fake_service(
+                lot_category=self.lot_category).pk,
+        }
+
+    def _create_service(self, instance=None, data=None):
+
+        if not data:
+            data = self.data
+
+        fake_factory = MockFactory()
+
+        if not data:
+            data = {}
+
+        if 'subscription' not in data:
+            data['subscription'] = fake_factory.fake_subscription(
+                lot=self.lot).pk
+
+        if 'optional' not in data:
+            data['optional'] = fake_factory.fake_service(
+                lot_category=self.lot_category).pk
+
+        if instance is not None:
+            service = self.application_service_class(
+                instance=instance,
+                data=data
+            )
+        else:
+            service = self.application_service_class(data=data)
+
+        return service
+
+    def test_create(self):
+        self.create()
+
+    def test_edit(self):
+        self.data = None
+        self.edit()
