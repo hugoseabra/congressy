@@ -13,8 +13,8 @@ from addon.models import (
     Product,
     Service,
     OptionalType,
-    SubscriptionOptionalProduct,
-    SubscriptionOptionalService,
+    SubscriptionProduct,
+    SubscriptionService,
     Theme,
 )
 from gatheros_event.models import Person, Organization, Event, Category
@@ -160,7 +160,7 @@ class MockFactory:
                 lot_category=subscription.lot.category
             )
 
-        return SubscriptionOptionalService.objects.create(
+        return SubscriptionService.objects.create(
             subscription=subscription,
             optional=optional_service,
         )
@@ -176,7 +176,7 @@ class MockFactory:
                 lot_category=subscription.lot.category
             )
 
-        return SubscriptionOptionalProduct.objects.create(
+        return SubscriptionProduct.objects.create(
             subscription=subscription,
             optional=optional_product,
         )

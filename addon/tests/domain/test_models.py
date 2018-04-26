@@ -42,9 +42,9 @@ class ModelsConfiguredTest(TestCase):
         # SubscriptionOptional
         self.assertIn(
             rules.MustBeSameOptionalLotCategory,
-            models.SubscriptionOptionalProduct.rule_instances
+            models.SubscriptionProduct.rule_instances
         )
         self.assertIn(
             rules.MustBeSameOptionalLotCategory,
-            models.SubscriptionOptionalService.rule_instances
+            models.SubscriptionService.rule_instances
         )

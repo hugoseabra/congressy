@@ -303,7 +303,7 @@ class SubscriptionProductManagerRulesTest(TestCase):
         self.assertTrue(product_manager.is_valid())
         product_manager.save()
         self.assertEqual(
-            addon_models.SubscriptionOptionalProduct.objects.all().count(), 1)
+            addon_models.SubscriptionProduct.objects.all().count(), 1)
 
         failing_product_manager = managers.SubscriptionProductManager(
             data={
@@ -408,7 +408,7 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         self.assertTrue(service_manager.is_valid())
         service_manager.save()
         self.assertEqual(
-            addon_models.SubscriptionOptionalService.objects.all().count(),
+            addon_models.SubscriptionService.objects.all().count(),
             1
         )
 
@@ -510,6 +510,49 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         service_1_manager.save()
         self.assertTrue(service_2_manager.is_valid())
         service_2_manager.save()
+
+    def test_validation_by_session_with_flag_on_bilaterally(self):
+        """Teste para verificar se a rega consegue ser aplicada de maneira
+        bilateral"""
+
+        subscription = self.fake_factory.fake_subscription()
+
+        # Crie dois Services
+        service_1 = self.fake_factory.fake_service(
+            lot_category=subscription.lot.category)
+        service_2 = self.fake_factory.fake_service(
+            lot_category=subscription.lot.category)
+
+        # Configurando os dois serviços para usar a flag de sessão
+        service_1.date_start = datetime.now()
+        service_1.date_end = datetime.now() + timedelta(days=1)
+        service_1.restrict_unique = False
+        service_1.save()
+
+        service_2.date_start = datetime.now()
+        service_2.date_end = datetime.now() + timedelta(days=1)
+        service_2.restrict_unique = True
+        service_2.save()
+
+        # Criando os gerenciadores de serviços
+        service_1_manager = managers.SubscriptionServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional': service_1.pk,
+            }
+        )
+
+        service_2_manager = managers.SubscriptionServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional': service_2.pk,
+            }
+        )
+
+        # Validações
+        self.assertTrue(service_1_manager.is_valid())
+        service_1_manager.save()
+        self.assertFalse(service_2_manager.is_valid())
 
     def test_validation_by_theme_with_flag_on(self):
         # Crie uma única Subscription para ser usada para criar o

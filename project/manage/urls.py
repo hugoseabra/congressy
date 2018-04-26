@@ -66,6 +66,7 @@ if not settings.DEBUG:
 api_urls = [
     url(r'^', include(urlpatterns_public_payments_api, 'payment')),
     url(r'^', include('gatheros_subscription.api_urls', 'subscription')),
+    url(r'^', include('addon.api_urls', 'addon')),
     url(r'^', include('kanu_locations.urls', 'city')),
 ]
 
