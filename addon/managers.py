@@ -6,8 +6,8 @@ from .models import (
     Product,
     Service,
     OptionalType,
-    SubscriptionOptionalService,
-    SubscriptionOptionalProduct,
+    SubscriptionService,
+    SubscriptionProduct,
     Theme,
 )
 
@@ -48,7 +48,7 @@ class SubscriptionServiceManager(managers.Manager):
     """ Manager de serviços opcionais de inscrições"""
 
     class Meta:
-        model = SubscriptionOptionalService
+        model = SubscriptionService
         fields = '__all__'
 
     def clean(self):
@@ -85,7 +85,7 @@ class SubscriptionServiceManager(managers.Manager):
 
         is_restricted = optional_service.restrict_unique
 
-        for sub_optional in subscription.subscriptionoptionalservice.all():
+        for sub_optional in subscription.subscriptionservice.all():
 
             start = sub_optional.optional.date_start
             stop = sub_optional.optional.date_end
@@ -110,7 +110,7 @@ class SubscriptionServiceManager(managers.Manager):
 
             total = 0
 
-            for optional in subscription.subscriptionoptionalservice.all():
+            for optional in subscription.subscriptionservice.all():
 
                 if optional.optional.theme == optional_service.theme:
                     total += 1
@@ -128,7 +128,7 @@ class SubscriptionProductManager(managers.Manager):
     """ Manager de produtos opcionais de inscrições """
 
     class Meta:
-        model = SubscriptionOptionalProduct
+        model = SubscriptionProduct
         fields = '__all__'
 
     def clean(self):

@@ -41,7 +41,7 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
         return '{}: {}'.format(__name__, self.subscription.person.name)
 
 
-class SubscriptionOptionalProduct(AbstractSubscriptionOptional):
+class SubscriptionProduct(AbstractSubscriptionOptional):
     """
         Vínculo de uma inscrição com um Opcional de Produto.
     """
@@ -53,7 +53,7 @@ class SubscriptionOptionalProduct(AbstractSubscriptionOptional):
     )
 
 
-class SubscriptionOptionalService(AbstractSubscriptionOptional):
+class SubscriptionService(AbstractSubscriptionOptional):
     """
         Vínculo de uma inscrição com um Opcional de Serviço.
     """
