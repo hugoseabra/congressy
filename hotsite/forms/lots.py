@@ -35,7 +35,7 @@ class LotsForm(forms.Form):
             label='lote',
         )
 
-        if self.is_bound:
+        if kwargs.get('instance'):
             self.fields['lots'].queryset = Lot.objects.filter(event=self.event,
                                                               date_start__lte=datetime.now(),
                                                               date_end__gte=datetime.now())
