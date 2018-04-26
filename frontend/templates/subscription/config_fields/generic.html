@@ -14,8 +14,10 @@
             <small style="color:#C9302C">*</small>
         {% endif %}
 
-        <div {% if field.field.widget.input_type == "checkbox" %} class="row"
-        {% endif %}>
+        <div
+                {% if field.field.widget.input_type == "checkbox" or field.field.widget.input_type == "radio" %}
+                    class="row"
+                {% endif %}>
 
             {% if autofocus %}
 
@@ -28,10 +30,11 @@
             {% elif field.field.widget.input_type == "checkbox" %}
 
                 {% if  required  or required == 'True' %}
-                    {% render_field field  required="required"%}
+                    {% render_field field required="required" %}
                 {% else %}
                     {% render_field field %}
                 {% endif %}
+                <br>
 
             {% else %}
 
