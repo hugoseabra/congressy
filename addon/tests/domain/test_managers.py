@@ -147,29 +147,20 @@ class SubscriptionOptionalProductManagerRulesTest(TestCase):
             inscrições já foi atingida, novas inscrições não poderão ser
             realizadas
         """
-
         subscription = self.fake_factory.fake_subscription()
         failing_subscription = self.fake_factory.fake_subscription(
             lot=subscription.lot)
 
         lot_category = subscription.lot.category
 
-        optional_product = self.fake_factory.fake_optional_product(
-            lot_categories=(lot_category,),
-        )
-        optional_product.quantity = 1
-        optional_product.save()
-
-        price = self.fake_factory.fake_product_price(
-            lot_category=lot_category,
-            optional_product=optional_product
-        )
+        product = self.fake_factory.fake_product(lot_category=lot_category)
+        product.quantity = 1
+        product.save()
 
         product_manager = managers.SubscriptionOptionalProductManager(
             data={
                 'subscription': subscription.pk,
-                'optional_product': optional_product.pk,
-                'price': price.price,
+                'optional': product.pk,
             }
         )
 
@@ -181,8 +172,7 @@ class SubscriptionOptionalProductManagerRulesTest(TestCase):
         failing_product_manager = managers.SubscriptionOptionalProductManager(
             data={
                 'subscription': failing_subscription.pk,
-                'optional_product': optional_product.pk,
-                'price': price.price,
+                'optional': product.pk,
             }
         )
 

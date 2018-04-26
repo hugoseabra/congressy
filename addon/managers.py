@@ -141,9 +141,9 @@ class SubscriptionOptionalProductManager(managers.Manager):
         """
         cleaned_data = super().clean()
 
-        optional_product = cleaned_data['optional_product']
-        num_subs = optional_product.subscription_products.count()
-        quantity = optional_product.quantity or 0
+        product = cleaned_data['optional']
+        num_subs = product.products.count()
+        quantity = product.quantity or 0
         if 0 < quantity <= num_subs:
             raise ValidationError(
                 'Quantidade de inscrições já foi atingida, '
