@@ -44,7 +44,7 @@ class ServiceManager(managers.Manager):
         fields = '__all__'
 
 
-class SubscriptionOptionalServiceManager(managers.Manager):
+class SubscriptionServiceManager(managers.Manager):
     """ Manager de serviços opcionais de inscrições"""
 
     class Meta:
@@ -60,7 +60,7 @@ class SubscriptionOptionalServiceManager(managers.Manager):
             Regra #2: Validar restrição de sessão se há restrição por Sessão,
                 ou seja, se há outro Optional dentro do mesmo intervalo de
                 data e hora final e inicial do Optional informado.
-            Regra #3: Validar restrição por tema (LimitByTheme), se há
+            Regra #3: Validar rest-rição por tema (LimitByTheme), se há
              restrição por Tema, ou seja, se o Participante já possui X
              opcionais no mesmo tema e não pode mais se cadastrar em outro.
 
@@ -124,7 +124,7 @@ class SubscriptionOptionalServiceManager(managers.Manager):
         return cleaned_data
 
 
-class SubscriptionOptionalProductManager(managers.Manager):
+class SubscriptionProductManager(managers.Manager):
     """ Manager de produtos opcionais de inscrições """
 
     class Meta:

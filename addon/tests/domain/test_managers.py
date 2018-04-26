@@ -223,7 +223,7 @@ class ServiceManagerPersistenceTest(ManagerPersistenceTestCase):
 class SubscriptionProductManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
 
-    manager_class = managers.SubscriptionOptionalProductManager
+    manager_class = managers.SubscriptionProductManager
     required_fields = (
         'subscription',
         'optional',
@@ -293,7 +293,7 @@ class SubscriptionProductManagerRulesTest(TestCase):
         product.quantity = 1
         product.save()
 
-        product_manager = managers.SubscriptionOptionalProductManager(
+        product_manager = managers.SubscriptionProductManager(
             data={
                 'subscription': subscription.pk,
                 'optional': product.pk,
@@ -305,7 +305,7 @@ class SubscriptionProductManagerRulesTest(TestCase):
         self.assertEqual(
             addon_models.SubscriptionOptionalProduct.objects.all().count(), 1)
 
-        failing_product_manager = managers.SubscriptionOptionalProductManager(
+        failing_product_manager = managers.SubscriptionProductManager(
             data={
                 'subscription': failing_subscription.pk,
                 'optional': product.pk,
@@ -323,7 +323,7 @@ class SubscriptionProductManagerRulesTest(TestCase):
 class SubscriptionServiceManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
 
-    manager_class = managers.SubscriptionOptionalServiceManager
+    manager_class = managers.SubscriptionServiceManager
     required_fields = (
         'subscription',
         'optional',
@@ -398,7 +398,7 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         optional_service.quantity = 1
         optional_service.save()
 
-        service_manager = managers.SubscriptionOptionalServiceManager(
+        service_manager = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
                 'optional': optional_service.pk,
@@ -412,7 +412,7 @@ class SubscriptionServiceManagerRulesTest(TestCase):
             1
         )
 
-        failing_product_manager = managers.SubscriptionOptionalServiceManager(
+        failing_product_manager = managers.SubscriptionServiceManager(
             data={
                 'subscription': failing_subscription.pk,
                 'optional': optional_service.pk,
@@ -449,14 +449,14 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         service_2.save()
 
         # Criando os gerenciadores de serviços
-        service_1_manager = managers.SubscriptionOptionalServiceManager(
+        service_1_manager = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
                 'optional': service_1.pk,
             }
         )
 
-        service_2_manager = managers.SubscriptionOptionalServiceManager(
+        service_2_manager = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
                 'optional': service_2.pk,
@@ -491,14 +491,14 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         service_2.save()
 
         # Criando os gerenciadores de serviços
-        service_1_manager = managers.SubscriptionOptionalServiceManager(
+        service_1_manager = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
                 'optional': service_1.pk,
             }
         )
 
-        service_2_manager = managers.SubscriptionOptionalServiceManager(
+        service_2_manager = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
                 'optional': service_2.pk,
@@ -526,14 +526,14 @@ class SubscriptionServiceManagerRulesTest(TestCase):
             lot_category=subscription.lot.category, theme=theme)
 
         # Criando os gerenciadores de serviços
-        service_manager_1 = managers.SubscriptionOptionalServiceManager(
+        service_manager_1 = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
                 'optional': service.pk,
             }
         )
 
-        service_manager_2 = managers.SubscriptionOptionalServiceManager(
+        service_manager_2 = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
                 'optional': service.pk,
@@ -559,14 +559,14 @@ class SubscriptionServiceManagerRulesTest(TestCase):
             lot_category=subscription.lot.category, theme=theme)
 
         # Criando os gerenciadores de serviços
-        service_manager_1 = managers.SubscriptionOptionalServiceManager(
+        service_manager_1 = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
                 'optional': service.pk,
             }
         )
 
-        service_manager_2 = managers.SubscriptionOptionalServiceManager(
+        service_manager_2 = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
                 'optional': service.pk,
