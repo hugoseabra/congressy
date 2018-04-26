@@ -4,8 +4,42 @@
  *   Copyright 2014 Authentic Goods Co. http://authenticgoods.co
  *
 */
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700");
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800");
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Montserrat Regular'), local('Montserrat-Regular'), url(https://fonts.gstatic.com/s/montserrat/v12/JTUSjIg1_i6t8kCHKm459Wlhzg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Montserrat Bold'), local('Montserrat-Bold'), url(https://fonts.gstatic.com/s/montserrat/v12/JTURjIg1_i6t8kCHKm45_dJE3gnD-w.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans Regular'), local('OpenSans-Regular'), url(https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Open Sans SemiBold'), local('OpenSans-SemiBold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UNirkOUuhs.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UN7rgOUuhs.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 800;
+  src: local('Open Sans ExtraBold'), local('OpenSans-ExtraBold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UN8rsOUuhs.ttf) format('truetype');
+}
 html {
   height: 100%;
   font-size: 100%;
@@ -539,7 +573,7 @@ canvas {
   text-transform: uppercase;
 }
 .sidebar-left a {
-  color: #B3B8C3;
+  color: #fff;
 }
 .sidebar-left a:focus,
 .sidebar-left a:hover {
@@ -616,14 +650,14 @@ canvas {
 }
 @media (max-width: 767px) {
   .sidebar {
-    left: -240px;
+    left: 0;
   }
   .sidebar-opened .sidebar-left {
     display: block;
     left: 0;
   }
   .sidebar-opened .sidebar-left + .main-content-wrapper {
-    left: 240px;
+    left: 0;
     overflow: hidden;
   }
   .sidebar-opened {
@@ -784,7 +818,7 @@ canvas {
   cursor: pointer;
 }
 .sidebar-mini .setting-list {
-  display: none;
+  display: block;
 }
 #main-wrapper {
   -webkit-transition: all 0.2s ease-in-out;
@@ -3316,7 +3350,7 @@ label.valid {
   background: #000912;
 }
 .theme-cgsy-full #header .brand {
-  background: #000912;
+  background: #F0F3F3;
 }
 .theme-cgsy-full #header .brand .logo {
   color: #fff;
@@ -3342,15 +3376,15 @@ label.valid {
 .theme-cgsy-full #header .nav li.profile > a:hover,
 .theme-cgsy-full #header .nav li.profile > a:active,
 .theme-cgsy-full #header .nav li.profile > a:focus {
-  background: #00162c;
+  background: #d4dcdc;
 }
 .theme-cgsy-full #header .nav .open > a,
 .theme-cgsy-full #header .nav .open > a:focus,
 .theme-cgsy-full #header .nav .open > a:hover {
-  background: #00162c;
+  background: #d4dcdc;
 }
 .theme-cgsy-full .sidebar-left {
-  background-color: #022140;
+  background-color: #1f7bb6;
 }
 .theme-cgsy-full .sidebar-mini .sidebar-left .nav > li.active > a:focus,
 .theme-cgsy-full .sidebar-mini .sidebar-left .nav > li.active > a:hover,
@@ -3362,8 +3396,9 @@ label.valid {
 }
 .theme-cgsy-full .sidebar-left .nav > li.open > a,
 .theme-cgsy-full .sidebar-left .nav > li > a:hover {
-  color: #022140;
-  background-color: #ffffff;
+  color: #34495e;
+  background-color: transparent;
+  outline: 0;
 }
 .theme-cgsy-full.sidebar-mini .sidebar-left .nav > li.nav-dropdown-open > .nav-sub,
 .theme-cgsy-full.sidebar-mini .sidebar-left .nav > li:hover > .nav-sub {

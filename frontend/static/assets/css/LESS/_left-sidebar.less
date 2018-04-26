@@ -161,7 +161,7 @@
     text-transform: uppercase;
 }
 .sidebar-left a {
-    color: #B3B8C3;
+    color: #fff;
 }
 .sidebar-left a:focus, .sidebar-left a:hover {
     color: #fff;
@@ -232,14 +232,14 @@
 }
 @media (max-width: 767px) {
     .sidebar {
-        left: -240px;
+        left: 0;
     }
     .sidebar-opened .sidebar-left {
         display: block;
         left: 0;
     }
     .sidebar-opened .sidebar-left+.main-content-wrapper {
-        left: 240px;
+        left: 0;
         overflow: hidden;
     }
     .sidebar-opened {
@@ -382,5 +382,5 @@
 } 
 
 .sidebar-mini .setting-list{
-        display: none;
+        display: block;
     }
