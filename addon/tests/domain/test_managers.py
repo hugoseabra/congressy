@@ -354,7 +354,7 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         service_1_manager.save()
         self.assertFalse(service_2_manager.is_valid())
 
-    def test_validation_by_session_with_flag_on(self):
+    def test_validation_by_session_with_flag_off(self):
 
         # Crie uma única Subscription para ser usada para criar o
         # SubscriptionOptionalService
