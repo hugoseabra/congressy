@@ -32,6 +32,7 @@ def create_pagarme_transaction(transaction_data, subscription=None):
     )
 
     try:
+
         trx = pagarme.transaction.create(payment)
 
     except Exception as e:

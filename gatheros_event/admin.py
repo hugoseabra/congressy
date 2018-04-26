@@ -24,6 +24,7 @@ class EventAdmin(admin.ModelAdmin):
     Admin para Event
     """
     search_fields = ('name',)
+    list_filter = ('subscription_type',)
     list_display = (
         'name',
         'get_partner_percents',
