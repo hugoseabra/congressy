@@ -28,9 +28,9 @@
             {% elif field.field.widget.input_type == "checkbox" %}
 
                 {% if  required  or required == 'True' %}
-                    {{ field|attr:"required:required" }}
+                    {% render_field field  required="required"%}
                 {% else %}
-                    {{ field }}
+                    {% render_field field %}
                 {% endif %}
 
             {% else %}
