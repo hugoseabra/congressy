@@ -1,4 +1,4 @@
-{% extends "base/base-hotsite.html" %}
+{% extends "base/base.html" %}
 
 {% load static i18n widget_tweaks queryset_filter form_config_tags %}
 
@@ -42,7 +42,6 @@
         .address-row {
 {#            display: none;#}
         }
-        .
     </style>
 {% endblock %}
 
@@ -311,20 +310,38 @@
     </script>
 {% endblock %}
 
+{% block new_nav %}
+    <ul class="nav nav-pills nav-stacked" style="width:70px">
+        <li>
+            <a href="{% url 'event:event-list' %}"
+               title="Eventos"class="fa fa-calendar">
+            </a>
+        </li>
+        <li>
+            <a href="#"
+               title="Inscrições"class="fa fa-list"></a>
+        </li>
+        <li>
+            <a href="#"
+               title="Organizações" class="fa fa-sitemap"></a>
+        </li>
+    </ul>
 
+{% endblock %}
 
 {% block nav_aside_itens %}
     <span class ="visible-xs">
         <a href="{% url 'event:event-add' %}" class="btn
-    btn-success navbar-btn" style="color:#4c4c4c;">
+    btn-success navbar-btn">
         <i class="fa fa-plus"></i>
             Novo Evento
         </a>
     </span>
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
+    <h5 class="sidebar-header">Início</h5>
     <ul class="nav nav-pills nav-stacked">
         <li>
-            <a href="#" title="Painel" style="color: #4c4c4c">
+            <a href="#"
+               title="Painel">
                 <i class="fas fa-tachometer-alt"></i>
                 Painel
             </a>
@@ -335,7 +352,7 @@
         {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
             <li>
                 <a href="{% url 'subscription:lot-list' event.pk %}"
-                   title="Inscrições" style="color:#4c4c4c;">
+                   title="Inscrições">
                     <i class="fas fa-th-large"></i>
                     Lotes/Categorias
                 </a>
@@ -343,7 +360,7 @@
         {% endif %}
         <li>
             <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições" style="color:#4c4c4c;">
+               title="Inscrições">
                 <i class="fa fa-clipboard"></i>
                 Inscrições
                 <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
@@ -351,58 +368,58 @@
         </li>
                 <li>
                     <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
-                       title="Check-in" style="color:#4c4c4c;">
+                       title="Check-in">
                         <i class="fas fa-calendar-check"></i>
                         Check-in
                     </a>
                 </li>
     </ul>
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
+    <h5 class="sidebar-header">Configurações</h5>
     <ul class="nav nav-pills nav-stacked">
         <li class="active">
             <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento" style="color:#4c4c4c;">
+               title="Página do evento">
                 <i class="fas fa-file-alt"></i> Página do evento
             </a>
         </li>
         <li>
             <a href="{% url 'event:event-edit' event.pk %}"
-               title="Configurações gerais" style="color:#4c4c4c;">
+               title="Configurações gerais">
                 <i class="fas fa-cog"></i> Configurações gerais
             </a>
         </li>
         <li>
             <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário" style="color:#4c4c4c;">
+               title="Formulário">
                 <i class="fab fa-wpforms"></i> Formulário
             </a>
         </li>
         {% if has_paid_lots %}
             <li>
                 <a href="{% url 'payment:event-payments' event.pk %}"
-                   title="Pagamentos" style="color:#4c4c4c;">
+                   title="Pagamentos">
                     <i class="fas fa-money-bill-alt"></i> Pagamentos
                 </a>
             </li>
         {% endif %}
     </ul>
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Adicionais</h5>
+    <h5 class="sidebar-header">Adicionais</h5>
     <ul class="nav nav-pills nav-stacked">
         <li>
             <a href="#"
-               title="Opicionais" style="color:#4c4c4c;">
+               title="Opicionais">
                 <i class="far fa-calendar-plus"></i> Opicionais
             </a>
         </li>
         <li>
             <a href="#"
-               title="Certificados" style="color:#4c4c4c;">
+               title="Certificados">
                 <i class="fas fa-address-card"></i> Certificados
             </a>
         </li>
         <li>
             <a href="#"
-               title="Submissão de artigos" style="color:#4c4c4c;">
+               title="Submissão de artigos">
                 <i class="fas fa-newspaper"></i> Submissão de artigos
             </a>
         </li>
@@ -410,226 +427,5 @@
 {% endblock %}
 
 {% block content %}
-    <form id="hotsite-form" action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
-        {% csrf_token %}
 
-        {% if form.non_field_errors %}
-            {% render_errors form.non_field_errors %}
-        {% endif %}
-
-        {% for hidden_field in form.hidden_fields %}
-            {% if hidden_field.errors %}
-                {% render_errors hidden_field.errors %}
-            {% endif %}
-            {{ hidden_field }}
-        {% endfor %}
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="buttonbar">
-                    <div class="float-right">
-                        <button type="button" class="btn btn-success submit-button">
-                            <i class="fa fa-save"></i>
-                            Salvar
-                        </button>
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-9">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="panel panel-primary" id="block-form">
-                            <div class="panel-heading">
-                                <div class="panel-title">
-                                    Capa da Página
-                                </div>
-                            </div>
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.image_main %}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.lead %}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.description_html %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 hidden-xs hidden-sm">
-                <div class="panel panel-primary" id="block-status-icons">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            Etapas de configuração
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                {% if info and info.description_html %}
-                                    <a href="{% url 'public:hotsite' info.event.slug %}"
-                                       target="_blank"
-                                       class="btn btn-primary btn-block">
-                                        <i class="fa fa-globe"></i>
-                                        Visualizar página
-                                    </a>
-                                {% else %}
-                                    <button type="button"
-                                            class="btn btn-primary btn-trans btn-block disabled"
-                                            title="Você deve configurar pelo menos a descrição do seu evento.">
-                                        <i class="fa fa-globe"></i>
-                                        Visualizar página
-                                    </button>
-                                {% endif %}
-                                <div class="col-md-12 event-info-status-item">
-                                    <div>
-                                        <i class="fas fa-check-circle fa-5x {% if info and info.image_main %}success-color{% endif %}"></i>
-                                    </div>
-                                    <div>
-                                        <div class="title">Banner principal</div>
-                                        <div class="text-muted description">
-                                            Deixa o site do evento mais apresentável.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 event-info-status-item">
-                                    <div>
-                                        <i class="fas fa-check-circle fa-5x {% if info and info.lead %}success-color{% endif %}"></i>
-                                    </div>
-                                    <div>
-                                        <div class="title">Descrição rápida</div>
-                                        <div class="text-muted description">
-                                            Motive o visitante a permanecer no site,
-                                            aumentando a possibilidade de conclusão de
-                                            sua inscrição.
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 event-info-status-item">
-                                    <div>
-                                        <i class="fas fa-check-circle fa-5x  {% if info and info.description_html %}success-color{% endif %}"></i>
-                                    </div>
-                                    <div>
-                                        <div class="title">Sobre o evento</div>
-                                        <div class="text-muted description">
-                                            Deixa claro para o visitante que ainda não
-                                            conhece os detalhes do evento e gostaria de
-                                            saber do que se trata.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            Localização
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-6" id="place-form-block">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.show_location %}
-                                    </div>
-                                </div>
-                                <div class="row name-row">
-                                    <div class="col-md-12 col-lg-8 col-xl-9">
-                                        {% render_generic_field form.name help_text='Pesquise pelo nome do local.' %}
-                                    </div>
-                                    <div class="col-md-12 col-lg-4 col-xl-3" style="padding-left: 30px;padding-right: 30px">
-                                        <div class="hidden-xs hidden-sm hidden-md" style="height:32px" ></div>
-                                        <button id="reload-map-button" type="button" class="btn btn-sm btn-block btn-primary">Buscar</button>
-                                        <div class="hidden-lg" style="height:32px" ></div>
-                                    </div>
-                                </div>
-                                <div class="row address-row">
-                                    <div class="col-md-6 col-xl-4">
-                                        {% render_generic_field form.zip_code  help_text='Informe o CEP para encontrar o endereço.' %}
-                                        <div id="cep_loader" style="width: 22px;position: absolute;
-                                             top: 33px;right: 33px;">
-                                            <img src="{% static 'assets/img/loader.gif' %}"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row address-row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.street %}
-                                    </div>
-                                </div>
-                                <div class="row address-row">
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.number %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.complement %}
-                                    </div>
-                                </div>
-                                <div class="row address-row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.village %}
-                                    </div>
-                                </div>
-                                <div class="row address-row">
-                                    <div class="col-md-4 address-row">
-                                        {% render_generic_field form.state %}
-                                    </div>
-                                    <div class="col-md-8 address-row">
-                                        {% render_generic_field form.city_name %}
-                                    </div>
-                                </div>
-                                <hr />
-                                <div class="text-center text-muted" style="font-size:12px">
-                                    A Congressy não se responsabiliza pelos dados de pesquisa advindos
-                                    do Google.
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div id="map-loader" class="fas info-color fa-2x fa-circle-notch fa-spin" style="position:absolute;z-index:1000;top:0;display:none"></div>
-                                <div class="text-center" style="padding:10px;">
-                                    Arraste o marcador para a posição desejada.
-                                </div>
-                                <div id="map" style="display:none"></div>
-                                <div id="map_banner" style="display:none">
-                                    <div class="text-muted">Informe o local para ver o mapa.</div>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="buttonbar bottom">
-                    <div class="float-right">
-                        <button type="button" class="btn btn-success submit-button">
-                            <i class="fa fa-save"></i>
-                            Salvar
-                        </button>
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-            </div>
-        </div>
-    </form>
 {% endblock %}

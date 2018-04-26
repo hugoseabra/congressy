@@ -19,12 +19,15 @@
     <link rel="stylesheet"
           href="{% static 'assets/plugins/icheck/css/all.css' %}">
 
+
+
     <style media="screen" type="text/css">
 +     td {
 +       max-width: 120px;
 +       white-space: nowrap;
 +       text-overflow: ellipsis;
 +     }
+
 +    </style>
 {% endblock %}
 
@@ -36,6 +39,7 @@
     <script>
 
         $(document).ready(function () {
+            $('.popover_toogle').popover();
             $('#subscription_table').DataTable({
                 "language": {
                     sEmptyTable: "Nenhum registro encontrado",
@@ -108,12 +112,32 @@
         });
     </script>
 {% endblock %}
+{% block new_nav %}
+    <ul class="nav nav-pills nav-stacked" style="width:70px;font-size: 25px;">
+        <li>
+            <a href="{% url 'event:event-list' %}"
+               class="popover_toogle fa fa-calendar" style="color:white;"
+               data-trigger="hover" rel="popover" data-placement="right"
+               data-content="Eventos">
+            </a>
+        </li>
+        <li>
+            <a href="#"
+                class="popover_toogle fa fa-list" style="color:white;"
+                data-trigger="hover" rel="popover" data-placement="right"
+                data-content="Inscrições">
+            </a>
+        </li>
+        <li>
+            <a href="#"
+               class="popover_toogle fa fa-sitemap" style="color:white;"
+               data-trigger="hover" rel="popover" data-placement="right"
+               data-content="Organizações">
+            </a>
+        </li>
+    </ul>
 
-{% block sidebar %}{% endblock %}
-
-{% block sidebar-bars %}{% endblock %}
-
-{% block toptitle %}{% endblock %}
+{% endblock %}
 
 {% block content %}
 

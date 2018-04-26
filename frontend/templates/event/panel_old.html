@@ -1,0 +1,332 @@
+{% extends "base/base.html" %}
+{# @TODO Change the icons in nav_aside_itens  #}
+{% load static %}
+{% load event_tags %}
+{% block title %} Painel do Evento | Congressy{% endblock %}
+{% block pageheader %}
+    <div class="pageheader">
+        <h2>Painel do Evento</h2>
+    </div>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <li style="font-weight: bold; color: #ffffff">Inscrições</li>
+    {#    {% event_payment_type object as payment_type %}#}
+    {#    {% if can_change and object.subscription_type != object.SUBSCRIPTION_DISABLED and payment_type != 'free' %}#}
+    {#        <li>#}
+    {#            <a href="{% url 'subscription:lot-list' object.pk %}"#}
+    {#               title="Lotes">#}
+    {#                <i class="fa  fa-fw fa-rocket"></i> Lotes#}
+    {#            </a>#}
+    {#        </li>#}
+    {#    {% endif %}#}
+    <li>
+        <a href="{% url 'subscription:subscription-list' object.pk %}"
+           title="Inscrições">
+            <i class="fa  fa-fw fa-rocket"></i> Inscrições
+        </a>
+    </li>
+
+    <li>
+        <a href="{% url 'payment:event-payments' event.pk %}"
+           title="Formulário">
+            <i class="fa  fa-fw fa-rocket"></i> Formulário
+        </a>
+    </li>
+    {#    <li>#}
+    {#        <a href="{% url 'subscription:subscription-attendance-search' object.pk %}"#}
+    {#           title="Credenciamento">#}
+    {#            <i class="fa  fa-fw fa-rocket"></i> Credenciamento#}
+    {#        </a>#}
+    {#    </li>#}
+
+
+
+
+
+
+{% endblock %}
+{% block page_title %}Painel de Evento{% endblock %}
+{% block page_sub_title %}{{ object.name }}{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-9 ">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+
+                    {% if object.subscription_type == object.SUBSCRIPTION_BY_LOTS %}
+                        <div style="padding: 10px 0 0;">
+                            <div style="text-align: left">
+                                <strong>Inscrições:</strong>
+                            </div>
+                            <div style="color: #333;margin: 5px 10px">
+                                <table border="0" width="100%" cellpadding="10"
+                                       cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th width="2%">#</th>
+                                        <th style="text-align: left;">Lote</th>
+                                        <th width="30%">Insc.</th>
+                                        <th width="15%">Limite</th>
+                                        <th width="20%"
+                                            style="text-align: left;">Status
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for lot in object.lots.all %}
+                                        <tr>
+                                            <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ forloop.counter }}</td>
+                                            <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ lot.name }}</td>
+                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
+                                                {{ lot.subscriptions.count }}
+                                                {% if lot.limit %}/
+                                                    {{ lot.limit }}{% endif %}
+                                            </td>
+                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
+                                                {% if lot.percent_completed %}
+                                                    {{ lot.percent_completed }}
+                                                    %{% else %}
+                                                    Livre{% endif %}
+                                            </td>
+                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:{% if lot.status == lot.LOT_STATUS_FINISHED %}darkred{% elif lot.status == lot.LOT_STATUS_RUNNING %}green{% else %}dimgray{% endif %}">
+                                                {% if lot.status %}
+                                                    {{ lot.get_status_display|capfirst }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td colspan="2"
+                                            style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">
+                                            <strong>TOTAIS</strong></td>
+                                        <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
+                                            {{ object.subscriptions.count }}
+                                        </td>
+                                        <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;">{{ object.percent_completed }}%</td>
+                                        <td style="text-align: center;border-bottom:1px solid lightgray;"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% elif object.subscription_type == object.SUBSCRIPTION_SIMPLE %}
+                        {% if object.limit %}
+                            <div style="padding: 10px 0 0;text-align: center;">
+                                <div style="text-align: left;">
+                                    <strong>Inscrições:</strong></div>
+                                <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                    {{ object.subscriptions.count }}
+                                    {% if object.limit %}/
+                                        {{ object.limit }}{% endif %}
+                                </div>
+                                <div style="color: #333">(25%)</div>
+                                <div style="color: dimgray;padding:10px">
+                                    Limitadas
+                                </div>
+                            </div>
+                        {% else %}
+                            <div style="padding: 10px 0 30px;text-align: center;">
+                                <div style="text-align: left;">
+                                    <strong>Inscrições: {{ object.subscriptions.count }}</strong>
+                                </div>
+
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div style="padding: 10px 0 0;text-align: left;">
+                            <div style="text-align: left;">
+                                <strong>Inscrições:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: darkred;padding: 10px 0">
+                                Desativadas
+                            </div>
+                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                {% if can_change %}
+                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Ativar</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 ">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    <form name="change_status"
+                          action="{% url 'event:event-edit-publication' object.pk %}"
+                          method="post">
+                        {% csrf_token %}
+                        {% if status.published %}
+                            {% if status.status == 'future' %}
+                                <div style="padding: 10px 0 0;text-align: center;">
+                                    <div style="text-align: left;">
+                                        <strong>Status:</strong></div>
+                                    <div style="font-weight: bold;font-size: 20px;color: darkgreen;padding: 10px 0">
+                                        Publicado
+                                    </div>
+                                    <div style="color: dimgray;padding:10px">
+                                        Faltam
+                                        <strong>{{ status.remaining }}</strong>
+                                    </div>
+                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                        {% if can_change %}
+                                            <a href="#"
+                                               onclick="document.change_status.submit()">Despublicar</a>
+                                            <input type="hidden"
+                                                   name="published"
+                                                   value="0"/>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% elif status.status == 'running' %}
+                                <div style="padding: 10px 0 30px;text-align: center;">
+                                    <div style="text-align: left;">
+                                        <strong>Status:</strong></div>
+                                    <div style="font-weight: bold;font-size: 20px;color: darkgreen;padding: 10px 0">
+                                        Em andamento
+                                    </div>
+                                </div>
+                            {% elif status.status == 'finished' %}
+                                <div style="padding: 10px 0 30px;text-align: center;">
+                                    <div style="text-align: left;">
+                                        <strong>Status:</strong></div>
+                                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
+                                        Encerrado
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            {% if status.status == 'future' %}
+                                <div style="padding: 10px 0 0;text-align: center;">
+                                    <div style="text-align: left;">
+                                        <strong>Status:</strong></div>
+                                    <div style="font-weight: bold;font-size: 20px;color: darkred;padding: 10px 0">
+                                        Não publicado
+                                    </div>
+                                    <div style="color: dimgray;padding:10px">
+                                        Faltam
+                                        <strong>{{ status.remaining }}</strong>
+                                    </div>
+                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                        {% if can_change %}
+                                            <a href="{% url 'event:event-edit-dates' object.pk %}">Alterar
+                                                data</a>
+                                            &nbsp;&nbsp; | &nbsp;&nbsp;
+                                            <a href="#"
+                                               onclick="document.change_status.submit()">Publicar</a>
+                                            <input type="hidden"
+                                                   name="published" value="1"/>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% elif status.status == 'expired' %}
+                                <div style="padding: 10px 0 0;text-align: center;">
+                                    <div style="text-align: left;">
+                                        <strong>Status:</strong></div>
+                                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
+                                        Expirado
+                                    </div>
+                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                        {% if can_change %}
+                                            <a href="{% url 'event:event-edit-dates' object.pk %}">Alterar
+                                                data</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% elif status.status == 'running' %}
+                                <div style="padding: 10px 0 0;text-align: center;">
+                                    <div style="text-align: left;">
+                                        <strong>Status:</strong></div>
+                                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
+                                        Em andamento
+                                    </div>
+                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                        {% if can_change %}
+                                            <a href="#"
+                                               onclick="document.change_status.submit()">Publicar</a>
+                                            <input type="hidden"
+                                                   name="published"
+                                                   value="1"/>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class=" pull-right col-md-3 ">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+
+                    <div style="padding: 10px 0 0;text-align: center;">
+
+                    </div>
+
+                    {% event_payment_type object as payment_type %}
+                    {% if payment_type == 'free' %}
+                        <div style="padding: 10px 0 0;text-align: center">
+                            <div style="text-align: left;"><strong>Tipo de
+                                inscrição:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                Gratuitas
+                            </div>
+                            {% if object.subscription_offline %}
+                                <div style="color: dimgray;padding:10px">
+                                    <strong>Inscrições off-line
+                                        ativas</strong>
+                                </div>
+                            {% endif %}
+                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
+                                {% if can_change %}
+                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% elif payment_type == 'mixed' %}
+                        <div style="padding: 10px 0 30px;text-align: center">
+                            <div style="text-align: left;"><strong>Tipo de
+                                inscrição:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                Mistas
+                            </div>
+                            <div style="color: dimgray;padding:10px">
+                                Gratuitas e
+                                pagas
+                            </div>
+                            {% if object.subscription_offline %}
+                                <div style="color: dimgray;padding:10px">
+                                    <strong>Inscrições off-line
+                                        ativas</strong>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% elif payment_type == 'paied' %}
+                        <div style="padding: 10px 0 0;text-align: center">
+                            <div style="text-align: left;"><strong>Tipo de
+                                inscrição:</strong></div>
+                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
+                                Pagas
+                            </div>
+                        </div>
+                    {% endif %}
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

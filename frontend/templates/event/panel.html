@@ -1,332 +1,340 @@
-{% extends "base/base.html" %}
+{% extends "base/base-hotsite.html" %}
 {# @TODO Change the icons in nav_aside_itens  #}
 {% load static %}
 {% load event_tags %}
-{% block title %} Painel do Evento | Congressy{% endblock %}
+{% load static i18n widget_tweaks queryset_filter form_config_tags %}
+{% block scripts %}
+    <script src="{% static "/assets/plugins/gauge/gauge.min.js" %}"></script>
+    <script>
+        var opts = {
+          lines: 12, // The number of lines to draw
+          angle: 0, // The length of each line
+          lineWidth: 0.4, // The line thickness
+          pointer: {
+            length: 0.75, // The radius of the inner circle
+            strokeWidth: 0.042, // The rotation offset
+            color: '#1D212A' // Fill color
+          },
+          limitMax: 'false',   // If true, the pointer will not go past the end of the gauge
+          colorStart: '#6FAFC0',   // Colors
+          colorStop: '#6FAFC0',    // just experiment with them
+          strokeColor: '#F0F3F3',   // to see which ones work best for you
+          generateGradient: true
+        };
+    var target = document.getElementById('gauge'); // your canvas element
+    var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+    gauge.maxValue = 100; // set max gauge value
+    gauge.animationSpeed = 32; // set animation speed (32 is default value)
+    gauge.set(60); // set actual value
+    gauge.setTextField(document.getElementById("gauge-text"));
+    </script>
+{% endblock %}
+{% block styles %}
+    <style>
+        .todo_list_element{
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+
+        .new_nav_items{
+            width: 40px;
+        }
+
+        .divider {
+            height: 1px;
+            margin: 9px 0;
+            overflow: hidden;
+            background-color: #e5e5e5;
+        }
+
+         .sidebar-left .nav > li.active > a{
+             color: #6FAFC0;
+         }
+    </style>
+{% endblock %}
 {% block pageheader %}
     <div class="pageheader">
         <h2>Painel do Evento</h2>
     </div>
 {% endblock %}
 
-{% block nav_aside_itens %}
-    <li style="font-weight: bold; color: #ffffff">Inscrições</li>
-    {#    {% event_payment_type object as payment_type %}#}
-    {#    {% if can_change and object.subscription_type != object.SUBSCRIPTION_DISABLED and payment_type != 'free' %}#}
-    {#        <li>#}
-    {#            <a href="{% url 'subscription:lot-list' object.pk %}"#}
-    {#               title="Lotes">#}
-    {#                <i class="fa  fa-fw fa-rocket"></i> Lotes#}
-    {#            </a>#}
-    {#        </li>#}
-    {#    {% endif %}#}
-    <li>
-        <a href="{% url 'subscription:subscription-list' object.pk %}"
-           title="Inscrições">
-            <i class="fa  fa-fw fa-rocket"></i> Inscrições
-        </a>
-    </li>
+{% block title %} Painel do evento | Congressy{% endblock %}
 
-    <li>
-        <a href="{% url 'payment:event-payments' event.pk %}"
-           title="Formulário">
-            <i class="fa  fa-fw fa-rocket"></i> Formulário
-        </a>
-    </li>
-    {#    <li>#}
-    {#        <a href="{% url 'subscription:subscription-attendance-search' object.pk %}"#}
-    {#           title="Credenciamento">#}
-    {#            <i class="fa  fa-fw fa-rocket"></i> Credenciamento#}
-    {#        </a>#}
-    {#    </li>#}
+{% block page_title %}{{ object.name }}{% endblock %}
 
-
-
-
-
+{% block new_nav %}
+    <ul class="nav nav-pills nav-stacked " style="width:70px;font-size: 25px;">
+        <li class="new_nav_items">
+            <a href="{% url 'event:event-list' %}"
+               title="Eventos" class="fa fa-calendar" style="color:white;">
+            </a>
+        </li>
+         <li class="new_nav_items">
+            <a href="#"
+               title="Inscrições"class="fa fa-list" style="color:white;"></a>
+        </li>
+         <li class="new_nav_items">
+            <a href="#"
+       title="Organizações" class="fa fa-sitemap" style="color:white;"
+            ></a>
+        </li>
+    </ul>
 
 {% endblock %}
-{% block page_title %}Painel de Evento{% endblock %}
-{% block page_sub_title %}{{ object.name }}{% endblock %}
+
+{% block nav_aside_itens %}
+    <span class ="visible-xs">
+        <a href="{% url 'event:event-add' %}" class="btn
+    btn-success navbar-btn" style="color:#4c4c4c;">
+        <i class="fa fa-plus"></i>
+            Novo Evento
+        </a>
+    </span>
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="#" title="Painel" style="color: #4c4c4c">
+                <i class="fas fa-tachometer-alt"></i>
+                Painel
+            </a>
+        </li>
+     </ul>
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+            <li>
+                <a href="{% url 'subscription:lot-list' event.pk %}"
+                   title="Inscrições" style="color:#4c4c4c;">
+                    <i class="fas fa-th-large"></i>
+                    Lotes/Categorias
+                </a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições" style="color:#4c4c4c;">
+                <i class="fa fa-clipboard"></i>
+                Inscrições
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+            </a>
+        </li>
+                <li>
+                    <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+                       title="Check-in" style="color:#4c4c4c;">
+                        <i class="fas fa-calendar-check"></i>
+                        Check-in
+                    </a>
+                </li>
+    </ul>
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento" style="color:#4c4c4c;">
+                <i class="fas fa-file-alt"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'event:event-edit' event.pk %}"
+               title="Configurações gerais" style="color:#4c4c4c;">
+                <i class="fas fa-cog"></i> Configurações gerais
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário" style="color:#4c4c4c;">
+                <i class="fab fa-wpforms"></i> Formulário
+            </a>
+        </li>
+        {% if has_paid_lots %}
+            <li>
+                <a href="{% url 'payment:event-payments' event.pk %}"
+                   title="Pagamentos" style="color:#4c4c4c;">
+                    <i class="fas fa-money-bill-alt"></i> Pagamentos
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Adicionais</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="#"
+               title="Opicionais" style="color:#4c4c4c;">
+                <i class="far fa-calendar-plus"></i> Opicionais
+            </a>
+        </li>
+        <li>
+            <a href="#"
+               title="Certificados" style="color:#4c4c4c;">
+                <i class="fas fa-address-card"></i> Certificados
+            </a>
+        </li>
+        <li>
+            <a href="#"
+               title="Submissão de artigos" style="color:#4c4c4c;">
+                <i class="fas fa-newspaper"></i> Submissão de artigos
+            </a>
+        </li>
+    </ul>
+{% endblock %}
 
 {% block content %}
-
-    <div class="row">
-        <div class="col-md-9 ">
-            <div class="panel panel-primary">
+    <div class="col-md-12 col-lg-6">
+        <div class="col-md-6">
+            <div class="panel panel-solid-success widget-mini">
                 <div class="panel-body">
-
-                    {% if object.subscription_type == object.SUBSCRIPTION_BY_LOTS %}
-                        <div style="padding: 10px 0 0;">
-                            <div style="text-align: left">
-                                <strong>Inscrições:</strong>
-                            </div>
-                            <div style="color: #333;margin: 5px 10px">
-                                <table border="0" width="100%" cellpadding="10"
-                                       cellspacing="0">
-                                    <thead>
-                                    <tr>
-                                        <th width="2%">#</th>
-                                        <th style="text-align: left;">Lote</th>
-                                        <th width="30%">Insc.</th>
-                                        <th width="15%">Limite</th>
-                                        <th width="20%"
-                                            style="text-align: left;">Status
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for lot in object.lots.all %}
-                                        <tr>
-                                            <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ forloop.counter }}</td>
-                                            <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ lot.name }}</td>
-                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
-                                                {{ lot.subscriptions.count }}
-                                                {% if lot.limit %}/
-                                                    {{ lot.limit }}{% endif %}
-                                            </td>
-                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
-                                                {% if lot.percent_completed %}
-                                                    {{ lot.percent_completed }}
-                                                    %{% else %}
-                                                    Livre{% endif %}
-                                            </td>
-                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:{% if lot.status == lot.LOT_STATUS_FINISHED %}darkred{% elif lot.status == lot.LOT_STATUS_RUNNING %}green{% else %}dimgray{% endif %}">
-                                                {% if lot.status %}
-                                                    {{ lot.get_status_display|capfirst }}
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    <tr>
-                                        <td colspan="2"
-                                            style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">
-                                            <strong>TOTAIS</strong></td>
-                                        <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
-                                            {{ object.subscriptions.count }}
-                                        </td>
-                                        <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;">{{ object.percent_completed }}%</td>
-                                        <td style="text-align: center;border-bottom:1px solid lightgray;"></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    {% elif object.subscription_type == object.SUBSCRIPTION_SIMPLE %}
-                        {% if object.limit %}
-                            <div style="padding: 10px 0 0;text-align: center;">
-                                <div style="text-align: left;">
-                                    <strong>Inscrições:</strong></div>
-                                <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                    {{ object.subscriptions.count }}
-                                    {% if object.limit %}/
-                                        {{ object.limit }}{% endif %}
-                                </div>
-                                <div style="color: #333">(25%)</div>
-                                <div style="color: dimgray;padding:10px">
-                                    Limitadas
-                                </div>
-                            </div>
-                        {% else %}
-                            <div style="padding: 10px 0 30px;text-align: center;">
-                                <div style="text-align: left;">
-                                    <strong>Inscrições: {{ object.subscriptions.count }}</strong>
-                                </div>
-
-                            </div>
-                        {% endif %}
-                    {% else %}
-                        <div style="padding: 10px 0 0;text-align: left;">
-                            <div style="text-align: left;">
-                                <strong>Inscrições:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: darkred;padding: 10px 0">
-                                Desativadas
-                            </div>
-                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                {% if can_change %}
-                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Ativar</a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endif %}
-
-
+                    <i class="icon-bar-chart"></i>
+                    <span class="total text-center">$3,200</span>
+                    <span class="title text-center">Pagos</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 ">
-            <div class="panel panel-primary">
+        <div class="col-md-6">
+            <div class="panel widget-mini">
                 <div class="panel-body">
-                    <form name="change_status"
-                          action="{% url 'event:event-edit-publication' object.pk %}"
-                          method="post">
-                        {% csrf_token %}
-                        {% if status.published %}
-                            {% if status.status == 'future' %}
-                                <div style="padding: 10px 0 0;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: darkgreen;padding: 10px 0">
-                                        Publicado
-                                    </div>
-                                    <div style="color: dimgray;padding:10px">
-                                        Faltam
-                                        <strong>{{ status.remaining }}</strong>
-                                    </div>
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                        {% if can_change %}
-                                            <a href="#"
-                                               onclick="document.change_status.submit()">Despublicar</a>
-                                            <input type="hidden"
-                                                   name="published"
-                                                   value="0"/>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% elif status.status == 'running' %}
-                                <div style="padding: 10px 0 30px;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: darkgreen;padding: 10px 0">
-                                        Em andamento
-                                    </div>
-                                </div>
-                            {% elif status.status == 'finished' %}
-                                <div style="padding: 10px 0 30px;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
-                                        Encerrado
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% else %}
-                            {% if status.status == 'future' %}
-                                <div style="padding: 10px 0 0;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: darkred;padding: 10px 0">
-                                        Não publicado
-                                    </div>
-                                    <div style="color: dimgray;padding:10px">
-                                        Faltam
-                                        <strong>{{ status.remaining }}</strong>
-                                    </div>
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                        {% if can_change %}
-                                            <a href="{% url 'event:event-edit-dates' object.pk %}">Alterar
-                                                data</a>
-                                            &nbsp;&nbsp; | &nbsp;&nbsp;
-                                            <a href="#"
-                                               onclick="document.change_status.submit()">Publicar</a>
-                                            <input type="hidden"
-                                                   name="published" value="1"/>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% elif status.status == 'expired' %}
-                                <div style="padding: 10px 0 0;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
-                                        Expirado
-                                    </div>
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                        {% if can_change %}
-                                            <a href="{% url 'event:event-edit-dates' object.pk %}">Alterar
-                                                data</a>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% elif status.status == 'running' %}
-                                <div style="padding: 10px 0 0;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
-                                        Em andamento
-                                    </div>
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                        {% if can_change %}
-                                            <a href="#"
-                                               onclick="document.change_status.submit()">Publicar</a>
-                                            <input type="hidden"
-                                                   name="published"
-                                                   value="1"/>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endif %}
-
-                    </form>
+                    <i class="icon-support"></i>
+                    <span class="total text-center">40</span>
+                    <span class="title text-center">Aguardando
+                        pagamento</span>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class=" pull-right col-md-3 ">
-            <div class="panel panel-primary">
+        <div class="col-md-6">
+            <div class="panel widget-mini">
                 <div class="panel-body">
-
-                    <div style="padding: 10px 0 0;text-align: center;">
-
+                    <i class="icon-envelope-open"></i>
+                    <span class="total text-center">1,680</span>
+                    <span class="title text-center">Disponíveis
+                        para saque</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel widget-mini">
+                <div class="panel-body">
+                    <i class="icon-envelope-open"></i>
+                    <span class="total text-center">1,680</span>
+                    <span class="title text-center">Disponíveis
+                        para saque</span>
+                </div>
+            </div>
+        </div>
+        </div>
+    <div class=" col-lg-3" style="height: 234px;">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Total de inscritos</h3>
+                </div>
+                <div class="panel-body widget-gauge">
+                    <canvas width="160" height="100" id="gauge" class=""></canvas>
+                    <div class="goal-wrapper">
+                        <span class="gauge-value pull-left"></span>
+                        <span id="gauge-text" class="gauge-value
+                        pull-left">60</span>
+                        <span id="goal-text" class="goal-value
+                        pull-right">100</span>
                     </div>
+                </div>
+            </div>
+    </div>
 
-                    {% event_payment_type object as payment_type %}
-                    {% if payment_type == 'free' %}
-                        <div style="padding: 10px 0 0;text-align: center">
-                            <div style="text-align: left;"><strong>Tipo de
-                                inscrição:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                Gratuitas
-                            </div>
-                            {% if object.subscription_offline %}
-                                <div style="color: dimgray;padding:10px">
-                                    <strong>Inscrições off-line
-                                        ativas</strong>
-                                </div>
-                            {% endif %}
-                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                {% if can_change %}
-                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% elif payment_type == 'mixed' %}
-                        <div style="padding: 10px 0 30px;text-align: center">
-                            <div style="text-align: left;"><strong>Tipo de
-                                inscrição:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                Mistas
-                            </div>
-                            <div style="color: dimgray;padding:10px">
-                                Gratuitas e
-                                pagas
-                            </div>
-                            {% if object.subscription_offline %}
-                                <div style="color: dimgray;padding:10px">
-                                    <strong>Inscrições off-line
-                                        ativas</strong>
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% elif payment_type == 'paied' %}
-                        <div style="padding: 10px 0 0;text-align: center">
-                            <div style="text-align: left;"><strong>Tipo de
-                                inscrição:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                Pagas
-                            </div>
-                        </div>
-                    {% endif %}
+     <div class="panel panel-primary col-sm-5 col-md-6"
+         style="padding: 0;margin-left: 25px">
+
+        <div class="panel-heading">
+            <div class="panel-title">Criação do seu evento</div>
+        </div>
+        <div class="panel-body" >
+            <div class="progress">
+                <div class="progress-bar progress-bar-info" role="progressbar"
+                     aria-valuenow="75"
+                aria-valuemin="0" aria-valuemax="100" style="width: 75%;">75%
+            </div>
+        </div>
+            <ul class="nav nav-pills nav-stacked">
+                <li class="todo_list_element" role="presentation">
+                    <row>
+                        <i class="fas fa-check"></i>
+                        <a href="#">Criar hot-site</a>
+                    </row>
+                </li>
+
+                <li class="todo_list_element" role="presentation">
+                <row>
+                    <i class="fas fa-check"></i>
+                    <a href="#">Configurar lote</a>
+                </row>
+                </li>
+
+                <li class="todo_list_element" role="presentation">
+                <row>
+                    <i class="fas fa-check"></i>
+                    <a href="#">Configurar dados bancários</a>
+                </row>
+                </li>
+
+                <li class="todo_list_element" role="presentation">
+                <row>
+                    <a href="#">Configurar
+                    cerficados</a>
+                </row>
+                </li>
+
+                <li role="separator" class="divider"></li>
+
+                <li class="todo_list_element" role="presentation">
+                    <row>
+                        <i class="fas fa-plus"></i>
+                        <a href="#">Opicionais</a>
+                    </row>
+                </li>
+                <li class="todo_list_element" role="presentation">
+                    <row>
+                        <i class="fas fa-plus"></i>
+                        <a href="#">Submissão de artigos científicos</a>
+                    </row>
+                </li>
 
 
+            </ul>
+        </div>
+    </div>
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Interaction Zoom</h3>
+                    <div class="actions pull-right">
+                        <i class="fa fa-expand"></i>
+                        <i class="fa fa-chevron-down"></i>
+                        <i class="fa fa-times"></i>
+                    </div>
+                </div>
+                <div class="panel-body text-center">
+                    <div class="chart">
+                        <div id="zoom" style="position: relative;">
+                            <svg width="1051" height="325">
+                                <defs>
+                                    <clipPath id="zoom-clip">
+                                        <rect
+                                            y="0" width="1010" height="265">
+                                        </rect>
+                                    </clipPath>
+                                    <clipPath id="xaxis-clip">
+                                        <rect x="-41" y="-20" width="1053"
+                                        height="40"></rect>
+                                    </clipPath>
+                                    <clipPath id="yaxis-clip">
+                                        <rect x="-39" y="-1" width="60"
+                                        height="262"></rect>
+                                    </clipPath>
+                                </defs><g transform="translate(40,0)">
+                                <g class="x axis"
+                               clip-path="url(http://neuboard.com/Charts/CS3Charts#xaxis-clip)" transform="translate(0,265)" style="opacity: 1;"><g class="tick" transform="translate(9.901960784313728,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">0</text></g><g class="tick" transform="translate(103.3166851646319,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">5</text></g><g class="tick" transform="translate(196.73140954495005,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">10</text></g><g class="tick" transform="translate(290.1461339252682,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">15</text></g><g class="tick" transform="translate(383.5608583055864,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">20</text></g><g class="tick" transform="translate(476.9755826859046,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">25</text></g><g class="tick" transform="translate(570.3903070662227,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">30</text></g><g class="tick" transform="translate(663.805031446541,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">35</text></g><g class="tick" transform="translate(757.2197558268591,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">40</text></g><g class="tick" transform="translate(850.6344802071773,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">45</text></g><g class="tick" transform="translate(944.0492045874954,0)" style="opacity: 1;"><line y2="6" x2="0"></line><text y="9" x="0" dy=".71em" style="text-anchor: middle;">50</text></g><path class="domain" d="M0,6V0H1010V6"></path><text class="-axis-x-label" x="1010" dy="-.5em" style="text-anchor: end;"></text></g><g class="y axis" clip-path="" style="opacity: 1;"><g class="tick" transform="translate(0,260.83782958984375)" style="opacity: 1;"><line x2="-6" y2="0"></line><text x="-9" y="0" dy=".32em" style="text-anchor: end;">0</text></g><g class="tick" transform="translate(0,231.1081085205078)" style="opacity: 1;"><line x2="-6" y2="0"></line><text x="-9" y="0" dy=".32em" style="text-anchor: end;">50</text></g><g class="tick" transform="translate(0,201.3783721923828)" style="opacity: 1;"><line x2="-6" y2="0"></line><text x="-9" y="0" dy=".32em" style="text-anchor: end;">100</text></g><g class="tick" transform="translate(0,171.64865112304688)" style="opacity: 1;"><line x2="-6" y2="0"></line><text x="-9" y="0" dy=".32em" style="text-anchor: end;">150</text></g><g class="tick" transform="translate(0,141.91891479492188)" style="opacity: 1;"><line x2="-6" y2="0"></line><text x="-9" y="0" dy=".32em" style="text-anchor: end;">200</text></g><g class="tick" transform="translate(0,112.1891860961914)" style="opacity: 1;"><line x2="-6" y2="0"></line><text x="-9" y="0" dy=".32em" style="text-anchor: end;">250</text></g><g class="tick" transform="translate(0,82.45945739746094)" style="opacity: 1;"><line x2="-6" y2="0"></line><text x="-9" y="0" dy=".32em" style="text-anchor: end;">300</text></g><g class="tick" transform="translate(0,52.72972869873047)" style="opacity: 1;"><line x2="-6" y2="0"></line><text x="-9" y="0" dy=".32em" style="text-anchor: end;">350</text></g><g class="tick" transform="translate(0,23)" style="opacity: 1;"><line x2="-6" y2="0"></line><text x="-9" y="0" dy=".32em" style="text-anchor: end;">400</text></g><path class="domain" d="M0,1H0V265H0"></path><text transform="rotate(-90)" dy="1.2em" dx="-.5em" style="text-anchor: end;"></text></g><rect class="zoom-rect" width="1010" height="265" style="opacity: 0; cursor: ew-resize;"></rect><g clip-path="url(http://neuboard.com/Charts/CS3Charts#zoom-clip)" class="grid"><g class="xgrid-focus"><line class="xgrid-focus" x1="9.901960784313728" x2="9.901960784313728" y1="0" y2="265" style="visibility: hidden;"></line></g></g><g clip-path="url(http://neuboard.com/Charts/CS3Charts#zoom-clip)" class="regions"></g><g clip-path="url(http://neuboard.com/Charts/CS3Charts#zoom-clip)" class="chart"><g class="event-rects" style="fill-opacity: 0; cursor: ew-resize;"><rect class="event-rect event-rect-0" x="0.373658897521274" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-1" x="19.056603773584904" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-2" x="37.73954864964855" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-3" x="56.42249352571218" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-4" x="75.10543840177581" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-5" x="93.78838327783946" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-6" x="112.47132815390309" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-7" x="131.1542730299667" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-8" x="149.83721790603033" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-9" x="168.52016278209396" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-10" x="187.2031076581576" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-11" x="205.88605253422122" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-12" x="224.56899741028485" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-13" x="243.2519422863485" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-14" x="261.9348871624121" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-15" x="280.61783203847574" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-16" x="299.3007769145394" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-17" x="317.9837217906031" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-18" x="336.6666666666667" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-19" x="355.3496115427304" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-20" x="374.03255641879394" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-21" x="392.71550129485763" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-22" x="411.3984461709212" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-23" x="430.0813910469849" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-24" x="448.7643359230485" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-25" x="467.44728079911215" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-26" x="486.1302256751758" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-27" x="504.81317055123947" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-28" x="523.4961154273032" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-29" x="542.1790603033667" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-30" x="560.8620051794303" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-31" x="579.544950055494" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-32" x="598.2278949315577" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-33" x="616.9108398076212" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-34" x="635.5937846836849" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-35" x="654.2767295597486" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-36" x="672.9596744358122" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-37" x="691.6426193118758" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-38" x="710.3255641879394" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-39" x="729.0085090640031" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-40" x="747.6914539400667" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-41" x="766.3743988161303" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-42" x="785.057343692194" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-43" x="803.7402885682576" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-44" x="822.4232334443213" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-45" x="841.1061783203849" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-46" x="859.7891231964485" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-47" x="878.4720680725121" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-48" x="897.1550129485759" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-49" x="915.8379578246394" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-50" x="934.520902700703" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-51" x="953.2038475767667" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-52" x="971.8867924528304" y="0" width="19.056603773584907" height="265"></rect><rect class="event-rect event-rect-53" x="990.5697373288939" y="0" width="19.056603773584907" height="265"></rect></g><g class="chart-bars"><g class="chart-bar target target-sample" style="pointer-events: none;"><g class="-shapes -shapes-sample -bars -bars-sample" style="fill: rgb(45, 204, 112); stroke: none; cursor: pointer;"></g></g></g><g class="chart-lines"><g class="chart-line target target-sample" style="pointer-events: none;"><path class="-shapes -shapes-sample -line -line-sample" d="M9.901960784313728,243L28.58490566037736,141.9189189189189L47.267850536441,201.3783783783784L65.95079541250463,23L84.63374028856826,171.64864864864865L103.3166851646319,112.1891891891892L121.99963004069554,171.64864864864865L140.68257491675917,141.9189189189189L159.3655197928228,159.75675675675677L178.04846466888642,118.13513513513513L196.73140954495005,52.72972972972974L215.41435442101368,171.64864864864865L234.0972992970773,201.3783783783784L252.78024417314097,23L271.4631890492046,171.64864864864865L290.1461339252682,112.1891891891892L308.8290788013319,171.64864864864865L327.5120236773956,141.9189189189189L346.19496855345915,159.75675675675677L364.87791342952283,118.13513513513513L383.5608583055864,201.3783783783784L402.2438031816501,171.64864864864865L420.92674805771367,112.1891891891892L439.60969293377735,171.64864864864865L458.292637809841,141.9189189189189L476.9755826859046,159.75675675675677L495.65852756196824,118.13513513513513L514.3414724380319,243L533.0244173140956,141.9189189189189L551.7073621901591,201.3783783783784L570.3903070662227,23L589.0732519422864,171.64864864864865L607.7561968183501,112.1891891891892L626.4391416944136,171.64864864864865L645.1220865704773,141.9189189189189L663.805031446541,159.75675675675677L682.4879763226046,118.13513513513513L701.1709211986682,52.72972972972974L719.8538660747319,171.64864864864865L738.5368109507955,201.3783783783784L757.2197558268591,23L775.9027007029227,52.72972972972974L794.5856455789864,130.02702702702703L813.26859045505,112.1891891891892L831.9515353311137,82.45945945945945L850.6344802071773,100.29729729729732L869.3174250832409,177.59459459459458L888.0003699593045,171.64864864864865L906.6833148353683,207.32432432432432L925.3662597114318,171.64864864864865L944.0492045874954,231.10810810810813L962.7321494635592,189.48648648648648L981.4150943396228,219.21621621621622L1000.0980392156863,237.05405405405406" style="opacity: 1; stroke: rgb(45, 204, 112);"></path><path class="-shapes -shapes-sample -area -area-sample" d="M 9.901960784313728 243" style="opacity: 0.2; fill: rgb(45, 204, 112);"></path><g class="selected-circles selected-circles-sample"></g><g class="-shapes -shapes-sample -circles -circles-sample" style="fill: rgb(45, 204, 112); cursor: pointer;"><circle class="-shape -shape-0 -circle -circle-0" r="2.5" style="opacity: 1;" cy="243" cx="9.901960784313728"></circle><circle class="-shape -shape-1 -circle -circle-1" r="2.5" style="opacity: 1;" cy="141.9189189189189" cx="28.58490566037736"></circle><circle class="-shape -shape-2 -circle -circle-2" r="2.5" style="opacity: 1;" cy="201.3783783783784" cx="47.267850536441"></circle><circle class="-shape -shape-3 -circle -circle-3" r="2.5" style="opacity: 1;" cy="23" cx="65.95079541250463"></circle><circle class="-shape -shape-4 -circle -circle-4" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="84.63374028856826"></circle><circle class="-shape -shape-5 -circle -circle-5" r="2.5" style="opacity: 1;" cy="112.1891891891892" cx="103.3166851646319"></circle><circle class="-shape -shape-6 -circle -circle-6" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="121.99963004069554"></circle><circle class="-shape -shape-7 -circle -circle-7" r="2.5" style="opacity: 1;" cy="141.9189189189189" cx="140.68257491675917"></circle><circle class="-shape -shape-8 -circle -circle-8" r="2.5" style="opacity: 1;" cy="159.75675675675677" cx="159.3655197928228"></circle><circle class="-shape -shape-9 -circle -circle-9" r="2.5" style="opacity: 1;" cy="118.13513513513513" cx="178.04846466888642"></circle><circle class="-shape -shape-10 -circle -circle-10" r="2.5" style="opacity: 1;" cy="52.72972972972974" cx="196.73140954495005"></circle><circle class="-shape -shape-11 -circle -circle-11" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="215.41435442101368"></circle><circle class="-shape -shape-12 -circle -circle-12" r="2.5" style="opacity: 1;" cy="201.3783783783784" cx="234.0972992970773"></circle><circle class="-shape -shape-13 -circle -circle-13" r="2.5" style="opacity: 1;" cy="23" cx="252.78024417314097"></circle><circle class="-shape -shape-14 -circle -circle-14" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="271.4631890492046"></circle><circle class="-shape -shape-15 -circle -circle-15" r="2.5" style="opacity: 1;" cy="112.1891891891892" cx="290.1461339252682"></circle><circle class="-shape -shape-16 -circle -circle-16" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="308.8290788013319"></circle><circle class="-shape -shape-17 -circle -circle-17" r="2.5" style="opacity: 1;" cy="141.9189189189189" cx="327.5120236773956"></circle><circle class="-shape -shape-18 -circle -circle-18" r="2.5" style="opacity: 1;" cy="159.75675675675677" cx="346.19496855345915"></circle><circle class="-shape -shape-19 -circle -circle-19" r="2.5" style="opacity: 1;" cy="118.13513513513513" cx="364.87791342952283"></circle><circle class="-shape -shape-20 -circle -circle-20" r="2.5" style="opacity: 1;" cy="201.3783783783784" cx="383.5608583055864"></circle><circle class="-shape -shape-21 -circle -circle-21" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="402.2438031816501"></circle><circle class="-shape -shape-22 -circle -circle-22" r="2.5" style="opacity: 1;" cy="112.1891891891892" cx="420.92674805771367"></circle><circle class="-shape -shape-23 -circle -circle-23" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="439.60969293377735"></circle><circle class="-shape -shape-24 -circle -circle-24" r="2.5" style="opacity: 1;" cy="141.9189189189189" cx="458.292637809841"></circle><circle class="-shape -shape-25 -circle -circle-25" r="2.5" style="opacity: 1;" cy="159.75675675675677" cx="476.9755826859046"></circle><circle class="-shape -shape-26 -circle -circle-26" r="2.5" style="opacity: 1;" cy="118.13513513513513" cx="495.65852756196824"></circle><circle class="-shape -shape-27 -circle -circle-27" r="2.5" style="opacity: 1;" cy="243" cx="514.3414724380319"></circle><circle class="-shape -shape-28 -circle -circle-28" r="2.5" style="opacity: 1;" cy="141.9189189189189" cx="533.0244173140956"></circle><circle class="-shape -shape-29 -circle -circle-29" r="2.5" style="opacity: 1;" cy="201.3783783783784" cx="551.7073621901591"></circle><circle class="-shape -shape-30 -circle -circle-30" r="2.5" style="opacity: 1;" cy="23" cx="570.3903070662227"></circle><circle class="-shape -shape-31 -circle -circle-31" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="589.0732519422864"></circle><circle class="-shape -shape-32 -circle -circle-32" r="2.5" style="opacity: 1;" cy="112.1891891891892" cx="607.7561968183501"></circle><circle class="-shape -shape-33 -circle -circle-33" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="626.4391416944136"></circle><circle class="-shape -shape-34 -circle -circle-34" r="2.5" style="opacity: 1;" cy="141.9189189189189" cx="645.1220865704773"></circle><circle class="-shape -shape-35 -circle -circle-35" r="2.5" style="opacity: 1;" cy="159.75675675675677" cx="663.805031446541"></circle><circle class="-shape -shape-36 -circle -circle-36" r="2.5" style="opacity: 1;" cy="118.13513513513513" cx="682.4879763226046"></circle><circle class="-shape -shape-37 -circle -circle-37" r="2.5" style="opacity: 1;" cy="52.72972972972974" cx="701.1709211986682"></circle><circle class="-shape -shape-38 -circle -circle-38" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="719.8538660747319"></circle><circle class="-shape -shape-39 -circle -circle-39" r="2.5" style="opacity: 1;" cy="201.3783783783784" cx="738.5368109507955"></circle><circle class="-shape -shape-40 -circle -circle-40" r="2.5" style="opacity: 1;" cy="23" cx="757.2197558268591"></circle><circle class="-shape -shape-41 -circle -circle-41" r="2.5" style="opacity: 1;" cy="52.72972972972974" cx="775.9027007029227"></circle><circle class="-shape -shape-42 -circle -circle-42" r="2.5" style="opacity: 1;" cy="130.02702702702703" cx="794.5856455789864"></circle><circle class="-shape -shape-43 -circle -circle-43" r="2.5" style="opacity: 1;" cy="112.1891891891892" cx="813.26859045505"></circle><circle class="-shape -shape-44 -circle -circle-44" r="2.5" style="opacity: 1;" cy="82.45945945945945" cx="831.9515353311137"></circle><circle class="-shape -shape-45 -circle -circle-45" r="2.5" style="opacity: 1;" cy="100.29729729729732" cx="850.6344802071773"></circle><circle class="-shape -shape-46 -circle -circle-46" r="2.5" style="opacity: 1;" cy="177.59459459459458" cx="869.3174250832409"></circle><circle class="-shape -shape-47 -circle -circle-47" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="888.0003699593045"></circle><circle class="-shape -shape-48 -circle -circle-48" r="2.5" style="opacity: 1;" cy="207.32432432432432" cx="906.6833148353683"></circle><circle class="-shape -shape-49 -circle -circle-49" r="2.5" style="opacity: 1;" cy="171.64864864864865" cx="925.3662597114318"></circle><circle class="-shape -shape-50 -circle -circle-50" r="2.5" style="opacity: 1;" cy="231.10810810810813" cx="944.0492045874954"></circle><circle class="-shape -shape-51 -circle -circle-51" r="2.5" style="opacity: 1;" cy="189.48648648648648" cx="962.7321494635592"></circle><circle class="-shape -shape-52 -circle -circle-52" r="2.5" style="opacity: 1;" cy="219.21621621621622" cx="981.4150943396228"></circle><circle class="-shape -shape-53 -circle -circle-53" r="2.5" style="opacity: 1;" cy="237.05405405405406" cx="1000.0980392156863"></circle></g></g></g><g class="chart-arcs" transform="translate(505,132.5)"><text class="chart-arcs-title" style="text-anchor: middle; opacity: 0;"></text><g class="chart-arc target target-sample"><path class="-shapes -shapes-sample -arc -arc-sample" transform="" style="opacity: 1; fill: rgb(45, 204, 112); cursor: pointer;" d="M 0 0"></path><text dy=".35em" transform="translate(6.166096633706924e-15,100.7)" style="opacity: 0; text-anchor: middle; pointer-events: none;">100.0%</text></g></g></g></g><g transform="translate(40,285)"><g class="legend-item legend-item-sample" style="cursor: pointer;"><rect class="legend-item-event" x="465" y="4" width="80" height="24" style="fill-opacity: 0;"></rect><rect class="legend-item-tile" x="465" y="11" width="10" height="10" style="pointer-events: none; fill: rgb(45, 204, 112);"></rect><text x="479" y="20" style="pointer-events: none;">sample</text></g></g></svg><div style="position: absolute; z-index: 10; display: none; visibility: visible; top: 184px; left: 69.902px;"><table class="-tooltip"><tbody><tr><th colspan="2">0</th></tr><tr class="-tooltip-name-sample"><td class="name"><span style="background-color:#2dcc70"></span>sample</td><td class="value">30</td></tr></tbody></table></div></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-
 {% endblock %}

@@ -31,11 +31,11 @@ class EventPanelView(AccountMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        return redirect(reverse('subscription:subscription-list', kwargs={
-            'event_pk': self.object.pk
-        }))
+        # return redirect(reverse('subscription:subscription-list', kwargs={
+        #     'event_pk': self.object.pk
+        # }))
 
-        # return super().dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(EventPanelView, self).get_context_data(**kwargs)
