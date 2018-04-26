@@ -13,7 +13,23 @@ class RestrictionViewMixin(object):
     permission_classes = (IsAuthenticated,)
 
 
-class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class ThemeViewSet(viewsets.ModelViewSet):
+    """
+        API endpoint that allows users to be viewed or edited.
+    """
+    queryset = models.Theme.objects.all().order_by('name')
+    serializer_class = serializers.ThemeSerializer
+
+
+class OptionalTypeViewSet(viewsets.ModelViewSet):
+    """
+        API endpoint that allows users to be viewed or edited.
+    """
+    queryset = models.OptionalType.objects.all().order_by('name')
+    serializer_class = serializers.OptionalTypeSerializer
+
+
+class ProductViewSet(viewsets.ModelViewSet):
     """
         API endpoint that allows users to be viewed or edited.
     """
@@ -21,9 +37,25 @@ class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     serializer_class = serializers.ProductSerializer
 
 
-class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+class SubscriptionProductViewSet(viewsets.ModelViewSet):
+    """
+        API endpoint that allows users to be viewed or edited.
+    """
+    queryset = models.SubscriptionProduct.objects.all()
+    serializer_class = serializers.SubscriptionProductSerializer
+
+
+class ServiceViewSet(viewsets.ModelViewSet):
     """
         API endpoint that allows users to be viewed or edited.
     """
     queryset = models.Service.objects.all().order_by('name')
-    serializer_class = serializers.Ser
+    serializer_class = serializers.ServiceSerializer
+
+
+class SubscriptionServiceViewSet(viewsets.ModelViewSet):
+    """
+        API endpoint that allows users to be viewed or edited.
+    """
+    queryset = models.SubscriptionService.objects.all()
+    serializer_class = serializers.SubscriptionServiceSerializer
