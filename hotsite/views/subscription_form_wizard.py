@@ -74,10 +74,10 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
     def dispatch(self, request, *args, **kwargs):
 
+        response = super().dispatch(request, *args, **kwargs)
+
         if not self.request.user.is_authenticated:
             return redirect('public:hotsite', slug=self.event.slug)
-
-        response = super().dispatch(request, *args, **kwargs)
 
         if not self.storage:
             return redirect('public:hotsite', slug=self.event.slug)
