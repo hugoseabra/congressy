@@ -31,14 +31,6 @@ class OptionalTypeManager(managers.Manager):
         fields = '__all__'
 
 
-class SessionManager(managers.Manager):
-    """ Manager de session. """
-
-    class Meta:
-        model = Session
-        fields = '__all__'
-
-
 class OptionalProductManager(managers.Manager):
     """ Manager de produtos opcionais. """
 
@@ -53,46 +45,6 @@ class OptionalServiceManager(managers.Manager):
     class Meta:
         model = OptionalService
         fields = '__all__'
-
-
-class ProductPriceManager(managers.Manager):
-    """ Manager de preços. """
-
-    class Meta:
-        model = ProductPrice
-        fields = '__all__'
-
-    def clean(self):
-        cleaned_data = super().clean()
-        """
-            Optional: se tiver "prices", o campo has_cost deve ser True
-        """
-
-        optional_product = cleaned_data['optional_product']
-        optional_product.has_cost = True
-        optional_product.save()
-
-        return cleaned_data
-
-
-class ServicePriceManager(managers.Manager):
-    """ Manager de preços. """
-
-    class Meta:
-        model = ServicePrice
-        fields = '__all__'
-
-    def clean(self):
-        cleaned_data = super().clean()
-        """
-            Optional: se tiver "prices", o campo has_cost deve ser True
-        """
-
-        optional_service = cleaned_data['optional_service']
-        optional_service.has_cost = True
-        optional_service.save()
-
-        return cleaned_data
 
 
 class SubscriptionOptionalServiceManager(managers.Manager):

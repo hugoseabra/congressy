@@ -10,9 +10,10 @@ from addon.tests.mock_factory import MockFactory
 from base.models import RuleIntegrityError
 
 
-class OptionalPriceRulesTest(TestCase):
+class OptionalMustDateEndAfterDateStartTest(TestCase):
     """
-        Testes de regras de domínio de Opcional e Price.
+        Testes de regras de opcionais onde a data de início deve antes da
+        data de fim.
     """
     mocker = None
 
@@ -20,12 +21,13 @@ class OptionalPriceRulesTest(TestCase):
         self.mocker = MockFactory()
         self.rule = rules.MustDateEndAfterDateStart()
 
-    def test_session_must_date_end_after_date_start(self):
+    def test_optional_service_must_date_end_after_date_start(self):
         """
-            Testa regra de session com data inicial antes da data final.
+            Testa regra de opcional de serviço na qual data inicial antes da
+            data final.
         """
         # Failure
-        instance = self.mocker.fake_session()
+        instance = self.mocker.fake_service()
 
         instance.date_end = instance.date_start - timedelta(days=3)
 
@@ -38,15 +40,16 @@ class OptionalPriceRulesTest(TestCase):
         )
 
         # Success
-        instance = self.mocker.fake_session()
+        instance = self.mocker.fake_service()
         self.rule.check(model_instance=instance)
 
-    def test_service_price_must_date_end_after_date_start(self):
+    def test_optional_product_must_date_end_after_date_start(self):
         """
-            Testa regra de preço na qual data inicial antes da data final.
+            Testa regra de opcional de produto na qual data inicial antes da
+            data final.
         """
         # Failure
-        instance = self.mocker.fake_service_price()
+        instance = self.mocker.fake_product()
 
         instance.date_end = instance.date_start - timedelta(days=3)
 
@@ -59,150 +62,88 @@ class OptionalPriceRulesTest(TestCase):
         )
 
         # Success
-        instance = self.mocker.fake_service_price()
-        self.rule.check(model_instance=instance)
-
-    def test_product_price_must_date_end_after_date_start(self):
-        """
-            Testa regra de preço na qual data inicial antes da data final.
-        """
-        # Failure
-        instance = self.mocker.fake_product_price()
-
-        instance.date_end = instance.date_start - timedelta(days=3)
-
-        with self.assertRaises(RuleIntegrityError) as e:
-            self.rule.check(model_instance=instance)
-
-        self.assertIn(
-            'Data inicial deve ser anterior a data final',
-            str(e.exception)
-        )
-
-        # Success
-        instance = self.mocker.fake_product_price()
+        instance = self.mocker.fake_product()
         self.rule.check(model_instance=instance)
 
 
-class PriceRulesTest(TestCase):
+class OptionalMustHaveUniqueDatetimeIntervalTest(TestCase):
     """
-        Testes de regras de domínio de Rules de Price.
+        Testes de regras de opcionais na qual deve haver um opcional
+        dentro de um mesmo horário (sessão) para a mesma categoria de lote
+        de um evento.
     """
     mocker = None
     lot_category = None
-    product_price = None
-    service_price = None
 
     def setUp(self):
         self.mocker = MockFactory()
         self.lot_category = self.mocker.fake_lot_category()
-        self.product_price = self.mocker.fake_product_price()
-        self.service_price = self.mocker.fake_service_price()
 
-    def test_lot_category_must_be_in_optional_categories(self):
+    def test_optional_product_unique_session(self):
         """
-            Testa regra de categoria de lote informa estar entre os
+            Testa de optional não possui datas que podem ou não dar conflitar
+            o horário.
         """
-        rule = rules.MustLotCategoryBeAmongOptionalLotCategories()
-        original_lot_category = self.product_price.lot_category
+        rule = rules.ProductMustHaveUniqueDatetimeInterval()
 
-        # Failure - ProductPrice
-        price = self.product_price
-
-        # Muda a categoria para uma que não está vinculada ao evento e
-        # categoria de lote previament inseridos na instância de price.
-        price.lot_category = self.lot_category
-
-        with self.assertRaises(RuleIntegrityError) as e:
-            rule.check(model_instance=price)
-
-        self.assertIn(
-            'Você deve informar uma categoria de lote que já esteja inserida'
-            ' no opcional',
-            str(e.exception)
-        )
-
-        # Success - ProductPrice
-        price.lot_category = original_lot_category
-        rule.check(model_instance=price)
-
-        # Failure - ServicePrice
-        original_lot_category = self.service_price.lot_category
-
-        # Failure - ProductPrice
-        price = self.service_price
-
-        # Muda a categoria para uma que não está vinculada ao evento e
-        # categoria de lote previament inseridos na instância de price.
-        price.lot_category = self.lot_category
-
-        with self.assertRaises(RuleIntegrityError) as e:
-            rule.check(model_instance=price)
-
-        self.assertIn(
-            'Você deve informar uma categoria de lote que já esteja inserida'
-            ' no opcional',
-            str(e.exception)
-        )
-
-        # Success - ServicePrice
-        price.lot_category = original_lot_category
-        rule.check(model_instance=price)
-
-    def test_unique_datetime_interval(self):
-        """
-            Testa de preço inserido em um opcional não possui datas que chocam
-            entre si.
-        """
-        rule = rules.MustHaveUniqueDatetimeInterval()
-
-        # Failure - ProductPrice
-        price1 = self.product_price
-
+        # Failure
         # Já existe um preço será criado com o mesmo período
-        price2 = \
-            self.mocker.fake_product_price(lot_category=price1.lot_category)
+        optional1 = self.mocker.fake_product()
+
+        optional2 = \
+            self.mocker.fake_product(
+                lot_category=optional1.lot_category
+            )
 
         # força mesmas datas
-        price2.date_start = price1.date_start + timedelta(minutes=30)
+        optional2.date_start = optional1.date_start + timedelta(minutes=30)
 
         with self.assertRaises(RuleIntegrityError) as e:
-            rule.check(model_instance=price2)
+            rule.check(model_instance=optional2)
 
         self.assertIn(
-            'As datas informadas conflitam com outro(s) preço(s)',
+            'As datas informadas conflitam com outro(s) opcionais(s)',
             str(e.exception)
         )
 
-        # Sucesso - ProductPrice
-        price2.date_start = price1.date_end + timedelta(days=1)
-        price2.date_end = price2.date_start + timedelta(days=3)
+        # Sucesso
+        optional2.date_start = optional1.date_end + timedelta(days=1)
+        optional2.date_end = optional1.date_start + timedelta(days=3)
 
-        rule.check(model_instance=price2)
+        rule.check(model_instance=optional2)
 
-        # Failure - ServicePrice
-        price1 = self.service_price
+    def test_optional_service_unique_session(self):
+        """
+            Testa de optional não possui datas que podem ou não dar conflitar
+            o horário.
+        """
+        rule = rules.ServiceMustHaveUniqueDatetimeInterval()
 
+        # Failure
         # Já existe um preço será criado com o mesmo período
-        price2 = \
-            self.mocker.fake_service_price(lot_category=price1.lot_category)
+        optional1 = self.mocker.fake_service()
+
+        optional2 = \
+            self.mocker.fake_service(
+                lot_category=optional1.lot_category
+            )
 
         # força mesmas datas
-        price2.date_start = price1.date_start + timedelta(minutes=30)
+        optional2.date_start = optional1.date_start + timedelta(minutes=30)
 
         with self.assertRaises(RuleIntegrityError) as e:
-            rule.check(model_instance=price2)
+            rule.check(model_instance=optional2)
 
         self.assertIn(
-            'As datas informadas conflitam com outro(s) preço(s)',
+            'As datas informadas conflitam com outro(s) opcionais(s)',
             str(e.exception)
         )
 
-        # Sucesso - ServicePrice
-        price2.date_start = price1.date_end + timedelta(days=1)
-        price2.date_end = price2.date_start + timedelta(days=3)
+        # Sucesso
+        optional2.date_start = optional1.date_end + timedelta(days=1)
+        optional2.date_end = optional1.date_start + timedelta(days=3)
 
-        rule.check(model_instance=price2)
+        rule.check(model_instance=optional2)
 
 
 class SubscriptionOptionalRulesTest(TestCase):

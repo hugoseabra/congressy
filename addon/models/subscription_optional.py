@@ -9,7 +9,7 @@ from django.db import models
 from addon import rules
 from base.models import EntityMixin
 from gatheros_subscription.models import Subscription
-from .optional import OptionalProduct, OptionalService
+from .optional import Product, Service
 
 
 class AbstractSubscriptionOptional(EntityMixin, models.Model):
@@ -32,12 +32,6 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
         verbose_name='inscrição',
     )
 
-    price = models.DecimalField(
-        verbose_name='preço',
-        decimal_places=2,
-        max_digits=10,
-    )
-
     created = models.DateTimeField(
         auto_now_add=True,
         verbose_name="data de criação",
@@ -51,11 +45,11 @@ class SubscriptionOptionalProduct(AbstractSubscriptionOptional):
     """
         Vínculo de uma inscrição com um Opcional de Produto.
     """
-    optional_product = models.ForeignKey(
-        OptionalProduct,
+    optional = models.ForeignKey(
+        Product,
         on_delete=models.CASCADE,
         verbose_name='opcional de produto',
-        related_name='subscription_products'
+        related_name='products'
     )
 
 
@@ -63,9 +57,9 @@ class SubscriptionOptionalService(AbstractSubscriptionOptional):
     """
         Vínculo de uma inscrição com um Opcional de Serviço.
     """
-    optional_service = models.ForeignKey(
-        OptionalService,
+    optional = models.ForeignKey(
+        Service,
         on_delete=models.DO_NOTHING,
         verbose_name='opcional de serviço',
-        related_name='subscription_services'
+        related_name='services'
     )

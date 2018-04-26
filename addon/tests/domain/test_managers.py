@@ -54,32 +54,6 @@ class OptionalTypePersistenceTest(ManagerPersistenceTestCase):
         self.edit()
 
 
-class SessionPersistenceTest(ManagerPersistenceTestCase):
-    """ Testes de persistência de dados: criação e edição."""
-    manager_class = managers.SessionManager
-    required_fields = ('date_start', 'date_end',)
-    data_edit_to = {
-        'restrict_unique': True,
-    }
-
-    def setUp(self):
-
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
-
-        self.data = {
-            'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
-            'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
-            'restrict_unique': False,
-        }
-
-    def test_create(self):
-        self.create()
-
-    def test_edit(self):
-        self.edit()
-
-
 class OptionalProductManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
 

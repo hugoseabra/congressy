@@ -18,33 +18,39 @@ class MustDateEndAfterDateStart(RuleChecker):
             )
 
 
-# =============================== PRICE ===================================== #
-class MustLotCategoryBeAmongOptionalLotCategories(RuleChecker):
+# ============================= OPTIONAL ==================================== #
+def check_dates_conflict(optional, other_optionals):
+    conflict_prices = []
+    for o_optional in other_optionals.all():
+        optional_str = '{} - {} a {}'.format(
+            o_optional.name,
+            o_optional.date_start.strftime('%d/%m/%Y %H:%M'),
+            o_optional.date_end.strftime('%d/%m/%Y %H:%M'),
+        )
+
+        date_start = o_optional.date_start
+        date_end = o_optional.date_end
+
+        dt_start_conflicts = \
+            date_start <= optional.date_start <= o_optional.date_end
+
+        dt_end_conflicts = \
+            date_end <= optional.date_end <= o_optional.date_end
+
+        if dt_start_conflicts or dt_end_conflicts:
+            conflict_prices.append(optional_str)
+
+    if conflict_prices:
+        raise RuleIntegrityError(
+            'As datas informadas conflitam com outro(s) opcionais(s) já'
+            ' existente(s): {}'.format('; '.join(conflict_prices))
+        )
+
+
+class ProductMustHaveUniqueDatetimeInterval(RuleChecker):
     """
-    Regra: o LotCategory de Price deve estar entre os LotCategory da relação
-    N-N do Optional Informado.
-    """
-
-    def check(self, model_instance, *args, **kwargs):
-        if hasattr(model_instance, 'optional_product'):
-            optional = model_instance.optional_product
-        else:
-            optional = model_instance.optional_service
-
-        lot_category = model_instance.lot_category
-        lot_pks = [lc.pk for lc in optional.lot_categories.all()]
-
-        if lot_category.pk not in lot_pks:
-            raise RuleIntegrityError(
-                'Você deve informar uma categoria de lote que já esteja'
-                ' inserida no opcional "{}".'.format(optional.name)
-            )
-
-
-class MustHaveUniqueDatetimeInterval(RuleChecker):
-    """
-    Regra: o Price cadastrado não pode chocar com outro vinculado ao seu
-    Opcional.
+    Regra: o opcional de produto cadastrado não pode chocar com outro na mesma
+    categoria de lote.
     """
 
     def check(self, model_instance, *args, **kwargs):
@@ -55,33 +61,26 @@ class MustHaveUniqueDatetimeInterval(RuleChecker):
             if not date_start_changed and not date_end_changed:
                 return
 
-        if hasattr(model_instance, 'optional_product'):
-            optional = model_instance.optional_product
-        else:
-            optional = model_instance.optional_service
+        lot_category = model_instance.lot_category
+        check_dates_conflict(model_instance, lot_category.product_optionals)
 
-        conflict_prices = []
-        for price in optional.prices.all():
-            price_str = 'R$ {:.2f}'.format(round(price.price, 2))
-            price_str += ' - {} a {}'.format(
-                price.date_start.strftime('%d/%m/%Y %H:%M'),
-                price.date_end.strftime('%d/%m/%Y %H:%M'),
-            )
 
-            dt_start_conflicts = \
-                price.date_start <= model_instance.date_start <= price.date_end
-            dt_end_conflicts = \
-                price.date_start <= model_instance.date_end <= price.date_end
+class ServiceMustHaveUniqueDatetimeInterval(RuleChecker):
+    """
+    Regra: o opcional de serviço cadastrado não pode chocar com outro na mesma
+    categoria de lote.
+    """
 
-            if dt_start_conflicts or dt_end_conflicts:
-                conflict_prices.append(price_str)
+    def check(self, model_instance, *args, **kwargs):
+        if model_instance._state.adding is False:
+            date_start_changed = model_instance.has_changed('date_start')
+            date_end_changed = model_instance.has_changed('date_end')
 
-        if conflict_prices:
-            raise RuleIntegrityError(
-                'As datas informadas conflitam com outro(s) preço(s) já'
-                ' existente(s) para este Opcional.'
-                ' O(s) preço(s) é(são): {}.'.format('; '.join(conflict_prices))
-            )
+            if not date_start_changed and not date_end_changed:
+                return
+
+        lot_category = model_instance.lot_category
+        check_dates_conflict(model_instance, lot_category.service_optionals)
 
 
 # ===================== SUBSCRIPTION OPTIONAL =============================== #
@@ -91,17 +90,11 @@ class MustBeSameOptionalLotCategory(RuleChecker):
     """
 
     def check(self, model_instance, *args, **kwargs):
-        if hasattr(model_instance, 'optional_product'):
-            optional = model_instance.optional_product
-        else:
-            optional = model_instance.optional_service
+        optional = model_instance.optional
 
         sub = model_instance.subscription
-        lot_category = sub.lot.category
 
-        lot_pks = [lc.pk for lc in optional.lot_categories.all()]
-
-        if lot_category.pk not in lot_pks:
+        if optional.lot_category.pk != sub.lot.category.pk:
             raise RuleIntegrityError(
                 'Você deve informar uma categoria de lote que já esteja'
                 ' inserida no opcional "{}".'.format(optional.name)

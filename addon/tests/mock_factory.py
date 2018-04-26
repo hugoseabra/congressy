@@ -10,12 +10,9 @@ from django.contrib.auth.models import User
 from faker import Faker
 
 from addon.models import (
-    OptionalProduct,
-    OptionalService,
+    Product,
+    Service,
     OptionalType,
-    ProductPrice,
-    ServicePrice,
-    Session,
     SubscriptionOptionalProduct,
     SubscriptionOptionalService,
     Theme,
@@ -31,17 +28,6 @@ class MockFactory:
 
     def __init__(self):
         self.fake_factory = Faker()
-
-    def fake_lot_category(self, event=None):
-        if not event:
-            event = self.fake_event()
-
-        return LotCategory.objects.create(event=event,
-                                          name=self.fake_factory.words(
-                                              nb=3, ext_word_list=None),
-                                          description=self.fake_factory.words(
-                                              nb=7, ext_word_list=None)
-                                          )
 
     def fake_organization(self):
         return Organization.objects.create(name=self.fake_factory.company())
@@ -59,20 +45,14 @@ class MockFactory:
             category=Category.objects.first(),
         )
 
-    def fake_lot(self, event=None, lot_category=None):
-
+    def fake_lot_category(self, event=None):
         if not event:
             event = self.fake_event()
 
-        if not lot_category:
-            lot_category = self.fake_lot_category(event=event)
-
-        return Lot.objects.create(
+        return LotCategory.objects.create(
             event=event,
-            name='Lot: ' + ' '.join(self.fake_factory.words(nb=3)),
-            date_start=datetime.now() + timedelta(days=3),
-            date_end=datetime.now() + timedelta(days=4),
-            category=lot_category,
+            name=self.fake_factory.words(nb=3, ext_word_list=None),
+            description=self.fake_factory.words(nb=7, ext_word_list=None)
         )
 
     def fake_person(self):
@@ -88,6 +68,22 @@ class MockFactory:
         assert person is not None
 
         return person
+
+    def fake_lot(self, event=None, lot_category=None):
+
+        if not event:
+            event = self.fake_event()
+
+        if not lot_category:
+            lot_category = self.fake_lot_category(event=event)
+
+        return Lot.objects.create(
+            event=event,
+            name='Lot: ' + ' '.join(self.fake_factory.words(nb=3)),
+            date_start=datetime.now() + timedelta(days=3),
+            date_end=datetime.now() + timedelta(days=4),
+            category=lot_category,
+        )
 
     def fake_subscription(self, lot=None, person=None):
 
@@ -109,54 +105,30 @@ class MockFactory:
             name=self.fake_factory.words(nb=3, ext_word_list=None),
         )
 
-    def fake_session(self):
+    def fake_product(self, optional_type=None, lot_category=None):
+
+        if not lot_category:
+            lot_category = self.fake_lot_category()
+
+        if not optional_type:
+            optional_type = self.fake_optional_type()
+
         date_start = datetime.now() - timedelta(days=3)
         date_end = datetime.now() + timedelta(days=3)
 
-        return Session.objects.create(
+        return Product.objects.create(
+            name='optional product',
+            optional_type=optional_type,
+            lot_category=lot_category,
             date_start=date_start,
             date_end=date_end,
             restrict_unique=False,
         )
 
-    def fake_optional_product(self,
-                              optional_type=None,
-                              session=None,
-                              lot_categories=None):
+    def fake_service(self, optional_type=None, theme=None, lot_category=None):
 
-        if not lot_categories:
-            lot_categories = [self.fake_lot_category()]
-
-        if not optional_type:
-            optional_type = self.fake_optional_type()
-
-        if not session:
-            session = self.fake_session()
-
-        op = OptionalProduct(
-            name='optional product',
-            session=session,
-            optional_type=optional_type,
-            description='original description',
-        )
-
-        op.save()
-
-        for lot_category in lot_categories:
-            op.lot_categories.add(lot_category)
-
-        op.save()
-
-        return op
-
-    def fake_optional_service(self,
-                              optional_type=None,
-                              session=None,
-                              theme=None,
-                              lot_categories=None):
-
-        if not lot_categories:
-            lot_categories = [self.fake_lot_category()]
+        if not lot_category:
+            lot_category = self.fake_lot_category()
 
         if not optional_type:
             optional_type = self.fake_optional_type()
@@ -164,64 +136,17 @@ class MockFactory:
         if not theme:
             theme = self.fake_theme()
 
-        if not session:
-            session = self.fake_session()
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
 
-        os = OptionalService(
-            name='optional service',
+        return Service.objects.create(
+            name='optional product',
             optional_type=optional_type,
-            session=session,
             theme=theme,
-            description='original description',
-        )
-
-        os.save()
-
-        for lot_category in lot_categories:
-            os.lot_categories.add(lot_category)
-
-        os.save()
-
-        return os
-
-    def fake_service_price(self, lot_category=None, optional_service=None):
-        if not lot_category:
-            lot_category = self.fake_lot_category()
-
-        if not optional_service:
-            optional_service = self.fake_optional_service(
-                lot_categories=[lot_category]
-            )
-
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
-
-        return ServicePrice.objects.create(
+            lot_category=lot_category,
             date_start=date_start,
             date_end=date_end,
-            price=Decimal(20.00),
-            lot_category=lot_category,
-            optional_service=optional_service,
-        )
-
-    def fake_product_price(self, lot_category=None, optional_product=None):
-        if not lot_category:
-            lot_category = self.fake_lot_category()
-
-        if not optional_product:
-            optional_product = self.fake_optional_product(
-                lot_categories=[lot_category]
-            )
-
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
-
-        return ProductPrice.objects.create(
-            date_start=date_start,
-            date_end=date_end,
-            price=Decimal(20.00),
-            lot_category=lot_category,
-            optional_product=optional_product,
+            restrict_unique=False,
         )
 
     def fake_subscription_optional_service(self,
@@ -231,14 +156,13 @@ class MockFactory:
             subscription = self.fake_subscription()
 
         if not optional_service:
-            optional_service = self.fake_optional_service(
-                lot_categories=[subscription.lot.category]
+            optional_service = self.fake_service(
+                lot_category=subscription.lot.category
             )
 
         return SubscriptionOptionalService.objects.create(
             subscription=subscription,
-            optional_service=optional_service,
-            price=Decimal(20.00),
+            optional=optional_service,
         )
 
     def fake_subscription_optional_product(self,
@@ -248,14 +172,13 @@ class MockFactory:
             subscription = self.fake_subscription()
 
         if not optional_product:
-            optional_product = self.fake_optional_product(
-                lot_categories=[subscription.lot.category]
+            optional_product = self.fake_product(
+                lot_category=subscription.lot.category
             )
 
         return SubscriptionOptionalProduct.objects.create(
             subscription=subscription,
-            optional_product=optional_product,
-            price=Decimal(20.00),
+            optional=optional_product,
         )
 
     def fake_theme(self):
