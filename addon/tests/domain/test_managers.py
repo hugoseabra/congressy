@@ -54,55 +54,51 @@ class OptionalTypePersistenceTest(ManagerPersistenceTestCase):
         self.edit()
 
 
-class OptionalProductManagerPersistenceTest(ManagerPersistenceTestCase):
+class ProductManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
 
-    manager_class = managers.OptionalProductManager
+    edited_date_start = datetime.now() - timedelta(days=6)
+    edited_date_end = datetime.now() + timedelta(days=6)
+
+    manager_class = managers.ProductManager
     required_fields = (
-        'name',
         'optional_type',
-        'lot_categories',
-        'session',
+        'lot_category',
+        'date_start',
+        'date_end',
+        'published',
+        'created_by',
+        'modified_by',
+        'price',
+        'restrict_unique',
         'description',
         'quantity',
-        'published',
-        'has_cost',
     )
 
     data_edit_to = {
-        'description': 'edited description',
-        'quantity': random.randint(5, 10000),
-        'published': False,
-        'has_cost': False,
-        'modified_by': 'test user',
+        'name': 'edited optional name',
+        'published': True,
+        'created_by': 'test edited user',
+        'modified_by': 'test edited user',
+        'price': round(decimal.Decimal(43.43), 2),
+        'restrict_unique': True,
+        'description': 'Optional edited description',
+        'quantity': 10,
     }
 
-    def setUp(self):
-        fake_factory = MockFactory()
-        self.data = {
-            'name': 'optional name',
-            'optional_type': fake_factory.fake_optional_type().pk,
-            'session': fake_factory.fake_session().pk,
-            'lot_categories': (fake_factory.fake_lot_category().pk,),
-            'description': 'original description',
-            'quantity': 3,
-            'published': True,
-            'has_cost': True,
-        }
-
     def _create_manager(self, instance=None, data=None):
+
+        static_fake_factory = MockFactory()
 
         if not data:
             data = self.data
 
-        if 'lot_categories' not in data:
-            data['lot_categories'] = (self.fake_factory.fake_lot_category(
-
-            ).pk,)
-
         if 'optional_type' not in data:
             data[
-                'optional_type'] = self.fake_factory.fake_optional_type().pk
+                'optional_type'] = static_fake_factory.fake_optional_type().pk
+
+        if 'lot_category' not in data:
+            data['lot_category'] = static_fake_factory.fake_lot_category().pk
 
         if instance is not None:
             manager = self.manager_class(instance=instance, data=data)
@@ -111,79 +107,30 @@ class OptionalProductManagerPersistenceTest(ManagerPersistenceTestCase):
 
         return manager
 
+    def setUp(self):
+        fake_factory = MockFactory()
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+        self.data = {
+            'optional_type': fake_factory.fake_optional_type().pk,
+            'lot_category': fake_factory.fake_lot_category().pk,
+            'name': 'optional name',
+            'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
+            'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+            'published': True,
+            'created_by': 'test user',
+            'modified_by': 'test user',
+            'price': format(decimal.Decimal(42.42), '.2f'),
+            'restrict_unique': False,
+            'description': 'Optional description',
+            'quantity': 5,
+        }
+
     def test_create(self):
         self.create()
 
     def test_edit(self):
         self.edit()
-
-
-class OptionalProductPriceManagerRulesTest(TestCase):
-    """Testes com a intenção de validar as regras dos managers normalmente
-    colocadas dentro dos cleans"""
-
-    def setUp(self):
-        self.fake_factory = MockFactory()
-
-    def test_setting_optional_product_has_cost_to_true(self):
-        """ Regra: se tiver "prices", o campo has_cost deve ser True """
-        new_optional_product = self.fake_factory.fake_optional_product()
-
-        # Validando que o produto possui a flag correta
-        self.assertFalse(new_optional_product.has_cost)
-
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
-
-        price_manager = managers.ProductPriceManager(
-            data={
-                'lot_category': new_optional_product.lot_categories.first().pk,
-                'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
-                'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
-                'price': format(decimal.Decimal(42.42), '.2f'),
-                'optional_product': new_optional_product.pk,
-            }
-        )
-
-        self.assertTrue(price_manager.is_valid())
-
-        # Buscando o objeto OptionalProduct da persistência para validar se
-        # o flag foi definido corretamente.
-
-        persisted = addon_models.OptionalProduct.objects.get(
-            pk=new_optional_product.pk)
-        # Validando que o produto possui a flag correta
-        self.assertTrue(persisted.has_cost)
-
-    def test_setting_optional_service_has_cost_to_true(self):
-        """ Regra: se tiver "prices", o campo has_cost deve ser True """
-        new_optional_service = self.fake_factory.fake_optional_service()
-
-        # Validando que o produto possui a flag correta
-        self.assertFalse(new_optional_service.has_cost)
-
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
-
-        price_manager = managers.ServicePriceManager(
-            data={
-                'lot_category': new_optional_service.lot_categories.first().pk,
-                'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
-                'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
-                'price': format(decimal.Decimal(42.42), '.2f'),
-                'optional_service': new_optional_service.pk,
-            }
-        )
-
-        self.assertTrue(price_manager.is_valid())
-
-        # Buscando o objeto OptionalProduct da persistência para validar se
-        # o flag foi definido corretamente.
-
-        persisted = addon_models.OptionalService.objects.get(
-            pk=new_optional_service.pk)
-        # Validando que o produto possui a flag correta
-        self.assertTrue(persisted.has_cost)
 
 
 class SubscriptionOptionalProductManagerRulesTest(TestCase):
@@ -310,7 +257,6 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         )
 
     def test_validation_by_session_with_flag_on(self):
-
         # Crie uma única Subscription para ser usada para criar o
         # SubscriptionOptionalService
         subscription = self.fake_factory.fake_subscription()
@@ -355,7 +301,6 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         self.assertFalse(service_2_manager.is_valid())
 
     def test_validation_by_session_with_flag_off(self):
-
         # Crie uma única Subscription para ser usada para criar o
         # SubscriptionOptionalService
         subscription = self.fake_factory.fake_subscription()
@@ -401,7 +346,6 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         service_2_manager.save()
 
     def test_validation_by_theme_with_flag_on(self):
-
         # Crie uma única Subscription para ser usada para criar o
         # SubscriptionOptionalService
         subscription = self.fake_factory.fake_subscription()
@@ -410,7 +354,6 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         theme = self.fake_factory.fake_theme()
         theme.limit = 1
         theme.save()
-
 
         # Crie OptionalServices com tema.
         service = self.fake_factory.fake_optional_service(
@@ -438,7 +381,6 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         self.assertFalse(service_manager_2.is_valid())
 
     def test_validation_by_theme_with_flag_off(self):
-
         # Crie uma única Subscription para ser usada para criar o
         # SubscriptionOptionalService
         subscription = self.fake_factory.fake_subscription()
@@ -475,64 +417,57 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         service_manager_2.save()
 
 
-class OptionalServiceManagerPersistenceTest(ManagerPersistenceTestCase):
+class ServiceManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
 
-    manager_class = managers.OptionalServiceManager
+    edited_date_start = datetime.now() - timedelta(days=6)
+    edited_date_end = datetime.now() + timedelta(days=6)
+
+    manager_class = managers.ServiceManager
     required_fields = (
-        'name',
-        'session',
         'optional_type',
-        'lot_categories',
+        'lot_category',
+        'date_start',
+        'date_end',
+        'published',
+        'created_by',
+        'modified_by',
+        'price',
+        'restrict_unique',
         'description',
         'quantity',
-        'published',
-        'has_cost',
-        'theme'
+        'theme',
+        'place',
     )
 
-    date_start = datetime.now() - timedelta(days=3)
-    date_end = datetime.now() + timedelta(days=3)
-
     data_edit_to = {
-        'description': 'edited description',
-        'quantity': random.randint(5, 10000),
-        'published': False,
-        'has_cost': True,
-        'modified_by': 'test user',
+        'name': 'edited optional name',
+        'published': True,
+        'created_by': 'test edited user',
+        'modified_by': 'test edited user',
+        'price': round(decimal.Decimal(43.43), 2),
+        'restrict_unique': True,
+        'description': 'Optional edited description',
+        'quantity': 10,
+        'place': 'Edited place',
     }
 
-    def setUp(self):
-        fake_factory = MockFactory()
-
-        self.data = {
-            'name': 'optional name',
-            'optional_type': fake_factory.fake_optional_type().pk,
-            'session': fake_factory.fake_session().pk,
-            'lot_categories': (fake_factory.fake_lot_category().pk,),
-            'description': 'original description',
-            'quantity': 3,
-            'published': True,
-            'has_cost': True,
-            'theme': fake_factory.fake_theme().pk
-        }
-
     def _create_manager(self, instance=None, data=None):
+
+        static_fake_factory = MockFactory()
 
         if not data:
             data = self.data
 
-        if 'lot_categories' not in data:
-            data['lot_categories'] = (self.fake_factory.fake_lot_category(
-
-            ).pk,)
-
         if 'optional_type' not in data:
             data[
-                'optional_type'] = self.fake_factory.fake_optional_type().pk
+                'optional_type'] = static_fake_factory.fake_optional_type().pk
+
+        if 'lot_category' not in data:
+            data['lot_category'] = static_fake_factory.fake_lot_category().pk
 
         if 'theme' not in data:
-            data['theme'] = self.fake_factory.fake_theme().pk
+            data['theme'] = static_fake_factory.fake_theme().pk
 
         if instance is not None:
             manager = self.manager_class(instance=instance, data=data)
@@ -541,80 +476,25 @@ class OptionalServiceManagerPersistenceTest(ManagerPersistenceTestCase):
 
         return manager
 
-    def test_create(self):
-        self.create()
-
-    def test_edit(self):
-        self.edit()
-
-
-class ProductPriceManagerPersistenceTest(ManagerPersistenceTestCase):
-    """ Testes de persistência de dados: criação e edição."""
-    manager_class = managers.ProductPriceManager
-    required_fields = (
-        'optional_product',
-        'lot_category',
-        'date_start',
-        'date_end',
-        'price',
-    )
-
-    data_edit_to = {
-        'price': decimal.Decimal(random.randrange(155, 389)) / 100,
-    }
-
     def setUp(self):
         fake_factory = MockFactory()
-
-        date_start = datetime.now()
-        date_end = date_start + timedelta(days=15)
-
-        optional = fake_factory.fake_optional_product()
-
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
         self.data = {
-            'optional_product': optional.pk,
-            'date_start': date_start.strftime("%d/%m/%Y %H:%M"),
-            'date_end': date_end.strftime("%d/%m/%Y %H:%M"),
-            'price': decimal.Decimal(random.randrange(155, 389)) / 100,
-            'lot_category': optional.lot_categories.first().pk,
-        }
-
-    def test_create(self):
-        self.create()
-
-    def test_edit(self):
-        self.edit()
-
-
-class ServicePriceManagerPersistenceTest(ManagerPersistenceTestCase):
-    """ Testes de persistência de dados: criação e edição."""
-    manager_class = managers.ServicePriceManager
-    required_fields = (
-        'optional_service',
-        'lot_category',
-        'date_start',
-        'date_end',
-        'price',
-    )
-
-    data_edit_to = {
-        'price': decimal.Decimal(random.randrange(155, 389)) / 100,
-    }
-
-    def setUp(self):
-        fake_factory = MockFactory()
-
-        date_start = datetime.now()
-        date_end = date_start + timedelta(days=15)
-
-        optional = fake_factory.fake_optional_service()
-
-        self.data = {
-            'optional_service': optional.pk,
-            'date_start': date_start.strftime("%d/%m/%Y %H:%M"),
-            'date_end': date_end.strftime("%d/%m/%Y %H:%M"),
-            'price': decimal.Decimal(random.randrange(155, 389)) / 100,
-            'lot_category': optional.lot_categories.first().pk,
+            'optional_type': fake_factory.fake_optional_type().pk,
+            'lot_category': fake_factory.fake_lot_category().pk,
+            'name': 'optional name',
+            'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
+            'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+            'published': True,
+            'created_by': 'test user',
+            'modified_by': 'test user',
+            'price': format(decimal.Decimal(42.42), '.2f'),
+            'restrict_unique': False,
+            'description': 'Optional description',
+            'quantity': 5,
+            'theme': fake_factory.fake_theme().pk,
+            'place': 'Some place'
         }
 
     def test_create(self):

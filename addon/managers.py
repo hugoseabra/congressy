@@ -3,12 +3,9 @@ from django.forms import ValidationError
 from base import managers
 from core.util.date import DateTimeRange
 from .models import (
-    OptionalProduct,
-    OptionalService,
+    Product,
+    Service,
     OptionalType,
-    ProductPrice,
-    ServicePrice,
-    Session,
     SubscriptionOptionalService,
     SubscriptionOptionalProduct,
     Theme,
@@ -31,19 +28,19 @@ class OptionalTypeManager(managers.Manager):
         fields = '__all__'
 
 
-class OptionalProductManager(managers.Manager):
+class ProductManager(managers.Manager):
     """ Manager de produtos opcionais. """
 
     class Meta:
-        model = OptionalProduct
+        model = Product
         fields = '__all__'
 
 
-class OptionalServiceManager(managers.Manager):
+class ServiceManager(managers.Manager):
     """ Manager de serviços opcionais """
 
     class Meta:
-        model = OptionalService
+        model = Service
         fields = '__all__'
 
 
