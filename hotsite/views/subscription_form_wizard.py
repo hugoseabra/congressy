@@ -22,6 +22,8 @@ from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 FORMS = [("lot", forms.LotsForm),
          ("person", forms.SubscriptionPersonForm),
@@ -74,7 +76,10 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         response = super().dispatch(request, *args, **kwargs)
 
-        if not self.storage or not request.user.is_authenticated:
+        if not self.request.user.is_authenticated:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        if not self.storage:
             return redirect('public:hotsite', slug=self.event.slug)
 
         enabled = self.subscription_enabled()
