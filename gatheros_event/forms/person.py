@@ -3,8 +3,7 @@ from django import forms
 from django.db.models.fields import NOT_PROVIDED
 from django.utils import six
 from django.utils.datastructures import MultiValueDictKeyError
-from kanu_locations.models import City
-from localflavor.br.forms import BRCPFField
+from localflavor.br.forms import BRCPFField, BRCNPJField
 
 from core.forms.cleaners import clear_string, clean_cellphone as phone_cleaner
 from core.forms.widgets import DateInput, AjaxChoiceField, TelephoneInput
@@ -57,7 +56,22 @@ class PersonForm(forms.ModelForm):
         """ Meta """
         model = Person
         # fields = '__all__'
-        exclude = ('user', 'occupation')
+        exclude = (
+            'user',
+            'occupation',
+            'skype',
+            'linkedin',
+            'twitter',
+            'facebook',
+            'website',
+            'avatar',
+            'synchronized',
+            'rg',
+            'orgao_expedidor',
+            'pne',
+            'politics_version',
+            'term_version',
+        )
 
         widgets = {
             # CPF como telefone para aparecer como número no mobile
@@ -76,8 +90,9 @@ class PersonForm(forms.ModelForm):
     def __init__(self, is_chrome=False, **kwargs):
 
         uf = None
-        if 'instance' in kwargs:
-            instance = kwargs.get('instance')
+
+        instance = kwargs.get('instance')
+        if instance:
             if instance.city:
                 uf = instance.city.uf
 
@@ -98,7 +113,8 @@ class PersonForm(forms.ModelForm):
         self.fields[field_name].required = True
 
     def clean_zip_code(self):
-        zip_code = self.data.get('zip_code')
+        zip_code = self.cleaned_data.get('zip_code')
+
         if zip_code:
             zip_code = clear_string(zip_code)
 
@@ -111,27 +127,28 @@ class PersonForm(forms.ModelForm):
             return clear_string(cpf)
         return cpf
 
+    def clean_institution_cnpj(self):
+        cnpj = self.cleaned_data.get('institution_cnpj')
+
+        if cnpj:
+            cnpj = BRCNPJField().clean(cnpj)
+            return clear_string(cnpj)
+
+        return cnpj
+
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
         if phone:
             phone = phone_cleaner(phone)
         return phone
 
-    # def clean_city(self):
-    #
-    #     city_pk = self.cleaned_data.get('city', None)
-    #
-    #     if not city_pk or not isinstance(int(city_pk), int):
-    #         return None
-    #
-    #     return City.objects.get(pk=int(city_pk))
-
     def clean_email(self):
-        try:
-            email = self.data['email']
-        except MultiValueDictKeyError:
-            email = self.initial['email']
-        return email.lower()
+        email = self.cleaned_data['email']
+
+        if email:
+            return email.lower()
+
+        return email
 
     def clean_occupation(self):
         return Occupation.objects.get(pk=self.data['occupation'])

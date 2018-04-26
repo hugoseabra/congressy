@@ -1,5 +1,5 @@
 {% extends 'hotsite/base.html' %}
-{% load static base_tags %}
+{% load static base_tags humanize l10n %}
 
 {% block content %}
 
@@ -65,6 +65,9 @@
                                         <th class="col-xs-3">Forma de
                                             Pagamento
                                         </th>
+                                        <th class="col-xs-2 hidden-xs">
+                                            Valor (R$)
+                                        </th>
                                         <th class="col-xs-1">Voucher</th>
                                     </tr>
                                     </thead>
@@ -91,8 +94,6 @@
                                                 {% endif %}
                                                 {{ transaction.get_status_display }}
                                             </td>
-
-
                                             <td class="hidden-xs">
                                                 {% to_datetime transaction.data.date_created as created_date %}
                                                 {{ created_date }}h
@@ -120,6 +121,9 @@
                                                 {% else %}
                                                     Error
                                                 {% endif %}
+                                            </td>
+                                            <td>
+                                                R$ {{ transaction.amount|money_divide|intcomma }}
                                             </td>
                                             <td>
                                                 {% if transaction.status == transaction.PAID %}
@@ -165,10 +169,15 @@
 
 
                             <a href="{% url 'public:hotsite-subscription' event.slug %}"
-                                class="btn btn-success btn-xs">Novo pagamento
+                               class="btn btn-success btn-xs">Novo pagamento
                             </a>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
+                        {% include "base/footer.html" %}
                     </div>
                 </div>
             </div>

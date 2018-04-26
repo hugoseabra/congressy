@@ -9,6 +9,7 @@ from datetime import datetime
 from django.db import models
 from django.db.models import Max
 
+from core.model import track_data
 from gatheros_event.models import Event, Person
 from gatheros_event.models.constants import (
     CONGRESSY_PERCENTS,
@@ -41,6 +42,7 @@ class SubscriptionManager(models.Manager):
                 return code
 
 
+@track_data('lot_id')
 class Subscription(models.Model, GatherosModelMixin):
     """ Modelo de inscrição """
 
@@ -59,7 +61,7 @@ class Subscription(models.Model, GatherosModelMixin):
     STATUSES = (
         (CONFIRMED_STATUS, 'Confirmado'),
         (CANCELED_STATUS, 'Cancelado'),
-        (AWAITING_STATUS,  'Pendente'),
+        (AWAITING_STATUS, 'Pendente'),
     )
 
     uuid = models.UUIDField(
@@ -175,7 +177,6 @@ class Subscription(models.Model, GatherosModelMixin):
 
     def save(self, *args, **kwargs):
         """ Salva entidade. """
-        self.full_clean()
         self.check_rules()
         self.congressy_percent = self.event.congressy_percent
         super(Subscription, self).save(*args, **kwargs)
@@ -194,7 +195,7 @@ class Subscription(models.Model, GatherosModelMixin):
             self.code = Subscription.objects.generate_code(self.event)
 
         # RULE 3 - rule.test_rule_3_numero_inscricao_gerado
-        if not self.count:
+        if not self.count or self.has_changed('lot_id'):
             self.count = Subscription.objects.next_count(self.lot)
 
         # RULE 4 - test_rule_4_inscricao_confirmada_com_data_confirmacao
