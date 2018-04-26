@@ -244,22 +244,16 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
 
         lot_category = subscription.lot.category
 
-        optional_service = self.fake_factory.fake_optional_service(
-            lot_categories=(lot_category,),
+        optional_service = self.fake_factory.fake_service(
+            lot_category=lot_category,
         )
         optional_service.quantity = 1
         optional_service.save()
 
-        price = self.fake_factory.fake_service_price(
-            lot_category=lot_category,
-            optional_service=optional_service
-        )
-
         service_manager = managers.SubscriptionOptionalServiceManager(
             data={
                 'subscription': subscription.pk,
-                'optional_service': optional_service.pk,
-                'price': price.price,
+                'optional': optional_service.pk,
             }
         )
 
@@ -273,8 +267,7 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         failing_product_manager = managers.SubscriptionOptionalServiceManager(
             data={
                 'subscription': failing_subscription.pk,
-                'optional_service': optional_service.pk,
-                'price': price.price,
+                'optional': optional_service.pk,
             }
         )
 
@@ -290,37 +283,35 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         # SubscriptionOptionalService
         subscription = self.fake_factory.fake_subscription()
 
-        # Definindo datas conflitantes, ambas começam ao mesmo tempo.
-        session = self.fake_factory.fake_session()
-        now = datetime.now()
-
-        session.date_start = now
-        session.date_end = now + timedelta(days=1)
+        # Crie dois Services
+        service_1 = self.fake_factory.fake_service(
+            lot_category=subscription.lot.category)
+        service_2 = self.fake_factory.fake_service(
+            lot_category=subscription.lot.category)
 
         # Configurando os dois serviços para usar a flag de sessão
-        session.restrict_unique = True
-        session.save()
+        service_1.date_start = datetime.now()
+        service_1.date_end = datetime.now() + timedelta(days=1)
+        service_1.restrict_unique = True
+        service_1.save()
 
-        # Crie dois OptionalServices
-        service_1 = self.fake_factory.fake_optional_service(
-            lot_categories=(subscription.lot.category,), session=session)
-        service_2 = self.fake_factory.fake_optional_service(
-            lot_categories=(subscription.lot.category,), session=session)
+        service_2.date_start = datetime.now()
+        service_2.date_end = datetime.now() + timedelta(days=1)
+        service_2.restrict_unique = True
+        service_2.save()
 
         # Criando os gerenciadores de serviços
         service_1_manager = managers.SubscriptionOptionalServiceManager(
             data={
                 'subscription': subscription.pk,
-                'optional_service': service_1.pk,
-                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional': service_1.pk,
             }
         )
 
         service_2_manager = managers.SubscriptionOptionalServiceManager(
             data={
                 'subscription': subscription.pk,
-                'optional_service': service_2.pk,
-                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional': service_2.pk,
             }
         )
 
@@ -334,37 +325,35 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         # SubscriptionOptionalService
         subscription = self.fake_factory.fake_subscription()
 
-        # Definindo datas conflitantes, ambas começam ao mesmo tempo.
-        session = self.fake_factory.fake_session()
-        now = datetime.now()
-
-        session.date_start = now
-        session.date_end = now + timedelta(days=1)
+        # Crie dois Services
+        service_1 = self.fake_factory.fake_service(
+            lot_category=subscription.lot.category)
+        service_2 = self.fake_factory.fake_service(
+            lot_category=subscription.lot.category)
 
         # Configurando os dois serviços para usar a flag de sessão
-        session.restrict_unique = False
-        session.save()
+        service_1.date_start = datetime.now()
+        service_1.date_end = datetime.now() + timedelta(days=1)
+        service_1.restrict_unique = False
+        service_1.save()
 
-        # Crie dois OptionalServices
-        service_1 = self.fake_factory.fake_optional_service(
-            lot_categories=(subscription.lot.category,), session=session)
-        service_2 = self.fake_factory.fake_optional_service(
-            lot_categories=(subscription.lot.category,), session=session)
+        service_2.date_start = datetime.now()
+        service_2.date_end = datetime.now() + timedelta(days=1)
+        service_2.restrict_unique = False
+        service_2.save()
 
         # Criando os gerenciadores de serviços
         service_1_manager = managers.SubscriptionOptionalServiceManager(
             data={
                 'subscription': subscription.pk,
-                'optional_service': service_1.pk,
-                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional': service_1.pk,
             }
         )
 
         service_2_manager = managers.SubscriptionOptionalServiceManager(
             data={
                 'subscription': subscription.pk,
-                'optional_service': service_2.pk,
-                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional': service_2.pk,
             }
         )
 
@@ -385,23 +374,21 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         theme.save()
 
         # Crie OptionalServices com tema.
-        service = self.fake_factory.fake_optional_service(
-            lot_categories=(subscription.lot.category,), theme=theme)
+        service = self.fake_factory.fake_service(
+            lot_category=subscription.lot.category, theme=theme)
 
         # Criando os gerenciadores de serviços
         service_manager_1 = managers.SubscriptionOptionalServiceManager(
             data={
                 'subscription': subscription.pk,
-                'optional_service': service.pk,
-                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional': service.pk,
             }
         )
 
         service_manager_2 = managers.SubscriptionOptionalServiceManager(
             data={
                 'subscription': subscription.pk,
-                'optional_service': service.pk,
-                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional': service.pk,
             }
         )
 
@@ -420,23 +407,21 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         theme.save()
 
         # Crie OptionalServices com tema.
-        service = self.fake_factory.fake_optional_service(
-            lot_categories=(subscription.lot.category,), theme=theme)
+        service = self.fake_factory.fake_service(
+            lot_category=subscription.lot.category, theme=theme)
 
         # Criando os gerenciadores de serviços
         service_manager_1 = managers.SubscriptionOptionalServiceManager(
             data={
                 'subscription': subscription.pk,
-                'optional_service': service.pk,
-                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional': service.pk,
             }
         )
 
         service_manager_2 = managers.SubscriptionOptionalServiceManager(
             data={
                 'subscription': subscription.pk,
-                'optional_service': service.pk,
-                'price': format(decimal.Decimal(42.42), '.2f'),
+                'optional': service.pk,
             }
         )
 

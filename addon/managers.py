@@ -67,9 +67,9 @@ class SubscriptionOptionalServiceManager(managers.Manager):
         """
         cleaned_data = super().clean()
 
-        optional_service = cleaned_data['optional_service']
+        optional_service = cleaned_data['optional']
         subscription = cleaned_data['subscription']
-        total_subscriptions = optional_service.subscription_services.count()
+        total_subscriptions = optional_service.services.count()
         quantity = optional_service.quantity or 0
 
         # Regra 1:
@@ -80,17 +80,17 @@ class SubscriptionOptionalServiceManager(managers.Manager):
             )
 
         # Regra 2:
-        new_start = optional_service.session.date_start
-        new_end = optional_service.session.date_end
+        new_start = optional_service.date_start
+        new_end = optional_service.date_end
 
-        is_restricted = optional_service.session.restrict_unique
+        is_restricted = optional_service.restrict_unique
 
         for sub_optional in subscription.subscriptionoptionalservice.all():
 
-            start = sub_optional.optional_service.session.date_start
-            stop = sub_optional.optional_service.session.date_end
+            start = sub_optional.optional.date_start
+            stop = sub_optional.optional.date_end
             is_sub_restricted = \
-                sub_optional.optional_service.session.restrict_unique
+                sub_optional.optional.restrict_unique
 
             session_range = DateTimeRange(start=start, stop=stop)
             has_conflict = (new_start in session_range or new_end in
@@ -101,7 +101,7 @@ class SubscriptionOptionalServiceManager(managers.Manager):
                     'Conflito de horário: o opcional "{}" '
                     'está em conflito com o opcional "{}".'.format(
                         optional_service.name,
-                        sub_optional.optional_service.name
+                        sub_optional.optional.name
                     )
                 )
 
@@ -112,7 +112,7 @@ class SubscriptionOptionalServiceManager(managers.Manager):
 
             for optional in subscription.subscriptionoptionalservice.all():
 
-                if optional.optional_service.theme == optional_service.theme:
+                if optional.optional.theme == optional_service.theme:
                     total += 1
 
             if total >= optional_service.theme.limit:
