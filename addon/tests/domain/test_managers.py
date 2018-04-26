@@ -57,9 +57,6 @@ class OptionalTypePersistenceTest(ManagerPersistenceTestCase):
 class ProductManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
 
-    edited_date_start = datetime.now() - timedelta(days=6)
-    edited_date_end = datetime.now() + timedelta(days=6)
-
     manager_class = managers.ProductManager
     required_fields = (
         'optional_type',
@@ -86,26 +83,66 @@ class ProductManagerPersistenceTest(ManagerPersistenceTestCase):
         'quantity': 10,
     }
 
-    def _create_manager(self, instance=None, data=None):
+    def setUp(self):
+        fake_factory = MockFactory()
+        date_start = datetime.now() - timedelta(days=3)
+        date_end = datetime.now() + timedelta(days=3)
+        self.data = {
+            'optional_type': fake_factory.fake_optional_type().pk,
+            'lot_category': fake_factory.fake_lot_category().pk,
+            'name': 'optional name',
+            'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
+            'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+            'published': True,
+            'created_by': 'test user',
+            'modified_by': 'test user',
+            'price': format(decimal.Decimal(42.42), '.2f'),
+            'restrict_unique': False,
+            'description': 'Optional description',
+            'quantity': 5,
+        }
 
-        static_fake_factory = MockFactory()
+    def test_create(self):
+        self.create()
 
-        if not data:
-            data = self.data
+    def test_edit(self):
+        self.edit()
 
-        if 'optional_type' not in data:
-            data[
-                'optional_type'] = static_fake_factory.fake_optional_type().pk
 
-        if 'lot_category' not in data:
-            data['lot_category'] = static_fake_factory.fake_lot_category().pk
+class ServiceManagerPersistenceTest(ManagerPersistenceTestCase):
+    """ Testes de persistência de dados: criação e edição."""
 
-        if instance is not None:
-            manager = self.manager_class(instance=instance, data=data)
-        else:
-            manager = self.manager_class(data=data)
+    edited_date_start = datetime.now() - timedelta(days=6)
+    edited_date_end = datetime.now() + timedelta(days=6)
 
-        return manager
+    manager_class = managers.ServiceManager
+    required_fields = (
+        'optional_type',
+        'lot_category',
+        'date_start',
+        'date_end',
+        'published',
+        'created_by',
+        'modified_by',
+        'price',
+        'restrict_unique',
+        'description',
+        'quantity',
+        'theme',
+        'place',
+    )
+
+    data_edit_to = {
+        'name': 'edited optional name',
+        'published': True,
+        'created_by': 'test edited user',
+        'modified_by': 'test edited user',
+        'price': round(decimal.Decimal(43.43), 2),
+        'restrict_unique': True,
+        'description': 'Optional edited description',
+        'quantity': 10,
+        'place': 'Edited place',
+    }
 
     def setUp(self):
         fake_factory = MockFactory()
@@ -124,6 +161,8 @@ class ProductManagerPersistenceTest(ManagerPersistenceTestCase):
             'restrict_unique': False,
             'description': 'Optional description',
             'quantity': 5,
+            'theme': fake_factory.fake_theme().pk,
+            'place': 'Some place'
         }
 
     def test_create(self):
@@ -405,93 +444,6 @@ class SubscriptionOptionalServiceManagerRulesTest(TestCase):
         service_manager_1.save()
         self.assertTrue(service_manager_2.is_valid())
         service_manager_2.save()
-
-
-class ServiceManagerPersistenceTest(ManagerPersistenceTestCase):
-    """ Testes de persistência de dados: criação e edição."""
-
-    edited_date_start = datetime.now() - timedelta(days=6)
-    edited_date_end = datetime.now() + timedelta(days=6)
-
-    manager_class = managers.ServiceManager
-    required_fields = (
-        'optional_type',
-        'lot_category',
-        'date_start',
-        'date_end',
-        'published',
-        'created_by',
-        'modified_by',
-        'price',
-        'restrict_unique',
-        'description',
-        'quantity',
-        'theme',
-        'place',
-    )
-
-    data_edit_to = {
-        'name': 'edited optional name',
-        'published': True,
-        'created_by': 'test edited user',
-        'modified_by': 'test edited user',
-        'price': round(decimal.Decimal(43.43), 2),
-        'restrict_unique': True,
-        'description': 'Optional edited description',
-        'quantity': 10,
-        'place': 'Edited place',
-    }
-
-    def _create_manager(self, instance=None, data=None):
-
-        static_fake_factory = MockFactory()
-
-        if not data:
-            data = self.data
-
-        if 'optional_type' not in data:
-            data[
-                'optional_type'] = static_fake_factory.fake_optional_type().pk
-
-        if 'lot_category' not in data:
-            data['lot_category'] = static_fake_factory.fake_lot_category().pk
-
-        if 'theme' not in data:
-            data['theme'] = static_fake_factory.fake_theme().pk
-
-        if instance is not None:
-            manager = self.manager_class(instance=instance, data=data)
-        else:
-            manager = self.manager_class(data=data)
-
-        return manager
-
-    def setUp(self):
-        fake_factory = MockFactory()
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
-        self.data = {
-            'optional_type': fake_factory.fake_optional_type().pk,
-            'lot_category': fake_factory.fake_lot_category().pk,
-            'name': 'optional name',
-            'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
-            'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
-            'published': True,
-            'created_by': 'test user',
-            'modified_by': 'test user',
-            'price': format(decimal.Decimal(42.42), '.2f'),
-            'restrict_unique': False,
-            'description': 'Optional description',
-            'quantity': 5,
-            'theme': fake_factory.fake_theme().pk,
-            'place': 'Some place'
-        }
-
-    def test_create(self):
-        self.create()
-
-    def test_edit(self):
-        self.edit()
 
 
 class SubscriptionProductManagerPersistenceTest(ManagerPersistenceTestCase):
