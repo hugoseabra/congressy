@@ -80,6 +80,60 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         return response
 
+    def post(self, *args, **kwargs):
+        """
+        This method handles POST requests.
+
+        The wizard will render either the current step (if form validation
+        wasn't successful), the next step (if the current step was stored
+        successful) or the done view (if no more steps are available)
+        """
+        # Look for a wizard_goto_step element in the posted data which
+        # contains a valid step name. If one was found, render the requested
+        # form. (This makes stepping back a lot easier).
+        wizard_goto_step = self.request.POST.get('wizard_goto_step', None)
+        if wizard_goto_step and wizard_goto_step in self.get_form_list():
+            return self.render_goto_step(wizard_goto_step)
+
+        # Check if form was refreshed
+        management_form = ManagementForm(self.request.POST, prefix=self.prefix)
+        if not management_form.is_valid():
+            raise ValidationError(
+                _('ManagementForm data is missing or has been tampered.'),
+                code='missing_management_form',
+            )
+
+        form_current_step = management_form.cleaned_data['current_step']
+        if (form_current_step != self.steps.current and
+                self.storage.current_step is not None):
+            # form refreshed, change current step
+            self.storage.current_step = form_current_step
+
+        # get the form for the current step
+        form = self.get_form(data=self.request.POST, files=self.request.FILES)
+
+        # and try to validate
+
+        while form.is_valid():
+            # if the form is valid, store the cleaned data and files.
+            try:
+                self.storage.set_step_data(self.steps.current,
+                                           self.process_step(form))
+                self.storage.set_step_files(self.steps.current,
+                                            self.process_step_files(form))
+            except ValidationError as e:
+                form.add_error('__all__', e.message)
+                break
+
+            # check if the current step is the last step
+            if self.steps.current == self.steps.last:
+                # no more steps, render done view
+                return self.render_done(form, **kwargs)
+            else:
+                # proceed to the next step
+                return self.render_next_step(form)
+        return self.render(form)
+
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
@@ -93,70 +147,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
     def get_template_names(self):
         return [TEMPLATES[self.steps.current]]
 
-    def done(self, form_list, **kwargs):
-
-        # Assert that we have a person in storage
-        if not hasattr(self.storage, 'person'):
-
-            try:
-                person = Person.objects.get(user=self.request.user)
-            except Person.DoesNotExist:
-                person_data = self.storage.get_step_data('person')
-                person_email = person_data.get('person-email')
-
-                person = Person.objects.get(email=person_email)
-            self.storage.person = person
-
-        lot_data = self.storage.get_step_data('lot')
-        lot = lot_data.get('lot-lots', '')
-
-        # Get a lot object.
-        if not isinstance(lot, Lot):
-            try:
-                lot = Lot.objects.get(pk=lot, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot, self.event)
-                raise TypeError(message)
-
-        subscription = None
-
-        try:
-            subscription = Subscription.objects.get(
-                person=self.storage.person,
-                event=self.event
-            )
-        except Subscription.DoesNotExist:
-            subscription = Subscription(
-                person=self.storage.person,
-                event=self.event,
-                created_by=self.request.user.id
-            )
-
-        # Insere ou edita lote
-        subscription.lot = lot
-        subscription.save()
-
-        self.storage.subscription = subscription
-
-        messages.success(
-            self.request,
-            'Inscrição realizada com sucesso!'
-        )
-
-        if subscription.lot.price and subscription.lot.price > 0:
-            return HttpResponseRedirect(reverse_lazy(
-                'public:hotsite-subscription-status', kwargs={
-                    'slug': self.event.slug,
-                }))
-
-        return HttpResponseRedirect(reverse_lazy(
-            'public:hotsite', kwargs={
-                'slug': self.event.slug,
-            }))
-
-    # this runs for the step it's on as well as for the step before
     def get_form_initial(self, step):
 
         if step == 'lot':
@@ -346,56 +336,65 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         return form_data
 
-    def post(self, *args, **kwargs):
-        """
-        This method handles POST requests.
+    def done(self, form_list, **kwargs):
 
-        The wizard will render either the current step (if form validation
-        wasn't successful), the next step (if the current step was stored
-        successful) or the done view (if no more steps are available)
-        """
-        # Look for a wizard_goto_step element in the posted data which
-        # contains a valid step name. If one was found, render the requested
-        # form. (This makes stepping back a lot easier).
-        wizard_goto_step = self.request.POST.get('wizard_goto_step', None)
-        if wizard_goto_step and wizard_goto_step in self.get_form_list():
-            return self.render_goto_step(wizard_goto_step)
+        # Assert that we have a person in storage
+        if not hasattr(self.storage, 'person'):
 
-        # Check if form was refreshed
-        management_form = ManagementForm(self.request.POST, prefix=self.prefix)
-        if not management_form.is_valid():
-            raise ValidationError(
-                _('ManagementForm data is missing or has been tampered.'),
-                code='missing_management_form',
+            try:
+                person = Person.objects.get(user=self.request.user)
+            except Person.DoesNotExist:
+                person_data = self.storage.get_step_data('person')
+                person_email = person_data.get('person-email')
+
+                person = Person.objects.get(email=person_email)
+            self.storage.person = person
+
+        lot_data = self.storage.get_step_data('lot')
+        lot = lot_data.get('lot-lots', '')
+
+        # Get a lot object.
+        if not isinstance(lot, Lot):
+            try:
+                lot = Lot.objects.get(pk=lot, event=self.event)
+            except Lot.DoesNotExist:
+                message = 'Não foi possivel resgatar um Lote ' \
+                          'a partir das referencias: lot<{}> e evento<{}>.' \
+                    .format(lot, self.event)
+                raise TypeError(message)
+
+        subscription = None
+
+        try:
+            subscription = Subscription.objects.get(
+                person=self.storage.person,
+                event=self.event
+            )
+        except Subscription.DoesNotExist:
+            subscription = Subscription(
+                person=self.storage.person,
+                event=self.event,
+                created_by=self.request.user.id
             )
 
-        form_current_step = management_form.cleaned_data['current_step']
-        if (form_current_step != self.steps.current and
-                self.storage.current_step is not None):
-            # form refreshed, change current step
-            self.storage.current_step = form_current_step
+        # Insere ou edita lote
+        subscription.lot = lot
+        subscription.save()
 
-        # get the form for the current step
-        form = self.get_form(data=self.request.POST, files=self.request.FILES)
+        self.storage.subscription = subscription
 
-        # and try to validate
+        messages.success(
+            self.request,
+            'Inscrição realizada com sucesso!'
+        )
 
-        while form.is_valid():
-            # if the form is valid, store the cleaned data and files.
-            try:
-                self.storage.set_step_data(self.steps.current,
-                                           self.process_step(form))
-                self.storage.set_step_files(self.steps.current,
-                                            self.process_step_files(form))
-            except ValidationError as e:
-                form.add_error('__all__', e.message)
-                break
+        if subscription.lot.price and subscription.lot.price > 0:
+            return HttpResponseRedirect(reverse_lazy(
+                'public:hotsite-subscription-status', kwargs={
+                    'slug': self.event.slug,
+                }))
 
-            # check if the current step is the last step
-            if self.steps.current == self.steps.last:
-                # no more steps, render done view
-                return self.render_done(form, **kwargs)
-            else:
-                # proceed to the next step
-                return self.render_next_step(form)
-        return self.render(form)
+        return HttpResponseRedirect(reverse_lazy(
+            'public:hotsite', kwargs={
+                'slug': self.event.slug,
+            }))
