@@ -1,10 +1,10 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, views
 from rest_framework.authentication import (
     BasicAuthentication,
     SessionAuthentication,
 )
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.response import Response
 from addon import models, serializers
 
 
@@ -45,12 +45,18 @@ class SubscriptionProductViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.SubscriptionProductSerializer
 
 
-class ServiceViewSet(viewsets.ModelViewSet):
-    """
-        API endpoint that allows users to be viewed or edited.
-    """
-    queryset = models.Service.objects.all().order_by('name')
-    serializer_class = serializers.ServiceSerializer
+class ServiceViewSet(RestrictionViewMixin, views.APIView):
+        """
+        A custom endpoint for GET request.
+        """
+
+        def get(self, *args, **kwargs):
+            """
+            Return a hardcoded response.
+            """
+
+            return Response({"success": True, "content": "Hello World!"})
+
 
 
 class SubscriptionServiceViewSet(viewsets.ModelViewSet):
