@@ -22,12 +22,15 @@ from survey.directors import SurveyDirector
 FORMS = [("lot", forms.LotsForm),
          ("person", forms.SubscriptionPersonForm),
          ("survey", forms.SurveyForm),
+         ("addon", forms.AddonForm),
          ("payment", forms.PaymentForm)]
 
 TEMPLATES = {"lot": "hotsite/lot_form.html",
              "person": "hotsite/person_form.html",
              "survey": "hotsite/survey_form.html",
-             "payment": "hotsite/payment_form.html"}
+             "addon": "hotsite/addon_form.html",
+             "payment": "hotsite/payment_form.html"
+             }
 
 
 def is_paid_lot(wizard):
@@ -63,8 +66,30 @@ def has_survey(wizard):
     return False
 
 
+def has_addons(wizard):
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+
+    # Return true if lot has price and price > 0
+    lot = cleaned_data['lots']
+
+    if isinstance(lot, Lot):
+
+        if lot.category:
+            if lot.category.service_optionals or \
+                    lot.category.product_optionals:
+                return True
+
+    return False
+
+
 class SubscriptionWizardView(EventMixin, SessionWizardView):
-    condition_dict = {'payment': is_paid_lot, 'survey': has_survey, }
+
+    condition_dict = {
+        'payment': is_paid_lot,
+        'survey': has_survey,
+        'addon': has_addons
+    }
 
     def dispatch(self, request, *args, **kwargs):
 
