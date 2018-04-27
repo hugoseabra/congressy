@@ -25,26 +25,21 @@
                                 {% if messages %}
                                     <div style="width:100%;margin-top:3px;padding-bottom:10px">
                                     {% for message in messages %}
-
                                         {% if message.tags %}
-                                            <div class="alert alert-{{ message.tags }} alert-dismissible"
-                                                 role="alert">
-
+                                        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
                                         {% else %}
-                                            <div class="alert alert-warning alert-dismissible"
-                                                 role="alert">
+                                        <div class="alert alert-warning alert-dismissible" role="alert">
                                         {% endif %}
 
-                                    <button type="button" class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"><span
-                                            aria-hidden="true">&times;</span>
-                                    </button>
-                                    {{ message|capfirst }}
-                                    </div>
-
+                                            <button type="button" class="close"
+                                                    data-dismiss="alert"
+                                                    aria-label="Close"><span
+                                                    aria-hidden="true">&times;</span>
+                                            </button>
+                                            {{ message|capfirst }}
+                                        </div>
                                     {% endfor %}
-                                </div>
+                                    </div>
                                 {% endif %}
                             {% endblock messages %}
 
@@ -58,10 +53,8 @@
                                 {% endif %}
                             {% endfor %}
 
-                            <div id="payment_buttons" class="text-center"
-                                 style="display: none">
-                                <button id="id_boleto" type="button"
-                                        style="text-align: center;display: none">
+                            <div id="payment_buttons" class="text-center" style="display: none">
+                                <button id="id_boleto" type="button" style="text-align: center;display: none">
                                     Boleto
                                     <br/>
                                     <img class="img-responsive"
@@ -120,13 +113,11 @@
                                     <i class="fas fa-chevron-circle-right"></i>
                                 </button>
                             </form>
-                            </div>
                         </div>
-
-
                     </div>
                 </div>
             </div>
+        </div>
     </section>
 
 {% endblock %}

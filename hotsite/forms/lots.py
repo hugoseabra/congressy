@@ -14,7 +14,7 @@ class LotFormModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
 
         if obj.price and obj.price > 0:
-            return "{} - R${}".format(obj.name, obj.price)
+            return "{} - R${}".format(obj.name, obj.get_calculated_price())
 
         return "{}".format(obj.name)
 

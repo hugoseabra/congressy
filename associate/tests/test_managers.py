@@ -8,7 +8,7 @@ from .mock_factory import MockFactory
 class AssociateManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     manager_class = managers.AssociateManager
-    required_fields = ('organization', 'name', 'email',)
+    required_fieds = ('organization', 'name', 'email',)
     data_edit_to = {
         'name': 'another name edited',
     }

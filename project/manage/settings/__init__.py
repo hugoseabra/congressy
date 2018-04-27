@@ -14,7 +14,9 @@ INSTALLED_APPS += [
     'hotsite',
     'survey',
     'formtools',
-    'addon',
+    # 'addon',
+    'associate',
+    # 'bitly',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'

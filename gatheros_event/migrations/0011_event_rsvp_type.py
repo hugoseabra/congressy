@@ -15,6 +15,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='rsvp_type',
-            field=models.CharField(choices=[('rsvp-disabled', 'Aberto'), ('rsvp-open', 'Convidados associados terão um lote especial.'), ('rsvp-restricted', 'Somente associados poderão se inscrever.')], default='rsvp-disabled', help_text='Se há associados vinculados à organização, o evento poderá exibir um lote especial para eles, com um valor especial.', max_length=20, verbose_name='Distribuição de Público'),
+            field=models.CharField(
+                choices=[
+                    ('rsvp-disabled', 'Aberto'),
+                    ('rsvp-open', 'Convidados associados terão um lote'
+                                  ' especial.'),
+                    ('rsvp-restricted', 'Somente associados poderão se'
+                                        ' inscrever.')
+                ],
+                default='rsvp-disabled',
+                null=True,
+                blank=True,
+                help_text='Se há associados vinculados à organização, o evento'
+                          ' poderá exibir um lote especial para eles, com um'
+                          ' valor especial.',
+                max_length=20,
+                verbose_name='Distribuição de Público'
+            ),
         ),
     ]

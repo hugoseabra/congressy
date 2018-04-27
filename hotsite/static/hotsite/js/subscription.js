@@ -202,7 +202,6 @@ function load_coupon() {
     button.addClass('disabled').attr('disabled', 'disabled').text('Aguarde...');
 
     var lot_fields = $('#lots-field');
-    var original_lots_field = $('#original-lots-field');
 
     common_lots_content = lot_fields.html();
 
