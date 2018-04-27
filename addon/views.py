@@ -6,18 +6,20 @@ from .models import Product
 
 
 """
-DEV NOTES: What am I doing here and how do I continue?
+DEV NOTES: 
 
-    Well this View is responsible for two things, rendering a list of the 
-    currently selected optional products, how the hell does it do this? 
-    Well, we fetch it from a session variable called product_storage, 
-    and set that in the view as 'self.storage' in the __ini__ constructor 
-    for processing during the GET or later use in the POST.
+    O que estou fazendo aqui?
+
+    Bem, esta View é responsável por duas coisas, fazendo uma lista dos
+    produtos opcionais atualmente selecionados, como diabos isso acontece?
+    Bem, nós buscamos por uma variável de sessão chamada 'product_storage',
+    e defina isso na exibição como 'self.storage' no construtor __ini__
+    para processamento durante o GET ou posterior uso no POST.
     
-    GET requests always return HTML.
+    Solicitações GET sempre retornam HTML.
     
-    POST requests are responsible for checking for conflicts and resolving 
-    them by removing conflicting products from our self.storage. 
+    As solicitações POST são responsáveis ​​por verificar conflitos e 
+    ás resolver removendo produtos conflitantes da nossa variavel de sessão.
 
 """
 
@@ -33,10 +35,7 @@ class EventProductOptionalManagementView(generic.TemplateView):
 
     def get(self, request, *args, **kwargs):
         """
-            LIST OPCIONAIS DO EVENTO EM COMPARAÇÃO COM PERSISTÊNCIA VOLÁTIL
-            DE OUTRA LISTA DE OPCIONAIS.
 
-            - persistência volátil: session
         """
 
         category_pk = kwargs.get('category_pk')
