@@ -1,7 +1,7 @@
 """
 Rules: Módulo afiliados
 """
-
+from addon import constants
 from base.models import RuleChecker, RuleIntegrityError
 
 
@@ -81,6 +81,22 @@ class ServiceMustHaveUniqueDatetimeInterval(RuleChecker):
 
         lot_category = model_instance.lot_category
         check_dates_conflict(model_instance, lot_category.service_optionals)
+
+
+class OptionalMustHaveMinimumDays(RuleChecker):
+    """
+    Regra: o opcional deve ter o valor do 'release_days' com valor do mínimo
+    configurado.
+    """
+
+    def check(self, model_instance, *args, **kwargs):
+        if model_instance.release_days < constants.MINIMUM_RELEASE_DAYS:
+            raise RuleIntegrityError(
+                'O número de dias de liberação de opcionais para inscrições'
+                ' não confirmadas deve ser, no mínimo, "{}" dias.'.format(
+                    constants.MINIMUM_RELEASE_DAYS
+                )
+            )
 
 
 # ===================== SUBSCRIPTION OPTIONAL =============================== #
