@@ -2,13 +2,15 @@
 import decimal
 from datetime import datetime, timedelta
 
-from addon import services
+from test_plus.test import TestCase
+
+from addon import models, services
 from base.tests.test_suites import \
-    ApplicationServicePersistenceTestCase as TestCase
+    ApplicationServicePersistenceTestCase as PersistenceTestCase
 from ..mock_factory import MockFactory
 
 
-class ThemeServicePersistenceTest(TestCase):
+class ThemeServicePersistenceTest(PersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     application_service_class = services.ThemeService
     required_fields = ('name',)
@@ -28,7 +30,7 @@ class ThemeServicePersistenceTest(TestCase):
         self.edit()
 
 
-class OptionalTypeServicePersistenceTest(TestCase):
+class OptionalTypeServicePersistenceTest(PersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     application_service_class = services.OptionalTypeService
     required_fields = ('name',)
@@ -48,7 +50,7 @@ class OptionalTypeServicePersistenceTest(TestCase):
         self.edit()
 
 
-class ProductServicePersistenceTest(TestCase):
+class ProductServicePersistenceTest(PersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     application_service_class = services.ProductService
     required_fields = (
@@ -103,7 +105,7 @@ class ProductServicePersistenceTest(TestCase):
         self.edit()
 
 
-class ServiceServicePersistenceTest(TestCase):
+class ServiceServicePersistenceTest(PersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     application_service_class = services.ServiceService
     required_fields = (
@@ -162,13 +164,16 @@ class ServiceServicePersistenceTest(TestCase):
         self.edit()
 
 
-class SubscriptionProductServicePersistenceTest(TestCase):
+class SubscriptionProductServicePersistenceTest(PersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     application_service_class = services.SubscriptionProductService
     required_fields = (
         'subscription',
         'optional',
     )
+    event = None
+    lot_category = None
+    lot = None
 
     def setUp(self):
         fake_factory = MockFactory()
@@ -218,13 +223,16 @@ class SubscriptionProductServicePersistenceTest(TestCase):
         self.edit()
 
 
-class SubscriptionServiceServicePersistenceTest(TestCase):
+class SubscriptionServiceServicePersistenceTest(PersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     application_service_class = services.SubscriptionServiceService
     required_fields = (
         'subscription',
         'optional',
     )
+    event = None
+    lot_category = None
+    lot = None
 
     def setUp(self):
         fake_factory = MockFactory()
@@ -272,3 +280,202 @@ class SubscriptionServiceServicePersistenceTest(TestCase):
     def test_edit(self):
         self.data = None
         self.edit()
+
+
+class RemoveExpiredOptionalTest(TestCase):
+    """
+        Testes de Mixin que processa liberação de opcional.
+    """
+    sub_optional_product = None
+    sub_optional_service = None
+
+    def setUp(self):
+        mocker = MockFactory()
+
+        self.sub_optional_product = mocker.fake_subscription_optional_product()
+        self.sub_optional_service = mocker.fake_subscription_optional_service()
+
+    def test_confirmed_subscription_opt_product(self):
+        """
+            Testa se a inscrição do opcional confirmada é ignorada.
+        """
+        sub = self.sub_optional_product.subscription
+        sub.status = sub.CONFIRMED_STATUS
+
+        self.sub_optional_product.subscription = sub
+
+        removed = services.remove_expired_optional_subscription(
+            self.sub_optional_product
+        )
+
+        self.assertFalse(removed)
+
+        sub_product = models.SubscriptionProduct.objects.get(
+            pk=self.sub_optional_product.pk
+        )
+        self.assertIsInstance(sub_product, models.SubscriptionProduct)
+
+    def test_confirmed_subscription_opt_service(self):
+        """
+            Testa se a inscrição do opcional confirmada é ignorada.
+        """
+        sub = self.sub_optional_service.subscription
+        sub.status = sub.CONFIRMED_STATUS
+
+        self.sub_optional_service.subscription = sub
+
+        removed = services.remove_expired_optional_subscription(
+            self.sub_optional_service
+        )
+
+        self.assertFalse(removed)
+
+        sub_service = models.SubscriptionService.objects.get(
+            pk=self.sub_optional_service.pk
+        )
+        self.assertIsInstance(sub_service, models.SubscriptionService)
+
+    def test_not_confirmed_subscription_opt_product_and_not_expired(self):
+        """
+            Testa se a inscrição do opcional é ignorada quando criada ainda
+            não está confirmada, mas possui menos dias com do que configurado.
+        """
+        sub = self.sub_optional_product.subscription
+        sub.status = sub.AWAITING_STATUS
+
+        self.sub_optional_product.subscription = sub
+
+        removed = services.remove_expired_optional_subscription(
+            self.sub_optional_product
+        )
+
+        self.assertFalse(removed)
+
+        sub_service = models.SubscriptionProduct.objects.get(
+            pk=self.sub_optional_product.pk
+        )
+        self.assertIsInstance(sub_service, models.SubscriptionProduct)
+
+    def test_not_confirmed_subscription_opt_service_and_not_expired(self):
+        """
+            Testa se a inscrição do opcional é ignorada quando criada ainda
+            não está confirmada, mas possui menos dias com do que configurado.
+        """
+        sub = self.sub_optional_service.subscription
+        sub.status = sub.AWAITING_STATUS
+
+        self.sub_optional_service.subscription = sub
+
+        removed = services.remove_expired_optional_subscription(
+            self.sub_optional_service
+        )
+
+        self.assertFalse(removed)
+
+        sub_service = models.SubscriptionService.objects.get(
+            pk=self.sub_optional_service.pk
+        )
+        self.assertIsInstance(sub_service, models.SubscriptionService)
+
+    def test_not_confirmed_subscription_opt_product_and_expired(self):
+        """
+            Testa se a inscrição do opcional é realmente removida quando criada
+            com mais de dias do que configurado.
+        """
+        sub_optional = self.sub_optional_product
+
+        sub = sub_optional.subscription
+        sub.status = sub.AWAITING_STATUS
+        sub.created = datetime.now() - timedelta(days=20)
+
+        sub_optional.subscription = sub
+
+        removed = services.remove_expired_optional_subscription(
+            sub_optional,
+            7
+        )
+
+        self.assertTrue(removed)
+
+        with self.assertRaises(models.SubscriptionProduct.DoesNotExist):
+            models.SubscriptionProduct.objects.get(
+                pk=sub_optional.pk
+            )
+
+    def test_not_confirmed_subscription_opt_service_and_expired(self):
+        """
+            Testa se a inscrição do opcional é realmente removida quando criada
+            com mais de dias do que configurado.
+        """
+        sub_optional = self.sub_optional_service
+
+        sub = sub_optional.subscription
+        sub.status = sub.AWAITING_STATUS
+        sub.created = datetime.now() - timedelta(days=20)
+
+        sub_optional.subscription = sub
+
+        removed = services.remove_expired_optional_subscription(
+            sub_optional,
+            7
+        )
+
+        self.assertTrue(removed)
+
+        with self.assertRaises(models.SubscriptionService.DoesNotExist):
+            models.SubscriptionService.objects.get(
+                pk=sub_optional.pk
+            )
+
+
+class SubscriptionOptionalRemoveExpiredOptionalTest(TestCase):
+    """
+        Testes de liberação de opcional através do processamento de inscrições
+        de opcionais a partir de um número de dias configurado.
+    """
+
+    def test_release_sub_optional_product(self):
+        """
+            Caso nenhum 'número de dias para liberação (release_days) não
+            for informado
+        """
+        mocker = MockFactory()
+        sub_optional = mocker.fake_subscription_optional_product()
+
+        sub = sub_optional.subscription
+        sub.status = sub.AWAITING_STATUS
+
+        service = services.SubscriptionProductService(instance=sub_optional)
+        removed = service.release_optional()
+        self.assertFalse(removed)
+
+        sub.created = datetime.now() - timedelta(days=30)
+        sub_optional.subscription = sub
+
+        service = services.SubscriptionProductService(instance=sub_optional)
+        removed = service.release_optional()
+        self.assertTrue(removed)
+
+    def test_release_sub_optional_service(self):
+        """
+            Caso nenhum 'número de dias para liberação (release_days) não
+            for informado
+        """
+        mocker = MockFactory()
+        sub_optional = mocker.fake_subscription_optional_service()
+
+        sub = sub_optional.subscription
+        sub.status = sub.AWAITING_STATUS
+
+        sub_optional.subscription = sub
+
+        service = services.SubscriptionServiceService(instance=sub_optional)
+        removed = service.release_optional()
+        self.assertFalse(removed)
+
+        sub.created = datetime.now() - timedelta(days=30)
+        sub_optional.subscription = sub
+
+        service = services.SubscriptionServiceService(instance=sub_optional)
+        removed = service.release_optional()
+        self.assertTrue(removed)

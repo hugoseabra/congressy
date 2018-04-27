@@ -26,4 +26,4 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         API endpoint that allows users to be viewed or edited.
     """
     queryset = models.Service.objects.all().order_by('name')
-    serializer_class = serializers.Ser
+    serializer_class = serializers.ServiceSerializer

@@ -7,7 +7,7 @@ from decimal import Decimal
 
 from django.db import models
 
-from addon import rules
+from addon import constants, rules
 from base.models import EntityMixin
 from core.model import track_data
 from gatheros_subscription.models import LotCategory
@@ -104,7 +104,7 @@ class AbstractOptional(EntityMixin, models.Model):
 
     release_days = models.PositiveIntegerField(
         verbose_name="dias de liberação de opcionais",
-        default=7,
+        default=constants.MINIMUM_RELEASE_DAYS,
         null=True,
         blank=True,
         help_text='Número de dias em que serão liberadas as vagas de opcionais'
