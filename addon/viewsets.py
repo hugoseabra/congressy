@@ -62,18 +62,26 @@ class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
         return queryset.filter(lot_category__event__organization__in=org_pks)
 
 
-# class SubscriptionProductViewSet(viewsets.ModelViewSet):
-#     """
-#         API endpoint that allows users to be viewed or edited.
-#     """
-#     queryset = models.SubscriptionProduct.objects.all()
-#     serializer_class = serializers.SubscriptionProductSerializer
-#
+class SubscriptionServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+    """
+         Essa view é responsavel por retornar
+    """
+    queryset = models.SubscriptionService.objects.all()
+    serializer_class = serializers.SubscriptionServiceSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(subscription=self.kwargs.get('subscription_pk'))
 
 
-# class SubscriptionServiceViewSet(viewsets.ModelViewSet):
-#     """
-#         API endpoint that allows users to be viewed or edited.
-#     """
-#     queryset = models.SubscriptionService.objects.all()
-#     serializer_class = serializers.SubscriptionServiceSerializer
+class SubscriptionProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
+    """
+         Essa view é responsavel por retornar
+    """
+    queryset = models.SubscriptionProduct.objects.all()
+    serializer_class = serializers.SubscriptionProductSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(subscription=self.kwargs.get('subscription_pk'))
+

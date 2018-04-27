@@ -1,0 +1,125 @@
+{% extends 'hotsite/base.html' %}
+{% load l10n humanize static form_config_tags user_agents user_agent_tag %}
+
+{% block content %}
+
+    {% include 'hotsite/includes/2_cover_no_form.html' %}
+
+    <!-- FORM
+    ================================= -->
+    <section id="about" class="about-section section">
+
+        <div class="container">
+
+            <h2 class="section-heading text-center">Inscrição</h2>
+
+            <div class="about-row row">
+
+                <div class="col-md-9 col-md-offset-2">
+
+                    {% if form.non_field_errors %}
+                        {% render_errors form.non_field_errors %}
+                    {% endif %}
+
+                    {% for hidden_field in form.hidden_fields %}
+                        {% if hidden_field.errors %}
+                            {% render_errors hidden_field.errors %}
+                        {% endif %}
+                    {% endfor %}
+
+
+                    {% block messages %}
+                        {% if messages %}
+                            <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                            {% for message in messages %}
+
+                                {% if message.tags %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissible"
+                                         role="alert">
+
+                                {% else %}
+                                    <div class="alert alert-warning alert-dismissible"
+                                         role="alert">
+                                {% endif %}
+
+                            <button type="button" class="close"
+                                    data-dismiss="alert"
+                                    aria-label="Close"><span
+                                    aria-hidden="true">&times;</span>
+                            </button>
+                            {{ message|capfirst }}
+                            </div>
+
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endblock messages %}
+
+                    <div class="form-validation alert"></div>
+
+                    <div style="margin-bottom: 20px">
+
+                        <div class="panel panel-default">
+
+                            <div class="panel-heading">
+                                <div class="panel-title">Perguntas do
+                                    organizador:
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+
+                                <div class="row">
+
+                                    <div class="col-md-12">
+
+                                        <form method="post" action="" novalidate>
+
+                                            {% csrf_token %}
+                                            {{ wizard.management_form }}
+
+                                            {% for field in form.visible_fields %}
+                                                {% render_generic_field field %}
+                                            {% endfor %}
+
+                                            <br />
+                                            {% if wizard.steps.prev %}
+                                                <button name="wizard_goto_step"
+                                                        type="submit"
+                                                        class="btn btn-primary"
+                                                        value="{{ wizard.steps.prev }}">
+                                                    <i class="fas fa-chevron-circle-left"></i>
+                                                    Voltar
+                                                </button>
+                                            {% endif %}
+
+                                            <button type="submit"
+                                                    class="btn btn-primary pull-right">
+                                                Próximo
+                                                <i class="fas fa-chevron-circle-right"></i>
+                                            </button>
+                                        </form>
+
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+    </section>
+
+{% endblock %}
+
+
+
