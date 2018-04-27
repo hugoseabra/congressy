@@ -146,6 +146,76 @@ class OptionalMustHaveUniqueDatetimeIntervalTest(TestCase):
         rule.check(model_instance=optional2)
 
 
+class OptionalMustHaveMinimumDaysTest(TestCase):
+    """
+        Testes de regras de opcionais na qual deve haver um opcional
+        dentro de um mesmo horário (sessão) para a mesma categoria de lote
+        de um evento.
+    """
+    mocker = None
+    rule = None
+
+    def setUp(self):
+        self.mocker = MockFactory()
+        self.rule = rules.OptionalMustHaveMinimumDays()
+
+    def test_optional_product_minimum_days_test(self):
+        """
+            Testa de optional de produto salvo persiste 'release_days' com o
+            o mínimo de dias configurado ou retorna um erro de integridade.
+        """
+        from addon import constants
+
+        minimum_to_persist = constants.MINIMUM_RELEASE_DAYS - 1
+
+        # Failure
+        optional = self.mocker.fake_product()
+        optional.release_days = minimum_to_persist
+
+        with self.assertRaises(RuleIntegrityError) as e:
+            self.rule.check(model_instance=optional)
+
+        self.assertIn(
+            'O número de dias de liberação de opcionais para inscrições não'
+            ' confirmadas deve ser, no mínimo, "{}" dias'.format(
+                constants.MINIMUM_RELEASE_DAYS
+            ),
+            str(e.exception)
+        )
+
+        # Sucesso
+        optional.release_days = constants.MINIMUM_RELEASE_DAYS
+        self.rule.check(model_instance=optional)
+
+    def test_optional_service_minimum_days_test(self):
+        """
+            Testa de optional de serviço salvo persiste 'release_days' com o
+            o mínimo de dias configurado ou retorna um erro de integridade.
+        """
+        from addon import constants
+
+        minimum_to_persist = constants.MINIMUM_RELEASE_DAYS - 1
+
+        # Failure
+        optional = self.mocker.fake_service()
+        optional.release_days = minimum_to_persist
+
+        with self.assertRaises(RuleIntegrityError) as e:
+            self.rule.check(model_instance=optional)
+
+        self.assertIn(
+            'O número de dias de liberação de opcionais para inscrições não'
+            ' confirmadas deve ser, no mínimo, "{}" dias'.format(
+                constants.MINIMUM_RELEASE_DAYS
+            ),
+            str(e.exception)
+        )
+
+        # Sucesso
+        optional.release_days = constants.MINIMUM_RELEASE_DAYS
+        self.rule.check(model_instance=optional)
+
+
 class SubscriptionOptionalRulesTest(TestCase):
     """
         Testes de regras de domínio de Rules de Inscrição de Optional.

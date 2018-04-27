@@ -94,8 +94,8 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(get_object_value(person, 'name'))
 
         if person.birth_date:
-            collector[row_idx].append(person.age)
             collector[row_idx].append(person.birth_date.strftime('%d/%m/%Y'))
+            collector[row_idx].append(person.age)
         else:
             collector[row_idx].append('')
             collector[row_idx].append('')

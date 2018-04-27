@@ -2,6 +2,7 @@ from django.forms import ValidationError
 
 from base import managers
 from core.util.date import DateTimeRange
+from .constants import MINIMUM_RELEASE_DAYS
 from .models import (
     Product,
     Service,
@@ -34,6 +35,14 @@ class ProductManager(managers.Manager):
     class Meta:
         model = Product
         fields = '__all__'
+
+    def __init__(self, **kwargs):
+        initial = kwargs.get('initial', {})
+        if not kwargs.get('instance') and initial.get('release_days') is None:
+            initial.update({'release_days': MINIMUM_RELEASE_DAYS})
+            kwargs.update({'initial': initial})
+
+        super().__init__(**kwargs)
 
 
 class ServiceManager(managers.Manager):

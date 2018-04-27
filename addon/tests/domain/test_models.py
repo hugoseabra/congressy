@@ -20,6 +20,15 @@ class ModelsConfiguredTest(TestCase):
             models.Service.rule_instances
         )
 
+        self.assertIn(
+            rules.OptionalMustHaveMinimumDays,
+            models.Product.rule_instances
+        )
+        self.assertIn(
+            rules.OptionalMustHaveMinimumDays,
+            models.Service.rule_instances
+        )
+
         # Price
         self.assertIn(
             rules.MustDateEndAfterDateStart,
