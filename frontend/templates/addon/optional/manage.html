@@ -1,0 +1,145 @@
+{% extends "base/base.html" %}
+{# @TODO Change the icons in nav_aside_itens  #}
+{% load static %}
+{% load base_tags %}
+{% load queryset_filter %}
+
+{% block title %} Opcionais | Congressy{% endblock %}
+
+{% block page_title %}Opcionais{% endblock %}
+
+{% block page_sub_title %}
+    {{ event.name }}
+{% endblock %}
+
+{% block styles %}
+    <style>
+        ul.block-list li:hover {
+            background: #f5f5f5;
+        }
+        ul.block-list li.active {
+            background-color: #337ab7;
+        }
+        ul.block-list li .list-icons .well {
+            padding: 3px !important;
+            margin-bottom: 0;
+        }
+        ul.block-list li .list-icons .well:hover {
+            background-color: #DDD;
+        }
+        .tab-wrapper .tab-content div.active {
+            outline: none;
+        }
+    </style>
+
+    {% if object_list %}
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'assets/js/lot.js' %}"></script>
+    <script>
+    $(document).ready(function() {
+        selectFromHash();
+        createAnchorEvents();
+    });
+    </script>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'subscription:lot-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Lotes/Categorias
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+            </a>
+        </li>
+        {#        <li>#}
+        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+        {#               title="Check-in">#}
+        {#                <i class="fa  fa-fw fa-rocket"></i>#}
+        {#                Check-in#}
+        {#            </a>#}
+        {#        </li>#}
+    </ul>
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+        {% if has_paid_lots %}
+            <li>
+                <a href="{% url 'payment:event-payments' event.pk %}"
+                   title="Pagamentos">
+                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
+                </a>
+            </li>
+        {% endif %}
+
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12 col-xl-8 col-xl-push-2">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="buttonbar">
+                        <div class="float-left">
+                            <a href="{% url 'subscription:category-list' event.pk %}"
+                                class="btn btn-primary">
+                                <i class="fab fa-stack-exchange"></i>
+                                Gerenciar Categorias
+                            </a>
+                            <a href="{% url 'subscription:lot-add' event.pk %}"
+                                class="btn btn-success">
+                                <i class="fa fa-plus"></i>
+                                Novo Lote
+                            </a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+
+            {% if categories.count %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                Opcionais por Categorias de Lote
+                            </div>
+                        </div>
+                        <div class="panel-body" id="lot-list-main-block">
+                            {% include 'addon/optional/categories-lots-list.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

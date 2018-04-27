@@ -21,7 +21,7 @@ class MustDateEndAfterDateStart(RuleChecker):
 # ============================= OPTIONAL ==================================== #
 def check_dates_conflict(optional, other_optionals):
     conflict_prices = []
-    for o_optional in other_optionals.all():
+    for o_optional in other_optionals:
         optional_str = '{} - {} a {}'.format(
             o_optional.name,
             o_optional.date_start.strftime('%d/%m/%Y %H:%M'),
@@ -43,7 +43,9 @@ def check_dates_conflict(optional, other_optionals):
     if conflict_prices:
         raise RuleIntegrityError(
             'As datas informadas conflitam com outro(s) opcionais(s) já'
-            ' existente(s): {}'.format('; '.join(conflict_prices))
+            ' existente(s) para esta mesma categoria de lote: {}'.format(
+                '; '.join(conflict_prices)
+            )
         )
 
 
@@ -62,7 +64,10 @@ class ProductMustHaveUniqueDatetimeInterval(RuleChecker):
                 return
 
         lot_category = model_instance.lot_category
-        check_dates_conflict(model_instance, lot_category.product_optionals)
+        check_dates_conflict(
+            model_instance,
+            lot_category.product_optionals.all()
+        )
 
 
 class ServiceMustHaveUniqueDatetimeInterval(RuleChecker):
@@ -80,7 +85,10 @@ class ServiceMustHaveUniqueDatetimeInterval(RuleChecker):
                 return
 
         lot_category = model_instance.lot_category
-        check_dates_conflict(model_instance, lot_category.service_optionals)
+        check_dates_conflict(
+            model_instance,
+            lot_category.service_optionals.all()
+        )
 
 
 class OptionalMustHaveMinimumDays(RuleChecker):
