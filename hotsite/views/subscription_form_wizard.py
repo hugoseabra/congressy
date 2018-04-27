@@ -18,6 +18,8 @@ from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
+from addon.models import Service, Product
+
 
 FORMS = [("lot", forms.LotsForm),
          ("person", forms.SubscriptionPersonForm),
@@ -67,20 +69,22 @@ def has_survey(wizard):
 
 
 def has_addons(wizard):
-    # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+    # # Get cleaned data from lots step
+    # cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+    #
+    # # Return true if lot has price and price > 0
+    # lot = cleaned_data['lots']
+    #
+    # if isinstance(lot, Lot):
+    #
+    #     if lot.category:
+    #         if lot.category.service_optionals or \
+    #                 lot.category.product_optionals:
+    #             return True
+    #
+    # return False
 
-    # Return true if lot has price and price > 0
-    lot = cleaned_data['lots']
-
-    if isinstance(lot, Lot):
-
-        if lot.category:
-            if lot.category.service_optionals or \
-                    lot.category.product_optionals:
-                return True
-
-    return False
+    return True
 
 
 class SubscriptionWizardView(EventMixin, SessionWizardView):
@@ -166,6 +170,22 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         if self.storage.current_step == 'payment':
             context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
+
+        if self.storage.current_step == 'addon':
+
+            lot_data = self.storage.get_step_data('lot')
+
+            lot = lot_data.get('lot-lots')
+
+            try:
+                lot = Lot.objects.get(pk=lot, event=self.event)
+            except Lot.DoesNotExist:
+                message = 'Não foi possivel resgatar um Lote ' \
+                          'a partir das referencias: lot<{}> e evento<{}>.' \
+                    .format(lot, self.event)
+                raise TypeError(message)
+
+            context['lot_category_pk'] = lot.category.pk
 
         return context
 
