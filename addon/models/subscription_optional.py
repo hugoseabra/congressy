@@ -24,6 +24,7 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('subscription__event',)
 
     subscription = models.ForeignKey(
         Subscription,
@@ -45,6 +46,10 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
     """
         Vínculo de uma inscrição com um Opcional de Produto.
     """
+    class Meta(AbstractSubscriptionOptional.Meta):
+        verbose_name_plural = 'inscrições de opcional de produto'
+        verbose_name = 'inscrição de opcional de produto'
+
     optional = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
@@ -57,6 +62,10 @@ class SubscriptionService(AbstractSubscriptionOptional):
     """
         Vínculo de uma inscrição com um Opcional de Serviço.
     """
+    class Meta(AbstractSubscriptionOptional.Meta):
+        verbose_name_plural = 'inscrições de opcional de serviço'
+        verbose_name = 'inscrição de opcional de serviço'
+
     optional = models.ForeignKey(
         Service,
         on_delete=models.DO_NOTHING,

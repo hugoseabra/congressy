@@ -28,6 +28,7 @@ class AbstractOptional(EntityMixin, models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('name',)
 
     optional_type = models.ForeignKey(
         OptionalType,
@@ -120,6 +121,10 @@ class Product(AbstractOptional):
         Opcional de produto é um adicional de produto a ser comprado no ato da
         inscrição de um evento. Exemplo: camiseta, caneca, kit, dentre outros.
     """
+    class Meta(AbstractOptional.Meta):
+        verbose_name_plural = 'opcionais de produto'
+        verbose_name = 'opcional de produto'
+
     rule_instances = (
         rules.MustDateEndAfterDateStart,
         rules.ProductMustHaveUniqueDatetimeInterval,
@@ -132,6 +137,10 @@ class Service(AbstractOptional):
         Opcional de Serviço é um serviço a ser adquirido no ato da inscrição
         de um evento. Exemplo: curso, workshop, treinamento, dentre outros.
     """
+    class Meta(AbstractOptional.Meta):
+        verbose_name_plural = 'opcionais de serviço'
+        verbose_name = 'opcional de serviço'
+
     rule_instances = (
         rules.MustDateEndAfterDateStart,
         rules.ServiceMustHaveUniqueDatetimeInterval,
