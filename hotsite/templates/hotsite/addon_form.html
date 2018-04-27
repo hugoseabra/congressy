@@ -62,8 +62,8 @@
                         <div class="panel panel-default">
 
                             <div class="panel-heading">
-                                <div class="panel-title">Perguntas do
-                                    organizador:
+                                <div class="panel-title">
+                                    Opcionais
                                 </div>
                             </div>
 
@@ -73,16 +73,18 @@
 
                                     <div class="col-md-12">
 
-                                        <form method="post" action="" novalidate>
+                                        <div class="panel-body"
+                                             id="optional-list-main-block">
+                                            {% include 'hotsite/optionals_form.html' %}
+                                        </div>
+
+                                        <form method="post" action="">
 
                                             {% csrf_token %}
                                             {{ wizard.management_form }}
 
-                                            {% for field in form.visible_fields %}
-                                                {% render_generic_field field %}
-                                            {% endfor %}
 
-                                            <br />
+                                            <br/>
                                             {% if wizard.steps.prev %}
                                                 <button name="wizard_goto_step"
                                                         type="submit"
@@ -99,7 +101,6 @@
                                                 <i class="fas fa-chevron-circle-right"></i>
                                             </button>
                                         </form>
-
 
                                     </div>
 
