@@ -22,6 +22,8 @@ from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 FORMS = [("lot", forms.LotsForm),
          ("person", forms.SubscriptionPersonForm),
@@ -74,7 +76,10 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         response = super().dispatch(request, *args, **kwargs)
 
-        if not self.storage or not request.user.is_authenticated:
+        if not self.request.user.is_authenticated:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        if not self.storage:
             return redirect('public:hotsite', slug=self.event.slug)
 
         enabled = self.subscription_enabled()
@@ -280,14 +285,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
                 # Assert that we have a person in storage
                 if not hasattr(self.storage, 'person'):
-
-                    try:
-                        person = Person.objects.get(user=self.request.user)
-                    except Person.DoesNotExist:
-                        person_data = self.storage.get_step_data('person')
-                        person_email = person_data.get('person-email')
-
-                        person = Person.objects.get(email=person_email)
+                    person = Person.objects.get(user=self.request.user)
                     self.storage.person = person
 
                 lot_data = self.storage.get_step_data('lot')
