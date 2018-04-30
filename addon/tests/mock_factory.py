@@ -4,7 +4,6 @@
 
 import random
 from datetime import datetime, timedelta
-from decimal import Decimal
 
 from django.contrib.auth.models import User
 from faker import Faker
@@ -12,7 +11,8 @@ from faker import Faker
 from addon.models import (
     Product,
     Service,
-    OptionalType,
+    OptionalProductType,
+    OptionalServiceType,
     SubscriptionProduct,
     SubscriptionService,
     Theme,
@@ -99,9 +99,15 @@ class MockFactory:
             created_by=0,
         )
 
-    def fake_optional_type(self):
+    def fake_optional_product_type(self):
 
-        return OptionalType.objects.create(
+        return OptionalProductType.objects.create(
+            name=self.fake_factory.words(nb=3, ext_word_list=None),
+        )
+
+    def fake_optional_service_type(self):
+
+        return OptionalServiceType.objects.create(
             name=self.fake_factory.words(nb=3, ext_word_list=None),
         )
 
@@ -111,7 +117,7 @@ class MockFactory:
             lot_category = self.fake_lot_category()
 
         if not optional_type:
-            optional_type = self.fake_optional_type()
+            optional_type = self.fake_optional_product_type()
 
         date_start = datetime.now() - timedelta(days=3)
         date_end = datetime.now() + timedelta(days=3)
@@ -131,7 +137,7 @@ class MockFactory:
             lot_category = self.fake_lot_category()
 
         if not optional_type:
-            optional_type = self.fake_optional_type()
+            optional_type = self.fake_optional_service_type()
 
         if not theme:
             theme = self.fake_theme()

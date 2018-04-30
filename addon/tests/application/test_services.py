@@ -30,9 +30,28 @@ class ThemeServicePersistenceTest(PersistenceTestCase):
         self.edit()
 
 
-class OptionalTypeServicePersistenceTest(PersistenceTestCase):
+class OptionalProductTypeServicePersistenceTest(PersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
-    application_service_class = services.OptionalTypeService
+    application_service_class = services.OptionalProductTypeService
+    required_fields = ('name',)
+    data_edit_to = {
+        'name': 'another name edited',
+    }
+
+    def setUp(self):
+        self.data = {
+            'name': 'theme name',
+        }
+
+    def test_create(self):
+        self.create()
+
+    def test_edit(self):
+        self.edit()
+
+class OptionalServiceTypeServicePersistenceTest(PersistenceTestCase):
+    """ Testes de persistência de dados: criação e edição."""
+    application_service_class = services.OptionalServiceTypeService
     required_fields = ('name',)
     data_edit_to = {
         'name': 'another name edited',
@@ -84,7 +103,7 @@ class ProductServicePersistenceTest(PersistenceTestCase):
         date_end = datetime.now() + timedelta(days=3)
 
         self.data = {
-            'optional_type': fake_factory.fake_optional_type().pk,
+            'optional_type': fake_factory.fake_optional_product_type().pk,
             'lot_category': fake_factory.fake_lot_category().pk,
             'name': 'optional name',
             'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
@@ -141,7 +160,7 @@ class ServiceServicePersistenceTest(PersistenceTestCase):
         date_start = datetime.now() - timedelta(days=3)
         date_end = datetime.now() + timedelta(days=3)
         self.data = {
-            'optional_type': fake_factory.fake_optional_type().pk,
+            'optional_type': fake_factory.fake_optional_service_type().pk,
             'lot_category': fake_factory.fake_lot_category().pk,
             'name': 'optional name',
             'date_start': date_start.strftime('%d/%m/%Y %H:%M'),

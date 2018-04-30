@@ -6,7 +6,8 @@ from .constants import MINIMUM_RELEASE_DAYS
 from .models import (
     Product,
     Service,
-    OptionalType,
+    OptionalProductType,
+    OptionalServiceType,
     SubscriptionService,
     SubscriptionProduct,
     Theme,
@@ -21,11 +22,19 @@ class ThemeManager(managers.Manager):
         fields = '__all__'
 
 
-class OptionalTypeManager(managers.Manager):
+class OptionalProductTypeManager(managers.Manager):
     """ Manager de tipos de opcionais """
 
     class Meta:
-        model = OptionalType
+        model = OptionalProductType
+        fields = '__all__'
+
+
+class OptionalServiceTypeManager(managers.Manager):
+    """ Manager de tipos de opcionais """
+
+    class Meta:
+        model = OptionalServiceType
         fields = '__all__'
 
 

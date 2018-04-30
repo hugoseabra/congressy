@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from gatheros_subscription.models import LotCategory
+
 from addon import models
+from gatheros_subscription.models import LotCategory
 
 
 class LotCategorySerializer(serializers.ModelSerializer):
@@ -18,9 +19,15 @@ class ThemeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class OptionalTypeSerializer(serializers.ModelSerializer):
+class OptionalProductTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.OptionalType
+        model = models.OptionalProductType
+        fields = '__all__'
+
+
+class OptionalServiceTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.OptionalServiceType
         fields = '__all__'
 
 

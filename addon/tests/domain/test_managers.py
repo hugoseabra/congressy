@@ -31,9 +31,32 @@ class ThemeManagerPersistenceTest(ManagerPersistenceTestCase):
         self.edit()
 
 
-class OptionalTypePersistenceTest(ManagerPersistenceTestCase):
+class OptionalProductTypePersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
-    manager_class = managers.OptionalTypeManager
+    manager_class = managers.OptionalProductTypeManager
+    required_fields = ('name',)
+    fake_factory = None
+
+    data_edit_to = {
+        'name': 'edited name',
+    }
+
+    def setUp(self):
+        self.fake_factory = MockFactory()
+        self.data = {
+            'name': 'original name',
+        }
+
+    def test_create(self):
+        self.create()
+
+    def test_edit(self):
+        self.edit()
+
+
+class OptionalServiceTypePersistenceTest(ManagerPersistenceTestCase):
+    """ Testes de persistência de dados: criação e edição."""
+    manager_class = managers.OptionalServiceTypeManager
     required_fields = ('name',)
     fake_factory = None
 
@@ -95,7 +118,8 @@ class ProductManagerPersistenceTest(ManagerPersistenceTestCase):
 
         if 'optional_type' not in data:
             data[
-                'optional_type'] = static_fake_factory.fake_optional_type().pk
+                'optional_type'] = \
+                static_fake_factory.fake_optional_product_type().pk
 
         if 'lot_category' not in data:
             data['lot_category'] = static_fake_factory.fake_lot_category().pk
@@ -112,7 +136,7 @@ class ProductManagerPersistenceTest(ManagerPersistenceTestCase):
         date_start = datetime.now() - timedelta(days=3)
         date_end = datetime.now() + timedelta(days=3)
         self.data = {
-            'optional_type': fake_factory.fake_optional_type().pk,
+            'optional_type': fake_factory.fake_optional_product_type().pk,
             'lot_category': fake_factory.fake_lot_category().pk,
             'name': 'optional name',
             'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
@@ -177,7 +201,8 @@ class ServiceManagerPersistenceTest(ManagerPersistenceTestCase):
 
         if 'optional_type' not in data:
             data[
-                'optional_type'] = static_fake_factory.fake_optional_type().pk
+                'optional_type'] = \
+                static_fake_factory.fake_optional_service_type().pk
 
         if 'lot_category' not in data:
             data['lot_category'] = static_fake_factory.fake_lot_category().pk
@@ -197,7 +222,7 @@ class ServiceManagerPersistenceTest(ManagerPersistenceTestCase):
         date_start = datetime.now() - timedelta(days=3)
         date_end = datetime.now() + timedelta(days=3)
         self.data = {
-            'optional_type': fake_factory.fake_optional_type().pk,
+            'optional_type': fake_factory.fake_optional_service_type().pk,
             'lot_category': fake_factory.fake_lot_category().pk,
             'name': 'optional name',
             'date_start': date_start.strftime('%d/%m/%Y %H:%M'),

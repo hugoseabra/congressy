@@ -8,9 +8,14 @@ class ThemeService(services.ApplicationService):
     manager_class = managers.ThemeManager
 
 
-class OptionalTypeService(services.ApplicationService):
+class OptionalProductTypeService(services.ApplicationService):
     """ Application service. """
-    manager_class = managers.OptionalTypeManager
+    manager_class = managers.OptionalProductTypeManager
+
+
+class OptionalServiceTypeService(services.ApplicationService):
+    """ Application service. """
+    manager_class = managers.OptionalServiceTypeManager
 
 
 class ProductService(services.ApplicationService):
