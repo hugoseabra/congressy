@@ -1,76 +1,26 @@
 """
 Rules: Módulo afiliados
 """
+from datetime import datetime
 from addon import constants
 from base.models import RuleChecker, RuleIntegrityError
 
 
 # ========================== SESSION e PRICE ================================ #
-class MustDateEndAfterDateStart(RuleChecker):
+class MustScheduleDateEndAfterDateStart(RuleChecker):
     """
-    Regra: a data final deve ser posterior à data inicial.
+    Regra: a data final da programação deve ser posterior à data inicial.
     """
 
     def check(self, model_instance, *args, **kwargs):
-        if model_instance.date_start >= model_instance.date_end:
+        if model_instance.schedule_start >= model_instance.schedule_start:
             raise RuleIntegrityError(
-                'Data inicial deve ser anterior a data final.'
+                'Data/hora inicial deve ser anterior a data/hora final.'
             )
 
 
 # ============================= OPTIONAL ==================================== #
-def check_dates_conflict(optional, other_optionals):
-    conflict_prices = []
-    for o_optional in other_optionals:
-        optional_str = '{} - {} a {}'.format(
-            o_optional.name,
-            o_optional.date_start.strftime('%d/%m/%Y %H:%M'),
-            o_optional.date_end.strftime('%d/%m/%Y %H:%M'),
-        )
-
-        date_start = o_optional.date_start
-        date_end = o_optional.date_end
-
-        dt_start_conflicts = \
-            date_start <= optional.date_start <= o_optional.date_end
-
-        dt_end_conflicts = \
-            date_end <= optional.date_end <= o_optional.date_end
-
-        if dt_start_conflicts or dt_end_conflicts:
-            conflict_prices.append(optional_str)
-
-    if conflict_prices:
-        raise RuleIntegrityError(
-            'As datas informadas conflitam com outro(s) opcionais(s) já'
-            ' existente(s) para esta mesma categoria de lote: {}'.format(
-                '; '.join(conflict_prices)
-            )
-        )
-
-
-class ProductMustHaveUniqueDatetimeInterval(RuleChecker):
-    """
-    Regra: o opcional de produto cadastrado não pode chocar com outro na mesma
-    categoria de lote.
-    """
-
-    def check(self, model_instance, *args, **kwargs):
-        if model_instance._state.adding is False:
-            date_start_changed = model_instance.has_changed('date_start')
-            date_end_changed = model_instance.has_changed('date_end')
-
-            if not date_start_changed and not date_end_changed:
-                return
-
-        lot_category = model_instance.lot_category
-        check_dates_conflict(
-            model_instance,
-            lot_category.product_optionals.all()
-        )
-
-
-class ServiceMustHaveUniqueDatetimeInterval(RuleChecker):
+class ServiceMustHaveUniqueDatetimeScheduleInterval(RuleChecker):
     """
     Regra: o opcional de serviço cadastrado não pode chocar com outro na mesma
     categoria de lote.
@@ -85,10 +35,38 @@ class ServiceMustHaveUniqueDatetimeInterval(RuleChecker):
                 return
 
         lot_category = model_instance.lot_category
-        check_dates_conflict(
-            model_instance,
-            lot_category.service_optionals.all()
-        )
+
+        optional = model_instance
+        other_optionals = lot_category.service_optionals.all()
+
+        conflict_prices = []
+        for o_optional in other_optionals:
+            optional_str = '{} - {} a {}'.format(
+                o_optional.name,
+                o_optional.schedule_start.strftime('%d/%m/%Y %H:%M'),
+                o_optional.schedule_end.strftime('%d/%m/%Y %H:%M'),
+            )
+
+            date_start = o_optional.schedule_start
+            date_end = o_optional.schedule_end
+
+            dt_start_conflicts = \
+                date_start <= optional.schedule_start <= o_optional.schedule_end
+
+            dt_end_conflicts = \
+                date_end <= optional.schedule_end <= o_optional.schedule_end
+
+            if dt_start_conflicts or dt_end_conflicts:
+                conflict_prices.append(optional_str)
+
+        if conflict_prices:
+            raise RuleIntegrityError(
+                'Conflito de horários de programação: as datas informadas'
+                ' conflitam com outro(s) opcionais(s) de serviço já'
+                ' existente(s) para esta mesma categoria de lote: {}'.format(
+                    '; '.join(conflict_prices)
+                )
+            )
 
 
 class OptionalMustHaveMinimumDays(RuleChecker):
@@ -122,4 +100,19 @@ class MustBeSameOptionalLotCategory(RuleChecker):
             raise RuleIntegrityError(
                 'Você deve informar uma categoria de lote que já esteja'
                 ' inserida no opcional "{}".'.format(optional.name)
+            )
+
+
+class RestrictSubscriptionAfterOptionalDateEnd(RuleChecker):
+    """
+    Regra: deve restringir a criação de inscrições em opcionais caso o opcional
+    selecionado esteja com a data/hora final antes da data/hora atual.
+    """
+
+    def check(self, model_instance, *args, **kwargs):
+        optional = model_instance.optional
+
+        if datetime.now() > optional.date_end_sub:
+            raise RuleIntegrityError(
+                'Este opcional já expirou e não aceita mais inscrições.'
             )

@@ -122,8 +122,7 @@ class Product(AbstractOptional):
         verbose_name = 'opcional de produto'
 
     rule_instances = (
-        rules.MustDateEndAfterDateStart,
-        # rules.ProductMustHaveUniqueDatetimeInterval,
+        rules.RestrictSubscriptionAfterOptionalDateEnd,
         rules.OptionalMustHaveMinimumDays,
     )
 
@@ -145,8 +144,9 @@ class Service(AbstractOptional):
         verbose_name = 'opcional de serviço'
 
     rule_instances = (
-        rules.MustDateEndAfterDateStart,
-        # rules.ServiceMustHaveUniqueDatetimeInterval,
+        rules.MustScheduleDateEndAfterDateStart,
+        rules.ServiceMustHaveUniqueDatetimeScheduleInterval,
+        rules.RestrictSubscriptionAfterOptionalDateEnd,
         rules.OptionalMustHaveMinimumDays,
     )
 
