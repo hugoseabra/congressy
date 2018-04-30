@@ -5,13 +5,22 @@
 from django.db import models
 
 from base.models import EntityMixin
+from gatheros_event.models import Event
 
 
 class Theme(EntityMixin, models.Model):
+
     class Meta:
         verbose_name_plural = 'temas'
         verbose_name = 'tema'
-        ordering = ('name',)
+        ordering = ('event', 'name')
+
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        verbose_name="eventos",
+        related_name="events",
+    )
 
     name = models.CharField(max_length=255, verbose_name='nome')
     limit = models.PositiveIntegerField(

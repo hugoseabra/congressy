@@ -87,6 +87,24 @@ class OptionalMustHaveMinimumDays(RuleChecker):
             )
 
 
+# ============================= OPTIONAL SERVICE =+========================== #
+class ThemeMustBeSameEvent(RuleChecker):
+    """
+    Regra: o Opcional e o tema devem ser do mesmo evento
+    """
+
+    def check(self, model_instance, *args, **kwargs):
+        theme = model_instance.theme
+
+        event = model_instance.lot_category.event
+
+        if theme.event.pk != event.pk:
+            raise RuleIntegrityError(
+                'Conflito de evento entre o tema "{}" e '
+                'o serviço "{}".'.format(theme.event.name, event.name)
+            )
+
+
 # ===================== SUBSCRIPTION OPTIONAL =============================== #
 class MustBeSameOptionalLotCategory(RuleChecker):
     """
