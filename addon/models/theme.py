@@ -13,7 +13,7 @@ class Theme(EntityMixin, models.Model):
     class Meta:
         verbose_name_plural = 'temas'
         verbose_name = 'tema'
-        ordering = ('name',)
+        ordering = ('event', 'name')
 
     event = models.ForeignKey(
         Event,

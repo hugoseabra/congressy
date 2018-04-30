@@ -139,7 +139,7 @@ class MockFactory:
             optional_type = self.fake_optional_service_type()
 
         if not theme:
-            theme = self.fake_theme()
+            theme = self.fake_theme(event=lot_category.event)
 
         date_start = datetime.now() - timedelta(days=3)
         date_end = datetime.now() + timedelta(days=3)

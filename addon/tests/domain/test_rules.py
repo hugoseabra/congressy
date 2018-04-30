@@ -74,7 +74,8 @@ class OptionalMustHaveUniqueDatetimeIntervalTest(TestCase):
         )
 
         # força mesmas datas
-        optional2.schedule_start = optional1.schedule_start + timedelta(minutes=30)
+        optional2.schedule_start = optional1.schedule_start + timedelta(
+            minutes=30)
 
         with self.assertRaises(RuleIntegrityError) as e:
             rule.check(model_instance=optional2)
@@ -89,6 +90,44 @@ class OptionalMustHaveUniqueDatetimeIntervalTest(TestCase):
         optional2.schedule_end = optional1.schedule_start + timedelta(days=3)
 
         rule.check(model_instance=optional2)
+
+
+class OptionalServiceMustHaveSameEventAsTheme(TestCase):
+    """
+        Testes de regras de opcionais na qual o evento do serviço deve ser o
+        mesmo evento do tema
+    """
+    mocker = None
+    lot_category = None
+
+    def setUp(self):
+        self.mocker = MockFactory()
+        self.lot_category = self.mocker.fake_lot_category()
+
+    def test_optional_service_same_event_as_theme(self):
+        """
+            Testa de optional estar no mesmo evento que seu tema.
+        """
+        rule = rules.ThemeMustBeSameEvent()
+
+        different_theme = self.mocker.fake_theme()
+
+        optional = self.mocker.fake_service()
+        optional.theme = different_theme
+
+        with self.assertRaises(RuleIntegrityError) as e:
+            rule.check(model_instance=optional)
+
+        self.assertIn(
+            'Conflito de evento entre o tema',
+            str(e.exception)
+        )
+
+        # Sucesso
+        correct_theme = self.mocker.fake_theme(
+            event=optional.lot_category.event)
+        optional.theme = correct_theme
+        rule.check(model_instance=optional)
 
 
 class OptionalMustHaveMinimumDaysTest(TestCase):

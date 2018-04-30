@@ -177,9 +177,10 @@ class ServiceServicePersistenceTest(PersistenceTestCase):
         fake_factory = MockFactory()
         date_start = datetime.now() - timedelta(days=3)
         date_end = datetime.now() + timedelta(days=3)
+        lot_category = fake_factory.fake_lot_category()
         self.data = {
             'optional_type': fake_factory.fake_optional_service_type().pk,
-            'lot_category': fake_factory.fake_lot_category().pk,
+            'lot_category': lot_category.pk,
             'name': 'optional name',
             'schedule_start': date_start.strftime('%d/%m/%Y %H:%M'),
             'schedule_end': date_end.strftime('%d/%m/%Y %H:%M'),
@@ -191,7 +192,7 @@ class ServiceServicePersistenceTest(PersistenceTestCase):
             'restrict_unique': False,
             'description': 'Optional description',
             'quantity': 5,
-            'theme': fake_factory.fake_theme().pk,
+            'theme': fake_factory.fake_theme(event=lot_category.event).pk,
             'place': 'Some place'
         }
 
