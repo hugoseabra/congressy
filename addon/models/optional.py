@@ -42,8 +42,10 @@ class AbstractOptional(EntityMixin, models.Model):
         verbose_name="nome",
     )
 
-    date_start = models.DateTimeField(verbose_name="data inicial", )
-    date_end = models.DateTimeField(verbose_name="data final", )
+    date_end_sub = models.DateTimeField(
+        verbose_name="data final",
+        help_text='Data final em que o opcional aceita inscrições.'
+    )
 
     published = models.BooleanField(
         verbose_name="publicado",
@@ -160,6 +162,15 @@ class Service(AbstractOptional):
         on_delete=models.PROTECT,
         verbose_name="themas",
         related_name="services",
+    )
+
+    schedule_start = models.DateTimeField(
+        verbose_name="data/hora inicial",
+        help_text='Data e hora inicial da programação no dia do evento.'
+    )
+    schedule_end = models.DateTimeField(
+        verbose_name="data/hora final",
+        help_text='Data e hora final da programação no dia do evento.'
     )
 
     place = models.CharField(
