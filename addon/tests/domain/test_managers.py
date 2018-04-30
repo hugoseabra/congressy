@@ -80,15 +80,11 @@ class OptionalServiceTypePersistenceTest(ManagerPersistenceTestCase):
 class ProductManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
 
-    edited_date_start = datetime.now() - timedelta(days=6)
-    edited_date_end = datetime.now() + timedelta(days=6)
-
     manager_class = managers.ProductManager
     required_fields = (
         'optional_type',
         'lot_category',
-        'date_start',
-        'date_end',
+        'date_end_sub',
         'published',
         'created_by',
         'modified_by',
@@ -133,14 +129,14 @@ class ProductManagerPersistenceTest(ManagerPersistenceTestCase):
 
     def setUp(self):
         fake_factory = MockFactory()
-        date_start = datetime.now() - timedelta(days=3)
+
         date_end = datetime.now() + timedelta(days=3)
+
         self.data = {
             'optional_type': fake_factory.fake_optional_product_type().pk,
             'lot_category': fake_factory.fake_lot_category().pk,
             'name': 'optional name',
-            'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
-            'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+            'date_end_sub': date_end.strftime('%d/%m/%Y %H:%M'),
             'published': True,
             'created_by': 'test user',
             'modified_by': 'test user',
@@ -160,15 +156,13 @@ class ProductManagerPersistenceTest(ManagerPersistenceTestCase):
 class ServiceManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
 
-    edited_date_start = datetime.now() - timedelta(days=6)
-    edited_date_end = datetime.now() + timedelta(days=6)
-
     manager_class = managers.ServiceManager
     required_fields = (
         'optional_type',
         'lot_category',
-        'date_start',
-        'date_end',
+        'schedule_start',
+        'schedule_end',
+        'date_end_sub',
         'published',
         'created_by',
         'modified_by',
@@ -219,14 +213,15 @@ class ServiceManagerPersistenceTest(ManagerPersistenceTestCase):
 
     def setUp(self):
         fake_factory = MockFactory()
-        date_start = datetime.now() - timedelta(days=3)
-        date_end = datetime.now() + timedelta(days=3)
+        schedule_start = datetime.now() - timedelta(days=3)
+        schedule_end = datetime.now() + timedelta(days=3)
         self.data = {
             'optional_type': fake_factory.fake_optional_service_type().pk,
             'lot_category': fake_factory.fake_lot_category().pk,
             'name': 'optional name',
-            'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
-            'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+            'schedule_start': schedule_start.strftime('%d/%m/%Y %H:%M'),
+            'schedule_end': schedule_end.strftime('%d/%m/%Y %H:%M'),
+            'date_end_sub': schedule_end.strftime('%d/%m/%Y %H:%M'),
             'published': True,
             'created_by': 'test user',
             'modified_by': 'test user',
@@ -458,18 +453,20 @@ class SubscriptionServiceManagerRulesTest(TestCase):
 
         # Crie dois Services
         service_1 = self.fake_factory.fake_service(
-            lot_category=subscription.lot.category)
+            lot_category=subscription.lot.category
+        )
         service_2 = self.fake_factory.fake_service(
-            lot_category=subscription.lot.category)
+            lot_category=subscription.lot.category
+        )
 
         # Configurando os dois serviços para usar a flag de sessão
-        service_1.date_start = datetime.now()
-        service_1.date_end = datetime.now() + timedelta(days=1)
+        service_1.schedule_start = datetime.now()
+        service_1.schedule_end = datetime.now() + timedelta(days=1)
         service_1.restrict_unique = True
         service_1.save()
 
-        service_2.date_start = datetime.now()
-        service_2.date_end = datetime.now() + timedelta(days=1)
+        service_2.schedule_start = datetime.now()
+        service_2.schedule_end = datetime.now() + timedelta(days=1)
         service_2.restrict_unique = True
         service_2.save()
 
@@ -505,13 +502,13 @@ class SubscriptionServiceManagerRulesTest(TestCase):
             lot_category=subscription.lot.category)
 
         # Configurando os dois serviços para usar a flag de sessão
-        service_1.date_start = datetime.now()
-        service_1.date_end = datetime.now() + timedelta(days=1)
+        service_1.schedule_start = datetime.now()
+        service_1.schedule_end = datetime.now() + timedelta(days=1)
         service_1.restrict_unique = False
         service_1.save()
 
-        service_2.date_start = datetime.now()
-        service_2.date_end = datetime.now() + timedelta(days=1)
+        service_2.schedule_start = datetime.now()
+        service_2.schedule_end = datetime.now() + timedelta(days=1)
         service_2.restrict_unique = False
         service_2.save()
 
@@ -549,13 +546,13 @@ class SubscriptionServiceManagerRulesTest(TestCase):
             lot_category=subscription.lot.category)
 
         # Configurando os dois serviços para usar a flag de sessão
-        service_1.date_start = datetime.now()
-        service_1.date_end = datetime.now() + timedelta(days=1)
+        service_1.schedule_start = datetime.now()
+        service_1.schedule_end = datetime.now() + timedelta(days=1)
         service_1.restrict_unique = False
         service_1.save()
 
-        service_2.date_start = datetime.now()
-        service_2.date_end = datetime.now() + timedelta(days=1)
+        service_2.schedule_start = datetime.now()
+        service_2.schedule_end = datetime.now() + timedelta(days=1)
         service_2.restrict_unique = True
         service_2.save()
 

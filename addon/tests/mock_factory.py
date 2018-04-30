@@ -126,8 +126,7 @@ class MockFactory:
             name='optional product',
             optional_type=optional_type,
             lot_category=lot_category,
-            date_start=date_start,
-            date_end=date_end,
+            date_end_sub=date_end,
             restrict_unique=False,
         )
 
@@ -150,8 +149,9 @@ class MockFactory:
             optional_type=optional_type,
             theme=theme,
             lot_category=lot_category,
-            date_start=date_start,
-            date_end=date_end,
+            date_end_sub=date_end,
+            schedule_start=date_start,
+            schedule_end=date_end,
             restrict_unique=False,
         )
 

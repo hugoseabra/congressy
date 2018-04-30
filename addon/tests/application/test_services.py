@@ -49,6 +49,7 @@ class OptionalProductTypeServicePersistenceTest(PersistenceTestCase):
     def test_edit(self):
         self.edit()
 
+
 class OptionalServiceTypeServicePersistenceTest(PersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     application_service_class = services.OptionalServiceTypeService
@@ -75,8 +76,7 @@ class ProductServicePersistenceTest(PersistenceTestCase):
     required_fields = (
         'optional_type',
         'lot_category',
-        'date_start',
-        'date_end',
+        'date_end_sub',
         'published',
         'created_by',
         'modified_by',
@@ -99,15 +99,13 @@ class ProductServicePersistenceTest(PersistenceTestCase):
 
     def setUp(self):
         fake_factory = MockFactory()
-        date_start = datetime.now() - timedelta(days=3)
         date_end = datetime.now() + timedelta(days=3)
 
         self.data = {
             'optional_type': fake_factory.fake_optional_product_type().pk,
             'lot_category': fake_factory.fake_lot_category().pk,
             'name': 'optional name',
-            'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
-            'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+            'date_end_sub': date_end.strftime('%d/%m/%Y %H:%M'),
             'published': True,
             'created_by': 'test user',
             'modified_by': 'test user',
@@ -130,8 +128,9 @@ class ServiceServicePersistenceTest(PersistenceTestCase):
     required_fields = (
         'optional_type',
         'lot_category',
-        'date_start',
-        'date_end',
+        'schedule_start',
+        'schedule_end',
+        'date_end_sub',
         'published',
         'created_by',
         'modified_by',
@@ -163,8 +162,9 @@ class ServiceServicePersistenceTest(PersistenceTestCase):
             'optional_type': fake_factory.fake_optional_service_type().pk,
             'lot_category': fake_factory.fake_lot_category().pk,
             'name': 'optional name',
-            'date_start': date_start.strftime('%d/%m/%Y %H:%M'),
-            'date_end': date_end.strftime('%d/%m/%Y %H:%M'),
+            'schedule_start': date_start.strftime('%d/%m/%Y %H:%M'),
+            'schedule_end': date_end.strftime('%d/%m/%Y %H:%M'),
+            'date_end_sub': date_end.strftime('%d/%m/%Y %H:%M'),
             'published': True,
             'created_by': 'test user',
             'modified_by': 'test user',
