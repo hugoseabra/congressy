@@ -11,7 +11,7 @@ from addon import constants, rules
 from base.models import EntityMixin
 from core.model import track_data
 from gatheros_subscription.models import LotCategory
-from .optional_type import OptionalType
+from .optional_type import OptionalServiceType, OptionalProductType
 from .theme import Theme
 
 
@@ -29,13 +29,6 @@ class AbstractOptional(EntityMixin, models.Model):
     class Meta:
         abstract = True
         ordering = ('name',)
-
-    optional_type = models.ForeignKey(
-        OptionalType,
-        on_delete=models.PROTECT,
-        verbose_name='tipo',
-        related_name='%(class)s_optionals',
-    )
 
     lot_category = models.ForeignKey(
         LotCategory,
@@ -82,6 +75,7 @@ class AbstractOptional(EntityMixin, models.Model):
         verbose_name='preço',
         decimal_places=2,
         max_digits=10,
+        blank=True,
     )
 
     restrict_unique = models.BooleanField(
@@ -127,8 +121,15 @@ class Product(AbstractOptional):
 
     rule_instances = (
         rules.MustDateEndAfterDateStart,
-        rules.ProductMustHaveUniqueDatetimeInterval,
+        # rules.ProductMustHaveUniqueDatetimeInterval,
         rules.OptionalMustHaveMinimumDays,
+    )
+
+    optional_type = models.ForeignKey(
+        OptionalProductType,
+        on_delete=models.PROTECT,
+        verbose_name='tipo',
+        related_name='product_type_optionals',
     )
 
 
@@ -143,8 +144,15 @@ class Service(AbstractOptional):
 
     rule_instances = (
         rules.MustDateEndAfterDateStart,
-        rules.ServiceMustHaveUniqueDatetimeInterval,
+        # rules.ServiceMustHaveUniqueDatetimeInterval,
         rules.OptionalMustHaveMinimumDays,
+    )
+
+    optional_type = models.ForeignKey(
+        OptionalServiceType,
+        on_delete=models.PROTECT,
+        verbose_name='tipo',
+        related_name='service_type_optionals',
     )
 
     theme = models.ForeignKey(
