@@ -6,7 +6,6 @@ from django.conf.urls import include, static, url
 from django.contrib import admin
 from django.views.generic import RedirectView
 
-from addon.urls import urlpatterns as addon_urlpatterns
 from gatheros_event.urls.invitation import urlpatterns_public_invitation
 from gatheros_event.urls.me import (
     urlpatterns_public_account,
@@ -29,8 +28,6 @@ private_urlpatterns = [
     url(r'^manage/', include('gatheros_event.urls', 'event')),
     url(r'^manage/', include(gatheros_front_private, 'front')),
     url(r'^manage/', include(private_payment_urls, 'payment')),
-    url(r'^hotsite/', include(addon_urlpatterns, 'optional')),
-
 ]
 
 public_urls = gatheros_front_public

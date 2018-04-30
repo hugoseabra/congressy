@@ -14,6 +14,9 @@ public_hotsite_urls = [
         name='hotsite-subscription-status'),
     url(r'^(?P<slug>[\w-]+)/coupon/$', views.CouponView.as_view(),
         name='hotsite-coupon'),
+    url(r'category/(?P<category_pk>[\d]+)/products/',
+        views.EventProductOptionalManagementView.as_view(),
+        name='hotsite_available_optional_product_list'),
 ]
 
 urlpatterns_public_hotsite = [url(r'^', include(public_hotsite_urls))]

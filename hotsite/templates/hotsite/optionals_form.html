@@ -48,7 +48,7 @@
 
 
     function render_available_options_list() {
-        var url = '{% url 'optional:available_optional_product_list' category_pk=lot_category_pk  %}';
+        var url = '{% url 'public:hotsite_available_optional_product_list' category_pk=lot_category_pk  %}';
 
         send(
             url,

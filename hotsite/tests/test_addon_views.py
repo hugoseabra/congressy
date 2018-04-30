@@ -6,9 +6,9 @@ from django.test.client import Client
 from django.urls import reverse_lazy
 from test_plus.test import TestCase
 
-from addon.tests import MockFactory
+from addon.tests import MockFactory as AddonMockFactory
 
-fake_email = MockFactory().fake_factory.free_email()
+fake_email = AddonMockFactory().fake_factory.free_email()
 password = 'mypassword'
 
 test_user = User.objects.create_user(fake_email, fake_email, password)
@@ -17,7 +17,7 @@ test_user = User.objects.create_user(fake_email, fake_email, password)
 class EventProductManagementViewTest(TestCase):
 
     def setUp(self):
-        factory = MockFactory()
+        factory = AddonMockFactory()
         self.c = Client()
         self.c.login(username=test_user.username, password=password)
         self.lot_category = factory.fake_lot_category()
@@ -36,7 +36,7 @@ class EventProductManagementViewTest(TestCase):
 
     def test_get_requests_with_no_session_returns_all_optionals(self):
         response = self.c.get(path=reverse_lazy(
-            'optional:available_optional_product_list', kwargs={
+            'public:hotsite_available_optional_product_list', kwargs={
                 'category_pk': self.lot_category.pk
             }))
 
@@ -53,7 +53,7 @@ class EventProductManagementViewTest(TestCase):
         s.save()
 
         response = self.c.get(path=reverse_lazy(
-            'optional:available_optional_product_list', kwargs={
+            'public:hotsite_available_optional_product_list', kwargs={
                 'category_pk': self.lot_category.pk
             }))
 
@@ -64,19 +64,18 @@ class EventProductManagementViewTest(TestCase):
 
     def test_post_requests_no_optional_id_sent(self):
         response = self.c.post(path=reverse_lazy(
-            'optional:available_optional_product_list', kwargs={
+            'public:hotsite_available_optional_product_list', kwargs={
                 'category_pk': self.lot_category.pk
             }))
 
         self.assertEqual(response.status_code, 400)
 
     def test_post_requests_with_optional_id_sent_no_itens_in_session(self):
-
-        newly_created_product = MockFactory().fake_product(
+        newly_created_product = AddonMockFactory().fake_product(
             lot_category=self.lot_category)
 
         response = self.c.post(path=reverse_lazy(
-            'optional:available_optional_product_list', kwargs={
+            'public:hotsite_available_optional_product_list', kwargs={
                 'category_pk': self.lot_category.pk
             }), data={
             'optional_id': newly_created_product.pk,
@@ -92,7 +91,7 @@ class EventProductManagementViewTest(TestCase):
         s.save()
 
         response = self.c.post(path=reverse_lazy(
-            'optional:available_optional_product_list', kwargs={
+            'public:hotsite_available_optional_product_list', kwargs={
                 'category_pk': self.lot_category.pk
             }), data={
             'optional_id': self.second_product.pk,
