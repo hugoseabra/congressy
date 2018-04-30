@@ -100,7 +100,6 @@ class ProductServicePersistenceTest(PersistenceTestCase):
         'created_by',
         'modified_by',
         'price',
-        'restrict_unique',
         'description',
         'quantity',
     )
@@ -111,7 +110,6 @@ class ProductServicePersistenceTest(PersistenceTestCase):
         'created_by': 'test edited user',
         'modified_by': 'test edited user',
         'price': round(decimal.Decimal(43.43), 2),
-        'restrict_unique': True,
         'description': 'Optional edited description',
         'quantity': 10,
     }
@@ -129,7 +127,6 @@ class ProductServicePersistenceTest(PersistenceTestCase):
             'created_by': 'test user',
             'modified_by': 'test user',
             'price': format(decimal.Decimal(42.42), '.2f'),
-            'restrict_unique': False,
             'description': 'Optional description',
             'quantity': 5,
         }

@@ -96,7 +96,7 @@ class SubscriptionServiceManager(managers.Manager):
 
         optional_service = cleaned_data['optional']
         subscription = cleaned_data['subscription']
-        total_subscriptions = optional_service.services.count()
+        total_subscriptions = optional_service.subscription_services.count()
         quantity = optional_service.quantity or 0
 
         # Regra 1:
