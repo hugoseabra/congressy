@@ -13,15 +13,34 @@ from ..mock_factory import MockFactory
 class ThemeServicePersistenceTest(PersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     application_service_class = services.ThemeService
-    required_fields = ('name',)
+    required_fields = ('name', 'event')
     data_edit_to = {
         'name': 'another name edited',
     }
 
     def setUp(self):
+        fake_factory = MockFactory()
         self.data = {
+            'event': fake_factory.fake_event().pk,
             'name': 'theme name',
         }
+
+    def _create_service(self, instance=None, data=None):
+        if not data:
+            data = self.data
+
+        if 'event' not in data:
+            data['event'] = MockFactory().fake_event().pk
+
+        if instance is not None:
+            service = self.application_service_class(
+                instance=instance,
+                data=data
+            )
+        else:
+            service = self.application_service_class(data=data)
+
+        return service
 
     def test_create(self):
         self.create()

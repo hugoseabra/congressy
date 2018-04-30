@@ -187,8 +187,13 @@ class MockFactory:
             optional=optional_product,
         )
 
-    def fake_theme(self):
+    def fake_theme(self, event=None):
+
+        if not event:
+            event = self.fake_event()
+
         return Theme.objects.create(
+            event=event,
             name=self.fake_factory.words(nb=3, ext_word_list=None),
         )
 

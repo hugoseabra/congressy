@@ -13,15 +13,32 @@ from base.tests.test_suites import ManagerPersistenceTestCase
 class ThemeManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
     manager_class = managers.ThemeManager
-    required_fields = ('name',)
+    required_fields = ('name', 'event')
     data_edit_to = {
         'name': 'another name edited',
     }
 
     def setUp(self):
+        fake_factory = MockFactory()
         self.data = {
+            'event': fake_factory.fake_event().pk,
             'name': 'my name',
         }
+
+    def _create_manager(self, instance=None, data=None):
+
+        if not data:
+            data = self.data
+
+        if 'event' not in data:
+            data['event'] = MockFactory().fake_event().pk
+
+        if instance is not None:
+            manager = self.manager_class(instance=instance, data=data)
+        else:
+            manager = self.manager_class(data=data)
+
+        return manager
 
     def test_create(self):
         self.create()
