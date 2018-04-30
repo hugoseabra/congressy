@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from test_plus.test import TestCase
 
 from addon import models as addon_models, managers
-
 from addon.tests.mock_factory import MockFactory
 from base.tests.test_suites import ManagerPersistenceTestCase
 
@@ -684,7 +683,7 @@ class SubscriptionServiceManagerRulesTest(TestCase):
 
         future_service = self.fake_factory.fake_service(
             lot_category=subscription.lot.category)
-        future_service.date_end_sub = datetime.now() + timedelta(days=1)
+        future_service.date_end_sub = datetime.now() - timedelta(days=1)
         future_service.save()
 
         service_manager = managers.SubscriptionServiceManager(
@@ -695,8 +694,9 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         )
 
         self.assertFalse(service_manager.is_valid())
-        self.assertIn(service_manager.errors,
-                      'Este opcional já expirou e não aceita mais inscrições.')
+        self.assertEqual(service_manager.errors['__all__'][0],
+                         'Este opcional já expirou e não aceita mais '
+                         'inscrições.')
 
     def test_date_end_validation_in_the_future(self):
         subscription = self.fake_factory.fake_subscription()
