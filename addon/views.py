@@ -71,12 +71,29 @@ class EventProductOptionalManagementView(generic.TemplateView):
 
     def post(self, request, *args, **kwargs):
 
-        self.storage = self.request.session.get('product_storage')
-
         category_pk = kwargs.get('category_pk')
         category = get_object_or_404(LotCategory, pk=category_pk)
+        session_altered = False
 
-        if not self.storage:
-            print('sadasd')
+        product_storage = request.session.get('product_storage')
 
-        return HttpResponse(status=400)
+        if not product_storage:
+            self.storage = []
+
+        optional_id = request.POST.get('optional_id')
+        if not optional_id:
+            return HttpResponse(status=400)
+
+        for item in self.storage:
+            pass
+            # Check for theme conflict
+            # Check for quantity conflicts
+
+
+
+        request.session['product_storage'] = self.storage
+
+        if session_altered:
+            return HttpResponse(status=201)
+
+        return HttpResponse(status=200)

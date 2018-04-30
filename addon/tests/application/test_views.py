@@ -57,16 +57,45 @@ class EventProductManagementViewTest(TestCase):
                 'category_pk': self.lot_category.pk
             }))
 
-        self.assertIs(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.first_product.name)
         self.assertNotContains(response, self.second_product.name)
         self.assertContains(response, self.third_product.name)
 
     def test_post_requests_no_optional_id_sent(self):
-
         response = self.c.post(path=reverse_lazy(
             'optional:available_optional_product_list', kwargs={
                 'category_pk': self.lot_category.pk
             }))
 
-        self.assertIs(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_requests_with_optional_id_sent(self):
+
+        newly_created_product = MockFactory().fake_product(
+            lot_category=self.lot_category)
+
+        response = self.c.post(path=reverse_lazy(
+            'optional:available_optional_product_list', kwargs={
+                'category_pk': self.lot_category.pk
+            }), data={
+            'optional_id': newly_created_product.pk,
+        })
+
+        self.assertEqual(response.status_code, 201)
+
+    def test_post_requests_with_optional_id_sent_and_items_in_session(self):
+        s = self.c.session
+        s.update({
+            "product_storage": [self.first_product.pk, self.third_product.pk],
+        })
+        s.save()
+
+        response = self.c.post(path=reverse_lazy(
+            'optional:available_optional_product_list', kwargs={
+                'category_pk': self.lot_category.pk
+            }), data={
+            'optional_id': self.second_product.pk,
+        })
+
+        self.assertEqual(response.status_code, 201)
