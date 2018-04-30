@@ -106,15 +106,15 @@ class SubscriptionServiceManager(managers.Manager):
             )
 
         # Regra 2:
-        new_start = optional_service.date_start
-        new_end = optional_service.date_end
+        new_start = optional_service.schedule_start
+        new_end = optional_service.schedule_end
 
         is_restricted = optional_service.restrict_unique
 
         for sub_optional in subscription.subscriptionservice.all():
 
-            start = sub_optional.optional.date_start
-            stop = sub_optional.optional.date_end
+            start = sub_optional.optional.schedule_start
+            stop = sub_optional.optional.schedule_end
             is_sub_restricted = \
                 sub_optional.optional.restrict_unique
 

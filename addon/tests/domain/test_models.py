@@ -12,11 +12,6 @@ class ModelsConfiguredTest(TestCase):
     def test_has_rules(self):
         # Optionals - Product
         self.assertIn(
-            rules.RestrictSubscriptionAfterOptionalDateEnd,
-            models.Service.rule_instances
-        )
-
-        self.assertIn(
             rules.OptionalMustHaveMinimumDays,
             models.Product.rule_instances
         )
@@ -30,11 +25,6 @@ class ModelsConfiguredTest(TestCase):
         self.assertIn(
             rules.ServiceMustHaveUniqueDatetimeScheduleInterval,
             models.Service.rule_instances
-        )
-
-        self.assertIn(
-            rules.RestrictSubscriptionAfterOptionalDateEnd,
-            models.Product.rule_instances
         )
 
         self.assertIn(

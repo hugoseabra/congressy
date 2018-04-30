@@ -15,7 +15,7 @@ from .optional_type import OptionalServiceType, OptionalProductType
 from .theme import Theme
 
 
-@track_data('date_start', 'date_end')
+@track_data('date_end_sub')
 class AbstractOptional(EntityMixin, models.Model):
     """
         Opcional é um item adicional (add-on) à inscrição de um evento que
@@ -122,7 +122,6 @@ class Product(AbstractOptional):
         verbose_name = 'opcional de produto'
 
     rule_instances = (
-        rules.RestrictSubscriptionAfterOptionalDateEnd,
         rules.OptionalMustHaveMinimumDays,
     )
 
@@ -134,6 +133,7 @@ class Product(AbstractOptional):
     )
 
 
+@track_data('schedule_start', 'schedule_end')
 class Service(AbstractOptional):
     """
         Opcional de Serviço é um serviço a ser adquirido no ato da inscrição
@@ -146,7 +146,6 @@ class Service(AbstractOptional):
     rule_instances = (
         rules.MustScheduleDateEndAfterDateStart,
         rules.ServiceMustHaveUniqueDatetimeScheduleInterval,
-        rules.RestrictSubscriptionAfterOptionalDateEnd,
         rules.OptionalMustHaveMinimumDays,
     )
 

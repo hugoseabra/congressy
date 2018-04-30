@@ -10,18 +10,19 @@ from addon.tests.mock_factory import MockFactory
 from base.models import RuleIntegrityError
 
 
-class OptionalMustDateEndAfterDateStartTest(TestCase):
+class OptionalMustScheduleDateEndAfterDateStart(TestCase):
     """
         Testes de regras de opcionais onde a data de início deve antes da
         data de fim.
     """
     mocker = None
+    rule = None
 
     def setUp(self):
         self.mocker = MockFactory()
-        self.rule = rules.MustDateEndAfterDateStart()
+        self.rule = rules.MustScheduleDateEndAfterDateStart()
 
-    def test_optional_service_must_date_end_after_date_start(self):
+    def test_optional_service_must_schedule_end_after_schedule_start(self):
         """
             Testa regra de opcional de serviço na qual data inicial antes da
             data final.
@@ -29,40 +30,18 @@ class OptionalMustDateEndAfterDateStartTest(TestCase):
         # Failure
         instance = self.mocker.fake_service()
 
-        instance.date_end = instance.date_start - timedelta(days=3)
+        instance.schedule_end = instance.schedule_start - timedelta(days=3)
 
         with self.assertRaises(RuleIntegrityError) as e:
             self.rule.check(model_instance=instance)
 
         self.assertIn(
-            'Data inicial deve ser anterior a data final',
+            'Data/hora inicial deve ser anterior a data/hora final',
             str(e.exception)
         )
 
         # Success
         instance = self.mocker.fake_service()
-        self.rule.check(model_instance=instance)
-
-    def test_optional_product_must_date_end_after_date_start(self):
-        """
-            Testa regra de opcional de produto na qual data inicial antes da
-            data final.
-        """
-        # Failure
-        instance = self.mocker.fake_product()
-
-        instance.date_end = instance.date_start - timedelta(days=3)
-
-        with self.assertRaises(RuleIntegrityError) as e:
-            self.rule.check(model_instance=instance)
-
-        self.assertIn(
-            'Data inicial deve ser anterior a data final',
-            str(e.exception)
-        )
-
-        # Success
-        instance = self.mocker.fake_product()
         self.rule.check(model_instance=instance)
 
 
@@ -79,69 +58,35 @@ class OptionalMustHaveUniqueDatetimeIntervalTest(TestCase):
         self.mocker = MockFactory()
         self.lot_category = self.mocker.fake_lot_category()
 
-    def test_optional_product_unique_session(self):
-        """
-            Testa de optional não possui datas que podem ou não dar conflitar
-            o horário.
-        """
-        rule = rules.ProductMustHaveUniqueDatetimeInterval()
-
-        # Failure
-        # Já existe um preço será criado com o mesmo período
-        optional1 = self.mocker.fake_product()
-
-        optional2 = \
-            self.mocker.fake_product(
-                lot_category=optional1.lot_category
-            )
-
-        # força mesmas datas
-        optional2.date_start = optional1.date_start + timedelta(minutes=30)
-
-        with self.assertRaises(RuleIntegrityError) as e:
-            rule.check(model_instance=optional2)
-
-        self.assertIn(
-            'As datas informadas conflitam com outro(s) opcionais(s)',
-            str(e.exception)
-        )
-
-        # Sucesso
-        optional2.date_start = optional1.date_end + timedelta(days=1)
-        optional2.date_end = optional1.date_start + timedelta(days=3)
-
-        rule.check(model_instance=optional2)
-
     def test_optional_service_unique_session(self):
         """
             Testa de optional não possui datas que podem ou não dar conflitar
             o horário.
         """
-        rule = rules.ServiceMustHaveUniqueDatetimeInterval()
+        rule = rules.ServiceMustHaveUniqueDatetimeScheduleInterval()
 
         # Failure
         # Já existe um preço será criado com o mesmo período
         optional1 = self.mocker.fake_service()
 
-        optional2 = \
-            self.mocker.fake_service(
-                lot_category=optional1.lot_category
-            )
+        optional2 = self.mocker.fake_service(
+            lot_category=optional1.lot_category
+        )
 
         # força mesmas datas
-        optional2.date_start = optional1.date_start + timedelta(minutes=30)
+        optional2.schedule_start = optional1.schedule_start + timedelta(minutes=30)
 
         with self.assertRaises(RuleIntegrityError) as e:
             rule.check(model_instance=optional2)
 
         self.assertIn(
-            'As datas informadas conflitam com outro(s) opcionais(s)',
+            'Conflito de horários de programação',
             str(e.exception)
         )
 
         # Sucesso
-        optional2.date_start = optional1.date_end + timedelta(days=1)
-        optional2.date_end = optional1.date_start + timedelta(days=3)
+        optional2.schedule_start = optional1.schedule_end + timedelta(days=1)
+        optional2.schedule_end = optional1.schedule_start + timedelta(days=3)
 
         rule.check(model_instance=optional2)
 
