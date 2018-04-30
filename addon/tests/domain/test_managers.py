@@ -1,12 +1,12 @@
 """ Testes de managers do módulo de opcionais. """
 
 import decimal
-import random
 from datetime import datetime, timedelta
 
 from test_plus.test import TestCase
 
 from addon import models as addon_models, managers
+
 from addon.tests.mock_factory import MockFactory
 from base.tests.test_suites import ManagerPersistenceTestCase
 
@@ -344,6 +344,42 @@ class SubscriptionProductManagerRulesTest(TestCase):
             failing_product_manager.errors['__all__']
         )
 
+    def test_date_end_validation_in_the_past(self):
+        subscription = self.fake_factory.fake_subscription()
+
+        past_product = self.fake_factory.fake_product(
+            lot_category=subscription.lot.category)
+        past_product.date_end_sub = datetime.now() - timedelta(days=1)
+        past_product.save()
+
+        product_manager = managers.SubscriptionProductManager(
+            data={
+                'subscription': subscription.pk,
+                'optional': past_product.pk,
+            }
+        )
+        self.assertFalse(product_manager.is_valid())
+        self.assertIn(product_manager.errors,
+                      'Este opcional já expirou e não aceita mais inscrições.')
+        
+    def test_date_end_validation_in_the_future(self):
+        subscription = self.fake_factory.fake_subscription()
+
+        future_product = self.fake_factory.fake_product(
+            lot_category=subscription.lot.category)
+        future_product.date_end_sub = datetime.now() + timedelta(days=1)
+        future_product.save()
+
+        product_manager = managers.SubscriptionProductManager(
+            data={
+                'subscription': subscription.pk,
+                'optional': future_product.pk,
+            }
+        )
+        self.assertTrue(product_manager.is_valid())
+        self.assertIsInstance(product_manager.save(),
+                              addon_models.SubscriptionProduct)
+
 
 class SubscriptionServiceManagerPersistenceTest(ManagerPersistenceTestCase):
     """ Testes de persistência de dados: criação e edição."""
@@ -579,7 +615,7 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         service_1_manager.save()
         self.assertFalse(service_2_manager.is_valid())
 
-    def test_validation_by_theme_with_flag_on(self):
+    def test_validation_by_theme_with_limit(self):
         # Crie uma única Subscription para ser usada para criar o
         # SubscriptionOptionalService
         subscription = self.fake_factory.fake_subscription()
@@ -612,7 +648,7 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         service_manager_1.save()
         self.assertFalse(service_manager_2.is_valid())
 
-    def test_validation_by_theme_with_flag_off(self):
+    def test_validation_by_theme_without_limit(self):
         # Crie uma única Subscription para ser usada para criar o
         # SubscriptionOptionalService
         subscription = self.fake_factory.fake_subscription()
@@ -645,3 +681,41 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         service_manager_1.save()
         self.assertTrue(service_manager_2.is_valid())
         service_manager_2.save()
+
+    def test_date_end_validation_in_the_past(self):
+        subscription = self.fake_factory.fake_subscription()
+
+        future_service = self.fake_factory.fake_service(
+            lot_category=subscription.lot.category)
+        future_service.date_end_sub = datetime.now() + timedelta(days=1)
+        future_service.save()
+
+        service_manager = managers.SubscriptionServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional': future_service.pk,
+            }
+        )
+
+        self.assertFalse(service_manager.is_valid())
+        self.assertIn(service_manager.errors,
+                      'Este opcional já expirou e não aceita mais inscrições.')
+
+    def test_date_end_validation_in_the_future(self):
+        subscription = self.fake_factory.fake_subscription()
+
+        future_service = self.fake_factory.fake_service(
+            lot_category=subscription.lot.category)
+        future_service.date_end_sub = datetime.now() + timedelta(days=1)
+        future_service.save()
+
+        service_manager = managers.SubscriptionServiceManager(
+            data={
+                'subscription': subscription.pk,
+                'optional': future_service.pk,
+            }
+        )
+
+        self.assertTrue(service_manager.is_valid())
+        self.assertIsInstance(service_manager.save(),
+                              addon_models.SubscriptionService)

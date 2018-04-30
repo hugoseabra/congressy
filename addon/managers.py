@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.forms import ValidationError
 
 from base import managers
@@ -71,16 +73,22 @@ class SubscriptionServiceManager(managers.Manager):
 
     def clean(self):
         """
-        Implementação da regras:
 
-            Regra #1: Se quantidade de inscrições já foi atingida,
-                novas inscrições não poderão ser realizadas
-            Regra #2: Validar restrição de sessão se há restrição por Sessão,
-                ou seja, se há outro Optional dentro do mesmo intervalo de
-                data e hora final e inicial do Optional informado.
-            Regra #3: Validar rest-rição por tema (LimitByTheme), se há
-             restrição por Tema, ou seja, se o Participante já possui X
-             opcionais no mesmo tema e não pode mais se cadastrar em outro.
+        Regra #1: Se quantidade de inscrições já foi atingida,
+            novas inscrições não poderão ser realizadas
+
+        Regra #2: Validar restrição de sessão se há restrição por Sessão,
+            ou seja, se há outro Optional dentro do mesmo intervalo de
+            data e hora final e inicial do Optional informado.
+
+        Regra #3: Validar rest-rição por tema (LimitByTheme), se há
+            restrição por Tema, ou seja, se o Participante já possui X
+            opcionais no mesmo tema e não pode mais se cadastrar em outro.
+
+        Regra #4:
+            Deve restringir a criação de inscrições em opcionais caso o
+            opcional selecionado esteja com a data/hora final antes da
+            data/hora atual.
 
         """
         cleaned_data = super().clean()
@@ -139,6 +147,13 @@ class SubscriptionServiceManager(managers.Manager):
                     'atingido'.format(optional_service.theme.name)
                 )
 
+        # Regra 4
+        if optional_service.date_end_sub and \
+                datetime.now() > optional_service.date_end_sub:
+            raise ValidationError(
+                'Este opcional já expirou e não aceita mais inscrições.'
+            )
+
         return cleaned_data
 
 
@@ -151,20 +166,32 @@ class SubscriptionProductManager(managers.Manager):
 
     def clean(self):
         """
-        Implementação da regra:
-
+        Regra #1:
             Se quantidade de inscrições já foi atingida, novas inscrições
             não poderão ser realizadas
+
+        Regra #2:
+            Deve restringir a criação de inscrições em opcionais caso o
+            opcional selecionado esteja com a data/hora final antes da
+            data/hora atual.
 
         """
         cleaned_data = super().clean()
 
         product = cleaned_data['optional']
+
+        # Regra 1
         num_subs = product.products.count()
         quantity = product.quantity or 0
         if 0 < quantity <= num_subs:
             raise ValidationError(
                 'Quantidade de inscrições já foi atingida, '
                 'novas inscrições não poderão ser realizadas')
+
+        # Regra 2
+        if product.date_end_sub and datetime.now() > product.date_end_sub:
+            raise ValidationError(
+                'Este opcional já expirou e não aceita mais inscrições.'
+            )
 
         return cleaned_data
