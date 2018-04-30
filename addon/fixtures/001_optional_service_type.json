@@ -1,132 +1,132 @@
 [
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 1,
     "fields": {
       "name": "Alimenta\u00e7\u00e3o"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 2,
     "fields": {
       "name": "Alojamento"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 3,
     "fields": {
       "name": "Confer\u00eancia"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 4,
     "fields": {
       "name": "Congresso"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 5,
     "fields": {
       "name": "Curso"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 6,
     "fields": {
       "name": "Excurs\u00e3o T\u00e9cnica"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 7,
     "fields": {
       "name": "Grupo Tem\u00e1tico"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 8,
     "fields": {
       "name": "Grupo de Trabalho"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 9,
     "fields": {
       "name": "Lazer"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 10,
     "fields": {
       "name": "Mesa Redonda"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 11,
     "fields": {
       "name": "Mincurso"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 12,
     "fields": {
       "name": "Oficina"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 13,
     "fields": {
       "name": "Painel"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 14,
     "fields": {
       "name": "Palestra"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 15,
     "fields": {
       "name": "Rodada de Conversa"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 16,
     "fields": {
       "name": "Simp\u00f3sio"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 17,
     "fields": {
       "name": "Semin\u00e1rio"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 18,
     "fields": {
       "name": "Show"
     }
   },
   {
-    "model": "addon.optionaltype",
+    "model": "addon.optionalservicetype",
     "pk": 19,
     "fields": {
       "name": "Transporte"

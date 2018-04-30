@@ -1,0 +1,45 @@
+[
+  {
+    "model": "addon.optionalproducttype",
+    "pk": 1,
+    "fields": {
+      "name": "Brinde de Particpante"
+    }
+  },
+  {
+    "model": "addon.optionalproducttype",
+    "pk": 2,
+    "fields": {
+      "name": "Camiseta"
+    }
+  },
+  {
+    "model": "addon.optionalproducttype",
+    "pk": 3,
+    "fields": {
+      "name": "Caneca"
+    }
+  },
+  {
+    "model": "addon.optionalproducttype",
+    "pk": 4,
+    "fields": {
+      "name": "Chaveiro"
+    }
+  },
+  {
+    "model": "addon.optionalproducttype",
+    "pk": 5,
+    "fields": {
+      "name": "Kit de Participante"
+    }
+  },
+
+  {
+    "model": "addon.optionalproducttype",
+    "pk": 6,
+    "fields": {
+      "name": "Material Did\u00e1tico"
+    }
+  }
+]
