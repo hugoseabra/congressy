@@ -1,25 +1,30 @@
 from django.shortcuts import get_object_or_404
 from django.views import generic
-
+from django.http import HttpResponse
 from gatheros_subscription.models import LotCategory
 from .models import Product
-
 
 """
 DEV NOTES: 
 
     O que estou fazendo aqui?
 
+    Solicitações GET sempre retornam HTML.
+    Solicitações POST sempre retornam apenas um código de resposta HTTP.
+
     Bem, esta View é responsável por duas coisas, fazendo uma lista dos
     produtos opcionais atualmente selecionados, como diabos isso acontece?
     Bem, nós buscamos por uma variável de sessão chamada 'product_storage',
     e defina isso na exibição como 'self.storage' no construtor __ini__
     para processamento durante o GET ou posterior uso no POST.
-    
-    Solicitações GET sempre retornam HTML.
-    
-    As solicitações POST são responsáveis ​​por verificar conflitos e 
-    ás resolver removendo produtos conflitantes da nossa variavel de sessão.
+
+    As solicitações POST são responsáveis receber uma variavel via o 
+    array de POST chamado 'optional_id' e usa também uma variável de sessão 
+    chamada 'product_storage'​​por verificar conflitos e ás resolver removendo
+    produtos conflitantes da nossa variavel de sessão. Dependendo do 
+    resultado dessa resolução de conflitos, retornamos uma resposta HTTP 
+    vazia, marcando apenas o código de resposta para representar se deu tudo 
+    certo.
 
 """
 
@@ -29,23 +34,29 @@ class EventProductOptionalManagementView(generic.TemplateView):
     storage = None
     template_name = "optionals/product_list.html"
 
-    def __init__(self, *args, **kwargs):
-        self.storage = self.request.session.get('product_storage')
-        super().__init__(*args, **kwargs)
-
     def get(self, request, *args, **kwargs):
-        """
 
-        """
+        self.storage = self.request.session.get('product_storage')
 
         category_pk = kwargs.get('category_pk')
         category = get_object_or_404(LotCategory, pk=category_pk)
+        self.available_options = []
 
-        event_optionals_products = Product.objects.filter(
-            lot_category=category, published=True)
+        if self.storage:
 
-        for optional in event_optionals_products:
-            self.available_options.append(optional)
+            for item in self.storage:
+                try:
+                    optional = Product.objects.get(pk=item,
+                                                   lot_category=category)
+                    self.available_options.append(optional)
+                except Product.DoesNotExist:
+                    pass
+        else:
+            event_optionals_products = Product.objects.filter(
+                lot_category=category, published=True)
+
+            for optional in event_optionals_products:
+                self.available_options.append(optional)
 
         context = self.get_context_data()
         return self.render_to_response(context)
@@ -57,26 +68,32 @@ class EventProductOptionalManagementView(generic.TemplateView):
             context_data['object_list'] = self.available_options
 
         return context_data
-#     def post(self, request, *args, **kwargs):
-#
-#         """
-#             Persistir opcionais selecionadas em persistência volátil
-#         """
-#         if not hasattr(self.storage, 'optionals'):
-#             self.storage.optionals = {}
-#
-#         optional_id = request.POST.get('optional_id')
-#
-#         try:
-#             optional = Optional.objects.get(
-#                 pk=optional_id,
-#                 lot_category__event=self.event,
-#                 published=True
-#             )
-#         except Optional.DoesNotExist:
-#             # retornar excepção para usuário informanco que optional não é
-#             # válida.
-#
-#         self.storage.optionals[optional.pk] = optional
-#
-#         # retornar 201
+
+    def post(self, request, *args, **kwargs):
+
+        category_pk = kwargs.get('category_pk')
+        category = get_object_or_404(LotCategory, pk=category_pk)
+        session_altered = False
+
+        product_storage = request.session.get('product_storage')
+
+        if not product_storage:
+            self.storage = []
+
+        optional_id = request.POST.get('optional_id')
+        if not optional_id:
+            return HttpResponse(status=400)
+
+        for item in self.storage:
+            pass
+            # Check for theme conflict
+            # Check for quantity conflicts
+
+
+
+        request.session['product_storage'] = self.storage
+
+        if session_altered:
+            return HttpResponse(status=201)
+
+        return HttpResponse(status=200)
