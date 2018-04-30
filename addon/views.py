@@ -89,8 +89,6 @@ class EventProductOptionalManagementView(generic.TemplateView):
             # Check for theme conflict
             # Check for quantity conflicts
 
-
-
         request.session['product_storage'] = self.storage
 
         if session_altered:

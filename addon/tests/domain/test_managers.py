@@ -354,7 +354,7 @@ class SubscriptionProductManagerRulesTest(TestCase):
             }
         )
         self.assertFalse(product_manager.is_valid())
-        self.assertIn(product_manager.errors,
+        self.assertEqual(product_manager.errors['__all__'][0],
                       'Este opcional já expirou e não aceita mais inscrições.')
         
     def test_date_end_validation_in_the_future(self):
