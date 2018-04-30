@@ -70,7 +70,7 @@ class EventProductManagementViewTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    def test_post_requests_with_optional_id_sent(self):
+    def test_post_requests_with_optional_id_sent_no_itens_in_session(self):
 
         newly_created_product = MockFactory().fake_product(
             lot_category=self.lot_category)
@@ -82,7 +82,7 @@ class EventProductManagementViewTest(TestCase):
             'optional_id': newly_created_product.pk,
         })
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
 
     def test_post_requests_with_optional_id_sent_and_items_in_session(self):
         s = self.c.session

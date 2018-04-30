@@ -5,6 +5,7 @@ from django.forms import ValidationError
 from base import managers
 from core.util.date import DateTimeRange
 from .constants import MINIMUM_RELEASE_DAYS
+from .helpers import has_quantity_conflict
 from .models import (
     Product,
     Service,
@@ -181,9 +182,7 @@ class SubscriptionProductManager(managers.Manager):
         product = cleaned_data['optional']
 
         # Regra 1
-        num_subs = product.products.count()
-        quantity = product.quantity or 0
-        if 0 < quantity <= num_subs:
+        if has_quantity_conflict(product):
             raise ValidationError(
                 'Quantidade de inscrições já foi atingida, '
                 'novas inscrições não poderão ser realizadas')

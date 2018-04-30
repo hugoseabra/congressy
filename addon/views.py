@@ -1,7 +1,9 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
-from django.http import HttpResponse
+
 from gatheros_subscription.models import LotCategory
+from .helpers import has_quantity_conflict
 from .models import Product
 
 """
@@ -79,15 +81,25 @@ class EventProductOptionalManagementView(generic.TemplateView):
 
         if not product_storage:
             self.storage = []
+        else:
+            self.storage = product_storage
 
         optional_id = request.POST.get('optional_id')
         if not optional_id:
             return HttpResponse(status=400)
 
         for item in self.storage:
-            pass
-            # Check for theme conflict
+            existing_product = get_object_or_404(Product, pk=item)
+
             # Check for quantity conflicts
+            if has_quantity_conflict(existing_product):
+                session_altered = True
+                self.storage = [item for item in self.storage if
+                                not existing_product]
+            else:
+                session_altered = True
+                self.storage.append(existing_product)
+
 
         request.session['product_storage'] = self.storage
 
