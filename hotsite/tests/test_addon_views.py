@@ -81,12 +81,19 @@ class EventProductManagementViewTest(TestCase):
             'optional_id': newly_created_product.pk,
         })
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
     def test_post_requests_with_optional_id_sent_and_items_in_session(self):
+
+        AddonMockFactory().fake_subscription_optional_product(
+            optional_product=self.second_product)
+
         s = self.c.session
         s.update({
-            "product_storage": [self.first_product.pk, self.third_product.pk],
+            "product_storage": [
+                self.first_product.pk,
+                self.third_product.pk,
+            ],
         })
         s.save()
 

@@ -85,21 +85,19 @@ class EventProductOptionalManagementView(generic.TemplateView):
             self.storage = product_storage
 
         optional_id = request.POST.get('optional_id')
+
         if not optional_id:
             return HttpResponse(status=400)
 
-        for item in self.storage:
-            existing_product = get_object_or_404(Product, pk=item)
+        new_product = get_object_or_404(Product, pk=optional_id)
 
-            # Check for quantity conflicts
-            if has_quantity_conflict(existing_product):
-                session_altered = True
-                self.storage = [item for item in self.storage if
-                                not existing_product]
-            else:
-                session_altered = True
-                self.storage.append(existing_product)
-
+        if has_quantity_conflict(new_product):
+            session_altered = True
+            self.storage = [item.pk for item in self.storage if
+                            not new_product]
+        else:
+            session_altered = True
+            self.storage.append(new_product.pk)
 
         request.session['product_storage'] = self.storage
 
