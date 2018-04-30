@@ -22,8 +22,6 @@ from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
-from django.contrib.auth.mixins import LoginRequiredMixin
-
 
 FORMS = [("lot", forms.LotsForm),
          ("person", forms.SubscriptionPersonForm),
@@ -165,36 +163,31 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 'slug': self.event.slug,
             }))
 
-    # this runs for the step it's on as well as for the step before
     def get_form_initial(self, step):
 
         if step == 'lot':
             return self.initial_dict.get(step, {'event': self.event})
+        else:
 
-        # get the data for step person from  step lot
-        # @TODO pass artifacts as kwargs instead of inital_dict
+            lot_data = self.storage.get_step_data('lot')
+            if not lot_data:
+                # reset the current step to the first step.
+                messages.error(
+                    self.request,
+                    'Por favor escolha um lote.'
+                )
+                self.storage.current_step = self.steps.first
+                return self.render(self.get_form())
+
+            lot = lot_data.get('lot-lots')
+
         if step == 'person':
-            prev_data = self.storage.get_step_data('lot')
-            lot = prev_data.get('lot-lots', '')
             return self.initial_dict.get(step, {
                 'lot': lot,
                 'event': self.event,
             })
 
-        # get the data for step survey from  step lot
         if step == 'survey':
-            prev_data = self.storage.get_step_data('lot')
-
-            lot = prev_data.get('lot-lots')
-
-            try:
-                lot = Lot.objects.get(pk=lot, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot, self.event)
-                raise TypeError(message)
-
             return self.initial_dict.get(step, {
                 'event_survey': lot.event_survey,
                 'event': self.event,
@@ -202,10 +195,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             })
 
         if step == 'payment':
-
-            lot_data = self.storage.get_step_data('lot')
-            lot = lot_data.get('lot-lots')
-
             # Assert that we have a person in storage
             if not hasattr(self.storage, 'person'):
 
@@ -216,14 +205,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                                     'person'.format(self.request.user.email))
 
                 self.storage.person = person
-
-            try:
-                lot = Lot.objects.get(pk=lot, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot, self.event)
-                raise TypeError(message)
 
             return self.initial_dict.get(step, {
                 'choosen_lot': lot,

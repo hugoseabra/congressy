@@ -18,16 +18,9 @@ class LotFormModelChoiceField(ModelChoiceField):
 
         return "{}".format(obj.name)
 
-    def to_python(self, value):
-
-        event = self.queryset.first().event
-
-        self.queryset = Lot.objects.filter(
-            event=event,
-            date_start__lte=datetime.now(),
-            date_end__gte=datetime.now())
-
-        return super().to_python(value)
+    def _get_queryset(self):
+        queryset = super()._get_queryset()
+        return queryset.filter(private=True)
 
 
 class LotsForm(forms.Form):
