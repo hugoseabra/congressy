@@ -81,12 +81,6 @@ class AbstractOptional(EntityMixin, models.Model):
         blank=True,
     )
 
-    restrict_unique = models.BooleanField(
-        default=False,
-        verbose_name='restringir como único',
-        help_text='Restringir como única dentro do intervalo de tempo.'
-    )
-
     description = models.TextField(
         verbose_name="descrição",
         null=True,
@@ -133,6 +127,17 @@ class Product(AbstractOptional):
         verbose_name='tipo',
         related_name='product_type_optionals',
     )
+
+    @property
+    def num_consumed(self):
+        """
+        Resgata quantidade de opcionais vendidos/consumidos através de
+        inscrições.
+
+        :return: número de opcionais vendidos
+        :type: bool
+        """
+        return self.subscription_products.count()
 
 
 @track_data('schedule_start', 'schedule_end')
@@ -181,3 +186,20 @@ class Service(AbstractOptional):
         null=True,
         blank=True,
     )
+
+    restrict_unique = models.BooleanField(
+        default=False,
+        verbose_name='restringir como único',
+        help_text='Restringir como única dentro do intervalo de tempo.'
+    )
+
+    @property
+    def num_consumed(self):
+        """
+        Resgata quantidade de opcionais vendidos/consumidos através de
+        inscrições.
+
+        :return: número de opcionais vendidos
+        :type: bool
+        """
+        return self.subscription_services.count()

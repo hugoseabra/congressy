@@ -54,7 +54,7 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
         Product,
         on_delete=models.CASCADE,
         verbose_name='opcional de produto',
-        related_name='products'
+        related_name='subscription_products'
     )
 
 
@@ -70,5 +70,5 @@ class SubscriptionService(AbstractSubscriptionOptional):
         Service,
         on_delete=models.DO_NOTHING,
         verbose_name='opcional de serviço',
-        related_name='services'
+        related_name='subscription_services'
     )

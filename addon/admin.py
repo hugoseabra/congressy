@@ -67,7 +67,6 @@ class OptionalProductAdmin(admin.ModelAdmin):
         'optional_type__name',
         'name',
     )
-    list_filter = ('restrict_unique',)
     list_display = (
         'name',
         'lot_category',
@@ -90,7 +89,6 @@ class OptionalProductAdmin(admin.ModelAdmin):
         ('Preços e Restrições', {
             'fields': (
                 'price',
-                'restrict_unique',
                 'quantity',
                 'release_days',
             ),
