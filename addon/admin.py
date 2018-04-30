@@ -39,12 +39,13 @@ class OptionalServiceAdmin(admin.ModelAdmin):
                 'lot_category',
                 'theme',
                 'name',
-                'date_start',
-                'date_end',
-                'description',
+                'schedule_start',
+                'schedule_end',
+                'date_end_sub',
                 'created_by',
                 'modified_by',
                 'published',
+                'description',
             ),
         }),
         ('Preços e Restrições', {
@@ -58,6 +59,44 @@ class OptionalServiceAdmin(admin.ModelAdmin):
     )
 
 
-admin.site.register(Product)
+@admin.register(Product)
+class OptionalProductAdmin(admin.ModelAdmin):
+    search_fields = (
+        'lot_category__event__name',
+        'lot_category__lots__name',
+        'optional_type__name',
+        'name',
+    )
+    list_filter = ('restrict_unique',)
+    list_display = (
+        'name',
+        'lot_category',
+        'quantity',
+        'price',
+    )
+    fieldsets = (
+        (None, {
+            'fields': (
+                'optional_type',
+                'lot_category',
+                'name',
+                'date_end_sub',
+                'created_by',
+                'modified_by',
+                'published',
+                'description',
+            ),
+        }),
+        ('Preços e Restrições', {
+            'fields': (
+                'price',
+                'restrict_unique',
+                'quantity',
+                'release_days',
+            ),
+        }),
+    )
+
+
 admin.site.register(SubscriptionProduct)
 admin.site.register(SubscriptionService)
