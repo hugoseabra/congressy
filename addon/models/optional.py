@@ -43,8 +43,9 @@ class AbstractOptional(EntityMixin, models.Model):
     )
 
     date_end_sub = models.DateTimeField(
-        verbose_name="data final",
-        help_text='Data final em que o opcional aceita inscrições.'
+        verbose_name="Inscrição - data/hora limite",
+        help_text='Data e hora limite para se aceitar inscrições para este'
+                  ' opcional.'
     )
 
     published = models.BooleanField(
@@ -117,6 +118,7 @@ class Product(AbstractOptional):
         Opcional de produto é um adicional de produto a ser comprado no ato da
         inscrição de um evento. Exemplo: camiseta, caneca, kit, dentre outros.
     """
+
     class Meta(AbstractOptional.Meta):
         verbose_name_plural = 'opcionais de produto'
         verbose_name = 'opcional de produto'
@@ -139,6 +141,7 @@ class Service(AbstractOptional):
         Opcional de Serviço é um serviço a ser adquirido no ato da inscrição
         de um evento. Exemplo: curso, workshop, treinamento, dentre outros.
     """
+
     class Meta(AbstractOptional.Meta):
         verbose_name_plural = 'opcionais de serviço'
         verbose_name = 'opcional de serviço'
@@ -164,11 +167,11 @@ class Service(AbstractOptional):
     )
 
     schedule_start = models.DateTimeField(
-        verbose_name="data/hora inicial",
+        verbose_name="programação - data/hora inicial",
         help_text='Data e hora inicial da programação no dia do evento.'
     )
     schedule_end = models.DateTimeField(
-        verbose_name="data/hora final",
+        verbose_name="programação - data/hora final",
         help_text='Data e hora final da programação no dia do evento.'
     )
 
