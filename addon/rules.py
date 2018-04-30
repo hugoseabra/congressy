@@ -102,17 +102,3 @@ class MustBeSameOptionalLotCategory(RuleChecker):
                 ' inserida no opcional "{}".'.format(optional.name)
             )
 
-
-class RestrictSubscriptionAfterOptionalDateEnd(RuleChecker):
-    """
-    Regra: deve restringir a criação de inscrições em opcionais caso o opcional
-    selecionado esteja com a data/hora final antes da data/hora atual.
-    """
-
-    def check(self, model_instance, *args, **kwargs):
-        optional = model_instance.optional
-
-        if datetime.now() > optional.date_end_sub:
-            raise RuleIntegrityError(
-                'Este opcional já expirou e não aceita mais inscrições.'
-            )
