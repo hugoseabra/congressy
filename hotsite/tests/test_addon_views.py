@@ -55,8 +55,11 @@ class EventProductManagementViewTest(TestCase):
 
         response = self.c.get(path=reverse_lazy(
             'public:hotsite_available_optional_product_list', kwargs={
-                'category_pk': self.lot_category.pk
-            }))
+                'category_pk': self.lot_category.pk,
+
+            }), data={
+                'fetch_in_storage': 'true',
+        })
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.first_product.name)
@@ -69,7 +72,7 @@ class EventProductManagementViewTest(TestCase):
                 'category_pk': self.lot_category.pk
             }))
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
 
     def test_post_requests_no_existing_itens_in_session(self):
         newly_created_product = AddonMockFactory().fake_product(
@@ -80,6 +83,7 @@ class EventProductManagementViewTest(TestCase):
                 'category_pk': self.lot_category.pk
             }), data={
             'optional_id': newly_created_product.pk,
+            'action': 'add',
         })
 
         self.assertEqual(response.status_code, 201)
@@ -103,6 +107,7 @@ class EventProductManagementViewTest(TestCase):
                 'category_pk': self.lot_category.pk
             }), data={
             'optional_id': self.second_product.pk,
+            'action': 'add',
         })
 
         self.assertEqual(response.status_code, 201)

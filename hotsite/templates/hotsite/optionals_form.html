@@ -6,22 +6,14 @@
         <div class="panel panel-success">
             <div class="panel-heading">Selecionados</div>
             <div class="panel-body">
-
-                <label for="products_table">Produtos</label>
-
-                <div class="table-responsive">
-                    <table class="table">
-                        <tbody id="selecionados">
-                        </tbody>
-                    </table>
-                </div>
-
+                <div id="currently_selected"></div>
             </div>
         </div>
 
         <div class="panel panel-default">
             <div class="panel-heading">Disponiveis</div>
-            <div class="panel-body" id="available_optionals">
+            <div class="panel-body">
+                <div id="available_optionals"></div>
             </div>
         </div>
 
@@ -34,14 +26,8 @@
 
 
     document.addEventListener("DOMContentLoaded", function (event) {
-        Messenger.options = {
-            extraClasses: 'messenger-fixed messenger-on-bottom ' +
-            'messenger-on-right',
-            theme: 'flat'
-        };
-
-
         window.setTimeout(function () {
+            render_current_options_list();
             render_available_options_list();
         }, 300);
     });
@@ -55,56 +41,117 @@
             'GET',
             null,
             function (response) {
-                $('#available_optionals').html(response);
+                $('#available_optionals').replaceWith(response);
             },
             null
         );
     }
 
+    function render_current_options_list() {
+        var url = '{% url 'public:hotsite_available_optional_product_list' category_pk=lot_category_pk  %}';
+
+        send(
+            url,
+            'GET',
+            {
+                fetch_in_storage: true
+            },
+            function (response) {
+                $('#currently_selected').replaceWith(response);
+                render_available_options_list();
+            },
+            null
+        );
+    }
+
+    function addOptionalProduct(product_name, product_id) {
+
+        var url = '{% url 'public:hotsite_available_optional_product_list' category_pk=lot_category_pk  %}';
+
+        send(
+            url,
+            'POST',
+            {
+                'optional_id': product_id,
+                'action': 'add'
+            },
+            function () {
+                render_current_options_list();
+                render_available_options_list();
+            },
+            function (err) {
+                console.log('err');
+                console.error(err);
+            }
+        );
+    }
+
+    function removeOptionalProduct(product_id) {
+
+        var url = '{% url 'public:hotsite_available_optional_product_list' category_pk=lot_category_pk  %}';
+
+        send(
+            url,
+            'POST',
+            {
+                'optional_id': product_id,
+                'action': 'remove'
+            },
+            function () {
+                render_current_options_list();
+                render_available_options_list();
+            },
+            function (err) {
+                console.log('err');
+                console.error(err);
+            }
+        );
+    }
+
     function send(url, method, data, success_callback, error_callback) {
-    // CSRF code
-    function getCookie(name) {
-        var cookieValue = null;
-        var i = 0;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (i; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+        // CSRF code
+        function getCookie(name) {
+            var cookieValue = null;
+            var i = 0;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (i; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
                 }
             }
+            return cookieValue;
         }
-        return cookieValue;
-    }
 
-    var csrftoken = getCookie('csrftoken');
+        var csrftoken = getCookie('csrftoken');
 
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
 
-    $.ajax({
-        url: url,
-        type: method,
-        data: data || {},
-        encode: true,
-        crossDomain: false,
-        beforeSend: function (xhr, settings) {
-            if (!csrfSafeMethod(settings.type)) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        $.ajax({
+            url: url,
+            type: method,
+            data: data || {},
+            encode: true,
+            crossDomain: false,
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type)) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            },
+            success: success_callback || function () {
+            },
+            error: error_callback || function (err) {
+                console.log(err);
             }
-        },
-        success: success_callback || function () {
-        },
-        error: error_callback || function (err) {
-            console.log(err);
-        }
-    });
-}
+        });
+    }
 
 </script>
 

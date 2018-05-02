@@ -1,0 +1,65 @@
+{#{% if  object_list %}#}
+{#<label for="service_table">Services</label>#}
+{##}
+{#<div class="table-responsive" id="service_table">#}
+{#    <table class="table">#}
+{#        <thead>#}
+{#        <tr>#}
+{#            <th>Nome</th>#}
+{#            <th>Theme</th>#}
+{#            <th>Tipo</th>#}
+{#            <th>Preço</th>#}
+{#        </tr>#}
+{#        </thead>#}
+{#        <tbody>#}
+{#        <tr>#}
+{#            {% for service in available_addon_services %}#}
+{#                <td>{{ service.name }}</td>#}
+{#                <td>{{ service.theme.name }}</td>#}
+{#                <td>{{ service.optional_type.name }}</td>#}
+{#                <td>R${{ service.price }}</td>#}
+{#            {% endfor %}#}
+{#        </tr>#}
+{#        </tbody>#}
+{#    </table>#}
+{#</div><br><br>#}
+{#    #}
+{#{% endif %}#}
+
+<div id="currently_selected">
+    {% if  object_list %}
+    <label for="selected_products_table">Produtos</label>
+
+    <div class="table-responsive" id="selected_products_table">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Preço</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for product in object_list %}
+                <tr>
+
+                    <td>{{ product.optional.name }}</td>
+                    <td>{{ product.optional.optional_type.name }}</td>
+                    <td>R${{ product.optional.price }}</td>
+                    <td>
+                        <button style="width: 100%"
+                                onclick="removeOptionalProduct({{ product.optional.pk }})"
+                                class="btn btn-sm btn-danger">
+                            Remover
+                        </button>
+                    </td>
+
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    Nenhum opcional escolhido até o momento.
+{% endif %}
+</div>

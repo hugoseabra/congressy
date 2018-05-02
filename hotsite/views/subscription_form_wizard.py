@@ -8,7 +8,10 @@ from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
-
+from mailer.services import (
+    notify_new_free_subscription,
+    notify_new_user_and_free_subscription,
+)
 from gatheros_event.models import Person
 from gatheros_subscription.models import Lot, \
     Subscription
@@ -69,22 +72,20 @@ def has_survey(wizard):
 
 
 def has_addons(wizard):
-    # # Get cleaned data from lots step
-    # cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
-    #
-    # # Return true if lot has price and price > 0
-    # lot = cleaned_data['lots']
-    #
-    # if isinstance(lot, Lot):
-    #
-    #     if lot.category:
-    #         if lot.category.service_optionals or \
-    #                 lot.category.product_optionals:
-    #             return True
-    #
-    # return False
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
 
-    return True
+    # Return true if lot has price and price > 0
+    lot = cleaned_data['lots']
+
+    if isinstance(lot, Lot):
+
+        if lot.category:
+            if lot.category.service_optionals or \
+                    lot.category.product_optionals:
+                return True
+
+    return False
 
 
 class SubscriptionWizardView(EventMixin, SessionWizardView):
@@ -138,11 +139,21 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
+        # @TODO: Fix this ugly hack for pre-form cleaning
+        # Copy is needed, QueryDict is immutable
+        post_data = self.request.POST.copy()
+        post_data = self.clear_string('person-institution_cnpj',
+                                      data=post_data)
+        post_data = self.clear_string('person-cpf', data=post_data)
+        post_data = self.clear_string('person-zip_code', data=post_data)
+        post_data = self.clear_string('person-phone', data=post_data)
+
         # get the form for the current step
-        form = self.get_form(data=self.request.POST, files=self.request.FILES)
+        # @TODO: Fix this ugly hack for pre-form cleaning
+        # This should be receiving self.request.POST no post_data
+        form = self.get_form(data=post_data, files=self.request.FILES)
 
         # and try to validate
-
         while form.is_valid():
             # if the form is valid, store the cleaned data and files.
             try:
@@ -151,7 +162,17 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 self.storage.set_step_files(self.steps.current,
                                             self.process_step_files(form))
             except ValidationError as e:
-                form.add_error('__all__', e.message)
+
+                if hasattr(e, 'message'):
+                    form.add_error('__all__', e.message)
+                elif hasattr(e, 'error_dict'):
+                    for field, err in e:
+                        form.add_error(field, err)
+                elif hasattr(e, 'error_list'):
+                    for err in e:
+                        form.add_error('__all__', err)
+                else:
+                    raise Exception('Unknown ValidationError message.')
                 break
 
             # check if the current step is the last step
@@ -189,6 +210,14 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         return context
 
+    def get_form_kwargs(self, step=None):
+        kwargs = super().get_form_kwargs(step)
+
+        if step == 'person':
+            kwargs.update({'user': self.request.user})
+
+        return kwargs
+
     def get_template_names(self):
         return [TEMPLATES[self.steps.current]]
 
@@ -196,31 +225,38 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         if step == 'lot':
             return self.initial_dict.get(step, {'event': self.event})
+        else:
 
-        # get the data for step person from  step lot
-        if step == 'person':
-            prev_data = self.storage.get_step_data('lot')
-            lot = prev_data.get('lot-lots', '')
-            return self.initial_dict.get(step, {
-                'lot': lot,
-                'event': self.event,
-                'user': self.request.user,
-            })
+            lot_data = self.storage.get_step_data('lot')
+            if not lot_data:
+                # reset the current step to the first step.
+                messages.error(
+                    self.request,
+                    'Por favor escolha um lote.'
+                )
+                self.storage.current_step = self.steps.first
+                return self.render(self.get_form())
 
-        # get the data for step survey from  step lot
-        if step == 'survey':
-            prev_data = self.storage.get_step_data('lot')
-
-            lot = prev_data.get('lot-lots')
+            lot = lot_data.get('lot-lots')
 
             try:
                 lot = Lot.objects.get(pk=lot, event=self.event)
             except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot, self.event)
-                raise TypeError(message)
+                # reset the current step to the first step.
+                messages.error(
+                    self.request,
+                    'Por favor escolha um lote.'
+                )
+                self.storage.current_step = self.steps.first
+                return self.render(self.get_form())
 
+        if step == 'person':
+            return self.initial_dict.get(step, {
+                'lot': lot,
+                'event': self.event,
+            })
+
+        if step == 'survey':
             return self.initial_dict.get(step, {
                 'event_survey': lot.event_survey,
                 'event': self.event,
@@ -228,25 +264,16 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             })
 
         if step == 'payment':
-
-            lot_data = self.storage.get_step_data('lot')
-            lot = lot_data.get('lot-lots')
-
             # Assert that we have a person in storage
             if not hasattr(self.storage, 'person'):
-                person_data = self.storage.get_step_data('person')
-                person_email = person_data.get('person-email')
 
-                person = Person.objects.get(email=person_email)
+                try:
+                    person = Person.objects.get(user=self.request.user)
+                except Person.DoesNotExist:
+                    raise Exception('User com email {} não possui '
+                                    'person'.format(self.request.user.email))
+
                 self.storage.person = person
-
-            try:
-                lot = Lot.objects.get(pk=lot, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot, self.event)
-                raise TypeError(message)
 
             return self.initial_dict.get(step, {
                 'choosen_lot': lot,
@@ -263,11 +290,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
             person = form.save()
-
-            if not person.user:
-                person.user = self.request.user
-
-            person.save()
             self.storage.person = person
 
         # Persisting survey
@@ -309,91 +331,77 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
 
-            # Assert that we have a person in storage
-            if not hasattr(self.storage, 'person'):
+            if form.is_valid():
 
-                try:
+                # Assert that we have a person in storage
+                if not hasattr(self.storage, 'person'):
                     person = Person.objects.get(user=self.request.user)
-                except Person.DoesNotExist:
-                    person_data = self.storage.get_step_data('person')
-                    person_email = person_data.get('person-email')
+                    self.storage.person = person
 
-                    person = Person.objects.get(email=person_email)
-                self.storage.person = person
+                lot_data = self.storage.get_step_data('lot')
+                lot = lot_data.get('lot-lots', '')
 
-            lot_data = self.storage.get_step_data('lot')
-            lot = lot_data.get('lot-lots', '')
+                # Get a lot object.
+                if not isinstance(lot, Lot):
+                    try:
+                        lot = Lot.objects.get(pk=lot, event=self.event)
+                    except Lot.DoesNotExist:
+                        message = 'Não foi possivel resgatar um Lote ' \
+                                  'a partir das referencias: lot<{}> e evento<{}>.' \
+                            .format(lot, self.event)
+                        raise TypeError(message)
 
-            # Get a lot object.
-            if not isinstance(lot, Lot):
                 try:
-                    lot = Lot.objects.get(pk=lot, event=self.event)
-                except Lot.DoesNotExist:
-                    message = 'Não foi possivel resgatar um Lote ' \
-                              'a partir das referencias: lot<{}> e evento<{}>.' \
-                        .format(lot, self.event)
-                    raise TypeError(message)
-
-            try:
-                subscription = Subscription.objects.get(
-                    person=self.storage.person,
-                    event=self.event
-                )
-            except Subscription.DoesNotExist:
-                subscription = Subscription(
-                    person=self.storage.person,
-                    event=self.event,
-                    created_by=self.storage.person.user.id
-                )
-
-            try:
-                with transaction.atomic():
-                    # Insere ou edita lote
-                    subscription.lot = lot
-                    subscription.save()
-
-                    transaction_data = PagarmeTransactionInstanceData(
-                        subscription=subscription,
-                        extra_data=form_data,
+                    subscription = Subscription.objects.get(
+                        person=self.storage.person,
                         event=self.event
                     )
-
-                    create_pagarme_transaction(
-                        transaction_data=transaction_data,
-                        subscription=subscription
+                except Subscription.DoesNotExist:
+                    subscription = Subscription(
+                        person=self.storage.person,
+                        event=self.event,
+                        created_by=self.storage.person.user.id
                     )
 
-            except TransactionError as e:
-                error_dict = {
-                    'No transaction type': \
-                        'Por favor escolher uma forma de pagamento.',
-                    'Transaction type not allowed': \
-                        'Forma de pagamento não permitida.',
-                    'Organization has no bank account': \
-                        'Organização não está podendo receber pagamentos no'
-                        ' momento.',
-                    'No organization': 'Evento não possui organizador.',
-                }
-                if e.message in error_dict:
-                    e.message = error_dict[e.message]
+                try:
+                    with transaction.atomic():
+                        # Insere ou edita lote
+                        subscription.lot = lot
+                        subscription.save()
 
-                raise ValidationError(e.message)
+                        transaction_data = PagarmeTransactionInstanceData(
+                            subscription=subscription,
+                            extra_data=form_data,
+                            event=self.event
+                        )
+
+                        create_pagarme_transaction(
+                            transaction_data=transaction_data,
+                            subscription=subscription
+                        )
+
+                except TransactionError as e:
+                    error_dict = {
+                        'No transaction type': \
+                            'Por favor escolher uma forma de pagamento.',
+                        'Transaction type not allowed': \
+                            'Forma de pagamento não permitida.',
+                        'Organization has no bank account': \
+                            'Organização não está podendo receber pagamentos no'
+                            ' momento.',
+                        'No organization': 'Evento não possui organizador.',
+                    }
+                    if e.message in error_dict:
+                        e.message = error_dict[e.message]
+
+                    raise ValidationError(e.message)
 
         return form_data
 
     def done(self, form_list, **kwargs):
 
-        # Assert that we have a person in storage
         if not hasattr(self.storage, 'person'):
-
-            try:
-                person = Person.objects.get(user=self.request.user)
-            except Person.DoesNotExist:
-                person_data = self.storage.get_step_data('person')
-                person_email = person_data.get('person-email')
-
-                person = Person.objects.get(email=person_email)
-            self.storage.person = person
+            raise Exception('Não possuimos uma person no storage do wizard')
 
         lot_data = self.storage.get_step_data('lot')
         lot = lot_data.get('lot-lots', '')
@@ -408,7 +416,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                     .format(lot, self.event)
                 raise TypeError(message)
 
-        subscription = None
+        new_subscription = False
+        new_account = self.request.user.last_login is None
 
         try:
             subscription = Subscription.objects.get(
@@ -421,12 +430,20 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 event=self.event,
                 created_by=self.request.user.id
             )
+            new_subscription = True
 
         # Insere ou edita lote
         subscription.lot = lot
-        subscription.save()
+        if not lot.price or lot.price == 0:
 
-        self.storage.subscription = subscription
+            subscription.status = Subscription.CONFIRMED_STATUS
+
+            if new_account and new_subscription:
+                notify_new_user_and_free_subscription(self.event, subscription)
+            else:
+                notify_new_free_subscription(self.event, subscription)
+
+        subscription.save()
 
         messages.success(
             self.request,
@@ -443,3 +460,21 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             'public:hotsite', kwargs={
                 'slug': self.event.slug,
             }))
+
+    def clear_string(self, field_name, data):
+        if data and field_name in data:
+
+            value = data.get(field_name)
+
+            if value:
+                value = value \
+                    .replace('.', '') \
+                    .replace('-', '') \
+                    .replace('/', '') \
+                    .replace('(', '') \
+                    .replace(')', '') \
+                    .replace(' ', '')
+
+                data[field_name] = value
+
+        return data

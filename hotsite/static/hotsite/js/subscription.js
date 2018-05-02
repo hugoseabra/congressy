@@ -35,13 +35,14 @@ function send(url, method, data, success_callback, error_callback) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
         },
-        success: success_callback || function () {
+        success: success_callback || function (result) {
+            console.log(result);
         },
-        error: error_callback || function () {
+        error: error_callback || function (err) {
+            console.error(err)
         }
     });
 }
-
 
 function show_hide_payment_block(action) {
     action = action === true;
@@ -175,7 +176,6 @@ function hotsiteRepopulate_cities(uf_el, selected_value, callback) {
     });
 }
 
-
 var common_lots_content = null;
 
 function load_coupon() {
@@ -259,7 +259,6 @@ function start_popover() {
         trigger: 'click'
     });
 }
-
 
 (function ($) {
     $(document).ready(function () {
