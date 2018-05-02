@@ -181,6 +181,16 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
             lot = lot_data.get('lot-lots')
 
+            try:
+                lot = Lot.objects.get(pk=lot, event=self.event)
+            except Lot.DoesNotExist:
+                messages.error(
+                    self.request,
+                    'Por favor escolha um lote.'
+                )
+                self.storage.current_step = self.steps.first
+                return self.render(self.get_form())
+
         if step == 'person':
             return self.initial_dict.get(step, {
                 'lot': lot,
