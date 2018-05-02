@@ -184,6 +184,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             try:
                 lot = Lot.objects.get(pk=lot, event=self.event)
             except Lot.DoesNotExist:
+                # reset the current step to the first step.
                 messages.error(
                     self.request,
                     'Por favor escolha um lote.'
