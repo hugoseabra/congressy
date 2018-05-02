@@ -2,8 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
-from addon.helpers import has_quantity_conflict, has_sub_end_date_conflict, \
-    has_quantity_conflict_with_future_prediction
+from addon.helpers import has_quantity_conflict, has_sub_end_date_conflict
 from addon.models import Product
 from gatheros_subscription.models import LotCategory
 
@@ -64,18 +63,12 @@ class EventProductOptionalManagementView(generic.TemplateView):
 
             for optional in event_optionals_products:
 
-                if self.storage and optional.pk in self.storage:
-                    quantity_conflict = has_quantity_conflict_with_future_prediction(
-                        optional, is_in_storage=True)
-                else:
-                    quantity_conflict = has_quantity_conflict_with_future_prediction(
-                        optional, is_in_storage=False)
+                if not self.storage or optional.pk not in self.storage:
+                    available = not has_quantity_conflict(optional) and \
+                                not has_sub_end_date_conflict(optional)
 
-                available = not quantity_conflict and \
-                            not has_sub_end_date_conflict(optional)
-
-                self.available_options.append({'optional': optional,
-                                               'available': available})
+                    self.available_options.append({'optional': optional,
+                                                   'available': available})
 
         context = self.get_context_data()
         return self.render_to_response(context)

@@ -42,33 +42,36 @@
                 </thead>
                 <tbody>
                 {% for product in object_list %}
-                <tr>
-                <td>{{ product.optional.name }}</td>
-                <td>{{ product.optional.optional_type.name }}</td>
-                <td>R${{ product.optional.price }}</td>
-                {% if product.available %}
-                    <td>
-                        <button style="width: 100%"
-                                onclick="addOptionalProduct
-                                        ('{{ product.optional.name }}'
-                                        ,{{ product.optional.pk }})"
-                                class="btn btn-sm btn-success">
-                            Selecionar
-                        </button>
-                    </td>
-                {% else %}
-                    <td>
-                        <button style="width: 100%"
-                                disabled="disabled"
-                                class="btn btn-sm btn-warning">
-                            Esgotado
-                        </button>
-                    </td>
-                {% endif %}
-                </tr>
+                    <tr>
+                        <td>{{ product.optional.name }}</td>
+                        <td>{{ product.optional.optional_type.name }}</td>
+                        <td>R${{ product.optional.price }}</td>
+                        {% if product.available %}
+                            <td>
+                                <button style="width: 100%"
+                                        onclick="addOptionalProduct
+                                                ('{{ product.optional.name }}'
+                                                ,{{ product.optional.pk }})"
+                                        class="btn btn-sm btn-success">
+                                    Selecionar
+                                </button>
+                            </td>
+                        {% else %}
+                            <td>
+                                <button style="width: 100%"
+                                        disabled="disabled"
+                                        class="btn btn-sm btn-warning">
+                                    Esgotado
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </button>
+                            </td>
+                        {% endif %}
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
+    {% else %}
+        Nenhum opcional disponivel no momento.
     {% endif %}
 </div>
