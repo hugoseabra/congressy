@@ -267,7 +267,7 @@ DEFAULT_FROM_EMAIL = 'Congressy <mail@congressy.net>'
 CONGRESSY_REPLY_TO = 'Congressy <congressy@congressy.com>'
 DEV_ALERT_EMAILS = ['Infra Congressy <infra@congressy.com>']
 SALES_ALERT_EMAILS = [
-    'Congressy SAC <congressy@congressy.com>',
+    'Wyndson Oliveira <wyndson@congressy.com>',
     'Infra Congressy <infra@congressy.com>'
 ]
 # ============================ WKHTML PDF =================================== #
