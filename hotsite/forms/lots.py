@@ -18,10 +18,6 @@ class LotFormModelChoiceField(ModelChoiceField):
 
         return "{}".format(obj.name)
 
-    def _get_queryset(self):
-        queryset = super()._get_queryset()
-        return queryset.filter(private=True)
-
 
 class LotsForm(forms.Form):
 
@@ -32,9 +28,16 @@ class LotsForm(forms.Form):
         self.fields['lots'] = LotFormModelChoiceField(
             queryset=Lot.objects.filter(event=self.event,
                                         date_start__lte=datetime.now(),
-                                        date_end__gte=datetime.now(),
-                                        private=False),
-            empty_label="- Selecione -",
+                                        date_end__gte=datetime.now()),
             required=True,
             label='lote',
         )
+        self.fields['lots'].choices = self.get_public_lot_choices()
+
+    def get_public_lot_choices(self):
+        public_lots = Lot.objects.filter(event=self.event,
+                                         date_start__lte=datetime.now(),
+                                         date_end__gte=datetime.now(),
+                                         private=False)
+
+        return [(o.id, str(o)) for o in public_lots]
