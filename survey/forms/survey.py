@@ -69,38 +69,40 @@ class SurveyForm(forms.Form):
 
         for question, answer in self.cleaned_data.items():
 
-            author = Author.objects.get_or_create(survey=self.survey,
-                                                  user=self.user)[0]
+            if answer:
 
-            question = Question.objects.get(name=question)
+                author = Author.objects.get_or_create(survey=self.survey,
+                                                      user=self.user)[0]
 
-            existing_answer = None
+                question = Question.objects.get(name=question)
 
-            try:
-                existing_answer = Answer.objects.get(question=question.pk,
-                                                     author=author)
-            except Answer.DoesNotExist:
-                pass
+                existing_answer = None
 
-            if existing_answer:
-                answer_service = AnswerService(instance=existing_answer, data={
-                    'question': question.pk,
-                    'author': author.pk,
-                    'value': answer,
-                })
-            else:
-                answer_service = AnswerService(data={
-                    'question': question.pk,
-                    'author': author.pk,
-                    'value': answer,
-                })
+                try:
+                    existing_answer = Answer.objects.get(question=question.pk,
+                                                         author=author)
+                except Answer.DoesNotExist:
+                    pass
 
-            if answer_service.is_valid():
-                answer_object = answer_service.save()
-                answer_list.append(answer_object)
-            else:
-                msg = 'Não foi possivel validar a resposta: {}'.format(
-                    answer_service.data)
-                raise ValidationError(msg)
+                if existing_answer:
+                    answer_service = AnswerService(instance=existing_answer, data={
+                        'question': question.pk,
+                        'author': author.pk,
+                        'value': answer,
+                    })
+                else:
+                    answer_service = AnswerService(data={
+                        'question': question.pk,
+                        'author': author.pk,
+                        'value': answer,
+                    })
+
+                if answer_service.is_valid():
+                    answer_object = answer_service.save()
+                    answer_list.append(answer_object)
+                else:
+                    msg = 'Não foi possivel validar a resposta: {}'.format(
+                        answer_service.data)
+                    raise ValidationError(msg)
 
         return answer_list
