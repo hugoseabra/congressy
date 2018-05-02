@@ -91,11 +91,7 @@ class EventProductOptionalManagementView(generic.TemplateView):
 
         new_product = get_object_or_404(Product, pk=optional_id)
 
-        if has_quantity_conflict(new_product):
-            session_altered = True
-            self.storage = [item.pk for item in self.storage if
-                            not new_product]
-        else:
+        if not has_quantity_conflict(new_product):
             session_altered = True
             self.storage.append(new_product.pk)
 

@@ -70,7 +70,8 @@ class EventProductManagementViewTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    def test_post_requests_with_optional_id_sent_no_itens_in_session(self):
+    def test_post_requests_with_optional_id_sent_no_existing_itens_in_session(
+            self):
         newly_created_product = AddonMockFactory().fake_product(
             lot_category=self.lot_category)
 
@@ -83,7 +84,8 @@ class EventProductManagementViewTest(TestCase):
 
         self.assertEqual(response.status_code, 201)
 
-    def test_post_requests_with_optional_id_sent_and_items_in_session(self):
+    def test_post_requests_with_items_in_session_and_no_quantity_conflict(
+            self):
 
         AddonMockFactory().fake_subscription_optional_product(
             optional_product=self.second_product)
@@ -105,3 +107,39 @@ class EventProductManagementViewTest(TestCase):
         })
 
         self.assertEqual(response.status_code, 201)
+        s = self.c.session
+        self.assertIn(self.second_product.pk, s['product_storage'])
+        self.assertIn(self.first_product.pk, s['product_storage'])
+        self.assertIn(self.third_product.pk, s['product_storage'])
+
+    def test_post_requests_with_items_in_session_and_quantity_conflict(self):
+
+        self.second_product.quantity = 1
+        self.second_product.save()
+
+        AddonMockFactory().fake_subscription_optional_product(
+            optional_product=self.second_product)
+
+        s = self.c.session
+        s.update({
+            "product_storage": [
+                self.first_product.pk,
+                self.third_product.pk,
+            ],
+        })
+        s.save()
+
+        response = self.c.post(path=reverse_lazy(
+            'public:hotsite_available_optional_product_list', kwargs={
+                'category_pk': self.lot_category.pk
+            }), data={
+            'optional_id': self.second_product.pk,
+        })
+
+        self.assertEqual(response.status_code, 200)
+        s = self.c.session
+        self.assertNotIn(self.second_product.pk, s['product_storage'])
+        self.assertIn(self.first_product.pk, s['product_storage'])
+        self.assertIn(self.third_product.pk, s['product_storage'])
+
+
