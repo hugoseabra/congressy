@@ -46,7 +46,7 @@
         {#            display: none;#}
         }
 
-        .nav-pills>li.active>a {
+        .nav-pills > li.active > a {
             background-color: #1f7bb6;
         }
     </style>
@@ -362,7 +362,7 @@
             </a>
         </li>
     </ul>
- <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
     <ul class="nav nav-pills nav-stacked">
         <li class="active">
             <a class="sidebar-itens" href=
@@ -391,8 +391,8 @@
         <li>
             <a class="sidebar-itens" href=
                     "{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fab fa-wpforms"></i> Formulário
+               title="Form. Personalizado">
+                <i class="fab fa-wpforms"></i> Form. Personalizado
             </a>
         </li>
 
@@ -402,7 +402,7 @@
         <li>
             <a class="sidebar-itens" href="#"
                title="Opcionais">
-                <i class="far fa-calendar-plus"></i> Opicionais
+                <i class="far fa-calendar-plus"></i> Opcionais
             </a>
         </li>
         <li>
@@ -494,21 +494,23 @@
                                 {% if info and info.description_html %}
                                     <a href="{% url 'public:hotsite' info.event.slug %}"
                                        target="_blank"
-                                       class="btn btn-primary btn-block">
+                                       class="btn btn-success btn-block">
                                         <i class="fa fa-globe"></i>
-                                        Visualizar página
+                                        Link do Evento
                                     </a>
                                 {% else %}
                                     <button type="button"
-                                            class="btn btn-primary btn-trans btn-block disabled"
+                                            class="btn btn-default btn-trans
+                                            btn-block disabled"
                                             title="Você deve configurar pelo menos a descrição do seu evento.">
                                         <i class="fa fa-globe"></i>
-                                        Visualizar página
+                                        Link do Evento
                                     </button>
                                 {% endif %}
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
-                                        <i class="fas fa-check-circle fa-5x {% if info and info.image_main %}success-color{% endif %}"></i>
+                                        <i class="fas fa-check-circle fa-4x
+{% if info and info.image_main %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
                                         <div class="title">Banner principal
@@ -521,7 +523,8 @@
                                 </div>
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
-                                        <i class="fas fa-check-circle fa-5x {% if info and info.lead %}success-color{% endif %}"></i>
+                                        <i class="fas fa-check-circle fa-4x
+{% if info and info.lead %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
                                         <div class="title">Descrição rápida
@@ -537,7 +540,8 @@
                                 </div>
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
-                                        <i class="fas fa-check-circle fa-5x  {% if info and info.description_html %}success-color{% endif %}"></i>
+                                        <i class="fas fa-check-circle fa-4x
+{% if info and info.description_html %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
                                         <div class="title">Sobre o evento</div>
