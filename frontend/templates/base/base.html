@@ -19,8 +19,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}Congressy{% endblock %}</title>
     <meta name="description" content="">
-{#        <meta name="viewport"#}
-{#              content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet"
@@ -57,7 +57,6 @@
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
 
 
-
     <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
 
     {% block headscripts %}{% endblock %}
@@ -79,166 +78,200 @@
 
 
 <section id="main-wrapper" class="theme-cgsy-full">
+    <header id="header" style="background-color: #F0F3F3">
+
+        <!--logo start-->
+        <div class="brand">
+            <a href="{% url 'front:start' %}">
+                <img class="img base_logo" src=
+                        "{% static "assets/img/header-logo_black.png" %}"
+                />
+            </a>
+        </div>
+        <!--logo end-->
+
+        {% block navbar %}
+            {% if user %}
+                <ul class="nav navbar-nav navbar-right">
+                     <li style="padding-top: 5px">
+                        <span class="meta hidden-xs">
+                            <button type="button" onclick="location.href=
+                                    '{% url 'event:event-add' %}'"
+                                    class="btn btn-sm
+                        btn-success navbar-btn">
+                            <i class="fa fa-plus"></i>
+                                Novo Evento
+                            </button>
+                        </span>
+                    </li>
+                    <li class="dropdown profile hidden-xs"
+                        style="background-color: #F0F3F3">
+                        <a href="javascript:void(0);"
+                           class="dropdown-toggle"
+                           data-toggle="dropdown">
+                                    <span class="meta" style="color: black">
+                                        <span class="fas fa-user"></span>
+                                        <span class="text  hidden-xs">{{ user.first_name }}</span>
+                                        <span class="caret hidden-xs"></span>
+                                    </span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight "
+                            role="menu">
+                            <li>
+                                <a href="{% url 'event:profile' %}">
+                                        <span class="icon">
+                                            <i class="fas fa-list-alt"></i>
+                                        </span>
+                                    Meus Dados
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'public:logout' %}">
+                                        <span class="icon">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                        </span>
+                                    Sair
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            {% endif %}
+        {% endblock %}
+    </header>
     <div class="row">
-    <div class="col-xs-1 col-sm-1 col-lg-1 col-xl-1" style="height: 100%;
-    position: fixed;width: 60px;z-index: 2000;">
-        <div class="new_nav sidebar-left sidebar" style="width: 60px;
+        <div class="navbar-header">
+            <button type="button" class="sidebar-toggle navbar-toggle
+            collapsed" data-toggle="collapse" data-target="#sidebar"
+                    aria-expanded="false" style="z-index: 1000;text-align:
+                    right ">
+                <i class="fas fa-bars"
+                   style="font-size: 30px;"></i>
+
+            </button>
+        </div>
+        <div id="sidebar" class="collapse navbar-collapse col-xs-1 col-sm-1
+        col-lg-1 col-xl-1"style="height: 100%; position: fixed;width: 60px;z-index: 2000;">
+            <div class="tooltip-wrapper new_nav sidebar-left sidebar
+            principal_sidebar" style="width: 50px;
         padding-top: 0">
                 <ul class="col nav nav-pills nav-stacked " style="
-                font-size: 25px;text-align: center;">
+                font-size: 25px;text-align: center;margin: 0">
                     <li class="dropdown visible-xs" style="width: 50px">
-                    <a class="dropdown-toggle"
-                        data-toggle="dropdown">
+                        <a class="dropdown-toggle"
+                           data-toggle="dropdown">
 
-                        <span class="meta" >
+                        <span class="meta">
                             <span class="fas fa-user"></span>
                         </span>
-                    </a>
-                    <ul class="col nav nav-pills nav-stacked
+                        </a>
+                        <ul class="col nav nav-pills nav-stacked
                     " role="menu"
-                        style="display: block;font-size: 20px">
-                        <li>
-                            <a href="{% url 'event:profile' %}">
-                                    <i class="fas fa-list-alt"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'public:logout' %}">
+                            style="display: block;font-size: 20px;margin: 0">
+                            <li>
+                                <a href="{% url 'event:profile' %}"
+                                   data-toggle="tooltip"
+                                   data-placement="right"
+                                   title=""
+                                   data-original-title="Meus dados">
+                                    <i class=" fas fa-list-alt"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'public:logout' %}"
+                                   data-toggle="tooltip"
+                                   data-placement="right"
+                                   title=""
+                                   data-original-title="Sair">
                                     <i class="fas fa-sign-out-alt"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="divider visible-xs" style="height: 1px;
                     margin: 9px 0;width: 50px;
                     overflow: hidden;
                     background-color: #52AEE9;"></li>
                     <li style="width: 50px">
                         <a href="{% url 'event:event-list' %}"
-                           title="Eventos" class="fa fa-calendar">
+                           data-toggle="tooltip"
+                           data-placement="right"
+                           title=""
+                           data-original-title="Eventos"
+                           class="fa fa-calendar">
                         </a>
                     </li>
                     <li style="width: 50px">
                         <a href="{% url 'subscription:my-subscriptions' %}"
-                        title="Inscrições"class="fa fa-list"></a>
+                           data-toggle="tooltip"
+                           data-placement="right"
+                           data-original-title="Inscrições"
+                           title="Inscrições" class="fa fa-list"></a>
                     </li>
                     <li style="width: 50px">
                         <a href="{% url 'event:organization-list' %}"
-                       title="Organizações" class="fa fa-sitemap"
+                           title="Organizações" class="fa fa-sitemap"
+                           data-toggle="tooltip"
+                           data-placement="right"
+                           data-original-title="Organizações"
 
                         ></a>
                     </li>
-            </ul>
-            <ul class="col nav nav-pills nav-stacked visible-xs" style="
-                font-size: 30px;text-align: center;margin-right: 0;">
-                <li class="divider visible-xs" style="height: 1px;
+                </ul>
+                <ul class="col nav nav-pills nav-stacked visible-xs" style="
+                font-size: 30px;text-align: center;margin: 0;">
+                    <li class="divider visible-xs" style="height: 1px;
                     margin: 9px 0;width: 50px;
                     overflow: hidden;
                     background-color: #52AEE9;"></li>
-                <li>
-                    <a href="{% url 'event:event-add' %}" class="btn
+                    <li>
+                        <a href="{% url 'event:event-add' %}" class="btn
                     " style="width: 50px;height:
-                    50px">
-                        <i class="fa fa-plus" style="color:#4caf4c"></i>
-                    </a>
-                </li>
-            </ul>
+                    50px" data-toggle="tooltip"
+                           data-placement="right"
+                           title=""
+                           data-original-title="Novo evento">
+                            <i class="fa fa-plus" style="color:#4caf4c"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-    <div class="col-xs-11 col-sm-11 col-lg-11 col-xl-11" style="float:
+        <div class="col-xs-12 col-sm-11 col-lg-11 col-xl-11" style="float:
     right; position: relative">
-        <header id="header" style="background-color: #F0F3F3">
 
-            <!--logo start-->
-            <div class="brand">
-                <a href="{% url 'front:start' %}">
-                    <img class="base_logo" src=
-                            "{% static "assets/img/header-logo_black.png" %}"
-                         width="70%"/>
-                </a>
-            </div>
-            <!--logo end-->
-
-            {% block navbar %}
-                {% if user %}
-                    <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <span class ="meta hidden-xs">
-                                <a href="{% url 'event:event-add' %}" class="btn
-                            btn-success navbar-btn">
-                                <i class="fa fa-plus"></i>
-                                    Novo Evento
-                                </a>
-                            </span>
-                        </li>
-                        <li class="dropdown profile hidden-xs" style="background-color: #F0F3F3">
-                            <a href="javascript:void(0);" class="dropdown-toggle"
-                               data-toggle="dropdown">
-                                    <span class="meta"style="color: black">
-                                        <span class="fas fa-user"></span>
-                                        <span class="text  hidden-xs">{{ user.first_name }}</span>
-                                        <span class="caret hidden-xs"></span>
-                                    </span>
-                            </a>
-                            <ul class="dropdown-menu animated fadeInRight "
-                                role="menu">
-                                <li>
-                                    <a href="{% url 'event:profile' %}">
-                                        <span class="icon">
-                                            <i class="fas fa-list-alt"></i>
-                                        </span>
-                                        Meus Dados
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'public:logout' %}">
-                                        <span class="icon">
-                                            <i class="fas fa-sign-out-alt"></i>
-                                        </span>
-                                        Sair
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                {% endif %}
-            {% endblock %}
-        </header>
-
-
-
-
-        <!--main content start-->
-        <section class="main-content-wrapper col-sm-12" style="position:
+            <!--main content start-->
+            <section class="main-content-wrapper col-sm-12" style="position:
         relative;">
-            <div class="pageheader">
-                <h1>{% block page_title %}{% endblock %}</h1>
-                <h2>{% block page_sub_title %}{% endblock %}</h2>
-                <p class="text-muted">
-                    {% block page_description %}{% endblock %}</p>
-            </div>
-            <section id="main-content">
-                {% block messages %}
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissable">
-                                <button type="button" class="close"
-                                        data-dismiss="alert" aria-hidden="true">×
-                                </button>
-                                {{ message|capfirst }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endblock messages %}
-                {% block content %}{% endblock %}
+                <div class="pageheader">
+                    <h1>{% block page_title %}{% endblock %}</h1>
+                    <h2>{% block page_sub_title %}{% endblock %}</h2>
+                    <p class="text-muted">
+                        {% block page_description %}{% endblock %}</p>
+                </div>
+                <section id="main-content">
+                    {% block messages %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissable">
+                                    <button type="button" class="close"
+                                            data-dismiss="alert"
+                                            aria-hidden="true">×
+                                    </button>
+                                    {{ message|capfirst }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endblock messages %}
+                    {% block content %}{% endblock %}
 
+                </section>
+                <!-- main content end -->
+                <section class="cgsy-footer footer-wrapper" style="z-index: 10000">
+                    {% include "base/footer.html" %}
+                </section>
             </section>
-            <!-- main content end -->
-            <section class="cgsy-footer footer-wrapper">
-                {% include "base/footer.html" %}
-            </section>
-        </section>
-    </div>
+        </div>
     </div>
 </section>
 

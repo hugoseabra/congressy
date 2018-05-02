@@ -1,5 +1,38 @@
 //congressy - dark-blue
 .theme-cgsy-full {
+  .brand {
+    margin-left: 50px;
+  }
+  .principal_sidebar {
+    height: 100%;
+    position: fixed;
+    width: 50px;
+    z-index: 2000;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .manage_sidebar {
+    margin-top: 60px;
+    margin-left: 51px;
+    width: 200px;
+    padding-left: 0;
+    padding-right: 10px;
+    background-color: #F0F3F3;
+    z-index: 100
+  }
+  .sidebar-itens{
+      color: #4c4c4c;
+    }
+  .sidebar-itens:active{
+      color: #F0F3F3;
+      background-color: #1f7bb6 ;
+  }
+  .sidebar-itens:hover{
+      color: #F0F3F3;
+      background-color: #1f7bb6;
+      outline: 0;
+  }
   #header {
     .brand {
       background: #F0F3F3;
@@ -42,7 +75,7 @@
   }
   .sidebar-left .nav > li.open > a, .sidebar-left .nav > li > a:hover {
     color: #34495e;
-    background-color:transparent;
+    background-color: transparent;
     outline: 0;
   }
   &.sidebar-mini .sidebar-left .nav > li.nav-dropdown-open > .nav-sub, &.sidebar-mini .sidebar-left .nav > li:hover > .nav-sub {
@@ -64,37 +97,63 @@
     padding-bottom: 105px !important;
   }
 
+  @media only screen and (max-width: 768px) {
+    .navbar-collapse {
+      position: absolute;
+    }
+
+    .principal_sidebar {
+      top: 0;
+    }
+
+    .manage_sidebar {
+      margin-top: 0;
+    }
+
+    .main-content-wrapper {
+      padding-top: 0;
+    }
+
+    .brand {
+      margin-left: 0;
+    }
+
+    .manage_sidebar {
+      margin-top: 0;
+    }
+
+  }
+
   //================================ WELL ===================================//
   .well.well-info {
-      background-color: lighten(@infoColor, 5%);
-      color: #fff;
+    background-color: lighten(@infoColor, 5%);
+    color: #fff;
   }
 
   .well.well-warning {
-      background-color: lighten(@warningColor, 5%);
-      color: #fff;
+    background-color: lighten(@warningColor, 5%);
+    color: #fff;
   }
 
   .well.well-success {
-      background-color: lighten(@successColor, 5%);
-      color: #fff;
+    background-color: lighten(@successColor, 5%);
+    color: #fff;
   }
 
   .well.well-primary {
-      background-color: lighten(@primaryColor, 5%);
-      color: #fff;
+    background-color: lighten(@primaryColor, 5%);
+    color: #fff;
   }
 
   .well.well-danger {
-      background-color: lighten(@dangerColor, 5%);
-      color: #fff;
+    background-color: lighten(@dangerColor, 5%);
+    color: #fff;
   }
 
   .well.well-default {
-      background-color: lighten(@defaultColor, 5%);
-      color: #fff;
+    background-color: lighten(@defaultColor, 5%);
+    color: #fff;
   }
-
 
   //============================ PAGE HEADER ================================//
   .pageheader {
@@ -341,7 +400,7 @@
   //============================== LOGO =====================================//
 
   .base_logo {
-    padding-top: 10px;
+    padding-top: 7px;
   }
 
   //============================== FOOTER ===================================//
