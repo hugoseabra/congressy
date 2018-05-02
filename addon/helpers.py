@@ -12,7 +12,7 @@ def has_quantity_conflict(product):
     return False
 
 
-def has_end_date_conflict(product):
+def has_sub_end_date_conflict(product):
 
     if product.date_end_sub and datetime.now() > product.date_end_sub:
         return True

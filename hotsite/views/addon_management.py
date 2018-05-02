@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.views import generic
 
 from gatheros_subscription.models import LotCategory
-from addon.helpers import has_quantity_conflict, has_end_date_conflict
+from addon.helpers import has_quantity_conflict, has_sub_end_date_conflict
 from addon.models import Product
 
 """
@@ -92,7 +92,7 @@ class EventProductOptionalManagementView(generic.TemplateView):
         new_product = get_object_or_404(Product, pk=optional_id)
 
         if not has_quantity_conflict(new_product) and not \
-                has_end_date_conflict(new_product):
+                has_sub_end_date_conflict(new_product):
             session_altered = True
             self.storage.append(new_product.pk)
 
