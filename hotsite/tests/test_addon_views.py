@@ -4,6 +4,7 @@
 from django.contrib.auth.models import User
 from django.test.client import Client
 from django.urls import reverse_lazy
+from datetime import datetime, timedelta
 from test_plus.test import TestCase
 
 from addon.tests import MockFactory as AddonMockFactory
@@ -84,8 +85,7 @@ class EventProductManagementViewTest(TestCase):
 
         self.assertEqual(response.status_code, 201)
 
-    def test_post_requests_with_items_in_session_and_no_quantity_conflict(
-            self):
+    def test_post_requests_with_items_in_session_and_no_conflicts(self):
 
         AddonMockFactory().fake_subscription_optional_product(
             optional_product=self.second_product)
@@ -119,6 +119,33 @@ class EventProductManagementViewTest(TestCase):
 
         AddonMockFactory().fake_subscription_optional_product(
             optional_product=self.second_product)
+
+        s = self.c.session
+        s.update({
+            "product_storage": [
+                self.first_product.pk,
+                self.third_product.pk,
+            ],
+        })
+        s.save()
+
+        response = self.c.post(path=reverse_lazy(
+            'public:hotsite_available_optional_product_list', kwargs={
+                'category_pk': self.lot_category.pk
+            }), data={
+            'optional_id': self.second_product.pk,
+        })
+
+        self.assertEqual(response.status_code, 200)
+        s = self.c.session
+        self.assertNotIn(self.second_product.pk, s['product_storage'])
+        self.assertIn(self.first_product.pk, s['product_storage'])
+        self.assertIn(self.third_product.pk, s['product_storage'])
+
+    def test_post_requests_with_items_in_session_and_date_end_conflict(self):
+
+        self.second_product.date_end_sub = datetime.now() - timedelta(days=2)
+        self.second_product.save()
 
         s = self.c.session
         s.update({
