@@ -328,6 +328,20 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 raise Exception('SurveyForm was invalid: {}'.format(
                     survey_form.errors))
 
+        # Persisting optionals in session storage
+        if isinstance(form, forms.AddonForm):
+            """
+            Continuar daqui: TODO: 
+            
+            - Setar um nome para os campos hiddens dos optionais com prefixo 
+                para facil acesso. 
+            - persistir dentro do storage para acesso durante o step de 
+            payments  
+            
+            
+            """
+            print('sdsadas')
+
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
 

@@ -78,7 +78,8 @@
                                             {% include 'hotsite/optionals_form.html' %}
                                         </div>
 
-                                        <form method="post" action="">
+                                        <form method="post" action=""
+                                              id="optional_form">
 
                                             {% csrf_token %}
                                             {{ wizard.management_form }}

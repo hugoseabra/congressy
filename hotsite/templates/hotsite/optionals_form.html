@@ -76,6 +76,7 @@
                 'action': 'add'
             },
             function () {
+                addToForm(product_id);
                 render_current_options_list();
                 render_available_options_list();
             },
@@ -98,6 +99,7 @@
                 'action': 'remove'
             },
             function () {
+                removeFromForm(product_id);
                 render_current_options_list();
                 render_available_options_list();
             },
@@ -106,6 +108,21 @@
                 console.error(err);
             }
         );
+    }
+
+    function addToForm(product_id) {
+        var form = $('#optional_form');
+
+        $('<input>').attr({
+            type: 'hidden',
+            id: product_id,
+            value: product_id,
+            name: 'optionalProducts[]',
+        }).appendTo(form);
+    }
+
+    function removeFromForm(product_id) {
+        $('#' + product_id).remove();
     }
 
     function send(url, method, data, success_callback, error_callback) {
