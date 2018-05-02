@@ -71,8 +71,7 @@ class EventProductManagementViewTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
 
-    def test_post_requests_with_optional_id_sent_no_existing_itens_in_session(
-            self):
+    def test_post_requests_no_existing_itens_in_session(self):
         newly_created_product = AddonMockFactory().fake_product(
             lot_category=self.lot_category)
 
@@ -85,7 +84,7 @@ class EventProductManagementViewTest(TestCase):
 
         self.assertEqual(response.status_code, 201)
 
-    def test_post_requests_with_items_in_session_and_no_conflicts(self):
+    def test_post_requests_no_conflicts(self):
 
         AddonMockFactory().fake_subscription_optional_product(
             optional_product=self.second_product)
@@ -112,7 +111,7 @@ class EventProductManagementViewTest(TestCase):
         self.assertIn(self.first_product.pk, s['product_storage'])
         self.assertIn(self.third_product.pk, s['product_storage'])
 
-    def test_post_requests_with_items_in_session_and_quantity_conflict(self):
+    def test_post_requests_quantity_conflict(self):
 
         self.second_product.quantity = 1
         self.second_product.save()
@@ -142,7 +141,7 @@ class EventProductManagementViewTest(TestCase):
         self.assertIn(self.first_product.pk, s['product_storage'])
         self.assertIn(self.third_product.pk, s['product_storage'])
 
-    def test_post_requests_with_items_in_session_and_date_end_conflict(self):
+    def test_post_requests_sub_date_end_conflict(self):
 
         self.second_product.date_end_sub = datetime.now() - timedelta(days=2)
         self.second_product.save()
