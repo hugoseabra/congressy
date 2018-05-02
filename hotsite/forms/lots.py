@@ -46,7 +46,7 @@ class LotsForm(forms.Form):
 
             if lot.price and lot.price > 0:
                 lot_name = "{} - R${}".format(lot.name,
-                                             lot.get_calculated_price())
+                                              lot.get_calculated_price())
             else:
                 lot_name = "{}".format(lot.name)
 
