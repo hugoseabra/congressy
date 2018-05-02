@@ -40,4 +40,16 @@ class LotsForm(forms.Form):
                                          date_end__gte=datetime.now(),
                                          private=False)
 
-        return [(o.id, str(o)) for o in public_lots]
+        choices = []
+
+        for lot in public_lots:
+
+            if lot.price and lot.price > 0:
+                lot_name = "{} - R${}".format(lot.name,
+                                             lot.get_calculated_price())
+            else:
+                lot_name = "{}".format(lot.name)
+
+            choices.append((lot.id, lot_name))
+
+        return choices
