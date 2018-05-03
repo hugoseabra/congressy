@@ -1,0 +1,150 @@
+{% load base_tags l10n humanize %}
+
+
+{% if optionals.count %}
+<ul class="list-group block-list">
+    {% for optional in optionals.all %}
+    <li class="list-group-item">
+        <div class="row tooltip-wrapper">
+            <div class="col-md-8 col-lg-7 col-xl-8" style="word-wrap: break-word">
+                <div class="panel-title">
+                    {{ optional.name }}
+                </div>
+                <hr />
+                <div style="margin-bottom:3px;">
+                    <div class="float-left" style="margin-bottom:3px;">
+                        Disponível até:
+                        <span style="font-weight: bold;">
+                            {{ optional.date_end_sub|date:"d/m/Y H\hi" }}
+                        </span>
+                    </div>
+
+                    <div class="float-right">
+                    {% if optional.theme %}
+                        <div title="Tema" style="font-size:14px" class="badge badge-primary">{{ optional.theme.name }}</div>
+                    {% endif %}
+
+                    {% if optional.price %}
+                        <div title="Preço" style="font-size:14px" class="badge badge-primary">R$ {{ optional.price|intcomma|unlocalize }}</div>
+                    {% endif %}
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+                {% if optional.running %}
+                    <div title="Status" class="badge badge-success">Andamento</div>
+                {% elif optional.finished %}
+                    <div title="Status" class="badge badge-warning">Finalizado</div>
+                {% else %}
+                    <div title="Status" class="badge">Não-iniciado</div>
+                {% endif %}
+                <hr />
+                <div style="margin-bottom:3px;">
+                    Inscrições:
+                    <span style="font-weight: bold;">
+                        {{ subscription_stats.num|lookup:optional.pk }}
+                        {% if not optional.quantity %}(ilimitado){% endif %}
+                    </span>
+                </div>
+                {% if optional.quantity %}
+                <div style="margin-bottom:3px;">
+                    Vagas disponíveis: <span style="font-weight: bold;"><span style="font-weight: bold;">{{ subscription_stats.remaining|lookup:optional.pk }}</span></span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-2 col-lg-3 col-xl-2">
+                <hr class="hidden-md hidden-lg hidden-xl" />
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="Gerenciar limite de vagas">
+                    <button
+                        class="btn btn-sm btn-info btn-block {% if not optional.limit %}btn-trans{% endif %}"
+                        data-toggle="modal"
+                        data-backdrop="static"
+                        onclick="$('#lot-limit-lot_id').val('{{ optional.pk }}');$('#lot-limit-name').text('{{ optional.name }}');$('#lot-limit').val('{{ optional.limit|default_if_none:0 }}')"
+                        data-target="#lot-limit-form">
+                        <i class="fas fa-users"></i>
+                        <span class="hidden-md">Vagas</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="Editar">
+                    {% if active == 'service' %}
+                    <button
+                       onclick="window.location.href='{% url 'addon:optional-service-edit' event.pk optional.pk %}'"
+                       class="btn btn-sm btn-primary btn-trans btn-block"
+                       data-target="#lot-form">
+                       <i class="fa fa-pencil-alt"></i>
+                    </button>
+                    {% endif %}
+                    {% if active == 'product' %}
+                    <button
+                       onclick="window.location.href='{% url 'addon:optional-product-edit' event.pk optional.pk %}'"
+                       class="btn btn-sm btn-primary btn-trans btn-block"
+                       data-target="#lot-form">
+                       <i class="fa fa-pencil-alt"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                {% if optional.published %}
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="Este lote está ativo. Clique para desativa-lo.">
+                    <button
+                        onclick="unpublishLot('{{ optional.pk }}')"
+                        class="btn btn-sm btn-success btn-trans btn-block">
+                        <i class="fas fa-check-circle"></i>
+                    </button>
+                </div>
+                {% else %}
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="Este lote está inativo. Clique para ativa-lo.">
+                    <button
+                        onclick="publishLot('{{ optional.pk }}')"
+                        class="btn btn-sm btn-warning btn-trans btn-block">
+                        <i class="fa fa-exclamation-circle"></i>
+                    </button>
+                </div>
+                {% endif %}
+                {% if optional.is_deletable %}
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="Excluir">
+                    {% if active == 'service' %}
+                    <button class="btn btn-sm btn-default btn-trans btn-block"
+                        onclick="window.location.href='{% url 'addon:optional-service-delete' event.pk optional.pk %}'">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    {% endif %}
+                    {% if active == 'product' %}
+                    <button class="btn btn-sm btn-default btn-trans btn-block"
+                        onclick="window.location.href='{% url 'addon:optional-product-delete' event.pk optional.pk %}'">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+    <div style="padding: 40px 20px">
+    Não há opcionais nesta categoria.
+    </div>
+{% endif %}

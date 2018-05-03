@@ -23,7 +23,8 @@ def render_generic_field(
         use_required_field=True,
         autofocus=False,
         label=None,
-        help_text=None):
+        help_text=None,
+        hide=False):
     if required is False and use_required_field is True:
         required = field.field.required
 
@@ -44,6 +45,7 @@ def render_generic_field(
         'errors': field.errors,
         'required': required,
         'autofocus': autofocus,
+        'hide': hide,
     }
 
 
@@ -54,7 +56,8 @@ def render_switchery_field(
         use_required_field=True,
         autofocus=False,
         label=None,
-        help_text=None):
+        help_text=None,
+        hide=False):
     if required is False and use_required_field is True:
         required = field.field.required
 
@@ -75,6 +78,7 @@ def render_switchery_field(
         'errors': field.errors,
         'required': required,
         'autofocus': autofocus,
+        'hide': hide,
     }
 
 
@@ -85,7 +89,8 @@ def render_typeahead_field(
         use_required_field=True,
         autofocus=False,
         label=None,
-        help_text=None):
+        help_text=None,
+        hide=False):
     return render_generic_field(**{
         'field': field,
         'use_required_field': use_required_field,
@@ -93,7 +98,7 @@ def render_typeahead_field(
         'autofocus': autofocus,
         'label': label,
         'help_text': help_text,
-
+        'hide': hide,
     })
 
 
@@ -104,7 +109,8 @@ def render_multiselect_field(
         use_required_field=True,
         autofocus=False,
         label=None,
-        help_text=None):
+        help_text=None,
+        hide=False):
 
     return render_generic_field(**{
         'field': field,
@@ -113,4 +119,5 @@ def render_multiselect_field(
         'autofocus': autofocus,
         'label': label,
         'help_text': help_text,
+        'hide': hide,
     })

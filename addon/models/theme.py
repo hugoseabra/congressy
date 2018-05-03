@@ -6,9 +6,10 @@ from django.db import models
 
 from base.models import EntityMixin
 from gatheros_event.models import Event
+from gatheros_event.models.mixins import GatherosModelMixin
 
 
-class Theme(EntityMixin, models.Model):
+class Theme(GatherosModelMixin, EntityMixin, models.Model):
 
     class Meta:
         verbose_name_plural = 'temas'

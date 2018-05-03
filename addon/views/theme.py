@@ -3,17 +3,16 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 
-from gatheros_event.helpers.account import update_account
+from addon import services
+from addon.models import Theme
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
-from gatheros_subscription import forms
-from gatheros_subscription.models import LotCategory
 
 
-class LotCategoryListView(AccountMixin, generic.ListView):
+class ThemeListView(AccountMixin, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
-    model = LotCategory
-    template_name = 'lotcategory/list.html'
+    model = Theme
+    template_name = 'addon/theme/list.html'
     ordering = ['name']
     event = None
 
@@ -27,13 +26,6 @@ class LotCategoryListView(AccountMixin, generic.ListView):
                 "Evento não informado."
             )
             return redirect(reverse_lazy('event:event-list'))
-
-        else:
-            update_account(
-                request=self.request,
-                organization=self.event.organization,
-                force=True
-            )
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -49,9 +41,9 @@ class LotCategoryListView(AccountMixin, generic.ListView):
         return query_set.filter(event=self.event).order_by('pk')
 
 
-class LotCategoryAddView(generic.CreateView):
-    form_class = forms.LotCategoryForm
-    template_name = 'lotcategory/form.html'
+class ThemeAddView(AccountMixin, generic.CreateView):
+    form_class = services.ThemeService
+    template_name = 'addon/theme/form.html'
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -65,30 +57,12 @@ class LotCategoryAddView(generic.CreateView):
             )
             return redirect(reverse_lazy('event:event-list'))
 
-        else:
-            update_account(
-                request=self.request,
-                organization=self.event.organization,
-                force=True
-            )
-
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse('subscription:category-list', kwargs={
+        return reverse('addon:theme-list', kwargs={
             'event_pk': self.event.pk,
         })
-
-    def get_context_data(self, **kwargs):
-        # noinspection PyUnresolvedReferences
-        context = super().get_context_data(**kwargs)
-        context['event'] = self.event
-        return context
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({'event': self.event})
-        return kwargs
 
     def form_valid(self, form):
         try:
@@ -98,14 +72,27 @@ class LotCategoryAddView(generic.CreateView):
             messages.error(self.request, str(e))
             return self.form_invalid(form)
 
-        messages.success(self.request, 'Categoria de lote criada com sucesso.')
+        messages.success(self.request, 'Tema criado com sucesso.')
         return response
 
+    def get_context_data(self, **kwargs):
+        # noinspection PyUnresolvedReferences
+        context = super().get_context_data(**kwargs)
+        context['event'] = self.event
+        return context
 
-class LotCategoryEditView(AccountMixin, generic.UpdateView):
-    form_class = forms.LotCategoryForm
-    model = forms.LotCategoryForm.Meta.model
-    template_name = 'lotcategory/form.html'
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        data = data.copy()
+        data.update({'event': self.event.pk})
+        request.POST = data
+        return super().post(request, *args, **kwargs)
+
+
+class ThemeEditView(AccountMixin, generic.UpdateView):
+    form_class = services.ThemeService
+    model = services.ThemeService.manager_class.Meta.model
+    template_name = 'addon/theme/form.html'
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -119,17 +106,10 @@ class LotCategoryEditView(AccountMixin, generic.UpdateView):
             )
             return redirect(reverse_lazy('event:event-list'))
 
-        else:
-            update_account(
-                request=self.request,
-                organization=self.event.organization,
-                force=True
-            )
-
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse('subscription:category-list', kwargs={
+        return reverse('addon:theme-list', kwargs={
             'event_pk': self.event.pk,
         })
 
@@ -139,10 +119,12 @@ class LotCategoryEditView(AccountMixin, generic.UpdateView):
         context['event'] = self.event
         return context
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({'event': self.event})
-        return kwargs
+    def post(self, request, *args, **kwargs):
+        data = request.POST
+        data = data.copy()
+        data.update({'event': self.event.pk})
+        request.POST = data
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         try:
@@ -154,19 +136,19 @@ class LotCategoryEditView(AccountMixin, generic.UpdateView):
 
         messages.success(
             self.request,
-            'Categoria de lote alterada com sucesso.'
+            'Tema alterado com sucesso.'
         )
         return response
 
 
-class LotCategoryDeleteView(DeleteViewMixin):
-    model = LotCategory
-    delete_message = "Tem certeza que deseja excluir a categoria \"{name}\"?"
+class ThemeDeleteView(DeleteViewMixin):
+    model = services.ThemeService.manager_class.Meta.model
+    delete_message = "Tem certeza que deseja excluir o tema \"{name}\"?"
     success_message = "Categoria excluída com sucesso!"
 
     def get_success_url(self):
         return reverse(
-            'subscription:category-list',
+            'addon:theme-list',
             kwargs={'event_pk': self.kwargs['event_pk']}
         )
 

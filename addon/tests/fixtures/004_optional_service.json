@@ -17,7 +17,7 @@
       "price": "828.00",
       "restrict_unique": true,
       "description": "",
-      "quantity": null,
+      "quantity": 50,
       "release_days": 7,
       "theme": 1,
       "place": null
@@ -41,7 +41,7 @@
       "price": "828.00",
       "restrict_unique": true,
       "description": "",
-      "quantity": null,
+      "quantity": 30,
       "release_days": 7,
       "theme": 1,
       "place": null
@@ -65,7 +65,7 @@
       "price": "828.00",
       "restrict_unique": true,
       "description": "",
-      "quantity": null,
+      "quantity": 20,
       "release_days": 7,
       "theme": 1,
       "place": null
@@ -89,7 +89,7 @@
       "price": "1036.20",
       "restrict_unique": true,
       "description": "",
-      "quantity": null,
+      "quantity": 10,
       "release_days": 7,
       "theme": 2,
       "place": null
@@ -113,7 +113,7 @@
       "price": "1036.20",
       "restrict_unique": true,
       "description": "",
-      "quantity": null,
+      "quantity": 30,
       "release_days": 7,
       "theme": 2,
       "place": null
@@ -137,7 +137,7 @@
       "price": "1036.20",
       "restrict_unique": true,
       "description": "",
-      "quantity": null,
+      "quantity": 20,
       "release_days": 7,
       "theme": 2,
       "place": null

@@ -7,8 +7,8 @@ function selectFromHash() {
 }
 
 function select(cat_id) {
-    $('.nav-tabs').find('li').removeClass('active');
-    $('.tab-pane').removeClass('active');
+    $('.cat-tabs .nav-tabs').find('li').removeClass('active');
+    $('.cat-tabs .tab-pane').removeClass('active');
 
     $('#cat-super-' + cat_id).addClass('active');
     $('#cat-' + cat_id).addClass('active');

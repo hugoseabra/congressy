@@ -22,10 +22,48 @@ class ProductService(services.ApplicationService):
     """ Application service. """
     manager_class = managers.ProductManager
 
+    def __init__(self, event, **kwargs):
+        self.event = event
+
+        data = kwargs.get('data', {})
+        data = data.copy()
+        data.update({'event': event.pk})
+        kwargs['data'] = data
+
+        super().__init__(**kwargs)
+
+        # Filtra categorias de lote por evento
+        lot_cat_queryset = self.manager.fields['lot_category'].queryset
+        self.manager.fields['lot_category'].queryset = lot_cat_queryset.filter(
+            event=event
+        )
+
 
 class ServiceService(services.ApplicationService):
     """ Application service. """
     manager_class = managers.ServiceManager
+
+    def __init__(self, event, **kwargs):
+        self.event = event
+
+        data = kwargs.get('data', {})
+        data = data.copy()
+        data.update({'event': event.pk})
+        kwargs['data'] = data
+
+        super().__init__(**kwargs)
+
+        # Filtra temas por evento
+        theme_queryset = self.manager.fields['theme'].queryset
+        self.manager.fields['theme'].queryset = theme_queryset.filter(
+            event=event
+        )
+
+        # Filtra categorias de lote por evento
+        lot_cat_queryset = self.manager.fields['lot_category'].queryset
+        self.manager.fields['lot_category'].queryset = lot_cat_queryset.filter(
+            event=event
+        )
 
 
 def remove_expired_optional_subscription(

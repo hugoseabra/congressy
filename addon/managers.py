@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from django.forms import ValidationError
+from django import forms
 
 from base import managers
+from core.forms.widgets import SplitDateTimeWidget, PriceInput
 from core.util.date import DateTimeRange
 from .constants import MINIMUM_RELEASE_DAYS
 from .helpers import has_quantity_conflict, has_sub_end_date_conflict
@@ -47,6 +48,10 @@ class ProductManager(managers.Manager):
     class Meta:
         model = Product
         fields = '__all__'
+        widgets = {
+            'price': PriceInput,
+            'date_end_sub': SplitDateTimeWidget,
+        }
 
     def __init__(self, **kwargs):
         initial = kwargs.get('initial', {})
@@ -56,6 +61,23 @@ class ProductManager(managers.Manager):
 
         super().__init__(**kwargs)
 
+        if not self.instance.pk or self.instance.price == 0:
+            self.fields['price'].initial = '0.00'
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+
+        # Não é permitido editar preço para opcionais com inscrições.
+        if self.instance.pk \
+                and self.instance.has_changed('price') \
+                and self.instance.subscription_products.count() > 0:
+            raise forms.ValidationError(
+                'Este opcional já possui inscrições. Seu valor não pode ser'
+                ' alterado.'
+            )
+
+        return price
+
 
 class ServiceManager(managers.Manager):
     """ Manager de serviços opcionais """
@@ -63,6 +85,37 @@ class ServiceManager(managers.Manager):
     class Meta:
         model = Service
         fields = '__all__'
+        widgets = {
+            'price': PriceInput,
+            'date_end_sub': SplitDateTimeWidget,
+            'schedule_start': SplitDateTimeWidget,
+            'schedule_end': SplitDateTimeWidget,
+        }
+
+    def __init__(self, **kwargs):
+        initial = kwargs.get('initial', {})
+        if not kwargs.get('instance') and initial.get('release_days') is None:
+            initial.update({'release_days': MINIMUM_RELEASE_DAYS})
+            kwargs.update({'initial': initial})
+
+        super().__init__(**kwargs)
+
+        if not self.instance.pk or self.instance.price == 0:
+            self.fields['price'].initial = '0.00'
+
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+
+        # Não é permitido editar preço para opcionais com inscrições.
+        if self.instance.pk \
+                and self.instance.has_changed('price') \
+                and self.instance.subscription_services.count() > 0:
+            raise forms.ValidationError(
+                'Este opcional já possui inscrições. Seu valor não pode ser'
+                ' alterado.'
+            )
+
+        return price
 
 
 class SubscriptionServiceManager(managers.Manager):
@@ -101,7 +154,7 @@ class SubscriptionServiceManager(managers.Manager):
 
         # Regra 1:
         if 0 < quantity <= total_subscriptions:
-            raise ValidationError(
+            raise forms.ValidationError(
                 'Quantidade de inscrições já foi atingida, novas inscrições '
                 'não poderão ser realizadas'
             )
@@ -150,7 +203,7 @@ class SubscriptionServiceManager(managers.Manager):
 
         # Regra 4
         if optional_service.date_end_sub and \
-                datetime.now() > optional_service.date_end_sub:
+                        datetime.now() > optional_service.date_end_sub:
             raise ValidationError(
                 'Este opcional já expirou e não aceita mais inscrições.'
             )

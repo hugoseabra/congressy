@@ -7,7 +7,7 @@
 
 {% else %}
 
-    <div class="form-group">
+    <div class="form-group" {% if hide is True %}style="display:none"{% endif %}>
 
         {{ label_tag|safe|capfirst }}
         {% if  required  or required == 'True' %}
@@ -19,6 +19,7 @@
                     class="row"
                 {% endif %}>
 
+        <div>
             {% if autofocus %}
 
                 {% if  required  or required == 'True' %}
