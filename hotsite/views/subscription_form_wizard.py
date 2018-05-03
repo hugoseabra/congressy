@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
@@ -8,20 +10,22 @@ from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
-from mailer.services import (
-    notify_new_free_subscription,
-    notify_new_user_and_free_subscription,
-)
+
+from addon.models import Product
+from addon.services import SubscriptionProductService
 from gatheros_event.models import Person
 from gatheros_subscription.models import Lot, \
     Subscription
 from hotsite import forms
 from hotsite.views.mixins import EventMixin
+from mailer.services import (
+    notify_new_free_subscription,
+    notify_new_user_and_free_subscription,
+)
 from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
-from addon.models import Service, Product
 
 FORMS = [("lot", forms.LotsForm),
          ("person", forms.SubscriptionPersonForm),
@@ -421,6 +425,19 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         if not hasattr(self.storage, 'person'):
             raise Exception('Não possuimos uma person no storage do wizard')
 
+        if not hasattr(self.storage, 'product_storage'):
+            self.storage.product_storage = []
+
+            addons_data = self.storage.get_step_data('addon')
+
+            for key, value in addons_data.items():
+                if 'product_' in key:
+
+                    product = self.get_product(pk=value)
+
+                    if product not in self.storage.product_storage:
+                        self.storage.product_storage.append(product)
+
         lot_data = self.storage.get_step_data('lot')
         lot = lot_data.get('lot-lots', '')
 
@@ -462,6 +479,21 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 notify_new_free_subscription(self.event, subscription)
 
         subscription.save()
+
+        if hasattr(self.storage, 'product_storage') and \
+                len(self.storage.product_storage) > 0:
+            for product in self.storage.product_storage:
+
+                liquid_price = self.get_calculated_price(product.price, lot)
+
+                service = SubscriptionProductService(data={
+                    'subscription': subscription.pk,
+                    'optional': product.pk,
+                    'optional_amount_price': product.price,
+                    'optional_liquid_amount': liquid_price,
+                })
+                
+                service.save()
 
         messages.success(
             self.request,
@@ -511,3 +543,24 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             return self.render_goto_step('addon')
 
         return product
+
+    def get_calculated_price(self, price, lot):
+        """
+        Resgata o valor calculado do preço do opcional de acordo com as regras
+        da Congressy.
+        """
+        if price is None:
+            return 0
+
+        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent = \
+            Decimal(self.event.congressy_percent) / 100
+
+        congressy_amount = price * congressy_plan_percent
+        if congressy_amount < minimum:
+            congressy_amount = minimum
+
+        if lot.transfer_tax is True:
+            return round(price + congressy_amount, 2)
+
+        return round(price, 2)

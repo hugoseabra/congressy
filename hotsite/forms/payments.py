@@ -86,6 +86,7 @@ class PaymentForm(forms.Form):
 
         self.fields['products_as_json'].initial = json.dumps(product_json)
 
+    # @TODO not DRY, fix
     def create_product_json(self, product):
 
         remove_fields = [
@@ -114,6 +115,7 @@ class PaymentForm(forms.Form):
 
         return product_obj
 
+    # @TODO not DRY, fix
     def get_calculated_price(self, price, lot):
         """
         Resgata o valor calculado do preço do opcional de acordo com as regras

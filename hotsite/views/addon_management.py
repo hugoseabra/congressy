@@ -1,4 +1,7 @@
-from django.http import HttpResponse
+import json
+
+from django.core import serializers
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
@@ -57,6 +60,18 @@ class EventProductOptionalManagementView(generic.TemplateView):
                         self.available_options.append({'optional': optional})
                     except Product.DoesNotExist:
                         pass
+
+            return_format = self.request.GET.get('format')
+
+            if return_format and return_format == 'json':
+
+                json_list = []
+
+                for product in self.available_options:
+                    json_list.append(
+                        self.create_product_json(product['optional']))
+                return JsonResponse(json_list, safe=False)
+
         else:
             event_optionals_products = Product.objects.filter(
                 lot_category=category, published=True)
@@ -129,3 +144,30 @@ class EventProductOptionalManagementView(generic.TemplateView):
             template_name = "optionals/currently_selected_product_list.html"
 
         return template_name
+
+    # @TODO not DRY, fix
+    def create_product_json(self, product):
+
+        remove_fields = [
+            'lot_category',
+            'created_by',
+            'modified_by',
+            'created',
+            'modified',
+            'release_days',
+            'optional_type',
+            'quantity',
+            'date_end_sub',
+            'published',
+        ]
+
+        product_obj_as_json = serializers.serialize('json', [product, ])
+        product_obj = json.loads(product_obj_as_json)
+        product_obj = product_obj[0]
+        product_obj = product_obj['fields']
+        product_obj['id'] = product.pk
+
+        for field in remove_fields:
+            del product_obj[field]
+
+        return product_obj
