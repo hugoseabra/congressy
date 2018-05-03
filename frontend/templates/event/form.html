@@ -1,4 +1,4 @@
-{% extends "base/base-hotsite.html" %}
+{% extends "base/base.html" %}
 {% load static %}
 {% load static i18n queryset_filter %}
 {% load base_tags %}
@@ -37,13 +37,13 @@
     {% endif %}
 {% endblock %}
 
-{% if object %}
 
     {% block nav_aside_itens %}
-        {% include 'event/event-menu.html' with active='dados-do-evento'%}
+        {% if object %}
+            {% include 'event/event-menu.html' with active='dados-do-evento'%}
+        {% endif %}
     {% endblock %}
 
-{% endif %}
 
 {% block content %}
     <form action="" method="post" class="form-horizontal form-border"
