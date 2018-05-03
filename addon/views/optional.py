@@ -142,21 +142,6 @@ class OptionalAddView(EventViewMixin, generic.CreateView):
         kwargs['event'] = self.event
         return kwargs
 
-    def get_initial(self):
-        from datetime import datetime
-
-        return {
-            'name': 'My service optional',
-            'lot_category': 1,
-            'optional_service_type': 1,
-            'theme': 1,
-            'schedule_start': datetime(2018, 6, 2, 14, 00, 00),
-            'schedule_end': datetime(2018, 6, 2, 15, 00, 00),
-            'date_end_sub': datetime(2018, 5, 30, 23, 59, 59),
-            'description': 'Some description',
-            'price': '230.00',
-        }
-
     def form_valid(self, form):
         try:
             response = super().form_valid(form)
