@@ -1,11 +1,12 @@
 from django.contrib import messages
+from django.forms.models import model_to_dict
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import generic
-from django.forms.models import model_to_dict
 
 from addon import forms
 from addon.models import Product, Service
+from core.views.mixins import TemplateNameableMixin
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription.models import LotCategory
@@ -34,7 +35,9 @@ class EventViewMixin(AccountMixin, generic.View):
         return context
 
 
-class OptionalServiceListView(EventViewMixin, generic.ListView):
+class OptionalServiceListView(TemplateNameableMixin,
+                              EventViewMixin,
+                              generic.ListView):
     queryset = LotCategory.objects.all()
     template_name = 'addon/optional/manage-service.html'
 
