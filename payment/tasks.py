@@ -32,10 +32,6 @@ def create_pagarme_transaction(transaction_data, subscription=None):
     )
 
     try:
-        body = json.dumps(payment)
-        subject = 'Pagarme Params...'
-
-        send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
 
         trx = pagarme.transaction.create(payment)
 

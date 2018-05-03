@@ -3,8 +3,7 @@ from django import forms
 from django.db.models.fields import NOT_PROVIDED
 from django.utils import six
 from django.utils.datastructures import MultiValueDictKeyError
-from kanu_locations.models import City
-from localflavor.br.forms import BRCPFField
+from localflavor.br.forms import BRCPFField, BRCNPJField
 
 from core.forms.cleaners import clear_string, clean_cellphone as phone_cleaner
 from core.forms.widgets import DateInput, AjaxChoiceField, TelephoneInput
@@ -68,12 +67,10 @@ class PersonForm(forms.ModelForm):
             'avatar',
             'synchronized',
             'rg',
-            ' zip_code',
             'orgao_expedidor',
             'pne',
             'politics_version',
             'term_version',
-            'institution_cnpj'
         )
 
         widgets = {
@@ -129,6 +126,15 @@ class PersonForm(forms.ModelForm):
             cpf = BRCPFField().clean(cpf)
             return clear_string(cpf)
         return cpf
+
+    def clean_institution_cnpj(self):
+        cnpj = self.cleaned_data.get('institution_cnpj')
+
+        if cnpj:
+            cnpj = BRCNPJField().clean(cnpj)
+            return clear_string(cnpj)
+
+        return cnpj
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
