@@ -23,7 +23,6 @@ from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 from addon.models import Service, Product
 
-
 FORMS = [("lot", forms.LotsForm),
          ("person", forms.SubscriptionPersonForm),
          ("survey", forms.SurveyForm),
@@ -89,7 +88,6 @@ def has_addons(wizard):
 
 
 class SubscriptionWizardView(EventMixin, SessionWizardView):
-
     condition_dict = {
         'payment': is_paid_lot,
         'survey': has_survey,
@@ -330,17 +328,11 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         # Persisting optionals in session storage
         if isinstance(form, forms.AddonForm):
-            """
-            Continuar daqui: TODO: 
-            
-            - Setar um nome para os campos hiddens dos optionais com prefixo 
-                para facil acesso. 
-            - persistir dentro do storage para acesso durante o step de 
-            payments  
-            
-            
-            """
-            print('sdsadas')
+            self.storage.product_storage = []
+            for key, value in form_data.items():
+                if 'product_' in key:
+                    product = self.get_product(pk=value)
+                    self.storage.product_storage.append(product)
 
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
@@ -492,3 +484,18 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 data[field_name] = value
 
         return data
+
+    def get_product(self, pk):
+        product = None
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            pass
+
+        if not product:
+            messages.error(request=self.request,
+                           message='Não foi possivel resgatar todos opcionais'
+                                   ' selecionados')
+            return self.render_goto_step('addon')
+
+        return product
