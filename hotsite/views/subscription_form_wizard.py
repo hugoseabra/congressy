@@ -273,11 +273,17 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
                 self.storage.person = person
 
-            return self.initial_dict.get(step, {
+            payment_initial = {
                 'choosen_lot': lot,
                 'event': self.event,
                 'person': self.storage.person
-            })
+            }
+
+            if hasattr(self.storage, 'product_storage'):
+                payment_initial.update(
+                    {'optional_products': self.storage.product_storage})
+
+            return self.initial_dict.get(step, payment_initial)
 
         return self.initial_dict.get(step, {})
 
@@ -328,11 +334,17 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         # Persisting optionals in session storage
         if isinstance(form, forms.AddonForm):
-            self.storage.product_storage = []
+
+            if not hasattr(self.storage, 'product_storage'):
+                self.storage.product_storage = []
+
             for key, value in form_data.items():
                 if 'product_' in key:
+
                     product = self.get_product(pk=value)
-                    self.storage.product_storage.append(product)
+
+                    if product not in self.storage.product_storage:
+                        self.storage.product_storage.append(product)
 
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
