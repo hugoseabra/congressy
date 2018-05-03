@@ -15,7 +15,7 @@ public_hotsite_urls = [
     url(r'^(?P<slug>[\w-]+)/coupon/$', views.CouponView.as_view(),
         name='hotsite-coupon'),
     url(r'category/(?P<category_pk>[\d]+)/products/',
-        views.EventProductOptionalManagementView.as_view(),
+        views.ProductOptionalManagementView.as_view(),
         name='hotsite_available_optional_product_list'),
 ]
 

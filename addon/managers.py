@@ -135,7 +135,7 @@ class SubscriptionServiceManager(managers.Manager):
             ou seja, se há outro Optional dentro do mesmo intervalo de
             data e hora final e inicial do Optional informado.
 
-        Regra #3: Validar rest-rição por tema (LimitByTheme), se há
+        Regra #3: Validar restrição por tema (LimitByTheme), se há
             restrição por Tema, ou seja, se o Participante já possui X
             opcionais no mesmo tema e não pode mais se cadastrar em outro.
 
@@ -149,15 +149,12 @@ class SubscriptionServiceManager(managers.Manager):
 
         optional_service = cleaned_data['optional']
         subscription = cleaned_data['subscription']
-        total_subscriptions = optional_service.subscription_services.count()
-        quantity = optional_service.quantity or 0
 
-        # Regra 1:
-        if 0 < quantity <= total_subscriptions:
+        # Regra 1
+        if has_quantity_conflict(optional_service):
             raise forms.ValidationError(
-                'Quantidade de inscrições já foi atingida, novas inscrições '
-                'não poderão ser realizadas'
-            )
+                'Quantidade de inscrições já foi atingida, '
+                'novas inscrições não poderão ser realizadas')
 
         # Regra 2:
         new_start = optional_service.schedule_start
@@ -177,7 +174,7 @@ class SubscriptionServiceManager(managers.Manager):
                             session_range)
 
             if has_conflict is True and (is_restricted or is_sub_restricted):
-                raise ValidationError(
+                raise forms.ValidationError(
                     'Conflito de horário: o opcional "{}" '
                     'está em conflito com o opcional "{}".'.format(
                         optional_service.name,
@@ -196,15 +193,14 @@ class SubscriptionServiceManager(managers.Manager):
                     total += 1
 
             if total >= optional_service.theme.limit:
-                raise ValidationError(
+                raise forms.ValidationError(
                     'Limite por tema excedido: limite do ''tema {} já foi '
                     'atingido'.format(optional_service.theme.name)
                 )
 
         # Regra 4
-        if optional_service.date_end_sub and \
-                        datetime.now() > optional_service.date_end_sub:
-            raise ValidationError(
+        if has_sub_end_date_conflict(optional_service):
+            raise forms.ValidationError(
                 'Este opcional já expirou e não aceita mais inscrições.'
             )
 
@@ -236,13 +232,13 @@ class SubscriptionProductManager(managers.Manager):
 
         # Regra 1
         if has_quantity_conflict(product):
-            raise ValidationError(
+            raise forms.ValidationError(
                 'Quantidade de inscrições já foi atingida, '
                 'novas inscrições não poderão ser realizadas')
 
         # Regra 2
         if has_sub_end_date_conflict(product):
-            raise ValidationError(
+            raise forms.ValidationError(
                 'Este opcional já expirou e não aceita mais inscrições.'
             )
 

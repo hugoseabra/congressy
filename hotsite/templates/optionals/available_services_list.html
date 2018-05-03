@@ -1,29 +1,31 @@
-<div id="available_optional_products">
+<div id="available_optional_services">
     {% if  object_list %}
-        <label for="products_table">Produtos</label>
+        <label for="services_table">Serviços</label>
 
-        <div class="table-responsive" id="products_table">
+        <div class="table-responsive" id="services_table">
             <table class="table">
                 <thead>
                 <tr>
                     <th>Nome</th>
                     <th>Tipo</th>
                     <th>Preço</th>
+                    <th>Tema</th>
+                    <th>Data de inicio</th>
+                    <th>Data de encerramento</th>
+                    <th>Local</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for product in object_list %}
+                {% for service in object_list %}
                     <tr>
-                        <td>{{ product.optional.name }}</td>
-                        <td>{{ product.optional.optional_type.name }}</td>
-                        <td>R${{ product.optional.price }}</td>
-                        {% if product.available %}
+                        <td>{{ service.optional.name }}</td>
+                        <td>{{ service.optional.optional_type.name }}</td>
+                        <td>R${{ service.optional.price }}</td>
+                        {% if service.available %}
                             <td>
                                 <button style="width: 100%"
-                                        onclick="addOptionalProduct
-                                                ('{{ product.optional.name }}'
-                                                ,{{ product.optional.pk }})"
+                                        onclick="addOptionalService{{ product.optional.pk }})"
                                         class="btn btn-sm btn-success">
                                     Selecionar
                                 </button>
@@ -44,6 +46,6 @@
             </table>
         </div>
     {% else %}
-        Nenhum produto opcional disponivel no momento.
+        Nenhum serviço opcional disponivel no momento.
     {% endif %}
 </div>
