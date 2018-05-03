@@ -59,16 +59,16 @@ function send(url, method, data, success_callback, error_callback) {
     });
 }
 
-function render_lot_list(selected_cat) {
+function render_service_optional_list(selected_cat) {
     var url = window.location.href.replace(window.location.hash, '');
-    url += '?template_name=lot/categories-lots-list';
+    url += '?template_name=addon/optional/includes/service';
 
     send(
         url,
         'GET',
         null,
         function (response) {
-            $('#lot-list-main-block').html(response);
+            $('#main-service-list-block').html(response);
 
             $('.tooltip').remove();
             app.tooltips();
@@ -85,14 +85,47 @@ function render_lot_list(selected_cat) {
             app.tooltips();
             createAnchorEvents();
             Messenger().post({
-                message: 'Não foi possivel carregar lista de lotes.',
+                message: 'Não foi possivel carregar lista de opcionais.',
                 type: 'error'
             });
         }
     );
 }
 
-function save_lot(url, data, msg) {
+function render_product_optional_list(selected_cat) {
+    var url = window.location.href.replace(window.location.hash, '');
+    url += '?template_name=addon/optional/includes/product';
+
+    send(
+        url,
+        'GET',
+        null,
+        function (response) {
+            $('#main-product-list-block').html(response);
+
+            $('.tooltip').remove();
+            app.tooltips();
+            createAnchorEvents();
+
+            if (parseInt(selected_cat) > 0) {
+                select(parseInt(selected_cat));
+            } else {
+                selectFromHash();
+            }
+        },
+        function () {
+            $('.tooltip').remove();
+            app.tooltips();
+            createAnchorEvents();
+            Messenger().post({
+                message: 'Não foi possivel carregar lista de opcionais.',
+                type: 'error'
+            });
+        }
+    );
+}
+
+function save_optional(url, data, msg) {
     send(
         url,
         'PATCH',
@@ -102,7 +135,14 @@ function save_lot(url, data, msg) {
                 message: msg,
                 type: 'success'
             });
-            render_lot_list();
+
+            if (url.indexOf('services') !== -1) {
+                render_service_optional_list();
+            }
+
+            if (url.indexOf('products') !== -1) {
+                render_product_optional_list();
+            }
         },
         function (response) {
             console.error(response.responseJSON);
@@ -120,36 +160,56 @@ function createAnchorEvents() {
     });
 }
 
-function publishLot(lot_id) {
+function publish_optional(type, id) {
     if (!confirm(
             'Tem certeza que deseja publicar o lote? Ele será exibido' +
             ' conforme as configurações de data inicial e final.'
         )) {
         return;
     }
+
+    var url;
+    if (type === 'service') {
+        url = '/api/addon/optionals/services/'+ id +'/'
+    }
+
+    if (type === 'product') {
+        url = '/api/addon/optionals/products/'+ id +'/'
+    }
+
+    if (!url) {
+        return;
+    }
+
     var data = {'active': true};
-    save_lot('/api/lots/' + lot_id + '/', data, 'Lote publicado com sucesso!');
+    save_optional(url, data, 'Opcional publicado com sucesso!');
 
 }
 
-function unpublishLot(lot_id) {
+function unpublish_optional(type, lot_id) {
     if (!confirm(
             'Tem certeza que deseja despublicar o lote?.'
         )) {
         return;
     }
+
+    var url;
+    if (type === 'service') {
+        url = '/api/addon/optionals/services/'+ id +'/'
+    }
+
+    if (type === 'product') {
+        url = '/api/addon/optionals/products/'+ id +'/'
+    }
+
+    if (!url) {
+        return;
+    }
+
     var data = {'active': false};
     save_lot('/api/lots/' + lot_id + '/', data, 'Lote despublicado com sucesso!');
 
 }
-
-$(document).ready(function () {
-    Messenger.options = {
-        extraClasses: 'messenger-fixed messenger-on-bottom ' +
-        'messenger-on-right',
-        theme: 'flat'
-    };
-});
 
 function save_survey() {
     var lot_id = $('#survey-lot_id').val();
@@ -241,3 +301,11 @@ function save_privacy() {
     );
     $('#lot-privacy_form').modal('toggle');
 }
+
+$(document).ready(function () {
+    Messenger.options = {
+        extraClasses: 'messenger-fixed messenger-on-bottom ' +
+        'messenger-on-right',
+        theme: 'flat'
+    };
+});
