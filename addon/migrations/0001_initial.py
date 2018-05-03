@@ -6,7 +6,15 @@ import base.models
 from decimal import Decimal
 from django.db import migrations, models
 import django.db.models.deletion
+from django.core.management import call_command
 import gatheros_event.models.mixins.gatheros_model_mixin
+
+
+def load_initial_data(*_):
+    """ Carrega dados iniciais do sistema. """
+    print('\nLoading initial data:')
+    call_command('loaddata', '001_optional_product_type', app_label='addon')
+    call_command('loaddata', '001_optional_service_type', app_label='addon')
 
 
 class Migration(migrations.Migration):
@@ -157,4 +165,5 @@ class Migration(migrations.Migration):
             name='theme',
             field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='services', to='addon.Theme', verbose_name='tema'),
         ),
+        migrations.RunPython(load_initial_data),
     ]
