@@ -72,14 +72,28 @@ class Transaction(models.Model):
         blank=True,
     )
 
-    amount = models.DecimalField(
+    subscription_amount = models.DecimalField(
         decimal_places=2,
         max_digits=11,
         null=True,
         blank=True,
     )
 
-    liquid_amount = models.DecimalField(
+    subscription_liquid_amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        null=True,
+        blank=True,
+    )
+
+    optional_amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        null=True,
+        blank=True,
+    )
+
+    optional_liquid_amount = models.DecimalField(
         decimal_places=2,
         max_digits=11,
         null=True,
@@ -124,3 +138,19 @@ class Transaction(models.Model):
             or self.status == self.PENDING_REFUND \
             or self.status == self.REFUSED \
             or self.status == self.CHARGEDBACK
+
+    @property
+    def transaction_amount(self):
+        """
+        O valor total pago pelo participante
+        :return: DecimalField
+        """
+        return self.subscription_amount + self.optional_amount
+
+    @property
+    def transaction_liquid_amount(self):
+        """
+        O valor total que o organizador irá receber
+        :return: DecimalField
+        """
+        return self.subscription_liquid_amount + self.optional_liquid_amount
