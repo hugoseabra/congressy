@@ -65,9 +65,6 @@
                                         <th class="col-xs-3">Forma de
                                             Pagamento
                                         </th>
-                                        <th class="col-xs-2 hidden-xs">
-                                            Valor (R$)
-                                        </th>
                                         <th class="col-xs-1">Voucher</th>
                                     </tr>
                                     </thead>
@@ -122,9 +119,7 @@
                                                     Error
                                                 {% endif %}
                                             </td>
-                                            <td>
-                                                R$ {{ transaction.amount|money_divide|intcomma }}
-                                            </td>
+
                                             <td>
                                                 {% if transaction.status == transaction.PAID %}
 
