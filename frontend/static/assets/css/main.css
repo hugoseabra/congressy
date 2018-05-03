@@ -3346,6 +3346,9 @@ label.valid {
   border-radius: 0;
   border: solid 10px rgba(255, 255, 255, 0.6);
 }
+.theme-cgsy-full .nav-pills > li.active > a {
+  background-color: #1f7bb6;
+}
 .theme-cgsy-full .brand {
   margin-left: 50px;
 }
@@ -3359,9 +3362,9 @@ label.valid {
 }
 .theme-cgsy-full .manage_sidebar {
   margin-top: 60px;
-  margin-left: 51px;
+  margin-left: 50px;
+  padding-left: 1px;
   width: 200px;
-  padding-left: 0;
   padding-right: 10px;
   background-color: #F0F3F3;
   z-index: 100;

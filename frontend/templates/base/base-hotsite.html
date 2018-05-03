@@ -94,7 +94,7 @@
         {% block navbar %}
             {% if user %}
                 <ul class="nav navbar-nav navbar-right">
-                    <li  style="padding-top: 5px">
+                    <li style="padding-top: 5px">
                         <span class="meta hidden-xs">
                             <button type="button" onclick="location.href=
                                     '{% url 'event:event-add' %}'"
@@ -283,13 +283,14 @@
 
                 </section>
                 <!-- main content end -->
-                <section class="cgsy-footer footer-wrapper"
-                         style="z-index:10000;">
-                    {% include "base/footer.html" %}
-                </section>
+
             </section>
         </div>
     </div>
+    <section class="cgsy-footer footer-wrapper"
+             style="z-index:10000;">
+        {% include "base/footer.html" %}
+    </section>
 
 </section>
 

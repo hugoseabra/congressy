@@ -323,15 +323,15 @@
 
 
 {% block nav_aside_itens %}
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a class="sidebar-itens" href="#" title="Painel">
-                <i class="fas fa-tachometer-alt"></i>
-                Painel
-            </a>
-        </li>
-    </ul>
+{#    <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>#}
+{#    <ul class="nav nav-pills nav-stacked">#}
+{#        <li>#}
+{#            <a class="sidebar-itens" href="#" title="Painel">#}
+{#                <i class="fas fa-tachometer-alt"></i>#}
+{#                Painel#}
+{#            </a>#}
+{#        </li>#}
+{#    </ul>#}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Participantes</h5>
     <ul class="nav nav-pills nav-stacked">
 
@@ -353,14 +353,14 @@
                 </a>
             </li>
         {% endif %}
-        <li>
-            <a class="sidebar-itens" href=
-                    "{% url 'subscription:subscription-attendance-search' event.pk %}"
-               title="Check-in">
-                <i class="fas fa-calendar-check"></i>
-                Check-in
-            </a>
-        </li>
+{#        <li>#}
+{#            <a class="sidebar-itens" href=#}
+{#                    "{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+{#               title="Check-in">#}
+{#                <i class="fas fa-calendar-check"></i>#}
+{#                Check-in#}
+{#            </a>#}
+{#        </li>#}
     </ul>
     <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
     <ul class="nav nav-pills nav-stacked">
@@ -391,33 +391,33 @@
         <li>
             <a class="sidebar-itens" href=
                     "{% url 'subscription:form-config' event.pk %}"
-               title="Form. Personalizado">
+               title="Form. Personalizado" style="padding-right: 0">
                 <i class="fab fa-wpforms"></i> Form. Personalizado
             </a>
         </li>
 
     </ul>
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Adicionais</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a class="sidebar-itens" href="#"
-               title="Opcionais">
-                <i class="far fa-calendar-plus"></i> Opcionais
-            </a>
-        </li>
-        <li>
-            <a class="sidebar-itens" href="#"
-               title="Certificados">
-                <i class="fas fa-address-card"></i> Certificados
-            </a>
-        </li>
-        <li>
-            <a class="sidebar-itens" href="#"
-               title="Submissão de artigos">
-                <i class="fas fa-newspaper"></i> Artigos científicos
-            </a>
-        </li>
-    </ul>
+{#    <h5 class="sidebar-header" style="color:#4c4c4c;">Adicionais</h5>#}
+{#    <ul class="nav nav-pills nav-stacked">#}
+{#        <li>#}
+{#            <a class="sidebar-itens" href="#"#}
+{#               title="Opcionais">#}
+{#                <i class="far fa-calendar-plus"></i> Opcionais#}
+{#            </a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a class="sidebar-itens" href="#"#}
+{#               title="Certificados">#}
+{#                <i class="fas fa-address-card"></i> Certificados#}
+{#            </a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a class="sidebar-itens" href="#"#}
+{#               title="Submissão de artigos">#}
+{#                <i class="fas fa-newspaper"></i> Artigos científicos#}
+{#            </a>#}
+{#        </li>#}
+{#    </ul>#}
 {% endblock %}
 
 {% block content %}

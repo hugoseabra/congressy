@@ -1,4 +1,4 @@
-{% extends "base/base.html" %}
+{% extends "base/base-hotsite.html" %}
 {# @TODO Change the icons in nav_aside_itens  #}
 {% load static %}
 {% load event_tags %}
@@ -78,70 +78,118 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <h5 class="sidebar-header">Participantes</h5>
+{#    <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>#}
+{#    <ul class="nav nav-pills nav-stacked">#}
+{#        <li>#}
+{#            <a class="sidebar-itens" href="#" title="Painel">#}
+{#                <i class="fas fa-tachometer-alt"></i>#}
+{#                Painel#}
+{#            </a>#}
+{#        </li>#}
+{#    </ul>#}
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Participantes</h5>
     <ul class="nav nav-pills nav-stacked">
-        <li class="active">
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Lotes/Categorias
-            </a>
-        </li>
+
         <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
+            <a class="sidebar-itens" href=
+                    "{% url 'subscription:subscription-list' event.pk %}"
                title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
+                <i class="fa fa-clipboard"></i>
                 Inscrições
                 <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
             </a>
         </li>
-        {#        <li>#}
-        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fa  fa-fw fa-rocket"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
         {% if has_paid_lots %}
             <li>
-                <a href="{% url 'payment:event-payments' event.pk %}"
+                <a class="sidebar-itens" href=
+                        "{% url 'payment:event-payments' event.pk %}"
                    title="Pagamentos">
-                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
+                    <i class="fas fa-credit-card"></i> Pagamentos
                 </a>
             </li>
         {% endif %}
+{#        <li>#}
+{#            <a class="sidebar-itens" href=#}
+{#                    "{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+{#               title="Check-in">#}
+{#                <i class="fas fa-calendar-check"></i>#}
+{#                Check-in#}
+{#            </a>#}
+{#        </li>#}
+    </ul>
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a class="sidebar-itens" href=
+                    "{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fas fa-file-alt"></i> Página do evento
+            </a>
+        </li>
+        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+            <li class="active">
+                <a class="sidebar-itens" href=
+                        "{% url 'subscription:lot-list' event.pk %}"
+                   title="Lotes/Categorias">
+                    <i class="fas fa-th-large"></i>
+                    Lotes/Categorias
+                </a>
+            </li>
+        {% endif %}
+        <li>
+            <a class="sidebar-itens" href=
+                    "{% url 'event:event-edit' event.pk %}"
+               title="Configurações gerais">
+                <i class="fas fa-cog"></i> Dados do evento
+            </a>
+        </li>
+        <li>
+            <a class="sidebar-itens" href=
+                    "{% url 'subscription:form-config' event.pk %}"
+               title="Form. Personalizado" style="padding-right: 0">
+                <i class="fab fa-wpforms"></i> Form. Personalizado
+            </a>
+        </li>
 
     </ul>
+{#    <h5 class="sidebar-header" style="color:#4c4c4c;">Adicionais</h5>#}
+{#    <ul class="nav nav-pills nav-stacked">#}
+{#        <li>#}
+{#            <a class="sidebar-itens" href="#"#}
+{#               title="Opcionais">#}
+{#                <i class="far fa-calendar-plus"></i> Opcionais#}
+{#            </a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a class="sidebar-itens" href="#"#}
+{#               title="Certificados">#}
+{#                <i class="fas fa-address-card"></i> Certificados#}
+{#            </a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a class="sidebar-itens" href="#"#}
+{#               title="Submissão de artigos">#}
+{#                <i class="fas fa-newspaper"></i> Artigos científicos#}
+{#            </a>#}
+{#        </li>#}
+{#    </ul>#}
 {% endblock %}
+
+
 
 {% block content %}
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-right">
-{#                    {% if can_add %}#}
-                        <a href="{% url 'subscription:lot-add' event.pk %}"
-                           class="btn
+                    {#                    {% if can_add %}#}
+                    <a href="{% url 'subscription:lot-add' event.pk %}"
+                       class="btn
                         btn-success">
-                            <i class="fa fa-plus"></i>
-                            Adicionar
-                        </a>
-{#                    {% endif %}#}
+                        <i class="fa fa-plus"></i>
+                        Adicionar
+                    </a>
+                    {#                    {% endif %}#}
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -184,12 +232,13 @@
                                 {% else %}
                                     {{ lot.name }}
                                 {% endif %}
-                                <br />
+                                <br/>
                                 <small class="text-muted">{{ lot.get_period }}</small>
                             </td>
 
-                            <td class="hidden-xs hidden-sm">{% if lot.price and lot.price > 0 %}
-                                Pago{% else %}Gratuito{% endif %}</td>
+                            <td class="hidden-xs hidden-sm">
+                                {% if lot.price and lot.price > 0 %}
+                                    Pago{% else %}Gratuito{% endif %}</td>
 
 
                             <td class="hidden-xs hidden-sm">
