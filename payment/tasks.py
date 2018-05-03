@@ -66,7 +66,6 @@ def create_pagarme_transaction(transaction_data, subscription=None):
         send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
         raise TransactionError(message='Unknown API error')
 
-    # Separar centavos
     items = trx['items']
     subscription = items.pop(0)
 
@@ -74,12 +73,13 @@ def create_pagarme_transaction(transaction_data, subscription=None):
     transaction_instance.status = trx['status']
     transaction_instance.type = trx['payment_method']
     transaction_instance.date_created = trx['date_created']
-    transaction_instance.subscription_amount = subscription['unit_price']/100
+    transaction_instance.subscription_amount = separate_amount(subscription[
+                                                                   'unit_price'])
     transaction_instance.subscription_liquid_amount = liquid_amount
     optional_total = 0
 
     for item in items:
-        optional_total += item['unit_price']/100
+        optional_total += separate_amount(item['unit_price'])
 
     # @TODO add optional liquid amount and seperate cents
 
