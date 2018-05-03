@@ -103,21 +103,3 @@ Variáveis:
 {#            </a>#}
 {#        </li>#}
 {#        </ul>#}
-
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Equipe</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li {% if active == 'membros' %}class="active"{% endif %}>
-            <a class="sidebar-itens" href="{% url 'event:member-list' member_organization.pk %}"
-               title="Membros">
-                <i class="fa fa-users"></i> Membros
-            </a>
-        </li>
-        {% if can_manage_invitations %}
-        <li {% if active == 'form-personalizado' %}class="active"{% endif %}>
-            <a class="sidebar-itens" href=
-                        "{% url 'event:invitation-list' member_organization.pk %}" title="Convites">
-                <i class="fas fa-envelope-open"></i> Convites
-            </a>
-        </li>
-        {% endif %}
-    </ul>
