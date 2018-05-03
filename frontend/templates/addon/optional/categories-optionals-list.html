@@ -54,21 +54,21 @@
             </div>
             <div class="col-md-2 col-lg-3 col-xl-2">
                 <hr class="hidden-md hidden-lg hidden-xl" />
-                <div
-                    data-toggle="tooltip"
-                    data-placement="left"
-                    title=""
-                    data-original-title="Gerenciar limite de vagas">
-                    <button
-                        class="btn btn-sm btn-info btn-block {% if not optional.limit %}btn-trans{% endif %}"
-                        data-toggle="modal"
-                        data-backdrop="static"
-                        onclick="$('#lot-limit-lot_id').val('{{ optional.pk }}');$('#lot-limit-name').text('{{ optional.name }}');$('#lot-limit').val('{{ optional.limit|default_if_none:0 }}')"
-                        data-target="#lot-limit-form">
-                        <i class="fas fa-users"></i>
-                        <span class="hidden-md">Vagas</span>
-                    </button>
-                </div>
+{#                <div#}
+{#                    data-toggle="tooltip"#}
+{#                    data-placement="left"#}
+{#                    title=""#}
+{#                    data-original-title="Gerenciar limite de vagas">#}
+{#                    <button#}
+{#                        class="btn btn-sm btn-info btn-block {% if not optional.limit %}btn-trans{% endif %}"#}
+{#                        data-toggle="modal"#}
+{#                        data-backdrop="static"#}
+{#                        onclick="$('#lot-limit-lot_id').val('{{ optional.pk }}');$('#lot-limit-name').text('{{ optional.name }}');$('#lot-limit').val('{{ optional.limit|default_if_none:0 }}')"#}
+{#                        data-target="#lot-limit-form">#}
+{#                        <i class="fas fa-users"></i>#}
+{#                        <span class="hidden-md">Vagas</span>#}
+{#                    </button>#}
+{#                </div>#}
             </div>
             <div class="col-md-2">
                 <div
@@ -93,31 +93,31 @@
                     </button>
                     {% endif %}
                 </div>
-                {% if optional.published %}
-                <div
-                    data-toggle="tooltip"
-                    data-placement="left"
-                    title=""
-                    data-original-title="Este lote está ativo. Clique para desativa-lo.">
-                    <button
-                        onclick="unpublishLot('{{ optional.pk }}')"
-                        class="btn btn-sm btn-success btn-trans btn-block">
-                        <i class="fas fa-check-circle"></i>
-                    </button>
-                </div>
-                {% else %}
-                <div
-                    data-toggle="tooltip"
-                    data-placement="left"
-                    title=""
-                    data-original-title="Este lote está inativo. Clique para ativa-lo.">
-                    <button
-                        onclick="publishLot('{{ optional.pk }}')"
-                        class="btn btn-sm btn-warning btn-trans btn-block">
-                        <i class="fa fa-exclamation-circle"></i>
-                    </button>
-                </div>
-                {% endif %}
+{#                {% if optional.active %}#}
+{#                <div#}
+{#                    data-toggle="tooltip"#}
+{#                    data-placement="left"#}
+{#                    title=""#}
+{#                    data-original-title="Este lote está ativo. Clique para desativa-lo.">#}
+{#                    <button#}
+{#                        onclick="unpublishLot('{{ optional.pk }}')"#}
+{#                        class="btn btn-sm btn-success btn-trans btn-block">#}
+{#                        <i class="fas fa-check-circle"></i>#}
+{#                    </button>#}
+{#                </div>#}
+{#                {% else %}#}
+{#                <div#}
+{#                    data-toggle="tooltip"#}
+{#                    data-placement="left"#}
+{#                    title=""#}
+{#                    data-original-title="Este lote está inativo. Clique para ativa-lo.">#}
+{#                    <button#}
+{#                        onclick="publishLot('{{ optional.pk }}')"#}
+{#                        class="btn btn-sm btn-warning btn-trans btn-block">#}
+{#                        <i class="fa fa-exclamation-circle"></i>#}
+{#                    </button>#}
+{#                </div>#}
+{#                {% endif %}#}
                 {% if optional.is_deletable %}
                 <div
                     data-toggle="tooltip"

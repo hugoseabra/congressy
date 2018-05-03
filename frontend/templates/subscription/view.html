@@ -74,6 +74,12 @@
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
+        <li>
+            <a href="{% url 'addon:optional-service-list' event.pk %}"
+               title="Opcionais">
+                <i class="fa  fa-fw fa-rocket"></i> Opcionais
+            </a>
+        </li>
         {% if has_paid_lots %}
             <li>
                 <a href="{% url 'payment:event-payments' event.pk %}"

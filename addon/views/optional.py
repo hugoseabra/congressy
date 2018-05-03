@@ -76,7 +76,9 @@ class OptionalServiceListView(TemplateNameableMixin,
         return stats
 
 
-class OptionalProductListView(EventViewMixin, generic.ListView):
+class OptionalProductListView(TemplateNameableMixin,
+                              EventViewMixin,
+                              generic.ListView):
     queryset = LotCategory.objects.all()
     template_name = 'addon/optional/manage-product.html'
 
