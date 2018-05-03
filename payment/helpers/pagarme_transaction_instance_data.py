@@ -95,6 +95,7 @@ class PagarmeTransactionInstanceData:
                 {
                     "id": str(transaction_id),
                     "title": self.event.name,
+                    "category": "inscrição",
                     "unit_price": self.as_payment_format(
                         self.lot.get_calculated_price()),
                     "quantity": 1,
@@ -132,6 +133,7 @@ class PagarmeTransactionInstanceData:
             transaction_data['items'].append({
                 "id": str(optional.pk),
                 "title": optional.name,
+                "category": 'opcional',
                 "unit_price": self.as_payment_format(
                     self.get_calculated_price(optional.price, self.lot)),
                 "quantity": 1,

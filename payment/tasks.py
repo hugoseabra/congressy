@@ -66,23 +66,27 @@ def create_pagarme_transaction(transaction_data, subscription=None):
         send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
         raise TransactionError(message='Unknown API error')
 
-    items = trx['items']
-    subscription = items.pop(0)
+    items = trx['items'].copy()
+    trx_subscription = None
+
+    for item in items:
+        if item['category'] == 'inscrição':
+            trx_subscription = item
 
     transaction_instance.data = trx
     transaction_instance.status = trx['status']
     transaction_instance.type = trx['payment_method']
     transaction_instance.date_created = trx['date_created']
-    transaction_instance.subscription_amount = separate_amount(subscription[
-                                                                   'unit_price'])
+    transaction_instance.subscription_amount = separate_amount(
+        trx_subscription['unit_price'])
     transaction_instance.subscription_liquid_amount = liquid_amount
     optional_total = 0
 
     for item in items:
-        optional_total += separate_amount(item['unit_price'])
+        if item['category'] == 'opcional':
+            optional_total += separate_amount(item['unit_price'])
 
-    # @TODO add optional liquid amount and seperate cents
-
+    # @TODO add optional liquid amount
     transaction_instance.optional_amount = optional_total
 
     if transaction_instance.type == Transaction.BOLETO:
