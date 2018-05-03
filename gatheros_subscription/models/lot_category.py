@@ -33,4 +33,4 @@ class LotCategory(models.Model, GatherosModelMixin):
         ordering = ['name']
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.event.name)
+        return self.name

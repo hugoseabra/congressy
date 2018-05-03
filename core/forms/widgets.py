@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from django import forms
 from django.forms.utils import to_current_timezone
@@ -14,6 +15,17 @@ class AjaxChoiceField(forms.ChoiceField):
 
 class PriceInput(forms.TextInput):
     input_type = 'tel'
+
+    def value_from_datadict(self, data, files, name):
+        value = super().value_from_datadict(data, files, name)
+        if not value:
+            value = Decimal(0.00)
+
+        if isinstance(value, Decimal):
+            return value
+
+        value = value.replace('.', '').replace(',', '.')
+        return round(Decimal(value))
 
 
 class TelephoneInput(forms.TextInput):
@@ -33,6 +45,12 @@ class DateInput(forms.DateInput):
 
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)
+
+        if not value:
+            return value
+
+        if isinstance(value, datetime):
+            return value
 
         lang = get_language()
 
@@ -59,6 +77,13 @@ class TimeInput(forms.TimeInput):
 
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)
+
+        if not value:
+            return value
+
+        if isinstance(value, datetime):
+            return value
+
         if len(value) == 5:
             value += ':00'
 
@@ -73,7 +98,6 @@ class SplitDateTimeWidget(forms.MultiWidget):
     template_name = 'forms/widgets/splitdatetime.html'
 
     def __init__(self, attrs=None, date_format=None, time_format=None):
-        now = datetime.now()
         date = DateInput(attrs=attrs, format=date_format)
         time = TimeInput(attrs=attrs, format=time_format)
 
@@ -128,3 +152,13 @@ class DateTimeInput(forms.DateTimeInput):
     input_type = 'tel'
 
 
+class ModelChoiceField(forms.ModelChoiceField):
+    def __init__(self, to_field_label=None, *args, **kwargs):
+        self.to_field_label = to_field_label
+        super().__init__(*args, **kwargs)
+
+    def label_from_instance(self, obj):
+        if self.to_field_label is None:
+            return super().label_from_instance(obj)
+
+        return getattr(obj, self.to_field_label)

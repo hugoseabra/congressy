@@ -85,8 +85,8 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True, null=True, verbose_name='descrição')),
                 ('quantity', models.PositiveIntegerField(blank=True, help_text='Limite máximo permitido.', null=True, verbose_name='quantidade')),
                 ('release_days', models.PositiveIntegerField(blank=True, default=7, help_text='Número de dias em que serão liberadas as vagas de opcionais caso a inscrição esteja como pendente.', null=True, verbose_name='dias de liberação de opcionais')),
-                ('schedule_start', models.DateTimeField(help_text='Data e hora inicial da programação no dia do evento.', verbose_name='programação - data/hora inicial')),
-                ('schedule_end', models.DateTimeField(help_text='Data e hora final da programação no dia do evento.', verbose_name='programação - data/hora final')),
+                ('schedule_start', models.DateTimeField(help_text='Data e hora inicial da programação no dia do evento.', verbose_name='programação - início')),
+                ('schedule_end', models.DateTimeField(help_text='Data e hora final da programação no dia do evento.', verbose_name='programação - fim')),
                 ('place', models.CharField(blank=True, max_length=255, null=True, verbose_name='local')),
                 ('restrict_unique', models.BooleanField(default=False, help_text='Restringir como única dentro do intervalo de tempo.', verbose_name='restringir como único')),
                 ('lot_category', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='service_optionals', to='gatheros_subscription.LotCategory', verbose_name='categoria')),
@@ -150,6 +150,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='service',
             name='theme',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='services', to='addon.Theme', verbose_name='themas'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='services', to='addon.Theme', verbose_name='tema'),
         ),
     ]

@@ -3,6 +3,7 @@
 """
     Representação do serviços de opcional(add ons)
 """
+from datetime import datetime
 from decimal import Decimal
 
 from django.db import models
@@ -10,13 +11,14 @@ from django.db import models
 from addon import constants, rules
 from base.models import EntityMixin
 from core.model import track_data
+from gatheros_event.models.mixins import GatherosModelMixin
 from gatheros_subscription.models import LotCategory
 from .optional_type import OptionalServiceType, OptionalProductType
 from .theme import Theme
 
 
-@track_data('date_end_sub')
-class AbstractOptional(EntityMixin, models.Model):
+@track_data('date_end_sub', 'price')
+class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
     """
         Opcional é um item adicional (add-on) à inscrição de um evento que
         será de um *produto* ou *serviço*.
@@ -29,6 +31,9 @@ class AbstractOptional(EntityMixin, models.Model):
     class Meta:
         abstract = True
         ordering = ('name',)
+
+    OPTIONAL_STATUS_RUNNING = 'running'
+    OPTIONAL_STATUS_FINISHED = 'finished'
 
     lot_category = models.ForeignKey(
         LotCategory,
@@ -106,6 +111,30 @@ class AbstractOptional(EntityMixin, models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def status(self):
+        """
+        Status do opcional de acordo com suas datas.
+        :return: string
+        """
+        if self.quantity and self.quantity > 0:
+            if self.num_consumed >= self.quantity:
+                return self.OPTIONAL_STATUS_FINISHED
+
+        now = datetime.now()
+        if now > self.date_end_sub:
+            return self.OPTIONAL_STATUS_FINISHED
+
+        return self.OPTIONAL_STATUS_RUNNING
+
+    @property
+    def running(self):
+        return self.status == self.OPTIONAL_STATUS_RUNNING
+
+    @property
+    def finished(self):
+        return self.status == self.OPTIONAL_STATUS_FINISHED
+
 
 class Product(AbstractOptional):
     """
@@ -137,7 +166,9 @@ class Product(AbstractOptional):
         :return: número de opcionais vendidos
         :type: bool
         """
-        return self.subscription_products.count()
+        return self.subscription_products.filter(
+            subscription__status='canceled'
+        ).count()
 
 
 @track_data('schedule_start', 'schedule_end')
@@ -168,16 +199,16 @@ class Service(AbstractOptional):
     theme = models.ForeignKey(
         Theme,
         on_delete=models.PROTECT,
-        verbose_name="themas",
+        verbose_name="tema",
         related_name="services",
     )
 
     schedule_start = models.DateTimeField(
-        verbose_name="programação - data/hora inicial",
+        verbose_name="programação - início",
         help_text='Data e hora inicial da programação no dia do evento.'
     )
     schedule_end = models.DateTimeField(
-        verbose_name="programação - data/hora final",
+        verbose_name="programação - fim",
         help_text='Data e hora final da programação no dia do evento.'
     )
 
@@ -203,4 +234,6 @@ class Service(AbstractOptional):
         :return: número de opcionais vendidos
         :type: bool
         """
-        return self.subscription_services.count()
+        return self.subscription_services.filter(
+            subscription__status='canceled'
+        ).count()

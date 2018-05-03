@@ -1,0 +1,24 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="tab-wrapper tab-left ">
+            <ul class="nav nav-tabs">
+                {% for cat in object_list %}
+                <li id="cat-super-{{ cat.pk }}" class="{% if forloop.counter0 == 0 %}active{% endif %}" style="width:180px;overflow: hidden">
+                    <a class="cat-tab-link" data-cat-id="{{ cat.pk }}" href="#cat-{{ cat.pk }}" data-toggle="tab" aria-expanded="{% if forloop.counter0 == 0 %}true{% else %}false{% endif %}">
+                        {{ cat.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content">
+                {% for cat in object_list %}
+                <div class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}" id="cat-{{ cat.pk }}">
+                    <h3 style="font-weight: bold;padding: 10px 0">{{ cat.name }}</h3>
+                    <hr />
+                    {% include 'addon/optional/categories-optionals-list.html' with optionals=cat.product_optionals %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

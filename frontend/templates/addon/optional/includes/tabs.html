@@ -1,0 +1,56 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                {% if active == 'service' %}
+                <h3 class="panel-title">Opcionais de Serviço</h3>
+                {% endif %}
+                {% if active == 'product' %}
+                <h3 class="panel-title">Opcionais de Produto</h3>
+                {% endif %}
+            </div>
+            <div class="panel-body">
+                <div class="tab-wrapper tab-primary">
+                    <ul class="nav nav-tabs">
+                        <li {% if active == 'service' %}class="active"{% endif %}>
+                            <a href="{% url 'addon:optional-service-list' event.pk %}" >Serviços</a>
+                        </li>
+                        <li {% if active == 'product' %}class="active"{% endif %}>
+                            <a href="{% url 'addon:optional-product-list' event.pk %}" >Produtos</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active">
+
+                            {% if active == 'service' %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3 class="title" style="font-weight: bold;padding: 16px 0">Serviços</h3>
+                                    <div class="row cat-tabs">
+                                        <div class="col-md-12">
+                                            {% include 'addon/optional/includes/service.html' %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if active == 'product' %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3 class="title" style="font-weight: bold;padding: 16px 0">Produtos</h3>
+                                    <div class="row cat-tabs">
+                                        <div class="col-md-12">
+                                            {% include 'addon/optional/includes/product.html' %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

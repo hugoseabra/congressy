@@ -13,7 +13,13 @@ class MustScheduleDateEndAfterDateStart(RuleChecker):
     """
 
     def check(self, model_instance, *args, **kwargs):
-        if model_instance.schedule_start >= model_instance.schedule_end:
+        date_start = model_instance.schedule_start
+        date_end = model_instance.schedule_end
+
+        if not date_start or not date_end:
+            return
+
+        if date_start >= date_end:
             raise RuleIntegrityError(
                 'Data/hora inicial deve ser anterior a data/hora final.'
             )
@@ -27,6 +33,12 @@ class ServiceMustHaveUniqueDatetimeScheduleInterval(RuleChecker):
     """
 
     def check(self, model_instance, *args, **kwargs):
+        date_start = model_instance.schedule_start
+        date_end = model_instance.schedule_end
+
+        if not date_start or not date_end:
+            return
+
         if model_instance._state.adding is False:
             schedule_start_changed = \
                 model_instance.has_changed('schedule_start')
