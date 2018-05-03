@@ -102,7 +102,10 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         response = super().dispatch(request, *args, **kwargs)
 
-        if not self.storage or not request.user.is_authenticated:
+        if not self.request.user.is_authenticated:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        if not self.storage:
             return redirect('public:hotsite', slug=self.event.slug)
 
         enabled = self.subscription_enabled()
@@ -123,6 +126,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         # Look for a wizard_goto_step element in the posted data which
         # contains a valid step name. If one was found, render the requested
         # form. (This makes stepping back a lot easier).
+
         wizard_goto_step = self.request.POST.get('wizard_goto_step', None)
         if wizard_goto_step and wizard_goto_step in self.get_form_list():
             return self.render_goto_step(wizard_goto_step)
@@ -184,6 +188,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             else:
                 # proceed to the next step
                 return self.render_next_step(form)
+
         return self.render(form)
 
     def get_context_data(self, **kwargs):
