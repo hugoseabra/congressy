@@ -26,20 +26,22 @@
                                     <div style="width:100%;margin-top:3px;padding-bottom:10px">
                                     {% for message in messages %}
                                         {% if message.tags %}
-                                        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                                            <div class="alert alert-{{ message.tags }} alert-dismissible"
+                                                 role="alert">
                                         {% else %}
-                                        <div class="alert alert-warning alert-dismissible" role="alert">
+                                            <div class="alert alert-warning alert-dismissible"
+                                                 role="alert">
                                         {% endif %}
 
-                                            <button type="button" class="close"
-                                                    data-dismiss="alert"
-                                                    aria-label="Close"><span
-                                                    aria-hidden="true">&times;</span>
-                                            </button>
-                                            {{ message|capfirst }}
-                                        </div>
-                                    {% endfor %}
+                                    <button type="button" class="close"
+                                            data-dismiss="alert"
+                                            aria-label="Close"><span
+                                            aria-hidden="true">&times;</span>
+                                    </button>
+                                    {{ message|capfirst }}
                                     </div>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
                             {% endblock messages %}
 
@@ -53,8 +55,10 @@
                                 {% endif %}
                             {% endfor %}
 
-                            <div id="payment_buttons" class="text-center" style="display: none">
-                                <button id="id_boleto" type="button" style="text-align: center;display: none">
+                            <div id="payment_buttons" class="text-center"
+                                 style="display: none">
+                                <button id="id_boleto" type="button"
+                                        style="text-align: center;display: none">
                                     Boleto
                                     <br/>
                                     <img class="img-responsive"
@@ -98,10 +102,9 @@
                                 {% endfor %}
 
                                 {% if wizard.steps.prev %}
-                                    <button name="wizard_goto_step"
-                                            type="submit"
-                                            class="btn btn-primary"
-                                            value="{{ wizard.steps.prev }}">
+                                    <button type="button"
+                                            onclick="submit_back_form()"
+                                            class="btn btn-primary">
                                         <i class="fas fa-chevron-circle-left"></i>
                                         Voltar
                                     </button>
@@ -113,11 +116,22 @@
                                     <i class="fas fa-chevron-circle-right"></i>
                                 </button>
                             </form>
+
+                            <form id="back_form" action="" method="post" novalidate>
+
+                                {% csrf_token %}
+                                {{ wizard.management_form }}
+
+                                <input type="hidden"
+                                       name="wizard_goto_step"
+                                       value="{{ wizard.steps.prev }}">
+                            </form>
+
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
 {% endblock %}
@@ -148,6 +162,10 @@
                 );
             });
         });
+
+        function submit_back_form() {
+            $('#back_form').submit()
+        }
 
     </script>
 {% endblock %}
