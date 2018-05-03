@@ -16,12 +16,13 @@ CONGRESSY_RECIPIENT_ID = settings.PAGARME_RECIPIENT_ID
 class PagarmeTransactionInstanceData:
     # @TODO add international phone number capability
 
-    def __init__(self, subscription, extra_data, event):
+    def __init__(self, subscription, extra_data, optionals, event):
 
         self.subscription = subscription
         self.lot = subscription.lot
         self.person = subscription.person
         self.extra_data = extra_data
+        self.optionals = optionals
         self.event = event
 
         self._set_amount()
@@ -94,7 +95,8 @@ class PagarmeTransactionInstanceData:
                 {
                     "id": str(transaction_id),
                     "title": self.event.name,
-                    "unit_price": self.as_payment_format(self.amount),
+                    "unit_price": self.as_payment_format(
+                        self.lot.get_calculated_price()),
                     "quantity": 1,
                     "tangible": False
                 }
@@ -113,7 +115,8 @@ class PagarmeTransactionInstanceData:
 
         if self.transaction_type == 'credit_card':
             transaction_data['payment_method'] = 'credit_card'
-            transaction_data['card_hash'] = self.extra_data['payment-card_hash']
+            transaction_data['card_hash'] = self.extra_data[
+                'payment-card_hash']
 
             if self.subscription.lot.allow_installment is True \
                     and self.extra_data.get('payment-installments') \
@@ -124,6 +127,16 @@ class PagarmeTransactionInstanceData:
         if self.transaction_type == 'boleto':
             transaction_data['installments'] = ''
             transaction_data['payment_method'] = 'boleto'
+
+        for optional in self.optionals:
+            transaction_data['items'].append({
+                "id": str(optional.pk),
+                "title": optional.name,
+                "unit_price": self.as_payment_format(
+                    self.get_calculated_price(optional.price, self.lot)),
+                "quantity": 1,
+                "tangible": True
+            })
 
         # Estabelecer uma referência de qual o estado sistema houve a transação
         environment_version = os.getenv('ENVIRONMENT_VERSION')
@@ -168,7 +181,8 @@ class PagarmeTransactionInstanceData:
                 and self.lot.allow_installment is True \
                 and self.extra_data.get('payment-installments') \
                 and int(self.extra_data.get('payment-installments')) > 1:
-            self.installments = int(self.extra_data.get('payment-installments'))
+            self.installments = int(
+                self.extra_data.get('payment-installments'))
 
     def _set_organization(self):
 
@@ -319,3 +333,24 @@ class PagarmeTransactionInstanceData:
             split_rules.append(partner_rule)
 
         return split_rules
+
+    def get_calculated_price(self, price, lot):
+        """
+        Resgata o valor calculado do preço do opcional de acordo com as regras
+        da Congressy.
+        """
+        if price is None:
+            return 0
+
+        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent = \
+            Decimal(self.event.congressy_percent) / 100
+
+        congressy_amount = price * congressy_plan_percent
+        if congressy_amount < minimum:
+            congressy_amount = minimum
+
+        if lot.transfer_tax is True:
+            return round(price + congressy_amount, 2)
+
+        return round(price, 2)

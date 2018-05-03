@@ -365,6 +365,19 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                     person = Person.objects.get(user=self.request.user)
                     self.storage.person = person
 
+                if not hasattr(self.storage, 'product_storage'):
+                    self.storage.product_storage = []
+
+                    addons_data = self.storage.get_step_data('addon')
+
+                    for key, value in addons_data.items():
+                        if 'product_' in key:
+
+                            product = self.get_product(pk=value)
+
+                            if product not in self.storage.product_storage:
+                                self.storage.product_storage.append(product)
+
                 lot_data = self.storage.get_step_data('lot')
                 lot = lot_data.get('lot-lots', '')
 
@@ -399,6 +412,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                         transaction_data = PagarmeTransactionInstanceData(
                             subscription=subscription,
                             extra_data=form_data,
+                            optionals=self.storage.product_storage,
                             event=self.event
                         )
 
