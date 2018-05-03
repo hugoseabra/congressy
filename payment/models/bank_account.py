@@ -17,6 +17,8 @@ class BankAccount(models.Model):
     BRADESCO = "237"
     SANTANDER = "033"
     CAIXA_ECONOMICA = "104"
+    BANCOOB = "756"
+    SICOOB = "756"
 
     ACCOUNT_TYPES = (
         (CONTA_CORRENTE, 'Conta corrente'),
@@ -30,7 +32,9 @@ class BankAccount(models.Model):
         (ITAU, 'Itau'),
         (BRADESCO, 'Bradesco'),
         (SANTANDER, 'Santander'),
-        (CAIXA_ECONOMICA, 'Caixa Economica')
+        (CAIXA_ECONOMICA, 'Caixa Economica'),
+        (BANCOOB, 'BANCOOB - Banco Cooperativo do Brasil'),
+        (SICOOB, 'Sicoob'),
     )
 
     # Obrigatório - Código do banco
