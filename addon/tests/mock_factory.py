@@ -119,7 +119,6 @@ class MockFactory:
         if not optional_type:
             optional_type = self.fake_optional_product_type()
 
-        date_start = datetime.now() - timedelta(days=3)
         date_end = datetime.now() + timedelta(days=3)
 
         return Product.objects.create(
@@ -127,7 +126,6 @@ class MockFactory:
             optional_type=optional_type,
             lot_category=lot_category,
             date_end_sub=date_end,
-            restrict_unique=False,
         )
 
     def fake_service(self, optional_type=None, theme=None, lot_category=None):

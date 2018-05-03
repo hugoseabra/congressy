@@ -6,7 +6,7 @@ from base import managers
 from core.forms.widgets import SplitDateTimeWidget, PriceInput
 from core.util.date import DateTimeRange
 from .constants import MINIMUM_RELEASE_DAYS
-from .helpers import has_quantity_conflict
+from .helpers import has_quantity_conflict, has_sub_end_date_conflict
 from .models import (
     Product,
     Service,
@@ -149,7 +149,7 @@ class SubscriptionServiceManager(managers.Manager):
 
         optional_service = cleaned_data['optional']
         subscription = cleaned_data['subscription']
-        total_subscriptions = optional_service.services.count()
+        total_subscriptions = optional_service.subscription_services.count()
         quantity = optional_service.quantity or 0
 
         # Regra 1:
@@ -241,7 +241,7 @@ class SubscriptionProductManager(managers.Manager):
                 'novas inscrições não poderão ser realizadas')
 
         # Regra 2
-        if product.date_end_sub and datetime.now() > product.date_end_sub:
+        if has_sub_end_date_conflict(product):
             raise ValidationError(
                 'Este opcional já expirou e não aceita mais inscrições.'
             )

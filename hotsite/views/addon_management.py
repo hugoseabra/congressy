@@ -1,10 +1,13 @@
-from django.http import HttpResponse
+import json
+
+from django.core import serializers
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
-from gatheros_subscription.models import LotCategory
-from addon.helpers import has_quantity_conflict
+from addon.helpers import has_quantity_conflict, has_sub_end_date_conflict
 from addon.models import Product
+from gatheros_subscription.models import LotCategory
 
 """
 DEV NOTES: 
@@ -34,7 +37,7 @@ DEV NOTES:
 class EventProductOptionalManagementView(generic.TemplateView):
     available_options = []
     storage = None
-    template_name = "optionals/product_list.html"
+    template_name = "optionals/available_product_list.html"
 
     def get(self, request, *args, **kwargs):
 
@@ -44,21 +47,43 @@ class EventProductOptionalManagementView(generic.TemplateView):
         category = get_object_or_404(LotCategory, pk=category_pk)
         self.available_options = []
 
-        if self.storage:
+        fetch_in_storage = self.request.GET.get('fetch_in_storage')
 
-            for item in self.storage:
-                try:
-                    optional = Product.objects.get(pk=item,
-                                                   lot_category=category)
-                    self.available_options.append(optional)
-                except Product.DoesNotExist:
-                    pass
+        if fetch_in_storage:
+
+            if self.storage:
+
+                for item in self.storage:
+                    try:
+                        optional = Product.objects.get(pk=item,
+                                                       lot_category=category)
+                        self.available_options.append({'optional': optional})
+                    except Product.DoesNotExist:
+                        pass
+
+            return_format = self.request.GET.get('format')
+
+            if return_format and return_format == 'json':
+
+                json_list = []
+
+                for product in self.available_options:
+                    json_list.append(
+                        self.create_product_json(product['optional']))
+                return JsonResponse(json_list, safe=False)
+
         else:
             event_optionals_products = Product.objects.filter(
                 lot_category=category, published=True)
 
             for optional in event_optionals_products:
-                self.available_options.append(optional)
+
+                if not self.storage or optional.pk not in self.storage:
+                    available = not has_quantity_conflict(optional) and \
+                                not has_sub_end_date_conflict(optional)
+
+                    self.available_options.append({'optional': optional,
+                                                   'available': available})
 
         context = self.get_context_data()
         return self.render_to_response(context)
@@ -73,8 +98,15 @@ class EventProductOptionalManagementView(generic.TemplateView):
 
     def post(self, request, *args, **kwargs):
 
-        category_pk = kwargs.get('category_pk')
-        category = get_object_or_404(LotCategory, pk=category_pk)
+        optional_id = request.POST.get('optional_id')
+        action = request.POST.get('action')
+        new_product = get_object_or_404(Product, pk=optional_id)
+
+        if not optional_id:
+            return HttpResponse(status=400)
+
+        optional_id = int(optional_id)
+
         session_altered = False
 
         product_storage = request.session.get('product_storage')
@@ -84,22 +116,16 @@ class EventProductOptionalManagementView(generic.TemplateView):
         else:
             self.storage = product_storage
 
-        optional_id = request.POST.get('optional_id')
-        if not optional_id:
-            return HttpResponse(status=400)
-
-        for item in self.storage:
-            existing_product = get_object_or_404(Product, pk=item)
-
-            # Check for quantity conflicts
-            if has_quantity_conflict(existing_product):
+        if action and action == 'add':
+            if optional_id not in self.storage:
+                if not has_quantity_conflict(new_product) and not \
+                        has_sub_end_date_conflict(new_product):
+                    session_altered = True
+                    self.storage.append(new_product.pk)
+        elif action and action == 'remove':
+            if optional_id in self.storage:
                 session_altered = True
-                self.storage = [item for item in self.storage if
-                                not existing_product]
-            else:
-                session_altered = True
-                self.storage.append(existing_product)
-
+                self.storage.remove(optional_id)
 
         request.session['product_storage'] = self.storage
 
@@ -107,3 +133,41 @@ class EventProductOptionalManagementView(generic.TemplateView):
             return HttpResponse(status=201)
 
         return HttpResponse(status=200)
+
+    def get_template_names(self):
+
+        template_name = super().get_template_names()
+
+        fetch_in_storage = self.request.GET.get('fetch_in_storage')
+
+        if fetch_in_storage:
+            template_name = "optionals/currently_selected_product_list.html"
+
+        return template_name
+
+    # @TODO not DRY, fix
+    def create_product_json(self, product):
+
+        remove_fields = [
+            'lot_category',
+            'created_by',
+            'modified_by',
+            'created',
+            'modified',
+            'release_days',
+            'optional_type',
+            'quantity',
+            'date_end_sub',
+            'published',
+        ]
+
+        product_obj_as_json = serializers.serialize('json', [product, ])
+        product_obj = json.loads(product_obj_as_json)
+        product_obj = product_obj[0]
+        product_obj = product_obj['fields']
+        product_obj['id'] = product.pk
+
+        for field in remove_fields:
+            del product_obj[field]
+
+        return product_obj

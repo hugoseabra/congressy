@@ -12,19 +12,17 @@ from gatheros_subscription.models import FormConfig, Lot
 
 class SubscriptionPersonForm(PersonForm):
 
-    def __init__(self, is_chrome=False, **kwargs):
+    def __init__(self, user, is_chrome=False, **kwargs):
 
+        self.user = user
         self.lot = kwargs.get('initial').get('lot')
         self.event = kwargs.get('initial').get('event')
 
-        user = kwargs.get('initial').get('user')
-
-        if user:
-            try:
-                person = Person.objects.get(user=user)
-                kwargs.update({'instance': person})
-            except Person.DoesNotExist:
-                pass
+        try:
+            person = Person.objects.get(user=user)
+            kwargs.update({'instance': person})
+        except Person.DoesNotExist:
+            pass
 
         if not isinstance(self.lot, Lot):
             try:
@@ -36,6 +34,9 @@ class SubscriptionPersonForm(PersonForm):
                 raise TypeError(message)
 
         super().__init__(is_chrome, **kwargs)
+
+        self.fields['email'].widget.attrs['disabled'] = 'disabled'
+        self.fields['email'].disabled = True
 
         try:
             config = self.event.formconfig
@@ -70,17 +71,6 @@ class SubscriptionPersonForm(PersonForm):
         for field_name in required_fields:
             self.setAsRequired(field_name)
 
-    def clean_email(self):
-
-        if self.data.get('email') or self.initial.get('email'):
-            try:
-                email = self.data.get('email')
-                if not email:
-                    email = self.data.get('person-email')
-            except MultiValueDictKeyError:
-                email = self.initial.get('email')
-                if not email:
-                    email = self.data.get('person-email')
-            return email.lower()
-
-        return None
+    def save(self, commit=True):
+        self.instance.user = self.user
+        return super().save(commit=commit)

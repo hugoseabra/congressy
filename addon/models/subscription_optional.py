@@ -38,6 +38,20 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
         verbose_name="data de criação",
     )
 
+    optional_price = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        null=True,
+        blank=True,
+    )
+
+    optional_liquid_price = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        null=True,
+        blank=True,
+    )
+
     def __str__(self):
         return '{}: {}'.format(__name__, self.subscription.person.name)
 
