@@ -15,6 +15,12 @@ class AjaxChoiceField(forms.ChoiceField):
 
 class PriceInput(forms.TextInput):
     input_type = 'tel'
+    template_name = 'forms/widgets/price.html'
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context['lang'] = get_language()
+        return context
 
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)

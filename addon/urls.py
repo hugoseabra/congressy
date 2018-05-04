@@ -61,6 +61,11 @@ optional_urls = [
         name='optional-service-list'
     ),
     url(
+        r'^services/add/$',
+        views.OptionalAddServiceView.as_view(),
+        name='optional-service-add'
+    ),
+    url(
         r'^add/$',
         views.OptionalAddView.as_view(),
         name='optional-add'

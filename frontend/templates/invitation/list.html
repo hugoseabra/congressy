@@ -196,7 +196,7 @@
                                             <form action="{% url 'event:invitation-resend' invitation_organization.pk item.pk %}"
                                                   method="post"
                                                   onsubmit="return confirm('Deseja renovar este convite?')">{% csrf_token %}
-                                                <button type="submit">
+                                                <button class="btn btn-sm btn-primary" type="submit">
                                                     Reenviar
                                                 </button>
                                             </form>

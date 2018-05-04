@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import generic
 
-from addon import forms
+from addon import forms, services
 from addon.models import Product, Service
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.models import Event
@@ -154,6 +154,47 @@ class OptionalAddView(EventViewMixin, generic.CreateView):
         return response
 
 
+class OptionalAddServiceView(EventViewMixin, generic.CreateView):
+    form_class = services.ServiceService
+    template_name = 'addon/optional/form-service.html'
+
+    def get_success_url(self):
+        url = reverse('addon:optional-service-list', kwargs={
+            'event_pk': self.event.pk
+        })
+
+        if self.object and self.object.pk:
+            url += '#cat=' + str(self.object.lot_category.pk)
+
+        return url
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active'] = 'service'
+        return context
+
+    def post(self, request, *args, **kwargs):
+        request.POST = request.POST.copy()
+        request.POST.update({'created_by': request.user.first_name})
+        return super().post(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['event'] = self.event
+        return kwargs
+
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+
+        except Exception as e:
+            messages.error(self.request, str(e))
+            return self.form_invalid(form)
+
+        messages.success(self.request, 'Opcional criado com sucesso.')
+        return response
+
+
 class OptionalProductEditView(EventViewMixin, generic.UpdateView):
     form_class = forms.OptionalForm
     model = Product
@@ -196,14 +237,19 @@ class OptionalProductEditView(EventViewMixin, generic.UpdateView):
         messages.success(self.request, 'Opcional alterado com sucesso.')
         return response
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = self.get_object()
+        return context
+
     def form_invalid(self, form):
         return super().form_invalid(form)
 
 
 class OptionalServiceEditView(EventViewMixin, generic.UpdateView):
-    form_class = forms.OptionalForm
+    form_class = services.ServiceService
     model = Service
-    template_name = 'addon/optional/form.html'
+    template_name = 'addon/optional/form-service.html'
     pk_url_kwarg = 'optional_pk'
     initial = {
         'optional_kind': 'service',
@@ -219,6 +265,11 @@ class OptionalServiceEditView(EventViewMixin, generic.UpdateView):
 
         return url
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = self.get_object()
+        return context
+
     def get_initial(self):
         initial = super().get_initial()
         initial.update({'optional_service_type': self.object.optional_type.pk})
@@ -227,9 +278,13 @@ class OptionalServiceEditView(EventViewMixin, generic.UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
         kwargs['event'] = self.event
         return kwargs
+
+    def post(self, request, *args, **kwargs):
+        request.POST = request.POST.copy()
+        request.POST.update({'modified_by': request.user.first_name})
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         try:

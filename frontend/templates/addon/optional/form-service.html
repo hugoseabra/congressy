@@ -1,0 +1,179 @@
+{% extends "base/base.html" %}
+{% load l10n static event_tags  base_tags  widget_tweaks form_config_tags %}
+{% load humanize %}
+{% load queryset_filter %}
+
+{% block title %}
+    {% if object %}Editar{% else %}Novo{% endif %} Atividades Extras | Congressy
+{% endblock %}
+
+{% block page_title %}
+    {% if object %}Editar{% else %}Nova{% endif %} Atividade Extra
+{% endblock %}
+
+{% block page_sub_title %}
+    {% if form_title %}
+        {{ form_title }}
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script src="{% static "assets/js/price-format.min.js" %}"></script>
+    <script type="application/javascript">
+
+        (function ($) {
+            $(document).ready(function () {
+                {% if LANGUAGE_CODE == 'pt-br' or LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
+                    $('#id_date_end_sub_0').mask("99/99/9999");
+                    $('#id_schedule_start_0').mask("99/99/9999");
+                    $('#id_schedule_end_0').mask("99/99/9999");
+                {% else %}
+                    $('#id_date_end_sub_0').mask("9999-99-99");
+                    $('#id_schedule_start_0').mask("9999-99-99");
+                    $('#id_schedule_end_0').mask("9999-99-99");
+                {% endif %}
+
+                $('#id_date_end_sub_1').mask("99:99");
+                $('#id_schedule_start_1').mask("99:99");
+                $('#id_schedule_end_1').mask("99:99");
+                $('#id_price').mask('#.##0,00', {reverse: true});
+            });
+
+        })(jQuery);
+    </script>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    {% include 'addon/optional/includes/side-menu.html' %}
+{% endblock %}
+
+{% block content %}
+
+    <form action="" method="post" class="form-horizontal form-border"
+          role="form" name="optional_form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <a href="{% url 'addon:optional-service-list' event.pk %}{% if object.lot_category %}#cat={{ object.lot_category.pk }}{% endif %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>
+                            Cancelar
+                        </a>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Dados principais
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                {% render_generic_field form.name autofocus=True %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                {% render_generic_field form.lot_category %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_generic_field form.optional_type %}
+                            </div>
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_generic_field form.theme %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_switchery_field form.restrict_unique %}
+                            </div>
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_generic_field form.date_end_sub %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_generic_field form.schedule_start %}
+                            </div>
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_generic_field form.schedule_end %}
+                            </div>
+                        </div>
+{#                        <div class="row">#}
+{#                            <div class="col-md-11">#}
+{#                                {% render_generic_field form.description %}#}
+{#                            </div>#}
+{#                        </div>#}
+                    </div>
+                </div>
+                {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
+                {% if object.subscription_services.count > 0 and not object.price %}
+                {% else %}
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                Custos e taxas
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-xl-push-1 col-xl-2 col-md-4">
+                                    {% render_generic_field form.price %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+                        <a href="{% url 'addon:optional-service-list' event.pk %}{% if object.lot_category %}#cat={{ object.lot_category.pk }}{% endif %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

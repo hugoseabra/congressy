@@ -4,9 +4,9 @@
 {% load base_tags %}
 {% load queryset_filter %}
 
-{% block title %} Opcionais | Congressy{% endblock %}
+{% block title %} Atividades Extras | Congressy{% endblock %}
 
-{% block page_title %}Opcionais{% endblock %}
+{% block page_title %}Atividades Extras{% endblock %}
 
 {% block page_sub_title %}
     {{ event.name }}
@@ -63,10 +63,10 @@
                                 <i class="fab fa-stack-exchange"></i>
                                 Gerenciar Temas
                             </a>
-                            <a href="{% url 'addon:optional-add' event.pk %}"
+                            <a href="{% url 'addon:optional-service-add' event.pk %}"
                                 class="btn btn-success">
                                 <i class="fa fa-plus"></i>
-                                Novo Opcional
+                                Nova Atividade
                             </a>
                         </div>
                         <div class="clearfix"></div>

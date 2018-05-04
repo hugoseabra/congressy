@@ -6,6 +6,7 @@ from .theme import (
 )
 from .optional import (
     OptionalAddView,
+    OptionalAddServiceView,
     OptionalProductDeleteView,
     OptionalProductListView,
     OptionalProductEditView,

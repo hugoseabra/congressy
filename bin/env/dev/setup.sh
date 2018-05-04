@@ -37,7 +37,7 @@ python $BASE_DIR/manage.py loaddata 012_invitation
 python $BASE_DIR/manage.py loaddata 006_lotcategory 007_lot 008_subscription
 
 # addon
-python $BASE_DIR/manage.py loaddata 001_optional_service_type 002_optional_product_type
+#python $BASE_DIR/manage.py loaddata 001_optional_service_type 002_optional_product_type
 python $BASE_DIR/manage.py loaddata 003_theme 004_optional_service 005_optional_product
 
 # Atualizando a data dos eventos
