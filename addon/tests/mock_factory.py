@@ -95,6 +95,7 @@ class MockFactory:
 
         return Subscription.objects.create(
             lot=lot,
+            event=lot.event,
             person=person,
             created_by=0,
         )
