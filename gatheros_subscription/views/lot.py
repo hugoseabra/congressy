@@ -128,7 +128,8 @@ class LotListView(BaseLotView, generic.ListView):
         context = super(LotListView, self).get_context_data(**kwargs)
         context['event'] = self.event
         context['can_add'] = self._can_add
-
+        context['has_inside_bar'] = True
+        context['active'] = 'membros'
         return context
 
     def _can_add(self):
@@ -148,6 +149,9 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
         context['form_title'] = "Novo lote para '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
+        context['has_inside_bar'] = True
+        context['active'] = 'membros'
+
         return context
 
     def form_valid(self, form):

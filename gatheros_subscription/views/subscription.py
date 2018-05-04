@@ -549,6 +549,8 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
             **kwargs)
         context['organization'] = self.organization
         context['go_back_path'] = self.get_success_url()
+        context['has_inside_bar'] = True
+        context['active'] = 'inscricoes'
 
         # noinspection PyProtectedMember
         verbose_name = self.object._meta.verbose_name

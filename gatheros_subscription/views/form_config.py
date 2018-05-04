@@ -120,6 +120,8 @@ class FormConfigView(EventViewMixin, generic.FormView):
 
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
+        cxt['has_inside_bar'] = True
+        cxt['active'] = 'form-personalizado'
         cxt['object'] = self.object
 
         return cxt

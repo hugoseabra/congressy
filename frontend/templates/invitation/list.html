@@ -1,4 +1,4 @@
-{% extends "base/base-hotsite.html" %}
+{% extends "base/base.html" %}
 {% load organization_tags %}
 
 {% block title %}Convites | Congressy{% endblock %}
@@ -9,25 +9,6 @@
 
 {% block page_description %}
     Convites pendentes que ainda não foram aceitos pelos convidados.
-{% endblock %}
-{% block nav_aside_itens %}
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Equipe</h5>
-    <ul class="nav nav-pills nav-stacked">
-        {% if can_view_members or can_manage_members %}
-        <li>
-            <a class="sidebar-itens" href=
-                       "{% url 'event:member-list' invitation_organization.pk %}" title="Membros">
-                <i class="fas fa-users"></i> Membros
-            </a>
-        </li>
-        {% endif %}
-        <li class="active">
-            <a class="sidebar-itens" href=
-                        "{% url 'event:invitation-list' invitation_organization.pk %}" title="Convites">
-                <i class="fas fa-envelope-open"></i> Convites
-            </a>
-        </li>
-    </ul>
 {% endblock %}
 
 {% block content %}

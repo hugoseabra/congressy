@@ -1,4 +1,4 @@
-{% extends "base/base-hotsite.html" %}
+{% extends "base/base.html" %}
 {% load i18n static widget_tweaks queryset_filter %}
 
 {% block title %}
@@ -13,11 +13,6 @@
     <div>{{ event.name }}</div>
 {% endblock %}
 
-{% block nav_aside_itens %}
-
-        {% include 'event/event-menu.html' with active='form-personalizado' %}
-
-{% endblock %}
 
 {% block content %}
 

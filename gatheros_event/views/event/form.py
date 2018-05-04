@@ -198,6 +198,16 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
 
         return super(EventEditFormView, self).get_success_url()
 
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['has_inside_bar'] = True
+        context['active'] = 'dados-do-evento'
+
+        return context
+
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
