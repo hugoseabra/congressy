@@ -74,12 +74,12 @@ class OptionalServiceTypeServicePersistenceTest(PersistenceTestCase):
     application_service_class = services.OptionalServiceTypeService
     required_fields = ('name',)
     data_edit_to = {
-        'name': 'another name edited',
+        'name': 'edited name',
     }
 
     def setUp(self):
         self.data = {
-            'name': 'theme name',
+            'name': 'name',
         }
 
     def test_create(self):
@@ -95,7 +95,8 @@ class ProductServicePersistenceTest(PersistenceTestCase):
     required_fields = (
         'optional_type',
         'lot_category',
-        'date_end_sub',
+        'date_end_sub_0',
+        'date_end_sub_1',
         'published',
         'created_by',
         'modified_by',
@@ -116,13 +117,19 @@ class ProductServicePersistenceTest(PersistenceTestCase):
 
     def setUp(self):
         fake_factory = MockFactory()
+        lot_category = fake_factory.fake_lot_category()
         date_end = datetime.now() + timedelta(days=3)
+
+        self.service_kwargs = {
+            'event': lot_category.event
+        }
 
         self.data = {
             'optional_type': fake_factory.fake_optional_product_type().pk,
-            'lot_category': fake_factory.fake_lot_category().pk,
+            'lot_category': lot_category.pk,
             'name': 'optional name',
-            'date_end_sub': date_end.strftime('%d/%m/%Y %H:%M'),
+            'date_end_sub_0': date_end.strftime('%d/%m/%Y'),
+            'date_end_sub_1': date_end.strftime('%H:%M'),
             'published': True,
             'created_by': 'test user',
             'modified_by': 'test user',
@@ -144,9 +151,12 @@ class ServiceServicePersistenceTest(PersistenceTestCase):
     required_fields = (
         'optional_type',
         'lot_category',
-        'schedule_start',
-        'schedule_end',
-        'date_end_sub',
+        'schedule_start_0',
+        'schedule_start_1',
+        'schedule_end_0',
+        'schedule_end_1',
+        'date_end_sub_0',
+        'date_end_sub_1',
         'published',
         'created_by',
         'modified_by',
@@ -175,13 +185,21 @@ class ServiceServicePersistenceTest(PersistenceTestCase):
         date_start = datetime.now() - timedelta(days=3)
         date_end = datetime.now() + timedelta(days=3)
         lot_category = fake_factory.fake_lot_category()
+
+        self.service_kwargs = {
+            'event': lot_category.event
+        }
+
         self.data = {
             'optional_type': fake_factory.fake_optional_service_type().pk,
             'lot_category': lot_category.pk,
             'name': 'optional name',
-            'schedule_start': date_start.strftime('%d/%m/%Y %H:%M'),
-            'schedule_end': date_end.strftime('%d/%m/%Y %H:%M'),
-            'date_end_sub': date_end.strftime('%d/%m/%Y %H:%M'),
+            'schedule_start_0': date_start.strftime('%d/%m/%Y'),
+            'schedule_start_1': date_start.strftime('%H:%M'),
+            'schedule_end_0': date_end.strftime('%d/%m/%Y'),
+            'schedule_end_1': date_end.strftime('%H:%M'),
+            'date_end_sub_0': date_end.strftime('%d/%m/%Y'),
+            'date_end_sub_1': date_end.strftime('%H:%M'),
             'published': True,
             'created_by': 'test user',
             'modified_by': 'test user',
