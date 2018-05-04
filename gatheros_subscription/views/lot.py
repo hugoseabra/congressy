@@ -149,6 +149,7 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         for cat in queryset.all():
             for lot in cat.lots.all():
                 sub_queryset = lot.subscriptions.filter(
+                    completed=True,
                     status__in=['confirmed', 'awaiting']
                 )
                 num = sub_queryset.count()
@@ -273,6 +274,9 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         context['form_title'] = "Editar lote de '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
+        context['has_subscriptions'] = self.object.subscriptions.filter(
+            completed=True,
+        ).count() > 0
 
         return context
 

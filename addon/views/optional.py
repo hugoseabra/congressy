@@ -32,7 +32,19 @@ class EventViewMixin(AccountMixin, generic.View):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
+        context['has_paid_lots'] = self.has_paid_lots()
         return context
+
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+
+            price = lot.price
+
+            if price and price > 0:
+                return True
+
+        return False
 
 
 class OptionalServiceListView(TemplateNameableMixin,
@@ -240,6 +252,11 @@ class OptionalProductEditView(EventViewMixin, generic.UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object'] = self.get_object()
+        context['active'] = 'product'
+        context['has_subscriptions'] = \
+            self.object.subscription_products.filter(
+                subscription__completed=True
+            ).count()
         return context
 
     def form_invalid(self, form):
@@ -268,6 +285,11 @@ class OptionalServiceEditView(EventViewMixin, generic.UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object'] = self.get_object()
+        context['active'] = 'service'
+        context['has_subscriptions'] = \
+            self.object.subscription_services.filter(
+                subscription__completed=True
+            ).count()
         return context
 
     def get_initial(self):
@@ -279,6 +301,7 @@ class OptionalServiceEditView(EventViewMixin, generic.UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['event'] = self.event
+
         return kwargs
 
     def post(self, request, *args, **kwargs):

@@ -2,7 +2,7 @@
 {# @TODO Change the icons in nav_aside_itens  #}
 {% load static %}
 {% load base_tags %}
-{% load queryset_filter %}
+{% load subscription_tags %}
 
 {% block title %} Lotes | Congressy{% endblock %}
 
@@ -120,7 +120,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+                <span class="badge float-right">{% event_count_completed_subscriptions event %}</span>
             </a>
         </li>
         {#        <li>#}
@@ -255,7 +255,7 @@
 
 
                                 <td class="hidden-xs hidden-sm">
-                                    {{ lot.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}
+                                    {% lot_count_completed_subscriptions lot %}
                                     {% if lot.limit %}
                                         / {{ lot.limit }}
                                         vagas

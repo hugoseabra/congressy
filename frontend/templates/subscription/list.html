@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 
-{% load i18n static  subscription_tags queryset_filter %}
+{% load i18n static  subscription_tags %}
 
 {% block title %} Inscrições | Congressy{% endblock %}
 
@@ -118,7 +118,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+                <span class="badge float-right">{% event_count_completed_subscriptions event %}</span>
             </a>
         </li>
         {#        <li>#}

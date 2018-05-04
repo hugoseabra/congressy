@@ -63,7 +63,9 @@ class LotForm(forms.ModelForm):
             label='Categoria',
         )
 
-        if self.instance.pk and self.instance.subscriptions.count() > 0:
+        if self.instance.pk and self.instance.subscriptions.filter(
+            completed=True
+        ).count() > 0:
             self.fields['price'].widget.attrs['disabled'] = 'disabled'
             self.fields['price'].disabled = True
 
