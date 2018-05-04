@@ -267,7 +267,7 @@
                                 </td>
                                 <td>
                                     {% if lot.price and lot.price > 0 %}
-                                        R$ {{ lot.get_calculated_price }}
+                                        {{ lot.display_publicly }}
                                     {% else %}
                                         ----
                                     {% endif %}
@@ -286,21 +286,19 @@
                                 <td>
                                     <div class="btn-group">
                                         <button
-                                                type="button"
-                                                class="btn
+                                            type="button"
+                                            class="btn
                                             btn-primary btn-trans
                                             btn-sm dropdown-toggle"
-                                                data-toggle="dropdown"
-                                                aria-expanded="false"
-                                        >
+                                            data-toggle="dropdown"
+                                            aria-expanded="false">
                                             <span class="fas fa-cog"></span>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-right"
                                             role="menu">
                                             {% if user has 'gatheros_subscription.change_lot' of lot %}
                                                 <li>
-                                                    <a href="
-    {% url 'subscription:lot-edit' event.pk lot.pk %}">
+                                                    <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">
                                                         <i class="fas fa-pencil-alt"></i>
                                                         Editar
                                                     </a>
@@ -308,8 +306,7 @@
                                             {% endif %}
                                             {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
                                                 <li>
-                                                    <a href="
-    {% url 'subscription:lot-delete' event.pk lot.pk %}">
+                                                    <a href="{% url 'subscription:lot-delete' event.pk lot.pk %}">
                                                         <i class="fas fa-trash-alt"></i>
                                                         Excluir
                                                     </a>
