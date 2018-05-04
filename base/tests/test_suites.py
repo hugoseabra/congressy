@@ -136,19 +136,22 @@ class ApplicationServicePersistenceTestCase(TestCase):
     Campos a serem alterados na edição.
     """
 
+    service_kwargs = {}
+
+    def _get_service_kwargs(self):
+        return self.service_kwargs
+
     def _create_service(self, instance=None, data=None):
         if not data:
             data = self.data
 
-        if instance is not None:
-            service = self.application_service_class(
-                instance=instance,
-                data=data
-            )
-        else:
-            service = self.application_service_class(data=data)
+        kwargs = self._get_service_kwargs()
+        kwargs.update({'data': data})
 
-        return service
+        if instance is not None:
+            kwargs.update({'instance': instance})
+
+        return self.application_service_class(**kwargs)
 
     def _create_instance(self, service=None):
         if not service:
