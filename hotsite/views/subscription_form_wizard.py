@@ -300,10 +300,30 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         form_data = self.get_form_step_data(form)
 
+        # Creating a subscription.
+        if isinstance(form, forms.LotsForm):
+
+            person = Person.objects.get(user=self.request.user)
+            lot = form.cleaned_data.get('lots')
+
+            try:
+                subscription = Subscription.objects.get(
+                    person=person,
+                    event=self.event
+                )
+                subscription.lot = lot
+                subscription.save()
+            except Subscription.DoesNotExist:
+                Subscription.objects.create(
+                    person=person,
+                    event=self.event,
+                    lot=lot,
+                    created_by=person.user.pk
+                )
+
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
             person = form.save()
-            self.storage.person = person
 
         # Persisting survey
         if isinstance(form, forms.SurveyForm):
