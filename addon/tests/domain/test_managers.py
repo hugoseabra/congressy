@@ -377,8 +377,8 @@ class SubscriptionProductManagerRulesTest(TestCase):
         )
         self.assertFalse(product_manager.is_valid())
         self.assertEqual(product_manager.errors['__all__'][0],
-                      'Este opcional já expirou e não aceita mais inscrições.')
-        
+                         'Este opcional já expirou e não aceita mais inscrições.')
+
     def test_date_end_validation_in_the_future(self):
         subscription = self.fake_factory.fake_subscription()
 
@@ -523,11 +523,6 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         service_1.restrict_unique = True
         service_1.save()
 
-        service_2.schedule_start = datetime.now()
-        service_2.schedule_end = datetime.now() + timedelta(days=1)
-        service_2.restrict_unique = True
-        service_2.save()
-
         # Criando os gerenciadores de serviços
         service_1_manager = managers.SubscriptionServiceManager(
             data={
@@ -539,7 +534,7 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         service_2_manager = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
-                'optional': service_2.pk,
+                'optional': service_1.pk,
             }
         )
 
@@ -596,6 +591,8 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         bilateral"""
 
         subscription = self.fake_factory.fake_subscription()
+        subscription_2 = self.fake_factory.fake_subscription(
+            lot=subscription.lot)
 
         # Crie dois Services
         service_1 = self.fake_factory.fake_service(
@@ -607,11 +604,13 @@ class SubscriptionServiceManagerRulesTest(TestCase):
         service_1.schedule_start = datetime.now()
         service_1.schedule_end = datetime.now() + timedelta(days=1)
         service_1.restrict_unique = False
+        service_1.name = "service 1"
         service_1.save()
 
         service_2.schedule_start = datetime.now()
         service_2.schedule_end = datetime.now() + timedelta(days=1)
         service_2.restrict_unique = True
+        service_2.name = "service 2"
         service_2.save()
 
         # Criando os gerenciadores de serviços
@@ -622,6 +621,10 @@ class SubscriptionServiceManagerRulesTest(TestCase):
             }
         )
 
+        # Validações
+        self.assertTrue(service_1_manager.is_valid())
+        service_1_manager.save()
+
         service_2_manager = managers.SubscriptionServiceManager(
             data={
                 'subscription': subscription.pk,
@@ -629,10 +632,9 @@ class SubscriptionServiceManagerRulesTest(TestCase):
             }
         )
 
-        # Validações
-        self.assertTrue(service_1_manager.is_valid())
-        service_1_manager.save()
-        self.assertFalse(service_2_manager.is_valid())
+        is_valid = service_2_manager.is_valid()
+        print('dasdas')
+        self.assertFalse(is_valid)
 
     def test_validation_by_theme_with_limit(self):
         # Crie uma única Subscription para ser usada para criar o

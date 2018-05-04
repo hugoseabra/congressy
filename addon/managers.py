@@ -1,12 +1,8 @@
-from datetime import datetime
-
 from django import forms
 
 from base import managers
 from core.forms.widgets import SplitDateTimeWidget, PriceInput
-from core.util.date import DateTimeRange
 from .constants import MINIMUM_RELEASE_DAYS
-from .helpers import has_quantity_conflict, has_sub_end_date_conflict
 from .models import (
     Product,
     Service,
@@ -151,36 +147,19 @@ class SubscriptionServiceManager(managers.Manager):
         subscription = cleaned_data['subscription']
 
         # Regra 1
-        if has_quantity_conflict(optional_service):
+        if optional_service.has_quantity_conflict:
             raise forms.ValidationError(
                 'Quantidade de inscrições já foi atingida, '
                 'novas inscrições não poderão ser realizadas')
 
         # Regra 2:
-        new_start = optional_service.schedule_start
-        new_end = optional_service.schedule_end
-
-        is_restricted = optional_service.restrict_unique
-
-        for sub_optional in subscription.subscriptionservice.all():
-
-            start = sub_optional.optional.schedule_start
-            stop = sub_optional.optional.schedule_end
-            is_sub_restricted = \
-                sub_optional.optional.restrict_unique
-
-            session_range = DateTimeRange(start=start, stop=stop)
-            has_conflict = (new_start in session_range or new_end in
-                            session_range)
-
-            if has_conflict is True and (is_restricted or is_sub_restricted):
-                raise forms.ValidationError(
-                    'Conflito de horário: o opcional "{}" '
-                    'está em conflito com o opcional "{}".'.format(
-                        optional_service.name,
-                        sub_optional.optional.name
-                    )
-                )
+        if optional_service.has_schedule_conflicts:
+            conflicting_service = \
+                optional_service.get_schedule_conflict_service
+            raise forms.ValidationError(
+                'Conflito de horário: o opcional "{}" '
+                'está em conflito com o opcional "{}".'.format(
+                    optional_service.name, conflicting_service.name))
 
         # Regra 3:
         if optional_service.theme.limit:
@@ -199,7 +178,7 @@ class SubscriptionServiceManager(managers.Manager):
                 )
 
         # Regra 4
-        if has_sub_end_date_conflict(optional_service):
+        if optional_service.has_sub_end_date_conflict:
             raise forms.ValidationError(
                 'Este opcional já expirou e não aceita mais inscrições.'
             )
@@ -231,13 +210,13 @@ class SubscriptionProductManager(managers.Manager):
         product = cleaned_data['optional']
 
         # Regra 1
-        if has_quantity_conflict(product):
+        if product.has_quantity_conflict:
             raise forms.ValidationError(
                 'Quantidade de inscrições já foi atingida, '
                 'novas inscrições não poderão ser realizadas')
 
         # Regra 2
-        if has_sub_end_date_conflict(product):
+        if product.has_sub_end_date_conflict:
             raise forms.ValidationError(
                 'Este opcional já expirou e não aceita mais inscrições.'
             )

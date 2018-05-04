@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404
 from django.views import generic
 
 from .helpers import create_optional_dict
-from addon.helpers import has_quantity_conflict, has_sub_end_date_conflict
 from addon.models import Product, Service
 from gatheros_subscription.models import LotCategory
 
@@ -80,8 +79,8 @@ class ProductOptionalManagementView(generic.TemplateView):
             for optional in event_optionals_products:
 
                 if not self.storage or optional.pk not in self.storage:
-                    available = not has_quantity_conflict(optional) and \
-                                not has_sub_end_date_conflict(optional)
+                    available = not optional.has_quantity_conflict and \
+                                not optional.as_sub_end_date_conflict
 
                     self.available_options.append({'optional': optional,
                                                    'available': available})
@@ -119,8 +118,8 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         if action and action == 'add':
             if optional_id not in self.storage:
-                if not has_quantity_conflict(new_product) and not \
-                        has_sub_end_date_conflict(new_product):
+                if not new_product.has_quantity_conflict and not \
+                        new_product.has_sub_end_date_conflict:
                     session_altered = True
                     self.storage.append(new_product.pk)
         elif action and action == 'remove':
@@ -233,9 +232,9 @@ class ServiceOptionalManagementView(generic.TemplateView):
             for optional in optionals_services:
 
                 if not self.storage or optional.pk not in self.storage:
-                    available = not has_quantity_conflict(optional) and \
-                                not has_sub_end_date_conflict(optional) and \
-                                not has
+                    available = not optional.has_quantity_conflict and \
+                                not optional.has_sub_end_date_conflict and \
+                                not optional.has_schedule_conflicts
 
                     self.available_options.append({'optional': optional,
                                                    'available': available})

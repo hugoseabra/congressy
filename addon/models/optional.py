@@ -11,6 +11,7 @@ from django.db import models
 from addon import constants, rules
 from base.models import EntityMixin
 from core.model import track_data
+from core.util.date import DateTimeRange
 from gatheros_event.models.mixins import GatherosModelMixin
 from gatheros_subscription.models import LotCategory
 from .optional_type import OptionalServiceType, OptionalProductType
@@ -135,6 +136,23 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
     def finished(self):
         return self.status == self.OPTIONAL_STATUS_FINISHED
 
+    @property
+    def has_quantity_conflict(self):
+        num_subs = self.num_consumed
+        quantity = self.quantity or 0
+
+        if 0 < quantity <= num_subs:
+            return True
+
+        return False
+
+    @property
+    def has_sub_end_date_conflict(self):
+        if self.date_end_sub and datetime.now() > self.date_end_sub:
+            return True
+
+        return False
+
 
 class Product(AbstractOptional):
     """
@@ -166,7 +184,7 @@ class Product(AbstractOptional):
         :return: número de opcionais vendidos
         :type: bool
         """
-        return self.subscription_products.filter(
+        return self.subscription_products.exclude(
             subscription__status='canceled'
         ).count()
 
@@ -234,6 +252,52 @@ class Service(AbstractOptional):
         :return: número de opcionais vendidos
         :type: bool
         """
-        return self.subscription_services.filter(
+        return self.subscription_services.exclude(
             subscription__status='canceled'
         ).count()
+
+    @property
+    def has_schedule_conflicts(self):
+        new_start = self.schedule_start
+        new_end = self.schedule_end
+
+        is_restricted = self.restrict_unique
+
+        for sub_optional in self.lot_category.service_optionals.all():
+
+            start = sub_optional.schedule_start
+            stop = sub_optional.schedule_end
+            is_sub_restricted = \
+                sub_optional.restrict_unique
+
+            session_range = DateTimeRange(start=start, stop=stop)
+            has_conflict = (new_start in session_range or new_end in
+                            session_range)
+
+            if has_conflict is True and (is_restricted or is_sub_restricted):
+                return True
+
+        return False
+
+    @property
+    def get_schedule_conflict_service(self):
+        new_start = self.schedule_start
+        new_end = self.schedule_end
+
+        is_restricted = self.restrict_unique
+
+        for sub_optional in self.lot_category.service_optionals.all():
+
+            start = sub_optional.schedule_start
+            stop = sub_optional.schedule_end
+            is_sub_restricted = \
+                sub_optional.restrict_unique
+
+            session_range = DateTimeRange(start=start, stop=stop)
+            has_conflict = (new_start in session_range or new_end in
+                            session_range)
+
+            if has_conflict is True and (is_restricted or is_sub_restricted):
+                return sub_optional
+
+        return None
