@@ -3,17 +3,15 @@ from django.contrib import messages
 from django.db import transaction
 from django.forms import ValidationError
 from django.http import HttpResponseRedirect, QueryDict
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
-from gatheros_event.models import Person
-from gatheros_subscription.models import Lot, \
-    Subscription
+from gatheros_event.models import Person, Event
+from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
-from hotsite.views.mixins import EventMixin
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
@@ -41,11 +39,12 @@ def is_paid_lot(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
 
     # Return true if lot has price and price > 0
-    lot = cleaned_data['lots']
+    if cleaned_data:
+        lot = cleaned_data['lots']
 
-    if isinstance(lot, Lot):
-        if lot.price and lot.price > 0:
-            return True
+        if isinstance(lot, Lot):
+            if lot.price and lot.price > 0:
+                return True
 
     return False
 
@@ -61,17 +60,24 @@ def has_survey(wizard):
 
     if isinstance(lot, Lot):
 
-        if lot.event_survey:
+        if lot.event_survey and lot.event_survey.survey.questions.count() > 0:
             return True
 
     return False
 
 
-class SubscriptionWizardView(EventMixin, SessionWizardView):
+class SubscriptionWizardView(SessionWizardView):
     condition_dict = {'payment': is_paid_lot, 'survey': has_survey, }
+    event = None
 
     def dispatch(self, request, *args, **kwargs):
 
+        slug = self.kwargs.get('slug')
+
+        if not slug:
+            return redirect('https://congressy.com')
+
+        self.event = get_object_or_404(Event, slug=slug)
         response = super().dispatch(request, *args, **kwargs)
 
         if not self.request.user.is_authenticated:
@@ -80,20 +86,34 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         if not self.storage:
             return redirect('public:hotsite', slug=self.event.slug)
 
-        enabled = self.subscription_enabled()
-
-        if not enabled:
-            return redirect('public:hotsite', slug=self.event.slug)
-
         return response
 
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
         context['remove_preloader'] = True
+        context['event'] = self.event
 
         if self.storage.current_step == 'payment':
             context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
+
+        if self.storage.current_step == 'person':
+
+            try:
+                config = self.event.formconfig
+            except AttributeError:
+                config = FormConfig()
+
+            if self.has_paid_lots():
+                config.email = True
+                config.phone = True
+                config.city = True
+
+                config.cpf = config.CPF_REQUIRED
+                config.birth_date = config.BIRTH_DATE_REQUIRED
+                config.address = config.ADDRESS_SHOW
+
+            context['config'] = config
 
         return context
 
@@ -192,17 +212,9 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 self.storage.current_step = self.steps.first
                 return self.render(self.get_form())
 
-        if step == 'person':
-            return self.initial_dict.get(step, {
-                'lot': lot,
-                'event': self.event,
-            })
-
         if step == 'survey':
             return self.initial_dict.get(step, {
                 'event_survey': lot.event_survey,
-                'event': self.event,
-                'user': self.request.user,
             })
 
         if step == 'payment':
@@ -362,7 +374,17 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         kwargs = super().get_form_kwargs(step)
 
         if step == 'person':
-            kwargs.update({'user': self.request.user})
+            lot_data = self.storage.get_step_data('lot')
+
+            lot_pk = lot_data.get('lot-lots')
+
+            lot = Lot.objects.get(pk=lot_pk, event=self.event)
+
+            kwargs.update({'user': self.request.user, 'lot': lot, 'event':
+                self.event})
+
+        if step == 'survey':
+            kwargs.update({'user': self.request.user, 'event': self.event})
 
         return kwargs
 
@@ -441,3 +463,15 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 return self.render_next_step(form)
 
         return self.render(form)
+
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+            price = lot.price
+            if price is None:
+                continue
+
+            if lot.price > 0:
+                return True
+
+        return False
