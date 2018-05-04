@@ -3,35 +3,24 @@
     hotsite
 """
 
-from django.utils.datastructures import MultiValueDictKeyError
-
 from gatheros_event.forms import PersonForm
 from gatheros_event.models import Person
-from gatheros_subscription.models import FormConfig, Lot
+from gatheros_subscription.models import FormConfig
 
 
 class SubscriptionPersonForm(PersonForm):
 
-    def __init__(self, user, is_chrome=False, **kwargs):
+    def __init__(self, user, lot, event, is_chrome=False, **kwargs):
 
         self.user = user
-        self.lot = kwargs.get('initial').get('lot')
-        self.event = kwargs.get('initial').get('event')
+        self.lot = lot
+        self.event = event
 
         try:
             person = Person.objects.get(user=user)
             kwargs.update({'instance': person})
         except Person.DoesNotExist:
             pass
-
-        if not isinstance(self.lot, Lot):
-            try:
-                self.lot = Lot.objects.get(pk=self.lot, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(self.lot, self.event)
-                raise TypeError(message)
 
         super().__init__(is_chrome, **kwargs)
 
