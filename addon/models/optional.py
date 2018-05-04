@@ -72,11 +72,13 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
     created_by = models.CharField(
         max_length=255,
         verbose_name="criado por",
+        blank=True,
     )
 
     modified_by = models.CharField(
         max_length=255,
         verbose_name="modificado por",
+        blank=True,
     )
 
     price = models.DecimalField(

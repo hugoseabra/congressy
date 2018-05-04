@@ -6,7 +6,15 @@ import base.models
 from decimal import Decimal
 from django.db import migrations, models
 import django.db.models.deletion
+from django.core.management import call_command
 import gatheros_event.models.mixins.gatheros_model_mixin
+
+
+def load_initial_data(*_):
+    """ Carrega dados iniciais do sistema. """
+    print('\nLoading initial data:')
+    call_command('loaddata', '001_optional_service_type', app_label='addon')
+    call_command('loaddata', '002_optional_product_type', app_label='addon')
 
 
 class Migration(migrations.Migration):
@@ -54,8 +62,8 @@ class Migration(migrations.Migration):
                 ('published', models.BooleanField(default=True, verbose_name='publicado')),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='criado')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='modificado')),
-                ('created_by', models.CharField(max_length=255, verbose_name='criado por')),
-                ('modified_by', models.CharField(max_length=255, verbose_name='modificado por')),
+                ('created_by', models.CharField(max_length=255, verbose_name='criado por', blank=True)),
+                ('modified_by', models.CharField(max_length=255, verbose_name='modificado por', blank=True)),
                 ('price', models.DecimalField(blank=True, decimal_places=2, default=Decimal('0'), max_digits=10, verbose_name='preço')),
                 ('description', models.TextField(blank=True, null=True, verbose_name='descrição')),
                 ('quantity', models.PositiveIntegerField(blank=True, help_text='Limite máximo permitido.', null=True, verbose_name='quantidade')),
@@ -80,8 +88,8 @@ class Migration(migrations.Migration):
                 ('published', models.BooleanField(default=True, verbose_name='publicado')),
                 ('created', models.DateTimeField(auto_now_add=True, verbose_name='criado')),
                 ('modified', models.DateTimeField(auto_now=True, verbose_name='modificado')),
-                ('created_by', models.CharField(max_length=255, verbose_name='criado por')),
-                ('modified_by', models.CharField(max_length=255, verbose_name='modificado por')),
+                ('created_by', models.CharField(max_length=255, verbose_name='criado por', blank=True)),
+                ('modified_by', models.CharField(max_length=255, verbose_name='modificado por', blank=True)),
                 ('price', models.DecimalField(blank=True, decimal_places=2, default=Decimal('0'), max_digits=10, verbose_name='preço')),
                 ('description', models.TextField(blank=True, null=True, verbose_name='descrição')),
                 ('quantity', models.PositiveIntegerField(blank=True, help_text='Limite máximo permitido.', null=True, verbose_name='quantidade')),
@@ -157,4 +165,5 @@ class Migration(migrations.Migration):
             name='theme',
             field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='services', to='addon.Theme', verbose_name='tema'),
         ),
+        migrations.RunPython(load_initial_data),
     ]

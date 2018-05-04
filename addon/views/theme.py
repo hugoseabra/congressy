@@ -33,6 +33,7 @@ class ThemeListView(AccountMixin, generic.ListView):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
+        context['active'] = 'service'
         return context
 
     def get_queryset(self):

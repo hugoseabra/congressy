@@ -47,9 +47,10 @@ class ServiceService(services.ApplicationService):
         self.event = event
 
         data = kwargs.get('data', {})
-        data = data.copy()
-        data.update({'event': event.pk})
-        kwargs['data'] = data
+        if data:
+            data = data.copy()
+            data.update({'event': event.pk})
+            kwargs['data'] = data
 
         super().__init__(**kwargs)
 
