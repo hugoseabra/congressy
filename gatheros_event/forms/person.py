@@ -117,7 +117,7 @@ class PersonForm(forms.ModelForm):
 
         if zip_code:
             zip_code = clear_string(zip_code)
-            if len(zip_code) < 8:
+            if len(zip_code) != 8:
                 raise forms.ValidationError(
                     'O CEP deve não está correto. Verifique a quantidade de'
                     ' caracteres.'
