@@ -171,7 +171,8 @@
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-right">
-                    <button type="button" class="btn btn-primary"
+                    <button type="button" class="btn btn-primary {% if not object_list %}disabled{% endif %}"
+                            {% if not object_list %}disabled title="Nenhuma inscrição para exportar."{% endif %}
                             onclick="$('#export-form').submit();">
                         <i class="fa fa-download"></i>
                         Exportar
