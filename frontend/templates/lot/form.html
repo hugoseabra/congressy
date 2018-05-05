@@ -500,24 +500,24 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-xl-5 col-lg-6 col-md-6">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
                                 {% render_generic_field form.name autofocus=True %}
                             </div>
-                            <div class="col-xl-5 col-lg-5 col-md-5">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
                                 {% render_generic_field form.category %}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-5">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
                                 {% render_generic_field form.date_start %}
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
                                 {% render_generic_field form.date_end %}
                             </div>
                         </div>
                         {% if object.event.rsvp_type != object.event.RSVP_DISABLED and object.event.has_rsvp %}
                         <div class="row">
-                            <div class="col-xl-10 col-lg-11 col-md-11">
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
                                 {% render_switchery_field form.rsvp_restrict %}
                             </div>
                         </div>
@@ -525,7 +525,7 @@
                     </div>
                 </div>
                 {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
-                {% if has_subscriptions and not object.price %}
+                {% if lot_has_subscriptions and not object.price %}
                 {% else %}
                     <div class="panel panel-primary">
                         <div class="panel-heading">
@@ -536,23 +536,23 @@
                         <div class="panel-body">
                             {% if full_banking %}
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4 col-xl-push-1">
                                         {% render_generic_field form.price %}
                                     </div>
-                                    <div class="col-md-5 col-xl-6 col-lg-5">
+                                    <div class="col-md-8 col-xl-5 col-xl-push-1">
                                         <div style="display: none">
                                             {% render_switchery_field form.transfer_tax %}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-3 col-xl-3">
+                                    <div class="col-md-4 col-lg-3 col-xl-push-1">
                                         {% render_switchery_field form.allow_installment %}
                                     </div>
-                                    <div class="col-lg-3 col-xl-3">
+                                    <div class="col-md-3 col-lg-3 col-xl-push-1">
                                         {% render_generic_field form.installment_limit %}
                                     </div>
-                                    <div class="col-xs-11 col-lg-5 col-xl-5">
+                                    <div class="col-md-4 col-lg-5 col-xl-3 col-xl-push-1">
                                         <div>
                                             <div class="float-left">
                                                 {% render_switchery_field form.num_install_interest_absortion %}
