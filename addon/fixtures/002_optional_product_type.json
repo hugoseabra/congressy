@@ -1,45 +1,72 @@
 [
-  {
+   {
     "model": "addon.optionalproducttype",
     "pk": 1,
     "fields": {
-      "name": "Brinde de Particpante"
+      "name": "Alimenta\u00e7\u00e3o"
     }
   },
   {
     "model": "addon.optionalproducttype",
     "pk": 2,
     "fields": {
-      "name": "Camiseta"
+      "name": "Alojamento"
     }
   },
   {
     "model": "addon.optionalproducttype",
     "pk": 3,
     "fields": {
-      "name": "Caneca"
+      "name": "Brinde de Particpante"
     }
   },
   {
     "model": "addon.optionalproducttype",
     "pk": 4,
     "fields": {
-      "name": "Chaveiro"
+      "name": "Camiseta"
     }
   },
   {
     "model": "addon.optionalproducttype",
     "pk": 5,
     "fields": {
-      "name": "Kit de Participante"
+      "name": "Caneca"
     }
   },
-
   {
     "model": "addon.optionalproducttype",
     "pk": 6,
     "fields": {
+      "name": "Chaveiro"
+    }
+  },
+  {
+    "model": "addon.optionalproducttype",
+    "pk": 7,
+    "fields": {
+      "name": "Excurs\u00e3o T\u00e9cnica"
+    }
+  },
+  {
+    "model": "addon.optionalproducttype",
+    "pk": 8,
+    "fields": {
+      "name": "Kit de Participante"
+    }
+  },
+  {
+    "model": "addon.optionalproducttype",
+    "pk": 9,
+    "fields": {
       "name": "Material Did\u00e1tico"
+    }
+  },
+  {
+    "model": "addon.optionalproducttype",
+    "pk": 10,
+    "fields": {
+      "name": "Transporte"
     }
   }
 ]
