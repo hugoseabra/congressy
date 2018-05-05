@@ -33,24 +33,24 @@
                                         </div>
                                         <div class="float-right">
                                         {% if lot.price %}
-                                            <div style="font-size:14px" class="badge badge-primary">R$ {{ lot.get_calculated_price }}</div>
+                                            <div style="font-size:14px" class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Preço do lote">R$ {{ lot.get_calculated_price }}</div>
                                         {% endif %}
                                         </div>
                                         <div class="clearfix"></div>
                                     </div>
 
                                     {% if lot.status == lot.LOT_STATUS_RUNNING %}
-                                        <div class="badge badge-success">Andamento</div>
+                                        <div class="badge badge-success" data-toggle="tooltip" title="" data-original-title="Status: em andamento">Andamento</div>
                                     {% elif lot.status == lot.LOT_STATUS_FINISHED %}
-                                        <div class="badge badge-warning">Finalizado</div>
+                                        <div class="badge badge-warning" data-toggle="tooltip" title="" data-original-title="Status: já finalizado">Finalizado</div>
                                     {% else %}
-                                        <div class="badge">Não-iniciado</div>
+                                        <div class="badge" data-toggle="tooltip" title="" data-original-title="Status: ainda não-iniciado">Não-iniciado</div>
                                     {% endif %}
                                     {% if lot.private %}
-                                        <div class="badge badge-primary">Privado</div>
+                                        <div class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Lote privado: somente para cupons.">Privado</div>
                                     {% endif %}
                                     {% if lot.event_survey %}
-                                        <div class="badge badge-primary">{{ lot.event_survey }}</div>
+                                        <div class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Formulário personalizado">{{ lot.event_survey }}</div>
                                     {% endif %}
                                     {% if not full_banking %}
                                     <br />
@@ -81,8 +81,8 @@
                                 <div class="col-md-2 col-lg-3 col-xl-2">
                                     <hr class="hidden-md hidden-lg hidden-xl" />
                                     <div
-                                        data-toggle="tooltip"
                                         data-placement="left"
+                                        data-toggle="tooltip"
                                         title=""
                                         data-original-title="Gerenciar Formulário personalizado">
                                         <button

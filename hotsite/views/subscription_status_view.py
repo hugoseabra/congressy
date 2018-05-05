@@ -32,14 +32,12 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
                 slug=self.event.slug
             )
 
+        if not request.user.is_authenticated or not self.person:
+            return redirect('public:hotsite', slug=self.event.slug)
+
         try:
             self.subscription = Subscription.objects.get(
-                event=self.event, person=self.person)
-
-            if not request.user.is_authenticated or not self.person:
-                return redirect('public:hotsite', slug=self.event.slug)
-
-            return response
+                event=self.event, person=self.person, completed=True)
 
         except Subscription.DoesNotExist:
             messages.error(
@@ -47,6 +45,8 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
                 request=request
             )
             return redirect('public:hotsite', slug=self.event.slug)
+
+        return response
 
     def get_context_data(self, **kwargs):
 
@@ -134,6 +134,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
             try:
                 person = user.person
                 subscription = Subscription.objects.get(person=person,
+                                                        completed=True,
                                                         event=self.event)
                 self.subscription = subscription
                 return True

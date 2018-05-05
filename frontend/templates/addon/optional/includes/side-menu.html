@@ -1,5 +1,5 @@
 
-{% load queryset_filter %}
+{% load subscription_tags %}
 
 <h5 class="sidebar-header">Participantes</h5>
 <ul class="nav nav-pills nav-stacked">
@@ -15,7 +15,7 @@
            title="Inscrições">
             <i class="fa  fa-fw fa-rocket"></i>
             Inscrições
-            <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+            <span class="badge float-right">{% event_count_completed_subscriptions event %}</span>
         </a>
     </li>
     {#        <li>#}

@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 
-{% load static event_tags %}
+{% load static event_tags subscription_tags %}
 
 {% block title %} Eventos | Congressy{% endblock %}
 
@@ -140,10 +140,8 @@
                                     </td>
                                     <td class="hidden-xs hidden-sm">{{ event.category.name }}</td>
                                     <td>
-                                        {{ event.subscriptions.all|length }}
-                                        {% if event.limit %} /
-                                            {{ event.limit }}
-                                        {% endif %}
+                                        {% event_count_completed_subscriptions event %}
+                                        {% if event.limit %} / {{ event.limit }}{% endif %}
                                     </td>
                                     <td>
                                         <div class="btn-group">

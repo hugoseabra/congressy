@@ -1,4 +1,5 @@
 {% load static %}
+{% load hotsite_tags %}
 
 <!-- HERO
 ================================= -->
@@ -52,34 +53,38 @@
                         {% endif %}
                         {% if subscription_enabled and lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
                             {% for cat in event.lot_categories.all %}
+                                {% cat_has_active_lots cat as has_active_lots %}
 
+                                {% if has_active_lots %}
                                 <h3 class="icon-list-title">
                                     <strong>
                                         {{ cat.name }}
                                     </strong>
                                 </h3>
-                            <ul class="icon-list">
-                                {% for lot in cat.lots.all %}
-                                    {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
-                                    <li>
-                                        <span class="icon-list-icon " data-animation="bounceIn" {% if lot.status == lot.LOT_STATUS_FINISHED %}style="background-color:#515050"{% endif %}>
-                                            <strong>{{ forloop.counter }}</strong>
-                                        </span>
-                                        <h4 class="icon-list-title">
-                                            <strong {% if lot.status == lot.LOT_STATUS_FINISHED %}style="text-decoration: line-through"{% endif %}>
-                                                {{ lot.display_publicly }}
-                                            </strong>
-                                        </h4>
+                                <ul class="icon-list">
+                                    {% cat_get_lots cat as cat_lots %}
+                                    {% for lot in cat_lots %}
+                                        {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
+                                        <li>
+                                            <span class="icon-list-icon " data-animation="bounceIn" {% if lot.status == lot.LOT_STATUS_FINISHED %}style="background-color:#515050"{% endif %}>
+                                                <strong>{{ forloop.counter }}</strong>
+                                            </span>
+                                            <h4 class="icon-list-title">
+                                                <strong {% if lot.status == lot.LOT_STATUS_FINISHED %}style="text-decoration: line-through"{% endif %}>
+                                                    {{ lot.display_publicly }}
+                                                </strong>
+                                            </h4>
 
-                                        <p>
-{#                                            <strong>{{ lot.places_remaining }} Vaga(s) restante(s)</strong>#}
-{#                                            <br/>#}
-                                            <small class="text-muted">{{ lot.get_period }}</small>
-                                        </p>
-                                    </li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
+                                            <p>
+    {#                                            <strong>{{ lot.places_remaining }} Vaga(s) restante(s)</strong>#}
+    {#                                            <br/>#}
+                                                <small class="text-muted">{{ lot.get_period }}</small>
+                                            </p>
+                                        </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
                             {% endfor %}
                         {% elif subsciption_finished %}
                             <p style="font-size: 20px;font-style: italic;">Inscrições encerradas.</p>
@@ -93,7 +98,8 @@
                             {% if has_paid_lots and not has_active_bank_account %}
                                 <p style="position: relative;font-size: 20px;font-style: italic;padding: 10px 0 25px;">
                                     Evento está sendo configurado, volte em
-                                    breve para realizar sua inscrição!</p>
+                                    breve para realizar sua inscrição!
+                                </p>
                             {% else %}
                                {% include 'hotsite/subscription_simple_form.html' %}
                             {% endif %}
