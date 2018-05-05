@@ -274,7 +274,7 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         context['form_title'] = "Editar lote de '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
-        context['has_subscriptions'] = self.object.subscriptions.filter(
+        context['lot_has_subscriptions'] = self.object.subscriptions.filter(
             completed=True,
         ).count() > 0
 

@@ -253,7 +253,7 @@ class OptionalProductEditView(EventViewMixin, generic.UpdateView):
         context = super().get_context_data(**kwargs)
         context['object'] = self.get_object()
         context['active'] = 'product'
-        context['has_subscriptions'] = \
+        context['optonal_has_subscriptions'] = \
             self.object.subscription_products.filter(
                 subscription__completed=True
             ).count()
