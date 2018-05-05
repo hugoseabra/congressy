@@ -100,25 +100,32 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_generic_field form.optional_type %}
+
+                            </div>
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
                                 {% render_generic_field form.lot_category %}
                             </div>
                         </div>
+{#                        <div class="row">#}
+{#                            <div class="col-xl-10 col-xl-push-1 col-md-12">#}
+{#                                {% render_generic_field form.description %}#}
+{#                            </div>#}
+{#                        </div>#}
+                    </div>
+                </div>
 
-                        <div class="row">
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                {% render_generic_field form.optional_type %}
-                            </div>
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                {% render_generic_field form.theme %}
-                            </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Programação e Cobrança
                         </div>
+                    </div>
+                    <div class="panel-body">
                         <div class="row">
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                {% render_switchery_field form.restrict_unique %}
-                            </div>
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                {% render_generic_field form.date_end_sub %}
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                {% render_generic_field form.theme %}
                             </div>
                         </div>
                         <div class="row">
@@ -129,31 +136,78 @@
                                 {% render_generic_field form.schedule_end %}
                             </div>
                         </div>
-{#                        <div class="row">#}
-{#                            <div class="col-md-11">#}
-{#                                {% render_generic_field form.description %}#}
-{#                            </div>#}
-{#                        </div>#}
-                    </div>
-                </div>
-                {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
-                {% if object.subscription_services.count > 0 and not object.price %}
-                {% else %}
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <div class="panel-title">
-                                Custos e taxas
+                        <div class="row">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_generic_field form.place %}
+                            </div>
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
+                                {% if optonal_has_subscriptions and not object.price %}
+                                {% else %}
+                                    <div class="form-group">
+                                        <label for="id_has_price">Cobrar pela atividade?</label>
+                                        <div>
+                                            <input type="checkbox" name="has_price" id="id_has_price" class="js-switch" style="display:none">
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
-                        <div class="panel-body">
+                        {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
+                        {% if optonal_has_subscriptions and not object.price %}
+                        {% else %}
                             <div class="row">
-                                <div class="col-xl-push-1 col-xl-2 col-md-4">
-                                    {% render_generic_field form.price %}
+                                <div class="col-xl-3 col-xl-push-1 col-md-4">
+                                        {% render_generic_field form.price %}
+                                </div>
+                                <div class="col-xl-7 col-xl-push-1 col-md-8">
+                                    <div class="well well-sm">
+                                        <div><strong>Importante:</strong></div>
+                                        <small class="help-text text-muted">
+                                            O valor que você receberá por esta atividade será de acordo com o lote/ingresso
+                                            selecionado pelo participante, respeitando as configurações de custos do lote.
+                                            Se o lote for configurado com <u>absorção de taxas</u> você receberá o valor
+                                            com abatimento das taxas. Se o lote for configurado com <u>não absorver taxas</u>,
+                                            você receberá o valor exato configurado aqui, mas o participante pagará pelas
+                                            taxas de transação.
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Restrições
                         </div>
                     </div>
-                {% endif %}
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_generic_field form.date_end_sub %}
+                            </div>
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_switchery_field form.restrict_unique %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                <div class="form-group">
+                                    <label>Restrição de tema:</label>
+                                    <div>
+                                        asdf
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-xl-3 col-xl-push-1 col-md-6">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
