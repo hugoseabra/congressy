@@ -70,6 +70,18 @@
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
             </a>
         </li>
+        <li>
+            <a href="{% url 'addon:optional-service-list' event.pk %}"
+               title="Atividades Extras">
+                <i class="fa  fa-fw fa-rocket"></i> Atividades Extras
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'addon:optional-product-list' event.pk %}"
+               title="Venda de Produtos">
+                <i class="fa  fa-fw fa-rocket"></i> Venda de Produtos
+            </a>
+        </li>
         <li class="active">
             <a href="{% url 'payment:event-payments' event.pk %}"
                title="Pagamentos">

@@ -147,8 +147,14 @@
         </li>
         <li>
             <a href="{% url 'addon:optional-service-list' event.pk %}"
-               title="Opcionais">
-                <i class="fa  fa-fw fa-rocket"></i> Opcionais
+               title="Atividades Extras">
+                <i class="fa  fa-fw fa-rocket"></i> Atividades Extras
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'addon:optional-product-list' event.pk %}"
+               title="Venda de Produtos">
+                <i class="fa  fa-fw fa-rocket"></i> Venda de Produtos
             </a>
         </li>
         {% if has_paid_lots %}
