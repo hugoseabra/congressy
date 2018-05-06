@@ -188,7 +188,8 @@ class Subscription(models.Model, GatherosModelMixin):
     def check_rules(self):
         """ Verifica regras de negócios de inscrição """
 
-        rule.rule_1_limite_lote_excedido(self)
+        if self._stage.adding or self.has_changed('lot_id'):
+            rule.rule_1_limite_lote_excedido(self)
 
         # RULE 2 - rule.rule_2_codigo_inscricao_deve_ser_gerado
         if not self.code:

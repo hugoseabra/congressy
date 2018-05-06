@@ -12,7 +12,9 @@ def rule_1_limite_lote_excedido(subscription):
     """
     lot = subscription.lot
     limit = lot.limit
-    num = lot.subscriptions.exclude(status=subscription.CANCELED_STATUS).count()
+    num = lot.subscriptions.filter(completed=True).exclude(
+        status=subscription.CANCELED_STATUS
+    ).count()
     if limit and int(limit) > 0 and int(num) >= limit:
         raise IntegrityError('O lote atingiu o limite de inscrições.')
 
