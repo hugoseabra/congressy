@@ -80,7 +80,7 @@ class ProductOptionalManagementView(generic.TemplateView):
 
                 if not self.storage or optional.pk not in self.storage:
                     available = not optional.has_quantity_conflict and \
-                                not optional.as_sub_end_date_conflict
+                                not optional.has_sub_end_date_conflict
 
                     self.available_options.append({'optional': optional,
                                                    'available': available})
@@ -91,7 +91,7 @@ class ProductOptionalManagementView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
 
-        if self.available_options:
+        if self.available_options and len(self.available_options) > 0:
             context_data['object_list'] = self.available_options
 
         return context_data
@@ -200,6 +200,7 @@ class ServiceOptionalManagementView(generic.TemplateView):
         self.available_options = []
 
         fetch_in_storage = self.request.GET.get('fetch_in_storage')
+        return_format = self.request.GET.get('format')
 
         if fetch_in_storage:
 
@@ -212,8 +213,6 @@ class ServiceOptionalManagementView(generic.TemplateView):
                         self.available_options.append({'optional': optional})
                     except Service.DoesNotExist:
                         pass
-
-            return_format = self.request.GET.get('format')
 
             if return_format and return_format == 'json':
 
@@ -238,6 +237,8 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
                     self.available_options.append({'optional': optional,
                                                    'available': available})
+
+            print('asdasdasd')
 
         context = self.get_context_data()
         return self.render_to_response(context)

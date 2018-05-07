@@ -84,8 +84,8 @@ def has_addons(wizard):
     if isinstance(lot, Lot):
 
         if lot.category:
-            if lot.category.service_optionals or \
-                    lot.category.product_optionals:
+            if lot.category.service_optionals.count() or \
+                    lot.category.product_optionals.count():
                 return True
 
     return False
