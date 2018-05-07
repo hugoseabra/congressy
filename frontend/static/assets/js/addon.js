@@ -66,11 +66,19 @@ window.cgsy.addon = window.cgsy.addon || {};
     addon.show_hide_price_block = function() {
         var has_price = $('#id_has_price');
         var price_block = $('#price-block');
+        var price_el = $('#id_price');
 
         if (has_price.prop('checked') === true) {
             price_block.fadeIn();
+            price_el.attr('required', '');
+            if (price_el.val() === '0,00'){
+                price_el.val('');
+            }
+
         } else {
             price_block.fadeOut();
+            price_el.removeAttr('required');
+            price_el.val('');
         }
     }
 

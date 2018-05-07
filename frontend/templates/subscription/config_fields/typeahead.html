@@ -1,12 +1,19 @@
 {% load widget_tweaks form_config_tags %}
 
 <div class="form-group" {% if hide is True %}style="display:none"{% endif %}>
-    <label for="id_{{ name }}_search">
-        {{ label_tag|capfirst }}
-        {% if required %}
-            <small style="color:#C9302C">*</small>
-        {% endif %}
+    {%  if field.label %}
+    <label for="{{ field.id_for_label }}">
+    {% if '!?' in field.label %}
+        {{ field.label|safe|capfirst }}
+    {% else %}
+        {{ field.label|safe|capfirst }}:
+    {% endif %}
+    {% if  required  or required == 'True' %}
+        <span style="color:#C9302C">*</span>
+    {% endif %}
     </label>
+    {% endif %}
+
     <div id="{{ name }}">
 
         <input name="{{ name }}_search"

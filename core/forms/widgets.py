@@ -158,13 +158,6 @@ class DateTimeInput(forms.DateTimeInput):
     input_type = 'tel'
 
 
-class ModelChoiceField(forms.ModelChoiceField):
-    def __init__(self, to_field_label=None, *args, **kwargs):
-        self.to_field_label = to_field_label
-        super().__init__(*args, **kwargs)
-
-    def label_from_instance(self, obj):
-        if self.to_field_label is None:
-            return super().label_from_instance(obj)
-
-        return getattr(obj, self.to_field_label)
+class ManageableSelect(forms.Select):
+    """ Select com ícones de editar e adicionar registros e atualiza-lo. """
+    template_name = 'forms/widgets/manageable-select.html'
