@@ -129,7 +129,7 @@ class LotListView(BaseLotView, generic.ListView):
         context['event'] = self.event
         context['can_add'] = self._can_add
         context['has_inside_bar'] = True
-        context['active'] = 'membros'
+        context['active'] = 'lotes-categorias'
         return context
 
     def _can_add(self):

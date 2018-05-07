@@ -1,7 +1,7 @@
 {% if has_inside_bar %}
     <div class="tooltip-wrapper collapse navbar-collapse col-xs-12
             col-sm-4 col-lg-4
-            col-xl-4" id="sidebar" data-animated="fadeInRight">
+            col-xl-2" id="sidebar" data-animated="fadeInRight">
 {% endif %}
 
 <div {% if has_inside_bar %} class="col-xs-1 col-sm-1 col-lg-1
@@ -99,14 +99,13 @@
 </div>
 
 {% if has_inside_bar %}
-    <div class="manage_sidebar col-xs-3 col-sm-3 col-lg-3 col-xl-3">
+    <div class="manage_sidebar col-xs-3 col-sm-3 col-lg-3 col-xl-1">
         <div>
 
             <nav style="color: #383838">
                 {% if event %}
                     {% include 'event/event-menu.html' %}
-                {% endif %}
-                {% if organization %}
+                {% elif organization %}
                     {% include 'organization/organization-menu.html' %}
                 {% endif %}
             </nav>
@@ -117,7 +116,7 @@
 
 
 <div {% if has_inside_bar %}
-    class="col-xs-12  col-sm-8 col-lg-9 col-xl-9"
+    class="col-xs-12  col-sm-8 col-lg-9 col-xl-10"
 {% else %}
     class="col-xs-12 col-sm-12 col-lg-12
                     col-xl-12"

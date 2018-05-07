@@ -295,6 +295,8 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
             'lots': self.get_lots(),
             'has_filter': self.has_filter,
             'has_paid_lots': self.has_paid_lots(),
+            'has_inside_bar' : True,
+            'active' : 'inscricoes',
         })
         return cxt
 
@@ -331,6 +333,8 @@ class SubscriptionViewFormView(EventViewMixin, generic.FormView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['object'] = self.object
+        ctx['has_inside_bar'] = True
+        ctx['active']= 'inscricoes'
         return ctx
 
     def get_form_kwargs(self):

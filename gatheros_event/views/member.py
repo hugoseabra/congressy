@@ -85,6 +85,8 @@ class MemberListView(BaseOrganizationMixin, ListView):
             # 'member_organization': self.get_member_organization(),
             'member_organization': self.organization,
             'member_active_list': member_active_list,
+            'has_inside_bar' : True,
+            'active' : 'membros',
             'member_inactive_list': member_inactive_list,
         })
 
