@@ -322,7 +322,7 @@
 
 
 
-{% include 'event/event-menu.html'%}
+{% include 'event/event-menu.html' %}
 
 {% block content %}
     <form id="hotsite-form" action="" method="post" class="form-horizontal"
@@ -341,15 +341,24 @@
         {% endfor %}
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-3 float-right">
                 <div class="buttonbar">
-                    <div class="float-right">
+                    {% if info and info.description_html %}
+                        <a href="{% url 'public:hotsite' info.event.slug %}"
+                           target="_blank"
+                           class="btn btn-success btn-block">
+                            <i class="fa fa-globe"></i>
+                            Link do Evento
+                        </a>
+                    {% else %}
                         <button type="button"
-                                class="btn btn-success submit-button">
-                            <i class="fa fa-save"></i>
-                            Salvar
+                                class="btn btn-default btn-trans
+                                            btn-block disabled"
+                                title="Você deve configurar pelo menos a descrição do seu evento.">
+                            <i class="fa fa-globe"></i>
+                            Link do Evento
                         </button>
-                    </div>
+                    {% endif %}
                     <div class="clearfix"></div>
                 </div>
             </div>
@@ -380,12 +389,20 @@
                                         {% render_generic_field form.description_html %}
                                     </div>
                                 </div>
+                                <button type="button"
+                                        class="btn btn-success submit-button"
+                                        style=" float: right; margin-right:
+                                        10px">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-3 hidden-xs hidden-sm">
+
                 <div class="panel panel-primary" id="block-status-icons">
                     <div class="panel-heading">
                         <div class="panel-title">
@@ -395,22 +412,7 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-md-12" style="text-align: center">
-                                {% if info and info.description_html %}
-                                    <a href="{% url 'public:hotsite' info.event.slug %}"
-                                       target="_blank"
-                                       class="btn btn-success btn-block">
-                                        <i class="fa fa-globe"></i>
-                                        Link do Evento
-                                    </a>
-                                {% else %}
-                                    <button type="button"
-                                            class="btn btn-default btn-trans
-                                            btn-block disabled"
-                                            title="Você deve configurar pelo menos a descrição do seu evento.">
-                                        <i class="fa fa-globe"></i>
-                                        Link do Evento
-                                    </button>
-                                {% endif %}
+
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
                                         <i class="fas fa-check-circle fa-4x
@@ -477,7 +479,7 @@
                             <div class="col-md-6" id="place-form-block">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        {% render_generic_field form.show_location %}
+                                        {% render_switchery_field form.show_location %}
                                     </div>
                                 </div>
                                 <div class="row name-row">
@@ -557,21 +559,22 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="buttonbar bottom">
-                        <div class="float-right">
-                            <button type="button"
-                                    class="btn btn-success submit-button">
-                                <i class="fa fa-save"></i>
-                                Salvar
-                            </button>
+                    <div class="row">
+                        <div class="col-md-12" >
+                            <div class="buttonbar bottom">
+                                <div class="float-right"style="margin-right: 20px">
+                                    <button type="button"
+                                            class="btn btn-success submit-button">
+                                        <i class="fa fa-save"></i>
+                                        Salvar
+                                    </button>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
                         </div>
-                        <div class="clearfix"></div>
                     </div>
                 </div>
             </div>
+        </div>
     </form>
 {% endblock %}
