@@ -13,7 +13,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">Disponiveis</div>
             <div class="panel-body">
-                <div id="available_optionals"></div>
+                <div id="available_optional_products"></div>
             </div>
         </div>
 
@@ -42,7 +42,8 @@
             'GET',
             null,
             function (response) {
-                $('#available_optionals').replaceWith(response);
+                console.log(response);
+                $('#available_optional_products').replaceWith(response);
             },
             null
         );
