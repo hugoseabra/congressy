@@ -6,50 +6,104 @@
         <div class="panel panel-success">
             <div class="panel-heading">Selecionados</div>
             <div class="panel-body">
-                <div id="currently_selected"></div>
+
+                <div class="panel-body">
+
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div id="currently_selected_products"></div>
+                        </div>
+
+                    </div>
+                    <hr/>
+                    <div class="row" style="margin-top: 50px">
+
+                        <div class="col-md-12">
+                            <div id="currently_selected_services"></div>
+                        </div>
+
+                    </div>
+
+                </div>
             </div>
         </div>
 
         <div class="panel panel-default">
+
             <div class="panel-heading">Disponiveis</div>
+
             <div class="panel-body">
-                <div id="available_optionals"></div>
+
+                <div class="row">
+
+                    <div class="col-md-12">
+                        <div id="available_optional_products">
+                            Nenhum produto selecionado;
+                        </div>
+                    </div>
+
+                </div>
+                <hr/>
+                <div class="row" style="margin-top: 50px">
+
+                    <div class="col-md-12">
+                        <div id="available_optional_services">
+                            Nenhum serviço selecionado;
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
+
         </div>
-
-
     </div>
 </div>
-
 
 <script>
 
 
     document.addEventListener("DOMContentLoaded", function (event) {
         window.setTimeout(function () {
-            render_current_options_list();
-            render_current_options_json_list();
-            render_available_options_list();
+            render_available_optional_products_list();
+            render_available_optional_services_list();
+            render_currently_selected_products_list();
+            render_currently_selected_service_list();
         }, 300);
     });
 
 
-    function render_available_options_list() {
-        var url = '{% url 'public:hotsite_available_optional_product_list' category_pk=lot_category_pk  %}';
+    function render_available_optional_products_list() {
+        var url = '{% url 'public:hotsite_products' subscription_pk=subscription  %}';
 
         send(
             url,
             'GET',
             null,
             function (response) {
-                $('#available_optionals').replaceWith(response);
+                $('#available_optional_products').replaceWith(response);
             },
             null
         );
     }
 
-    function render_current_options_list() {
-        var url = '{% url 'public:hotsite_available_optional_product_list' category_pk=lot_category_pk  %}';
+    function render_available_optional_services_list() {
+        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
+
+        send(
+            url,
+            'GET',
+            null,
+            function (response) {
+                $('#available_optional_services').replaceWith(response);
+            },
+            null
+        );
+    }
+
+    function render_currently_selected_products_list() {
+        var url = '{% url 'public:hotsite_products' subscription_pk=subscription  %}';
 
         send(
             url,
@@ -58,28 +112,25 @@
                 fetch_in_storage: true
             },
             function (response) {
-                $('#currently_selected').replaceWith(response);
-                render_available_options_list();
+                $('#currently_selected_products').replaceWith(response);
+                render_available_optional_products_list();
             },
             null
         );
     }
 
-    function render_current_options_json_list() {
-        var url = '{% url 'public:hotsite_available_optional_product_list' category_pk=lot_category_pk  %}';
+    function render_currently_selected_service_list() {
+        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
 
         send(
             url,
             'GET',
             {
-                fetch_in_storage: true,
-                format: 'json'
+                fetch_in_storage: true
             },
             function (response) {
-
-                jQuery.each(response, function (i, val) {
-                    addToForm(val.id)
-                });
+                $('#currently_selected_services').replaceWith(response);
+                render_available_optional_services_list();
             },
             null
         );
@@ -87,7 +138,7 @@
 
     function addOptionalProduct(product_name, product_id) {
 
-        var url = '{% url 'public:hotsite_available_optional_product_list' category_pk=lot_category_pk  %}';
+        var url = '{% url 'public:hotsite_products' subscription_pk=subscription  %}';
 
         send(
             url,
@@ -96,10 +147,10 @@
                 'optional_id': product_id,
                 'action': 'add'
             },
-            function () {
-                addToForm(product_id);
-                render_current_options_list();
-                render_available_options_list();
+            function (res) {
+                console.log(res);
+                render_available_optional_products_list();
+                render_currently_selected_products_list();
             },
             function (err) {
                 console.log('err');
@@ -107,43 +158,27 @@
             }
         );
     }
+    function addOptionalService(service_id) {
 
-    function removeOptionalProduct(product_id) {
-
-        var url = '{% url 'public:hotsite_available_optional_product_list' category_pk=lot_category_pk  %}';
+        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
 
         send(
             url,
             'POST',
             {
-                'optional_id': product_id,
-                'action': 'remove'
+                'optional_id': service_id,
+                'action': 'add'
             },
-            function () {
-                removeFromForm(product_id);
-                render_current_options_list();
-                render_available_options_list();
+            function (res) {
+                console.log(res);
+                render_available_optional_services_list();
+                render_currently_selected_service_list();
             },
             function (err) {
                 console.log('err');
                 console.error(err);
             }
         );
-    }
-
-    function addToForm(product_id) {
-        var form = $('#optional_form');
-
-        $('<input>').attr({
-            type: 'hidden',
-            id: product_id,
-            value: product_id,
-            name: 'product_' + product_id,
-        }).appendTo(form);
-    }
-
-    function removeFromForm(product_id) {
-        $('#' + product_id).remove();
     }
 
     function send(url, method, data, success_callback, error_callback) {
@@ -192,5 +227,3 @@
     }
 
 </script>
-
-

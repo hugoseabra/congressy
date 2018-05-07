@@ -9,10 +9,8 @@
                     <th>Nome</th>
                     <th>Tipo</th>
                     <th>Preço</th>
-                    <th>Tema</th>
                     <th>Data de inicio</th>
                     <th>Data de encerramento</th>
-                    <th>Local</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -21,11 +19,19 @@
                     <tr>
                         <td>{{ service.optional.name }}</td>
                         <td>{{ service.optional.optional_type.name }}</td>
-                        <td>R${{ service.optional.price }}</td>
+                        <td>
+                            {% if service.optional.price == 0.00 %}
+                                Grátis
+                            {% else %}
+                                R$ {{ service.optional.price }}
+                            {% endif %}
+                        </td>
+                        <td>{{ service.optional.schedule_start }}</td>
+                        <td>{{ service.optional.schedule_end }}</td>
                         {% if service.available %}
                             <td>
                                 <button style="width: 100%"
-                                        onclick="addOptionalService{{ product.optional.pk }})"
+                                        onclick="addOptionalService{{ service.optional.pk }})"
                                         class="btn btn-sm btn-success">
                                     Selecionar
                                 </button>
@@ -35,7 +41,7 @@
                                 <button style="width: 100%"
                                         disabled="disabled"
                                         class="btn btn-sm btn-warning">
-                                    Esgotado
+                                    Indisponível
                                     <i class="fas fa-exclamation-triangle"></i>
                                 </button>
                             </td>
@@ -46,6 +52,6 @@
             </table>
         </div>
     {% else %}
-        Nenhum serviço opcional disponivel no momento.
+        Nenhum serviço disponivel no momento.
     {% endif %}
 </div>

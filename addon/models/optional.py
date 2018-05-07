@@ -11,7 +11,6 @@ from django.db import models
 from addon import constants, rules
 from base.models import EntityMixin
 from core.model import track_data
-from core.util.date import DateTimeRange
 from gatheros_event.models.mixins import GatherosModelMixin
 from gatheros_subscription.models import LotCategory
 from .optional_type import OptionalServiceType, OptionalProductType
@@ -268,49 +267,3 @@ class Service(AbstractOptional):
         return self.subscription_services.exclude(
             subscription__status='canceled'
         ).count()
-
-    @property
-    def has_schedule_conflicts(self):
-        new_start = self.schedule_start
-        new_end = self.schedule_end
-
-        is_restricted = self.restrict_unique
-
-        for sub_optional in self.lot_category.service_optionals.all():
-
-            start = sub_optional.schedule_start
-            stop = sub_optional.schedule_end
-            is_sub_restricted = \
-                sub_optional.restrict_unique
-
-            session_range = DateTimeRange(start=start, stop=stop)
-            has_conflict = (new_start in session_range or new_end in
-                            session_range)
-
-            if has_conflict is True and (is_restricted or is_sub_restricted):
-                return True
-
-        return False
-
-    @property
-    def get_schedule_conflict_service(self):
-        new_start = self.schedule_start
-        new_end = self.schedule_end
-
-        is_restricted = self.restrict_unique
-
-        for sub_optional in self.lot_category.service_optionals.all():
-
-            start = sub_optional.schedule_start
-            stop = sub_optional.schedule_end
-            is_sub_restricted = \
-                sub_optional.restrict_unique
-
-            session_range = DateTimeRange(start=start, stop=stop)
-            has_conflict = (new_start in session_range or new_end in
-                            session_range)
-
-            if has_conflict is True and (is_restricted or is_sub_restricted):
-                return sub_optional
-
-        return None

@@ -8,6 +8,7 @@ from django.db import models
 
 from addon import rules
 from base.models import EntityMixin
+from core.util.date import DateTimeRange
 from gatheros_subscription.models import Subscription
 from .optional import Product, Service
 
@@ -60,6 +61,7 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
     """
         Vínculo de uma inscrição com um Opcional de Produto.
     """
+
     class Meta(AbstractSubscriptionOptional.Meta):
         verbose_name_plural = 'inscrições de opcional de produto'
         verbose_name = 'inscrição de opcional de produto'
@@ -71,11 +73,25 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
         related_name='subscription_products'
     )
 
+    @property
+    def num_consumed(self):
+        """
+        Resgata quantidade de opcionais vendidos/consumidos através de
+        inscrições.
+
+        :return: número de opcionais vendidos
+        :type: bool
+        """
+        return self.optional.subscription_products.exclude(
+            subscription__status='canceled'
+        ).count()
+
 
 class SubscriptionService(AbstractSubscriptionOptional):
     """
         Vínculo de uma inscrição com um Opcional de Serviço.
     """
+
     class Meta(AbstractSubscriptionOptional.Meta):
         verbose_name_plural = 'inscrições de opcional de serviço'
         verbose_name = 'inscrição de opcional de serviço'
@@ -86,3 +102,62 @@ class SubscriptionService(AbstractSubscriptionOptional):
         verbose_name='opcional de serviço',
         related_name='subscription_services'
     )
+
+    @property
+    def num_consumed(self):
+        """
+        Resgata quantidade de opcionais vendidos/consumidos através de
+        inscrições.
+
+        :return: número de opcionais vendidos
+        :type: bool
+        """
+        return self.optional.subscription_services.exclude(
+            subscription__status='canceled'
+        ).count()
+
+    @property
+    def has_schedule_conflicts(self):
+        new_start = self.optional.schedule_start
+        new_end = self.optional.schedule_end
+
+        is_restricted = self.optional.restrict_unique
+
+        for sub_optional in self.subscription.subscriptionservice.all():
+
+            start = sub_optional.schedule_start
+            stop = sub_optional.schedule_end
+            is_sub_restricted = \
+                sub_optional.restrict_unique
+
+            session_range = DateTimeRange(start=start, stop=stop)
+            has_conflict = (new_start in session_range or new_end in
+                            session_range)
+
+            if has_conflict is True and (is_restricted or is_sub_restricted):
+                return True
+
+        return False
+
+    @property
+    def get_schedule_conflict_service(self):
+        new_start = self.optional.schedule_start
+        new_end = self.optional.schedule_end
+
+        is_restricted = self.optional.restrict_unique
+
+        for sub_optional in self.subscription.subscriptionservice.all():
+
+            start = sub_optional.schedule_start
+            stop = sub_optional.schedule_end
+            is_sub_restricted = \
+                sub_optional.restrict_unique
+
+            session_range = DateTimeRange(start=start, stop=stop)
+            has_conflict = (new_start in session_range or new_end in
+                            session_range)
+
+            if has_conflict is True and (is_restricted or is_sub_restricted):
+                return sub_optional
+
+        return None
