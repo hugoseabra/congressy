@@ -306,6 +306,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             person = Person.objects.get(user=self.request.user)
             lot = form.cleaned_data.get('lots')
 
+            self.request.session['is_new_subscription'] = False
+
             try:
                 subscription = Subscription.objects.get(
                     person=person,
@@ -314,16 +316,22 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 subscription.lot = lot
                 subscription.save()
             except Subscription.DoesNotExist:
-                Subscription.objects.create(
+                subscription = Subscription.objects.create(
                     person=person,
                     event=self.event,
                     lot=lot,
                     created_by=person.user.pk
                 )
 
+                self.request.session['is_new_subscription'] = True
+
+            self.storage.subscription = subscription
+
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
-            person = form.save()
+            self.storage.person = form.save()
+            if not is_paid_lot(self):
+                self.set_subscription_as_completed()
 
         # Persisting survey
         if isinstance(form, forms.SurveyForm):
@@ -357,6 +365,9 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
             if survey_form.is_valid():
                 survey_form.save_answers()
+
+                if not is_paid_lot(self):
+                    self.set_subscription_as_completed()
             else:
                 raise Exception('SurveyForm was invalid: {}'.format(
                     survey_form.errors))
@@ -375,6 +386,9 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                     if product not in self.storage.product_storage:
                         self.storage.product_storage.append(product)
 
+            if not is_paid_lot(self):
+                self.set_subscription_as_completed()
+
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
 
@@ -390,47 +404,27 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
                     addons_data = self.storage.get_step_data('addon')
 
-                    for key, value in addons_data.items():
-                        if 'product_' in key:
+                    if addons_data:
 
-                            product = self.get_product(pk=value)
+                        for key, value in addons_data.items():
+                            if 'product_' in key:
 
-                            if product not in self.storage.product_storage:
-                                self.storage.product_storage.append(product)
+                                product = self.get_product(pk=value)
 
-                lot_data = self.storage.get_step_data('lot')
-                lot = lot_data.get('lot-lots', '')
+                                if product not in self.storage.product_storage:
+                                    self.storage.product_storage.append(product)
 
-                # Get a lot object.
-                if not isinstance(lot, Lot):
-                    try:
-                        lot = Lot.objects.get(pk=lot, event=self.event)
-                    except Lot.DoesNotExist:
-                        message = 'Não foi possivel resgatar um Lote ' \
-                                  'a partir das referencias: lot<{}> e evento<{}>.' \
-                            .format(lot, self.event)
-                        raise TypeError(message)
-
-                try:
-                    subscription = Subscription.objects.get(
+                if not hasattr(self.storage, 'subscription'):
+                    self.storage.subscription = Subscription.objects.get(
                         person=self.storage.person,
                         event=self.event
-                    )
-                except Subscription.DoesNotExist:
-                    subscription = Subscription(
-                        person=self.storage.person,
-                        event=self.event,
-                        created_by=self.storage.person.user.id
                     )
 
                 try:
                     with transaction.atomic():
-                        # Insere ou edita lote
-                        subscription.lot = lot
-                        subscription.save()
 
                         transaction_data = PagarmeTransactionInstanceData(
-                            subscription=subscription,
+                            subscription=self.storage.subscription,
                             extra_data=form_data,
                             optionals=self.storage.product_storage,
                             event=self.event
@@ -438,8 +432,11 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
                         create_pagarme_transaction(
                             transaction_data=transaction_data,
-                            subscription=subscription
+                            subscription=self.storage.subscription,
                         )
+
+                        self.storage.subscription.completed = True
+                        self.storage.subscription.save()
 
                 except TransactionError as e:
                     error_dict = {
@@ -461,66 +458,27 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
     def done(self, form_list, **kwargs):
 
-        if not hasattr(self.storage, 'person'):
-            raise Exception('Não possuimos uma person no storage do wizard')
+        if not hasattr(self.storage, 'subscription'):
+            raise Exception('Não possuimos uma subscription '
+                            'no storage do wizard')
+
+        subscription = self.storage.subscription
+        lot = subscription.lot
 
         if not hasattr(self.storage, 'product_storage'):
             self.storage.product_storage = []
 
             addons_data = self.storage.get_step_data('addon')
+            if addons_data:
+                for key, value in addons_data.items():
+                    if 'product_' in key:
 
-            for key, value in addons_data.items():
-                if 'product_' in key:
+                        product = self.get_product(pk=value)
 
-                    product = self.get_product(pk=value)
+                        if product not in self.storage.product_storage:
+                            self.storage.product_storage.append(product)
 
-                    if product not in self.storage.product_storage:
-                        self.storage.product_storage.append(product)
-
-        lot_data = self.storage.get_step_data('lot')
-        lot = lot_data.get('lot-lots', '')
-
-        # Get a lot object.
-        if not isinstance(lot, Lot):
-            try:
-                lot = Lot.objects.get(pk=lot, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot, self.event)
-                raise TypeError(message)
-
-        new_subscription = False
-        new_account = self.request.user.last_login is None
-
-        try:
-            subscription = Subscription.objects.get(
-                person=self.storage.person,
-                event=self.event
-            )
-        except Subscription.DoesNotExist:
-            subscription = Subscription(
-                person=self.storage.person,
-                event=self.event,
-                created_by=self.request.user.id
-            )
-            new_subscription = True
-
-        # Insere ou edita lote
-        subscription.lot = lot
-        if not lot.price or lot.price == 0:
-
-            subscription.status = Subscription.CONFIRMED_STATUS
-
-            if new_account and new_subscription:
-                notify_new_user_and_free_subscription(self.event, subscription)
-            else:
-                notify_new_free_subscription(self.event, subscription)
-
-        subscription.save()
-
-        if hasattr(self.storage, 'product_storage') and \
-                len(self.storage.product_storage) > 0:
+        if len(self.storage.product_storage) > 0:
             for product in self.storage.product_storage:
 
                 liquid_price = self.get_calculated_price(product.price, lot)
@@ -533,6 +491,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 })
                 
                 service.save()
+
+        self.set_subscription_as_completed()
 
         messages.success(
             self.request,
@@ -550,7 +510,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 'slug': self.event.slug,
             }))
 
-    def clear_string(self, field_name, data):
+    @staticmethod
+    def clear_string(field_name, data):
         if data and field_name in data:
 
             value = data.get(field_name)
@@ -603,3 +564,24 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             return round(price + congressy_amount, 2)
 
         return round(price, 2)
+
+    def set_subscription_as_completed(self):
+
+        subscription = self.storage.subscription
+        new_subscription = self.request.session['is_new_subscription']
+
+        subscription.completed = True
+        new_account = self.request.user.last_login is None
+        lot = subscription.lot
+
+        if not lot.price or lot.price == 0:
+
+            subscription.status = Subscription.CONFIRMED_STATUS
+
+            if new_account and new_subscription:
+                notify_new_user_and_free_subscription(self.event, subscription)
+            else:
+                notify_new_free_subscription(self.event, subscription)
+
+        subscription.save()
+
