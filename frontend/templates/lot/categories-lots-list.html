@@ -15,7 +15,7 @@
             <div class="tab-content">
                 {% for cat in categories %}
                 <div class="tab-pane {% if forloop.counter0 == 0 %}active{% endif %}" id="cat-{{ cat.pk }}">
-                    <h3 style="font-weight: bold;padding: 10px 0">{{ cat.name }}</h3>
+                    <h3 class="well well-sm" style="font-weight: bold;padding: 10px">{{ cat.name }}</h3>
                     <hr />
                     {% if cat.lots.count %}
                     <ul class="list-group block-list">
