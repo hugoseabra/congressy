@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
@@ -80,7 +81,8 @@ class SubscriptionWizardView(SessionWizardView):
         self.event = get_object_or_404(Event, slug=slug)
         response = super().dispatch(request, *args, **kwargs)
 
-        if not self.request.user.is_authenticated:
+        user = self.request.user
+        if not isinstance(user, User):
             return redirect('public:hotsite', slug=self.event.slug)
 
         if not self.storage:
@@ -390,6 +392,8 @@ class SubscriptionWizardView(SessionWizardView):
             lot_pk = lot_data.get('lot-lots')
 
             lot = Lot.objects.get(pk=lot_pk, event=self.event)
+
+
 
             kwargs.update({'user': self.request.user, 'lot': lot, 'event':
                 self.event})
