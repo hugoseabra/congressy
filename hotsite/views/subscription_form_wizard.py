@@ -379,6 +379,14 @@ class SubscriptionWizardView(SessionWizardView):
         if step == 'person':
             lot_data = self.storage.get_step_data('lot')
 
+            if not lot_data:
+                messages.error(
+                    self.request,
+                    'Não foi possivel selecionar este lote, tente novamente.'
+                )
+
+                return self.render_goto_step('lot')
+
             lot_pk = lot_data.get('lot-lots')
 
             lot = Lot.objects.get(pk=lot_pk, event=self.event)
