@@ -18,11 +18,15 @@
 {% endblock %}
 
 {% block scripts %}
+{#    <script src="http://malsup.github.com/jquery.form.js"></script>#}
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <script src="{% static "assets/js/price-format.min.js" %}"></script>
+    <script src="{% static "assets/js/addon.js" %}"></script>
     <script type="application/javascript">
 
         (function ($) {
+            "use strict";
+
             $(document).ready(function () {
                 {% if LANGUAGE_CODE == 'pt-br' or LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
                     $('#id_date_end_sub_0').mask("99/99/9999");
@@ -38,6 +42,19 @@
                 $('#id_schedule_start_1').mask("99:99");
                 $('#id_schedule_end_1').mask("99:99");
                 $('#id_price').mask('#.##0,00', {reverse: true});
+
+                window.setTimeout(function() {
+                    window.cgsy.addon.create_events();
+
+                    {% for theme in themes %}
+                        window.cgsy.addon.add_theme_limit({{ theme.pk }}, '{{ theme.name }}', {{ theme.limit|default_if_none:0 }});
+                    {% endfor %}
+                    window.cgsy.addon.show_theme_limit();
+
+                    {% if object and object.price and object.price > 0%}
+                        $('#id_has_price').trigger('click');
+                    {% endif %}
+                }, 300);
             });
 
         })(jQuery);
@@ -50,7 +67,9 @@
 
 {% block content %}
 
-    <form action="" method="post" class="form-horizontal form-border"
+    <div id="output"></div>
+
+    <form action="" id="optional_form" method="post" class="form-horizontal form-border"
           role="form" name="optional_form">
         {% csrf_token %}
 
@@ -119,7 +138,7 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">
-                            Programação e Cobrança
+                            Programação
                         </div>
                     </div>
                     <div class="panel-body">
@@ -137,10 +156,22 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
                                 {% render_generic_field form.place %}
                             </div>
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Cobrança
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
                                 {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
                                 {% if optonal_has_subscriptions and not object.price %}
                                 {% else %}
@@ -153,15 +184,15 @@
                                 {% endif %}
                             </div>
                         </div>
-                        {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
-                        {% if optonal_has_subscriptions and not object.price %}
-                        {% else %}
-                            <div class="row">
+                        <div class="row" id="price-block" style="display: none">
+                            {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
+                            {% if optonal_has_subscriptions and not object.price %}
+                            {% else %}
                                 <div class="col-xl-3 col-xl-push-1 col-md-4">
                                         {% render_generic_field form.price %}
                                 </div>
                                 <div class="col-xl-7 col-xl-push-1 col-md-8">
-                                    <div class="well well-sm">
+                                    <div class="well well-sm" style="text-align: justify">
                                         <div><strong>Importante:</strong></div>
                                         <small class="help-text text-muted">
                                             O valor que você receberá por esta atividade será de acordo com o lote/ingresso
@@ -173,10 +204,11 @@
                                         </small>
                                     </div>
                                 </div>
-                            </div>
-                        {% endif %}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
+
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">
@@ -193,17 +225,16 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-xl-5 col-xl-push-1 col-md-6">
-                                <div class="form-group">
-                                    <label>Restrição de tema:</label>
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                <div class="form-group" id="theme-limit-block" style="display: none">
+                                    <label>Restrição de grupo:</label>
                                     <div>
-                                        asdf
+                                        <small class="help-text text-muted">
+                                        O grupo <span style="font-weight: bold;color: blue;text-transform: uppercase;" id="theme_limit_name"></span> possui
+                                        restrição de <span style="font-weight: bold;" id="theme_limit_limit"></span> por participante.
+                                        </small>
                                     </div>
                                 </div>
-
-                            </div>
-                            <div class="col-xl-3 col-xl-push-1 col-md-6">
-
                             </div>
                         </div>
                     </div>

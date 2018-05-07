@@ -33,6 +33,7 @@ class EventViewMixin(AccountMixin, generic.View):
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
         context['has_paid_lots'] = self.has_paid_lots()
+        context['themes'] = self.event.themes.all()
         return context
 
     def has_paid_lots(self):

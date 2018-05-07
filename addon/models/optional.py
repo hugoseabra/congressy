@@ -40,12 +40,8 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         LotCategory,
         on_delete=models.PROTECT,
         verbose_name='categoria',
-        related_name='%(class)s_optionals'
-    )
-
-    name = models.CharField(
-        max_length=255,
-        verbose_name="nome",
+        related_name='%(class)s_optionals',
+        help_text='Para qual categoria de participante se destina.',
     )
 
     date_end_sub = models.DateTimeField(
@@ -170,11 +166,17 @@ class Product(AbstractOptional):
         rules.OptionalMustHaveMinimumDays,
     )
 
+    name = models.CharField(
+        max_length=255,
+        verbose_name="nome do produto",
+    )
+
     optional_type = models.ForeignKey(
         OptionalProductType,
         on_delete=models.PROTECT,
         verbose_name='tipo',
         related_name='product_type_optionals',
+        help_text='Exemplo: palestra, workshop, curso, hospedagem',
     )
 
     @property
@@ -209,6 +211,11 @@ class Service(AbstractOptional):
         rules.OptionalMustHaveMinimumDays,
     )
 
+    name = models.CharField(
+        max_length=255,
+        verbose_name="nome da atividade",
+    )
+
     optional_type = models.ForeignKey(
         OptionalServiceType,
         on_delete=models.PROTECT,
@@ -219,8 +226,9 @@ class Service(AbstractOptional):
     theme = models.ForeignKey(
         Theme,
         on_delete=models.PROTECT,
-        verbose_name="tema",
+        verbose_name="grupo temático",
         related_name="services",
+        help_text='Agrupar atividades por área temática.',
     )
 
     schedule_start = models.DateTimeField(
@@ -237,12 +245,15 @@ class Service(AbstractOptional):
         verbose_name='local',
         null=True,
         blank=True,
+        help_text='Local onde a atividade irá acontecer no dia do evento.',
     )
 
     restrict_unique = models.BooleanField(
         default=False,
-        verbose_name='restringir como único',
-        help_text='Restringir como única dentro do intervalo de tempo.'
+        verbose_name='Restringir horário',
+        help_text='Se marcado, os participantes inscritos nesta atividade'
+                  ' não poderão se inscrever em outras atividades que estejam'
+                  ' em conflito de horário com esta.'
     )
 
     @property

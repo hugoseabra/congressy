@@ -12,15 +12,15 @@ from gatheros_event.models.mixins import GatherosModelMixin
 class Theme(GatherosModelMixin, EntityMixin, models.Model):
 
     class Meta:
-        verbose_name_plural = 'temas'
-        verbose_name = 'tema'
+        verbose_name_plural = 'grupos'
+        verbose_name = 'grupo'
         ordering = ('event', 'name')
 
     event = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,
         verbose_name="eventos",
-        related_name="events",
+        related_name="themes",
     )
 
     name = models.CharField(max_length=255, verbose_name='nome')
@@ -33,4 +33,8 @@ class Theme(GatherosModelMixin, EntityMixin, models.Model):
     )
 
     def __str__(self):
-        return self.name
+        string = self.name
+        if self.limit and self.limit > 0:
+            string += ' (limitado)'
+
+        return string
