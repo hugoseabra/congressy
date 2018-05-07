@@ -103,7 +103,12 @@
         <div>
 
             <nav style="color: #383838">
-                {% include 'event/event-menu.html' %}
+                {% if event %}
+                    {% include 'event/event-menu.html' %}
+                {% endif %}
+                {% if organization %}
+                    {% include 'organization/organization-menu.html' %}
+                {% endif %}
             </nav>
         </div>
     </div>

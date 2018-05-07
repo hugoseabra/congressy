@@ -3468,6 +3468,7 @@ label.valid {
   }
   .theme-cgsy-full .manage_sidebar {
     margin-top: 0;
+    position: fixed;
   }
   .theme-cgsy-full .main-content-wrapper {
     padding-top: 0;

@@ -7,8 +7,6 @@ Variáveis:
 - has_paid_lots
 
 {% endcomment %}
-{% if active != 'membros' and active != 'convites' %}
-
     {#    <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>#}
     {#    <ul class="nav nav-pills nav-stacked">#}
     {#        <li>#}
@@ -105,45 +103,3 @@ Variáveis:
     {#            </a>#}
     {#        </li>#}
     {#        </ul>#}
-{% else %}
-
-    {% if active == 'convites' %}
-        <h5 class="sidebar-header" style="color:#4c4c4c;">Equipe</h5>
-        <ul class="nav nav-pills nav-stacked">
-            {% if can_view_members or can_manage_members %}
-            <li>
-                <a class="sidebar-itens" href=
-                           "{% url 'event:member-list' invitation_organization.pk %}" title="Membros">
-                    <i class="fas fa-users"></i> Membros
-                </a>
-            </li>
-            {% endif %}
-            <li class="active">
-                <a class="sidebar-itens" href=
-                            "{% url 'event:invitation-list' invitation_organization.pk %}" title="Convites">
-                    <i class="fas fa-envelope-open"></i> Convites
-                </a>
-            </li>
-        </ul>
-    {% endif %}
-    {% if active == 'membros' %}
-         <h5 class="sidebar-header" style="color:#4c4c4c;">Equipe</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li class="active">
-            <a class="sidebar-itens" href="{% url 'event:member-list' member_organization.pk %}"
-               title="Membros">
-                <i class="fa fa-users"></i> Membros
-            </a>
-        </li>
-        {% if can_manage_invitations %}
-        <li>
-            <a class="sidebar-itens" href=
-                        "{% url 'event:invitation-list' member_organization.pk %}" title="Convites">
-                <i class="fas fa-envelope-open"></i> Convites
-            </a>
-        </li>
-        {% endif %}
-    </ul>
-    {% endif %}
-
-{% endif %}
