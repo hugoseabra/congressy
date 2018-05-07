@@ -94,6 +94,9 @@ class SubscriptionWizardView(SessionWizardView):
         context['remove_preloader'] = True
         context['event'] = self.event
 
+        if self.storage.current_step == 'lot':
+            context['has_coupon'] = self.has_coupon()
+
         if self.storage.current_step == 'payment':
             context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
@@ -472,6 +475,15 @@ class SubscriptionWizardView(SessionWizardView):
                 continue
 
             if lot.price > 0:
+                return True
+
+        return False
+
+    def has_coupon(self):
+        """ Retorna se possui cupon, seja qual for. """
+        for lot in self.event.lots.all():
+            # código de exibição
+            if lot.private and lot.exhibition_code:
                 return True
 
         return False
