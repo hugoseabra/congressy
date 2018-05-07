@@ -1,13 +1,10 @@
-import json
-
-from django.core import serializers
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
-from .helpers import create_optional_dict
-from addon.models import Product, Service
-from gatheros_subscription.models import LotCategory
+from addon.models import Product, Service, SubscriptionProduct, \
+    SubscriptionService
+from gatheros_subscription.models import Subscription
 
 """
 DEV NOTES: 
@@ -41,46 +38,127 @@ class ProductOptionalManagementView(generic.TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        self.storage = self.request.session.get('product_storage')
+        subscription_pk = kwargs.get('subscription_pk')
+        subscription = get_object_or_404(Subscription, pk=subscription_pk)
 
-        category_pk = kwargs.get('category_pk')
-        category = get_object_or_404(LotCategory, pk=category_pk)
+        category = subscription.lot.category
+
         self.available_options = []
 
         fetch_in_storage = self.request.GET.get('fetch_in_storage')
+        # @TODO add user validation here, only if request.user == sub.user
+
+        all_products_selected_by_the_user = \
+            SubscriptionProduct.objects.filter(
+                subscription=subscription,
+                optional__lot_category=subscription.lot.category
+            )
 
         if fetch_in_storage:
-
-            if self.storage:
-
-                for item in self.storage:
-                    try:
-                        optional = Product.objects.get(pk=item,
-                                                       lot_category=category)
-                        self.available_options.append({'optional': optional})
-                    except Product.DoesNotExist:
-                        pass
-
-            return_format = self.request.GET.get('format')
-
-            if return_format and return_format == 'json':
-
-                json_list = []
-
-                for product in self.available_options:
-                    json_list.append(
-                        self.create_product_json(product['optional']))
-                return JsonResponse(json_list, safe=False)
+            for item in all_products_selected_by_the_user:
+                self.available_options.append({'optional': item.optional})
 
         else:
             event_optionals_products = Product.objects.filter(
                 lot_category=category, published=True)
 
             for optional in event_optionals_products:
+                available = not optional.has_quantity_conflict and \
+                            not optional.has_sub_end_date_conflict and \
+                            not optional not in \
+                            all_products_selected_by_the_user
 
-                if not self.storage or optional.pk not in self.storage:
+                self.available_options.append({'optional': optional,
+                                               'available': available})
+
+        context = self.get_context_data()
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+
+        if self.available_options and len(self.available_options) > 0:
+            context_data['object_list'] = self.available_options
+
+        return context_data
+
+    def get_template_names(self):
+
+        template_name = super().get_template_names()
+
+        fetch_in_storage = self.request.GET.get('fetch_in_storage')
+
+        if fetch_in_storage:
+            template_name = "optionals/currently_selected_product_list.html"
+
+        return template_name
+
+    def post(self, *args, **kwargs):
+
+        """
+            @TODO: IMPLEMENT SOME VALIDATION BEFORE CREATING!!!!!!!!
+        """
+
+        subscription_pk = kwargs.get('subscription_pk')
+        optional_id = self.request.POST.get('optional_id')
+        action = self.request.POST.get('action')
+
+        if not optional_id or not subscription_pk or not action:
+            return HttpResponse(status=400)
+
+        product = get_object_or_404(Product, pk=int(optional_id))
+        subscription = get_object_or_404(Subscription, pk=subscription_pk)
+
+        if action == 'add':
+            _, created = SubscriptionProduct.objects.get_or_create(
+                optional=product,
+                subscription=subscription
+            )
+
+            if created:
+                return HttpResponse('201 OK', status=201)
+
+        return HttpResponse('200 OK', status=200)
+
+
+class ServiceOptionalManagementView(generic.TemplateView):
+    available_options = []
+    storage = None
+    template_name = "optionals/available_services_list.html"
+
+    def get(self, request, *args, **kwargs):
+
+        subscription_pk = kwargs.get('subscription_pk')
+        subscription = get_object_or_404(Subscription, pk=subscription_pk)
+
+        category = subscription.lot.category
+        self.available_options = []
+
+        fetch_in_storage = self.request.GET.get('fetch_in_storage')
+        all_selected_services = SubscriptionService.objects.filter(
+            subscription=subscription,
+            optional__lot_category=subscription.lot.category
+        )
+        # @TODO add user validation here, only if request.user == sub.user
+
+        if fetch_in_storage:
+            for item in all_selected_services:
+                self.available_options.append({'optional': item.optional})
+        else:
+            event_optionals_services = Service.objects.filter(
+                lot_category=category, published=True)
+
+            for optional in event_optionals_services:
+
+                if optional not in all_selected_services:
                     available = not optional.has_quantity_conflict and \
-                                not optional.has_sub_end_date_conflict
+                                not optional.has_sub_end_date_conflict and \
+                                not optional not in all_selected_services
+
+                    if available:
+                        for service in subscription.subscriptionservice.all():
+                            if service.has_schedule_conflicts:
+                                available = False
 
                     self.available_options.append({'optional': optional,
                                                    'available': available})
@@ -96,44 +174,6 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         return context_data
 
-    def post(self, request, *args, **kwargs):
-
-        optional_id = request.POST.get('optional_id')
-        action = request.POST.get('action')
-        new_product = get_object_or_404(Product, pk=optional_id)
-
-        if not optional_id:
-            return HttpResponse(status=400)
-
-        optional_id = int(optional_id)
-
-        session_altered = False
-
-        product_storage = request.session.get('product_storage')
-
-        if not product_storage:
-            self.storage = []
-        else:
-            self.storage = product_storage
-
-        if action and action == 'add':
-            if optional_id not in self.storage:
-                if not new_product.has_quantity_conflict and not \
-                        new_product.has_sub_end_date_conflict:
-                    session_altered = True
-                    self.storage.append(new_product.pk)
-        elif action and action == 'remove':
-            if optional_id in self.storage:
-                session_altered = True
-                self.storage.remove(optional_id)
-
-        request.session['product_storage'] = self.storage
-
-        if session_altered:
-            return HttpResponse(status=201)
-
-        return HttpResponse(status=200)
-
     def get_template_names(self):
 
         template_name = super().get_template_names()
@@ -141,188 +181,33 @@ class ProductOptionalManagementView(generic.TemplateView):
         fetch_in_storage = self.request.GET.get('fetch_in_storage')
 
         if fetch_in_storage:
-            template_name = "optionals/currently_selected_product_list.html"
+            template_name = "optionals/currently_selected_service_list.html"
 
         return template_name
 
-    # @TODO not DRY, fix
-    def create_product_json(self, product):
+    def post(self, *args, **kwargs):
 
-        remove_fields = [
-            'lot_category',
-            'created_by',
-            'modified_by',
-            'created',
-            'modified',
-            'release_days',
-            'optional_type',
-            'quantity',
-            'date_end_sub',
-            'published',
-        ]
+        """
+            @TODO: IMPLEMENT SOME VALIDATION BEFORE CREATING!!!!!!!!
+        """
 
-        product_obj_as_json = serializers.serialize('json', [product, ])
-        product_obj = json.loads(product_obj_as_json)
-        product_obj = product_obj[0]
-        product_obj = product_obj['fields']
-        product_obj['id'] = product.pk
+        subscription_pk = kwargs.get('subscription_pk')
+        optional_id = self.request.POST.get('optional_id')
+        action = self.request.POST.get('action')
 
-        for field in remove_fields:
-            del product_obj[field]
+        if not optional_id or not subscription_pk or not action:
+            return HttpResponse(status=400)
 
-        return product_obj
+        product = get_object_or_404(Product, pk=int(optional_id))
+        subscription = get_object_or_404(Subscription, pk=subscription_pk)
 
+        if action == 'add':
+            _, created = SubscriptionService.objects.get_or_create(
+                optional=product,
+                subscription=subscription
+            )
 
-class ServiceOptionalManagementView(generic.TemplateView):
-    available_options = []
-    storage = None
-    template_name = "optionals/available_services_list.html"
+            if created:
+                return HttpResponse('201 OK', status=201)
 
-    remove_fields = [
-        'lot_category',
-        'created_by',
-        'modified_by',
-        'created',
-        'modified',
-        'release_days',
-        'optional_type',
-        'quantity',
-        'date_end_sub',
-        'published',
-    ]
-
-    def get(self, request, *args, **kwargs):
-
-        self.storage = self.request.session.get('service_storage')
-
-        category_pk = kwargs.get('category_pk')
-        category = get_object_or_404(LotCategory, pk=category_pk)
-        self.available_options = []
-
-        fetch_in_storage = self.request.GET.get('fetch_in_storage')
-        return_format = self.request.GET.get('format')
-
-        if fetch_in_storage:
-
-            if self.storage:
-
-                for item in self.storage:
-                    try:
-                        optional = Service.objects.get(pk=item,
-                                                       lot_category=category)
-                        self.available_options.append({'optional': optional})
-                    except Service.DoesNotExist:
-                        pass
-
-            if return_format and return_format == 'json':
-
-                json_list = []
-
-                for service in self.available_options:
-                    json_list.append(
-                        create_optional_dict(service['optional'],
-                                             remove_fields=self.remove_fields))
-                return JsonResponse(json_list, safe=False)
-
-        else:
-            optionals_services = Service.objects.filter(
-                lot_category=category, published=True)
-
-            for optional in optionals_services:
-
-                if not self.storage or optional.pk not in self.storage:
-                    available = not optional.has_quantity_conflict and \
-                                not optional.has_sub_end_date_conflict and \
-                                not optional.has_schedule_conflicts
-
-                    self.available_options.append({'optional': optional,
-                                                   'available': available})
-
-            print('asdasdasd')
-
-        context = self.get_context_data()
-        return self.render_to_response(context)
-
-    # def get_context_data(self, **kwargs):
-    #     context_data = super().get_context_data(**kwargs)
-    #
-    #     if self.available_options:
-    #         context_data['object_list'] = self.available_options
-    #
-    #     return context_data
-    #
-    # def post(self, request, *args, **kwargs):
-    #
-    #     optional_id = request.POST.get('optional_id')
-    #     action = request.POST.get('action')
-    #     new_product = get_object_or_404(Product, pk=optional_id)
-    #
-    #     if not optional_id:
-    #         return HttpResponse(status=400)
-    #
-    #     optional_id = int(optional_id)
-    #
-    #     session_altered = False
-    #
-    #     product_storage = request.session.get('product_storage')
-    #
-    #     if not product_storage:
-    #         self.storage = []
-    #     else:
-    #         self.storage = product_storage
-    #
-    #     if action and action == 'add':
-    #         if optional_id not in self.storage:
-    #             if not has_quantity_conflict(new_product) and not \
-    #                     has_sub_end_date_conflict(new_product):
-    #                 session_altered = True
-    #                 self.storage.append(new_product.pk)
-    #     elif action and action == 'remove':
-    #         if optional_id in self.storage:
-    #             session_altered = True
-    #             self.storage.remove(optional_id)
-    #
-    #     request.session['product_storage'] = self.storage
-    #
-    #     if session_altered:
-    #         return HttpResponse(status=201)
-    #
-    #     return HttpResponse(status=200)
-    #
-    # def get_template_names(self):
-    #
-    #     template_name = super().get_template_names()
-    #
-    #     fetch_in_storage = self.request.GET.get('fetch_in_storage')
-    #
-    #     if fetch_in_storage:
-    #         template_name = "optionals/currently_selected_product_list.html"
-    #
-    #     return template_name
-    #
-    # # @TODO not DRY, fix
-    # def create_product_json(self, product):
-    #
-    #     remove_fields = [
-    #         'lot_category',
-    #         'created_by',
-    #         'modified_by',
-    #         'created',
-    #         'modified',
-    #         'release_days',
-    #         'optional_type',
-    #         'quantity',
-    #         'date_end_sub',
-    #         'published',
-    #     ]
-    #
-    #     product_obj_as_json = serializers.serialize('json', [product, ])
-    #     product_obj = json.loads(product_obj_as_json)
-    #     product_obj = product_obj[0]
-    #     product_obj = product_obj['fields']
-    #     product_obj['id'] = product.pk
-    #
-    #     for field in remove_fields:
-    #         del product_obj[field]
-    #
-    #     return product_obj
+        return HttpResponse('200 OK', status=200)

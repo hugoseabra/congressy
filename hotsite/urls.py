@@ -14,9 +14,12 @@ public_hotsite_urls = [
         name='hotsite-subscription-status'),
     url(r'^(?P<slug>[\w-]+)/coupon/$', views.CouponView.as_view(),
         name='hotsite-coupon'),
-    url(r'category/(?P<category_pk>[\d]+)/products/',
+    url(r'addons/(?P<subscription_pk>[0-9A-Fa-f-]+)/products/',
         views.ProductOptionalManagementView.as_view(),
-        name='hotsite_available_optional_product_list'),
+        name='hotsite_products'),
+    url(r'addons/(?P<subscription_pk>[0-9A-Fa-f-]+)/services/',
+        views.ServiceOptionalManagementView.as_view(),
+        name='hotsite_services'),
 ]
 
 urlpatterns_public_hotsite = [url(r'^', include(public_hotsite_urls))]

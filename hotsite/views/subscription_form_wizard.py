@@ -81,9 +81,7 @@ def has_addons(wizard):
     # Return true if lot has price and price > 0
     lot = cleaned_data['lots']
 
-    if isinstance(lot, Lot):
-
-        if lot.category:
+    if isinstance(lot, Lot) and lot.category:
             if lot.category.service_optionals.count() or \
                     lot.category.product_optionals.count():
                 return True
@@ -201,19 +199,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         if self.storage.current_step == 'addon':
 
-            lot_data = self.storage.get_step_data('lot')
-
-            lot = lot_data.get('lot-lots')
-
-            try:
-                lot = Lot.objects.get(pk=lot, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot, self.event)
-                raise TypeError(message)
-
-            context['lot_category_pk'] = lot.category.pk
+            self.get_subscription_from_session()
+            context['subscription'] = self.storage.subscription.pk
 
         return context
 
@@ -324,6 +311,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 )
 
                 self.request.session['is_new_subscription'] = True
+
+            self.request.session['subscription'] = str(subscription.pk)
 
             self.storage.subscription = subscription
 
@@ -458,9 +447,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
     def done(self, form_list, **kwargs):
 
-        if not hasattr(self.storage, 'subscription'):
-            raise Exception('Não possuimos uma subscription '
-                            'no storage do wizard')
+        self.get_subscription_from_session()
 
         subscription = self.storage.subscription
         lot = subscription.lot
@@ -528,6 +515,22 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 data[field_name] = value
 
         return data
+
+    def get_subscription_from_session(self):
+
+        if not hasattr(self.storage, 'subscription'):
+
+            if 'subscription' not in self.request.session:
+                raise Exception('Não possuimos uma subscription '
+                                'no storage do wizard')
+
+            subscription_pk = self.request.session['subscription']
+            try:
+                self.storage.subscription = Subscription.objects.get(
+                    pk=subscription_pk)
+            except Subscription.DoesNotExist:
+                raise Exception('Inscrição salva dentro da session não é '
+                                'valida.')
 
     def get_product(self, pk):
         product = None
