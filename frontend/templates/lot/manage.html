@@ -2,7 +2,7 @@
 {# @TODO Change the icons in nav_aside_itens  #}
 {% load static %}
 {% load base_tags %}
-{% load queryset_filter %}
+{% load subscription_tags %}
 
 {% block title %} Lotes | Congressy{% endblock %}
 
@@ -120,7 +120,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+                <span class="badge float-right">{% event_count_completed_subscriptions event %}</span>
             </a>
         </li>
         {#        <li>#}
@@ -147,8 +147,14 @@
         </li>
         <li>
             <a href="{% url 'addon:optional-service-list' event.pk %}"
-               title="Opcionais">
-                <i class="fa  fa-fw fa-rocket"></i> Opcionais
+               title="Atividades Extras">
+                <i class="fa  fa-fw fa-rocket"></i> Atividades Extras
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'addon:optional-product-list' event.pk %}"
+               title="Venda de Produtos">
+                <i class="fa  fa-fw fa-rocket"></i> Venda de Produtos
             </a>
         </li>
         {% if has_paid_lots %}
@@ -255,7 +261,7 @@
 
 
                                 <td class="hidden-xs hidden-sm">
-                                    {{ lot.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}
+                                    {% lot_count_completed_subscriptions lot %}
                                     {% if lot.limit %}
                                         / {{ lot.limit }}
                                         vagas
@@ -267,7 +273,7 @@
                                 </td>
                                 <td>
                                     {% if lot.price and lot.price > 0 %}
-                                        R$ {{ lot.get_calculated_price }}
+                                        {{ lot.display_publicly }}
                                     {% else %}
                                         ----
                                     {% endif %}
@@ -286,21 +292,19 @@
                                 <td>
                                     <div class="btn-group">
                                         <button
-                                                type="button"
-                                                class="btn
+                                            type="button"
+                                            class="btn
                                             btn-primary btn-trans
                                             btn-sm dropdown-toggle"
-                                                data-toggle="dropdown"
-                                                aria-expanded="false"
-                                        >
+                                            data-toggle="dropdown"
+                                            aria-expanded="false">
                                             <span class="fas fa-cog"></span>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-right"
                                             role="menu">
                                             {% if user has 'gatheros_subscription.change_lot' of lot %}
                                                 <li>
-                                                    <a href="
-    {% url 'subscription:lot-edit' event.pk lot.pk %}">
+                                                    <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">
                                                         <i class="fas fa-pencil-alt"></i>
                                                         Editar
                                                     </a>
@@ -308,8 +312,7 @@
                                             {% endif %}
                                             {% if lot.is_deletable and user has 'gatheros_subscription.delete_lot' of lot %}
                                                 <li>
-                                                    <a href="
-    {% url 'subscription:lot-delete' event.pk lot.pk %}">
+                                                    <a href="{% url 'subscription:lot-delete' event.pk lot.pk %}">
                                                         <i class="fas fa-trash-alt"></i>
                                                         Excluir
                                                     </a>

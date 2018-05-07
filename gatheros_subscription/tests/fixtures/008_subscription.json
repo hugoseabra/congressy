@@ -14,7 +14,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:04:38.252",
       "modified": "2017-04-24T21:04:38.252",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -32,7 +33,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:05:04.904",
       "modified": "2017-04-24T21:05:04.904",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -50,7 +52,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:04:49.858",
       "modified": "2017-04-24T21:04:49.858",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -68,7 +71,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:04:56.412",
       "modified": "2017-04-24T21:04:56.412",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -86,7 +90,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:10:23.411",
       "modified": "2017-04-24T21:10:23.411",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -104,7 +109,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:10:14.963",
       "modified": "2017-04-24T21:10:14.963",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -122,7 +128,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:10:07.280",
       "modified": "2017-04-24T21:10:07.280",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -140,7 +147,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:10:00.887",
       "modified": "2017-04-24T21:10:00.887",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -158,7 +166,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:05:39.585",
       "modified": "2017-04-24T21:05:39.585",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -176,7 +185,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:05:28.469",
       "modified": "2017-04-24T21:05:28.469",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -194,7 +204,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:05:21.354",
       "modified": "2017-04-24T21:05:21.354",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -212,7 +223,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:05:47.104",
       "modified": "2017-04-24T21:05:47.104",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -230,7 +242,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:14:50.572",
       "modified": "2017-04-24T21:14:50.572",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -248,7 +261,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:14:43.176",
       "modified": "2017-04-24T21:14:43.176",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -266,7 +280,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:14:57.502",
       "modified": "2017-04-24T21:14:57.502",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -284,7 +299,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:15:03.617",
       "modified": "2017-04-24T21:15:03.617",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -302,7 +318,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:12:16.062",
       "modified": "2017-04-24T21:12:16.062",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -320,7 +337,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:12:25.379",
       "modified": "2017-04-24T21:12:25.379",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -338,7 +356,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:12:40.131",
       "modified": "2017-04-24T21:12:40.131",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -356,7 +375,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:12:21.073",
       "modified": "2017-04-24T21:12:21.073",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -374,7 +394,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:10:40.664",
       "modified": "2017-04-24T21:10:40.664",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -392,7 +413,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:12:10.704",
       "modified": "2017-04-24T21:12:10.704",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -410,7 +432,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:10:53.165",
       "modified": "2017-04-24T21:10:53.165",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -428,7 +451,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:10:46.729",
       "modified": "2017-04-24T21:10:46.729",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -446,7 +470,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:10:34.467",
       "modified": "2017-04-24T21:10:34.467",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -464,7 +489,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:11:07.142",
       "modified": "2017-04-24T21:11:07.142",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -482,7 +508,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:11:00.446",
       "modified": "2017-04-24T21:11:00.446",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -500,7 +527,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:08:06.603",
       "modified": "2017-04-24T21:08:06.603",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -518,7 +546,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:08:31.600",
       "modified": "2017-04-24T21:08:31.600",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -536,7 +565,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:07:49.419",
       "modified": "2017-04-24T21:07:49.419",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -554,7 +584,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:08:16.873",
       "modified": "2017-04-24T21:08:16.873",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -572,7 +603,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:08:40.685",
       "modified": "2017-04-24T21:08:40.685",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -590,7 +622,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:08:50.896",
       "modified": "2017-04-24T21:08:50.896",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -608,7 +641,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:08:45.385",
       "modified": "2017-04-24T21:08:45.385",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -626,7 +660,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:09:11.860",
       "modified": "2017-04-24T21:09:11.860",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -644,7 +679,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:09:06.943",
       "modified": "2017-04-24T21:09:06.943",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -662,7 +698,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:09:19.727",
       "modified": "2017-04-24T21:09:19.727",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -680,7 +717,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:09:29.770",
       "modified": "2017-04-24T21:09:29.770",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -698,7 +736,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:09:35.735",
       "modified": "2017-04-24T21:09:35.735",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -716,7 +755,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:09:42.298",
       "modified": "2017-04-24T21:09:42.298",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   },
   {
@@ -734,7 +774,8 @@
       "attended_on": null,
       "created": "2017-04-24T21:09:24.349",
       "modified": "2017-04-24T21:09:24.349",
-      "synchronized": false
+      "synchronized": false,
+      "completed": true
     }
   }
 ]

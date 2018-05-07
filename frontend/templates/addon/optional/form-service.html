@@ -1,7 +1,7 @@
 {% extends "base/base.html" %}
 {% load l10n static event_tags  base_tags  widget_tweaks form_config_tags %}
 {% load humanize %}
-{% load queryset_filter %}
+{% load subscription_tags %}
 
 {% block title %}
     {% if object %}Editar{% else %}Novo{% endif %} Atividades Extras | Congressy

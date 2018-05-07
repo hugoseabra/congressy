@@ -34,7 +34,19 @@ class ThemeListView(AccountMixin, generic.ListView):
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
         context['active'] = 'service'
+        context['has_paid_lots'] = self.has_paid_lots()
         return context
+
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+
+            price = lot.price
+
+            if price and price > 0:
+                return True
+
+        return False
 
     def get_queryset(self):
         """Lotes a exibir são de acordo com o evento e não-interno"""
@@ -80,7 +92,20 @@ class ThemeAddView(AccountMixin, generic.CreateView):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
+        context['active'] = 'service'
+        context['has_paid_lots'] = self.has_paid_lots()
         return context
+
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+
+            price = lot.price
+
+            if price and price > 0:
+                return True
+
+        return False
 
     def post(self, request, *args, **kwargs):
         data = request.POST
@@ -118,7 +143,20 @@ class ThemeEditView(AccountMixin, generic.UpdateView):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
+        context['active'] = 'service'
+        context['has_paid_lots'] = self.has_paid_lots()
         return context
+
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+
+            price = lot.price
+
+            if price and price > 0:
+                return True
+
+        return False
 
     def post(self, request, *args, **kwargs):
         data = request.POST

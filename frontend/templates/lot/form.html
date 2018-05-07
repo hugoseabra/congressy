@@ -1,7 +1,7 @@
 {% extends "base/base.html" %}
 {% load l10n static event_tags  base_tags  widget_tweaks form_config_tags %}
 {% load humanize %}
-{% load queryset_filter %}
+{% load subscription_tags %}
 
 {% block title %}
     {% if object %}Editar{% else %}Novo{% endif %} Lote | Congressy
@@ -404,7 +404,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+                <span class="badge float-right">{% event_count_completed_subscriptions event %}</span>
             </a>
         </li>
         {#        <li>#}
@@ -431,8 +431,14 @@
         </li>
         <li>
             <a href="{% url 'addon:optional-service-list' event.pk %}"
-               title="Opcionais">
-                <i class="fa  fa-fw fa-rocket"></i> Opcionais
+               title="Atividades Extras">
+                <i class="fa  fa-fw fa-rocket"></i> Atividades Extras
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'addon:optional-product-list' event.pk %}"
+               title="Venda de Produtos">
+                <i class="fa  fa-fw fa-rocket"></i> Venda de Produtos
             </a>
         </li>
         {% if has_paid_lots %}
@@ -519,7 +525,7 @@
                     </div>
                 </div>
                 {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
-                {% if object.subscriptions.count > 0 and not object.price %}
+                {% if has_subscriptions and not object.price %}
                 {% else %}
                     <div class="panel panel-primary">
                         <div class="panel-heading">
