@@ -3754,6 +3754,19 @@ label.valid {
   bottom: 0;
   z-index: 1000;
 }
+.theme-cgsy-full.app-only #header,
+.theme-cgsy-full.app-only .cgsy-footer,
+.theme-cgsy-full.app-only .sidebar {
+  display: none;
+}
+.theme-cgsy-full.app-only .main-content-wrapper {
+  padding-top: 0!important;
+  padding-bottom: 0 !important;
+  margin-left: 0 !important;
+}
+.theme-cgsy-full.app-only.no-app-title .pageheader {
+  display: none;
+}
 .float-left {
   float: left;
 }
