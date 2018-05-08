@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
-from addon.models import Product
+from addon.models import Product, SubscriptionProduct, SubscriptionService
 from addon.services import SubscriptionProductService
 from gatheros_event.models import Person
 from gatheros_subscription.models import Lot, \
@@ -82,9 +82,9 @@ def has_addons(wizard):
     lot = cleaned_data['lots']
 
     if isinstance(lot, Lot) and lot.category:
-            if lot.category.service_optionals.count() or \
-                    lot.category.product_optionals.count():
-                return True
+        if lot.category.service_optionals.count() or \
+                lot.category.product_optionals.count():
+            return True
 
     return False
 
@@ -194,13 +194,39 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
         context = super().get_context_data(**kwargs)
         context['remove_preloader'] = True
 
-        if self.storage.current_step == 'payment':
-            context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
-
         if self.storage.current_step == 'addon':
-
             self.get_subscription_from_session()
             context['subscription'] = self.storage.subscription.pk
+
+        if self.storage.current_step == 'payment':
+            self.get_subscription_from_session()
+            subscription = self.storage.subscription
+
+            context['lot'] = subscription.lot
+
+            products = [x.optional for x in
+                                   SubscriptionProduct.objects.filter(
+                                       subscription=subscription)]
+            services = [x.optional for x in
+                                  SubscriptionService.objects.filter(
+                                        subscription=subscription)]
+
+            context['products'] = products
+
+            context['services'] = services
+
+            total = subscription.lot.price or 0.00
+
+            for product in products:
+                total += product.price
+
+            for service in services:
+                total += service.price
+
+            context['total'] = total
+
+
+            context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
         return context
 
@@ -401,7 +427,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                                 product = self.get_product(pk=value)
 
                                 if product not in self.storage.product_storage:
-                                    self.storage.product_storage.append(product)
+                                    self.storage.product_storage.append(
+                                        product)
 
                 if not hasattr(self.storage, 'subscription'):
                     self.storage.subscription = Subscription.objects.get(
@@ -467,7 +494,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         if len(self.storage.product_storage) > 0:
             for product in self.storage.product_storage:
-
                 liquid_price = self.get_calculated_price(product.price, lot)
 
                 service = SubscriptionProductService(data={
@@ -476,7 +502,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                     'optional_amount_price': product.price,
                     'optional_liquid_amount': liquid_price,
                 })
-                
+
                 service.save()
 
         self.set_subscription_as_completed()
@@ -485,6 +511,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             self.request,
             'Inscrição realizada com sucesso!'
         )
+
+        self.clear_session()
 
         if subscription.lot.price and subscription.lot.price > 0:
             return HttpResponseRedirect(reverse_lazy(
@@ -525,6 +553,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                                 'no storage do wizard')
 
             subscription_pk = self.request.session['subscription']
+
             try:
                 self.storage.subscription = Subscription.objects.get(
                     pk=subscription_pk)
@@ -588,3 +617,10 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
         subscription.save()
 
+    def clear_session(self):
+        keys_to_be_cleared = [
+            'subscription'
+        ]
+
+        for key in keys_to_be_cleared:
+            del self.request.session[key]
