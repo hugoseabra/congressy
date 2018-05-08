@@ -84,24 +84,27 @@
                                                 {{ wizard.management_form }}
 
                                                 <div id="original-lots-field">
+                                                    {% if not is_private %}
+                                                        {% render_generic_field form.lots %}
 
-                                                    {% render_generic_field form.lots %}
+                                                        {% if has_coupon %}
+                                                            <div class="text-right small"
+                                                                 style="margin-top: 8px;">
+                                                                <a id="coupon_link"
+                                                                   href="javascript:void(0)"
+                                                                   data-toggle="popover"
+                                                                   title="<strong>Informe o código</strong>"
+                                                                   data-html="true"
+                                                                   data-container="body"
+                                                                   data-content="{% include 'hotsite/includes/coupon.html' %}">
+                                                                    Possui
+                                                                    cupom?
+                                                                </a>
+                                                            </div>
 
-                                                    {% if has_coupon %}
-                                                        <div class="text-right small"
-                                                             style="margin-top: 8px;">
-                                                            <a id="coupon_link"
-                                                               href="javascript:void(0)"
-                                                               data-toggle="popover"
-                                                               title="<strong>Informe o código</strong>"
-                                                               data-html="true"
-                                                               data-container="body"
-                                                               data-content="{% include 'hotsite/includes/coupon.html' %}">
-                                                                Possui
-                                                                cupom?
-                                                            </a>
-                                                        </div>
-
+                                                        {% endif %}
+                                                    {% else %}
+                                                        exibir cupom privado aqui
                                                     {% endif %}
 
 

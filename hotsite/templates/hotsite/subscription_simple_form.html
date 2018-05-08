@@ -85,8 +85,7 @@
 
         {% else %}
 
-
-            {% if not person or not person.email or not person.name or not person.phone %}
+            {% if not person or not person.email or not person.name %}
                 <p class="text-muted">
                     Preencha os dados seguintes para inicar sua inscrição.
                 </p>
@@ -98,6 +97,14 @@
 
             {% if not person or person and not person.email %}
                 {% render_generic_field form.email required=True %}
+            {% endif %}
+
+            {% comment %}Possui somente lotes privados{% endcomment %}
+            {% if not lots and private_lots %}
+                <div class="form-group">
+                    <label for="id_exhibition_code">Cupom: <small style="color:#C9302C">*</small></label><div>
+                    <input type="text" name="exhibition_code" id="id_exhibition_code" maxlength="255" required="" class="form-control placeholder" autofocus="autofocus" placeholder="Informe o código">
+                </div>
             {% endif %}
 
             <div class="form-group form-group-submit">

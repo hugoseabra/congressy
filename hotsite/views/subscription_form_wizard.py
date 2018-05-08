@@ -86,6 +86,15 @@ class SubscriptionWizardView(SessionWizardView):
         if not self.storage:
             return redirect('public:hotsite', slug=self.event.slug)
 
+        if self.is_private_event() and not self.has_previous_invalid_code():
+            messages.error(
+                request,
+                "Você deve informar um código válido para se inscrever neste"
+                " evento."
+            )
+            self.clear_session_exhibition_code()
+            return redirect('public:hotsite', slug=self.event.slug)
+
         return response
 
     def get_context_data(self, **kwargs):
@@ -93,6 +102,7 @@ class SubscriptionWizardView(SessionWizardView):
         context = super().get_context_data(**kwargs)
         context['remove_preloader'] = True
         context['event'] = self.event
+        context['is_private'] = self.is_private_event()
 
         if self.storage.current_step == 'lot':
             context['has_coupon'] = self.has_coupon()
@@ -417,7 +427,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                self.storage.current_step is not None):
+                    self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -487,3 +497,43 @@ class SubscriptionWizardView(SessionWizardView):
                 return True
 
         return False
+
+    def is_private_event(self):
+        """ Verifica se evento possui apenas lotes privados. """
+        public_lots = []
+        private_lots = []
+
+        for lot in self.event.lots.all():
+            if lot.private is True:
+                private_lots.append(lot.pk)
+                continue
+
+            public_lots.append(lot.pk)
+
+        return len(public_lots) == 0 and len(private_lots) > 0
+
+    def is_valid_exhibition_code(self, code):
+        """
+        Verifica se código de exibição informado é válido para o evento.
+        """
+        for lot in self.event.lots.filter(private=True):
+            if lot.exhibition_code == code:
+                return True
+
+        return False
+
+    def has_previous_invalid_code(self):
+        """
+        Verifica se código de exibição previamente enviado na sessão é válido.
+        """
+        if 'exhibition_code' not in self.request.session:
+            return False
+
+        code = self.request.session.get('exhibition_code')
+        return self.is_valid_exhibition_code(code)
+
+    def clear_session_exhibition_code(self):
+        if 'exhibition_code' not in self.request.session:
+            return
+
+        del self.request.session['exhibition_code']

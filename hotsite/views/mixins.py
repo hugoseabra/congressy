@@ -98,8 +98,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
 
     def subscription_enabled(self):
 
-        lots = self.get_lots()
-        if len(lots) == 0:
+        if self.has_available_lots() is False:
             return False
 
         return self.event.status == Event.EVENT_STATUS_NOT_STARTED
