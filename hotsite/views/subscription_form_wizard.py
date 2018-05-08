@@ -250,8 +250,11 @@ class SubscriptionWizardView(SessionWizardView):
             return self.initial_dict.get(step, {'event': self.event})
         else:
 
+            lot = None
+
             private_lot_data = self.storage.get_step_data('private_event')
-            lot = private_lot_data.get('private_event-lots')
+            if private_lot_data:
+                lot = private_lot_data.get('private_event-lots')
 
             if not lot:
                 lot_data = self.storage.get_step_data('lot')
