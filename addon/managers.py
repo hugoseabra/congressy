@@ -82,7 +82,7 @@ class ServiceManager(managers.Manager):
         model = Service
         fields = '__all__'
         widgets = {
-            'theme': ManageableSelect,
+            # 'theme': ManageableSelect,
             'price': PriceInput,
             'date_end_sub': SplitDateTimeWidget,
             'schedule_start': SplitDateTimeWidget,
