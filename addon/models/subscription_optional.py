@@ -128,7 +128,7 @@ class SubscriptionService(AbstractSubscriptionOptional):
             start = sub_optional.optional.schedule_start
             stop = sub_optional.optional.schedule_end
             is_sub_restricted = \
-                sub_optional.optional.restrict_unique
+                sub_optional.optional.restrict_unique 
 
             session_range = DateTimeRange(start=start, stop=stop)
             has_conflict = (new_start in session_range or new_end in

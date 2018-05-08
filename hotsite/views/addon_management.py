@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
+from core.util.date import DateTimeRange
 
 from addon.models import Product, Service, SubscriptionProduct, \
     SubscriptionService
@@ -175,11 +176,17 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
                     if available:
                         for service in subscription.subscriptionservice.all():
-                            if service.has_schedule_conflicts:
+
+                            # Exisiting conflicts.
+                            if service.has_schedule_conflicts or \
+                                    self.has_schedule_conflicts(
+                                        service.optional, optional):
+
                                 available = False
 
                     self.available_options.append({'optional': optional,
                                                    'available': available})
+
         context = self.get_context_data()
         return self.render_to_response(context)
 
@@ -232,3 +239,27 @@ class ServiceOptionalManagementView(generic.TemplateView):
             return HttpResponse('201 OK', status=201)
 
         return HttpResponse('200 OK', status=200)
+
+    @staticmethod
+    def has_schedule_conflicts(option_one, option_two):
+
+        is_restricted = option_one.restrict_unique
+        is_sub_restricted = option_two.restrict_unique
+
+        start_one = option_one.schedule_start
+        stop_one = option_one.schedule_end
+        start_two = option_two.schedule_start
+        stop_two = option_two.schedule_end
+
+        session_range_one = DateTimeRange(start=start_one, stop=stop_one)
+        session_range_two = DateTimeRange(start=start_two, stop=stop_two)
+
+        has_conflict = (start_one in session_range_one or stop_one in
+                        session_range_one) or \
+                       (start_two in session_range_two or stop_two
+                        in session_range_two)
+
+        if has_conflict is True and (is_restricted or is_sub_restricted):
+            return True
+
+        return False
