@@ -103,7 +103,8 @@
             {% if not lots and private_lots %}
                 <div class="form-group">
                     <label for="id_exhibition_code">Cupom: <small style="color:#C9302C">*</small></label><div>
-                    <input type="text" name="exhibition_code" id="id_exhibition_code" maxlength="255" required="" class="form-control placeholder" autofocus="autofocus" placeholder="Informe o código">
+                    <input type="text" name="exhibition_code"
+                           id="id_exhibition_code" style="text-transform: uppercase" maxlength="255" required="" class="form-control placeholder" autofocus="autofocus" placeholder="Informe o código">
                 </div>
             {% endif %}
 
