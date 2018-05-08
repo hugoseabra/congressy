@@ -324,6 +324,8 @@ class Event(models.Model, GatherosModelMixin):
         num_cities = len(Counter(cities))
 
         return {
+            'men': num_men,
+            'women': num_women,
             'num_men': '{} ({})'.format(num_men, perc(num_men, total)),
             'num_women': '{} ({})'.format(num_women, perc(num_women, total)),
             'num_pnes': '{} ({})'.format(num_pnes, perc(num_pnes, total)),
