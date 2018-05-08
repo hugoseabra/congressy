@@ -105,60 +105,78 @@
 
                             <tbody>
                             {% for item in object_list %}
-                                {% get_member_group item user as member_group %}
                                 <tr>
-                                    <td>
-                                        <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
-                                    </td>
-                                    <td class="hidden-sm hidden-xs">
-                                        {% get_member_group_name item user %}
-                                    </td>
-                                    <td class=" text-center">
+                                {% get_member_group item user as member_group %}
+                                <td>
+                                    <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
+                                </td>
+                                <td class="hidden-sm hidden-xs">
+                                    {% get_member_group_name item user %}
+                                </td>
+                                <td class=" text-center">
+                                    <form action="{% url 'event:organization-switch' %}"
+                                          method="post"
+                                          id="organization_context">
+                                        {% csrf_token %}
+
                                         <div class="btn-group">
                                             <button type="button" class="btn
                                                 btn-success btn-trans
                                                 btn-sm dropdown-toggle"
                                                     data-toggle="dropdown"
                                                     aria-expanded="false"
-                                                    aria-haspopup="true">
+                                                    aria-haspopup="true"
+                                                    onclick="cgsy_submit
+                                                            (
+                                                            {{ org.pk }})">
                                                 <span>Entrar</span>
                                             </button>
                                         </div>
 
-                                    </td>
-                                    <td>
-                                        {% if member_group == member.ADMIN %}
-                                            <div class="btn-group">
-                                                <button
-                                                        type="button"
-                                                        class="btn
+
+                                        <input
+                                                type="hidden"
+                                                name="organization-context-pk"
+                                                id="organization-context-pk"/>
+                                        <input
+                                                type="hidden"
+                                                name="next"
+                                                value="{{ request.path }}"/>
+                                    </form>
+                                </td>
+                                <td>
+                                    {% if member_group == member.ADMIN %}
+                                        <div class="btn-group">
+                                            <button
+                                                    type="button"
+                                                    class="btn
                                                 btn-primary btn-trans
                                                 btn-sm dropdown-toggle"
-                                                        data-toggle="dropdown"
-                                                        aria-expanded="false"
-                                                >
-                                                    <span class="fas fa-cog"></span>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-right"
-                                                    role="menu">
+                                                    data-toggle="dropdown"
+                                                    aria-expanded="false"
+                                            >
+                                                <span class="fas fa-cog"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right"
+                                                role="menu">
+                                                <li>
+                                                    <a href="{% url 'event:organization-edit' item.pk %}">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                        Editar
+                                                    </a>
+                                                </li>
+                                                {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
                                                     <li>
-                                                        <a href="{% url 'event:organization-edit' item.pk %}">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                            Editar
+                                                        <a href="{% url 'event:organization-delete' item.pk %}">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                            Excluir
                                                         </a>
                                                     </li>
-                                                    {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
-                                                        <li>
-                                                            <a href="{% url 'event:organization-delete' item.pk %}">
-                                                                <i class="fas fa-trash-alt"></i>
-                                                                Excluir
-                                                            </a>
-                                                        </li>
-                                                    {% endif %}
-                                                </ul>
-                                            </div>
-                                        {% endif %}
-                                    </td>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </td>
                                 </tr>
                             {% endfor %}
                             </tbody>

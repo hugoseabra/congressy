@@ -3346,6 +3346,9 @@ label.valid {
   border-radius: 0;
   border: solid 10px rgba(255, 255, 255, 0.6);
 }
+.theme-cgsy-full .principal_content {
+  padding-left: 51px;
+}
 .theme-cgsy-full .nav-pills > li.active > a {
   background-color: #1f7bb6;
 }
