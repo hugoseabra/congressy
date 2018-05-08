@@ -42,7 +42,9 @@ def is_paid_lot(wizard):
     """Return true if user opts for  a paid lot"""
 
     # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+    cleaned_data = wizard.get_cleaned_data_for_step('private_event')
+    if not cleaned_data:
+        cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
 
     # Return true if lot has price and price > 0
     if cleaned_data:
@@ -444,16 +446,24 @@ class SubscriptionWizardView(SessionWizardView):
         if step == 'person':
 
             private_lot_data = self.storage.get_step_data('private_event')
-            lot_pk = private_lot_data.get('private_event-lots')
+            lot_data = self.storage.get_step_data('lot')
 
-            if not lot_pk:
-                lot_data = self.storage.get_step_data('lot')
-                lot_pk = lot_data.get('lot-lots')
+            if private_lot_data or lot_data:
 
-            lot = Lot.objects.get(pk=lot_pk, event=self.event)
+                lot_pk = private_lot_data.get('private_event-lots')
 
-            kwargs.update({'user': self.request.user, 'lot': lot, 'event':
+                if not lot_pk:
+                    lot_pk = lot_data.get('lot-lots')
+
+                lot = Lot.objects.get(pk=lot_pk, event=self.event)
+
+                kwargs.update({'user': self.request.user, 'lot': lot, 'event':
                 self.event})
+            else:
+                messages.error(self.request, 'Não foi possivel identificar '
+                                             'seu '
+                                       'lote.')
+                self.render_goto_step('lot')
 
         if step == 'survey':
             kwargs.update({'user': self.request.user, 'event': self.event})
