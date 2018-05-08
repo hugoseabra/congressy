@@ -190,7 +190,7 @@ FIXTURE_DIRS = [
 # ============================= CKEDITOR ==================================== #
 CKEDITOR_CONFIGS = {
     'default': {
-        'toolbar_Full': [
+        'toolbar_Custom': [
             '/',
             {
                 'name': 'styles',
@@ -198,6 +198,19 @@ CKEDITOR_CONFIGS = {
                     'Styles',
                     'Format',
                     'FontSize'
+                ]
+            },
+            {
+                'name': 'clipboard',
+                'items': [
+                    'Cut',
+                    'Copy',
+                    'Paste',
+                    'PasteText',
+                    'PasteFromWord',
+                    '-',
+                    'Undo',
+                    'Redo'
                 ]
             },
             {
@@ -238,7 +251,8 @@ CKEDITOR_CONFIGS = {
                 'name': 'insert',
                 'items': [
                     'Table',
-                    'HorizontalRule'
+                    'HorizontalRule',
+                    'Youtube',
                 ]
             },
             {
@@ -250,7 +264,10 @@ CKEDITOR_CONFIGS = {
                 ]
             },
         ],
-        'toolbar': 'Full',
+        'toolbar': 'Custom',
+        'extraPlugins': ','.join([
+            'youtube',
+        ]),
         'width': '100%',
         'height': 150,
     },
