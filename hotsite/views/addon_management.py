@@ -34,6 +34,7 @@ DEV NOTES:
 class ProductOptionalManagementView(generic.TemplateView):
     available_options = []
     storage = None
+    fetch_in_storage = False
     template_name = "optionals/available_product_list.html"
 
     def get(self, request, *args, **kwargs):
@@ -45,7 +46,7 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         self.available_options = []
 
-        fetch_in_storage = self.request.GET.get('fetch_in_storage')
+        self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
         # @TODO add user validation here, only if request.user == sub.user
 
         all_products_selected_by_the_user = \
@@ -54,7 +55,7 @@ class ProductOptionalManagementView(generic.TemplateView):
                 optional__lot_category=subscription.lot.category
             )
 
-        if fetch_in_storage:
+        if self.fetch_in_storage:
             for item in all_products_selected_by_the_user:
                 self.available_options.append({'optional': item.optional})
 
@@ -63,13 +64,20 @@ class ProductOptionalManagementView(generic.TemplateView):
                 lot_category=category, published=True)
 
             for optional in event_optionals_products:
-                available = not optional.has_quantity_conflict and \
-                            not optional.has_sub_end_date_conflict and \
-                            not optional not in \
-                            all_products_selected_by_the_user
 
-                self.available_options.append({'optional': optional,
-                                               'available': available})
+                contains = False
+
+                for product in subscription.subscriptionproduct.all():
+                    if product.optional == optional:
+                        contains = True
+
+                if not contains:
+                    available = not optional.has_quantity_conflict and \
+                                not optional.has_sub_end_date_conflict
+
+                    self.available_options.append({
+                        'optional': optional,
+                        'available': available, })
 
         context = self.get_context_data()
         return self.render_to_response(context)
@@ -86,9 +94,7 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         template_name = super().get_template_names()
 
-        fetch_in_storage = self.request.GET.get('fetch_in_storage')
-
-        if fetch_in_storage:
+        if self.fetch_in_storage:
             template_name = "optionals/currently_selected_product_list.html"
 
         return template_name
@@ -124,6 +130,7 @@ class ProductOptionalManagementView(generic.TemplateView):
 class ServiceOptionalManagementView(generic.TemplateView):
     available_options = []
     storage = None
+    fetch_in_storage = False
     template_name = "optionals/available_services_list.html"
 
     def get(self, request, *args, **kwargs):
@@ -134,14 +141,14 @@ class ServiceOptionalManagementView(generic.TemplateView):
         category = subscription.lot.category
         self.available_options = []
 
-        fetch_in_storage = self.request.GET.get('fetch_in_storage')
+        self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
         all_selected_services = SubscriptionService.objects.filter(
             subscription=subscription,
             optional__lot_category=subscription.lot.category
         )
         # @TODO add user validation here, only if request.user == sub.user
 
-        if fetch_in_storage:
+        if self.fetch_in_storage:
             for item in all_selected_services:
                 self.available_options.append({'optional': item.optional})
         else:
@@ -150,10 +157,15 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
             for optional in event_optionals_services:
 
-                if optional not in all_selected_services:
+                contains = False
+
+                for service in subscription.subscriptionservice.all():
+                    if service.optional == optional:
+                        contains = True
+
+                if not contains:
                     available = not optional.has_quantity_conflict and \
-                                not optional.has_sub_end_date_conflict and \
-                                not optional not in all_selected_services
+                                not optional.has_sub_end_date_conflict
 
                     if available:
                         for service in subscription.subscriptionservice.all():
@@ -162,7 +174,6 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
                     self.available_options.append({'optional': optional,
                                                    'available': available})
-
         context = self.get_context_data()
         return self.render_to_response(context)
 
@@ -178,14 +189,12 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
         template_name = super().get_template_names()
 
-        fetch_in_storage = self.request.GET.get('fetch_in_storage')
-
-        if fetch_in_storage:
+        if self.fetch_in_storage:
             template_name = "optionals/currently_selected_service_list.html"
 
         return template_name
 
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
 
         """
             @TODO: IMPLEMENT SOME VALIDATION BEFORE CREATING!!!!!!!!
@@ -198,12 +207,12 @@ class ServiceOptionalManagementView(generic.TemplateView):
         if not optional_id or not subscription_pk or not action:
             return HttpResponse(status=400)
 
-        product = get_object_or_404(Product, pk=int(optional_id))
+        service = get_object_or_404(Service, pk=int(optional_id))
         subscription = get_object_or_404(Subscription, pk=subscription_pk)
 
         if action == 'add':
             _, created = SubscriptionService.objects.get_or_create(
-                optional=product,
+                optional=service,
                 subscription=subscription
             )
 

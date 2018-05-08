@@ -27,9 +27,7 @@
                         {% if product.available %}
                             <td>
                                 <button style="width: 100%"
-                                        onclick="addOptionalProduct
-                                                ('{{ product.optional.name }}'
-                                                ,{{ product.optional.pk }})"
+                                        onclick="addOptionalProduct({{ product.optional.pk }})"
                                         class="btn btn-sm btn-success">
                                     Selecionar
                                 </button>
