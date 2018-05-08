@@ -115,7 +115,7 @@ class SubscriptionWizardView(SessionWizardView):
         if not self.storage:
             return redirect('public:hotsite', slug=self.event.slug)
 
-        if self.is_private_event() and not self.has_previous_invalid_code():
+        if self.is_private_event() and not self.has_previous_valid_code():
             messages.error(
                 request,
                 "Você deve informar um código válido para se inscrever neste"
@@ -459,12 +459,16 @@ class SubscriptionWizardView(SessionWizardView):
 
                 lot = Lot.objects.get(pk=lot_pk, event=self.event)
 
-                kwargs.update({'user': self.request.user, 'lot': lot, 'event':
-                self.event})
+                kwargs.update({
+                    'user': self.request.user,
+                    'lot': lot,
+                    'event': self.event
+                })
             else:
-                messages.error(self.request, 'Não foi possivel identificar '
-                                             'seu '
-                                       'lote.')
+                messages.error(
+                    self.request,
+                    'Não foi possivel identificar seu lote.'
+                )
                 self.render_goto_step('lot')
 
         if step == 'survey':
@@ -594,7 +598,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         return False
 
-    def has_previous_invalid_code(self):
+    def has_previous_valid_code(self):
         """
         Verifica se código de exibição previamente enviado na sessão é válido.
         """
