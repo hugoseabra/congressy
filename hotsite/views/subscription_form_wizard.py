@@ -238,11 +238,13 @@ class SubscriptionWizardView(SessionWizardView):
 
     def get_form_initial(self, step):
 
-        if step == "private_event":
-            return self.initial_dict.get(step, {
-                'event': self.event,
-                'code': self.request.session['exhibition_code']
-            })
+        if is_private(self):
+
+            if step == "private_event":
+                return self.initial_dict.get(step, {
+                    'event': self.event,
+                    'code': self.request.session['exhibition_code']
+                })
 
         if step == 'lot':
             return self.initial_dict.get(step, {'event': self.event})
