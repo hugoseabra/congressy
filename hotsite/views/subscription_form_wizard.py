@@ -241,46 +241,31 @@ class SubscriptionWizardView(SessionWizardView):
         if is_private(self):
 
             if step == "private_lot":
+
                 return self.initial_dict.get(step, {
                     'event': self.event,
-                    'code': self.request.session['exhibition_code']
+                    'code': self.request.session['exhibition_code'] or 'None'
                 })
 
         if step == 'lot':
             return self.initial_dict.get(step, {'event': self.event})
-        else:
 
+        if step == 'survey':
             lot_pk = None
-
             private_lot_data = self.storage.get_step_data('private_lot')
             lot_data = self.storage.get_step_data('lot')
-            
-            if private_lot_data:
+
+            if private_lot_data is not None:
                 lot_pk = private_lot_data.get('private_lot-lots')
-            elif lot_data:
+            elif lot_data is not None:
                 lot_pk = lot_data.get('lot-lots')
 
             if not lot_pk:
-                # reset the current step to the first step.
-                messages.error(
-                    self.request,
-                    'Por favor escolha um lote.'
-                )
-                self.storage.current_step = self.steps.first
-                return self.render(self.get_form())
+                raise AttributeError('Não foi possivel pegar uma referencia '
+                                     'de lote.')
 
-            try:
-                lot = Lot.objects.get(pk=lot, event=self.event)
-            except Lot.DoesNotExist:
-                # reset the current step to the first step.
-                messages.error(
-                    self.request,
-                    'Por favor escolha um lote.'
-                )
-                self.storage.current_step = self.steps.first
-                return self.render(self.get_form())
+            lot = Lot.objects.get(pk=lot_pk, event=self.event)
 
-        if step == 'survey':
             return self.initial_dict.get(step, {
                 'event_survey': lot.event_survey,
             })
@@ -296,6 +281,21 @@ class SubscriptionWizardView(SessionWizardView):
                                     'person'.format(self.request.user.email))
 
                 self.storage.person = person
+
+            lot_pk = None
+            private_lot_data = self.storage.get_step_data('private_lot')
+            lot_data = self.storage.get_step_data('lot')
+
+            if private_lot_data is not None:
+                lot_pk = private_lot_data.get('private_lot-lots')
+            elif lot_data is not None:
+                lot_pk = lot_data.get('lot-lots')
+
+            if not lot_pk:
+                raise AttributeError('Não foi possivel pegar uma referencia '
+                                     'de lote.')
+
+            lot = Lot.objects.get(pk=lot_pk, event=self.event)
 
             return self.initial_dict.get(step, {
                 'choosen_lot': lot,
