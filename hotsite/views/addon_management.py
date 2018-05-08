@@ -99,7 +99,7 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         return template_name
 
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
 
         """
             @TODO: IMPLEMENT SOME VALIDATION BEFORE CREATING!!!!!!!!
@@ -123,6 +123,12 @@ class ProductOptionalManagementView(generic.TemplateView):
 
             if created:
                 return HttpResponse('201 OK', status=201)
+        elif action == 'remove':
+            subscription_product = get_object_or_404(SubscriptionProduct,
+                                                     optional=product,
+                                                     subscription=subscription)
+            subscription_product.delete()
+            return HttpResponse('201 OK', status=201)
 
         return HttpResponse('200 OK', status=200)
 
@@ -218,5 +224,11 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
             if created:
                 return HttpResponse('201 OK', status=201)
+        elif action == 'remove':
+            subscription_service = get_object_or_404(SubscriptionService,
+                                                     optional=service,
+                                                     subscription=subscription)
+            subscription_service.delete()
+            return HttpResponse('201 OK', status=201)
 
         return HttpResponse('200 OK', status=200)
