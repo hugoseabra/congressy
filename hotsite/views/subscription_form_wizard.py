@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
@@ -21,22 +22,30 @@ from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
-FORMS = [("lot", forms.LotsForm),
-         ("person", forms.SubscriptionPersonForm),
-         ("survey", forms.SurveyForm),
-         ("payment", forms.PaymentForm)]
+FORMS = [
+    ("private_event", forms.PrivateLotForm),
+    ("lot", forms.LotsForm),
+    ("person", forms.SubscriptionPersonForm),
+    ("survey", forms.SurveyForm),
+    ("payment", forms.PaymentForm)
+]
 
-TEMPLATES = {"lot": "hotsite/lot_form.html",
-             "person": "hotsite/person_form.html",
-             "survey": "hotsite/survey_form.html",
-             "payment": "hotsite/payment_form.html"}
+TEMPLATES = {
+    "private_event": "hotsite/private_lot_form.html",
+    "lot": "hotsite/lot_form.html",
+    "person": "hotsite/person_form.html",
+    "survey": "hotsite/survey_form.html",
+    "payment": "hotsite/payment_form.html"
+}
 
 
 def is_paid_lot(wizard):
     """Return true if user opts for  a paid lot"""
 
     # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+    cleaned_data = wizard.get_cleaned_data_for_step('private_event')
+    if not cleaned_data:
+        cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
 
     # Return true if lot has price and price > 0
     if cleaned_data:
@@ -66,8 +75,27 @@ def has_survey(wizard):
     return False
 
 
+def is_private(wizard):
+    if wizard.is_private_event():
+        return True
+
+    return False
+
+
+def is_not_private(wizard):
+    if wizard.is_private_event():
+        return False
+
+    return True
+
+
 class SubscriptionWizardView(SessionWizardView):
-    condition_dict = {'payment': is_paid_lot, 'survey': has_survey, }
+    condition_dict = {
+        'private_event': is_private,
+        'lot': is_not_private,
+        'payment': is_paid_lot,
+        'survey': has_survey
+    }
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -80,10 +108,20 @@ class SubscriptionWizardView(SessionWizardView):
         self.event = get_object_or_404(Event, slug=slug)
         response = super().dispatch(request, *args, **kwargs)
 
-        if not self.request.user.is_authenticated:
+        user = self.request.user
+        if not isinstance(user, User):
             return redirect('public:hotsite', slug=self.event.slug)
 
         if not self.storage:
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        if self.is_private_event() and not self.has_previous_invalid_code():
+            messages.error(
+                request,
+                "Você deve informar um código válido para se inscrever neste"
+                " evento."
+            )
+            self.clear_session_exhibition_code()
             return redirect('public:hotsite', slug=self.event.slug)
 
         return response
@@ -93,6 +131,14 @@ class SubscriptionWizardView(SessionWizardView):
         context = super().get_context_data(**kwargs)
         context['remove_preloader'] = True
         context['event'] = self.event
+        context['is_private'] = self.is_private_event()
+
+        if self.storage.current_step == 'private_event':
+            code = self.request.session.get('exhibition_code')
+            if self.is_valid_exhibition_code(code):
+                lot = Lot.objects.filter(
+                    exhibition_code=code.upper())
+                context['lot'] = lot.first()
 
         if self.storage.current_step == 'lot':
             context['has_coupon'] = self.has_coupon()
@@ -128,8 +174,12 @@ class SubscriptionWizardView(SessionWizardView):
         if not hasattr(self.storage, 'person'):
             raise Exception('Não possuimos uma person no storage do wizard')
 
-        lot_data = self.storage.get_step_data('lot')
-        lot = lot_data.get('lot-lots', '')
+        private_lot_data = self.storage.get_step_data('private_event')
+        lot = private_lot_data.get('private_event-lots')
+
+        if not lot:
+            lot_data = self.storage.get_step_data('lot')
+            lot = lot_data.get('lot-lots')
 
         # Get a lot object.
         if not isinstance(lot, Lot):
@@ -188,12 +238,24 @@ class SubscriptionWizardView(SessionWizardView):
 
     def get_form_initial(self, step):
 
+        if step == "private_event":
+            return self.initial_dict.get(step, {
+                'event': self.event,
+                'code': self.request.session['exhibition_code']
+            })
+
         if step == 'lot':
             return self.initial_dict.get(step, {'event': self.event})
         else:
 
-            lot_data = self.storage.get_step_data('lot')
-            if not lot_data:
+            private_lot_data = self.storage.get_step_data('private_event')
+            lot = private_lot_data.get('private_event-lots')
+
+            if not lot:
+                lot_data = self.storage.get_step_data('lot')
+                lot = lot_data.get('lot-lots')
+
+            if not lot:
                 # reset the current step to the first step.
                 messages.error(
                     self.request,
@@ -201,8 +263,6 @@ class SubscriptionWizardView(SessionWizardView):
                 )
                 self.storage.current_step = self.steps.first
                 return self.render(self.get_form())
-
-            lot = lot_data.get('lot-lots')
 
             try:
                 lot = Lot.objects.get(pk=lot, event=self.event)
@@ -255,8 +315,13 @@ class SubscriptionWizardView(SessionWizardView):
             survey_director = SurveyDirector(event=self.event,
                                              user=self.request.user)
 
-            lot_data = self.storage.get_step_data('lot')
-            lot = lot_data.get('lot-lots')
+            private_lot_data = self.storage.get_step_data('private_event')
+            lot = private_lot_data.get('private_event-lots')
+
+            if not lot:
+                lot_data = self.storage.get_step_data('lot')
+                lot = lot_data.get('lot-lots')
+
             try:
                 lot = Lot.objects.get(pk=lot, event=self.event)
             except Lot.DoesNotExist:
@@ -295,8 +360,12 @@ class SubscriptionWizardView(SessionWizardView):
                     person = Person.objects.get(user=self.request.user)
                     self.storage.person = person
 
-                lot_data = self.storage.get_step_data('lot')
-                lot = lot_data.get('lot-lots', '')
+                private_lot_data = self.storage.get_step_data('private_event')
+                lot = private_lot_data.get('private_event-lots')
+
+                if not lot:
+                    lot_data = self.storage.get_step_data('lot')
+                    lot = lot_data.get('lot-lots')
 
                 # Get a lot object.
                 if not isinstance(lot, Lot):
@@ -377,14 +446,26 @@ class SubscriptionWizardView(SessionWizardView):
         kwargs = super().get_form_kwargs(step)
 
         if step == 'person':
+
+            private_lot_data = self.storage.get_step_data('private_event')
             lot_data = self.storage.get_step_data('lot')
 
-            lot_pk = lot_data.get('lot-lots')
+            if private_lot_data or lot_data:
 
-            lot = Lot.objects.get(pk=lot_pk, event=self.event)
+                lot_pk = private_lot_data.get('private_event-lots')
 
-            kwargs.update({'user': self.request.user, 'lot': lot, 'event':
+                if not lot_pk:
+                    lot_pk = lot_data.get('lot-lots')
+
+                lot = Lot.objects.get(pk=lot_pk, event=self.event)
+
+                kwargs.update({'user': self.request.user, 'lot': lot, 'event':
                 self.event})
+            else:
+                messages.error(self.request, 'Não foi possivel identificar '
+                                             'seu '
+                                       'lote.')
+                self.render_goto_step('lot')
 
         if step == 'survey':
             kwargs.update({'user': self.request.user, 'event': self.event})
@@ -485,5 +566,54 @@ class SubscriptionWizardView(SessionWizardView):
             # código de exibição
             if lot.private and lot.exhibition_code:
                 return True
+
+        return False
+
+    def is_private_event(self):
+        """ Verifica se evento possui apenas lotes privados. """
+        public_lots = []
+        private_lots = []
+
+        for lot in self.event.lots.all():
+            if lot.private is True:
+                private_lots.append(lot.pk)
+                continue
+
+            if self.is_lot_available(lot):
+                public_lots.append(lot.pk)
+
+        return len(public_lots) == 0 and len(private_lots) > 0
+
+    def is_valid_exhibition_code(self, code):
+        """
+        Verifica se código de exibição informado é válido para o evento.
+        """
+        for lot in self.event.lots.filter(private=True):
+            if lot.exhibition_code.upper() == code.upper():
+                return True
+
+        return False
+
+    def has_previous_invalid_code(self):
+        """
+        Verifica se código de exibição previamente enviado na sessão é válido.
+        """
+        if 'exhibition_code' not in self.request.session:
+            return False
+
+        code = self.request.session.get('exhibition_code')
+        return self.is_valid_exhibition_code(code)
+
+    def clear_session_exhibition_code(self):
+        if 'exhibition_code' not in self.request.session:
+            return
+
+        del self.request.session['exhibition_code']
+
+    @staticmethod
+    def is_lot_available(lot):
+
+        if lot.status == lot.LOT_STATUS_RUNNING and not lot.private:
+            return True
 
         return False
