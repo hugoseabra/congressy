@@ -23,7 +23,7 @@ from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
 FORMS = [
-    ("private_event", forms.PrivateLotForm),
+    ("private_lot", forms.PrivateLotForm),
     ("lot", forms.LotsForm),
     ("person", forms.SubscriptionPersonForm),
     ("survey", forms.SurveyForm),
@@ -31,7 +31,7 @@ FORMS = [
 ]
 
 TEMPLATES = {
-    "private_event": "hotsite/private_lot_form.html",
+    "private_lot": "hotsite/private_lot_form.html",
     "lot": "hotsite/lot_form.html",
     "person": "hotsite/person_form.html",
     "survey": "hotsite/survey_form.html",
@@ -43,7 +43,7 @@ def is_paid_lot(wizard):
     """Return true if user opts for  a paid lot"""
 
     # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('private_event')
+    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
     if not cleaned_data:
         cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
 
@@ -76,14 +76,14 @@ def has_survey(wizard):
 
 
 def is_private(wizard):
-    if wizard.is_private_event():
+    if wizard.is_private_lot():
         return True
 
     return False
 
 
 def is_not_private(wizard):
-    if wizard.is_private_event():
+    if wizard.is_private_lot():
         return False
 
     return True
@@ -91,7 +91,7 @@ def is_not_private(wizard):
 
 class SubscriptionWizardView(SessionWizardView):
     condition_dict = {
-        'private_event': is_private,
+        'private_lot': is_private,
         'lot': is_not_private,
         'payment': is_paid_lot,
         'survey': has_survey
@@ -115,7 +115,7 @@ class SubscriptionWizardView(SessionWizardView):
         if not self.storage:
             return redirect('public:hotsite', slug=self.event.slug)
 
-        if self.is_private_event() and not self.has_previous_invalid_code():
+        if self.is_private_lot() and not self.has_previous_invalid_code():
             messages.error(
                 request,
                 "Você deve informar um código válido para se inscrever neste"
@@ -131,9 +131,9 @@ class SubscriptionWizardView(SessionWizardView):
         context = super().get_context_data(**kwargs)
         context['remove_preloader'] = True
         context['event'] = self.event
-        context['is_private'] = self.is_private_event()
+        context['is_private'] = self.is_private_lot()
 
-        if self.storage.current_step == 'private_event':
+        if self.storage.current_step == 'private_lot':
             code = self.request.session.get('exhibition_code')
             if self.is_valid_exhibition_code(code):
                 lot = Lot.objects.filter(
@@ -174,8 +174,8 @@ class SubscriptionWizardView(SessionWizardView):
         if not hasattr(self.storage, 'person'):
             raise Exception('Não possuimos uma person no storage do wizard')
 
-        private_lot_data = self.storage.get_step_data('private_event')
-        lot = private_lot_data.get('private_event-lots')
+        private_lot_data = self.storage.get_step_data('private_lot')
+        lot = private_lot_data.get('private_lot-lots')
 
         if not lot:
             lot_data = self.storage.get_step_data('lot')
@@ -240,7 +240,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         if is_private(self):
 
-            if step == "private_event":
+            if step == "private_lot":
                 return self.initial_dict.get(step, {
                     'event': self.event,
                     'code': self.request.session['exhibition_code']
@@ -250,17 +250,17 @@ class SubscriptionWizardView(SessionWizardView):
             return self.initial_dict.get(step, {'event': self.event})
         else:
 
-            lot = None
+            lot_pk = None
 
-            private_lot_data = self.storage.get_step_data('private_event')
+            private_lot_data = self.storage.get_step_data('private_lot')
+            lot_data = self.storage.get_step_data('lot')
+            
             if private_lot_data:
-                lot = private_lot_data.get('private_event-lots')
+                lot_pk = private_lot_data.get('private_lot-lots')
+            elif lot_data:
+                lot_pk = lot_data.get('lot-lots')
 
-            if not lot:
-                lot_data = self.storage.get_step_data('lot')
-                lot = lot_data.get('lot-lots')
-
-            if not lot:
+            if not lot_pk:
                 # reset the current step to the first step.
                 messages.error(
                     self.request,
@@ -320,8 +320,8 @@ class SubscriptionWizardView(SessionWizardView):
             survey_director = SurveyDirector(event=self.event,
                                              user=self.request.user)
 
-            private_lot_data = self.storage.get_step_data('private_event')
-            lot = private_lot_data.get('private_event-lots')
+            private_lot_data = self.storage.get_step_data('private_lot')
+            lot = private_lot_data.get('private_lot-lots')
 
             if not lot:
                 lot_data = self.storage.get_step_data('lot')
@@ -365,8 +365,8 @@ class SubscriptionWizardView(SessionWizardView):
                     person = Person.objects.get(user=self.request.user)
                     self.storage.person = person
 
-                private_lot_data = self.storage.get_step_data('private_event')
-                lot = private_lot_data.get('private_event-lots')
+                private_lot_data = self.storage.get_step_data('private_lot')
+                lot = private_lot_data.get('private_lot-lots')
 
                 if not lot:
                     lot_data = self.storage.get_step_data('lot')
@@ -452,12 +452,12 @@ class SubscriptionWizardView(SessionWizardView):
 
         if step == 'person':
 
-            private_lot_data = self.storage.get_step_data('private_event')
+            private_lot_data = self.storage.get_step_data('private_lot')
             lot_data = self.storage.get_step_data('lot')
 
             if private_lot_data or lot_data:
 
-                lot_pk = private_lot_data.get('private_event-lots')
+                lot_pk = private_lot_data.get('private_lot-lots')
 
                 if not lot_pk:
                     lot_pk = lot_data.get('lot-lots')
@@ -574,7 +574,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         return False
 
-    def is_private_event(self):
+    def is_private_lot(self):
         """ Verifica se evento possui apenas lotes privados. """
         public_lots = []
         private_lots = []
