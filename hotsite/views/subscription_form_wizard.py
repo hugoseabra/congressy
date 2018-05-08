@@ -21,15 +21,21 @@ from payment.helpers import PagarmeTransactionInstanceData
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
-FORMS = [("lot", forms.LotsForm),
-         ("person", forms.SubscriptionPersonForm),
-         ("survey", forms.SurveyForm),
-         ("payment", forms.PaymentForm)]
+FORMS = [
+    ("private_event", forms.PrivateLotForm),
+    ("lot", forms.LotsForm),
+    ("person", forms.SubscriptionPersonForm),
+    ("survey", forms.SurveyForm),
+    ("payment", forms.PaymentForm)
+]
 
-TEMPLATES = {"lot": "hotsite/lot_form.html",
-             "person": "hotsite/person_form.html",
-             "survey": "hotsite/survey_form.html",
-             "payment": "hotsite/payment_form.html"}
+TEMPLATES = {
+    "private_event": "hotsite/private_lot_form.html",
+    "lot": "hotsite/lot_form.html",
+    "person": "hotsite/person_form.html",
+    "survey": "hotsite/survey_form.html",
+    "payment": "hotsite/payment_form.html"
+}
 
 
 def is_paid_lot(wizard):
@@ -66,8 +72,27 @@ def has_survey(wizard):
     return False
 
 
+def is_private(wizard):
+    if wizard.is_private_event():
+        return True
+
+    return False
+
+
+def is_not_private(wizard):
+    if wizard.is_private_event():
+        return False
+
+    return True
+
+
 class SubscriptionWizardView(SessionWizardView):
-    condition_dict = {'payment': is_paid_lot, 'survey': has_survey, }
+    condition_dict = {
+        'private_event': is_private,
+        'lot': is_not_private,
+        'payment': is_paid_lot,
+        'survey': has_survey
+    }
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -104,6 +129,13 @@ class SubscriptionWizardView(SessionWizardView):
         context['event'] = self.event
         context['is_private'] = self.is_private_event()
 
+        if self.storage.current_step == 'private_event':
+            code = self.request.session.get('exhibition_code')
+            if self.is_valid_exhibition_code(code):
+                lot = Lot.objects.filter(
+                    exhibition_code=code.upper())
+                context['lot'] = lot.first()
+
         if self.storage.current_step == 'lot':
             context['has_coupon'] = self.has_coupon()
 
@@ -138,8 +170,12 @@ class SubscriptionWizardView(SessionWizardView):
         if not hasattr(self.storage, 'person'):
             raise Exception('Não possuimos uma person no storage do wizard')
 
-        lot_data = self.storage.get_step_data('lot')
-        lot = lot_data.get('lot-lots', '')
+        private_lot_data = self.storage.get_step_data('private_event')
+        lot = private_lot_data.get('private_event-lots')
+
+        if not lot:
+            lot_data = self.storage.get_step_data('lot')
+            lot = lot_data.get('lot-lots')
 
         # Get a lot object.
         if not isinstance(lot, Lot):
@@ -198,12 +234,24 @@ class SubscriptionWizardView(SessionWizardView):
 
     def get_form_initial(self, step):
 
+        if step == "private_event":
+            return self.initial_dict.get(step, {
+                'event': self.event,
+                'code': self.request.session['exhibition_code']
+            })
+
         if step == 'lot':
             return self.initial_dict.get(step, {'event': self.event})
         else:
 
-            lot_data = self.storage.get_step_data('lot')
-            if not lot_data:
+            private_lot_data = self.storage.get_step_data('private_event')
+            lot = private_lot_data.get('private_event-lots')
+
+            if not lot:
+                lot_data = self.storage.get_step_data('lot')
+                lot = lot_data.get('lot-lots')
+
+            if not lot:
                 # reset the current step to the first step.
                 messages.error(
                     self.request,
@@ -211,8 +259,6 @@ class SubscriptionWizardView(SessionWizardView):
                 )
                 self.storage.current_step = self.steps.first
                 return self.render(self.get_form())
-
-            lot = lot_data.get('lot-lots')
 
             try:
                 lot = Lot.objects.get(pk=lot, event=self.event)
@@ -265,8 +311,13 @@ class SubscriptionWizardView(SessionWizardView):
             survey_director = SurveyDirector(event=self.event,
                                              user=self.request.user)
 
-            lot_data = self.storage.get_step_data('lot')
-            lot = lot_data.get('lot-lots')
+            private_lot_data = self.storage.get_step_data('private_event')
+            lot = private_lot_data.get('private_event-lots')
+
+            if not lot:
+                lot_data = self.storage.get_step_data('lot')
+                lot = lot_data.get('lot-lots')
+
             try:
                 lot = Lot.objects.get(pk=lot, event=self.event)
             except Lot.DoesNotExist:
@@ -305,8 +356,12 @@ class SubscriptionWizardView(SessionWizardView):
                     person = Person.objects.get(user=self.request.user)
                     self.storage.person = person
 
-                lot_data = self.storage.get_step_data('lot')
-                lot = lot_data.get('lot-lots', '')
+                private_lot_data = self.storage.get_step_data('private_event')
+                lot = private_lot_data.get('private_event-lots')
+
+                if not lot:
+                    lot_data = self.storage.get_step_data('lot')
+                    lot = lot_data.get('lot-lots')
 
                 # Get a lot object.
                 if not isinstance(lot, Lot):
@@ -387,9 +442,13 @@ class SubscriptionWizardView(SessionWizardView):
         kwargs = super().get_form_kwargs(step)
 
         if step == 'person':
-            lot_data = self.storage.get_step_data('lot')
 
-            lot_pk = lot_data.get('lot-lots')
+            private_lot_data = self.storage.get_step_data('private_event')
+            lot_pk = private_lot_data.get('private_event-lots')
+
+            if not lot_pk:
+                lot_data = self.storage.get_step_data('lot')
+                lot_pk = lot_data.get('lot-lots')
 
             lot = Lot.objects.get(pk=lot_pk, event=self.event)
 
@@ -427,7 +486,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                    self.storage.current_step is not None):
+                self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -508,7 +567,8 @@ class SubscriptionWizardView(SessionWizardView):
                 private_lots.append(lot.pk)
                 continue
 
-            public_lots.append(lot.pk)
+            if self.is_lot_available(lot):
+                public_lots.append(lot.pk)
 
         return len(public_lots) == 0 and len(private_lots) > 0
 
@@ -517,7 +577,7 @@ class SubscriptionWizardView(SessionWizardView):
         Verifica se código de exibição informado é válido para o evento.
         """
         for lot in self.event.lots.filter(private=True):
-            if lot.exhibition_code == code:
+            if lot.exhibition_code.upper() == code.upper():
                 return True
 
         return False
@@ -537,3 +597,11 @@ class SubscriptionWizardView(SessionWizardView):
             return
 
         del self.request.session['exhibition_code']
+
+    @staticmethod
+    def is_lot_available(lot):
+
+        if lot.status == lot.LOT_STATUS_RUNNING and not lot.private:
+            return True
+
+        return False

@@ -50,7 +50,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
         context['event'] = self.event
         context['info'] = get_object_or_404(Info, event=self.event)
         context['period'] = self.get_period()
-        context['lots'] = self.get_lots()
+        context['lots'] = self.get_available_lots()
         context['paid_lots'] = [
             lot
             for lot in self.get_lots()
@@ -124,6 +124,17 @@ class EventMixin(TemplateNameableMixin, generic.View):
         available_lots = []
 
         for lot in self.event.lots.all():
+            if lot.status == lot.LOT_STATUS_RUNNING:
+                available_lots.append(lot)
+
+        return True if len(available_lots) > 0 else False
+
+    def has_available_public_lots(self):
+        available_lots = []
+
+        all_events = self.event.lots.filter(private=False)
+
+        for lot in all_events:
             if lot.status == lot.LOT_STATUS_RUNNING:
                 available_lots.append(lot)
 
