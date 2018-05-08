@@ -1,8 +1,8 @@
 {% extends "base/base.html" %}
 {# @TODO Change the icons in nav_aside_itens  #}
-{% load static %}
-{% load event_tags %}
-{% load static i18n widget_tweaks queryset_filter form_config_tags %}
+
+{% load static event_tags  base_tags  widget_tweaks form_config_tags humanize l10n %}
+{% load queryset_filter %}
 {% block scripts %}
     <script src="{% static "/assets/plugins/gauge/gauge.min.js" %}"></script>
     <script>
@@ -85,101 +85,6 @@
 
 {% endblock %}
 
-{% block nav_aside_itens %}
-    <span class ="visible-xs">
-        <a href="{% url 'event:event-add' %}" class="btn
-    btn-success navbar-btn" style="color:#4c4c4c;">
-        <i class="fa fa-plus"></i>
-            Novo Evento
-        </a>
-    </span>
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="#" title="Painel" style="color: #4c4c4c">
-                <i class="fas fa-tachometer-alt"></i>
-                Painel
-            </a>
-        </li>
-     </ul>
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
-            <li>
-                <a href="{% url 'subscription:lot-list' event.pk %}"
-                   title="Inscrições" style="color:#4c4c4c;">
-                    <i class="fas fa-th-large"></i>
-                    Lotes/Categorias
-                </a>
-            </li>
-        {% endif %}
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições" style="color:#4c4c4c;">
-                <i class="fa fa-clipboard"></i>
-                Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
-            </a>
-        </li>
-                <li>
-                    <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
-                       title="Check-in" style="color:#4c4c4c;">
-                        <i class="fas fa-calendar-check"></i>
-                        Check-in
-                    </a>
-                </li>
-    </ul>
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li class="active">
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento" style="color:#4c4c4c;">
-                <i class="fas fa-file-alt"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'event:event-edit' event.pk %}"
-               title="Configurações gerais" style="color:#4c4c4c;">
-                <i class="fas fa-cog"></i> Configurações gerais
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário" style="color:#4c4c4c;">
-                <i class="fab fa-wpforms"></i> Formulário
-            </a>
-        </li>
-        {% if has_paid_lots %}
-            <li>
-                <a href="{% url 'payment:event-payments' event.pk %}"
-                   title="Pagamentos" style="color:#4c4c4c;">
-                    <i class="fas fa-money-bill-alt"></i> Pagamentos
-                </a>
-            </li>
-        {% endif %}
-    </ul>
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Adicionais</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="#"
-               title="Opicionais" style="color:#4c4c4c;">
-                <i class="far fa-calendar-plus"></i> Opicionais
-            </a>
-        </li>
-        <li>
-            <a href="#"
-               title="Certificados" style="color:#4c4c4c;">
-                <i class="fas fa-address-card"></i> Certificados
-            </a>
-        </li>
-        <li>
-            <a href="#"
-               title="Submissão de artigos" style="color:#4c4c4c;">
-                <i class="fas fa-newspaper"></i> Submissão de artigos
-            </a>
-        </li>
-    </ul>
-{% endblock %}
 
 {% block content %}
     <div class="col-md-12 col-lg-6">
@@ -187,7 +92,9 @@
             <div class="panel panel-solid-success widget-mini">
                 <div class="panel-body">
                     <i class="icon-bar-chart"></i>
-                    <span class="total text-center">$3,200</span>
+                    <span class="total text-center">
+                        R$ {{ totals.total|money_divide|intcomma }}
+                    </span>
                     <span class="title text-center">Pagos</span>
                 </div>
             </div>
@@ -206,7 +113,9 @@
             <div class="panel widget-mini">
                 <div class="panel-body">
                     <i class="icon-envelope-open"></i>
-                    <span class="total text-center">1,680</span>
+                    <span class="total text-center">
+                        R$ {{ totals.paid|money_divide|intcomma }}
+                    </span>
                     <span class="title text-center">Disponíveis
                         para saque</span>
                 </div>

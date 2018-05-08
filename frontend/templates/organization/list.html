@@ -1,6 +1,5 @@
 {% extends "base/base.html" %}
-{% load static organization_tags%}
-
+{% load static organization_tags %}
 
 
 {% block sidebar %}{% endblock %}
@@ -87,17 +86,19 @@
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">
-                <div class="panel-body">
+                <div class="panel-body ">
                     {% if object_list %}
                         <table id="organization_table"
-                               class="table table-striped table-bordered dataTable no-footer nowrap"
+                               class="table table-striped
+                               table-bordered dataTable no-footer nowrap"
                                cellspacing="0"
                                width="100%"
                         >
                             <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Cargo</th>
+                                <th class="hidden-sm hidden-xs">Cargo</th>
+                                <th></th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -109,8 +110,21 @@
                                     <td>
                                         <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
                                     </td>
-                                    <td>
+                                    <td class="hidden-sm hidden-xs">
                                         {% get_member_group_name item user %}
+                                    </td>
+                                    <td class=" text-center">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn
+                                                btn-success btn-trans
+                                                btn-sm dropdown-toggle"
+                                                    data-toggle="dropdown"
+                                                    aria-expanded="false"
+                                                    aria-haspopup="true">
+                                                <span>Entrar</span>
+                                            </button>
+                                        </div>
+
                                     </td>
                                     <td>
                                         {% if member_group == member.ADMIN %}

@@ -3484,6 +3484,10 @@ label.valid {
   .theme-cgsy-full .manage_sidebar {
     margin-top: 0;
   }
+  .theme-cgsy-full .principal_content {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 .theme-cgsy-full .well.well-info {
   background-color: #238acc;
