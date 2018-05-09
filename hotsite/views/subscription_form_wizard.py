@@ -107,7 +107,6 @@ class SubscriptionWizardView(SessionWizardView):
             return redirect('https://congressy.com')
 
         self.event = get_object_or_404(Event, slug=slug)
-        response = super().dispatch(request, *args, **kwargs)
 
         user = self.request.user
         if not isinstance(user, User):
@@ -116,7 +115,7 @@ class SubscriptionWizardView(SessionWizardView):
         if not self.storage:
             return redirect('public:hotsite', slug=self.event.slug)
 
-        if self.is_private_lot() and not self.has_previous_invalid_code():
+        if self.is_private_lot() and not self.has_previous_valid_code():
             messages.error(
                 request,
                 "Você deve informar um código válido para se inscrever neste"
@@ -125,7 +124,7 @@ class SubscriptionWizardView(SessionWizardView):
             self.clear_session_exhibition_code()
             return redirect('public:hotsite', slug=self.event.slug)
 
-        return response
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
 
@@ -250,7 +249,7 @@ class SubscriptionWizardView(SessionWizardView):
             if step == "private_lot":
                 return self.initial_dict.get(step, {
                     'event': self.event,
-                    'code': self.request.session['exhibition_code'] or 'None'
+                    'code': self.request.session.get('exhibition_code')
                 })
 
         if step == 'lot':
@@ -617,7 +616,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         return False
 
-    def has_previous_invalid_code(self):
+    def has_previous_valid_code(self):
         """
         Verifica se código de exibição previamente enviado na sessão é válido.
         """
