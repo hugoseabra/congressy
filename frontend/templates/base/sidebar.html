@@ -15,13 +15,19 @@
                     50px; padding-top: 0">
         <ul class="col nav nav-pills nav-stacked " style="
                             font-size: 25px;text-align: center; margin: 0">
-            <li class="dropdown visible-xs" style="width: 50px">
+            <li class="dropdown" style="width: 50px;">
                 <a class="dropdown-toggle"
+                    data-toggle="tooltip"
+                    data-placement="right"
+                   data-original-title = "{{ user.get_full_name }}";
                    data-toggle="dropdown">
-
-                                    <span class="meta">
-                                        <span class="fas fa-user"></span>
-                                    </span>
+                    <span class="meta">
+                       <span style="background-color: slategray;
+                       border-radius: 2px; font-size: 25px"
+                             class="text">
+                        {{ user.first_name|slice:"0:1"|upper }}{{ user.last_name|slice:"0:1"|upper }}
+                       </span>
+                    </span>
                 </a>
                 <ul class="col nav nav-pills nav-stacked
                                 " role="menu"
@@ -46,10 +52,7 @@
                     </li>
                 </ul>
             </li>
-            <li class="divider visible-xs" style="height: 1px;
-                                margin: 9px 0;width: 50px;
-                                overflow: hidden;
-                                background-color: #52AEE9;"></li>
+            <li class="divider sidebar_divider"></li>
 
             <li style="width: 50px">
                 <a href="{% url 'event:event-list' %}"
@@ -77,12 +80,11 @@
                 ></a>
             </li>
         </ul>
+        <li class="divider sidebar_divider visible-xs"></li>
+
         <ul class="col nav nav-pills nav-stacked visible-xs"
             style="
                             font-size: 30px;text-align: center;margin: 0;">
-            <li class="divider visible-xs" style="height: 1px;
-                                width: 50px; overflow: hidden;margin: 0;
-                                background-color: #52AEE9;"></li>
             <li>
                 <a href="{% url 'event:event-add' %}" class="btn
                     " style="width: 50px;height:

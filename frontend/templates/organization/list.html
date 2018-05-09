@@ -99,7 +99,6 @@
                                 <th>Nome</th>
                                 <th class="hidden-sm hidden-xs">Cargo</th>
                                 <th></th>
-                                <th></th>
                             </tr>
                             </thead>
 
@@ -110,39 +109,8 @@
                                 <td>
                                     <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
                                 </td>
-                                <td class="hidden-sm hidden-xs">
+                                <td>
                                     {% get_member_group_name item user %}
-                                </td>
-                                <td class=" text-center">
-                                    <form action="{% url 'event:organization-switch' %}"
-                                          method="post"
-                                          id="organization_context">
-                                        {% csrf_token %}
-
-                                        <div class="btn-group">
-                                            <button type="button" class="btn
-                                                btn-success btn-trans
-                                                btn-sm dropdown-toggle"
-                                                    data-toggle="dropdown"
-                                                    aria-expanded="false"
-                                                    aria-haspopup="true"
-                                                    onclick="cgsy_submit
-                                                            (
-                                                            {{ item.pk }})">
-                                                <span>Entrar</span>
-                                            </button>
-                                        </div>
-
-
-                                        <input
-                                                type="hidden"
-                                                name="organization-context-pk"
-                                                id="organization-context-pk"/>
-                                        <input
-                                                type="hidden"
-                                                name="next"
-                                                value="{{ request.path }}"/>
-                                    </form>
                                 </td>
                                 <td>
                                     {% if member_group == member.ADMIN %}

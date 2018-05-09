@@ -152,6 +152,12 @@ class OrganizationEditFormView(BaseOrganizationView, generic.UpdateView):
 
         return super(OrganizationEditFormView, self).get_success_url()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['has_inside_bar'] = True
+        context['active'] = 'editar'
+        return context
+
 
 class OrganizationFinancialEditFormView(OrganizationEditFormView):
     template_name = 'organization/financial-form.html'
@@ -161,7 +167,9 @@ class OrganizationFinancialEditFormView(OrganizationEditFormView):
 
     def post(self, request, *args, **kwargs):
 
-        response = super(OrganizationFinancialEditFormView, self).post(request, *args, **kwargs)
+        response = super(OrganizationFinancialEditFormView, self).post(request,
+                                                                       *args,
+                                                                       **kwargs)
 
         form = self.get_form()
         if form.is_valid():
@@ -171,6 +179,3 @@ class OrganizationFinancialEditFormView(OrganizationEditFormView):
                 pass
 
         return response
-
-
-

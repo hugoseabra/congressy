@@ -3349,6 +3349,13 @@ label.valid {
 .theme-cgsy-full .principal_content {
   padding-left: 51px;
 }
+.theme-cgsy-full .sidebar_divider {
+  height: 1.4px;
+  margin: 9px 0;
+  width: 50px;
+  overflow: hidden;
+  background-color: #144f75;
+}
 .theme-cgsy-full .nav-pills > li.active > a {
   background-color: #1f7bb6;
 }
