@@ -209,13 +209,17 @@
 
 
                     {% for product in products %}
-                        //id, name, quantity, tangible
-                        window.cgsy.pagarme.add_items_list({{ product.id }}, '{{ product.name }}',{{ product.price }}, 1, true);
+                        //id, name, price, quantity, tangible
+                        window.cgsy.pagarme.add_items_list({{ product.id }}, '{{ product.name }}', {{ product.price }}, 1, true);
+                    {% endfor %}
+
+                    {% for service in services %}
+                        //id, name, price, quantity, tangible
+                        window.cgsy.pagarme.add_items_list({{ service.id }}, '{{ service.name }}', {{ service.price }}, 1, false);
                     {% endfor %}
 
 
                     console.log(window.cgsy.pagarme.get_list());
-
 
 
                 }, 300);
