@@ -1,10 +1,13 @@
+from decimal import Decimal
+
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
-from core.util.date import DateTimeRange
 
 from addon.models import Product, Service, SubscriptionProduct, \
     SubscriptionService
+from core.util.date import DateTimeRange
 from gatheros_subscription.models import Subscription
 
 """
@@ -119,7 +122,10 @@ class ProductOptionalManagementView(generic.TemplateView):
         if action == 'add':
             _, created = SubscriptionProduct.objects.get_or_create(
                 optional=product,
-                subscription=subscription
+                subscription=subscription,
+                optional_price=product.price,
+                optional_liquid_price=self.get_calculated_price(
+                    product.price, subscription.lot),
             )
 
             if created:
@@ -132,6 +138,28 @@ class ProductOptionalManagementView(generic.TemplateView):
             return HttpResponse('201 OK', status=201)
 
         return HttpResponse('200 OK', status=200)
+
+    @staticmethod
+    def get_calculated_price(price, lot):
+        """
+        Resgata o valor calculado do preço do opcional de acordo com as regras
+        da Congressy.
+        """
+        if price is None:
+            return 0
+
+        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent = \
+            Decimal(lot.event.congressy_percent) / 100
+
+        congressy_amount = price * congressy_plan_percent
+        if congressy_amount < minimum:
+            congressy_amount = minimum
+
+        if lot.transfer_tax is True:
+            return round(price + congressy_amount, 2)
+
+        return round(price, 2)
 
 
 class ServiceOptionalManagementView(generic.TemplateView):
@@ -181,7 +209,6 @@ class ServiceOptionalManagementView(generic.TemplateView):
                             if service.has_schedule_conflicts or \
                                     self.has_schedule_conflicts(
                                         service.optional, optional):
-
                                 available = False
 
                     self.available_options.append({'optional': optional,
@@ -226,7 +253,10 @@ class ServiceOptionalManagementView(generic.TemplateView):
         if action == 'add':
             _, created = SubscriptionService.objects.get_or_create(
                 optional=service,
-                subscription=subscription
+                subscription=subscription,
+                optional_price=service.price,
+                optional_liquid_price=self.get_calculated_price(
+                    service.price, subscription.lot)
             )
 
             if created:
@@ -263,3 +293,25 @@ class ServiceOptionalManagementView(generic.TemplateView):
             return True
 
         return False
+
+    @staticmethod
+    def get_calculated_price(price, lot):
+        """
+        Resgata o valor calculado do preço do opcional de acordo com as regras
+        da Congressy.
+        """
+        if price is None:
+            return 0
+
+        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent = \
+            Decimal(lot.event.congressy_percent) / 100
+
+        congressy_amount = price * congressy_plan_percent
+        if congressy_amount < minimum:
+            congressy_amount = minimum
+
+        if lot.transfer_tax is True:
+            return round(price + congressy_amount, 2)
+
+        return round(price, 2)
