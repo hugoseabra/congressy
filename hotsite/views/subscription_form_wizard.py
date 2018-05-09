@@ -112,9 +112,6 @@ class SubscriptionWizardView(SessionWizardView):
         if not isinstance(user, User):
             return redirect('public:hotsite', slug=self.event.slug)
 
-        if not self.storage:
-            return redirect('public:hotsite', slug=self.event.slug)
-
         if self.is_private_lot() and not self.has_previous_valid_code():
             messages.error(
                 request,
