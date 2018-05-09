@@ -31,7 +31,7 @@
                         {% if service.available %}
                             <td>
                                 <button style="width: 100%"
-                                        onclick="addOptionalService{{ service.optional.pk }})"
+                                        onclick="addOptionalService({{ service.optional.pk }})"
                                         class="btn btn-sm btn-success">
                                     Selecionar
                                 </button>

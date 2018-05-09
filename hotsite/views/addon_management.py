@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
+from core.util.date import DateTimeRange
 
 from addon.models import Product, Service, SubscriptionProduct, \
     SubscriptionService
@@ -34,6 +35,7 @@ DEV NOTES:
 class ProductOptionalManagementView(generic.TemplateView):
     available_options = []
     storage = None
+    fetch_in_storage = False
     template_name = "optionals/available_product_list.html"
 
     def get(self, request, *args, **kwargs):
@@ -45,7 +47,7 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         self.available_options = []
 
-        fetch_in_storage = self.request.GET.get('fetch_in_storage')
+        self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
         # @TODO add user validation here, only if request.user == sub.user
 
         all_products_selected_by_the_user = \
@@ -54,7 +56,7 @@ class ProductOptionalManagementView(generic.TemplateView):
                 optional__lot_category=subscription.lot.category
             )
 
-        if fetch_in_storage:
+        if self.fetch_in_storage:
             for item in all_products_selected_by_the_user:
                 self.available_options.append({'optional': item.optional})
 
@@ -63,13 +65,20 @@ class ProductOptionalManagementView(generic.TemplateView):
                 lot_category=category, published=True)
 
             for optional in event_optionals_products:
-                available = not optional.has_quantity_conflict and \
-                            not optional.has_sub_end_date_conflict and \
-                            not optional not in \
-                            all_products_selected_by_the_user
 
-                self.available_options.append({'optional': optional,
-                                               'available': available})
+                contains = False
+
+                for product in subscription.subscriptionproduct.all():
+                    if product.optional == optional:
+                        contains = True
+
+                if not contains:
+                    available = not optional.has_quantity_conflict and \
+                                not optional.has_sub_end_date_conflict
+
+                    self.available_options.append({
+                        'optional': optional,
+                        'available': available, })
 
         context = self.get_context_data()
         return self.render_to_response(context)
@@ -86,14 +95,12 @@ class ProductOptionalManagementView(generic.TemplateView):
 
         template_name = super().get_template_names()
 
-        fetch_in_storage = self.request.GET.get('fetch_in_storage')
-
-        if fetch_in_storage:
+        if self.fetch_in_storage:
             template_name = "optionals/currently_selected_product_list.html"
 
         return template_name
 
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
 
         """
             @TODO: IMPLEMENT SOME VALIDATION BEFORE CREATING!!!!!!!!
@@ -117,6 +124,12 @@ class ProductOptionalManagementView(generic.TemplateView):
 
             if created:
                 return HttpResponse('201 OK', status=201)
+        elif action == 'remove':
+            subscription_product = get_object_or_404(SubscriptionProduct,
+                                                     optional=product,
+                                                     subscription=subscription)
+            subscription_product.delete()
+            return HttpResponse('201 OK', status=201)
 
         return HttpResponse('200 OK', status=200)
 
@@ -124,6 +137,7 @@ class ProductOptionalManagementView(generic.TemplateView):
 class ServiceOptionalManagementView(generic.TemplateView):
     available_options = []
     storage = None
+    fetch_in_storage = False
     template_name = "optionals/available_services_list.html"
 
     def get(self, request, *args, **kwargs):
@@ -134,14 +148,14 @@ class ServiceOptionalManagementView(generic.TemplateView):
         category = subscription.lot.category
         self.available_options = []
 
-        fetch_in_storage = self.request.GET.get('fetch_in_storage')
+        self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
         all_selected_services = SubscriptionService.objects.filter(
             subscription=subscription,
             optional__lot_category=subscription.lot.category
         )
         # @TODO add user validation here, only if request.user == sub.user
 
-        if fetch_in_storage:
+        if self.fetch_in_storage:
             for item in all_selected_services:
                 self.available_options.append({'optional': item.optional})
         else:
@@ -150,14 +164,24 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
             for optional in event_optionals_services:
 
-                if optional not in all_selected_services:
+                contains = False
+
+                for service in subscription.subscriptionservice.all():
+                    if service.optional == optional:
+                        contains = True
+
+                if not contains:
                     available = not optional.has_quantity_conflict and \
-                                not optional.has_sub_end_date_conflict and \
-                                not optional not in all_selected_services
+                                not optional.has_sub_end_date_conflict
 
                     if available:
                         for service in subscription.subscriptionservice.all():
-                            if service.has_schedule_conflicts:
+
+                            # Exisiting conflicts.
+                            if service.has_schedule_conflicts or \
+                                    self.has_schedule_conflicts(
+                                        service.optional, optional):
+
                                 available = False
 
                     self.available_options.append({'optional': optional,
@@ -178,14 +202,12 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
         template_name = super().get_template_names()
 
-        fetch_in_storage = self.request.GET.get('fetch_in_storage')
-
-        if fetch_in_storage:
+        if self.fetch_in_storage:
             template_name = "optionals/currently_selected_service_list.html"
 
         return template_name
 
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
 
         """
             @TODO: IMPLEMENT SOME VALIDATION BEFORE CREATING!!!!!!!!
@@ -198,16 +220,46 @@ class ServiceOptionalManagementView(generic.TemplateView):
         if not optional_id or not subscription_pk or not action:
             return HttpResponse(status=400)
 
-        product = get_object_or_404(Product, pk=int(optional_id))
+        service = get_object_or_404(Service, pk=int(optional_id))
         subscription = get_object_or_404(Subscription, pk=subscription_pk)
 
         if action == 'add':
             _, created = SubscriptionService.objects.get_or_create(
-                optional=product,
+                optional=service,
                 subscription=subscription
             )
 
             if created:
                 return HttpResponse('201 OK', status=201)
+        elif action == 'remove':
+            subscription_service = get_object_or_404(SubscriptionService,
+                                                     optional=service,
+                                                     subscription=subscription)
+            subscription_service.delete()
+            return HttpResponse('201 OK', status=201)
 
         return HttpResponse('200 OK', status=200)
+
+    @staticmethod
+    def has_schedule_conflicts(option_one, option_two):
+
+        is_restricted = option_one.restrict_unique
+        is_sub_restricted = option_two.restrict_unique
+
+        start_one = option_one.schedule_start
+        stop_one = option_one.schedule_end
+        start_two = option_two.schedule_start
+        stop_two = option_two.schedule_end
+
+        session_range_one = DateTimeRange(start=start_one, stop=stop_one)
+        session_range_two = DateTimeRange(start=start_two, stop=stop_two)
+
+        has_conflict = (start_one in session_range_one or stop_one in
+                        session_range_one) or \
+                       (start_two in session_range_two or stop_two
+                        in session_range_two)
+
+        if has_conflict is True and (is_restricted or is_sub_restricted):
+            return True
+
+        return False

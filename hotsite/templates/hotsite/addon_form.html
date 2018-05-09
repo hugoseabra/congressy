@@ -76,32 +76,33 @@
                                         <div class="panel-body"
                                              id="optional-list-main-block">
                                             {% include 'hotsite/optionals_form.html' %}
-                                        </div>
-
-                                        <form method="post" action=""
-                                              id="optional_form">
-
-                                            {% csrf_token %}
-                                            {{ wizard.management_form }}
 
 
-                                            <br/>
-                                            {% if wizard.steps.prev %}
-                                                <button name="wizard_goto_step"
-                                                        type="submit"
-                                                        class="btn btn-primary"
-                                                        value="{{ wizard.steps.prev }}">
-                                                    <i class="fas fa-chevron-circle-left"></i>
-                                                    Voltar
+                                            <form method="post" action=""
+                                                  id="optional_form">
+
+                                                {% csrf_token %}
+                                                {{ wizard.management_form }}
+
+
+                                                <br/>
+                                                {% if wizard.steps.prev %}
+                                                    <button name="wizard_goto_step"
+                                                            type="submit"
+                                                            class="btn btn-primary"
+                                                            value="{{ wizard.steps.prev }}">
+                                                        <i class="fas fa-chevron-circle-left"></i>
+                                                        Voltar
+                                                    </button>
+                                                {% endif %}
+
+                                                <button type="submit"
+                                                        class="btn btn-primary pull-right">
+                                                    Próximo
+                                                    <i class="fas fa-chevron-circle-right"></i>
                                                 </button>
-                                            {% endif %}
-
-                                            <button type="submit"
-                                                    class="btn btn-primary pull-right">
-                                                Próximo
-                                                <i class="fas fa-chevron-circle-right"></i>
-                                            </button>
-                                        </form>
+                                            </form>
+                                        </div>
 
                                     </div>
 
@@ -110,8 +111,6 @@
                             </div>
 
                         </div>
-
-                    </div>
 
                     </div>
 

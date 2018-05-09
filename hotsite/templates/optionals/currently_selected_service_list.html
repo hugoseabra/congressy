@@ -12,21 +12,21 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for product in object_list %}
+                {% for service in object_list %}
                     <tr>
 
-                        <td>{{ product.optional.name }}</td>
-                        <td>{{ product.optional.optional_type.name }}</td>
+                        <td>{{ service.optional.name }}</td>
+                        <td>{{ service.optional.optional_type.name }}</td>
                         <td>
-                            {% if product.optional.price == 0.00 %}
+                            {% if service.optional.price == 0.00 %}
                                 Grátis
                             {% else %}
-                                R$ {{ product.optional.price }}
+                                R$ {{ service.optional.price }}
                             {% endif %}
                         </td>
                         <td>
                             <button style="width: 100%"
-                                    onclick="removeOptionalProduct({{ product.optional.pk }})"
+                                    onclick="removeOptionalService({{ service.optional.pk }})"
                                     class="btn btn-sm btn-danger">
                                 Remover
                             </button>
@@ -38,6 +38,6 @@
             </table>
         </div>
     {% else %}
-        Nenhum opcional escolhido até o momento.
+        Nenhum  serviço escolhido até o momento.
     {% endif %}
 </div>

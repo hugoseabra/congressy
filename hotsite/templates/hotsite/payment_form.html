@@ -54,6 +54,57 @@
                                     {% render_errors field.error %}
                                 {% endif %}
                             {% endfor %}
+                            <div class="well well-sm"
+                                 style="text-align: justify">
+                                <h3>Checkout:</h3>
+                                <div><strong>Inscrição:</strong></div>
+                                <ul>
+                                    {% if lot.price %}
+                                    <ol><strong>R$ {{ lot.price }}</strong></ol>
+                                    {% else %}
+                                        <ol><strong>Grátis</strong></ol>
+                                    {% endif %}
+                                </ul>
+
+                                {% if products %}
+                                    <div><strong>Produtos:</strong></div>
+                                    <ul>
+                                        {% for product in products %}
+                                            <ol>{{ product.name }}:
+                                                <strong>
+                                                    {% if product.price == 0.00 %}
+                                                        Grátis
+                                                    {% else %}
+                                                        {{ product.price }}
+                                                    {% endif %}
+                                                </strong>
+                                            </ol>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                {% if services %}
+                                    <div><strong>Serviços:</strong></div>
+                                    <ul>
+                                        {% for service in services %}
+                                            <ol>{{ service.name }}:
+                                                <strong>
+                                                    {% if service.price == 0.00 %}
+                                                        Grátis
+                                                    {% else %}
+                                                        R$ {{ service.price }}
+                                                    {% endif %}
+                                                </strong>
+                                            </ol>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            <h4> Total: R$ {{ total }} </h4>
+
+
+                            </div>
+
 
                             <div id="payment_buttons" class="text-center"
                                  style="display: none">
@@ -117,7 +168,8 @@
                                 </button>
                             </form>
 
-                            <form id="back_form" action="" method="post" novalidate>
+                            <form id="back_form" action="" method="post"
+                                  novalidate>
 
                                 {% csrf_token %}
                                 {{ wizard.management_form }}

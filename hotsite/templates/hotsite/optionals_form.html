@@ -39,7 +39,7 @@
 
                     <div class="col-md-12">
                         <div id="available_optional_products">
-                            Nenhum produto selecionado;
+                            Nenhum produto disponivel.
                         </div>
                     </div>
 
@@ -49,7 +49,7 @@
 
                     <div class="col-md-12">
                         <div id="available_optional_services">
-                            Nenhum serviço selecionado;
+                            Nenhum serviço disponivel.
                         </div>
                     </div>
 
@@ -82,7 +82,7 @@
             'GET',
             null,
             function (response) {
-                $('#available_optional_products').replaceWith(response);
+                $('#available_optional_products').html(response);
             },
             null
         );
@@ -96,7 +96,7 @@
             'GET',
             null,
             function (response) {
-                $('#available_optional_services').replaceWith(response);
+                $('#available_optional_services').html(response);
             },
             null
         );
@@ -112,7 +112,7 @@
                 fetch_in_storage: true
             },
             function (response) {
-                $('#currently_selected_products').replaceWith(response);
+                $('#currently_selected_products').html(response);
                 render_available_optional_products_list();
             },
             null
@@ -129,14 +129,14 @@
                 fetch_in_storage: true
             },
             function (response) {
-                $('#currently_selected_services').replaceWith(response);
+                $('#currently_selected_services').html(response);
                 render_available_optional_services_list();
             },
             null
         );
     }
 
-    function addOptionalProduct(product_name, product_id) {
+    function addOptionalProduct(product_id) {
 
         var url = '{% url 'public:hotsite_products' subscription_pk=subscription  %}';
 
@@ -168,6 +168,51 @@
             {
                 'optional_id': service_id,
                 'action': 'add'
+            },
+            function (res) {
+                console.log(res);
+                render_available_optional_services_list();
+                render_currently_selected_service_list();
+            },
+            function (err) {
+                console.log('err');
+                console.error(err.responseText);
+            }
+        );
+    }
+
+    function removeOptionalProduct(product_id) {
+
+        var url = '{% url 'public:hotsite_products' subscription_pk=subscription  %}';
+
+        send(
+            url,
+            'POST',
+            {
+                'optional_id': product_id,
+                'action': 'remove'
+            },
+            function (res) {
+                console.log(res);
+                render_currently_selected_products_list();
+                render_available_optional_products_list();
+            },
+            function (err) {
+                console.log('err');
+                console.error(err);
+            }
+        );
+    }
+    function removeOptionalService(service_id) {
+
+        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
+
+        send(
+            url,
+            'POST',
+            {
+                'optional_id': service_id,
+                'action': 'remove'
             },
             function (res) {
                 console.log(res);
