@@ -63,15 +63,20 @@ def has_survey(wizard):
     """ Return true if user opts for a lot with survey"""
 
     # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
+    if not cleaned_data:
+        cleaned_data = wizard.get_cleaned_data_for_step('lot') or {
+            'lots': 'none'}
 
-    # Return true if lot has price and price > 0
-    lot = cleaned_data['lots']
+    if cleaned_data:
 
-    if isinstance(lot, Lot):
+        # Return true if lot has price and price > 0
+        lot = cleaned_data['lots']
 
-        if lot.event_survey and lot.event_survey.survey.questions.count() > 0:
-            return True
+        if isinstance(lot, Lot):
+
+            if lot.event_survey and lot.event_survey.survey.questions.count() > 0:
+                return True
 
     return False
 
