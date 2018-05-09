@@ -6,9 +6,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.views import generic
 
+from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from hotsite.views import EventMixin
 from payment.models import Transaction
@@ -18,9 +19,19 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
     template_name = 'hotsite/subscription_status.html'
     person = None
     subscription = None
+    event = None
     restart_private_event = False
 
     def dispatch(self, request, *args, **kwargs):
+
+        slug = self.kwargs.get('slug')
+
+        if not slug:
+            return redirect('https://congressy.com')
+        self.event = get_object_or_404(Event, slug=slug)
+
+        if not request.user.is_authenticated:
+            return redirect('public:hotsite', slug=self.event.slug)
 
         response = super().dispatch(request, *args, **kwargs)
 
@@ -36,12 +47,6 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         try:
             self.subscription = Subscription.objects.get(
                 event=self.event, person=self.person)
-
-            if not request.user.is_authenticated or not self.person:
-                return redirect('public:hotsite', slug=self.event.slug)
-
-
-
             return response
 
         except Subscription.DoesNotExist:
