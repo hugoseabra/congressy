@@ -6,9 +6,11 @@
                     "{% url 'event:member-list' invitation_organization.pk %}"
                 {% elif active == 'membros' %}
                     "{% url 'event:member-list' organization.pk %}"
+                {% elif active == 'editar' %}
+                    "{% url 'event:member-list' organization.pk %}"
                 {% endif %}
 
-        title="Membros">
+       >
         <i class="fas fa-users"></i> Membros
         </a>
     </li>
@@ -18,10 +20,12 @@
                     "{% url 'event:invitation-list' invitation_organization.pk %}"
                 {% elif active == 'membros' %}
                     "{% url 'event:invitation-list' organization.pk %}"
+                {% elif active == 'editar' %}
+                    "{% url 'event:invitation-list' organization.pk %}"
                 {% endif %}
 
 
-        title="Convites">
+        >
         <i class="fas fa-envelope-open"></i> Convites
         </a>
     </li>
@@ -33,10 +37,10 @@
                     "{% url 'event:organization-edit' invitation_organization.pk %}"
                 {% elif active == 'membros' %}
                     "{% url 'event:organization-edit' organization.pk %}"
-                {% elif active == 'membros' %}
+                {% elif active == 'editar' %}
                     "{% url 'event:organization-edit' organization.pk %}"
                 {% endif %}
-           title="Editar Organização">
+           >
         <i class="fas fa-cog"></i> Configurações
         </a>
     </li>

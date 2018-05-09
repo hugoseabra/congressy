@@ -93,9 +93,9 @@
 
         {% block navbar %}
             {% if user %}
-                <ul class="nav navbar-nav navbar-right">
+                <ul class="nav navbar-nav navbar-right hidden-xs">
                     <li style="padding-top: 5px">
-                        <span class="meta hidden-xs">
+                        <span class="meta ">
                             <button type="button" onclick="location.href=
                                     '{% url 'event:event-add' %}'"
                                     class="btn btn-sm
@@ -125,7 +125,7 @@
 
                                 <li>
                                     <a href="
-{% url 'event:organization-panel' organization.pk %}">
+{% url 'event:organization-edit' organization.pk %}">
                                             <span class="icon">
                                                 <i class="fas fa-list-alt"></i>
                                             </span>
@@ -135,12 +135,12 @@
                                 <li class="divider"></li>
                                 <li role="presentation">
                                     <button type="button"
-                                       class="btn  btn-sm btn-success
+                                            class="btn  btn-sm btn-primary
                                        btn-block"
-                                       role="menuitem" tabindex="-1"
-                                       data-toggle="modal"
-                                       data-target="#change_organization">
-                                        <i class="fa fa-plus"></i>
+                                            role="menuitem" tabindex="-1"
+                                            data-toggle="modal"
+                                            data-target="#change_organization">
+                                        <i class="fas fa-exchange-alt"></i>
                                         Trocar de organização
                                     </button>
                                 </li>
@@ -166,7 +166,7 @@
                                 Minhas organizações</h4>
                         </div>
 
-                    {% csrf_token %}
+                        {% csrf_token %}
                         <div class="modal-body">
                             <div class="panel panel-primary">
                                 <div class="panel-body ">
@@ -246,7 +246,7 @@
             <button type="button" class="sidebar-toggle navbar-toggle
             collapsed" data-toggle="collapse" data-target="#sidebar"
                     aria-expanded="false" style="z-index: 1000;text-align:
-                    right ">
+                    right;width: 50px; ">
                 <i class="fas fa-bars"
                    style="font-size: 30px;"></i>
 
