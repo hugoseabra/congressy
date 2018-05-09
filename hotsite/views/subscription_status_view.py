@@ -33,8 +33,6 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         if not request.user.is_authenticated:
             return redirect('public:hotsite', slug=self.event.slug)
 
-        response = super().dispatch(request, *args, **kwargs)
-
         self.person = self.get_person()
 
         # Se  não há lotes pagos, não há o que fazer aqui.
@@ -43,18 +41,17 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
                 'public:hotsite',
                 slug=self.event.slug
             )
-
         try:
             self.subscription = Subscription.objects.get(
                 event=self.event, person=self.person)
-            return response
-
         except Subscription.DoesNotExist:
             messages.error(
                 message='Você não possui inscrição neste evento.',
                 request=request
             )
             return redirect('public:hotsite', slug=self.event.slug)
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
 
