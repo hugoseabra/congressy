@@ -71,12 +71,12 @@
                                     <div><strong>Produtos:</strong></div>
                                     <ul>
                                         {% for product in products %}
-                                            <ol>{{ product.name }}:
+                                            <ol>{{ product.optional.name }}:
                                                 <strong>
-                                                    {% if product.price == 0.00 %}
+                                                    {% if product.optional.price == 0.00 %}
                                                         Grátis
                                                     {% else %}
-                                                        {{ product.price }}
+                                                        {{ product.optional.price }}
                                                     {% endif %}
                                                 </strong>
                                             </ol>
@@ -88,12 +88,12 @@
                                     <div><strong>Serviços:</strong></div>
                                     <ul>
                                         {% for service in services %}
-                                            <ol>{{ service.name }}:
+                                            <ol>{{ service.optional.name }}:
                                                 <strong>
-                                                    {% if service.price == 0.00 %}
+                                                    {% if service.optional.price == 0.00 %}
                                                         Grátis
                                                     {% else %}
-                                                        R$ {{ service.price }}
+                                                        R$ {{ service.optional.price }}
                                                     {% endif %}
                                                 </strong>
                                             </ol>
@@ -210,12 +210,12 @@
 
                     {% for product in products %}
                         //id, name, price, quantity, tangible
-                        window.cgsy.pagarme.add_items_list({{ product.id }}, '{{ product.name }}', {{ product.price }}, 1, true);
+                        window.cgsy.pagarme.add_items_list({{ product.optional.id }}, '{{ product.optional.name }}',{{ product.optional_liquid_price }}, 1, true);
                     {% endfor %}
 
                     {% for service in services %}
                         //id, name, price, quantity, tangible
-                        window.cgsy.pagarme.add_items_list({{ service.id }}, '{{ service.name }}', {{ service.price }}, 1, false);
+                        window.cgsy.pagarme.add_items_list({{ service.optional.id }}, '{{ service.optional.name }}', {{ service.optional_liquid_price }}, 1, false);
                     {% endfor %}
 
 

@@ -204,12 +204,10 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
             context['lot'] = subscription.lot
 
-            products = [x.optional for x in
-                                   SubscriptionProduct.objects.filter(
-                                       subscription=subscription)]
-            services = [x.optional for x in
-                                  SubscriptionService.objects.filter(
-                                        subscription=subscription)]
+            products = [x for x in SubscriptionProduct.objects.filter(
+                subscription=subscription)]
+            services = [x for x in SubscriptionService.objects.filter(
+                subscription=subscription)]
 
             context['products'] = products
 
@@ -218,13 +216,12 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             total = subscription.lot.price or 0.00
 
             for product in products:
-                total += product.price
+                total += product.optional_liquid_price
 
             for service in services:
-                total += service.price
+                total += service.optional_liquid_price
 
             context['total'] = total
-
 
             context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
