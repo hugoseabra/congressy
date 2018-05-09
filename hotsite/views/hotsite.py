@@ -27,7 +27,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             subscription_id = self.request.session['has_private_subscription']
 
             try:
-                Subscription.objects.get(pk=subscription_id)
+                Subscription.objects.get(pk=subscription_id, event=self.event)
                 self.has_private_subscription = True
             except Subscription.DoesNotExist:
                 pass
