@@ -3,9 +3,10 @@
         <div class="tab-wrapper tab-left ">
             <ul class="nav nav-tabs">
                 {% for cat in object_list %}
-                <li id="cat-super-{{ cat.pk }}" class="{% if forloop.counter0 == 0 %}active{% endif %}" style="width:180px;overflow: hidden">
+                <li id="cat-super-{{ cat.pk }}" class="{% if forloop.counter0 == 0 %}active{% endif %}" style="overflow: hidden">
                     <a class="cat-tab-link" data-cat-id="{{ cat.pk }}" href="#cat-{{ cat.pk }}" data-toggle="tab" aria-expanded="{% if forloop.counter0 == 0 %}true{% else %}false{% endif %}">
-                        {{ cat.name }}
+                        <div class="hidden-xs" style="width:180px">{{ cat.name }}</div>
+                        <div class="hidden-sm hidden-md hidden-lg hidden-xl" title="{{ cat.name }}">{{ forloop.counter }}</div>
                     </a>
                 </li>
                 {% endfor %}
@@ -22,3 +23,5 @@
         </div>
     </div>
 </div>
+
+{% include 'addon/optional/includes/modal-product-limit.html' %}

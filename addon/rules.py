@@ -1,7 +1,6 @@
 """
 Rules: Módulo afiliados
 """
-from datetime import datetime
 from addon import constants
 from base.models import RuleChecker, RuleIntegrityError
 
@@ -71,15 +70,14 @@ class ServiceMustHaveUniqueDatetimeScheduleInterval(RuleChecker):
                 date_end <= optional.schedule_end <= o_optional.schedule_end
 
             if dt_start_conflicts or dt_end_conflicts:
-                conflict_prices.append(optional_str)
+                conflict_prices.append('<li>{}</li>'.format(optional_str))
 
         if conflict_prices:
             raise RuleIntegrityError(
-                'Conflito de horários de programação: as datas informadas'
-                ' conflitam com outro(s) opcionais(s) de serviço já'
-                ' existente(s) para esta mesma categoria de lote: {}'.format(
-                    '; '.join(conflict_prices)
-                )
+                "Conflito de horários de programação - as datas informadas"
+                " conflitam com outro(s) opcionais(s) de serviço já"
+                " existente(s) para esta mesma categoria de lote:"
+                " <br><ul>{}</ul>".format(''.join(conflict_prices))
             )
 
 
@@ -133,4 +131,3 @@ class MustBeSameOptionalLotCategory(RuleChecker):
                 'Você deve informar uma categoria de lote que já esteja'
                 ' inserida no opcional "{}".'.format(optional.name)
             )
-

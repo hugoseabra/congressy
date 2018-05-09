@@ -205,7 +205,7 @@ class Service(AbstractOptional):
 
     rule_instances = (
         rules.MustScheduleDateEndAfterDateStart,
-        rules.ServiceMustHaveUniqueDatetimeScheduleInterval,
+        # rules.ServiceMustHaveUniqueDatetimeScheduleInterval,
         rules.ThemeMustBeSameEvent,
         rules.OptionalMustHaveMinimumDays,
     )

@@ -5,6 +5,8 @@ from abc import ABC, abstractmethod
 
 from django.db.utils import IntegrityError
 from django.forms import ValidationError
+from django.utils.safestring import mark_safe
+
 
 __all__ = ['EntityMixin', 'RuleChecker']
 
@@ -74,4 +76,4 @@ class EntityMixin(object):
             try:
                 rule.check(self)
             except RuleIntegrityError as e:
-                raise ValidationError(str(e))
+                raise ValidationError(mark_safe(str(e)))

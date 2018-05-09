@@ -80,6 +80,18 @@ window.cgsy.addon = window.cgsy.addon || {};
             price_el.removeAttr('required');
             price_el.val('');
         }
+    };
+
+    addon.check_uncheck_has_price = function() {
+        var has_price = $('#id_has_price');
+        var price_el = $('#id_price');
+
+        if (price_el.val()) {
+            var price = price_el.val().replace('.', '').replace(',', '.');
+            if (parseFloat(price) > 0) {
+                has_price.trigger('click');
+            }
+        }
     }
 
 })(jQuery, window.cgsy.addon);

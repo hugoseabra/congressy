@@ -61,14 +61,14 @@ optional_urls = [
         name='optional-service-list'
     ),
     url(
+        r'^products/add/$',
+        views.OptionalAddProductView.as_view(),
+        name='optional-product-add'
+    ),
+    url(
         r'^services/add/$',
         views.OptionalAddServiceView.as_view(),
         name='optional-service-add'
-    ),
-    url(
-        r'^add/$',
-        views.OptionalAddView.as_view(),
-        name='optional-add'
     ),
     url(
         r'^$',

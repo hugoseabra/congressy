@@ -1,7 +1,7 @@
 from django import forms
 
 from base import managers
-from core.forms.widgets import SplitDateTimeWidget, PriceInput, ManageableSelect
+from core.forms.widgets import SplitDateTimeWidget, PriceInput
 from .constants import MINIMUM_RELEASE_DAYS
 from .models import (
     Product,
@@ -158,9 +158,12 @@ class SubscriptionServiceManager(managers.Manager):
             conflicting_service = \
                 optional_service.get_schedule_conflict_service
             raise forms.ValidationError(
-                'Conflito de horário: o opcional "{}" '
+                'Conflito de horário - o opcional "{}" '
                 'está em conflito com o opcional "{}".'.format(
-                    optional_service.name, conflicting_service.name))
+                    optional_service.name,
+                    conflicting_service.name
+                )
+            )
 
         # Regra 3:
         if optional_service.theme.limit:

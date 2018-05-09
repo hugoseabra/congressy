@@ -145,11 +145,15 @@ function save_optional(url, data, msg) {
             }
         },
         function (response) {
-            console.error(response.responseJSON);
-            Messenger().post({
-                message: 'Não foi possivel processar salvamento de lote.',
-                type: 'error'
-            });
+            response = response.responseJSON;
+            console.error(response);
+            var msg = 'Não foi possivel processar salvamento de opcional.';
+
+            if (response.hasOwnProperty('detail')) {
+                msg += '. Detalhe: ' + response.detail
+            }
+
+            Messenger().post({message: msg, type: 'error'});
         }
     );
 }
@@ -161,10 +165,10 @@ function createAnchorEvents() {
 }
 
 function publish_optional(type, id) {
-    if (!confirm(
-            'Tem certeza que deseja publicar o lote? Ele será exibido' +
-            ' conforme as configurações de data inicial e final.'
-        )) {
+
+    var title = (type === 'service') ? 'Atividade extra' : 'Produto / Serviço';
+
+    if (!confirm('Tem certeza que deseja publicar este '+title+'?')) {
         return;
     }
 
@@ -181,15 +185,15 @@ function publish_optional(type, id) {
         return;
     }
 
-    var data = {'active': true};
+    var data = {'published': true};
     save_optional(url, data, 'Opcional publicado com sucesso!');
-
 }
 
-function unpublish_optional(type, lot_id) {
-    if (!confirm(
-            'Tem certeza que deseja despublicar o lote?.'
-        )) {
+function unpublish_optional(type, id) {
+
+    var title = (type === 'service') ? 'Atividade extra' : 'Produto / Serviço';
+
+    if (!confirm('Tem certeza que deseja despublicar este '+title+'?')) {
         return;
     }
 
@@ -206,100 +210,96 @@ function unpublish_optional(type, lot_id) {
         return;
     }
 
-    var data = {'active': false};
-    save_lot('/api/lots/' + lot_id + '/', data, 'Lote despublicado com sucesso!');
-
+    var data = {'published': false};
+    save_optional(url, data, 'Opcional despublicado com sucesso!');
 }
 
-function save_survey() {
-    var lot_id = $('#survey-lot_id').val();
-    if (!lot_id) {
+function save_service_limit() {
+    var service_id = $('#service-limit_service-id').val();
+
+    if (!service_id) {
         Messenger().post({
-            message: 'Algo deu errado: Lote não encontrado. ',
+            message: 'Algo deu errado: Opcional não encontrado. ',
             type: 'error',
             hideAfter: 3
         });
         return;
     }
 
-    var survey_id = $('#lot-survey').val();
-    if (survey_id) {
-        survey_id = parseInt(survey_id);
-    }
-
-    save_lot(
-        '/api/lots/' + lot_id + '/',
-        {'event_survey': survey_id},
-        'Formulário vinculado ao lote com sucesso!'
-    );
-    $('#survey-lot-form').modal('toggle');
-}
-
-function save_limit() {
-    var lot_id = $('#lot-limit-lot_id').val();
-    if (!lot_id) {
-        Messenger().post({
-            message: 'Algo deu errado: Lote não encontrado. ',
-            type: 'error',
-            hideAfter: 3
-        });
-        return;
-    }
-
-    var limit = $('#lot-limit').val();
+    var limit = $('#service-limit').val();
     limit = (limit) ? parseInt(limit) : 0;
 
-    save_lot(
-        '/api/lots/' + lot_id + '/',
-        {'limit': limit},
+    save_optional(
+        '/api/addon/optionals/services/' + service_id + '/',
+        {'quantity': limit},
         'Limite de vagas configurado com sucesso!'
     );
 
-    $('#lot-limit-form').modal('toggle');
+    $('#modal-service-limit-form').modal('toggle');
 
 }
 
-function save_privacy() {
-    var lot_id = $('#lot-privacy-lot_id').val();
-    if (!lot_id) {
+function save_product_limit() {
+    var service_id = $('#product-limit_product-id').val();
+
+    if (!service_id) {
         Messenger().post({
-            message: 'Algo deu errado: Lote não encontrado. ',
+            message: 'Algo deu errado: Opcional não encontrado. ',
             type: 'error',
             hideAfter: 3
         });
         return;
     }
 
-    var is_private = $('#lot-privacy_private').prop('checked');
-    if (is_private === true) {
-        var code = $('#lot-privacy_exhibition-code').val();
-        if (!code) {
-            Messenger().post({
-                message: 'Informe um código para exibição do lote.',
-                type: 'info',
-                hideAfter: 3
-            });
-            return;
-        }
-        if (code.length < 8) {
-            Messenger().post({
-                message: 'O código deve conter, no mínimo, 8 dígitos.',
-                type: 'info',
-                hideAfter: 3
-            });
-            return;
-        }
+    var limit = $('#product-limit').val();
+    limit = (limit) ? parseInt(limit) : 0;
+
+    save_optional(
+        '/api/addon/optionals/products/' + service_id + '/',
+        {'quantity': limit},
+        'Limite de estoque configurado com sucesso!'
+    );
+
+    $('#modal-product-limit-form').modal('toggle');
+
+}
+
+function set_restrict_unique(type, id) {
+
+    var url;
+    if (type === 'service') {
+        url = '/api/addon/optionals/services/'+ id +'/'
     }
 
-    save_lot(
-        '/api/lots/' + lot_id + '/',
-        {
-            'private': is_private,
-            'exhibition_code': code
-        },
-        'Privacidade de lote configurada com sucesso!'
-    );
-    $('#lot-privacy_form').modal('toggle');
+    if (type === 'product') {
+        url = '/api/addon/optionals/products/'+ id +'/'
+    }
+
+    if (!url) {
+        return;
+    }
+
+    var data = {'restrict_unique': true};
+    save_optional(url, data, 'Atividade configurada como restrita!');
+}
+
+function unset_restrict_unique(type, id) {
+
+    var url;
+    if (type === 'service') {
+        url = '/api/addon/optionals/services/'+ id +'/'
+    }
+
+    if (type === 'product') {
+        url = '/api/addon/optionals/products/'+ id +'/'
+    }
+
+    if (!url) {
+        return;
+    }
+
+    var data = {'restrict_unique': false};
+    save_optional(url, data, 'Atividade configurada como não-restrita!');
 }
 
 $(document).ready(function () {

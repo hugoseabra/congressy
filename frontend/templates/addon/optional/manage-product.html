@@ -4,9 +4,9 @@
 {% load base_tags %}
 {% load subscription_tags %}
 
-{% block title %} Opcionais | Congressy{% endblock %}
+{% block title %} Produtos / Serviços | Congressy{% endblock %}
 
-{% block page_title %}Opcionais{% endblock %}
+{% block page_title %}Produtos / Serviços{% endblock %}
 
 {% block page_sub_title %}
     {{ event.name }}
@@ -58,10 +58,10 @@
                 <div class="col-md-12">
                     <div class="buttonbar">
                         <div class="float-left">
-                            <a href="{% url 'addon:optional-add' event.pk %}"
+                            <a href="{% url 'addon:optional-product-add' event.pk %}"
                                 class="btn btn-success">
                                 <i class="fa fa-plus"></i>
-                                Novo Opcional
+                                Novo Produto / Serviço
                             </a>
                         </div>
                         <div class="clearfix"></div>

@@ -5,7 +5,7 @@ from .theme import (
     ThemeListView,
 )
 from .optional import (
-    OptionalAddView,
+    OptionalAddProductView,
     OptionalAddServiceView,
     OptionalProductDeleteView,
     OptionalProductListView,
