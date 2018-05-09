@@ -60,7 +60,8 @@
                                 <div><strong>Inscrição:</strong></div>
                                 <ul>
                                     {% if lot.price %}
-                                    <ol><strong>R$ {{ lot.price }}</strong></ol>
+                                        <ol><strong>R$ {{ lot.price }}</strong>
+                                        </ol>
                                     {% else %}
                                         <ol><strong>Grátis</strong></ol>
                                     {% endif %}
@@ -100,7 +101,7 @@
                                     </ul>
                                 {% endif %}
 
-                            <h4> Total: R$ {{ total }} </h4>
+                                <h4> Total: R$ {{ total }} </h4>
 
 
                             </div>
@@ -193,7 +194,37 @@
     <!-- SCRIPT PAGAR.ME -->
     <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
     <script src="{% static "hotsite/js/payment.js" %}"></script>
+    <script src="{% static "hotsite/js/pagarme_integration.js" %}"></script>
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
+
+
+    <script type="application/javascript">
+        (function ($) {
+            "use strict";
+
+            $(document).ready(function () {
+
+
+                window.setTimeout(function () {
+
+
+                    {% for product in products %}
+                        //id, name, quantity, tangible
+                        window.cgsy.pagarme.add_items_list({{ product.id }}, '{{ product.name }}',{{ product.price }}, 1, true);
+                    {% endfor %}
+
+
+                    console.log(window.cgsy.pagarme.get_list());
+
+
+
+                }, 300);
+            });
+
+        })(jQuery);
+    </script>
+
+
     <script>
 
         $(document).ready(function () {
