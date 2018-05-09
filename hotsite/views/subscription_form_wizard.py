@@ -592,9 +592,10 @@ class SubscriptionWizardView(SessionWizardView):
         """
         Verifica se código de exibição informado é válido para o evento.
         """
-        for lot in self.event.lots.filter(private=True):
-            if lot.exhibition_code.upper() == code.upper():
-                return True
+        if not code:
+            for lot in self.event.lots.filter(private=True):
+                if lot.exhibition_code.upper() == code.upper():
+                    return True
 
         return False
 
