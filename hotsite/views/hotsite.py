@@ -11,11 +11,33 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 
 from gatheros_event.models import Member, Organization
+from gatheros_subscription.models import Subscription
 from hotsite.views import SubscriptionFormMixin
 
 
 class HotsiteView(SubscriptionFormMixin, generic.View):
     template_name = 'hotsite/main.html'
+
+    has_private_subscription = False
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if 'has_private_subscription' in self.request.session:
+
+            subscription_id = self.request.session['has_private_subscription']
+
+            try:
+                Subscription.objects.get(pk=subscription_id, event=self.event)
+                self.has_private_subscription = True
+            except Subscription.DoesNotExist:
+                pass
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+        context['has_private_subscription'] = self.has_private_subscription
+        return context
 
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)

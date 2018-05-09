@@ -18,6 +18,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
     template_name = 'hotsite/subscription_status.html'
     person = None
     subscription = None
+    restart_private_event = False
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -39,6 +40,8 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
             if not request.user.is_authenticated or not self.person:
                 return redirect('public:hotsite', slug=self.event.slug)
 
+
+
             return response
 
         except Subscription.DoesNotExist:
@@ -59,6 +62,19 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         context['pagarme_key'] = settings.PAGARME_ENCRYPTION_KEY
         context['remove_preloader'] = True
         context['subscription'] = self.subscription
+        context['is_private_event'] = self.is_private_event()
+        context['lot_is_still_valid'] = False
+
+        lot = self.subscription.lot
+
+        if lot.private is True:
+            
+            if lot.status == lot.LOT_STATUS_RUNNING:
+                context['lot_is_still_valid'] = True
+                self.request.session['exhibition_code'] = lot.exhibition_code
+
+            self.request.session['has_private_subscription'] = \
+                str(self.subscription.pk)
 
         return context
 
@@ -140,5 +156,28 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
 
             except (Subscription.DoesNotExist, AttributeError):
                 pass
+
+        return False
+
+    def is_private_event(self):
+        """ Verifica se evento possui apenas lotes privados. """
+        public_lots = []
+        private_lots = []
+
+        for lot in self.event.lots.all():
+            if lot.private is True:
+                private_lots.append(lot.pk)
+                continue
+
+            if self.is_lot_publicly_available(lot):
+                public_lots.append(lot.pk)
+
+        return len(public_lots) == 0 and len(private_lots) > 0
+
+    @staticmethod
+    def is_lot_publicly_available(lot):
+
+        if lot.status == lot.LOT_STATUS_RUNNING and not lot.private:
+            return True
 
         return False

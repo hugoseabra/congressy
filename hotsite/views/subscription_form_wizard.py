@@ -168,6 +168,9 @@ class SubscriptionWizardView(SessionWizardView):
 
     def done(self, form_list, **kwargs):
 
+        if 'has_private_subscription' in self.request.session:
+            del self.request.session['has_private_subscription']
+
         if not hasattr(self.storage, 'person'):
             raise Exception('Não possuimos uma person no storage do wizard')
 
@@ -340,7 +343,7 @@ class SubscriptionWizardView(SessionWizardView):
             except Lot.DoesNotExist:
                 message = 'Não foi possivel resgatar um Lote ' \
                           'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot.pk, self.event)
+                    .format(lot_pk, self.event)
                 raise TypeError(message)
 
             survey_response = QueryDict('', mutable=True)
