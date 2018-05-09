@@ -115,16 +115,53 @@
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-left">
-                    <a href="{% url 'subscription:subscription-list' event.pk %}"
+                    <button onclick="window.href.location='{% url 'subscription:subscription-list' event.pk %}'"
                        class="btn btn-primary">
                         <i class="fa fa-arrow-circle-left"></i>
                         Fechar
-                    </a>
+                    </button>
+                </div>
+                <div class="float-right">
+                    <button
+                       class="btn btn-info btn-trans" title="Relatório financeiro">
+                        <i class="far fa-money-bill-alt"></i>
+                        Financeiro
+                    </button>
+                    <button
+                       class="btn btn-info btn-trans" title="Gerenciar boleto">
+                        <i class="fas fa-barcode"></i>
+                        Boleto
+                    </button>
+                    <button
+                       class="btn btn-info btn-trans" title="Enviar mensagem para participante">
+                        <i class="far fa-envelope"></i>
+                        Mensagem
+                    </button>
                 </div>
                 <div class="clearfix"></div>
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel" id="address-block-hidden">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Detalhes</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                asdf
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-xl-2 col-lg-3 col-md-3" style="margin-bottom: 4px;">
             <div class="panel panel-primary" id="block-profile">
