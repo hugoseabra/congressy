@@ -168,14 +168,14 @@
                 <div class="panel-body">
                     <div class="row">
                         {% if object.lot.category %}
-                        <div class="col-md-5">
+                        <div class="col-lg-12 col-xl-5">
                             <div class="form-group">
                                 <label>Categoria:</label>
                                 <div class="well well-sm">{{ object.lot.category.name }}</div>
                             </div>
                         </div>
                         {% endif %}
-                        <div class="col-md-7">
+                        <div class="col-lg-12 col-xl-7">
                             <div class="form-group">
                                 <label>Lote:</label>
                                 <div class="well well-sm">{{ object.lot.display_publicly }}</div>
@@ -199,39 +199,36 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label>E-mail:</label>
                                 <div class="well well-sm">{{ object.person.email }}</div>
                             </div>
                         </div>
-                        {% if config.phone %}
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Celular:</label>
                                 <div class="well well-sm">{{ object.person.phone|default:'-' }}</div>
                             </div>
                         </div>
-                        {% endif %}
                     </div>
+                    {% if config.address != config.ADDRESS_SHOW %}
                     <div class="row">
-
-                        {% if config.city and not config.address %}
-                        <div class="col-lg-3 col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label>Cidade:</label>
                                 <div class="well well-sm">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
                             </div>
                         </div>
-                        {% endif %}
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
     <div class="row">
-    {% if config.address %}
-        <div class="col-lg-6">
+        {% if config.address == config.ADDRESS_SHOW %}
+        <div class="col-lg-{% if config.institution_show or config.institution_cnpj_show or config.function_show %}6{% else %}12{% endif %}">
             <div class="panel" id="address-block-hidden">
                 <div class="panel-heading">
                     <h3 class="panel-title">Endereço <a href="#" onclick="show_block('#address-block-visible', '#address-block-hidden');return false;" class="btn btn-link" style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a></h3>
@@ -265,13 +262,13 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-12 col-xl-4">
                             <div class="form-group">
                                 <label>Bairro:</label>
                                 <div class="well well-sm">{{ object.person.village|default:'-' }}</div>
                             </div>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-12 col-xl-8">
                             <div class="form-group">
                                 <label>Cidade:</label>
                                 <div class="well well-sm">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
@@ -283,7 +280,7 @@
         </div>
         {% endif %}
         {% if config.institution_show or config.institution_cnpj_show or config.function_show %}
-        <div class="col-lg-6">
+        <div class="col-lg-{% if config.address == config.ADDRESS_SHOW %}6{% else %}12{% endif %}">
             <div class="panel" id="institution-block-hidden">
                 <div class="panel-heading">
                     <h3 class="panel-title">Dados Institucionais <a href="#" onclick="show_block('#institution-block-visible', '#institution-block-hidden');return false;" class="btn btn-link" style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a></h3>
