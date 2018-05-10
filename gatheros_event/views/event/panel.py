@@ -47,7 +47,11 @@ class EventPanelView(AccountMixin, DetailView):
         context['status'] = self._get_status()
         context['totals'] = self._get_payables()
         context['limit'] = self._get_limit()
+        context['has_paid_lots'] = self.has_paid_lots()
         context['gender'] = self._get_gender()
+        context['pending'] = self._get_number_pending()
+        context['has_inside_bar'] = True
+        context['active'] = 'panel'
         context['total_subscriptions'] = self._get_total_subscriptions()
         context['can_transfer'] = self._can_transfer
         context['can_change'] = self._can_change
@@ -62,8 +66,21 @@ class EventPanelView(AccountMixin, DetailView):
 
         return context
 
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+            price = lot.price
+            if price is None:
+                continue
+
+            if lot.price > 0:
+                return True
+
+        return False
+
     def _get_gender(self):
         return self.event.get_report()
+
     def _get_limit(self):
         return self.event.limit
 
@@ -194,3 +211,18 @@ class EventPanelView(AccountMixin, DetailView):
                 totals['pending'] += transaction.liquid_amount or Decimal(0.00)
 
         return totals
+
+    def _get_number_pending(self):
+
+        pending = 0
+
+        transactions = \
+            Transaction.objects.filter(Q(subscription__event=self.event) & (Q(
+                status=Transaction.PAID) | Q(
+                status=Transaction.WAITING_PAYMENT)))
+
+        for transaction in transactions:
+            if transaction.pending:
+                pending += 1 or 0
+
+        return pending

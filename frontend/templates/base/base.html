@@ -153,7 +153,6 @@
                  role="dialog" data-backdrop="false">
 
                 <div class="modal-dialog " role="document">
-
                     <div class="modal-content">
 
                         <div class="modal-header">
@@ -242,15 +241,61 @@
         {% endblock %}
     </header>
     <div class="row">
-        <div class="navbar-header">
-            <button type="button" class="sidebar-toggle navbar-toggle
-            collapsed" data-toggle="collapse" data-target="#sidebar"
-                    aria-expanded="false" style="z-index: 1000;text-align:
-                    right;width: 50px; ">
-                <i class="fas fa-bars"
-                   style="font-size: 30px;"></i>
+        <div class="float-right navbar-header">
+            <ul class="nav nav-pills">
+                {% if organization %}
 
-            </button>
+                    <li class="dropdown visible-xs"
+                        role="presentation"
+                        style="background-color: #F0F3F3; outline:
+                            none;">
+                        <a href="javascript:void(0);"
+                           class="dropdown-toggle"
+                           data-toggle="dropdown" style="outline: none">
+                                        <span class="meta"
+                                              style="color: black">
+                                            <span style="background-color: slategray;
+                       border-radius: 2px; font-size: 25px"
+                                                  class="text">
+                                                {{ organization.name|slice:"0:5"|upper }}
+                                            </span>
+                                            <span class="caret hidden-xs"></span>
+                                        </span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight "
+                            role="menu" style="min-width: 20px">
+
+                            <li>
+                                <a href="
+{% url 'event:organization-edit' organization.pk %}">
+                                    <i class="fas fa-list-alt"></i>
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li role="presentation">
+                                <button type="button"
+                                        class="btn  btn-sm btn-primary
+                                       btn-block"
+                                        role="menuitem" tabindex="-1"
+                                        data-toggle="modal"
+                                        data-target="#change_organization">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
+                <li role="presentation">
+                    <button type="button" class="sidebar-toggle navbar-toggle
+            collapsed" data-toggle="collapse" data-target="#sidebar"
+                            aria-expanded="false" style="text-align:
+                    right;width: 50px; ">
+                        <i class="fas fa-bars"
+                           style="font-size: 30px;"></i>
+
+                    </button>
+                </li>
+            </ul>
         </div>
 
         {% include "base/sidebar.html" %}
@@ -311,7 +356,8 @@
 <script src="{% static "assets/js/cgsy.js" %}"></script>
 
 <script type="application/javascript">
-    console.log("{{ organization.pk }}")
+    console.log("{{gender.women}}")
+        console.log("{{gender.men}}")
     $(document).ready(function () {
         $('.cgsy-date-input').mask("99/99/9999");
         $('.cgsy-time-input').mask("99:99");
