@@ -202,16 +202,21 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
             self.get_subscription_from_session()
             subscription = self.storage.subscription
 
-            context['lot'] = subscription.lot
-
             products = [x for x in SubscriptionProduct.objects.filter(
                 subscription=subscription)]
             services = [x for x in SubscriptionService.objects.filter(
                 subscription=subscription)]
 
-            context['products'] = products
+            lot = subscription.lot
+            if lot.allow_installment:
+                lot.allow_installment = 'true'
+            else:
+                lot.allow_installment = 'false'
+            lot.price = self.get_calculated_price(lot=lot, price=lot.price)
 
+            context['products'] = products
             context['services'] = services
+            context['lot'] = lot
 
             total = subscription.lot.price or 0.00
 
@@ -222,7 +227,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 total += service.optional_liquid_price
 
             context['total'] = total
-
             context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
         return context
@@ -297,10 +301,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                 'event': self.event,
                 'person': self.storage.person
             }
-
-            if hasattr(self.storage, 'product_storage'):
-                payment_initial.update(
-                    {'optional_products': self.storage.product_storage})
 
             return self.initial_dict.get(step, payment_initial)
 
@@ -596,7 +596,7 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
     def set_subscription_as_completed(self):
 
-        subscription = self.storage.subscription
+        subscription = self.get_subscription_from_session()
         new_subscription = self.request.session['is_new_subscription']
 
         subscription.completed = True
