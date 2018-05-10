@@ -1,15 +1,18 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.forms import ValidationError
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
+from addon.models import SubscriptionProduct, SubscriptionService
 from gatheros_event.models import Person, Event
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
@@ -27,26 +30,27 @@ FORMS = [
     ("lot", forms.LotsForm),
     ("person", forms.SubscriptionPersonForm),
     ("survey", forms.SurveyForm),
+    ("addon", forms.AddonForm),
     ("payment", forms.PaymentForm)
 ]
 
-TEMPLATES = {
-    "private_lot": "hotsite/private_lot_form.html",
-    "lot": "hotsite/lot_form.html",
-    "person": "hotsite/person_form.html",
-    "survey": "hotsite/survey_form.html",
-    "payment": "hotsite/payment_form.html"
-}
+TEMPLATES = {"private_lot": "hotsite/private_lot_form.html",
+             "lot": "hotsite/lot_form.html",
+             "person": "hotsite/person_form.html",
+             "survey": "hotsite/survey_form.html",
+             "addon": "hotsite/addon_form.html",
+             "payment": "hotsite/payment_form.html"}
 
 
 def is_paid_lot(wizard):
     """Return true if user opts for  a paid lot"""
 
     # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
-    if not cleaned_data:
-        cleaned_data = wizard.get_cleaned_data_for_step('lot') or {
-            'lots': 'none'}
+    if is_private(wizard):
+        cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
+    else:
+        cleaned_data = wizard.get_cleaned_data_for_step('lot') or \
+                       {'lots': 'none'}
 
     # Return true if lot has price and price > 0
     if cleaned_data:
@@ -63,8 +67,9 @@ def has_survey(wizard):
     """ Return true if user opts for a lot with survey"""
 
     # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
-    if not cleaned_data:
+    if is_private(wizard):
+        cleaned_data = wizard.get_cleaned_data_for_step('private_lot')
+    else:
         cleaned_data = wizard.get_cleaned_data_for_step('lot') or {
             'lots': 'none'}
 
@@ -82,17 +87,32 @@ def has_survey(wizard):
 
 
 def is_private(wizard):
-    if wizard.is_private_lot():
+    if wizard.has_only_private_lots():
         return True
 
     return False
 
 
 def is_not_private(wizard):
-    if wizard.is_private_lot():
+    if wizard.has_only_private_lots():
         return False
 
     return True
+
+
+def has_addons(wizard):
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+
+    # Return true if lot has price and price > 0
+    lot = cleaned_data['lots']
+
+    if isinstance(lot, Lot) and lot.category:
+        if lot.category.service_optionals.count() or \
+                lot.category.product_optionals.count():
+            return True
+
+    return False
 
 
 class SubscriptionWizardView(SessionWizardView):
@@ -100,8 +120,10 @@ class SubscriptionWizardView(SessionWizardView):
         'private_lot': is_private,
         'lot': is_not_private,
         'payment': is_paid_lot,
-        'survey': has_survey
+        'survey': has_survey,
+        'addon': has_addons
     }
+
     event = None
 
     def dispatch(self, request, *args, **kwargs):
@@ -117,7 +139,7 @@ class SubscriptionWizardView(SessionWizardView):
         if not isinstance(user, User):
             return redirect('public:hotsite', slug=self.event.slug)
 
-        if self.is_private_lot() and not self.has_previous_valid_code():
+        if self.has_only_private_lots() and not self.has_previous_valid_code():
             messages.error(
                 request,
                 "Você deve informar um código válido para se inscrever neste"
@@ -133,7 +155,7 @@ class SubscriptionWizardView(SessionWizardView):
         context = super().get_context_data(**kwargs)
         context['remove_preloader'] = True
         context['event'] = self.event
-        context['is_private'] = self.is_private_lot()
+        context['is_private'] = self.has_only_private_lots()
 
         if self.storage.current_step == 'private_lot':
             code = self.request.session.get('exhibition_code')
@@ -145,7 +167,39 @@ class SubscriptionWizardView(SessionWizardView):
         if self.storage.current_step == 'lot':
             context['has_coupon'] = self.has_coupon()
 
+        if self.storage.current_step == 'addon':
+            self.get_subscription_from_session()
+            context['subscription'] = self.storage.subscription.pk
+
         if self.storage.current_step == 'payment':
+            self.get_subscription_from_session()
+            subscription = self.storage.subscription
+
+            products = [x for x in SubscriptionProduct.objects.filter(
+                subscription=subscription)]
+            services = [x for x in SubscriptionService.objects.filter(
+                subscription=subscription)]
+
+            lot = subscription.lot
+            if lot.allow_installment:
+                lot.allow_installment = 'true'
+            else:
+                lot.allow_installment = 'false'
+            lot.price = self.get_calculated_price(lot=lot, price=lot.price)
+
+            context['products'] = products
+            context['services'] = services
+            context['lot'] = lot
+
+            total = subscription.lot.price or 0.00
+
+            for product in products:
+                total += product.optional_liquid_price
+
+            for service in services:
+                total += service.optional_liquid_price
+
+            context['total'] = total
             context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
 
         if self.storage.current_step == 'person':
@@ -173,68 +227,19 @@ class SubscriptionWizardView(SessionWizardView):
 
     def done(self, form_list, **kwargs):
 
-        if 'has_private_subscription' in self.request.session:
-            del self.request.session['has_private_subscription']
+        if not hasattr(self.storage, 'subscription'):
+            self.get_subscription_from_session()
 
-        if not hasattr(self.storage, 'person'):
-            raise Exception('Não possuimos uma person no storage do wizard')
+        subscription = self.storage.subscription
 
-        lot_pk = None
-        private_lot_data = self.storage.get_step_data('private_lot')
-        lot_data = self.storage.get_step_data('lot')
-
-        if private_lot_data is not None:
-            lot_pk = private_lot_data.get('private_lot-lots')
-        elif lot_data is not None:
-            lot_pk = lot_data.get('lot-lots')
-
-        if not lot_pk:
-            raise AttributeError('Não foi possivel pegar uma referencia '
-                                 'de lote.')
-
-        # Get a lot object.
-        if not isinstance(lot_pk, Lot):
-            try:
-                lot = Lot.objects.get(pk=lot_pk, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot_pk, self.event)
-                raise TypeError(message)
-
-        new_subscription = False
-        new_account = self.request.user.last_login is None
-
-        try:
-            subscription = Subscription.objects.get(
-                person=self.storage.person,
-                event=self.event
-            )
-        except Subscription.DoesNotExist:
-            subscription = Subscription(
-                person=self.storage.person,
-                event=self.event,
-                created_by=self.request.user.id
-            )
-            new_subscription = True
-
-        # Insere ou edita lote
-        subscription.lot = lot
-        if not lot.price or lot.price == 0:
-
-            subscription.status = Subscription.CONFIRMED_STATUS
-
-            if new_account and new_subscription:
-                notify_new_user_and_free_subscription(self.event, subscription)
-            else:
-                notify_new_free_subscription(self.event, subscription)
-
-        subscription.save()
+        self.set_subscription_as_completed()
 
         messages.success(
             self.request,
             'Inscrição realizada com sucesso!'
         )
+
+        self.clear_session()
 
         if subscription.lot.price and subscription.lot.price > 0:
             return HttpResponseRedirect(reverse_lazy(
@@ -281,48 +286,56 @@ class SubscriptionWizardView(SessionWizardView):
             })
 
         if step == 'payment':
+
             # Assert that we have a person in storage
-            if not hasattr(self.storage, 'person'):
-
-                try:
-                    person = Person.objects.get(user=self.request.user)
-                except Person.DoesNotExist:
-                    raise Exception('User com email {} não possui '
-                                    'person'.format(self.request.user.email))
-
-                self.storage.person = person
-
-            lot_pk = None
-            private_lot_data = self.storage.get_step_data('private_lot')
-            lot_data = self.storage.get_step_data('lot')
-
-            if private_lot_data is not None:
-                lot_pk = private_lot_data.get('private_lot-lots')
-            elif lot_data is not None:
-                lot_pk = lot_data.get('lot-lots')
-
-            if not lot_pk:
-                raise AttributeError('Não foi possivel pegar uma referencia '
-                                     'de lote.')
-
-            lot = Lot.objects.get(pk=lot_pk, event=self.event)
+            if not hasattr(self.storage, 'subscription'):
+                self.get_subscription_from_session()
 
             return self.initial_dict.get(step, {
-                'choosen_lot': lot,
+                'choosen_lot': self.storage.subscription.lot,
                 'event': self.event,
-                'person': self.storage.person
+                'person': self.storage.subscription.person
             })
-
-        return self.initial_dict.get(step, {})
 
     def process_step(self, form):
 
         form_data = self.get_form_step_data(form)
 
+        # Creating a subscription.
+        if isinstance(form, forms.LotsForm) or \
+                isinstance(form, forms.PrivateLotForm):
+
+            person = Person.objects.get(user=self.request.user)
+            lot = form.cleaned_data.get('lots')
+
+            self.request.session['is_new_subscription'] = False
+
+            try:
+                subscription = Subscription.objects.get(
+                    person=person,
+                    event=self.event
+                )
+                subscription.lot = lot
+                subscription.save()
+            except Subscription.DoesNotExist:
+                subscription = Subscription.objects.create(
+                    person=person,
+                    event=self.event,
+                    lot=lot,
+                    created_by=person.user.pk
+                )
+
+                self.request.session['is_new_subscription'] = True
+
+            self.request.session['subscription'] = str(subscription.pk)
+
+            self.storage.subscription = subscription
+
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
-            person = form.save()
-            self.storage.person = person
+            self.storage.person = form.save()
+            if not is_paid_lot(self):
+                self.set_subscription_as_completed()
 
         # Persisting survey
         if isinstance(form, forms.SurveyForm):
@@ -330,26 +343,11 @@ class SubscriptionWizardView(SessionWizardView):
             survey_director = SurveyDirector(event=self.event,
                                              user=self.request.user)
 
-            lot_pk = None
-            private_lot_data = self.storage.get_step_data('private_lot')
-            lot_data = self.storage.get_step_data('lot')
+            # Assert that we have a person in storage
+            if not hasattr(self.storage, 'subscription'):
+                self.get_subscription_from_session()
 
-            if private_lot_data is not None:
-                lot_pk = private_lot_data.get('private_lot-lots')
-            elif lot_data is not None:
-                lot_pk = lot_data.get('lot-lots')
-
-            if not lot_pk:
-                raise AttributeError('Não foi possivel pegar uma referencia '
-                                     'de lote.')
-
-            try:
-                lot = Lot.objects.get(pk=lot_pk, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot_pk, self.event)
-                raise TypeError(message)
+            lot = self.storage.subscription.lot
 
             survey_response = QueryDict('', mutable=True)
             for form_question, form_response in form_data.items():
@@ -367,6 +365,9 @@ class SubscriptionWizardView(SessionWizardView):
 
             if survey_form.is_valid():
                 survey_form.save_answers()
+
+                if not is_paid_lot(self):
+                    self.set_subscription_as_completed()
             else:
                 raise Exception('SurveyForm was invalid: {}'.format(
                     survey_form.errors))
@@ -381,29 +382,8 @@ class SubscriptionWizardView(SessionWizardView):
                     person = Person.objects.get(user=self.request.user)
                     self.storage.person = person
 
-                lot_pk = None
-                private_lot_data = self.storage.get_step_data('private_lot')
-                lot_data = self.storage.get_step_data('lot')
-
-                if private_lot_data is not None:
-                    lot_pk = private_lot_data.get('private_lot-lots')
-                elif lot_data is not None:
-                    lot_pk = lot_data.get('lot-lots')
-
-                if not lot_pk:
-                    raise AttributeError(
-                        'Não foi possivel pegar uma referencia '
-                        'de lote.')
-
-                # Get a lot object.
-                if not isinstance(lot_pk, Lot):
-                    try:
-                        lot = Lot.objects.get(pk=lot_pk, event=self.event)
-                    except Lot.DoesNotExist:
-                        message = 'Não foi possivel resgatar um Lote ' \
-                                  'a partir das referencias: lot<{}> e evento<{}>.' \
-                            .format(lot_pk, self.event)
-                        raise TypeError(message)
+                if not hasattr(self.storage, 'subscription'):
+                    self.get_subscription_from_session()
 
                 try:
                     subscription = Subscription.objects.get(
@@ -419,20 +399,19 @@ class SubscriptionWizardView(SessionWizardView):
 
                 try:
                     with transaction.atomic():
-                        # Insere ou edita lote
-                        subscription.lot = lot
-                        subscription.save()
 
                         transaction_data = PagarmeTransactionInstanceData(
-                            subscription=subscription,
+                            subscription=self.storage.subscription,
                             extra_data=form_data,
-                            event=self.event
                         )
 
                         create_pagarme_transaction(
                             transaction_data=transaction_data,
-                            subscription=subscription
+                            subscription=self.storage.subscription,
                         )
+
+                        self.storage.subscription.completed = True
+                        self.storage.subscription.save()
 
                 except TransactionError as e:
                     error_dict = {
@@ -475,23 +454,17 @@ class SubscriptionWizardView(SessionWizardView):
 
         if step == 'person':
 
-            lot_pk = None
-            private_lot_data = self.storage.get_step_data('private_lot')
-            lot_data = self.storage.get_step_data('lot')
+            # Assert that we have a person in storage
+            if not hasattr(self.storage, 'subscription'):
+                self.get_subscription_from_session()
 
-            if private_lot_data is not None:
-                lot_pk = private_lot_data.get('private_lot-lots')
-            elif lot_data is not None:
-                lot_pk = lot_data.get('lot-lots')
+            lot = self.storage.subscription.lot
 
-            if not lot_pk:
-                raise AttributeError('Não foi possivel pegar uma referencia '
-                                     'de lote.')
-
-            lot = Lot.objects.get(pk=lot_pk, event=self.event)
-
-            kwargs.update({'user': self.request.user, 'lot': lot, 'event':
-                self.event})
+            kwargs.update({
+                'user': self.request.user,
+                'lot': lot,
+                'event': self.event,
+                'initial': self.storage.subscription.person})
 
         if step == 'survey':
             kwargs.update({'user': self.request.user, 'event': self.event})
@@ -574,6 +547,23 @@ class SubscriptionWizardView(SessionWizardView):
 
         return self.render(form)
 
+    def get_subscription_from_session(self):
+
+        if not hasattr(self.storage, 'subscription'):
+
+            if 'subscription' not in self.request.session:
+                raise Exception('Não possuimos uma subscription '
+                                'no storage do wizard')
+
+            subscription_pk = self.request.session['subscription']
+
+            try:
+                self.storage.subscription = Subscription.objects.get(
+                    pk=subscription_pk)
+            except Subscription.DoesNotExist:
+                raise Exception('Inscrição salva dentro da session não é '
+                                'valida.')
+
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
         for lot in self.event.lots.all():
@@ -595,7 +585,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         return False
 
-    def is_private_lot(self):
+    def has_only_private_lots(self):
         """ Verifica se evento possui apenas lotes privados. """
         public_lots = []
         private_lots = []
@@ -644,3 +634,55 @@ class SubscriptionWizardView(SessionWizardView):
             return True
 
         return False
+
+    def clear_session(self):
+        keys_to_be_cleared = [
+            'subscription'
+        ]
+
+        for key in keys_to_be_cleared:
+            del self.request.session[key]
+
+    def set_subscription_as_completed(self):
+
+        if not self.storage.subscription:
+            self.get_subscription_from_session()
+
+        subscription = self.storage.subscription
+        new_subscription = self.request.session['is_new_subscription']
+
+        subscription.completed = True
+        new_account = self.request.user.last_login is None
+        lot = subscription.lot
+
+        if not lot.price or lot.price == 0:
+
+            subscription.status = Subscription.CONFIRMED_STATUS
+
+            if new_account and new_subscription:
+                notify_new_user_and_free_subscription(self.event, subscription)
+            else:
+                notify_new_free_subscription(self.event, subscription)
+
+        subscription.save()
+
+    def get_calculated_price(self, price, lot):
+        """
+        Resgata o valor calculado do preço do opcional de acordo com as regras
+        da Congressy.
+        """
+        if price is None:
+            return 0
+
+        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent = \
+            Decimal(self.event.congressy_percent) / 100
+
+        congressy_amount = price * congressy_plan_percent
+        if congressy_amount < minimum:
+            congressy_amount = minimum
+
+        if lot.transfer_tax is True:
+            return round(price + congressy_amount, 2)
+
+        return round(price, 2)
