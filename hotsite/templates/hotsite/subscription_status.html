@@ -163,9 +163,32 @@
                             {#                            {% endif %}#}
 
 
-                            <a href="{% url 'public:hotsite-subscription' event.slug %}"
-                               class="btn btn-success btn-xs">Novo pagamento
-                            </a>
+                            {% if is_private_event %}
+
+                                {% if lot_is_still_valid %}
+
+                                    <a href="{% url 'public:hotsite-subscription' event.slug %}"
+                                       class="btn btn-success btn-xs">Novo
+                                        pagamento
+                                    </a>
+                                {% else %}
+
+                                    <a href="{% url 'public:hotsite' event.slug %}"
+                                       class="btn btn-success btn-xs">Novo
+                                        pagamento
+                                    </a>
+
+                                {% endif %}
+
+                            {% else %}
+
+                                <a href="{% url 'public:hotsite-subscription' event.slug %}"
+                                   class="btn btn-success btn-xs">Novo
+                                    pagamento
+                                </a>
+
+                            {% endif %}
+
                             </div>
                         </div>
                     </div>

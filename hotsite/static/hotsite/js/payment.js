@@ -8,14 +8,14 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
 
     var has_raven = window.hasOwnProperty('Raven');
 
-    raven.trigger = function(msg) {
+    raven.trigger = function (msg) {
         console.error(msg);
         if (has_raven) {
             window.Raven.captureException(msg);
         }
     };
 
-    raven.show_report_dialog = function() {
+    raven.show_report_dialog = function () {
         if (has_raven) {
             window.Raven.showReportDialog();
         }
@@ -62,8 +62,14 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
         max_installments = num;
     };
 
-    payment.set_free_rate_installments = function(num) {
-        free_rate_installments = parseInt(num);
+    payment.set_free_rate_installments = function (num) {
+
+        num = parseInt(num);
+        if (num > MAX_INSTALLMENTS) {
+            num = MAX_INSTALLMENTS;
+        }
+
+        free_rate_installments = num;
     };
 
     payment.add_item = function(type, id, title, quantity, amount) {
@@ -101,7 +107,14 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
         };
 
         if (allow_installment) {
-            params['maxInstallments'] = parseInt(max_installments) || MAX_INSTALLMENTS;
+
+            var max_installments = parseInt(max_installments);
+
+            if (max_installments > MAX_INSTALLMENTS) {
+                max_installments = MAX_INSTALLMENTS;
+            }
+
+            params['maxInstallments'] = max_installments;
 
             if (free_rate_installments) {
                 params['freeInstallments'] = parseInt(free_rate_installments);
@@ -113,7 +126,7 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
 
 })(jQuery, window.cgsy.payment, window.cgsy.raven);
 
-(function($, payment_form, raven) {
+(function ($, payment_form, raven) {
     "use strict";
 
     var _hide_payment_elements = function () {
@@ -170,10 +183,10 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
 
 })(jQuery, window.cgsy.payment_form, window.cgsy.raven);
 
-(function($, payment, payment_form, pagarme, PagarMeCheckout) {
+(function ($, payment, payment_form, pagarme, PagarMeCheckout) {
     "use strict";
 
-    pagarme.process_payment = function(encryption_key) {
+    pagarme.process_payment = function (encryption_key) {
 
         var checkout = new PagarMeCheckout.Checkout({
             encryption_key: encryption_key,

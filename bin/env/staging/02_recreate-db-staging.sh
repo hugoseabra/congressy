@@ -30,7 +30,8 @@ function error_msg() {
 
 function update_postgres_service() {
     docker-compose -f ./bin/env/docker-compose.yml up -d
-    sleep 10
+    sleep 25
+    docker logs cgsy-postgres
 
     local RUNNING=$(docker inspect -f {{.State.Running}} cgsy-postgres)
     if [ "$RUNNING" == "false" ]; then

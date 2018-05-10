@@ -15,7 +15,9 @@ docker-compose -f $BASE_DIR/bin/env/docker-compose.yml down --remove-orphans
 sleep 1
 
 docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
-sleep 8
+sleep 25
+docker logs cgsy-postgres
+
 
 # Removes previous media files
 rm -rf $BASE_DIR/media/*

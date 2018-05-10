@@ -92,12 +92,16 @@ class PersonForm(forms.ModelForm):
         uf = None
 
         instance = kwargs.get('instance')
+        initial = kwargs.get('initial')
+
+        if not initial:
+            initial = {}
+
         if instance:
             if instance.city:
                 uf = instance.city.uf
 
-        if 'initial' in kwargs and uf:
-            initial = kwargs.get('initial')
+        if uf:
             initial.update({'state': uf})
             kwargs.update({'initial': initial})
 
@@ -117,6 +121,11 @@ class PersonForm(forms.ModelForm):
 
         if zip_code:
             zip_code = clear_string(zip_code)
+            if len(zip_code) != 8:
+                raise forms.ValidationError(
+                    'O CEP deve não está correto. Verifique a quantidade de'
+                    ' caracteres.'
+                )
 
         return zip_code
 

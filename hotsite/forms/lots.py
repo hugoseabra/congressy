@@ -19,8 +19,8 @@ class LotFormModelChoiceField(ModelChoiceField):
 
 
 class LotsForm(forms.Form):
-    def __init__(self, **kwargs):
-        self.event = kwargs.get('initial').get('event')
+    def __init__(self, event, **kwargs):
+        self.event = event
         super().__init__(**kwargs)
 
         self.fields['lots'] = LotFormModelChoiceField(
