@@ -117,11 +117,12 @@
             <div class="col-md-6">
                 <div class="panel panel-solid-success widget-mini">
                     <div class="panel-body">
-                        <i class="icon-bar-chart"></i>
+                        <i class="icon-envelope-open"></i>
                         <span class="total text-center">
-                            R$ {{ totals.total|money_divide|intcomma }}
+                            R$ {{ totals.paid|money_divide|intcomma }}
                         </span>
-                        <span class="title text-center">Total</span>
+                        <span class="title text-center">Saldo das
+                            inscrições pagas</span>
                     </div>
                 </div>
             </div>
@@ -132,7 +133,7 @@
                         <span class="total text-center">
                              R$ {{ totals.pending|money_divide|intcomma }}
                         </span>
-                        <span class="title text-center">Aguardando
+                        <span class="title text-center">Pendentes de
                             pagamento</span>
                     </div>
                 </div>
@@ -140,12 +141,12 @@
             <div class="col-md-6">
                 <div class="panel widget-mini">
                     <div class="panel-body">
-                        <i class="icon-envelope-open"></i>
+                        <i class="icon-bar-chart"></i>
                         <span class="total text-center">
-                            R$ {{ totals.paid|money_divide|intcomma }}
+                            R$ {{ totals.total|money_divide|intcomma }}
                         </span>
-                        <span class="title text-center">Disponíveis
-                            para saque</span>
+                        <span class="title text-center">Potencial de
+                            faturamento atual</span>
                     </div>
                 </div>
             </div>
@@ -154,7 +155,7 @@
                     <div class="panel-body">
                         <i class="icon-envelope-open"></i>
                         <span class="total text-center">
-                            {{ pending }}
+                            {{ pending }} / {{ total_subscriptions }}
                         </span>
                         <span class="title text-center">Número de
                             inscrições pendentes</span>
@@ -181,7 +182,7 @@
                         </span>
 
                     {% else %}
-                        <canvas width="260" height="150" id="gauge"
+                        <canvas width="260" height="125" id="gauge"
                                 class=""></canvas>
                         <div class="goal-wrapper">
                             <span class="gauge-value pull-left"></span>
