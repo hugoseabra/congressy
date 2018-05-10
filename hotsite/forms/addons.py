@@ -6,5 +6,9 @@
 from django import forms
 
 
-class AddonForm(forms.Form):
+class ProductForm(forms.Form):
+    pass
+
+
+class ServiceForm(forms.Form):
     pass

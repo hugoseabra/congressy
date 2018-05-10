@@ -30,7 +30,8 @@ FORMS = [
     ("lot", forms.LotsForm),
     ("person", forms.SubscriptionPersonForm),
     ("survey", forms.SurveyForm),
-    ("addon", forms.AddonForm),
+    ("service", forms.ServiceForm),
+    ("product", forms.ProductForm),
     ("payment", forms.PaymentForm)
 ]
 
@@ -38,7 +39,8 @@ TEMPLATES = {"private_lot": "hotsite/private_lot_form.html",
              "lot": "hotsite/lot_form.html",
              "person": "hotsite/person_form.html",
              "survey": "hotsite/survey_form.html",
-             "addon": "hotsite/addon_form.html",
+             "service": "hotsite/service_form.html",
+             "product": "hotsite/product_form.html",
              "payment": "hotsite/payment_form.html"}
 
 
@@ -100,7 +102,7 @@ def is_not_private(wizard):
     return True
 
 
-def has_addons(wizard):
+def has_products(wizard):
     # Get cleaned data from lots step
     cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
 
@@ -115,13 +117,29 @@ def has_addons(wizard):
     return False
 
 
+def has_services(wizard):
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+
+    # Return true if lot has price and price > 0
+    lot = cleaned_data['lots']
+
+    if isinstance(lot, Lot) and lot.category:
+        if lot.category.service_optionals.count() or \
+                lot.category.service_optionals.count():
+            return True
+
+    return False
+
+
 class SubscriptionWizardView(SessionWizardView):
     condition_dict = {
         'private_lot': is_private,
         'lot': is_not_private,
         'payment': is_paid_lot,
         'survey': has_survey,
-        'addon': has_addons
+        'service': has_services,
+        'product': has_products,
     }
 
     event = None
@@ -167,7 +185,8 @@ class SubscriptionWizardView(SessionWizardView):
         if self.storage.current_step == 'lot':
             context['has_coupon'] = self.has_coupon()
 
-        if self.storage.current_step == 'addon':
+        if self.storage.current_step == 'product' or  \
+                self.storage.current_step == 'service':
             self.get_subscription_from_session()
             context['subscription'] = self.storage.subscription.pk
 
