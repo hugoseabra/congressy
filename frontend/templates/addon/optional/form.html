@@ -1,0 +1,274 @@
+{% extends "base/base.html" %}
+{% load l10n static event_tags  base_tags  widget_tweaks form_config_tags %}
+{% load humanize %}
+{% load subscription_tags %}
+
+{% block title %}
+    {% if object %}Editar{% else %}Novo{% endif %} Opcional | Congressy
+{% endblock %}
+
+{% block page_title %}
+    {% if object %}Editar{% else %}Novo{% endif %} Opcional
+{% endblock %}
+
+{% block page_sub_title %}
+    {% if form_title %}
+        {{ form_title }}
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+    <script src="{% static "assets/js/price-format.min.js" %}"></script>
+    <script type="application/javascript">
+
+        (function ($) {
+
+            function create_events() {
+                $('#id_optional_kind').on('change', function() {
+                    show_optional_type();
+                    show_hide_schedule_dates();
+                    show_hide_theme();
+                    hide_show_restrict_unique();
+                });
+            }
+
+            function show_optional_type() {
+                var kind = $('#id_optional_kind');
+                if (kind.val() === 'product') {
+                    $('#id_optional_product_type').parent().parent().fadeIn();
+                    $('#id_optional_product_type').removeAttr('disabled');
+
+                    $('#id_optional_service_type').parent().parent().hide();
+                    $('#id_optional_service_type').attr('disabled', '');
+                } else if (kind.val() === 'service') {
+                    $('#id_optional_product_type').parent().parent().hide();
+                    $('#id_optional_product_type').attr('disabled', '');
+
+                    $('#id_optional_service_type').parent().parent().fadeIn();
+                    $('#id_optional_service_type').removeAttr('disabled');
+                }
+            }
+
+            function show_hide_schedule_dates() {
+                var el = $('#schedule-dates');
+                var kind = $('#id_optional_kind');
+                var schedule_start_el0 = $('#id_schedule_start_0');
+                var schedule_start_el1 = $('#id_schedule_start_1');
+                var schedule_end_el0 = $('#id_schedule_end_0');
+                var schedule_end_el1 = $('#id_schedule_end_1');
+                if (kind.val() === 'product') {
+                    el.hide();
+
+                    schedule_start_el0.attr('disabled', '');
+                    schedule_start_el1.attr('disabled', '');
+                    schedule_end_el0.attr('disabled', '');
+                    schedule_end_el1.attr('disabled', '');
+
+                } else if (kind.val() === 'service') {
+                    el.fadeIn();
+
+                    schedule_start_el0.removeAttr('disabled');
+                    schedule_start_el1.removeAttr('disabled');
+                    schedule_end_el0.removeAttr('disabled');
+                    schedule_end_el1.removeAttr('disabled');
+                }
+            }
+
+            function show_hide_theme() {
+                var kind = $('#id_optional_kind');
+                var theme_el = $('#id_theme');
+                var el = theme_el.parent().parent();
+
+                if (kind.val() === 'product') {
+                    el.hide();
+                    theme_el.attr('disabled', '');
+                } else if (kind.val() === 'service') {
+                    el.fadeIn();
+                    theme_el.removeAttr('disabled');
+                }
+            }
+
+            function hide_show_restrict_unique() {
+                var el = $('#restrict_unique_row');
+                var kind = $('#id_optional_kind');
+
+                if (kind.val() === 'product') {
+                    app.switcheryElements['id_restrict_unique'].disable();
+                    el.fadeOut();
+                } else if (kind.val() === 'service') {
+                    app.switcheryElements['id_restrict_unique'].enable();
+                    el.fadeIn();
+                }
+            }
+
+            $(document).ready(function () {
+                {% if LANGUAGE_CODE == 'pt-br' or LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
+                    $('#id_date_end_sub_0').mask("99/99/9999");
+                    $('#id_schedule_start_0').mask("99/99/9999");
+                    $('#id_schedule_end_0').mask("99/99/9999");
+                {% else %}
+                    $('#id_date_end_sub_0').mask("9999-99-99");
+                    $('#id_schedule_start_0').mask("9999-99-99");
+                    $('#id_schedule_end_0').mask("9999-99-99");
+                {% endif %}
+
+                $('#id_date_end_sub_1').mask("99:99");
+                $('#id_schedule_start_1').mask("99:99");
+                $('#id_schedule_end_1').mask("99:99");
+                $('#id_price').mask('#.##0,00', {reverse: true});
+
+                create_events();
+                show_optional_type();
+                show_hide_schedule_dates();
+                show_hide_theme();
+                hide_show_restrict_unique();
+            });
+
+        })(jQuery);
+    </script>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    {% include 'addon/optional/includes/side-menu.html' %}
+{% endblock %}
+
+{% block content %}
+
+    <form action="" method="post" class="form-horizontal form-border"
+          role="form" name="optional_form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <a href="{% url 'addon:optional-service-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>
+                            Cancelar
+                        </a>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Dados principais
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-11">
+                                {% render_generic_field form.name autofocus=True %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-11">
+                                {% render_generic_field form.lot_category %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-5 col-lg-6 col-md-6">
+                                {% render_generic_field form.optional_kind %}
+                            </div>
+                            <div class="col-xl-5 col-lg-5 col-md-5">
+                                {% render_generic_field form.optional_product_type required=True hide=True %}
+                                {% render_generic_field form.optional_service_type required=True hide=True %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-11">
+                            </div>
+                        </div>
+                        <div class="row" id="schedule-dates" style="display:none">
+                            <div class="col-xl-5 col-lg-6 col-md-6">
+                                {% render_generic_field form.schedule_start required=True %}
+                            </div>
+                            <div class="col-xl-5 col-lg-5 col-md-5">
+                                {% render_generic_field form.schedule_end required=True %}
+                            </div>
+                        </div>
+                        <div class="row" id="restrict_unique_row">
+                            <div class="col-md-12">
+                                {% render_switchery_field form.restrict_unique %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xl-5 col-lg-6 col-md-6">
+                                {% render_generic_field form.date_end_sub %}
+                            </div>
+                            <div class="col-xl-5 col-lg-5 col-md-5">
+                                {% render_generic_field form.theme hide=True %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-11">
+                                {% render_generic_field form.description %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
+                {% if object.subscription_services.count > 0 or object.subscription_products.count > 0 and not object.price %}
+                {% else %}
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                Custos e taxas
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    {% render_generic_field form.price %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+                        <a href="{% url 'addon:optional-service-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

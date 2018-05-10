@@ -1,0 +1,29 @@
+[
+  {
+    "model": "addon.theme",
+    "pk": 1,
+    "fields": {
+      "name": "DiRoma Exclusive",
+      "event": 9,
+      "limit": 1
+    }
+  },
+  {
+    "model": "addon.theme",
+    "pk": 2,
+    "fields": {
+      "name": "Termas DiRoma",
+      "event": 9,
+      "limit": 1
+    }
+  },
+  {
+    "model": "addon.theme",
+    "pk": 3,
+    "fields": {
+      "name": "Vilas DiRoma",
+      "event": 9,
+      "limit": 1
+    }
+  }
+]

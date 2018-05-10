@@ -1,8 +1,8 @@
 from kanu_locations.models import City
 from rest_framework import serializers
 
-from gatheros_event.models import Person
-from gatheros_subscription.models import Subscription
+from gatheros_event.models import Person, Event
+from gatheros_subscription.models import Subscription, Lot
 
 
 class SerializerDinamicField(serializers.Field):
@@ -43,6 +43,25 @@ class PersonExportSerializer(serializers.ModelSerializer):
             'gender',
             'city',
         )
+
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = (
+            'id',
+            'name',
+            'date_start',
+            'date_end',
+        )
+
+
+class LotSerializer(serializers.ModelSerializer):
+    event = EventSerializer()
+
+    class Meta:
+        model = Lot
+        fields = '__all__'
 
 
 class SubscriptionExportSerializer(serializers.ModelSerializer):

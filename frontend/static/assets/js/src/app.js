@@ -8,6 +8,7 @@
             navToggleSub();
             profileToggle();
             switcheryToggle();
+            tooltips();
             icheckStart();
         });
 
@@ -98,12 +99,21 @@
             }
         };
 
+        //tooltips
+        var tooltips = function() {
+            $('.tooltip-wrapper').tooltip({
+                selector: "[data-toggle=tooltip]",
+                container: "body"
+            })
+        };
+
         //return functions
         return {
             'setSwitchery': setSwitchery,
             'disableSwitchery': enableDisableSwitchery,
             'switcheryToggle': switcheryToggle,
-            'switcheryElements': switcheryElements
+            'switcheryElements': switcheryElements,
+            'tooltips': tooltips
         };
     }();
 

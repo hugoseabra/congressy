@@ -11,6 +11,7 @@ from gatheros_event.models import Event, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot, EventSurvey
+from core.views.mixins import TemplateNameableMixin
 
 
 class BaseLotView(AccountMixin, View):
@@ -84,7 +85,7 @@ class BaseFormLotView(BaseLotView, generic.FormView):
     def get_initial(self):
         # noinspection PyUnresolvedReferences
         initial = super(BaseFormLotView, self).get_initial()
-        initial['event'] = self.event
+        initial['event'] = self.event.pk
 
         return initial
 
@@ -112,24 +113,70 @@ class BaseFormLotView(BaseLotView, generic.FormView):
         return kwargs
 
 
-class LotListView(BaseLotView, generic.ListView):
+class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
     """Lista de lotes de acordo com o evento do contexto"""
-    model = Lot
-    # template_name = 'gatheros_subscription/lot/list.html'
-    template_name = 'lot/list.html'
-    ordering = ['name']
+    template_name = 'lot/manage.html'
+    queryset = Lot.objects.filter(category__isnull=True).order_by(
+        'date_start',
+        'date_end'
+    )
 
     def get_queryset(self):
         """Lotes a exibir são de acordo com o evento e não-interno"""
         query_set = super(LotListView, self).get_queryset()
-        return query_set.filter(event=self.event, internal=False)
+        return query_set.filter(event=self.event, internal=False).order_by(
+            'date_start', 'date_end'
+        )
 
     def get_context_data(self, **kwargs):
         context = super(LotListView, self).get_context_data(**kwargs)
         context['event'] = self.event
         context['can_add'] = self._can_add
+        context['subscription_stats'] = self.get_subscription_stats()
+        context['full_banking'] = self._get_full_banking()
+        context['exhibition_code'] = Lot.objects.generate_exhibition_code()
+        context['categories'] = self.event.lot_categories.all().order_by('pk')
 
         return context
+
+    def get_subscription_stats(self):
+        stats = {
+            'num': {},
+            'remaining': {},
+        }
+        queryset = self.event.lot_categories
+
+        for cat in queryset.all():
+            for lot in cat.lots.all():
+                sub_queryset = lot.subscriptions.filter(
+                    completed=True,
+                    status__in=['confirmed', 'awaiting']
+                )
+                num = sub_queryset.count()
+                stats['num'][lot.pk] = num
+                if lot.limit is not None:
+                    if num > int(lot.limit):
+                        stats['remaining'][lot.pk] = 0
+                    else:
+                        stats['remaining'][lot.pk] = int(lot.limit) - num
+
+        return stats
+
+    def _get_full_banking(self):
+
+        if not self.organization:
+            return False
+
+        banking_required_fields = ['bank_code', 'agency', 'account',
+                                   'cnpj_ou_cpf', 'account_type']
+
+        for field in Organization._meta.get_fields():
+            for required_field in banking_required_fields:
+                if field.name == required_field:
+                    if not getattr(self.organization, field.name):
+                        return False
+
+        return True
 
     def _can_add(self):
         return self.request.user.has_perm(
@@ -142,6 +189,7 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
     form_class = forms.LotForm
     # template_name = 'gatheros_subscription/lot/form.html'
     template_name = 'lot/form.html'
+    cat_pk = None
 
     def get_context_data(self, **kwargs):
         context = super(LotAddFormView, self).get_context_data(**kwargs)
@@ -155,15 +203,22 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
         return super(LotAddFormView, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse(
+        url = reverse(
             'subscription:lot-list',
             kwargs={'event_pk': self.event.pk}
         )
+        if self.cat_pk is not None:
+            url += '#cat='+self.cat_pk
+
+        return url
 
     def post(self, request, *args, **kwargs):
         if 'limit_switch' not in request.POST:
             request.POST = request.POST.copy()
             request.POST['limit'] = 0
+
+        if 'category' in self.request.POST:
+            self.cat_pk = self.request.POST.get('category')
 
         return super().post(request, *args, **kwargs)
 
@@ -210,15 +265,18 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
     show_not_allowed_message = True
     form_class = forms.LotForm
     model = forms.LotForm.Meta.model
-    # template_name = 'gatheros_subscription/lot/form.html'
     template_name = 'lot/form.html'
     pk_url_kwarg = 'lot_pk'
+    cat_pk = None
 
     def get_context_data(self, **kwargs):
         context = super(LotEditFormView, self).get_context_data(**kwargs)
         context['form_title'] = "Editar lote de '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
+        context['lot_has_subscriptions'] = self.object.subscriptions.filter(
+            completed=True,
+        ).count() > 0
 
         return context
 
@@ -226,6 +284,9 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         if 'limit_switch' not in request.POST:
             request.POST = request.POST.copy()
             request.POST['limit'] = 0
+
+        if 'category' in self.request.POST:
+            self.cat_pk = self.request.POST.get('category')
 
         return super().post(request, *args, **kwargs)
 
@@ -242,10 +303,14 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
             return response
 
     def get_success_url(self):
-        return reverse(
+        url = reverse(
             'subscription:lot-list',
             kwargs={'event_pk': self.event.pk}
         )
+        if self.cat_pk is not None:
+            url += '#cat=' + self.cat_pk
+
+        return url
 
     def can_view(self, show_message=True):
         can_view = super(LotEditFormView, self).can_view(False)

@@ -13,8 +13,10 @@ INSTALLED_APPS += [
     'partner',
     'hotsite',
     'survey',
-    'bitly',
     'formtools',
+    'addon',
+    'associate',
+    # 'bitly',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'
@@ -37,6 +39,7 @@ FIXTURE_DIRS += [
     os.path.join(BASE_DIR, 'gatheros_event', 'tests', 'fixtures'),
     os.path.join(BASE_DIR, 'gatheros_subscription', 'tests', 'fixtures'),
     os.path.join(BASE_DIR, 'payment', 'tests', 'fixtures'),
+    os.path.join(BASE_DIR, 'addon', 'tests', 'fixtures'),
 ]
 # ============================= TEMPLATES =================================== #
 TEMPLATES[0]['OPTIONS']['context_processors'].append(

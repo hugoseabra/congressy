@@ -2,7 +2,6 @@
 {# @TODO Change the icons in nav_aside_itens  #}
 {% load static %}
 {% load event_tags %}
-{% load queryset_filter %}
 
 {% block title %} Lotes | Congressy{% endblock %}
 
@@ -92,7 +91,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+                <span class="badge float-right">{% event_count_completed_subscriptions event %}</span>
             </a>
         </li>
         {#        <li>#}
@@ -115,6 +114,18 @@
             <a href="{% url 'subscription:form-config' event.pk %}"
                title="Formulário">
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'addon:optional-service-list' event.pk %}"
+               title="Atividades Extras">
+                <i class="fa  fa-fw fa-rocket"></i> Atividades Extras
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'addon:optional-product-list' event.pk %}"
+               title="Produtos / Serviços">
+                <i class="fa  fa-fw fa-rocket"></i> Produtos / Serviços
             </a>
         </li>
         {% if has_paid_lots %}
@@ -179,6 +190,12 @@
                                 {% endif %}
 
                             <td>
+                                {% if lot.rsvp_restrict %}
+                                    <div>
+                                        <span class="badge badge-primary">Associados</span>
+                                    </div>
+                                {% endif %}
+
                                 {% if user has 'gatheros_subscription.change_lot' of lot %}
                                     <a href="{% url 'subscription:lot-edit' event.pk lot.pk %}">{{ lot.name }}</a>
                                 {% else %}
@@ -211,6 +228,7 @@
                                 {% endif %}
                             </td>
                             <td class="hidden-xs">
+
                                 {% if lot.private %}
                                     <div>
                                         <span class="badge badge-primary">Privado</span>

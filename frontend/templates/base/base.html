@@ -18,8 +18,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}Congressy{% endblock %}</title>
     <meta name="description" content="">
-    {#    <meta name="viewport"#}
-    {#          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet"
@@ -34,6 +34,8 @@
     <!-- Fonts  -->
     <link rel="stylesheet"
           href="{% static "assets/css/fontawesome-all.min.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/css/font-awesome-animation.min.css" %}">
     <link rel="stylesheet"
           href="{% static "assets/css/simple-line-icons.css" %}">
     <!-- CSS Animate -->
@@ -76,16 +78,14 @@
 </head>
 <body>
 
-
-<section id="main-wrapper" class="theme-cgsy-full">
+<section id="main-wrapper" class="theme-cgsy-full {% if apponly %}app-only{% endif %} {% if notitle %}no-app-title{% endif %}">
     <header id="header">
 
         <!--logo start-->
         <div class="brand">
             <a href="{% url 'front:start' %}">
                 <img class="base_logo" src=
-                        "{% static "assets/img/header-logo.png" %}"
-                     width="70%"/>
+                        "{% static "assets/img/header-logo.png" %}" />
             </a>
         </div>
         <!--logo end-->

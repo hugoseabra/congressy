@@ -1,7 +1,6 @@
 # pylint: skip-file
 
 import os
-
 from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
@@ -24,12 +23,12 @@ handler500 = 'project.views.handler500'
 admin_urlpatterns = [url(r'^cgsy-admin18/', admin.site.urls)]
 
 private_urlpatterns = [
+    url(r'^manage/', include('addon.urls', 'addon')),
     url(r'^manage/', include('gatheros_subscription.urls', 'subscription')),
     # url(r'^manage/', include('bitly.urls', 'bitly')),
     url(r'^manage/', include('gatheros_event.urls', 'event')),
     url(r'^manage/', include(gatheros_front_private, 'front')),
     url(r'^manage/', include(private_payment_urls, 'payment')),
-
 ]
 
 public_urls = gatheros_front_public
@@ -65,6 +64,8 @@ if not settings.DEBUG:
 # API
 api_urls = [
     url(r'^', include(urlpatterns_public_payments_api, 'payment')),
+    url(r'^', include('gatheros_subscription.api_urls', 'subscription')),
+    url(r'^', include('addon.api_urls', 'addon')),
     url(r'^', include('kanu_locations.urls', 'city')),
 ]
 

@@ -3,8 +3,10 @@
 """
 
 import json
+from decimal import Decimal
 
 from django import forms
+from django.conf import settings
 from django.core import serializers
 
 from gatheros_subscription.models import Lot
@@ -31,11 +33,6 @@ class PaymentForm(forms.Form):
         required=True,
     )
 
-    lot_as_json = forms.CharField(
-        widget=forms.HiddenInput(),
-        required=False,
-    )
-
     def __init__(self, **kwargs):
 
         self.lot_instance = kwargs.get('initial').get('choosen_lot')
@@ -54,17 +51,23 @@ class PaymentForm(forms.Form):
 
         super().__init__(**kwargs)
 
-        lot = self.lot_instance
-        lot.price = lot.get_calculated_price()
+    def get_calculated_price(self, price, lot):
+        """
+        Resgata o valor calculado do preço do opcional de acordo com as regras
+        da Congressy.
+        """
+        if price is None:
+            return 0
 
-        lot_obj_as_json = serializers.serialize('json', [lot, ])
-        json_obj = json.loads(lot_obj_as_json)
-        json_obj = json_obj[0]
-        json_obj = json_obj['fields']
+        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent = \
+            Decimal(self.event.congressy_percent) / 100
 
-        del json_obj['exhibition_code']
-        del json_obj['private']
+        congressy_amount = price * congressy_plan_percent
+        if congressy_amount < minimum:
+            congressy_amount = minimum
 
-        lot_obj_as_json = json.dumps(json_obj)
+        if lot.transfer_tax is True:
+            return round(price + congressy_amount, 2)
 
-        self.fields['lot_as_json'].initial = lot_obj_as_json
+        return round(price, 2)

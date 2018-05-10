@@ -32,9 +32,9 @@ class SubscriptionForm(forms.ModelForm):
         return Lot.objects.get(pk=self.data['lot'], event=self.event)
     
     def clean(self):
-        self.cleaned_data = super().clean()
+        cleaned_data = super().clean()
         
-        person = self.cleaned_data.get('person')
+        person = cleaned_data.get('person')
         
         qs = Subscription.objects.filter(person=person, event=self.event)
         if qs.exists():
@@ -44,4 +44,4 @@ class SubscriptionForm(forms.ModelForm):
                 'Esta inscrição já existe'
             )
         
-        return self.cleaned_data
+        return cleaned_data

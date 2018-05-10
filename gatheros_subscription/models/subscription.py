@@ -152,6 +152,13 @@ class Subscription(models.Model, GatherosModelMixin):
         null=True,
     )
 
+    completed = models.BooleanField(
+        default=False,
+        verbose_name='completa',
+        help_text='Inscrições que passaram por todo o fluxo de inscrições.',
+        editable=False
+    )
+
     objects = SubscriptionManager()
 
     class Meta:

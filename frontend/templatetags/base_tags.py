@@ -3,11 +3,9 @@ gatheros_subscription templatetags
 """
 import datetime
 from ast import literal_eval
-from decimal import Decimal
 
 import timestring
 from django import template
-from django.conf import settings
 from django.template.defaultfilters import stringfilter
 
 from core.util import git_util
@@ -92,3 +90,7 @@ def money_divide(value):
     except (ValueError, ZeroDivisionError):
         return None
 
+
+@register.filter(name='lookup')
+def lookup(value, arg):
+    return value[arg]

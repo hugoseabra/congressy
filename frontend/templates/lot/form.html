@@ -1,7 +1,7 @@
 {% extends "base/base.html" %}
 {% load l10n static event_tags  base_tags  widget_tweaks form_config_tags %}
 {% load humanize %}
-{% load queryset_filter %}
+{% load subscription_tags %}
 
 {% block title %}
     {% if object %}Editar{% else %}Novo{% endif %} Lote | Congressy
@@ -404,7 +404,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+                <span class="badge float-right">{% event_count_completed_subscriptions event %}</span>
             </a>
         </li>
         {#        <li>#}
@@ -427,6 +427,18 @@
             <a href="{% url 'subscription:form-config' event.pk %}"
                title="Formulário">
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'addon:optional-service-list' event.pk %}"
+               title="Atividades Extras">
+                <i class="fa  fa-fw fa-rocket"></i> Atividades Extras
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'addon:optional-product-list' event.pk %}"
+               title="Produtos / Serviços">
+                <i class="fa  fa-fw fa-rocket"></i> Produtos / Serviços
             </a>
         </li>
         {% if has_paid_lots %}
@@ -461,7 +473,7 @@
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar">
                     <div class="float-right">
-                        <a href="{% url 'subscription:lot-list' event.pk %}"
+                        <a href="{% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>
                             Cancelar
@@ -488,230 +500,157 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-xl-10 col-lg-11 col-md-11">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
                                 {% render_generic_field form.name autofocus=True %}
+                            </div>
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
+                                {% render_generic_field form.category %}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-5">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
                                 {% render_generic_field form.date_start %}
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-xl-5 col-xl-push-1 col-md-6">
                                 {% render_generic_field form.date_end %}
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            Configuração de vagas
-                        </div>
-                    </div>
-                    <div class="panel-body">
+                        {% if object.event.rsvp_type != object.event.RSVP_DISABLED and object.event.has_rsvp %}
                         <div class="row">
-                            <div class="col-xl-4 col-lg-5 col-md-5">
-                                <div class="form-group">
-                                    <label>Limitar vagas</label>
-                                    <div>
-                                        <input name="limit_switch"
-                                               class="js-switch"
-                                               id="limit_switch"
-                                               style="display:none"
-                                               type="checkbox"
-                                               {% if object and object.limit > 0 %}checked{% endif %}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-4 col-lg-7 col-md-7">
-                                <div style="display: none">
-                                    {% render_generic_field form.limit %}
-                                </div>
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                {% render_switchery_field form.rsvp_restrict %}
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            Custos e taxas
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        {% if full_banking %}
-                            <div class="row">
-                                <div class="col-md-3">
-                                    {% render_generic_field form.price %}
-                                </div>
-                                <div class="col-md-5 col-xl-6 col-lg-5">
-                                    <div style="display: none">
-                                        {% render_switchery_field form.transfer_tax %}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-3 col-xl-3">
-                                    {% render_switchery_field form.allow_installment %}
-                                </div>
-                                <div class="col-lg-3 col-xl-3">
-                                    {% render_generic_field form.installment_limit %}
-                                </div>
-                                <div class="col-xs-11 col-lg-5 col-xl-5">
-                                    <div>
-                                        <div class="float-left">
-                                            {% render_switchery_field form.num_install_interest_absortion %}
-                                        </div>
-                                        <div class="float-left">
-                                            <button style="position: absolute;top: 32px;"
-                                                    id="installment-items"
-                                                    type="button"
-                                                    data-html="true"
-                                                    class="btn btn-sm btn-default"
-                                                    title="Parcelas da Inscrição"
-                                                    data-container="body"
-                                                    data-toggle="popover"
-                                                    data-content="">
-                                                <i class="fa fa-info"></i>
-                                            </button>
-                                        </div>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row price-box">
-                                <div id="subscription_price_block"
-                                     class="col-sm-6 col-md-6">
-                                    <div class="well">
-                                        <div style="font-size:14px;text-align: center;font-weight: bold">
-                                            Para o participante:
-                                        </div>
-                                        <div style="text-align: center;font-weight: bold;font-size: 24px;color: blue;">
-                                            R$ <span
-                                                class="subscription_price"></span>
-                                        </div>
-                                        <div class="text-muted"
-                                             style="visibility:hidden;text-align: center;font-weight: bold;padding-top: 4px;font-size: 12px">
-                                            <strong>Taxa:</strong> R$ <span
-                                                class="congressy_tax"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="price_to_recieve_block"
-                                     class="col-sm-6 col-md-6">
-                                    <div class="well">
-                                        <div style="font-size:14px;text-align: center;font-weight: bold">
-                                            Para você:
-                                        </div>
-                                        <div style="text-align: center;font-weight: bold;font-size: 24px;color: green;">
-                                            R$ <span
-                                                class="price_to_recieve"></span>
-                                        </div>
-                                        <div class="text-muted"
-                                             style="visibility:hidden;text-align: center;font-weight: bold;padding-top: 4px;font-size: 12px">
-                                            <strong>Taxa:</strong> R$ <span
-                                                class="congressy_tax"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="installment_price_to_receive_block"
-                                     class="col-sm-4 col-md-4"
-                                     style="display: none">
-                                    <div>
-                                        <div style="font-size:14px;font-weight: bold">
-                                            Para você:
-                                        </div>
-                                        <div class="help-block"
-                                             style="font-size:12px">
-                                            Se o participante pagar parcelado.
-                                        </div>
-                                        <div style="font-weight: bold;font-size: 14px;color:green">
-                                            <div id="installment_price_to_receive"
-                                                 style="padding: 4px 0 0 8px;"></div>
-                                        </div>
-                                        <div class="text-muted"
-                                             style="visibility:hidden;text-align: center;font-weight: bold;padding-top: 4px;font-size: 12px">
-                                            <strong>Taxa:</strong> R$ <span
-                                                class="congressy_tax"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% else %}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="alert alert-warning">
-                                        <strong>È necessário que complete seus
-                                            dados bancários para criar lotes
-                                            pagos!</strong>
-
-                                    </div>
-                                    <p>
-                                        <a href="{% url 'event:organization-financial-edit' organization.pk %}">
-                                            Clique aqui para configurar estes
-                                            dados.</a></p>
-                                </div>
-                            </div>
                         {% endif %}
                     </div>
                 </div>
-
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            Privacidade
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                {% render_switchery_field form.private %}
-                            </div>
-                            <div class="col-md-3">
-                                {% render_generic_field form.exhibition_code %}
+                {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
+                {% if lot_has_subscriptions and not object.price %}
+                {% else %}
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                Custos e taxas
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            Questionários
-                        </div>
-                    </div>
-                    <div class="panel-body">
-
-                        {% if has_surveys %}
-
-                            {% render_generic_field form.event_survey %}
-
-                        {% else %}
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="alert alert-warning">
-                                        <strong>È necessário criar
-                                            questionarios para poder usar
-                                            eles em seus lotes</strong>
-
+                        <div class="panel-body">
+                            {% if full_banking %}
+                                <div class="row">
+                                    <div class="col-md-4 col-xl-push-1">
+                                        {% render_generic_field form.price %}
                                     </div>
-                                    <p>
-                                        <a href="
-                                        {% url 'subscription:form-config' event.pk %}">
-                                            Clique aqui para configurar estes
-                                            dados.</a></p>
+                                    <div class="col-md-8 col-xl-5 col-xl-push-1">
+                                        <div style="display: none">
+                                            {% render_switchery_field form.transfer_tax %}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                                <div class="row">
+                                    <div class="col-md-4 col-lg-3 col-xl-push-1">
+                                        {% render_switchery_field form.allow_installment %}
+                                    </div>
+                                    <div class="col-md-3 col-lg-3 col-xl-push-1">
+                                        {% render_generic_field form.installment_limit %}
+                                    </div>
+                                    <div class="col-md-4 col-lg-5 col-xl-3 col-xl-push-1">
+                                        <div>
+                                            <div class="float-left">
+                                                {% render_switchery_field form.num_install_interest_absortion %}
+                                            </div>
+                                            <div class="float-left">
+                                                <button style="position: absolute;top: 32px;"
+                                                        id="installment-items"
+                                                        type="button"
+                                                        data-html="true"
+                                                        class="btn btn-sm btn-default"
+                                                        title="Parcelas da Inscrição"
+                                                        data-container="body"
+                                                        data-toggle="popover"
+                                                        data-content="">
+                                                    <i class="fa fa-info"></i>
+                                                </button>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row price-box">
+                                    <div id="subscription_price_block"
+                                         class="col-sm-6 col-md-6">
+                                        <div class="well">
+                                            <div style="font-size:14px;text-align: center;font-weight: bold">
+                                                Para o participante:
+                                            </div>
+                                            <div style="text-align: center;font-weight: bold;font-size: 24px;color: blue;">
+                                                R$ <span
+                                                    class="subscription_price"></span>
+                                            </div>
+                                            <div class="text-muted"
+                                                 style="visibility:hidden;text-align: center;font-weight: bold;padding-top: 4px;font-size: 12px">
+                                                <strong>Taxa:</strong> R$ <span
+                                                    class="congressy_tax"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="price_to_recieve_block"
+                                         class="col-sm-6 col-md-6">
+                                        <div class="well">
+                                            <div style="font-size:14px;text-align: center;font-weight: bold">
+                                                Para você:
+                                            </div>
+                                            <div style="text-align: center;font-weight: bold;font-size: 24px;color: green;">
+                                                R$ <span
+                                                    class="price_to_recieve"></span>
+                                            </div>
+                                            <div class="text-muted"
+                                                 style="visibility:hidden;text-align: center;font-weight: bold;padding-top: 4px;font-size: 12px">
+                                                <strong>Taxa:</strong> R$ <span
+                                                    class="congressy_tax"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="installment_price_to_receive_block"
+                                         class="col-sm-4 col-md-4"
+                                         style="display: none">
+                                        <div>
+                                            <div style="font-size:14px;font-weight: bold">
+                                                Para você:
+                                            </div>
+                                            <div class="help-block"
+                                                 style="font-size:12px">
+                                                Se o participante pagar parcelado.
+                                            </div>
+                                            <div style="font-weight: bold;font-size: 14px;color:green">
+                                                <div id="installment_price_to_receive"
+                                                     style="padding: 4px 0 0 8px;"></div>
+                                            </div>
+                                            <div class="text-muted"
+                                                 style="visibility:hidden;text-align: center;font-weight: bold;padding-top: 4px;font-size: 12px">
+                                                <strong>Taxa:</strong> R$ <span
+                                                    class="congressy_tax"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-warning">
+                                            <strong>È necessário que complete seus
+                                                dados bancários para criar lotes
+                                                pagos!</strong>
 
-                        {% endif %}
-
-
+                                        </div>
+                                        <p>
+                                            <a href="{% url 'event:organization-financial-edit' organization.pk %}">
+                                                Clique aqui para configurar estes
+                                                dados.</a></p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-
+                {% endif %}
             </div>
         </div>
 
@@ -719,7 +658,7 @@
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar bottom">
                     <div class="float-right">
-                        <a href="{% url 'subscription:lot-list' event.pk %}"
+                        <a href="{% url 'subscription:lot-list' event.pk %}{% if object.category %}#cat={{ object.category.pk }}{% endif %}"
                            class="btn btn-danger">
                             <i class="fas fa-times-circle"></i>Cancelar
                         </a>

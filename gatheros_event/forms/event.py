@@ -2,6 +2,7 @@
 Formulários de Event
 """
 import os
+from datetime import datetime, timedelta
 
 from django import forms
 from django.shortcuts import get_object_or_404
@@ -25,6 +26,7 @@ class EventForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
+            'rsvp_type',
         ]
 
         widgets = {
@@ -41,8 +43,7 @@ class EventForm(forms.ModelForm):
 
         super(EventForm, self).__init__(*args, **kwargs)
 
-        if instance is None:
-            self._configure_organization_field()
+        self._configure_organization_field()
 
     def _configure_organization_field(self):
         orgs = []

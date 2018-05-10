@@ -54,6 +54,59 @@
                                     {% render_errors field.error %}
                                 {% endif %}
                             {% endfor %}
+                            <div class="well well-sm"
+                                 style="text-align: justify">
+                                <h3>Checkout:</h3>
+                                <div><strong>Inscrição:</strong></div>
+                                <ul>
+                                    {% if lot.price %}
+                                        <ol><strong>R$ {{ lot.price }}</strong>
+                                        </ol>
+                                    {% else %}
+                                        <ol><strong>Grátis</strong></ol>
+                                    {% endif %}
+                                </ul>
+
+                                {% if products %}
+                                    <div><strong>Produtos:</strong></div>
+                                    <ul>
+                                        {% for product in products %}
+                                            <ol>{{ product.optional.name }}:
+                                                <strong>
+                                                    {% if product.optional.price == 0.00 %}
+                                                        Grátis
+                                                    {% else %}
+                                                        {{ product.optional.price }}
+                                                    {% endif %}
+                                                </strong>
+                                            </ol>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                {% if services %}
+                                    <div><strong>Serviços:</strong></div>
+                                    <ul>
+                                        {% for service in services %}
+                                            <ol>{{ service.optional.name }}:
+                                                <strong>
+                                                    {% if service.optional.price == 0.00 %}
+                                                        Grátis
+                                                    {% else %}
+                                                        R$
+                                                        {{ service.optional.price }}
+                                                    {% endif %}
+                                                </strong>
+                                            </ol>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                <h4> Total: R$ {{ total }} </h4>
+
+
+                            </div>
+
 
                             <div id="payment_buttons" class="text-center"
                                  style="display: none">
@@ -92,14 +145,23 @@
                                 <img style="width: 80%; margin-top: 20px"
                                      src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
                             </div>
-                            <br/>
-                            <form action="" method="post">
+
+                            <form action="" method="post" novalidate>
                                 {% csrf_token %}
                                 {{ wizard.management_form }}
 
                                 {% for hidden in form.hidden_fields %}
                                     {{ hidden }}
                                 {% endfor %}
+
+                                {% if wizard.steps.prev %}
+                                    <button type="button"
+                                            onclick="submit_back_form()"
+                                            class="btn btn-primary">
+                                        <i class="fas fa-chevron-circle-left"></i>
+                                        Voltar
+                                    </button>
+                                {% endif %}
 
                                 <button type="submit"
                                         class="btn btn-primary pull-right">
@@ -108,27 +170,19 @@
                                 </button>
                             </form>
 
-                            <form action="" method="post" novalidate>
-                                {{ wizard.management_form }}
+                            <form id="back_form" action="" method="post"
+                                  novalidate>
+
                                 {% csrf_token %}
-                                {% if wizard.steps.prev %}
-                                    <input type="hidden" name="wizard_goto_step"
-                                           value="{{ wizard.steps.prev }}">
-                                    <button type="submit"
-                                            class="btn btn-primary">
-                                        <i class="fas fa-chevron-circle-left"></i>
-                                        Voltar
-                                    </button>
-                                {% endif %}
+                                {{ wizard.management_form }}
+
+                                <input type="hidden"
+                                       name="wizard_goto_step"
+                                       value="{{ wizard.steps.prev }}">
                             </form>
+
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-9 col-md-offset-2">
-                    <div class="text-right cgsy-footer footer-wrapper text-muted"
-                         style="font-size:12px;color:lightgrey">
-                        {% include "base/footer.html" %}
                     </div>
                 </div>
             </div>
@@ -142,27 +196,75 @@
     <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
     <script src="{% static "hotsite/js/payment.js" %}"></script>
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
-    <script>
 
-        $(document).ready(function () {
+    <script type="application/javascript">
+        function submit_back_form() {
+            $('#back_form').submit()
+        }
 
-            $('form').submit(function () {
-                $(this).find(':submit').attr('disabled', 'disabled');
-                $(this).attr('novalidate', 'novalidate');
-            });
+        jQuery(document).ready(function() {
 
-            var lot = JSON.parse($('#id_payment-lot_as_json').val());
+            window.setTimeout(function () {
+                $('form').submit(function () {
+                    $(this).find(':submit').attr('disabled', 'disabled');
+                });
 
-            $('#id_button_pay').on('click', function () {
-                process_single_lot_payment(
-                    '{{ pagarme_encryption_key }}',
-                    2.29,
-                    '{{ event.name }}',
-                    lot,
-                    null
+                // disable boleto method
+                //window.cgsy.payment.disable_boleto();
+
+                {% if lot.allow_installment is True %}
+                // disable installment
+                window.cgsy.payment.disable_installment();
+                {% endif %}
+
+                window.cgsy.payment.set_interest_rate(2.29);
+                window.cgsy.payment.set_max_installments('{{ lot.installment_limit }}');
+                window.cgsy.payment.set_free_rate_installments('{{ lot.num_install_interest_absortion }}');
+
+                // Adiciona billing de inscrição
+                window.cgsy.payment.add_item(
+                    'subscription',
+                    '{{ subscription.pk }}',
+                    'Inscrição: {{ lot.event.name }}',
+                    1,
+                    parseFloat('{{ lot.price|unlocalize|intcomma }}')
                 );
-            });
-        });
 
+                {% if products %}
+                    // Adiciona billing de opcionais de produtos/serviços
+                    {% for product in products %}
+                        {% if produdct.optional_price %}
+                        window.cgsy.payment.add_item(
+                            'optional-product',
+                            '{{ subscription.pk }}',
+                            'Produto/Serviço: {{ lot.event.name }}',
+                            1,
+                            parseFloat('{{ product.optional_price|unlocalize|intcomma }}')
+                        );
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if services %}
+                    // Adiciona billing de opcionais de atividades extras
+                    {% for service in services %}
+                        {% if service.optional_price %}
+                        window.cgsy.payment.add_item(
+                            'optional-service',
+                            '{{ subscription.pk }}',
+                            'Atividade extra: {{ lot.event.name }}',
+                            1,
+                            parseFloat('{{ service.optional_price|unlocalize|intcomma }}')
+                        );
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                 $('#id_button_pay').on('click', function () {
+                     window.cgsy.pagarme.process_payment('{{ pagarme_encryption_key }}');
+                 });
+
+            }, 300);
+        });
     </script>
 {% endblock %}

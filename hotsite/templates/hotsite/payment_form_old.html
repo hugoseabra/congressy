@@ -1,0 +1,317 @@
+{% extends 'hotsite/base.html' %}
+{% load l10n humanize static form_config_tags user_agents user_agent_tag %}
+
+{% block content %}
+
+    {% include 'hotsite/includes/2_cover_no_form.html' %}
+
+    <!-- FORM
+================================= -->
+    <section id="about" class="about-section section">
+        <div class="container">
+            <h2 class="section-heading text-center">Inscrição</h2>
+            <div class="about-row row">
+                <div class="col-md-9 col-md-offset-2">
+
+                    <div class="panel panel-default">
+
+                        <div class="panel-heading">
+                            <div class="panel-title">Pagamento</div>
+                        </div>
+
+                        <div class="panel-body">
+
+                            {% block messages %}
+                                {% if messages %}
+                                    <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                    {% for message in messages %}
+                                        {% if message.tags %}
+                                            <div class="alert alert-{{ message.tags }} alert-dismissible"
+                                                 role="alert">
+                                        {% else %}
+                                            <div class="alert alert-warning alert-dismissible"
+                                                 role="alert">
+                                        {% endif %}
+
+                                    <button type="button" class="close"
+                                            data-dismiss="alert"
+                                            aria-label="Close"><span
+                                            aria-hidden="true">&times;</span>
+                                    </button>
+                                    {{ message|capfirst }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            {% endblock messages %}
+
+                            {% if form.non_field_errors %}
+                                {% render_errors form.non_field_errors %}
+                            {% endif %}
+
+                            {% for field in form.hidden_fields %}
+                                {% if field.error %}
+                                    {% render_errors field.error %}
+                                {% endif %}
+                            {% endfor %}
+                            <div class="well well-sm"
+                                 style="text-align: justify">
+                                <h3>Checkout:</h3>
+                                <div><strong>Inscrição:</strong></div>
+                                <ul>
+                                    {% if lot.price %}
+                                        <ol><strong>R$ {{ lot.price }}</strong>
+                                        </ol>
+                                    {% else %}
+                                        <ol><strong>Grátis</strong></ol>
+                                    {% endif %}
+                                </ul>
+
+                                {% if products %}
+                                    <div><strong>Produtos:</strong></div>
+                                    <ul>
+                                        {% for product in products %}
+                                            <ol>{{ product.optional.name }}:
+                                                <strong>
+                                                    {% if product.optional.price == 0.00 %}
+                                                        Grátis
+                                                    {% else %}
+                                                        {{ product.optional.price }}
+                                                    {% endif %}
+                                                </strong>
+                                            </ol>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                {% if services %}
+                                    <div><strong>Serviços:</strong></div>
+                                    <ul>
+                                        {% for service in services %}
+                                            <ol>{{ service.optional.name }}:
+                                                <strong>
+                                                    {% if service.optional.price == 0.00 %}
+                                                        Grátis
+                                                    {% else %}
+                                                        R$
+                                                        {{ service.optional.price }}
+                                                    {% endif %}
+                                                </strong>
+                                            </ol>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                <h4> Total: R$ {{ total }} </h4>
+
+
+                            </div>
+
+
+                            <div id="payment_buttons" class="text-center"
+                                 style="display: none">
+                                <button id="id_boleto" type="button"
+                                        style="text-align: center;display: none">
+                                    Boleto
+                                    <br/>
+                                    <img class="img-responsive"
+                                         style="height: 153px; height: 153px"
+                                         src="{% static 'hotsite/logos/boleto.svg' %}">
+                                </button>
+                                <button id="id_credit_card" type="button"
+                                        style="display: none">
+                                    Cartão de Credito
+                                    <br/>
+                                    <img class="img-responsive"
+                                         src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
+                                </button>
+
+                                <br/>
+
+                                <a id="id_remove"
+                                   style="margin-top: 11px; font-size: 12px;display: none">
+                                    Remover
+                                </a>
+                            </div>
+                            <div class="text-center">
+                                <button id="id_button_pay"
+                                        class="btn btn-default"
+                                        type="button">
+                                    Escolha meio de pagamento
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <img style="width: 80%; margin-top: 20px"
+                                     src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
+                            </div>
+
+                            <form action="" method="post" novalidate>
+                                {% csrf_token %}
+                                {{ wizard.management_form }}
+
+                                {% for hidden in form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
+
+                                {% if wizard.steps.prev %}
+                                    <button type="button"
+                                            onclick="submit_back_form()"
+                                            class="btn btn-primary">
+                                        <i class="fas fa-chevron-circle-left"></i>
+                                        Voltar
+                                    </button>
+                                {% endif %}
+
+                                <button type="submit"
+                                        class="btn btn-primary pull-right">
+                                    Finalizar
+                                    <i class="fas fa-chevron-circle-right"></i>
+                                </button>
+                            </form>
+
+                            <form id="back_form" action="" method="post"
+                                  novalidate>
+
+                                {% csrf_token %}
+                                {{ wizard.management_form }}
+
+                                <input type="hidden"
+                                       name="wizard_goto_step"
+                                       value="{{ wizard.steps.prev }}">
+                            </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </section>
+
+{% endblock %}
+
+{% block scripts %}
+    <!-- SCRIPT Payment -->
+    <!-- SCRIPT PAGAR.ME -->
+    <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
+    <script src="{% static "hotsite/js/payment.js" %}"></script>
+    <script src="{% static "hotsite/js/pagarme_integration.js" %}"></script>
+    <script src="{% static "hotsite/js/subscription.js" %}"></script>
+
+
+    <script type="application/javascript">
+        (function ($) {
+            "use strict";
+
+            window.setTimeout(function () {
+
+                $('form').submit(function () {
+                    $(this).find(':submit').attr('disabled', 'disabled');
+                });
+
+                var lot_price = parseFloat('{{ lot.price|intcomma|unlocalize }}');
+                window.cgsy.pagarme.add_items_list({{ lot.id }}, '{{ lot.event.name }}', lot_price, 1, false);
+
+                {% for product in products %}
+                    //id, name, price, quantity, tangible
+                    var price = parseFloat('{{ product.optional_liquid_price|intcomma|unlocalize }}');
+                    window.cgsy.pagarme.add_items_list({{ product.optional.id }}, '{{ product.optional.name }}', price, 1, true);
+                {% endfor %}
+
+                {% for service in services %}
+                    //id, name, price, quantity, tangible
+                    var price = parseFloat('{{service.optional_liquid_price|intcomma|unlocalize }}');
+                    window.cgsy.pagarme.add_items_list({{ service.optional.id }}, '{{ service.optional.name }}', price, 1, false);
+                {% endfor %}
+
+                var lot = {
+                    allow_installment: {{ lot.allow_installment }},
+                    {% if  lot.free_installment %}
+                        free_installment: true
+                    {% else %}
+                        free_installment: false
+                    {% endif %}
+                };
+
+                $('#id_button_pay').on('click', function () {
+                    var total = '{{ total|intcomma|unlocalize }}';
+                    var params = window.cgsy.pagarme.create_params(parseFloat(total), 2.29);
+
+                    var allow_installment = lot.allow_installment === true;
+                    var installment_limit = lot.installment_limit;
+                    var free_installment = parseInt(lot.free_installment);
+                    allow_installment = allow_installment === true;
+
+                    function handleSuccess(data) {
+                        hide_payment_elements();
+
+                        switch (data.payment_method) {
+                            case 'boleto':
+                                $('#id_boleto').show();
+                                break;
+                            case 'credit_card':
+                                $('#id_credit_card').show();
+                                break;
+                            default:
+                                var msg = 'Unsupported payment type: ' + data.payment_method;
+                                Raven.captureException(msg);
+                                alert(
+                                    "Ocorreu um erro durante o processamento," +
+                                    " tente novamente depois."
+                                );
+                                Raven.showReportDialog();
+                        }
+
+                        $('#payment_buttons').show();
+                        $('#id_button_pay').hide();
+                        $('#id_remove').show();
+                        $('#next_btn').attr("disabled", false);
+                        $('#id_payment-transaction_type').val(data.payment_method);
+                        $('#id_payment-amount').val(data.amount);
+                        $('#id_payment-card_hash').val(data.card_hash);
+                        $('#id_payment-installments').val(data.installments);
+                    }
+
+                    function handleError(data) {
+                        if (TRACKER_CAPTURE && Raven) {
+                            Raven.captureException(JSON.stringify(data));
+                            Raven.showReportDialog();
+                        } else {
+                            alert(
+                                "Ocorreu um erro durante o processamento," +
+                                " tente novamente depois."
+                            );
+                        }
+                    }
+
+                    var checkout = new PagarMeCheckout.Checkout({
+                        encryption_key: '{{ pagarme_encryption_key }}',
+                        success: handleSuccess,
+                        error: handleError
+                    });
+
+                    if (allow_installment) {
+                        if (parseInt(installment_limit) > 10) {
+                            installment_limit = 10;
+                        }
+                        params['maxInstallments'] = parseInt(installment_limit) || 10;
+
+                        if (parseInt(free_installment) > 0) {
+                            params['freeInstallments'] = parseInt(free_installment);
+                        }
+                    }
+                    console.log(params);
+                    console.log(checkout);
+                    checkout.open(params);
+
+                });
+
+            }, 300);
+
+            function submit_back_form() {
+                $('#back_form').submit()
+            }
+        })(jQuery);
+
+    </script>
+{% endblock %}

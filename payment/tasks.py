@@ -18,6 +18,14 @@ pagarme.authentication_key(settings.PAGARME_API_KEY)
 congressy_id = settings.PAGARME_RECIPIENT_ID
 
 
+def separate_amount(amount):
+    amount = str(amount)
+    size = len(amount)
+    cents = amount[-2] + amount[-1]
+    amount = '{}.{}'.format(amount[0:size - 2], cents)
+    return Decimal(amount)
+
+
 # @TODO-low create a mock of the response to use during testing
 def create_pagarme_transaction(transaction_data, subscription=None):
     payment = transaction_data.get_data()
@@ -58,19 +66,28 @@ def create_pagarme_transaction(transaction_data, subscription=None):
         send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
         raise TransactionError(message='Unknown API error')
 
-    # Separar centavos
-    amount = str(trx['amount'])
-    size = len(amount)
-    cents = amount[-2] + amount[-1]
-    amount = '{}.{}'.format(amount[0:size - 2], cents)
-    amount = Decimal(amount)
+    items = trx['items'].copy()
+    trx_subscription = None
+
+    for item in items:
+        if item['category'] == 'inscrição':
+            trx_subscription = item
 
     transaction_instance.data = trx
     transaction_instance.status = trx['status']
     transaction_instance.type = trx['payment_method']
     transaction_instance.date_created = trx['date_created']
-    transaction_instance.amount = amount
-    transaction_instance.liquid_amount = liquid_amount
+    transaction_instance.subscription_amount = separate_amount(
+        trx_subscription['unit_price'])
+    transaction_instance.subscription_liquid_amount = liquid_amount
+    optional_total = 0
+
+    for item in items:
+        if item['category'] == 'opcional':
+            optional_total += separate_amount(item['unit_price'])
+
+    # @TODO add optional liquid amount
+    transaction_instance.optional_amount = optional_total
 
     if transaction_instance.type == Transaction.BOLETO:
         boleto_exp_date = trx.get('boleto_expiration_date')

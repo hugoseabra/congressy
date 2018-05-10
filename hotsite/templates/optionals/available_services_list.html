@@ -1,0 +1,57 @@
+<div id="available_optional_services">
+    {% if  object_list %}
+        <label for="services_table">Serviços</label>
+
+        <div class="table-responsive" id="services_table">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Preço</th>
+                    <th>Data de inicio</th>
+                    <th>Data de encerramento</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for service in object_list %}
+                    <tr>
+                        <td>{{ service.optional.name }}</td>
+                        <td>{{ service.optional.optional_type.name }}</td>
+                        <td>
+                            {% if service.optional.price == 0.00 %}
+                                Grátis
+                            {% else %}
+                                R$ {{ service.optional.price }}
+                            {% endif %}
+                        </td>
+                        <td>{{ service.optional.schedule_start }}</td>
+                        <td>{{ service.optional.schedule_end }}</td>
+                        {% if service.available %}
+                            <td>
+                                <button style="width: 100%"
+                                        onclick="addOptionalService({{ service.optional.pk }})"
+                                        class="btn btn-sm btn-success">
+                                    Selecionar
+                                </button>
+                            </td>
+                        {% else %}
+                            <td>
+                                <button style="width: 100%"
+                                        disabled="disabled"
+                                        class="btn btn-sm btn-warning">
+                                    Indisponível
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </button>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        Nenhum serviço disponivel no momento.
+    {% endif %}
+</div>

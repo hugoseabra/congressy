@@ -77,7 +77,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
 
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
-        for lot in self.event.lots.all():
+        for lot in self.event.lots.filter(active=True):
             price = lot.price
             if price is None:
                 continue
@@ -88,8 +88,8 @@ class EventMixin(TemplateNameableMixin, generic.View):
         return False
 
     def has_coupon(self):
-        """ Retorna se possui cupon, seja qual for. """
-        for lot in self.event.lots.all():
+        """ Retorna se possui cupom, seja qual for. """
+        for lot in self.event.lots.filter(active=True):
             # código de exibição
             if lot.private and lot.exhibition_code:
                 return True
@@ -104,7 +104,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
         return self.event.status == Event.EVENT_STATUS_NOT_STARTED
 
     def subsciption_finished(self):
-        for lot in self.event.lots.all():
+        for lot in self.event.lots.filter(active=True):
             if lot.status == Lot.LOT_STATUS_RUNNING:
                 return False
 
@@ -115,15 +115,15 @@ class EventMixin(TemplateNameableMixin, generic.View):
         return self.event.get_period()
 
     def get_lots(self):
-        return self.event.lots.filter(private=False)
+        return self.event.lots.filter(private=False, active=True)
 
     def get_private_lots(self):
-        return self.event.lots.filter(private=True)
+        return self.event.lots.filter(private=True, active=True)
 
     def has_available_lots(self):
         available_lots = []
 
-        for lot in self.event.lots.all():
+        for lot in self.event.lots.filter(active=True):
             if lot.status == lot.LOT_STATUS_RUNNING:
                 available_lots.append(lot)
 
@@ -141,7 +141,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
         return True if len(available_lots) > 0 else False
 
     def get_available_lots(self):
-        all_lots = self.event.lots.filter(private=False)
+        all_lots = self.event.lots.filter(private=False, active=True)
         available_lots = []
 
         for lot in all_lots:
@@ -197,6 +197,7 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
             try:
                 context['subscription'] = \
                     Subscription.objects.get(person=person,
+                                             completed=True,
                                              event=self.event)
                 context['is_subscribed'] = True
             except Subscription.DoesNotExist:
@@ -239,6 +240,7 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
                 person = user.person
                 Subscription.objects.get(
                     person=person,
+                    completed=True,
                     event=self.event
                 )
                 return True

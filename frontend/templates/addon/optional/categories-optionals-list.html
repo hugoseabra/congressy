@@ -1,0 +1,207 @@
+{% load base_tags l10n humanize %}
+
+{% if optionals.count %}
+<ul class="list-group block-list">
+    {% for optional in optionals.all %}
+    <li class="list-group-item">
+        <div class="row tooltip-wrapper">
+            <div class="col-md-8 col-lg-7 col-xl-8" style="word-wrap: break-word">
+                <div class="panel-title">
+                    <small class="text-muted">{{ optional.optional_type.name }}</small>
+                    <br />
+                    {{ optional.name }}
+                </div>
+                <hr />
+                <div style="margin-bottom:3px;">
+                    <div class="float-left" style="margin-bottom:3px;">
+                        <div>
+                            {% if active == 'product' %}Vendas{% else %}Inscrições{% endif %} até:
+                            <span style="font-weight: bold;">
+                                {{ optional.date_end_sub|date:"d/m/Y H\hi" }}
+                            </span>
+                        </div>
+                        {% if active == 'service' %}
+                        <div>
+                            <div style="margin-bottom:4px;">Programação:</div>
+                            <div style="margin-left:10px;font-size:12px">
+                                <div>
+                                    <strong>Início:</strong>
+                                    &ensp;&ensp;&ensp;&ensp;
+                                    <i class="fas fa-calendar" style="margin-right:2px"></i>
+                                    {{ optional.schedule_start|date:"d/m/Y" }}
+                                    &ensp;&ensp;
+                                    <i class="fas fa-clock" style="margin-right:2px"></i>
+                                    {{ optional.schedule_start|date:"H\hi" }}
+                                </div>
+                                <div>
+                                    <strong>Término:</strong>
+                                    &ensp;
+                                    <i class="fas fa-calendar" style="margin-right:2px"></i>
+                                    {{ optional.schedule_end|date:"d/m/Y" }}
+                                    &ensp;&ensp;
+                                    <i class="fas fa-clock" style="margin-right:2px"></i>
+                                    {{ optional.schedule_end|date:"H\hi" }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="float-right">
+                        {% if optional.theme %}
+                        <div style="font-size:14px" class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Grupo temático da atividade">{{ optional.theme.name }}</div>
+                        {% endif %}
+                        {% if optional.price %}
+                        <div style="font-size:14px" class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Preço {% if active == 'product' %}do produto/serviço{% else %}da atividade{% endif %}">R$ {{ optional.price|intcomma|unlocalize }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+
+                {% if optional.running %}
+                    <div class="badge badge-success" data-toggle="tooltip" title="" data-original-title="Status: em andamento">Andamento</div>
+                {% elif optional.finished %}
+                    <div class="badge badge-warning" data-toggle="tooltip" data-original-title="Status: finalizado">Finalizado</div>
+                {% else %}
+                    <div class="badge" data-toggle="tooltip" data-original-title="Status: ainda não iniciado">Não-iniciado</div>
+                {% endif %}
+
+
+                <hr />
+                <div style="margin-bottom:3px;">
+                    {% if active == 'product' %}Vendidos{% else %}Inscrições{% endif %}:
+                    <span style="font-weight: bold;">
+                        {{ subscription_stats.num|lookup:optional.pk }}
+                        {% if not optional.quantity %}(ilimitado){% endif %}
+                    </span>
+                </div>
+                {% if optional.quantity %}
+                <div style="margin-bottom:3px;">
+                    {% if active == 'product' %}Quantidade disponível{% else %}Vagas disponíveis{% endif %}: <span style="font-weight: bold;"><span style="font-weight: bold;">{{ subscription_stats.remaining|lookup:optional.pk }}</span></span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-2 col-lg-3 col-xl-2">
+                <hr class="hidden-md hidden-lg hidden-xl" />
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="Gerenciar limite de {% if active == 'product' %}estoque{% else %}vagas{% endif %}">
+                    {% if active == 'product' %}
+                    <button
+                        class="btn btn-sm btn-info btn-block {% if not optional.quantity %}btn-trans{% endif %}"
+                        data-toggle="modal"
+                        data-backdrop="static"
+                        onclick="$('#product-limit_product-id').val('{{ optional.pk }}');$('#product-limit_product-name').text('{{ optional.name }}');$('#product-limit').val('{{ optional.quantity|default_if_none:0 }}')"
+                        data-target="#modal-product-limit-form">
+                        <i class="fas fa-list"></i>
+                        <span class="hidden-md">Quantidade</span>
+                    </button>
+                    {% else %}
+                    <button
+                        class="btn btn-sm btn-info btn-block {% if not optional.quantity %}btn-trans{% endif %}"
+                        data-toggle="modal"
+                        data-backdrop="static"
+                        onclick="$('#service-limit_service-id').val('{{ optional.pk }}');$('#service-limit_service-name').text('{{ optional.name }}');$('#service-limit').val('{{ optional.quantity|default_if_none:0 }}')"
+                        data-target="#modal-service-limit-form">
+                        <i class="fas fa-users"></i>
+                        <span class="hidden-md">Vagas</span>
+                    </button>
+                    {% endif %}
+                </div>
+                {% if active == 'service' %}
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="Restringir vaga de participante exclusivamente para este opcional.">
+                    <button
+                        class="btn btn-sm btn-info btn-block {% if not optional.restrict_unique %}btn-trans{% endif %}"
+                        data-toggle="modal"
+                        data-backdrop="static"
+                        onclick="{% if optional.restrict_unique %}unset_restrict_unique('{{ active }}', {{ optional.pk }});{% else %}set_restrict_unique('{{ active }}', {{ optional.pk }}){% endif %}"
+                        data-target="#lot-limit-form">
+                        <i class="fas fa-user-times"></i>
+                        <span class="hidden-md">Restringir vagas</span>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-2">
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="Editar">
+                    {% if active == 'service' %}
+                    <button
+                       onclick="window.location.href='{% url 'addon:optional-service-edit' event.pk optional.pk %}'"
+                       class="btn btn-sm btn-primary btn-trans btn-block"
+                       data-target="#lot-form">
+                       <i class="fa fa-pencil-alt"></i>
+                    </button>
+                    {% endif %}
+                    {% if active == 'product' %}
+                    <button
+                       onclick="window.location.href='{% url 'addon:optional-product-edit' event.pk optional.pk %}'"
+                       class="btn btn-sm btn-primary btn-trans btn-block"
+                       data-target="#lot-form">
+                       <i class="fa fa-pencil-alt"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                {% if optional.published %}
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="{% if active == 'product' %}Este produto/serviço está ativo{% else %}Esta  atividade está ativa{% endif %}. Clique para desativá-la.">
+                    <button
+                        onclick="unpublish_optional('{{ active }}', {{ optional.pk }})"
+                        class="btn btn-sm btn-success btn-trans btn-block">
+                        <i class="fas fa-check-circle"></i>
+                    </button>
+                </div>
+                {% else %}
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="{% if active == 'product' %}Este produto/serviço está inativo{% else %}Esta atividade está inativa{% endif %}. Clique para ativá-la.">
+                    <button
+                        onclick="publish_optional('{{ active }}', {{ optional.pk }})"
+                        class="btn btn-sm btn-warning btn-trans btn-block">
+                        <i class="fa fa-exclamation-circle"></i>
+                    </button>
+                </div>
+                {% endif %}
+                {% if optional.is_deletable %}
+                <div
+                    data-toggle="tooltip"
+                    data-placement="left"
+                    title=""
+                    data-original-title="Excluir">
+                    {% if active == 'service' %}
+                    <button class="btn btn-sm btn-default btn-trans btn-block"
+                        onclick="window.location.href='{% url 'addon:optional-service-delete' event.pk optional.pk %}'">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    {% endif %}
+                    {% if active == 'product' %}
+                    <button class="btn btn-sm btn-default btn-trans btn-block"
+                        onclick="window.location.href='{% url 'addon:optional-product-delete' event.pk optional.pk %}'">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+    <div style="padding: 40px 20px">
+    Não há opcionais nesta categoria.
+    </div>
+{% endif %}
