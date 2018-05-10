@@ -56,8 +56,12 @@
                             {% endfor %}
                             <div class="well well-sm"
                                  style="text-align: justify">
-                                <h3>Checkout:</h3>
-                                <div><strong>Inscrição:</strong></div>
+                                <h3>Checkout: {{ subscription.person.name}}</h3>
+                                <div>
+                                    <strong>
+                                        Inscrição:
+                                    </strong>
+                                </div>
                                 <ul>
                                     {% if lot.price %}
                                         <ol><strong>R$ {{ lot.price }}</strong>
@@ -233,7 +237,7 @@
                 {% if products %}
                     // Adiciona billing de opcionais de produtos/serviços
                     {% for product in products %}
-                        {% if produdct.optional_price %}
+                        {% if product.optional_price %}
                         window.cgsy.payment.add_item(
                             'optional-product',
                             '{{ subscription.pk }}',

@@ -189,6 +189,7 @@ class SubscriptionWizardView(SessionWizardView):
 
             context['products'] = products
             context['services'] = services
+            context['subscription'] = subscription
             context['lot'] = lot
 
             total = subscription.lot.price or 0.00
