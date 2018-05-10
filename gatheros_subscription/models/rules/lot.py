@@ -100,7 +100,7 @@ def rule_9_lote_pago_deve_ter_limite(lot):
         ]})
 
 
-def rule_10_lote_privado_deve_ter_codigo_de(lot):
+def rule_10_lote_privado_deve_ter_codigo_de_exibicao(lot):
     if lot.private and not lot.promo_code:
         raise ValidationError({'exhibition_code': [
             'Lotes privados devem possui um código promocional para acessá-lo.'

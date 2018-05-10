@@ -110,30 +110,48 @@
     </script>
 {% endblock %}
 
+{% block styles %}
+    <style>
+    .profile-info-padding {
+        padding: 4px 9px;
+    }
+    </style>
+{% endblock %}
+
 {% block content %}
-    <div class="row">
+    <div class="row tooltip-wrapper">
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-left">
-                    <button onclick="window.href.location='{% url 'subscription:subscription-list' event.pk %}'"
-                       class="btn btn-primary">
+                    <button onclick="window.location.href='{% url 'subscription:subscription-list' event.pk %}'"
+                        data-toggle="tooltip"
+                        title=""
+                        data-original-title="Voltar a lista de inscrições"
+                        class="btn btn-primary">
                         <i class="fa fa-arrow-circle-left"></i>
-                        Fechar
+                        Inscrições
                     </button>
                 </div>
                 <div class="float-right">
                     <button
-                       class="btn btn-info btn-trans" title="Relatório financeiro">
+                        data-toggle="tooltip"
+                        title="Abrir informações financeiras do participante"
+                        class="btn btn-info btn-trans">
                         <i class="far fa-money-bill-alt"></i>
                         Financeiro
                     </button>
                     <button
-                       class="btn btn-info btn-trans" title="Gerenciar boleto">
+                        data-toggle="tooltip"
+                        title="Enviar boleto para o participante"
+                        class="btn btn-success btn-trans">
                         <i class="fas fa-barcode"></i>
-                        Boleto
+                        Enviar Boleto
                     </button>
                     <button
-                       class="btn btn-info btn-trans" title="Enviar mensagem para participante">
+                        data-toggle="tooltip"
+                        data-placement="left"
+                        title="Enviar mensagem personalizada ao participante"
+                        class="btn btn-success btn-trans">
                         <i class="far fa-envelope"></i>
                         Mensagem
                     </button>
@@ -143,19 +161,133 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel" id="address-block-hidden">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Detalhes</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                asdf
-                            </div>
+    <div class="row tooltip-wrapper">
+        <div class="col-md-3">
+            <div class="panel">
+                <div class="panel">
+                    <div class="panel-body" style="padding:0">
+                        <div style="border:1px solid #ddd">
+                            <table class="table table-inbox table-hover" style="margin-bottom:0">
+                                <thead>
+                                    <tr>
+                                        <th>Identificadores</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="unread">
+                                        <td class="message" style="cursor: default;border-top:0">
+                                            <span class="title">ID</span>
+                                            {{ object.pk }}
+                                        </td>
+                                    </tr>
+                                    <tr class="unread">
+                                        <td class="message">
+                                            <span class="title">Código</span>
+                                            {{ object.code }} (#{{ object.count }})
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel">
+                <div class="panel-body" style="padding:0">
+                    <div style="border:1px solid #ddd">
+                        <table class="table table-inbox table-hover" style="margin-bottom:0">
+                            <thead>
+                                <tr>
+                                    <th>Situação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="unread">
+                                    <td class="message" style="cursor: default;border-top:0">
+                                        <span class="title">Presente</span>
+{#                                        {% if object.attended %}Sim{% else %}Não{% endif %}#}
+                                        Sim <small class="text-muted">- 27/05/2018 17h03</small>
+                                    </td>
+                                </tr>
+                                <tr class="unread">
+                                    <td class="message">
+                                        <div>
+                                            <div class="float-left">
+                                                <span class="title">Status</span>
+{#                                                {% if object.status == object.CONFIRMED_STATUS %}#}
+{#                                                <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>#}
+{#                                                {% elif object.status == object.AWAITING_STATUS %}#}
+{#                                                <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>#}
+{#                                                {% elif object.status == object.CANCELED_STATUS %}#}
+{#                                                <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>#}
+{#                                                {% endif %}#}
+{#                                                {{ object.get_status_display|title }}#}
+                                                <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
+                                                Confirmado <small class="text-muted">- 27/05/2018 17h03</small>
+                                            </div>
+                                            <div class="float-right" style="margin-left:10px">
+                                                <button type="button"
+                                                        data-toggle="tooltip"
+                                                        title="Abrir voucher"
+                                                        class="btn btn-default btn-sm btn-trans">voucher</button>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel">
+                <div class="panel-body" style="padding:0">
+                    <div style="border:1px solid #ddd">
+                        <table class="table table-inbox table-hover" style="margin-bottom:0">
+                            <thead>
+                                <tr>
+                                    <th>Sobre o Pagamento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="unread">
+                                    <td class="message" style="cursor: default;border-top:0">
+                                        <div>
+                                            <div class="float-left">
+{#                                                <i style="font-size: 40px" class="fas fa-credit-card"></i>#}
+                                                <i style="font-size: 40px" class="fas fa-barcode"></i>
+                                            </div>
+                                            <div class="float-left" style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                Boleto <strong class="text-warning">(vencido)</strong>
+                                            </div>
+                                            <div class="float-right">
+                                                <button type="button"
+                                                        data-toggle="tooltip"
+                                                        title="Abrir documento"
+                                                        class="btn btn-default btn-sm btn-trans">documento</button>
+                                                <button type="button"
+                                                        data-toggle="tooltip"
+                                                        data-placement="left"
+                                                        title="Ver atualizações do pagamento"
+                                                        class="btn btn-info btn-sm btn-trans">atualizações</button>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="unread">
+                                    <td class="message">
+                                        <span class="title">Valor</span>
+                                        {{ object.lot.display_publicly }} <strong class="text-danger">(não-pago)</strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -165,7 +297,7 @@
     <div class="row">
         <div class="col-xl-2 col-lg-3 col-md-3" style="margin-bottom: 4px;">
             <div class="panel panel-primary" id="block-profile">
-                <div class="panel-body profile-block">
+                <div class="panel-body minimal profile-block">
                     <div class="col-md-12 col-xs-4">
                         <img src="{% static 'assets/img/user_undefined.jpg' %}" class="img-responsive">
                     </div>
@@ -208,14 +340,14 @@
                         <div class="col-lg-12 col-xl-5">
                             <div class="form-group">
                                 <label>Categoria:</label>
-                                <div class="well well-sm">{{ object.lot.category.name }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.lot.category.name }}</div>
                             </div>
                         </div>
                         {% endif %}
                         <div class="col-lg-12 col-xl-7">
                             <div class="form-group">
                                 <label>Lote:</label>
-                                <div class="well well-sm">{{ object.lot.display_publicly }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.lot.name }}</div>
                             </div>
                         </div>
                     </div>
@@ -231,7 +363,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Nome completo:</label>
-                                <div class="well well-sm">{{ object.person.name }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.person.name }}</div>
                             </div>
                         </div>
                     </div>
@@ -239,13 +371,13 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>E-mail:</label>
-                                <div class="well well-sm">{{ object.person.email }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.person.email }}</div>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Celular:</label>
-                                <div class="well well-sm">{{ object.person.phone|default:'-' }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.person.phone|default:'-' }}</div>
                             </div>
                         </div>
                     </div>
@@ -254,7 +386,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Cidade:</label>
-                                <div class="well well-sm">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
                             </div>
                         </div>
                     </div>
@@ -280,7 +412,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Logradouro (Rua/Av.):</label>
-                                <div class="well well-sm">{{ object.person.street|default:'-' }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.person.street|default:'-' }}</div>
                             </div>
                         </div>
                     </div>
@@ -288,13 +420,13 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Número:</label>
-                                <div class="well well-sm">{{ object.person.number|default:'-' }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.person.number|default:'-' }}</div>
                             </div>
                         </div>
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label>Complemento:</label>
-                                <div class="well well-sm">{{ object.person.complemento|default:'-' }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.person.complemento|default:'-' }}</div>
                             </div>
                         </div>
                     </div>
@@ -302,13 +434,13 @@
                         <div class="col-md-12 col-xl-4">
                             <div class="form-group">
                                 <label>Bairro:</label>
-                                <div class="well well-sm">{{ object.person.village|default:'-' }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.person.village|default:'-' }}</div>
                             </div>
                         </div>
                         <div class="col-md-12 col-xl-8">
                             <div class="form-group">
                                 <label>Cidade:</label>
-                                <div class="well well-sm">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
+                                <div class="well well-sm profile-info-padding">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
                             </div>
                         </div>
                     </div>
@@ -334,7 +466,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Instituição:</label>
-                                    <div class="well well-sm">{{ object.person.institution|default:'-' }}</div>
+                                    <div class="well well-sm profile-info-padding">{{ object.person.institution|default:'-' }}</div>
                                 </div>
                             </div>
                             {% endif %}
@@ -342,7 +474,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>CNPJ da Instituição:</label>
-                                    <div class="well well-sm">{{ object.person.get_institution_cnpj_display|default:'-' }}</div>
+                                    <div class="well well-sm profile-info-padding">{{ object.person.get_institution_cnpj_display|default:'-' }}</div>
                                 </div>
                             </div>
                             {% endif %}
@@ -350,7 +482,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Cargo:</label>
-                                    <div class="well well-sm">{{ object.person.function|default:'-' }}</div>
+                                    <div class="well well-sm profile-info-padding">{{ object.person.function|default:'-' }}</div>
                                 </div>
                             </div>
                             {% endif %}
@@ -359,22 +491,7 @@
                 </div>
             </div>
         </div>
-    </div>
-    {% endif %}
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="buttonbar bottom">
-                <div class="float-left">
-                    <a href="{% url 'subscription:subscription-list' event.pk %}"
-                       class="btn btn-primary">
-                        <i class="fa fa-arrow-circle-left"></i>
-                        Fechar
-                    </a>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
+        {% endif %}
     </div>
 
 {% endblock %}
