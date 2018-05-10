@@ -452,22 +452,51 @@ class SubscriptionWizardView(SessionWizardView):
     def get_form_kwargs(self, step=None):
         kwargs = super().get_form_kwargs(step)
 
+        if is_private(self):
+
+            if step == "private_lot":
+                kwargs.update({
+                    'event': self.event,
+                    'code': self.request.session.get('exhibition_code')
+                })
+
+        if step == 'lot':
+            kwargs.update({'event': self.event})
+
         if step == 'person':
 
-            # Assert that we have a person in storage
             if not hasattr(self.storage, 'subscription'):
                 self.get_subscription_from_session()
 
-            lot = self.storage.subscription.lot
-
             kwargs.update({
-                'user': self.request.user,
-                'lot': lot,
+                'user': self.storage.subscription.person.user,
+                'lot': self.storage.subscription.lot,
                 'event': self.event,
-                'initial': self.storage.subscription.person})
+                'instance': self.storage.subscription.person,
+            })
 
         if step == 'survey':
-            kwargs.update({'user': self.request.user, 'event': self.event})
+            if not hasattr(self.storage, 'subscription'):
+                self.get_subscription_from_session()
+
+            kwargs.update({
+                'event': self.event,
+                'user': self.storage.subscription.person.user,
+                'event_survey': self.storage.subscription.lot.event_survey,
+            })
+
+        if step == 'payment':
+
+            if not hasattr(self.storage, 'subscription'):
+                self.get_subscription_from_session()
+
+            subscription = self.storage.subscription
+
+            kwargs.update({
+                'chosen_lot': subscription.lot,
+                'event': self.event,
+                'person': subscription.person
+            })
 
         return kwargs
 

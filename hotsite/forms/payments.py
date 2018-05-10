@@ -33,11 +33,11 @@ class PaymentForm(forms.Form):
         required=True,
     )
 
-    def __init__(self, **kwargs):
+    def __init__(self, chosen_lot, event, person, **kwargs):
 
-        self.lot_instance = kwargs.get('initial').get('choosen_lot')
-        self.event = kwargs.get('initial').get('event')
-        self.person = kwargs.get('initial').get('person')
+        self.lot_instance = chosen_lot
+        self.event = event
+        self.person = person
 
         if not isinstance(self.lot_instance, Lot):
             try:
