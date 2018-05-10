@@ -177,6 +177,7 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='assumir juros de parcelas',
         help_text="Número de parcelas que deseja assumir os juros."
     )
+    # @TODO verificar campo repetido: allow_installment e allow_installments
     allow_installments = models.BooleanField(
         default=False,
         verbose_name='parcelamento',

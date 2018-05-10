@@ -195,76 +195,123 @@
     <!-- SCRIPT PAGAR.ME -->
     <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
     <script src="{% static "hotsite/js/payment.js" %}"></script>
+    <script src="{% static "hotsite/js/pagarme_integration.js" %}"></script>
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
 
-    <script type="application/javascript">
-        function submit_back_form() {
-            $('#back_form').submit()
-        }
 
-        jQuery(document).ready(function() {
+    <script type="application/javascript">
+        (function ($) {
+            "use strict";
 
             window.setTimeout(function () {
+
                 $('form').submit(function () {
                     $(this).find(':submit').attr('disabled', 'disabled');
                 });
 
-                // disable boleto method
-                //window.cgsy.payment.disable_boleto();
+                var lot_price = parseFloat('{{ lot.price|intcomma|unlocalize }}');
+                window.cgsy.pagarme.add_items_list({{ lot.id }}, '{{ lot.event.name }}', lot_price, 1, false);
 
-                {% if lot.allow_installment is True %}
-                // disable installment
-                window.cgsy.payment.disable_installment();
-                {% endif %}
+                {% for product in products %}
+                    //id, name, price, quantity, tangible
+                    var price = parseFloat('{{ product.optional_liquid_price|intcomma|unlocalize }}');
+                    window.cgsy.pagarme.add_items_list({{ product.optional.id }}, '{{ product.optional.name }}', price, 1, true);
+                {% endfor %}
 
-                window.cgsy.payment.set_interest_rate(2.29);
-                window.cgsy.payment.set_max_installments('{{ lot.installment_limit }}');
-                window.cgsy.payment.set_free_rate_installments('{{ lot.num_install_interest_absortion }}');
+                {% for service in services %}
+                    //id, name, price, quantity, tangible
+                    var price = parseFloat('{{service.optional_liquid_price|intcomma|unlocalize }}');
+                    window.cgsy.pagarme.add_items_list({{ service.optional.id }}, '{{ service.optional.name }}', price, 1, false);
+                {% endfor %}
 
-                // Adiciona billing de inscrição
-                window.cgsy.payment.add_item(
-                    'subscription',
-                    '{{ subscription.pk }}',
-                    'Inscrição: {{ lot.event.name }}',
-                    1,
-                    parseFloat('{{ lot.price|unlocalize|intcomma }}')
-                );
+                var lot = {
+                    allow_installment: {{ lot.allow_installment }},
+                    {% if  lot.free_installment %}
+                        free_installment: true
+                    {% else %}
+                        free_installment: false
+                    {% endif %}
+                };
 
-                {% if products %}
-                    // Adiciona billing de opcionais de produtos/serviços
-                    {% for product in products %}
-                        {% if produdct.optional_price %}
-                        window.cgsy.payment.add_item(
-                            'optional-product',
-                            '{{ subscription.pk }}',
-                            'Produto/Serviço: {{ lot.event.name }}',
-                            1,
-                            parseFloat('{{ product.optional_price|unlocalize|intcomma }}')
-                        );
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
+                $('#id_button_pay').on('click', function () {
+                    var total = '{{ total|intcomma|unlocalize }}';
+                    var params = window.cgsy.pagarme.create_params(parseFloat(total), 2.29);
 
-                {% if services %}
-                    // Adiciona billing de opcionais de atividades extras
-                    {% for service in services %}
-                        {% if service.optional_price %}
-                        window.cgsy.payment.add_item(
-                            'optional-service',
-                            '{{ subscription.pk }}',
-                            'Atividade extra: {{ lot.event.name }}',
-                            1,
-                            parseFloat('{{ service.optional_price|unlocalize|intcomma }}')
-                        );
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
+                    var allow_installment = lot.allow_installment === true;
+                    var installment_limit = lot.installment_limit;
+                    var free_installment = parseInt(lot.free_installment);
+                    allow_installment = allow_installment === true;
 
-                 $('#id_button_pay').on('click', function () {
-                     window.cgsy.pagarme.process_payment('{{ pagarme_encryption_key }}');
-                 });
+                    function handleSuccess(data) {
+                        hide_payment_elements();
+
+                        switch (data.payment_method) {
+                            case 'boleto':
+                                $('#id_boleto').show();
+                                break;
+                            case 'credit_card':
+                                $('#id_credit_card').show();
+                                break;
+                            default:
+                                var msg = 'Unsupported payment type: ' + data.payment_method;
+                                Raven.captureException(msg);
+                                alert(
+                                    "Ocorreu um erro durante o processamento," +
+                                    " tente novamente depois."
+                                );
+                                Raven.showReportDialog();
+                        }
+
+                        $('#payment_buttons').show();
+                        $('#id_button_pay').hide();
+                        $('#id_remove').show();
+                        $('#next_btn').attr("disabled", false);
+                        $('#id_payment-transaction_type').val(data.payment_method);
+                        $('#id_payment-amount').val(data.amount);
+                        $('#id_payment-card_hash').val(data.card_hash);
+                        $('#id_payment-installments').val(data.installments);
+                    }
+
+                    function handleError(data) {
+                        if (TRACKER_CAPTURE && Raven) {
+                            Raven.captureException(JSON.stringify(data));
+                            Raven.showReportDialog();
+                        } else {
+                            alert(
+                                "Ocorreu um erro durante o processamento," +
+                                " tente novamente depois."
+                            );
+                        }
+                    }
+
+                    var checkout = new PagarMeCheckout.Checkout({
+                        encryption_key: '{{ pagarme_encryption_key }}',
+                        success: handleSuccess,
+                        error: handleError
+                    });
+
+                    if (allow_installment) {
+                        if (parseInt(installment_limit) > 10) {
+                            installment_limit = 10;
+                        }
+                        params['maxInstallments'] = parseInt(installment_limit) || 10;
+
+                        if (parseInt(free_installment) > 0) {
+                            params['freeInstallments'] = parseInt(free_installment);
+                        }
+                    }
+                    console.log(params);
+                    console.log(checkout);
+                    checkout.open(params);
+
+                });
 
             }, 300);
-        });
+
+            function submit_back_form() {
+                $('#back_form').submit()
+            }
+        })(jQuery);
+
     </script>
 {% endblock %}
