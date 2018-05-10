@@ -51,6 +51,7 @@ class LotManager(models.Manager):
             except Lot.DoesNotExist:
                 return code
 
+
 class RunningLots(models.Manager):
     def all_running_lots(self):
         return
@@ -329,12 +330,10 @@ class Lot(models.Model, GatherosModelMixin):
         self.check_rules()
         super(Lot, self).save(**kwargs)
 
-        rule.rule_10_lote_privado_deve_ter_codigo_promocional(self)
-
     def clean(self):
         """ Limpa valores dos campos. """
-        if self.private and not self.promo_code:
-            self.promo_code = Lot.objects.generate_promo_code()
+        if self.private and not self.exhibition_code:
+            self.exhibition_code = Lot.objects.generate_exhibition_code()
 
         if self.category and self.category.event.pk != self.event.pk:
             raise ValidationError({'category': [
@@ -348,6 +347,7 @@ class Lot(models.Model, GatherosModelMixin):
         rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)
         rule.rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(self)
         rule.rule_8_lot_interno_nao_pode_ter_preco(self)
+        rule.rule_10_lote_privado_deve_ter_codigo_de_exibicao(self)
 
     def __str__(self):
         return '{} - {}'.format(self.event.name, self.name)

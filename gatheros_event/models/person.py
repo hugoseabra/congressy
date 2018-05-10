@@ -240,6 +240,23 @@ class Person(models.Model, GatherosModelMixin):
             return ''
         return '{0}.{1}.{2}-{3}'.format(cpf[:3], cpf[3:6], cpf[6:9], cpf[9:11])
 
+    def get_institution_cnpj_display(self):
+        """
+        Recupera CPF formatado.
+
+        :return: string
+        """
+        cnpj = str(self.institution_cnpj)
+        if not cnpj:
+            return ''
+        return '{0}.{1}.{2}/{3}-{4}'.format(
+            cnpj[:2],
+            cnpj[2:5],
+            cnpj[5:8],
+            cnpj[8:12],
+            cnpj[12:14],
+        )
+
     def get_birth_date_display(self):
         """
         Recupera data de nascimento formatada.
