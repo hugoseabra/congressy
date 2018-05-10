@@ -172,18 +172,18 @@ class OptionalAddProductView(EventViewMixin, generic.CreateView):
         )
         return response
 
-    def get_initial(self):
-        from datetime import timedelta
-
-        initial = super().get_initial()
-        initial.update({
-            'name': 'Optional test',
-            'optional_type': 1,
-            'lot_category': 1,
-            'price': '22,00',
-            'date_end_sub': self.event.date_start - timedelta(minutes=1),
-        })
-        return initial
+    # def get_initial(self):
+    #     from datetime import timedelta
+    # 
+    #     initial = super().get_initial()
+    #     initial.update({
+    #         'name': 'Optional test',
+    #         'optional_type': 1,
+    #         'lot_category': 1,
+    #         'price': '22,00',
+    #         'date_end_sub': self.event.date_start - timedelta(minutes=1),
+    #     })
+    #     return initial
 
 
 class OptionalAddServiceView(EventViewMixin, generic.CreateView):
