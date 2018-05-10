@@ -44,7 +44,7 @@ TEMPLATES = {"private_lot": "hotsite/private_lot_form.html",
              "payment": "hotsite/payment_form.html"}
 
 
-def is_paid_lot(wizard):
+def has_payments(wizard):
     """Return true if user opts for  a paid lot"""
 
     # Get cleaned data from lots step
@@ -136,7 +136,7 @@ class SubscriptionWizardView(SessionWizardView):
     condition_dict = {
         'private_lot': is_private,
         'lot': is_not_private,
-        'payment': is_paid_lot,
+        'payment': has_payments,
         'survey': has_survey,
         'service': has_services,
         'product': has_products,
@@ -354,7 +354,7 @@ class SubscriptionWizardView(SessionWizardView):
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
             self.storage.person = form.save()
-            if not is_paid_lot(self):
+            if not has_payments(self):
                 self.set_subscription_as_completed()
 
         # Persisting survey
@@ -386,7 +386,7 @@ class SubscriptionWizardView(SessionWizardView):
             if survey_form.is_valid():
                 survey_form.save_answers()
 
-                if not is_paid_lot(self):
+                if not has_payments(self):
                     self.set_subscription_as_completed()
             else:
                 raise Exception('SurveyForm was invalid: {}'.format(
