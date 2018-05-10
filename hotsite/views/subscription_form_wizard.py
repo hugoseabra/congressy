@@ -644,3 +644,5 @@ class SubscriptionWizardView(SessionWizardView):
             return True
 
         return False
+
+
