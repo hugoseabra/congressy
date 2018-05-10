@@ -8,6 +8,7 @@ from django.conf import settings
 from partner import constants as partner_constants
 from payment.helpers.calculator import Calculator
 from gatheros_event.models import Organization
+from addon.models import SubscriptionProduct, SubscriptionService
 from payment.exception import TransactionError
 
 CONGRESSY_RECIPIENT_ID = settings.PAGARME_RECIPIENT_ID
@@ -16,14 +17,15 @@ CONGRESSY_RECIPIENT_ID = settings.PAGARME_RECIPIENT_ID
 class PagarmeTransactionInstanceData:
     # @TODO add international phone number capability
 
-    def __init__(self, subscription, extra_data, optionals, event):
+    items_list = []
+
+    def __init__(self, subscription, extra_data):
 
         self.subscription = subscription
         self.lot = subscription.lot
         self.person = subscription.person
+        self.event = subscription.event
         self.extra_data = extra_data
-        self.optionals = optionals
-        self.event = event
 
         self._set_amount()
         self._set_organization()
@@ -55,6 +57,24 @@ class PagarmeTransactionInstanceData:
                 .replace(' ', '')
 
             return string
+
+        # Add subscription to the items list
+        self.add_subscription_to_items_list(self.subscription)
+
+        # Add optionals to items list
+        products = SubscriptionProduct.objects.filter(
+                subscription=self.subscription)
+        if products.count() > 0:
+            for product in products:
+                self.add_optional_items_list(optional=product.optional,
+                                             is_tangible=True)
+
+        services = SubscriptionService.objects.filter(
+            subscription=self.subscription)
+        if services.count() > 0:
+            for service in services:
+                self.add_optional_items_list(optional=service.optional,
+                                             is_tangible=False)
 
         transaction_data = {
 
@@ -91,17 +111,7 @@ class PagarmeTransactionInstanceData:
                 }
             },
 
-            "items": [
-                {
-                    "id": str(transaction_id),
-                    "title": self.event.name,
-                    "category": "inscrição",
-                    "unit_price": self.as_payment_format(
-                        self.lot.get_calculated_price()),
-                    "quantity": 1,
-                    "tangible": False
-                }
-            ],
+            "items": self.items_list,
 
             "metadata": {
                 "evento": self.event.name,
@@ -128,17 +138,6 @@ class PagarmeTransactionInstanceData:
         if self.transaction_type == 'boleto':
             transaction_data['installments'] = ''
             transaction_data['payment_method'] = 'boleto'
-
-        for optional in self.optionals:
-            transaction_data['items'].append({
-                "id": str(optional.pk),
-                "title": optional.name,
-                "category": 'opcional',
-                "unit_price": self.as_payment_format(
-                    self.get_calculated_price(optional.price, self.lot)),
-                "quantity": 1,
-                "tangible": True
-            })
 
         # Estabelecer uma referência de qual o estado sistema houve a transação
         environment_version = os.getenv('ENVIRONMENT_VERSION')
@@ -356,3 +355,32 @@ class PagarmeTransactionInstanceData:
             return round(price + congressy_amount, 2)
 
         return round(price, 2)
+
+    def add_optional_items_list(self, optional, is_tangible=False):
+
+        optional_dict = {
+            "id": str(optional.pk),
+            "title": optional.name,
+            "category": 'opcional',
+            "unit_price": self.as_payment_format(
+                self.get_calculated_price(optional.price, self.lot)),
+            "quantity": 1,
+            "tangible": is_tangible
+        }
+
+        self.items_list.append(optional_dict)
+
+    def add_subscription_to_items_list(self, subscription):
+
+        self.items_list.append(
+            {
+                "id": str(subscription.pk),
+                "title": 'Inscrição ' + self.event.name,
+                "category": "inscrição",
+                "unit_price": self.as_payment_format(
+                    self.lot.get_calculated_price()),
+                "quantity": 1,
+                "tangible": False
+            }
+        )
+

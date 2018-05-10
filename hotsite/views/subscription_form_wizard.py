@@ -411,27 +411,8 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                     person = Person.objects.get(user=self.request.user)
                     self.storage.person = person
 
-                if not hasattr(self.storage, 'product_storage'):
-                    self.storage.product_storage = []
-
-                    addons_data = self.storage.get_step_data('addon')
-
-                    if addons_data:
-
-                        for key, value in addons_data.items():
-                            if 'product_' in key:
-
-                                product = self.get_product(pk=value)
-
-                                if product not in self.storage.product_storage:
-                                    self.storage.product_storage.append(
-                                        product)
-
                 if not hasattr(self.storage, 'subscription'):
-                    self.storage.subscription = Subscription.objects.get(
-                        person=self.storage.person,
-                        event=self.event
-                    )
+                    self.get_subscription_from_session()
 
                 try:
                     with transaction.atomic():
@@ -439,8 +420,6 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
                         transaction_data = PagarmeTransactionInstanceData(
                             subscription=self.storage.subscription,
                             extra_data=form_data,
-                            optionals=self.storage.product_storage,
-                            event=self.event
                         )
 
                         create_pagarme_transaction(
