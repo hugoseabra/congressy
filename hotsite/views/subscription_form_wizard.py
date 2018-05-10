@@ -596,7 +596,10 @@ class SubscriptionWizardView(EventMixin, SessionWizardView):
 
     def set_subscription_as_completed(self):
 
-        subscription = self.get_subscription_from_session()
+        if not self.storage.subscription:
+            self.get_subscription_from_session()
+
+        subscription = self.storage.subscription
         new_subscription = self.request.session['is_new_subscription']
 
         subscription.completed = True
