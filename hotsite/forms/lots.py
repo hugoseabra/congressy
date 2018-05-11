@@ -43,6 +43,8 @@ class LotsForm(forms.Form):
         choices = []
 
         for lot in public_lots:
+            if not lot.places_remaining:
+                continue
 
             if lot.price and lot.price > 0:
                 lot_name = "{} - R${}".format(lot.name,
