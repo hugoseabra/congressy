@@ -443,20 +443,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         if step == 'person':
 
-            lot_pk = None
-            private_lot_data = self.storage.get_step_data('private_lot')
-            lot_data = self.storage.get_step_data('lot')
-
-            if private_lot_data is not None:
-                lot_pk = private_lot_data.get('private_lot-lots')
-            elif lot_data is not None:
-                lot_pk = lot_data.get('lot-lots')
-
-            if not lot_pk:
-                raise AttributeError('Não foi possivel pegar uma referencia '
-                                     'de lote.')
-
-            lot = Lot.objects.get(pk=lot_pk, event=self.event)
+            lot = self.get_lot_from_session()
 
             kwargs.update({'user': self.request.user, 'lot': lot, 'event':
                 self.event})
