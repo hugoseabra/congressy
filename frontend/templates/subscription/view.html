@@ -120,7 +120,7 @@
                         Inscrições
                     </button>
                 </div>
-                <div class="float-right">
+                <div class="float-right" style="display:none">
                     <button
                         data-toggle="tooltip"
                         title="Abrir informações financeiras do participante"
@@ -195,8 +195,8 @@
                                 <tr class="unread">
                                     <td class="message" style="cursor: default;border-top:0">
                                         <span class="title">Presente</span>
-{#                                        {% if object.attended %}Sim{% else %}Não{% endif %}#}
-                                        Sim <small class="text-muted">- 27/05/2018 17h03</small>
+                                        {% if object.attended %}Sim{% else %}Não{% endif %}
+{#                                        Sim <small class="text-muted">- 27/05/2018 17h03</small>#}
                                     </td>
                                 </tr>
                                 <tr class="unread">
@@ -204,19 +204,19 @@
                                         <div>
                                             <div class="float-left">
                                                 <span class="title">Status</span>
-{#                                                {% if object.status == object.CONFIRMED_STATUS %}#}
-{#                                                <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>#}
-{#                                                {% elif object.status == object.AWAITING_STATUS %}#}
-{#                                                <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>#}
-{#                                                {% elif object.status == object.CANCELED_STATUS %}#}
-{#                                                <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>#}
-{#                                                {% endif %}#}
-{#                                                {{ object.get_status_display|title }}#}
+                                                {% if object.status == object.CONFIRMED_STATUS %}
                                                 <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
-                                                Confirmado <small class="text-muted">- 27/05/2018 17h03</small>
+                                                {% elif object.status == object.AWAITING_STATUS %}
+                                                <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>
+                                                {% elif object.status == object.CANCELED_STATUS %}
+                                                <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>
+                                                {% endif %}
+                                                {{ object.get_status_display|title }}
+{#                                                <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>#}
+{#                                                Confirmado <small class="text-muted"> - 27/05/2018 17h03</small>#}
                                             </div>
                                             <div class="float-right" style="margin-left:10px">
-                                                <button type="button"
+                                                <button type="button" style="display:none"
                                                         data-toggle="tooltip"
                                                         title="Abrir voucher"
                                                         class="btn btn-default btn-sm btn-trans">voucher</button>
@@ -232,7 +232,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="panel">
+            <div class="panel" style="display:none">
                 <div class="panel-body" style="padding:0">
                     <div style="border:1px solid #ddd">
                         <table class="table table-inbox table-hover" style="margin-bottom:0">
