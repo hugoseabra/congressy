@@ -6,9 +6,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.views import generic
 
+from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from hotsite.views import EventMixin
 from payment.models import Transaction
@@ -18,10 +19,19 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
     template_name = 'hotsite/subscription_status.html'
     person = None
     subscription = None
+    event = None
+    restart_private_event = False
 
     def dispatch(self, request, *args, **kwargs):
 
-        response = super().dispatch(request, *args, **kwargs)
+        slug = self.kwargs.get('slug')
+
+        if not slug:
+            return redirect('https://congressy.com')
+        self.event = get_object_or_404(Event, slug=slug)
+
+        if not request.user.is_authenticated:
+            return redirect('public:hotsite', slug=self.event.slug)
 
         self.person = self.get_person()
 
@@ -31,22 +41,17 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
                 'public:hotsite',
                 slug=self.event.slug
             )
-
         try:
             self.subscription = Subscription.objects.get(
                 event=self.event, person=self.person)
-
-            if not request.user.is_authenticated or not self.person:
-                return redirect('public:hotsite', slug=self.event.slug)
-
-            return response
-
         except Subscription.DoesNotExist:
             messages.error(
                 message='Você não possui inscrição neste evento.',
                 request=request
             )
             return redirect('public:hotsite', slug=self.event.slug)
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
 
@@ -59,6 +64,19 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         context['pagarme_key'] = settings.PAGARME_ENCRYPTION_KEY
         context['remove_preloader'] = True
         context['subscription'] = self.subscription
+        context['is_private_event'] = self.is_private_event()
+        context['lot_is_still_valid'] = False
+
+        lot = self.subscription.lot
+
+        if lot.private is True:
+            
+            if lot.status == lot.LOT_STATUS_RUNNING:
+                context['lot_is_still_valid'] = True
+                self.request.session['exhibition_code'] = lot.exhibition_code
+
+            self.request.session['has_private_subscription'] = \
+                str(self.subscription.pk)
 
         return context
 
@@ -140,5 +158,28 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
 
             except (Subscription.DoesNotExist, AttributeError):
                 pass
+
+        return False
+
+    def is_private_event(self):
+        """ Verifica se evento possui apenas lotes privados. """
+        public_lots = []
+        private_lots = []
+
+        for lot in self.event.lots.all():
+            if lot.private is True:
+                private_lots.append(lot.pk)
+                continue
+
+            if self.is_lot_publicly_available(lot):
+                public_lots.append(lot.pk)
+
+        return len(public_lots) == 0 and len(private_lots) > 0
+
+    @staticmethod
+    def is_lot_publicly_available(lot):
+
+        if lot.status == lot.LOT_STATUS_RUNNING and not lot.private:
+            return True
 
         return False

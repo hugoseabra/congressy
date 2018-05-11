@@ -4,10 +4,10 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from django.db.models import Q
 from django.views.generic import ListView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -28,6 +28,8 @@ from mailer.services import (
     notify_new_user_and_unpaid_subscription_credit_card,
     notify_new_user_and_unpaid_subscription_boleto,
     notify_paid_subscription_boleto,
+    notify_refunded_subscription_boleto,
+    notify_refunded_subscription_credit_card,
 )
 from mailer.tasks import send_mail
 from payment.helpers import (
@@ -172,6 +174,7 @@ def postback_url_view(request, uidb64):
         is_new_subscription = not sub_user.last_login
         is_paid = new_desired_status == Transaction.PAID
         is_refused = new_desired_status == Transaction.REFUSED
+        is_refunded = new_desired_status == Transaction.REFUNDED
         is_starting_status = new_desired_status == Transaction.WAITING_PAYMENT
 
         if is_new_subscription:
@@ -189,12 +192,22 @@ def postback_url_view(request, uidb64):
                         event,
                         transaction
                     )
+                elif is_refunded:
+                    notify_refunded_subscription_boleto(event, transaction)
                 else:
                     raise mailer_notification.NotifcationError(
                         'Notificação de transação de boleto de nova inscrição'
                         ' não pôde ser realizada devido ao seguinte erro:'
-                        ' status desconhecido para notificação - "{}".'.format(
-                            new_desired_status
+                        ' status desconhecido para notificação - "{}".'
+                        ' Evento: {}. Inscrição: {} ({} - {} - {}).'
+                        ' Transaction {}: '.format(
+                            new_desired_status,
+                            event.name,
+                            sub_user.get_full_name(),
+                            sub_user.pk,
+                            sub_user.email,
+                            transaction.subscription.pk,
+                            transaction.pk,
                         )
                     )
 
@@ -217,19 +230,41 @@ def postback_url_view(request, uidb64):
                         event,
                         transaction
                     )
+                elif is_refunded:
+                    notify_refunded_subscription_credit_card(
+                        event,
+                        transaction
+                    )
                 else:
                     raise mailer_notification.NotifcationError(
                         'Notificação de transação de cartão de crédito de nova'
                         ' inscrição não pôde ser realizada devido ao seguinte'
                         ' erro: status desconhecido para notificação'
-                        ' - "{}".'.format(new_desired_status)
+                        ' - "{}". Evento: {}.'
+                        ' Inscrição: {} ({} - {} - {}).'
+                        ' Transaction {}: '.format(
+                            new_desired_status,
+                            event.name,
+                            sub_user.get_full_name(),
+                            sub_user.pk,
+                            sub_user.email,
+                            transaction.subscription.pk,
+                            transaction.pk,
+                        )
                     )
             else:
                 raise mailer_notification.NotifcationError(
                     'Notificação de transação de nova inscrição não pôde ser'
                     ' realizada devido ao seguinte erro: método de  pagamento'
-                    ' desconhecido para notificação - "{}".'.format(
-                        new_desired_status
+                    ' desconhecido para notificação - "{}". Evento: {}.'
+                    ' Inscrição: {} ({} - {} - {}). Transaction {}: '.format(
+                        new_desired_status,
+                        event.name,
+                        sub_user.get_full_name(),
+                        sub_user.pk,
+                        sub_user.email,
+                        transaction.subscription.pk,
+                        transaction.pk,
                     )
                 )
 
@@ -242,13 +277,22 @@ def postback_url_view(request, uidb64):
                 # Se não é status inicial, certamente o boleto foi pago.
                 elif is_paid:
                     notify_paid_subscription_boleto(event, transaction)
-
+                elif is_refunded:
+                    notify_refunded_subscription_boleto(event, transaction)
                 else:
                     raise mailer_notification.NotifcationError(
                         'Notificação de transação de boleto de inscrição'
                         ' não pôde ser realizada devido ao seguinte erro:'
-                        ' status desconhecido para notificação - "{}".'.format(
-                            new_desired_status
+                        ' status desconhecido para notificação - "{}".'
+                        ' Evento: {}. Inscrição: {} ({} - {} - {}).'
+                        ' Transaction {}: '.format(
+                            new_desired_status,
+                            event.name,
+                            sub_user.get_full_name(),
+                            sub_user.pk,
+                            sub_user.email,
+                            transaction.subscription.pk,
+                            transaction.pk,
                         )
                     )
 
@@ -271,20 +315,42 @@ def postback_url_view(request, uidb64):
                         event,
                         transaction
                     )
+                elif is_refunded:
+                    notify_refunded_subscription_credit_card(
+                        event,
+                        transaction
+                    )
                 else:
                     raise mailer_notification.NotifcationError(
                         'Notificação de transação de cartão de crédito de'
                         ' inscrição não pôde ser realizada devido ao seguinte'
                         ' erro: status desconhecido para notificação'
-                        ' - "{}".'.format(new_desired_status)
+                        ' - "{}". Evento: {}.'
+                        ' Inscrição: {} ({} - {} - {}).'
+                        ' Transaction {}: '.format(
+                            new_desired_status,
+                            event.name,
+                            sub_user.get_full_name(),
+                            sub_user.pk,
+                            sub_user.email,
+                            transaction.subscription.pk,
+                            transaction.pk,
+                        )
                     )
 
             else:
                 raise mailer_notification.NotifcationError(
                     'Notificação de transação de inscrição não pôde ser'
                     ' realizada devido ao seguinte erro: método de  pagamento'
-                    ' desconhecido para notificação - "{}".'.format(
-                        new_desired_status
+                    ' desconhecido para notificação - "{}". Evento: {}.'
+                    ' Inscrição: {} ({} - {} - {}). Transaction {}: '.format(
+                        new_desired_status,
+                        event.name,
+                        sub_user.get_full_name(),
+                        sub_user.pk,
+                        sub_user.email,
+                        transaction.subscription.pk,
+                        transaction.pk,
                     )
                 )
 

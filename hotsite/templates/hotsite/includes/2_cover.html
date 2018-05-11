@@ -2,8 +2,7 @@
 
 <!-- HERO
 ================================= -->
-<section id="hero"
-         class="hero-section hero-layout-classic hero-layout-features-and-form section section-dark">
+<section id="hero" class="hero-section hero-layout-classic hero-layout-features-and-form section section-dark">
 
     <div class="section-background">
 
@@ -21,6 +20,7 @@
 
         <div class="hero-content">
             <div class="hero-content-inner">
+
                 <div class="hero-heading text-center row"
                      data-animation="fadeIn">
                     <div class="col-md-10 col-md-offset-1">
@@ -50,7 +50,8 @@
                                 {{ info.lead }}
                             </p>
                         {% endif %}
-                        {% if subscription_enabled and lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS %}
+
+                        {% if subscription_enabled and lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subsciption_finished %}
                             <ul class="icon-list">
                                 {% for lot in lots %}
                                     {% if lot.status != lot.LOT_STATUS_NOT_STARTED %}
@@ -73,12 +74,17 @@
                                     {% endif %}
                                 {% endfor %}
                             </ul>
+                        {% elif subscription_enabled and private_lots and event.subscription_type == event.SUBSCRIPTION_BY_LOTS and not subsciption_finished %}
+
+                            <p style="font-size: 20px;font-style: italic;">Este é um evento restrito a convidados.</p>
+
                         {% elif subsciption_finished %}
                             <p style="font-size: 20px;font-style: italic;">Inscrições encerradas.</p>
                         {% elif not subscription_enabled %}
                             <p style="font-size: 20px;font-style: italic;">Evento não permite inscrições.</p>
                         {% endif %}
                     </div>
+
                     <div class="hero-features-right col-md-5"
                          data-animation="fadeIn">
                         {% if subscription_enabled and not subsciption_finished %}
@@ -91,8 +97,12 @@
                             {% endif %}
                         {% endif %}
                     </div>
+
                 </div>
+
             </div>
         </div>
+
     </div>
+
 </section>
