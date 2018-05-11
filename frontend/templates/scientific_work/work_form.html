@@ -12,20 +12,30 @@
 
         {% csrf_token %}
 
-        {% if form.non_field_errors %}
-            {% render_errors form.non_field_errors %}
-        {% endif %}
-
-        {% for hidden_field in form.hidden_fields %}
-            {% if hidden_field.errors %}
-                {% render_errors hidden_field.errors %}
-            {% endif %}
-            {{ hidden_field }}
-        {% endfor %}
-
         <div class="row">
 
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                {% if form.non_field_errors %}
+                    {% render_errors form.non_field_errors %}
+                {% endif %}
+
+                {% for field in form %}
+                    {% if field.errors %}
+                        {% render_errors field.errors %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if form.forms %}
+                    {% render_errors form.non_field_errors %}
+                {% endif %}
+
+                {% for hidden_field in form.hidden_fields %}
+                    {% if hidden_field.errors %}
+                        {% render_errors hidden_field.errors %}
+                    {% endif %}
+                    {{ hidden_field }}
+                {% endfor %}
+
 
                 <div class="panel panel-primary">
                     <div class="panel-heading">
@@ -43,72 +53,58 @@
                                 </div>
                                 {% render_generic_field form.keywords %}
 
-                                <div class="form-group">
+                                <div>
+                                    <div id="author_list">
+                                        {% render_generic_field form.author %}
+                                    </div>
+                                    <button class="btn-sm btn-primary"
+                                            id="add_author"
+                                            type="button">
+                                        Mais um author
+                                        <i class="fas fa-user-plus"></i>
+                                    </button>
 
-                                    <label for="id_author">Autores:</label>
-
-                                    <small style="color:#C9302C">*</small>
-                                    <div>
-                                        <div id="author_list">
-                                            <input type="text" name="author"
-                                                   maxlength="255"
-                                                   class="form-control"
-                                                   placeholder="Nome Completo"
-                                                   required="" id="id_author">
+                                    <div id="file_el" style="margin-top: 15px">
+                                        {% render_generic_field form.article_file %}
+                                    </div>
+                                    <div class="form-group">
+                                        <div>
+                                            <strong>
+                                                Declaro que li
+                                                e estou de acordo com as regras
+                                                para
+                                                submissão de trabalhos
+                                                científicos:
+                                            </strong>
                                         </div>
-                                        <button class="btn-sm btn-primary"
-                                                id="add_author"
-                                                type="button"
-                                                style="margin-top: 15px">
-                                            Mais um author
-                                            <i class="fas fa-user-plus"></i>
-                                        </button>
-                                        {% render_field form.author class="form-control" %}
-                                    </div>
-                                </div>
 
-
-                                <div id="file_el">
-                                    {% render_generic_field form.file %}
-                                </div>
-                                <div class="form-group">
-                                    <div>
-                                        <strong>
-                                            Declaro que li
-                                            e estou de acordo com as regras para
-                                            submissão de trabalhos
-                                            científicos:
-                                        </strong>
+                                        {{ form.accepts_terms }}
                                     </div>
 
-
-                                    {{ form.accepts_terms }}
                                 </div>
-
                             </div>
+
                         </div>
-
                     </div>
+
                 </div>
 
             </div>
 
-        </div>
-
-        <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                <div class="buttonbar">
-                    <div class="float-right">
-                        <button type="submit" id="save_btn" class="btn
+            <div class="row">
+                <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                    <div class="buttonbar">
+                        <div class="float-right">
+                            <button type="submit" id="save_btn" class="btn
                         btn-success">
-                            <i class="fa fa-save"></i>
-                            Salvar
-                        </button>
+                                <i class="fa fa-save"></i>
+                                Salvar
+                            </button>
+                        </div>
+                        <div class="clearfix"></div>
                     </div>
-                    <div class="clearfix"></div>
                 </div>
             </div>
-        </div>
 
     </form>
 

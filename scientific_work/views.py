@@ -13,4 +13,5 @@ class WorkAddFormView(AccountMixin, FormView):
 
     def form_valid(self, form):
         messages.success(self.request, 'Submissão realizado com sucesso.')
+        form.save()
         return super().form_valid(form)
