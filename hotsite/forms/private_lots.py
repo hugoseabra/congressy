@@ -25,14 +25,18 @@ class PrivateLotForm(forms.Form):
 
         queryset = Lot.objects.filter(event=self.event)
 
-        available_lots = [lot for lot in queryset if lot.places_remaining > 0]
+        available_lots = [
+            lot
+            for lot in queryset
+            if lot.status == lot.LOT_STATUS_RUNNING
+        ]
 
         self.fields['lots'] = forms.ModelChoiceField(
             queryset=queryset,
-            choices=available_lots,
             widget=forms.HiddenInput(),
             required=False,
         )
-        
+        self.fields['lots'].choices = available_lots
+
         if lot:
             self.fields['lots'].initial = lot

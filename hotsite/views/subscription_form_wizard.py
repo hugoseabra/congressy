@@ -446,7 +446,6 @@ class SubscriptionWizardView(SessionWizardView):
         kwargs = super().get_form_kwargs(step)
 
         if step == 'person':
-
             lot = self.get_lot_from_session()
 
             kwargs.update({'user': self.request.user, 'lot': lot, 'event':
@@ -483,7 +482,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                self.storage.current_step is not None):
+                    self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -549,7 +548,9 @@ class SubscriptionWizardView(SessionWizardView):
         """ Retorna se possui cupon, seja qual for. """
         for lot in self.event.lots.all():
             # código de exibição
-            if lot.private and lot.exhibition_code:
+            if lot.status == lot.LOT_STATUS_RUNNING and \
+                    lot.private and \
+                    lot.exhibition_code:
                 return True
 
         return False
@@ -621,5 +622,3 @@ class SubscriptionWizardView(SessionWizardView):
             return True
 
         return False
-
-
