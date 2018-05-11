@@ -40,7 +40,9 @@ class NewWorkForm(forms.Form):
     author = forms.CharField(
         max_length=255,
         label="Autores",
-        help_text="Separados por vírgula"
+        help_text="Separados por vírgula",
+        widget=forms.HiddenInput(),
+        required=False,
     )
 
     file = forms.FileField(label="Upload de artigos", required=False)

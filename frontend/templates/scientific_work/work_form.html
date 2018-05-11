@@ -8,7 +8,7 @@
 
 {% block content %}
 
-    <form method="POST"  enctype="multipart/form-data" id="submission_form">
+    <form method="POST" enctype="multipart/form-data" id="submission_form">
 
         {% csrf_token %}
 
@@ -43,7 +43,31 @@
                                 </div>
                                 {% render_generic_field form.keywords %}
 
-                                {% render_generic_field form.author %}
+                                <div class="form-group">
+
+                                    <label for="id_author">Autores:</label>
+
+                                    <small style="color:#C9302C">*</small>
+                                    <div>
+                                        <div id="author_list">
+                                            <input type="text" name="author"
+                                                   maxlength="255"
+                                                   class="form-control"
+                                                   placeholder="Nome Completo"
+                                                   required="" id="id_author">
+                                        </div>
+                                        <button class="btn-sm btn-primary"
+                                                id="add_author"
+                                                type="button"
+                                                style="margin-top: 15px">
+                                            Mais um author
+                                            <i class="fas fa-user-plus"></i>
+                                        </button>
+                                        {% render_field form.author class="form-control" %}
+                                    </div>
+                                </div>
+
+
                                 <div id="file_el">
                                     {% render_generic_field form.file %}
                                 </div>
@@ -96,11 +120,14 @@
     <script type="application/javascript">
         $(document).ready(function () {
 
+
             var form = $('#submission_form');
             var select_el = $('#id_modality');
             var resume_el = $('#resume_el');
             var file_el = $('#file_el');
             var save_el = $('#save_btn');
+            var new_author_btn = $('#add_author');
+            var author_list = $('#author_list');
 
             resume_el.hide();
 
@@ -109,7 +136,7 @@
                 if (this.value === "resumo") {
                     resume_el.fadeIn("slow");
                     file_el.fadeOut();
-                } else if (this.value === "artigo"){
+                } else if (this.value === "artigo") {
                     resume_el.fadeOut();
                     file_el.fadeIn("slow");
                 }
@@ -119,11 +146,22 @@
                 }
             });
 
-            save_el.on("click", function(){
+            save_el.on("click", function () {
                 form.submit();
                 console.log('Submitted');
             });
 
+            new_author_btn.on("click", function () {
+                $('<input>').attr({
+                    type: 'text',
+                    id: 'foo',
+                    name: 'bar',
+                    placeholder: 'Nome completo',
+                    class: 'form-control',
+                    maxlength: '255',
+                    style: 'margin-top: 15px'
+                }).appendTo(author_list);
+            });
 
         });
     </script>
