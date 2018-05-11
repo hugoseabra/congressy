@@ -177,30 +177,9 @@ class SubscriptionWizardView(SessionWizardView):
             del self.request.session['has_private_subscription']
 
         if not hasattr(self.storage, 'person'):
-            raise Exception('Não possuimos uma person no storage do wizard')
+            self.storage.person = self.get_person_from_session()
 
-        lot_pk = None
-        private_lot_data = self.storage.get_step_data('private_lot')
-        lot_data = self.storage.get_step_data('lot')
-
-        if private_lot_data is not None:
-            lot_pk = private_lot_data.get('private_lot-lots')
-        elif lot_data is not None:
-            lot_pk = lot_data.get('lot-lots')
-
-        if not lot_pk:
-            raise AttributeError('Não foi possivel pegar uma referencia '
-                                 'de lote.')
-
-        # Get a lot object.
-        if not isinstance(lot_pk, Lot):
-            try:
-                lot = Lot.objects.get(pk=lot_pk, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot_pk, self.event)
-                raise TypeError(message)
+        lot = self.get_lot_from_session()
 
         new_subscription = False
         new_account = self.request.user.last_login is None
@@ -228,6 +207,12 @@ class SubscriptionWizardView(SessionWizardView):
                 notify_new_user_and_free_subscription(self.event, subscription)
             else:
                 notify_new_free_subscription(self.event, subscription)
+
+        if 'lot' in self.request.session:
+            del self.request.session['lot']
+
+        if 'person' in self.request.session:
+            del self.request.session['person']
 
         subscription.save()
 
@@ -319,9 +304,18 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_data = self.get_form_step_data(form)
 
+        if isinstance(form, forms.LotsForm):
+            lot = form_data.get('lot-lots')
+            self.request.session['lot'] = lot
+
+        if isinstance(form, forms.PrivateLotForm):
+            lot = form_data.get('private_lot-lots')
+            self.request.session['lot'] = lot
+
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
             person = form.save()
+            self.request.session['person'] = str(person.pk)
             self.storage.person = person
 
         # Persisting survey
@@ -381,29 +375,7 @@ class SubscriptionWizardView(SessionWizardView):
                     person = Person.objects.get(user=self.request.user)
                     self.storage.person = person
 
-                lot_pk = None
-                private_lot_data = self.storage.get_step_data('private_lot')
-                lot_data = self.storage.get_step_data('lot')
-
-                if private_lot_data is not None:
-                    lot_pk = private_lot_data.get('private_lot-lots')
-                elif lot_data is not None:
-                    lot_pk = lot_data.get('lot-lots')
-
-                if not lot_pk:
-                    raise AttributeError(
-                        'Não foi possivel pegar uma referencia '
-                        'de lote.')
-
-                # Get a lot object.
-                if not isinstance(lot_pk, Lot):
-                    try:
-                        lot = Lot.objects.get(pk=lot_pk, event=self.event)
-                    except Lot.DoesNotExist:
-                        message = 'Não foi possivel resgatar um Lote ' \
-                                  'a partir das referencias: lot<{}> e evento<{}>.' \
-                            .format(lot_pk, self.event)
-                        raise TypeError(message)
+                lot = self.get_lot_from_session()
 
                 try:
                     subscription = Subscription.objects.get(
@@ -475,20 +447,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         if step == 'person':
 
-            lot_pk = None
-            private_lot_data = self.storage.get_step_data('private_lot')
-            lot_data = self.storage.get_step_data('lot')
-
-            if private_lot_data is not None:
-                lot_pk = private_lot_data.get('private_lot-lots')
-            elif lot_data is not None:
-                lot_pk = lot_data.get('lot-lots')
-
-            if not lot_pk:
-                raise AttributeError('Não foi possivel pegar uma referencia '
-                                     'de lote.')
-
-            lot = Lot.objects.get(pk=lot_pk, event=self.event)
+            lot = self.get_lot_from_session()
 
             kwargs.update({'user': self.request.user, 'lot': lot, 'event':
                 self.event})
@@ -636,6 +595,24 @@ class SubscriptionWizardView(SessionWizardView):
             return
 
         del self.request.session['exhibition_code']
+
+    def get_person_from_session(self):
+
+        if 'person' not in self.request.session:
+            raise Exception('Não temos uma pessoa na session.')
+
+        person_pk = self.request.session['person']
+
+        return Person.objects.get(pk=person_pk)
+
+    def get_lot_from_session(self):
+
+        if 'lot' not in self.request.session:
+            raise Exception('Não temos um lote na session.')
+
+        lot_pk = self.request.session['lot']
+
+        return Lot.objects.get(pk=lot_pk)
 
     @staticmethod
     def is_lot_available(lot):
