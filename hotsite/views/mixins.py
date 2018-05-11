@@ -143,8 +143,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
         all_events = self.event.lots.filter(private=False)
 
         for lot in all_events:
-            if lot.places_remaining > 0 and \
-                            lot.status == lot.LOT_STATUS_RUNNING:
+            if lot.status == lot.LOT_STATUS_RUNNING:
                 available_lots.append(lot)
 
         return True if len(available_lots) > 0 else False
