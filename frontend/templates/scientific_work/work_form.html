@@ -1,0 +1,76 @@
+{% extends "base/base.html" %}
+
+{% load i18n static widget_tweaks form_config_tags %}
+
+{% block title %}Nova submissão | Congressy{% endblock %}
+
+{% block page_title %}Nova submissão{% endblock %}
+
+{% block content %}
+
+    <form action="" method="post" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Nova submissão</div>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-md-9">
+                                {% render_generic_field form.modality %}
+                                {% render_generic_field form.area_category %}
+                                {% render_generic_field form.title %}
+                                {% render_generic_field form.summary %}
+                                {% render_generic_field form.keywords %}
+                                {% render_generic_field form.author %}
+                                {% render_generic_field form.accepts_terms %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
+{% block toptitle %}{% endblock %}
+{% block scripts %}{% endblock %}
+
