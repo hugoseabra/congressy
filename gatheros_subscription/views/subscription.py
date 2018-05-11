@@ -313,42 +313,9 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
         return num_lots > 0
 
 
-class SubscriptionViewFormView(EventViewMixin, generic.FormView):
+class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
     template_name = 'subscription/view.html'
-    form_class = PersonForm
-    subscription = None
-    object = None
-
-    def dispatch(self, request, *args, **kwargs):
-        self.subscription = get_object_or_404(
-            Subscription,
-            pk=self.kwargs.get('pk')
-        )
-        self.object = self.subscription.person
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['object'] = self.object
-        return ctx
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({'instance': self.object})
-        kwargs.update({
-            'is_chrome': 'chrome' in str(self.request.user_agent).lower()
-        })
-
-        try:
-            kwargs['initial'].update({
-                'city': '{}-{}'.format(self.object.city.name,
-                                       self.object.city.uf)
-            })
-        except AttributeError:
-            pass
-
-        return kwargs
+    queryset = Subscription.objects.get_queryset()
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):
