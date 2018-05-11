@@ -25,6 +25,7 @@ class EventForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
+            'is_scientific',
         ]
 
         widgets = {
@@ -40,6 +41,10 @@ class EventForm(forms.ModelForm):
         instance = kwargs.get('instance')
 
         super(EventForm, self).__init__(*args, **kwargs)
+        self.fields['is_scientific'].help_text = 'Trata-se de um evento com ' \
+                                                 'submissão de artigos ' \
+                                                 'cientificos?'
+        self.fields['is_scientific'].required = True
 
         if instance is None:
             self._configure_organization_field()
