@@ -18,6 +18,24 @@ def get_object_value(obj, attr):
     return getattr(obj, attr)
 
 
+def clean_sheet_title(title):
+    """ Limpa título de guia da planilha. """
+    title = str(title)
+
+    invalid_chars = (
+        '!',
+        '@',
+        '#',
+        '/',
+        '&',
+        '*',
+    )
+    for char in invalid_chars:
+        title = title.replace(char, '_')
+
+    return title
+
+
 def export_event_data(event):
     """
     Exportação do queryset de inscrições em formato xlsx
@@ -30,7 +48,7 @@ def export_event_data(event):
     wb = Workbook()
 
     ws1 = wb.active
-    ws1.title = 'Participantes'
+    ws1.title = clean_sheet_title('Participantes')
 
     subscriptions = event.subscriptions.all()
 
@@ -46,7 +64,9 @@ def export_event_data(event):
         _export_payments(wb.create_sheet(title='Pagamentos'), event)
 
     for ev_survey in event.surveys.all():
-        title = 'Formulário - {}'.format(ev_survey.survey.name)
+        title = clean_sheet_title(
+            'Formulário-{}'.format(ev_survey.survey.name)
+        )
         _export_survey_answers(wb.create_sheet(title=title), ev_survey)
 
     wb.save(stream)
