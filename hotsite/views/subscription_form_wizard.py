@@ -304,15 +304,18 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_data = self.get_form_step_data(form)
 
-        if isinstance(form, forms.LotsForm) or \
-                isinstance(form, forms.LotsForm):
-            lot = form_data.get('lots')
-            self.request.session['lot'] = lot.pk
+        if isinstance(form, forms.LotsForm):
+            lot = form_data.get('lot-lots')
+            self.request.session['lot'] = lot
+
+        if isinstance(form, forms.PrivateLotForm):
+            lot = form_data.get('private_lot-lots')
+            self.request.session['lot'] = lot
 
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
             person = form.save()
-            self.request.session['person'] = person.pk
+            self.request.session['person'] = str(person.pk)
             self.storage.person = person
 
         # Persisting survey
