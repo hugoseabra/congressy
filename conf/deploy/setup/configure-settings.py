@@ -47,7 +47,8 @@ env_dict = {
     'DBPASS': dbpass,
     'DBHOST': dbhost,
     'DBPORT': dbport,
-    'SECRET_KEY': get_random_secret_key(),
+    'SECRET_KEY': 'jq0m!8!um0yva5i5b!!j(imcu148gco-w+pe_y2k)wdg9x67t8',
+    # 'SECRET_KEY': get_random_secret_key(),
     'APP_VERSION': read_file('/var/www/cgsy/version'),
 }
 

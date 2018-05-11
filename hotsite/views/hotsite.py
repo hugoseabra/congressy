@@ -11,11 +11,33 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 
 from gatheros_event.models import Member, Organization
+from gatheros_subscription.models import Subscription
 from hotsite.views import SubscriptionFormMixin
 
 
 class HotsiteView(SubscriptionFormMixin, generic.View):
     template_name = 'hotsite/main.html'
+
+    has_private_subscription = False
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if 'has_private_subscription' in self.request.session:
+
+            subscription_id = self.request.session['has_private_subscription']
+
+            try:
+                Subscription.objects.get(pk=subscription_id, event=self.event)
+                self.has_private_subscription = True
+            except Subscription.DoesNotExist:
+                pass
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+        context['has_private_subscription'] = self.has_private_subscription
+        return context
 
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)
@@ -61,6 +83,13 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
         name = self.request.POST.get('name')
         email = self.request.POST.get('email')
+        exihibition_code = None
+
+        is_private_event = not self.has_available_public_lots() and \
+                           self.get_private_lots()
+
+        if is_private_event:
+            exihibition_code = self.request.POST.get('exhibition_code')
 
         # Pode acontecer caso que há usuário e não há pessoa.
         def get_person_form(user=None):
@@ -93,6 +122,20 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         user = self.request.user
 
         if user.is_authenticated:
+
+            if is_private_event and not exihibition_code:
+                messages.error(
+                    self.request,
+                    "Você deve informar um código válido para se inscrever"
+                    " neste evento."
+                )
+
+                context['exhibition_code'] = exihibition_code
+                return self.render_to_response(context)
+            else:
+                # Registra código para verificação mais adiante
+                request.session['exhibition_code'] = exihibition_code
+
             return redirect(
                 'public:hotsite-subscription',
                 slug=self.event.slug
@@ -107,6 +150,16 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
 
             context['name'] = name
             context['email'] = email
+            return self.render_to_response(context)
+
+        if is_private_event and not exihibition_code:
+            messages.error(
+                self.request,
+                "Você deve informar um código válido para se inscrever neste"
+                " evento."
+            )
+
+            context['exhibition_code'] = exihibition_code
             return self.render_to_response(context)
 
         # CONDIÇÃO 3
@@ -197,6 +250,10 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             # Remove last login para funcionar o reset da senha posteriormente.
             user.last_login = None
             user.save()
+
+        if is_private_event:
+            # Registra código para verificação mais adiante
+            request.session['exhibition_code'] = exihibition_code
 
         return redirect('public:hotsite-subscription', slug=self.event.slug)
 

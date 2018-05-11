@@ -67,17 +67,9 @@
                         "targets": [-1]
                     },
                     {
-                        "targets": 0,
-                        "className": "nowrap"
-                    },
-                    {
-                        "width": "13%",
                         "targets": 1,
-                        "className": "text-center"
-                    },
-                    {
+                        "orderable": false,
                         "width": "13%",
-                        "targets": 2,
                         "className": "text-center"
                     }
                 ],
@@ -159,7 +151,8 @@
         <div class="col-md-12">
             <div class="buttonbar">
                 <div class="float-right">
-                    <button type="button" class="btn btn-primary"
+                    <button type="button" class="btn btn-primary {% if not object_list %}disabled{% endif %}"
+                            {% if not object_list %}disabled title="Nenhuma inscrição para exportar."{% endif %}
                             onclick="$('#export-form').submit();">
                         <i class="fa fa-download"></i>
                         Exportar
@@ -176,7 +169,7 @@
         </form>
     </div>
 
-    <div class="row">
+    <div class="row tooltip-wrapper">
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-body">
@@ -189,8 +182,8 @@
                             <thead>
                             <tr>
                                 <th>Nome do Participante</th>
-                                <th class="hidden-xs">Cód. Inscrição</th>
-                                <th>Status</th>
+                                <th class="hidden-xs">Código</th>
+                                <th>Lote</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -202,14 +195,26 @@
 
                                         {% if item.status == item.CONFIRMED_STATUS %}
                                             <i class="fa fa-circle"
+                                               data-toggle="tooltip"
+                                               data-placement="right"
+                                               title=""
+                                               data-original-title="Status: confirmado"
                                                aria-hidden="true"
                                                style="color:#5cb85c"></i>
                                         {% elif item.status == item.AWAITING_STATUS %}
                                             <i class="fa fa-circle"
+                                               data-toggle="tooltip"
+                                               data-placement="right"
+                                               title=""
+                                               data-original-title="Status: pendente"
                                                aria-hidden="true"
                                                style="color: #f0ad4e"></i>
                                         {% elif item.status == item.CANCELED_STATUS %}
                                             <i class="fa fa-circle"
+                                               data-toggle="tooltip"
+                                               data-placement="right"
+                                               title=""
+                                               data-original-title="Status: cancelado"
                                                aria-hidden="true"
                                                style="color: #d9534f"></i>
                                         {% endif %}
@@ -218,15 +223,23 @@
                                         <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
                                             {{ item.person.name }}
                                         </a>
-                                        <div class="text-muted">{{ item.created }}</div>
+                                        <div class="hidden-xs" style="margin-left:18px;">
+                                            <small class="text-muted">
+                                                {{ item.created }}
+                                            </small>
+                                        </div>
+                                        <div class="hidden-sm hidden-md hidden-lg hidden-xl" style="margin-left:18px;">
+                                            <small class="text-muted">
+                                                {{ item.code }}
+                                            </small>
+                                        </div>
+
                                     </td>
                                     <td class="hidden-xs">
                                         {{ item.code }}
                                     </td>
-
                                     <td>
-                                        {{ item.get_status_display }}
-
+                                        {{ item.lot.name }}
                                     </td>
 
                                     <td>
@@ -268,24 +281,18 @@
                                     </td>
                                 </tr>
                             {% endfor %}
-
                             </tbody>
-
-
                         </table>
 
                         {% if has_paid_lots %}
-                            <small>
+                            <div class="text-muted" style="margin-top: 15px;margin-bottom:5px;"><small>Legenda de status:</small></div>
+                            <small style="margin-left: 10px;">
                                 <strong>
-                                    <i class="fa fa-circle" aria-hidden="true"
-                                       style="color:#5cb85c"></i>
-                                    Confirmado<br/>
-                                    <i class="fa fa-circle" aria-hidden="true"
-                                       style="color:#f0ad4e"></i>
-                                    Aguardando<br/>
-                                    <i class="fa fa-circle" aria-hidden="true"
-                                       style="color:#d9534f"></i> Pagamento
-                                    recusado
+                                    <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i> Confirmado
+                                     &ensp;  &ensp;  &ensp;
+                                    <i class="fa fa-circle" aria-hidden="true" style="color:#f0ad4e"></i> Pendente
+                                     &ensp;  &ensp;  &ensp;
+                                    <i class="fa fa-circle" aria-hidden="true" style="color:#d9534f"></i> Cancelado
                                 </strong>
                             </small>
                         {% endif %}
