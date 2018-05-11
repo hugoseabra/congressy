@@ -1,5 +1,18 @@
 <h5 class="sidebar-header" style="color:#4c4c4c;">Organização</h5>
 <ul class="nav nav-pills nav-stacked">
+    <li {% if active == 'editar' %} class="active" {% endif %}>
+        <a class="sidebar-itens" href=
+                {% if active == 'convites' %}
+                    "{% url 'event:organization-edit' invitation_organization.pk %}"
+                {% elif active == 'membros' %}
+                    "{% url 'event:organization-edit' organization.pk %}"
+                {% elif active == 'editar' %}
+                    "{% url 'event:organization-edit' organization.pk %}"
+                {% endif %}
+        >
+        <i class="fas fa-cog"></i> Configurações
+        </a>
+    </li>
     <li {% if active == 'membros' %} class="active" {% endif %}>
         <a class="sidebar-itens" href=
                 {% if active == 'convites' %}
@@ -10,7 +23,7 @@
                     "{% url 'event:member-list' organization.pk %}"
                 {% endif %}
 
-       >
+        >
         <i class="fas fa-users"></i> Membros
         </a>
     </li>
@@ -27,21 +40,6 @@
 
         >
         <i class="fas fa-envelope-open"></i> Convites
-        </a>
-    </li>
-
-
-    <li {% if active == 'editar' %} class="active" {% endif %}>
-        <a class="sidebar-itens" href=
-                {% if active == 'convites' %}
-                    "{% url 'event:organization-edit' invitation_organization.pk %}"
-                {% elif active == 'membros' %}
-                    "{% url 'event:organization-edit' organization.pk %}"
-                {% elif active == 'editar' %}
-                    "{% url 'event:organization-edit' organization.pk %}"
-                {% endif %}
-           >
-        <i class="fas fa-cog"></i> Configurações
         </a>
     </li>
 </ul>

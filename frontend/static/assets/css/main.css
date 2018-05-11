@@ -368,10 +368,14 @@ canvas {
   }
 }
 @media (max-width: 767px) {
+  #header {
+    z-index: 100;
+    width: 50%;
+    float: left;
+  }
   #header .brand {
     width: 100%;
     padding: 0 0 0 10px;
-    text-align: center;
   }
   #header .logo {
     font-size: 1.375em;
@@ -3366,7 +3370,7 @@ label.valid {
   height: 100%;
   position: fixed;
   width: 50px;
-  z-index: 2000;
+  z-index: 900;
   padding-left: 0;
   padding-right: 0;
 }
@@ -3475,6 +3479,9 @@ label.valid {
   padding-bottom: 105px !important;
 }
 @media only screen and (max-width: 768px) {
+  .theme-cgsy-full .brand {
+    margin-left: 0;
+  }
   .theme-cgsy-full .navbar-collapse {
     position: absolute;
   }
@@ -3489,7 +3496,7 @@ label.valid {
     padding-top: 0;
   }
   .theme-cgsy-full .brand {
-    margin-left: 0;
+    text-align: left;
   }
   .theme-cgsy-full .manage_sidebar {
     margin-top: 0;
@@ -3803,6 +3810,11 @@ label.valid {
   position: fixed;
   bottom: 0;
   z-index: 1000;
+}
+@media only screen and (min-width: 1600px) {
+  .theme-cgsy-full .cgsy-footer {
+    margin-bottom: 20px;
+  }
 }
 .float-left {
   float: left;

@@ -53,6 +53,7 @@
             });
         };
 
+
     </script>
 {% endblock %}
 {% block styles %}
@@ -114,10 +115,10 @@
 {% block content %}
     {% if has_paid_lots %}
         <div class="col-md-12 col-lg-12">
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="panel panel-solid-success widget-mini">
                     <div class="panel-body">
-                        <i class="icon-envelope-open"></i>
+                        <i class="icon-wallet"></i>
                         <span class="total text-center">
                             R$ {{ totals.paid|money_divide|intcomma }}
                         </span>
@@ -126,10 +127,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="panel widget-mini">
                     <div class="panel-body">
-                        <i class="icon-support"></i>
+                        <i class=" icon-clock"></i>
                         <span class="total text-center">
                              R$ {{ totals.pending|money_divide|intcomma }}
                         </span>
@@ -138,7 +139,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="panel widget-mini">
                     <div class="panel-body">
                         <i class="icon-bar-chart"></i>
@@ -150,10 +151,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="panel widget-mini">
                     <div class="panel-body">
-                        <i class="icon-envelope-open"></i>
+                        <i class="fas fa-tasks"></i>
                         <span class="total text-center">
                             {{ pending }} / {{ total_subscriptions }}
                         </span>
@@ -164,25 +165,33 @@
             </div>
         </div>
     {% endif %}
-    <div class="col-md-12 col-lg-12">
-        <div class=" col-lg-6" style="height: 234px;">
-            <div class="panel panel-default">
+    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+        <div class=" col-lg-6 col-md-6 col-sm-12 col-xs-12" style="margin-bottom: 15px ">
+            <div class="panel
+{% if limit == 0 or  total_subscriptions  > limit %} widget-mini
+panel-solid-info {% endif %}
+panel-default">
+                {% if limit != 0 and  total_subscriptions  < limit %}
                 <div class="panel-heading">
                     <h3 class="panel-title">Total de inscritos</h3>
                 </div>
                 {% if limit == 0 or  total_subscriptions  > limit %}
                     <div class="panel widget-mini">
                 {% endif %}
+            {% endif %}
 
                 <div class="panel-body {% if limit == 0 %} widget-gauge
 {% endif %}">
                     {% if limit == 0 or  total_subscriptions  > limit %}
+                        <i class="icon-user"></i>
                         <span class="total text-center">
                             {{ total_subscriptions }}
+                        <span class="title text-center">Inscritos</span>
                         </span>
 
+
                     {% else %}
-                        <canvas width="260" height="125" id="gauge"
+                        <canvas width="200" height="125" id="gauge"
                                 class=""></canvas>
                         <div class="goal-wrapper">
                             <span class="gauge-value pull-left"></span>
@@ -194,13 +203,12 @@
 
                     {% endif %}
                 </div>
-                {% if limit == 0 or  total_subscriptions  > limit %}
-                    </div>
-                {% endif %}
+
             </div>
         </div>
         {% if gender.men != 0 or gender.women != 0 %}
-            <div class=" col-lg-6" style="height: 234px;">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
+                 style="padding-bottom: 20px;margin-bottom: 20px ">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Gênero dos participantes</h3>
@@ -222,8 +230,8 @@
                             </div>
                             <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                                 <div>
-                                    <canvas id="doughnut" width="260"
-                                            height="260"
+                                    <canvas id="doughnut" width="100%"
+                                            height="100%"
                                     ></canvas>
                                 </div>
                             </div>

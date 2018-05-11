@@ -10,7 +10,7 @@
                 navbar-collapse col-xs-1
                 col-sm-1 col-lg-1
                 col-xl-1 " id="sidebar" style="height:
-                 100%; position: fixed;width: 60px;z-index: 2000;" {% endif %}>
+                 100%; position: fixed;width: 60px;z-index: 1000;" {% endif %}>
     <div class="principal_sidebar new_nav sidebar-left sidebar" style="width:
                     50px; padding-top: 0">
         <ul class="col nav nav-pills nav-stacked " style="
@@ -23,7 +23,7 @@
                    data-toggle="dropdown">
                     <span class="meta">
                        <span style="background-color: slategray;
-                       border-radius: 2px; font-size: 25px"
+                       border-radius: 18px; cursor: pointer"
                              class="text">
                         {{ user.first_name|slice:"0:1"|upper }}{{ user.last_name|slice:"0:1"|upper }}
                        </span>

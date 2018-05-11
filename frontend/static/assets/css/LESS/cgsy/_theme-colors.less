@@ -22,7 +22,7 @@
       height: 100%;
       position: fixed;
       width: 50px;
-      z-index: 2000;
+      z-index: 900;
       padding-left: 0;
       padding-right: 0;
     }
@@ -53,6 +53,7 @@
           width: auto;
         }
       }
+
     #header {
       .brand {
         background: #F0F3F3;
@@ -118,9 +119,10 @@
     }
 
     @media only screen and (max-width: 768px) {
-      #header{
-        width: 50%;
+      .brand {
+        margin-left: 0;
       }
+
       .navbar-collapse {
         position: absolute;
       }
@@ -139,7 +141,6 @@
       }
 
       .brand {
-        margin-left: 60px;
         text-align: left;
       }
 
@@ -448,4 +449,9 @@
       bottom: 0;
       z-index: 1000;
     }
+      @media only screen and (min-width: 1600px) {
+        .cgsy-footer {
+          margin-bottom: 20px;
+        }
+      }
   }
