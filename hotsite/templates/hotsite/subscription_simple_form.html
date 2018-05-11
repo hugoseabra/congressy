@@ -26,6 +26,13 @@
             <button type="submit" class="btn btn-primary">
                 Definir minha senha
             </button>
+            {% if event.is_scientific %}
+                <a href="{% url 'scientific_work:work-add' %}"
+                   class="btn btn-primary" style="margin-top: 15px">
+                    Deseja submeter seu artigo cientifico?
+                </a>
+            {% endif %}
+
         </div>
     </form>
 {% else %}
@@ -81,6 +88,12 @@
                        style="color: darkgreen"
                        aria-hidden="true"></i>
                 </div>
+                {% if event.is_scientific %}
+                    <a href="{% url 'scientific_work:work-add' %}"
+                       class="btn btn-success" style="margin-top: 15px">
+                        Deseja submeter seu artigo cientifico?
+                    </a>
+                {% endif %}
             </div>
 
         {% elif has_private_subscription %}

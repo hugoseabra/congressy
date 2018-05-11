@@ -28,6 +28,7 @@ class NewWorkForm(forms.Form):
 
     summary = forms.CharField(
         widget=forms.Textarea,
+        required=False,
     )
 
     keywords = forms.CharField(
@@ -41,6 +42,8 @@ class NewWorkForm(forms.Form):
         label="Autores",
         help_text="Separados por vírgula"
     )
+
+    file = forms.FileField(label="Upload de artigos", required=False)
 
     accepts_terms = forms.BooleanField(
         initial=False,

@@ -1,13 +1,15 @@
-from django.views.generic import FormView
-from django.urls import reverse_lazy
 from django.contrib import messages
+from django.urls import reverse_lazy
+from django.views.generic import FormView
+
+from gatheros_event.views.mixins import AccountMixin
 from .forms import NewWorkForm
 
 
-class WorkAddFormView(FormView):
+class WorkAddFormView(AccountMixin, FormView):
     template_name = "scientific_work/work_form.html"
     form_class = NewWorkForm
-    success_url = reverse_lazy('scientific_work:work-add')
+    success_url = reverse_lazy('front:start')
 
     def form_valid(self, form):
         messages.success(self.request, 'Submissão realizado com sucesso.')
