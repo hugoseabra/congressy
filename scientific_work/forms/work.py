@@ -2,24 +2,23 @@ from django import forms
 
 
 class NewWorkForm(forms.Form):
-
     modality = forms.ChoiceField(
         choices=[
-            'Artigo',
-            'Banner',
-            'Resumo'
+            ('artigo', 'Artigo'),
+            ('banner', 'Banner'),
+            ('resumo', 'Resumo'),
         ],
         label='Modalidade'
     )
 
     area_category = forms.ChoiceField(
         choices=[
-            'Ensino',
-            'Gestão',
-            'Marketing',
-            'Pesquisa',
+            ('ensino', 'Ensino'),
+            ('gestao', 'Gestão'),
+            ('marketing', 'Marketing'),
+            ('pesquisa', 'Pesquisa'),
         ],
-        label="Área temática"
+        label="Área temática",
     )
 
     title = forms.CharField(
@@ -48,5 +47,3 @@ class NewWorkForm(forms.Form):
         label="Declaro que li e estou de acordo com as regras para submissão "
               "de trabalhos científicos"
     )
-
-

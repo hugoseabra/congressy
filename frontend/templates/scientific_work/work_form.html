@@ -38,10 +38,26 @@
                                 {% render_generic_field form.modality %}
                                 {% render_generic_field form.area_category %}
                                 {% render_generic_field form.title %}
-                                {% render_generic_field form.summary %}
+                                <div id="resume_el">
+                                    {% render_generic_field form.summary %}
+                                </div>
                                 {% render_generic_field form.keywords %}
                                 {% render_generic_field form.author %}
-                                {% render_generic_field form.accepts_terms %}
+
+                                <div class="form-group">
+                                    <div>
+                                        <strong>
+                                            Declaro que li
+                                            e estou de acordo com as regras para
+                                            submissão de trabalhos
+                                            científicos:
+                                        </strong>
+                                    </div>
+
+
+                                    {{ form.accepts_terms }}
+                                </div>
+
                             </div>
                         </div>
 
@@ -72,5 +88,28 @@
 {% block sidebar %}{% endblock %}
 {% block sidebar-bars %}{% endblock %}
 {% block toptitle %}{% endblock %}
-{% block scripts %}{% endblock %}
+{% block scripts %}
+    <script type="application/javascript">
+        $(document).ready(function () {
+
+            var select_el = $('#id_modality');
+            var resume_el = $('#resume_el');
+
+            resume_el.hide();
+
+            select_el.on('change', function () {
+
+                console.log(this.value);
+
+                if (this.value === "resumo") {
+                    resume_el.fadeIn("slow");
+                } else {
+                    resume_el.fadeOut();
+                }
+            })
+
+
+        });
+    </script>
+{% endblock %}
 
