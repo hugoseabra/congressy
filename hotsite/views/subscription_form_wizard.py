@@ -304,7 +304,8 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_data = self.get_form_step_data(form)
 
-        if isinstance(form, forms.LotsForm) or isinstance(forms.LotsForm):
+        if isinstance(form, forms.LotsForm) or \
+                isinstance(form, forms.LotsForm):
             lot = form_data.get('lots')
             self.request.session['lot'] = lot.pk
 
