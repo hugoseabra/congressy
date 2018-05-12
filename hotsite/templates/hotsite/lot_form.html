@@ -15,6 +15,8 @@
 
                 <div class="col-md-9 col-md-offset-2">
 
+                    {% include "hotsite/includes/greetings.html" %}
+
                     {% if form.non_field_errors %}
                         {% render_errors form.non_field_errors %}
                     {% endif %}
@@ -24,16 +26,6 @@
                             {% render_errors hidden_field.errors %}
                         {% endif %}
                     {% endfor %}
-
-
-                    <h4 class="form-heading"
-                        style="font-weight: bold;">
-                        {% if user.is_authenticated %}
-                            Olá, {{ user.first_name }}
-                        {% else %}
-                            Inscreva-se agora!
-                        {% endif %}
-                    </h4>
 
                     {% block messages %}
                         {% if messages %}
@@ -84,7 +76,7 @@
                                                 {{ wizard.management_form }}
 
                                                 <div id="original-lots-field">
-                                                    {% if not is_private %}
+                                                    {% if not is_private_event %}
                                                         {% render_generic_field form.lots %}
 
                                                         {% if has_coupon %}
@@ -142,7 +134,7 @@
                                                    class="btn btn-primary pull-left"
                                                    style="margin-top: 5px;">
                                                     <i class="fas fa-chevron-circle-left"></i>
-                                                    Voltar
+                                                    Início
                                                 </a>
                                                 <button style="margin-top: 5px;"
                                                         class="btn

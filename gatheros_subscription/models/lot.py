@@ -252,6 +252,21 @@ class Lot(models.Model, GatherosModelMixin):
         return display
 
     @property
+    def display_price(self):
+        """ Exibição pública de infomações do lote. """
+
+        if self.price and self.price > 0:
+            return 'R$ {}'.format(
+                locale.format(
+                    percent='%.2f',
+                    value=self.get_calculated_price(),
+                    grouping=True
+                )
+            )
+
+        return ''
+
+    @property
     def places_remaining(self):
         """ Retorna a quantidade ainda restante de vagas. """
         if not self.limit:
