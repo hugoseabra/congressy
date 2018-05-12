@@ -135,7 +135,9 @@ class SubscriptionWizardView(SessionWizardView):
         context['event'] = self.event
         context['is_private'] = self.is_private_lot()
         context['num_lots'] = self.get_num_lots()
-        context['selected_lot'] = self.get_lot_from_session()
+
+        if self.storage.current_step not in ['lot', 'private_lot']:
+            context['selected_lot'] = self.get_lot_from_session()
 
         if self.storage.current_step == 'private_lot':
             code = self.request.session.get('exhibition_code')
