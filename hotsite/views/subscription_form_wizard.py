@@ -81,15 +81,15 @@ def has_survey(wizard):
     return False
 
 
-def is_private(wizard):
-    if wizard.is_private_lot():
+def is_private_event(wizard):
+    if wizard.is_private_event():
         return True
 
     return False
 
 
 def is_not_private(wizard):
-    if wizard.is_private_lot():
+    if wizard.is_private_event():
         return False
 
     return True
@@ -97,7 +97,7 @@ def is_not_private(wizard):
 
 class SubscriptionWizardView(SessionWizardView):
     condition_dict = {
-        'private_lot': is_private,
+        'private_lot': is_private_event,
         'lot': is_not_private,
         'payment': is_paid_lot,
         'survey': has_survey
@@ -117,7 +117,7 @@ class SubscriptionWizardView(SessionWizardView):
         if not isinstance(user, User):
             return redirect('public:hotsite', slug=self.event.slug)
 
-        if self.is_private_lot() and not self.has_previous_valid_code():
+        if self.is_private_event() and not self.has_previous_valid_code():
             messages.error(
                 request,
                 "Você deve informar um código válido para se inscrever neste"
@@ -133,7 +133,7 @@ class SubscriptionWizardView(SessionWizardView):
         context = super().get_context_data(**kwargs)
         context['remove_preloader'] = True
         context['event'] = self.event
-        context['is_private'] = self.is_private_lot()
+        context['is_private_event'] = self.is_private_event()
         context['num_lots'] = self.get_num_lots()
 
         if self.storage.current_step not in ['lot', 'private_lot']:
@@ -238,7 +238,7 @@ class SubscriptionWizardView(SessionWizardView):
 
     def get_form_initial(self, step):
 
-        if is_private(self):
+        if is_private_event(self):
 
             if step == "private_lot":
                 return self.initial_dict.get(step, {
@@ -559,8 +559,8 @@ class SubscriptionWizardView(SessionWizardView):
 
         return False
 
-    def is_private_lot(self):
-        """ Verifica se evento possui apenas lotes privados. """
+    def is_private_event(self):
+        """ Verifica se evento é privado possuindo apenas lotes privados. """
         public_lots = []
         private_lots = []
 

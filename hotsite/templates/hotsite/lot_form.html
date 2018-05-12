@@ -76,7 +76,7 @@
                                                 {{ wizard.management_form }}
 
                                                 <div id="original-lots-field">
-                                                    {% if not is_private %}
+                                                    {% if not is_private_event %}
                                                         {% render_generic_field form.lots %}
 
                                                         {% if has_coupon %}
