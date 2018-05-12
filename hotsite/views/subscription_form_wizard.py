@@ -134,6 +134,8 @@ class SubscriptionWizardView(SessionWizardView):
         context['remove_preloader'] = True
         context['event'] = self.event
         context['is_private'] = self.is_private_lot()
+        context['num_lots'] = self.get_num_lots()
+        context['selected_lot'] = self.get_lot_from_session()
 
         if self.storage.current_step == 'private_lot':
             code = self.request.session.get('exhibition_code')
@@ -615,9 +617,16 @@ class SubscriptionWizardView(SessionWizardView):
 
         return Lot.objects.get(pk=lot_pk)
 
+    def get_num_lots(self):
+        lots = [
+            lot
+            for lot in self.event.lots.all()
+            if lot.status == lot.LOT_STATUS_RUNNING
+        ]
+        return len(lots)
+
     @staticmethod
     def is_lot_available(lot):
-
         if lot.status == lot.LOT_STATUS_RUNNING and not lot.private:
             return True
 

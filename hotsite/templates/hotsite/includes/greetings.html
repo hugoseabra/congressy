@@ -1,0 +1,17 @@
+<div>
+    <h4 class="form-heading"
+        style="font-weight: bold;float:left">
+        {% if user.is_authenticated %}
+            Olá, {{ user.first_name }}
+        {% else %}
+            Inscreva-se agora!
+        {% endif %}
+    </h4>
+    <div style="float:left">
+        <button type="button" class="btn btn-link btn-block" style="color:#1b6d85;padding:0;text-transform: lowercase;margin-top:8px;margin-left:4px"
+           onclick="if(confirm('Deseja sair? Se sim, você irá recomeçar inserindo os dadosnovamente')){window.location.href='{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}'}">
+            não sou eu
+        </button>
+    </div>
+    <div class="clearfix"></div>
+</div>
