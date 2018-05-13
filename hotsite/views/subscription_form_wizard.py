@@ -39,6 +39,13 @@ TEMPLATES = {
 }
 
 
+class InvalidStateStepError(Exception):
+    """ Exceção acontece quando um step de formulário não possui
+     um estado esperado. """
+    pass
+
+
+
 def is_paid_lot(wizard):
     """Return true if user opts for  a paid lot"""
 
@@ -126,7 +133,42 @@ class SubscriptionWizardView(SessionWizardView):
             self.clear_session_exhibition_code()
             return redirect('public:hotsite', slug=self.event.slug)
 
-        return super().dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
+
+        if self.steps.current not in ['lot', 'private_lot']:
+            try:
+                self.get_lot_from_session()
+            except InvalidStateStepError:
+
+                messages.warning(
+                    request,
+                    "Por favor, informe os dados do início para validarmos"
+                    " as informações de sua inscrição."
+                )
+
+                return redirect(
+                    'public:hotsite-subscription',
+                    slug=self.event.slug
+                )
+
+        if self.steps.current not in ['lot', 'private_lot', 'person']:
+            try:
+                self.get_lot_from_session()
+                self.get_person_from_session()
+            except InvalidStateStepError:
+
+                messages.warning(
+                    request,
+                    "Por favor, informe os dados do início para validarmos"
+                    " as informações de sua inscrição."
+                )
+
+                return redirect(
+                    'public:hotsite-subscription',
+                    slug=self.event.slug
+                )
+
+        return response
 
     def get_context_data(self, **kwargs):
 
@@ -452,8 +494,11 @@ class SubscriptionWizardView(SessionWizardView):
         if step == 'person':
             lot = self.get_lot_from_session()
 
-            kwargs.update({'user': self.request.user, 'lot': lot, 'event':
-                self.event})
+            kwargs.update({
+                'user': self.request.user,
+                'lot': lot,
+                'event': self.event,
+            })
 
         if step == 'survey':
             kwargs.update({'user': self.request.user, 'event': self.event})
@@ -604,7 +649,7 @@ class SubscriptionWizardView(SessionWizardView):
     def get_person_from_session(self):
 
         if 'person' not in self.request.session:
-            raise Exception('Não temos uma pessoa na session.')
+            raise InvalidStateStepError('Não temos uma pessoa na session.')
 
         person_pk = self.request.session['person']
 
@@ -613,7 +658,7 @@ class SubscriptionWizardView(SessionWizardView):
     def get_lot_from_session(self):
 
         if 'lot' not in self.request.session:
-            raise Exception('Não temos um lote na session.')
+            raise InvalidStateStepError('Não temos um lote na session.')
 
         lot_pk = self.request.session['lot']
 
