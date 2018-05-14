@@ -108,7 +108,7 @@
 
 {% block content %}
     <div class="row tooltip-wrapper">
-        <div class="col-md-12">
+        <div class="col-xl-11 col-lg-11 col-md-12">
             <div class="buttonbar">
                 <div class="float-left">
                     <button onclick="window.location.href='{% url 'subscription:subscription-list' event.pk %}'"
@@ -120,36 +120,12 @@
                         Inscrições
                     </button>
                 </div>
-                <div class="float-right" style="display:none">
-                    <button
-                            data-toggle="tooltip"
-                            title="Abrir informações financeiras do participante"
-                            class="btn btn-info btn-trans">
-                        <i class="far fa-money-bill-alt"></i>
-                        Financeiro
-                    </button>
-                    <button
-                            data-toggle="tooltip"
-                            title="Enviar boleto para o participante"
-                            class="btn btn-success btn-trans">
-                        <i class="fas fa-barcode"></i>
-                        Enviar Boleto
-                    </button>
-                    <button
-                            data-toggle="tooltip"
-                            data-placement="left"
-                            title="Enviar mensagem personalizada ao participante"
-                            class="btn btn-success btn-trans">
-                        <i class="far fa-envelope"></i>
-                        Mensagem
-                    </button>
-                </div>
                 <div class="clearfix"></div>
             </div>
         </div>
     </div>
 
-    <div class="row tooltip-wrapper">
+    <div class="row tooltip-wrapper ">
         <div class="col-md-3">
             <div class="panel">
                 <div class="panel">
@@ -171,12 +147,13 @@
                                 </tr>
                                 <tr class="unread">
                                     <td class="message"
-                                        style="cursor: default">
+                                        style="cursor: default;overflow:hidden">
                                         <span class="title">Lote</span>
-                                        {{ object.lot.name }}
+                                        <div data-toggle="tooltip" title="{{ object.lot.name }}">
+                                            {{ object.lot.name|truncatechars:29 }}
+                                        </div>
                                     </td>
                                 </tr>
-
                                 </tbody>
                             </table>
                         </div>
@@ -224,19 +201,20 @@
                                                    style="color: #d9534f"></i>
                                             {% endif %}
                                             {{ object.get_status_display|title }}
-                                            {#                                                <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>#}
-                                            {#                                                Confirmado <small class="text-muted"> - 27/05/2018 17h03</small>#}
+                                            {# Confirmado <small class="text-muted"> - 27/05/2018 17h03</small>#}
                                         </div>
+                                        {% if object.status == object.CONFIRMED_STATUS %}
                                         <div class="float-right"
-                                             style="margin-left:10px">
+                                             style="margin-left:10px;margin-top:5px;">
                                             <button type="button"
-                                                    style="display:none"
                                                     data-toggle="tooltip"
                                                     title="Abrir voucher"
-                                                    class="btn btn-default btn-sm btn-trans">
+                                                    onclick="window.open('{% url 'subscription:subscription-voucher' event.pk object.pk %}')"
+                                                    class="btn btn-info btn-sm btn-trans">
                                                 voucher
                                             </button>
                                         </div>
+                                        {% endif %}
                                         <div class="clearfix"></div>
                                     </div>
                                 </td>
@@ -247,8 +225,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="panel" style="display:none">
+        <div class="col-xl-5 col-lg-5 col-md-6">
+            <div class="panel">
                 <div class="panel-body" style="padding:0">
                     <div style="border:1px solid #ddd">
                         <table class="table table-inbox table-hover"
@@ -264,15 +242,15 @@
                                     style="cursor: default;border-top:0">
                                     <div>
                                         <div class="float-left">
-                                            {#                                                <i style="font-size: 40px" class="fas fa-credit-card"></i>#}
-                                            <i style="font-size: 40px"
+{#                                        <i style="font-size: 40px" class="fas fa-credit-card"></i>#}
+                                        <i style="font-size: 40px"
                                                class="fas fa-barcode"></i>
                                         </div>
                                         <div class="float-left"
                                              style="margin-left:10px">
                                             <span class="title">Método</span>
-                                            Boleto <strong
-                                                class="text-warning">(vencido)</strong>
+                                            Boleto
+                                            <strong class="text-warning">(vencido)</strong>
                                         </div>
                                         <div class="float-right">
                                             <button type="button"
@@ -284,9 +262,9 @@
                                             <button type="button"
                                                     data-toggle="tooltip"
                                                     data-placement="left"
-                                                    title="Ver atualizações do pagamento"
+                                                    title="Ver histórico do pagamento"
                                                     class="btn btn-info btn-sm btn-trans">
-                                                atualizações
+                                                histórico
                                             </button>
                                         </div>
                                         <div class="clearfix"></div>
@@ -295,9 +273,27 @@
                             </tr>
                             <tr class="unread">
                                 <td class="message">
-                                    <span class="title">Valor</span>
-                                    {{ object.lot.display_publicly }} <strong
-                                        class="text-danger">(não-pago)</strong>
+                                    <div class="float-left">
+                                        <span class="title">Valor</span>
+                                        {% if object.status == object.CONFIRMED_STATUS %}
+                                        <strong class="text-success">{{ object.lot.display_price }} (pago)</strong>
+                                        {% else %}
+                                        <strong class="text-danger">{{ object.lot.display_price }} (não-pago)</strong>
+                                        {% endif %}
+                                    </div>
+                                    {% if object.status == object.CONFIRMED_STATUS %}
+                                    <div class="float-right"
+                                         style="margin-left:10px;margin-top:5px;">
+                                        <button type="button"
+                                                data-toggle="tooltip"
+                                                title="Abrir voucher"
+                                                onclick="window.open('{% url 'subscription:subscription-voucher' event.pk object.pk %}')"
+                                                class="btn btn-info btn-sm btn-trans">
+                                            detalhamento
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                    <div class="clearfix"></div>
                                 </td>
                             </tr>
                             </tbody>
@@ -308,235 +304,228 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-xl-2 col-lg-2 col-md-3" style="margin-bottom: 4px;">
-            <div class="panel panel-primary" id="block-profile">
-                <div class="panel-body minimal profile-block">
-                    <div class="col-md-12 col-xs-4">
-                        <img src="{% static 'assets/img/user_undefined.jpg' %}"
-                             class="img-responsive">
-                    </div>
-                    <div class="col-md-12 col-xs-8">
-                        <div class="profile-info">
-                            <div class="profile-info-label text-muted">Criado
-                                em:
-                            </div>
-                            <div class="profile-info-value text-muted">{{ object.created|date:"d/m/Y H\hi" }}</div>
+    <div class="row tooltip-wrapper">
+        <div class="col-xl-11 col-lg-11 col-md-12">
+            <section class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Informações Gerais</h3>
+                </div>
+                <div class="panel-body profile-wrapper profile-block">
+                    <div class="col-md-2">
+                        <div class="profile-pic text-center">
+                            <img src="{% static 'assets/img/user_undefined.jpg' %}" alt="" width="174px" class="img-circle">
                         </div>
-                        {% if object.person.gender %}
-                            <div class="profile-info">
-                                <div class="profile-info-label text-muted">
+                    </div>
+                    <div class="col-md-10">
+                        <h1 style="margin-top:8px">{{ object.person.name }}</h1>
+                        <hr />
+                        <small class="text-muted"><strong>Criado em:</strong> {{ object.created|date:"d/m/Y H\hi" }}</small>
+                        <div class="row" style="padding-left:16px;">
+                            <div class="profile-info col-lg-3  col-md-6">
+                                <div class="profile-info-label">
                                     Sexo:
                                 </div>
-                                <div class="profile-info-value text-muted">{{ object.person.get_gender_display }}</div>
+                                {% if object.person.gender %}
+                                <div class="profile-info-value">{{ object.person.get_gender_display }}</div>
+                                {% endif %}
                             </div>
-                        {% endif %}
-                        {% if config.cpf and object.person.cpf %}
-                            <div class="profile-info">
-                                <div class="profile-info-label text-muted">
+                            <div class="profile-info col-lg-3 col-md-6">
+                                <div class="profile-info-label">
+                                    E-mail:
+                                </div>
+                                {% if object.person.email %}
+                                <div class="profile-info-value">{{ object.person.email }}</div>
+                                {% endif %}
+                            </div>
+                            {% if config.cpf and object.person.cpf %}
+                            <div class="profile-info col-lg-3 col-md-6">
+                                <div class="profile-info-label">
                                     CPF:
                                 </div>
-                                <div class="profile-info-value text-muted">{{ object.person.get_cpf_display }}</div>
+                                <div class="profile-info-value">{{ object.person.get_cpf_display }}</div>
                             </div>
-                        {% endif %}
-                        {% if config.birth_date and object.person.birth_date %}
-                            <div class="profile-info">
-                                <div class="profile-info-label text-muted">Dt.
-                                    de Nascimento:
+                            {% endif %}
+                            {% if config.phone and object.person.phone %}
+                            <div class="profile-info col-lg-3 col-md-6">
+                                <div class="profile-info-label">
+                                    Celular:
                                 </div>
-                                <div class="profile-info-value text-muted">{{ object.person.get_birth_date_display }}</div>
-                                <div class="profile-info-value text-muted">{{ object.person.age }}
-                                    anos
-                                </div>
+                                <div class="profile-info-value">{{ object.person.get_phone_display }}</div>
                             </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-8 col-lg-9 col-md-9">
-{#            <div class="panel panel-primary" id="block-form-lot">#}
-{#                <div class="panel-heading">#}
-{#                    <h3 class="panel-title">Categoria / Lote / Ingresso</h3>#}
-{#                </div>#}
-{#                <div class="panel-body">#}
-{#                    <div class="row">#}
-{#                        {% if object.lot.category %}#}
-{#                            <div class="col-lg-12 col-xl-5">#}
-{#                                <div class="form-group">#}
-{#                                    <label>Categoria:</label>#}
-{#                                    <div class="well well-sm profile-info-padding">{{ object.lot.category.name }}</div>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        {% endif %}#}
-{#                        <div class="col-lg-12 col-xl-7">#}
-{#                            <div class="form-group">#}
-{#                                <label>Lote:</label>#}
-{#                                <div class="well well-sm profile-info-padding">{{ object.lot.name }}</div>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-
-            <div class="panel panel-primary" id="block-form-main">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Campos principais</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Nome completo:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.name }}</div>
+                            {% endif %}
+                            {% if object.person.city.name %}
+                            <div class="profile-info col-lg-3 col-md-6">
+                                <div class="profile-info-label">Cidade-UF:
+                                </div>
+                                <div class="profile-info-value">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
+                            </div>
+                            {% endif %}
+                            {% if config.city and object.person.birth_date %}
+                            <div class="profile-info col-lg-3 col-md-6">
+                                <div class="profile-info-label">Dt. de Nascimento:
+                                </div>
+                                <div class="profile-info-value">{{ object.person.get_birth_date_display }} ({{ object.person.age }} anos)</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <br />
+                        <div class="row" style="padding-left:16px;">
+                            <div class="connect social">
+                                <ul>
+                                    <li>
+                                        <button type="button" class="btn btn-info btn-trans"
+                                                data-toggle="tooltip"
+                                                title="Abrir informações financeiras do participante">
+                                            <span class="far fa-money-bill-alt"></span>
+                                            Financeiro
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="btn btn-primary btn-trans"
+                                                data-toggle="tooltip"
+                                                title="Enviar mensagem personalizada ao participante">
+                                            <span class="fa fa-comments"></span>
+                                            Enviar mensagem
+                                        </button>
+                                    </li>
+                                    <li style="display: none"><a href="#"><i class="fab fa-facebook-f fa-lg"></i></a></li>
+                                    <li style="display: none"><a href="#"><i class="fab fa-twitter fa-lg"></i></a></li>
+                                    <li style="display: none"><a href="#"><i class="fab fa-linkedin fa-lg"></i></a></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>E-mail:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.email }}</div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Celular:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.phone|default:'-' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% if config.address != config.ADDRESS_SHOW %}
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Cidade:</label>
-                                    <div class="well well-sm profile-info-padding">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
                 </div>
-            </div>
+            </section>
         </div>
     </div>
+
+    {% if config.address == config.ADDRESS_SHOW %}
     <div class="row">
-        {% if config.address == config.ADDRESS_SHOW %}
-            <div class="col-lg-{% if config.institution_show or config.institution_cnpj_show or config.function_show %}5{% else %}11{% endif %}">
-                <div class="panel" id="address-block-hidden">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Endereço <a href="#"
-                                                            onclick="show_block('#address-block-visible', '#address-block-hidden');return false;"
-                                                            class="btn btn-link"
-                                                            style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
-                        </h3>
-                    </div>
-                </div>
-                <div class="panel panel-primary" style="display:none"
-                     id="address-block-visible">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Endereço <a href="#"
-                                                            onclick="show_block('#address-block-hidden', '#address-block-visible');return false;"
-                                                            class="btn btn-link"
-                                                            style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a>
-                        </h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Logradouro (Rua/Av.):</label>
-                                    <div class="well well-sm profile-info-padding">{{ object.person.street|default:'-' }}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Número:</label>
-                                    <div class="well well-sm profile-info-padding">{{ object.person.number|default:'-' }}</div>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label>Complemento:</label>
-                                    <div class="well well-sm profile-info-padding">{{ object.person.complemento|default:'-' }}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 col-xl-4">
-                                <div class="form-group">
-                                    <label>Bairro:</label>
-                                    <div class="well well-sm profile-info-padding">{{ object.person.village|default:'-' }}</div>
-                                </div>
-                            </div>
-                            <div class="col-md-12 col-xl-8">
-                                <div class="form-group">
-                                    <label>Cidade:</label>
-                                    <div class="well well-sm profile-info-padding">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
-                                </div>
-                            </div>
+        <div class="col-xl-11 col-lg-11 col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel" id="address-block-hidden">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Endereço <a href="#"
+                                                                onclick="show_block('#address-block-visible', '#address-block-hidden');return false;"
+                                                                class="btn btn-link"
+                                                                style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
+                            </h3>
                         </div>
                     </div>
-                </div>
-            </div>
-        {% endif %}
-        {% if config.institution_show or config.institution_cnpj_show or config.function_show %}
-            <div class="col-lg-{% if config.address == config.ADDRESS_SHOW %}5{% else %}11{% endif %}">
-                <div class="panel" id="institution-block-hidden">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Dados Institucionais <a
-                                href="#"
-                                onclick="show_block('#institution-block-visible', '#institution-block-hidden');return false;"
-                                class="btn btn-link"
-                                style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
-                        </h3>
-                    </div>
-                </div>
-                <div class="panel panel-primary" style="display:none"
-                     id="institution-block-visible">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Dados Institucionais <a
-                                href="#"
-                                onclick="show_block('#institution-block-hidden', '#institution-block-visible');return false;"
-                                class="btn btn-link"
-                                style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a>
-                        </h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
+                    <div class="panel panel-primary" style="display:none" id="address-block-visible">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Endereço <a href="#"
+                                            onclick="show_block('#address-block-hidden', '#address-block-visible');return false;"
+                                            class="btn btn-link"
+                                            style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
                             <div class="row">
-                                {% if config.institution_show %}
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label>Instituição:</label>
-                                            <div class="well well-sm profile-info-padding">{{ object.person.institution|default:'-' }}</div>
-                                        </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Logradouro (Rua/Av.):</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.street|default:'-' }}</div>
                                     </div>
-                                {% endif %}
-                                {% if config.institution_cnpj_show %}
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>CNPJ da Instituição:</label>
-                                            <div class="well well-sm profile-info-padding">{{ object.person.get_institution_cnpj_display|default:'-' }}</div>
-                                        </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Número:</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.number|default:'-' }}</div>
                                     </div>
-                                {% endif %}
-                                {% if config.function_show %}
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Cargo:</label>
-                                            <div class="well well-sm profile-info-padding">{{ object.person.function|default:'-' }}</div>
-                                        </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label>Complemento:</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.complemento|default:'-' }}</div>
                                     </div>
-                                {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-xl-4">
+                                    <div class="form-group">
+                                        <label>Bairro:</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.village|default:'-' }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-xl-8">
+                                    <div class="form-group">
+                                        <label>Cidade:</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if config.institution_show or config.institution_cnpj_show or config.function_show %}
+    <div class="row">
+        <div class="col-xl-11 col-lg-11 col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel" id="institution-block-hidden">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Dados Institucionais <a
+                                    href="#"
+                                    onclick="show_block('#institution-block-visible', '#institution-block-hidden');return false;"
+                                    class="btn btn-link"
+                                    style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="panel panel-primary" style="display:none" id="institution-block-visible">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Dados Institucionais <a
+                                    href="#"
+                                    onclick="show_block('#institution-block-hidden', '#institution-block-visible');return false;"
+                                    class="btn btn-link"
+                                    style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="row">
+                                    {% if config.institution_show %}
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Instituição:</label>
+                                                <div class="well well-sm profile-info-padding">{{ object.person.institution|default:'-' }}</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if config.institution_cnpj_show %}
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>CNPJ da Instituição:</label>
+                                                <div class="well well-sm profile-info-padding">{{ object.person.get_institution_cnpj_display|default:'-' }}</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if config.function_show %}
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Cargo:</label>
+                                                <div class="well well-sm profile-info-padding">{{ object.person.function|default:'-' }}</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        {% endif %}
+        </div>
     </div>
-
+    {% endif %}
 {% endblock %}

@@ -2535,7 +2535,8 @@ body.fullscreen-widget-active .panel .panel-heading .actions > .fa-times {
   -o-transition: all ease 0.3s;
   -ms-transition: all ease 0.3s;
 }
-.social .fa-facebook:hover {
+.social .fa-facebook:hover,
+.social .fa-facebook-f:hover {
   background: #4060A5;
 }
 .social .fa-twitter:hover {
@@ -3658,11 +3659,10 @@ label.valid {
   padding: 10px 5px;
 }
 .theme-cgsy-full .profile-block .profile-info .profile-info-label {
-  font-size: 0.75em;
   font-weight: bold;
 }
 .theme-cgsy-full .profile-block .profile-info .profile-info-value {
-  font-size: 0.875em;
+  color: #666;
 }
 .theme-cgsy-full .filter-box {
   display: none;
@@ -3929,11 +3929,19 @@ label.valid {
 .float-right {
   float: right;
 }
+.text-bold {
+  font-weight: bold;
+}
 .no-shadow {
   box-shadow: none !important;
 }
 .cgsy-label {
   font-size: 0.938em;
+}
+.nowrap {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 @media (max-width: 991px) {
   .text-right.left-when-small {

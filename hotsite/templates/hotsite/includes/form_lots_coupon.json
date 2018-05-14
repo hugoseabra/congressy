@@ -3,7 +3,7 @@
 		"public_display": "{{ lot.display_publicly }}",
 		"is_free": {% if not lot.price %}" - Gratuito"{% else %}""{% endif %},
 		"exhibition_code": "{{ lot.exhibition_code }}",
-		"option": "<option value='{{ lot.pk }}'>{{ lot.name }} Lote</option>",
+		"option": "<option value='{{ lot.pk }}'>{{ lot.display_publicly }}</option>",
         "id": "{{ lot.pk }}"
 	}
 }
