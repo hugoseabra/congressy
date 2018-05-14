@@ -6,12 +6,13 @@
 
 <div {% if has_inside_bar %} class="col-xs-1 col-sm-1 col-lg-1
                 col-xl-1" style="padding: 0" {% else %} class="tooltip-wrapper
-                collapse
+                collapse FadeInLeft
                 navbar-collapse col-xs-1
                 col-sm-1 col-lg-1
                 col-xl-1 " id="sidebar" style="height:
                  100%; position: fixed;width: 60px;z-index: 1000;" {% endif %}>
-    <div class="principal_sidebar new_nav sidebar-left sidebar" style="width:
+    <div class="principal_sidebar new_nav  sidebar-left sidebar"
+         style="width:
                     50px; padding-top: 0">
         <ul class="col nav nav-pills nav-stacked " style="
                             font-size: 25px;text-align: center; margin: 0">
@@ -55,27 +56,30 @@
             <li class="divider sidebar_divider"></li>
 
             <li style="width: 50px">
+                <a href="{% url 'subscription:my-subscriptions' %}"
+                   data-toggle="tooltip"
+                   data-placement="right"
+                   title=""
+                   data-original-title="Minhas Inscrições"
+                   title="Inscrições" class="fa fa-list"></a>
+            </li>
+
+            <li style="width: 50px">
                 <a href="{% url 'event:event-list' %}"
                    data-toggle="tooltip"
                    data-placement="right"
                    title=""
-                   data-original-title="Eventos"
+                   data-original-title="Meus Eventos"
                    class="fa fa-calendar">
                 </a>
             </li>
             <li style="width: 50px">
-                <a href="{% url 'subscription:my-subscriptions' %}"
-                   data-toggle="tooltip"
-                   data-placement="right"
-                   data-original-title="Inscrições"
-                   title="Inscrições" class="fa fa-list"></a>
-            </li>
-            <li style="width: 50px">
                 <a href="{% url 'event:organization-list' %}"
+                   title=""
                    title="Organizações" class="fa fa-sitemap"
                    data-toggle="tooltip"
                    data-placement="right"
-                   data-original-title="Organizações"
+                   data-original-title="Minhas Organizações"
 
                 ></a>
             </li>

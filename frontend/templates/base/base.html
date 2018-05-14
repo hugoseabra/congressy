@@ -123,7 +123,8 @@
                             <ul class="dropdown-menu animated fadeInRight "
                                 role="menu">
 
-                                <li>
+                                <li style="padding-left:
+                                 5px; padding-right: 5px;">
                                     <a href="
 {% url 'event:organization-edit' organization.pk %}">
                                             <span class="icon">
@@ -133,7 +134,8 @@
                                     </a>
                                 </li>
                                 <li class="divider"></li>
-                                <li role="presentation">
+                                <li role="presentation" style="padding-left:
+                                 5px; padding-right: 5px;">
                                     <button type="button"
                                             class="btn  btn-sm btn-primary
                                        btn-block"
@@ -175,10 +177,12 @@
                                         </span>
                         </a>
                         <ul class="dropdown-menu animated fadeInRight "
-                            role="menu" style="min-width: 20px;text-align: center">
+                            role="menu" style="min-width: 20px;text-align:
+                            center;right: 0;left: inherit ">
 
-                            <li>
-                                <span class="text">
+                            <li style="padding-left:
+                                 5px; padding-right: 5px;">
+                                <span class="text" >
                                     {{ organization.name|truncatechars:15 }}
                                 </span>
                             </li>
@@ -191,7 +195,8 @@
                                 </a>
                             </li>
                             <li class="divider"></li>
-                            <li role="presentation">
+                            <li role="presentation" style="padding-left:
+                                 5px; padding-right: 5px;">
                                 <button type="button" id="org-button"
                                         class="btn  btn-sm btn-primary
                                        btn-block"
@@ -251,7 +256,8 @@
         </section>
     </div>
     </div>
-    <section class="cgsy-footer footer-wrapper" style="z-index: 1000">
+    <section class="cgsy-footer footer-wrapper" style="z-index: 100;
+    padding-left: 60px">
         {% include "base/footer.html" %}
     </section>
 </section>
