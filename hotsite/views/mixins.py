@@ -115,10 +115,18 @@ class EventMixin(TemplateNameableMixin, generic.View):
         return self.event.get_period()
 
     def get_lots(self):
-        return self.event.lots.filter(private=False)
+        return [
+            lot
+            for lot in self.event.lots.filter(private=False )
+            if lot.status == lot.LOT_STATUS_RUNNING
+        ]
 
     def get_private_lots(self):
-        return self.event.lots.filter(private=True)
+        return [
+            lot
+            for lot in self.event.lots.filter(private=True)
+            if lot.status == lot.LOT_STATUS_RUNNING
+        ]
 
     def has_available_lots(self):
         available_lots = []

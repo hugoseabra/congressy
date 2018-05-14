@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django import forms
 
 from core.forms import PriceInput, SplitDateTimeWidget
-from gatheros_subscription.models import Lot, EventSurvey
+from gatheros_subscription.models import EventSurvey, Lot
 
 INSTALLMENT_CHOICES = (
     (2, 2),
@@ -80,6 +80,22 @@ class LotForm(forms.ModelForm):
         if self.instance.pk and self.instance.subscriptions.count() > 0:
             self.fields['price'].widget.attrs['disabled'] = 'disabled'
             self.fields['price'].disabled = True
+
+            self.fields['transfer_tax'].widget.attrs['disabled'] = 'disabled'
+            self.fields['transfer_tax'].disabled = True
+
+            self.fields['allow_installment'].widget.attrs['disabled'] = \
+                'disabled'
+            self.fields['allow_installment'].disabled = True
+
+            self.fields['installment_limit'].widget.attrs['disabled'] = \
+                'disabled'
+            self.fields['installment_limit'].disabled = True
+
+            self.fields[
+                'num_install_interest_absortion'
+            ].widget.attrs['disabled'] = 'disabled'
+            self.fields['num_install_interest_absortion'].disabled = True
 
     def clean_date_end(self):
         date_end = self.cleaned_data.get('date_end')

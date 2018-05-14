@@ -11,7 +11,6 @@ from gatheros_subscription.models import Lot
 
 
 class LotFormModelChoiceField(ModelChoiceField):
-
     def label_from_instance(self, obj):
         if obj.price and obj.price > 0:
             return "{} - R${}".format(obj.name, obj.get_calculated_price())
@@ -20,7 +19,6 @@ class LotFormModelChoiceField(ModelChoiceField):
 
 
 class LotsForm(forms.Form):
-
     def __init__(self, **kwargs):
         self.event = kwargs.get('initial').get('event')
         super().__init__(**kwargs)
@@ -43,13 +41,9 @@ class LotsForm(forms.Form):
         choices = []
 
         for lot in public_lots:
+            if lot.status != lot.LOT_STATUS_RUNNING:
+                continue
 
-            if lot.price and lot.price > 0:
-                lot_name = "{} - R${}".format(lot.name,
-                                              lot.get_calculated_price())
-            else:
-                lot_name = "{}".format(lot.name)
-
-            choices.append((lot.id, lot_name))
+            choices.append((lot.id, lot.display_publicly))
 
         return choices
