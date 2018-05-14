@@ -24,10 +24,10 @@ handler500 = 'project.views.handler500'
 admin_urlpatterns = [url(r'^cgsy-admin18/', admin.site.urls)]
 
 private_urlpatterns = [
+    url(r'^manage/', include('scientific_work.urls', 'scientific_work')),
     url(r'^manage/', include('gatheros_subscription.urls', 'subscription')),
     # url(r'^manage/', include('bitly.urls', 'bitly')),
     url(r'^manage/', include('gatheros_event.urls', 'event')),
-    url(r'^manage/', include('scientific_work.urls', 'scientific_work')),
     url(r'^manage/', include(gatheros_front_private, 'front')),
     url(r'^manage/', include(private_payment_urls, 'payment')),
 

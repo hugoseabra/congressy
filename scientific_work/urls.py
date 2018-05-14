@@ -9,4 +9,6 @@ urls = [
     ),
 ]
 
-urlpatterns = [url(r'^scientific_work/', include(urls))]
+urlpatterns = [
+    url(r'^events/(?P<event_pk>[\d]+)/scientific_work/', include(urls))
+]

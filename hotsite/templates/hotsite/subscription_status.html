@@ -198,7 +198,7 @@
 
                             {% if event.is_scientific %}
 
-                                <a href="{% url 'scientific_work:work-add' %}"
+                                <a href="{% url 'scientific_work:work-add' event_pk=event.pk%}"
                                    class="btn btn-primary"
                                    style="margin-top: 15px">
                                     Deseja submeter seu artigo cientifico?
