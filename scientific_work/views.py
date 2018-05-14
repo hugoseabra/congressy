@@ -3,12 +3,13 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
-from gatheros_event.models import Event
+from gatheros_subscription.models import Subscription
 from gatheros_event.views.mixins import AccountMixin
 from .forms import NewWorkForm
 
 
 class WorkAddFormView(AccountMixin, FormView):
+    subscription = None
     template_name = "scientific_work/work_form.html"
     form_class = NewWorkForm
 
@@ -16,14 +17,14 @@ class WorkAddFormView(AccountMixin, FormView):
         return reverse_lazy('subscription:my-subscriptions')
 
     def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
 
-        event_pk = self.kwargs.get('event_pk')
-        if not event_pk:
+        subscription_pk = self.kwargs.get('subscription_pk')
+        if not subscription_pk:
             messages.error(self.request, 'Não foi possivel resgatar o evento.')
             return redirect(reverse_lazy('front:start'))
 
-        self.event = get_object_or_404(Event, pk=event_pk)
+        self.subscription = get_object_or_404(Subscription, pk=subscription_pk)
+        response = super().dispatch(request, *args, **kwargs)
 
         return response
 
@@ -34,5 +35,11 @@ class WorkAddFormView(AccountMixin, FormView):
 
     def get_success_url(self):
         return reverse_lazy('scientific_work:work-add', kwargs={
-            'event_pk': self.event.pk,
+            'subscription_pk': self.subscription.pk,
         })
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['subscription'] = self.subscription
+        return kwargs
+

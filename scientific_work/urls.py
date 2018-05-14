@@ -10,5 +10,6 @@ urls = [
 ]
 
 urlpatterns = [
-    url(r'^events/(?P<event_pk>[\d]+)/scientific_work/', include(urls))
+    url(r'^subscription/(?P<subscription_pk>[0-9A-Fa-f-]+)/scientific_work/',
+        include(urls))
 ]

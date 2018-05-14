@@ -3,19 +3,27 @@ from scientific_work.models import Work
 
 
 class NewWorkForm(forms.ModelForm):
+    subscription = None
+
+    def __init__(self, subscription, *args, **kwargs):
+        self.subscription = subscription
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = Work
-        fields = '__all__'
-
-    author = forms.CharField(
-            max_length=255,
-            label="Autores",
-    )
-
+        exclude = [
+            'subscription',
+        ]
 
     def clean_accepts_terms(self):
         terms = self.cleaned_data['accepts_terms']
         if not terms:
             raise forms.ValidationError('Você deve aceitar os termos e '
                                         'condições para submeter.')
+        return terms
+
+    def save(self, commit=True):
+        self.instance.subscription = self.subscription
+        return super().save(commit)
+
+

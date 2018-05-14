@@ -18,24 +18,20 @@
                 {% if form.non_field_errors %}
                     {% render_errors form.non_field_errors %}
                 {% endif %}
-
                 {% for field in form %}
                     {% if field.errors %}
                         {% render_errors field.errors %}
                     {% endif %}
                 {% endfor %}
-
                 {% if form.forms %}
                     {% render_errors form.non_field_errors %}
                 {% endif %}
-
                 {% for hidden_field in form.hidden_fields %}
                     {% if hidden_field.errors %}
                         {% render_errors hidden_field.errors %}
                     {% endif %}
                     {{ hidden_field }}
                 {% endfor %}
-
 
                 <div class="panel panel-primary">
                     <div class="panel-heading">
@@ -54,9 +50,7 @@
                                 {% render_generic_field form.keywords %}
 
                                 <div>
-                                    <div id="author_list">
-                                        {% render_generic_field form.author %}
-                                    </div>
+                                    <div id="author_list"></div>
                                     <button class="btn-sm btn-primary"
                                             id="add_author"
                                             style="margin-top: 5px"
@@ -128,7 +122,7 @@
 
             resume_el.hide();
 
-            select_el.on('change', function () {
+            select_el.on("change", function () {
 
                 if (this.value === "resumo") {
                     resume_el.fadeIn("slow");
