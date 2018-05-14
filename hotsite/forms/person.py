@@ -30,6 +30,10 @@ class SubscriptionPersonForm(PersonForm):
         self.fields['name'].widget.attrs['disabled'] = 'disabled'
         self.fields['name'].disabled = True
 
+        if self.instance and self.instance.cpf:
+            self.fields['cpf'].widget.attrs['disabled'] = 'disabled'
+            self.fields['cpf'].disabled = True
+
         try:
             config = self.event.formconfig
         except AttributeError:

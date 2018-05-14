@@ -541,6 +541,16 @@
                         </div>
                     </div>
                     <div class="panel-body">
+                        {% if lot.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" > 0 %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="alert alert-info">
+                                        <strong>Este lote já possui inscrições!</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
                         {% if full_banking %}
                             <div class="row">
                                 <div class="col-md-3">
