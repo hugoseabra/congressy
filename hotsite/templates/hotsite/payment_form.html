@@ -83,20 +83,13 @@
                                     Remover
                                 </a>
                             </div>
-                            <div class="text-center">
-                                <button id="id_button_pay"
-                                        class="btn btn-default"
-                                        type="button">
-                                    Escolha meio de pagamento
-                                </button>
-                            </div>
 
                             <div class="text-center">
                                 <img style="width: 80%; margin-top: 20px"
                                      src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
                             </div>
                             <br/>
-                            <form action="" method="post">
+                            <form action="" method="post" id="next_form">
                                 {% csrf_token %}
                                 {{ wizard.management_form }}
 
@@ -104,12 +97,14 @@
                                     {{ hidden }}
                                 {% endfor %}
 
-                                <button type="submit"
-                                        class="btn btn-primary pull-right">
-                                    Finalizar
-                                    <i class="fas fa-chevron-circle-right"></i>
-                                </button>
                             </form>
+
+                            <button type="button"
+                                    class="btn btn-primary pull-right"
+                                    id="id_button_pay">
+                                Realizar pagamento e finalizar
+                                <i class="fas fa-chevron-circle-right"></i>
+                            </button>
 
                             <form action="" method="post" novalidate>
                                 {{ wizard.management_form }}
@@ -149,6 +144,8 @@
 
         $(document).ready(function () {
 
+            var payment_btn_el = $('#id_button_pay');
+
             $('form').submit(function () {
                 $(this).find(':submit').attr('disabled', 'disabled');
                 $(this).attr('novalidate', 'novalidate');
@@ -156,7 +153,7 @@
 
             var lot = JSON.parse($('#id_payment-lot_as_json').val());
 
-            $('#id_button_pay').on('click', function () {
+            payment_btn_el.on('click', function () {
                 process_single_lot_payment(
                     '{{ pagarme_encryption_key }}',
                     2.29,

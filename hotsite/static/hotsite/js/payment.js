@@ -4,7 +4,6 @@ function hide_payment_elements() {
     $('#id_remove').hide();
     $('#payment_buttons').hide();
     $('#next_btn').attr("disabled", true);
-    $('#id_button_pay').show();
 
     $('#id_payment-card_hash').val('');
     $('#id_payment-installments').val('');
@@ -66,7 +65,6 @@ function process_payment(
         }
 
         $('#payment_buttons').show();
-        $('#id_button_pay').hide();
         $('#id_remove').show();
         $('#id_payment-transaction_type').val(data.payment_method);
         $('#id_payment-amount').val(data.amount);
@@ -168,13 +166,18 @@ function process_single_lot_payment(
         }
 
         $('#payment_buttons').show();
-        $('#id_button_pay').hide();
         $('#id_remove').show();
         $('#next_btn').attr("disabled", false);
         $('#id_payment-transaction_type').val(data.payment_method);
         $('#id_payment-amount').val(data.amount);
         $('#id_payment-card_hash').val(data.card_hash);
         $('#id_payment-installments').val(data.installments);
+
+        var payment_btn_el = $('#id_button_pay');
+        payment_btn_el.attr('disabled', 'disabled');
+        payment_btn_el.text('Aguarde...');
+
+        $('#next_form').submit();
     }
 
     function handleError(data) {
