@@ -133,42 +133,20 @@ class SubscriptionWizardView(SessionWizardView):
             self.clear_session_exhibition_code()
             return redirect('public:hotsite', slug=self.event.slug)
 
-        response = super().dispatch(request, *args, **kwargs)
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except InvalidStateStepError:
 
-        if self.steps.current not in ['lot', 'private_lot']:
-            try:
-                self.get_lot_from_session()
-            except InvalidStateStepError:
+            messages.warning(
+                request,
+                "Por favor, informe os dados do início para validarmos"
+                " as informações de sua inscrição."
+            )
 
-                messages.warning(
-                    request,
-                    "Por favor, informe os dados do início para validarmos"
-                    " as informações de sua inscrição."
-                )
-
-                return redirect(
-                    'public:hotsite-subscription',
-                    slug=self.event.slug
-                )
-
-        if self.steps.current not in ['lot', 'private_lot', 'person']:
-            try:
-                self.get_lot_from_session()
-                self.get_person_from_session()
-            except InvalidStateStepError:
-
-                messages.warning(
-                    request,
-                    "Por favor, informe os dados do início para validarmos"
-                    " as informações de sua inscrição."
-                )
-
-                return redirect(
-                    'public:hotsite-subscription',
-                    slug=self.event.slug
-                )
-
-        return response
+            return redirect(
+                'public:hotsite-subscription',
+                slug=self.event.slug
+            )
 
     def get_context_data(self, **kwargs):
 
