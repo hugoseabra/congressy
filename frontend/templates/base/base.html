@@ -150,10 +150,10 @@
                 </ul>
             {% endif %}
             <div class="modal fade in" id="change_organization"
-                 role="dialog"  data-backdrop="false">
+                 role="dialog"  data-backdrop="true">
 
                 <div class="modal-dialog " role="document">
-                    <div class="modal-content">
+                    <div class="modal-content" style="z-index: 10000;">
 
                         <div class="modal-header">
                             <button type="button" class="close"
@@ -263,10 +263,10 @@
                                         </span>
                         </a>
                         <ul class="dropdown-menu animated fadeInRight "
-                            role="menu" style="min-width: 20px">
+                            role="menu" style="min-width: 20px;text-align: center">
 
                             <li>
-                                <span class="text" style="text-align: center">
+                                <span class="text">
                                     {{ organization.name|truncatechars:15 }}
                                 </span>
                             </li>
