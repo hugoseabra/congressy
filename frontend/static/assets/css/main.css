@@ -3841,8 +3841,14 @@ label.valid {
 .theme-cgsy-full .dataTables_paginate {
   font-size: 0.875em;
 }
+.theme-cgsy-full .dataTables_filter {
+  float: right;
+}
 .theme-cgsy-full .dataTables_filter input {
   margin-left: 5px;
+}
+.theme-cgsy-full .dataTables_paginate {
+  float: right;
 }
 .theme-cgsy-full .danger-box-message.danger h2 {
   font-weight: bold;
