@@ -1,4 +1,5 @@
 from django.db import models
+from gatheros_subscription.models import Subscription
 
 
 class Work(models.Model):
@@ -23,6 +24,13 @@ class Work(models.Model):
         (MANAGEMENT, 'Gestão'),
         (MARKETING, 'Marketing'),
         (RESEARCH, 'Pesquisa'),
+    )
+
+    subscription = models.ForeignKey(
+        Subscription,
+        on_delete=models.CASCADE,
+        verbose_name='trabalho',
+        related_name='works',
     )
 
     modality = models.CharField(
