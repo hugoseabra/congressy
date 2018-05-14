@@ -3917,11 +3917,6 @@ label.valid {
   bottom: 0;
   z-index: 1000;
 }
-@media only screen and (min-width: 1600px) {
-  .theme-cgsy-full .cgsy-footer {
-    margin-bottom: 20px;
-  }
-}
 .float-left {
   float: left;
 }
