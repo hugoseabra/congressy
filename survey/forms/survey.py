@@ -74,7 +74,8 @@ class SurveyForm(forms.Form):
                 author = Author.objects.get_or_create(survey=self.survey,
                                                       user=self.user)[0]
 
-                question = Question.objects.get(name=question)
+                question = Question.objects.get(name=question,
+                                                survey=self.survey)
 
                 existing_answer = None
 
@@ -85,11 +86,12 @@ class SurveyForm(forms.Form):
                     pass
 
                 if existing_answer:
-                    answer_service = AnswerService(instance=existing_answer, data={
-                        'question': question.pk,
-                        'author': author.pk,
-                        'value': answer,
-                    })
+                    answer_service = AnswerService(instance=existing_answer,
+                                                   data={
+                                                       'question': question.pk,
+                                                       'author': author.pk,
+                                                       'value': answer,
+                                                   })
                 else:
                     answer_service = AnswerService(data={
                         'question': question.pk,

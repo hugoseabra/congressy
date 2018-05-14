@@ -43,7 +43,7 @@ class InvitationListView(AccountMixin, ListView):
 
     def dispatch(self, request, *args, **kwargs):
         if not self._can_view():
-            if self.organization.internal:
+            if self.organization and self.organization.internal:
                 messages.warning(request, 'Você não pode acessar esta área.')
                 return redirect(reverse_lazy('front:start'))
             else:

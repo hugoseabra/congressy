@@ -86,7 +86,7 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
         exihibition_code = None
 
         is_private_event = not self.has_available_public_lots() and \
-                           self.get_private_lots()
+                           len(self.get_private_lots()) > 0
 
         if is_private_event:
             exihibition_code = self.request.POST.get('exhibition_code')
