@@ -38,6 +38,18 @@ class Transaction(models.Model):
         (CREDIT_CARD, 'Cartão de credito')
     )
 
+    MANUAL_PAYMENT_MONEY = 'money'
+    MANUAL_PAYMENT_PAYCHECK = 'paycheck'
+    MANUAL_PAYMENT_DEBIT_CARD = 'debit_card'
+    MANUAL_PAYMENT_CREDIT_CARD = 'credit_card'
+
+    MANUAL_PAYMENT_TYPES = (
+        (MANUAL_PAYMENT_MONEY, 'Dinheiro'),
+        (MANUAL_PAYMENT_PAYCHECK, 'Chegue'),
+        (MANUAL_PAYMENT_DEBIT_CARD, 'Cartão de Débito'),
+        (MANUAL_PAYMENT_CREDIT_CARD, 'Cartão de Crédito'),
+    )
+
     class Meta:
         verbose_name = 'Transação'
         verbose_name_plural = 'Transações'
@@ -102,6 +114,27 @@ class Transaction(models.Model):
         Subscription,
         on_delete=models.DO_NOTHING,
         related_name='transactions'
+    )
+
+    manual = models.BooleanField(
+        default=False,
+        verbose_name='lançado manualmente',
+    )
+
+    manual_payment_type = models.CharField(
+        max_length=30,
+        choices=MANUAL_PAYMENT_TYPES,
+        null=True,
+        blank=True,
+        verbose_name='tipo de recebimento manual',
+    )
+
+    manual_registered_by = models.CharField(
+        max_length=120,
+        null=True,
+        blank=True,
+        verbose_name='registrado por',
+        editable=False,
     )
 
     data = JSONField()
