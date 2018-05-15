@@ -65,7 +65,13 @@ class Work(models.Model):
     )
 
     article_file = models.FileField(
-        upload_to='artigos/',
+        upload_to='scientific_work/artigos/',
+        blank=True,
+        null=True
+    )
+
+    banner_file = models.FileField(
+        upload_to='scientific_work/banners/',
         blank=True,
         null=True
     )

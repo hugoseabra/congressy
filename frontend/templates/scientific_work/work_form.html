@@ -5,10 +5,10 @@
 {% block title %}Nova submissão | Congressy{% endblock %}
 {% block page_title %}Nova submissão{% endblock %}
 {% block content %}
-    <form method="POST" enctype="multipart/form-data" id="submission_form">
+    <form method="POST">
         {% csrf_token %}
         <div class="row">
-            <div class="col-lg-6     col-lg-push-2 col-xl-8 col-xl-push-2">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 {% if form.non_field_errors %}
                     {% render_errors form.non_field_errors %}
                 {% endif %}
@@ -40,8 +40,13 @@
                                     {% render_generic_field form.summary %}
                                 </div>
                                 {% render_generic_field form.keywords %}
-                                <div id="file_el" style="margin-top: 15px">
+                                <div id="article_file_el"
+                                     style="margin-top: 15px">
                                     {% render_generic_field form.article_file %}
+                                </div>
+                                <div id="banner_file_el"
+                                     style="margin-top: 15px">
+                                    {% render_generic_field form.banner_file %}
                                 </div>
                                 <div class="form-group">
                                     {{ form.accepts_terms }}
@@ -62,9 +67,9 @@
                 <div class="buttonbar">
                     <div class="float-right">
                         <button type="submit"
-                                class="btnbtn-success">
+                                class="btn btn-success">
+                            <i class="far fa-save"></i>
                             Salvar
-                            <i class="fas fa-arrow-circle-right"></i>
                         </button>
                     </div>
                     <div class="clearfix"></div>
@@ -83,21 +88,26 @@
 
             var select_el = $('#id_modality');
             var resume_el = $('#resume_el');
-            var file_el = $('#file_el');
+            var article_file_el = $('#article_file_el');
+            var banner_file_el = $('#banner_file_el');
 
             resume_el.hide();
+            banner_file_el.hide();
+
             select_el.on("change", function () {
 
                 if (this.value === "resumo") {
                     resume_el.fadeIn("slow");
-                    file_el.fadeOut();
+                    article_file_el.fadeOut();
+                    banner_file_el.fadeOut();
                 } else if (this.value === "artigo") {
+                    article_file_el.fadeIn("slow");
                     resume_el.fadeOut();
-                    file_el.fadeIn("slow");
-                }
-                else {
+                    banner_file_el.fadeOut();
+                } else if (this.value === "banner") {
+                    banner_file_el.fadeIn("slow");
                     resume_el.fadeOut();
-                    file_el.fadeOut();
+                    article_file_el.fadeOut();
                 }
             });
 

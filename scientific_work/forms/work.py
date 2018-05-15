@@ -3,6 +3,7 @@ from scientific_work.models import Work
 
 
 class NewWorkForm(forms.ModelForm):
+
     subscription = None
 
     def __init__(self, subscription, *args, **kwargs):
@@ -25,5 +26,3 @@ class NewWorkForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance.subscription = self.subscription
         return super().save(commit)
-
-
