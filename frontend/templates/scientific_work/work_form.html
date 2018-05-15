@@ -7,7 +7,6 @@
 {% block content %}
     <form method="POST" enctype="multipart/form-data" id="submission_form">
         {% csrf_token %}
-        {{ wizard.management_form }}
         <div class="row">
             <div class="col-lg-6     col-lg-push-2 col-xl-8 col-xl-push-2">
                 {% if form.non_field_errors %}
@@ -33,43 +32,6 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-9 text-center">
-
-                                <div class="col-md-2 col-lg-offset-2">
-                                    <div class="row">
-                         <span class="fa-stack fa-2x">
-                                    <i class="fa fa-circle fa-stack-2x"
-                                       style="color: #556b8d"></i>
-                                    <i class="fas fa-file-alt fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                    </div>
-
-                                    <div class="row">
-                                        <strong>Artigo</strong>
-                                    </div>
-
-                                </div>
-                                <div class="col-lg-1">
-                                    <i class="fas fa-arrow-right fa-2x"></i>
-                                </div>
-                                <div class="col-md-2">
-
-                                    <div class="row">
-                                        <span class="fa-stack fa-2x"
-                                              style="opacity: 0.5">
-                                            <i class="fa fa-circle fa-stack-2x"
-                                            style="color: #556b8d"></i>
-                                            <i class="fas fa-user-plus fa-stack-1x fa-inverse"></i>
-                                        </span>
-                                    </div>
-
-                                    <div class="row">
-                                        <strong>Autores</strong>
-                                    </div>
-
-                                </div>
-
-                            </div>
                             <div class="col-md-12" style="margin-top: 20px">
                                 {% render_generic_field form.modality %}
                                 {% render_generic_field form.area_category %}
@@ -99,9 +61,9 @@
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar">
                     <div class="float-right">
-                        <button type="submit" id="save_btn" class="btn
-                  btn-success">
-                            Próximo
+                        <button type="submit"
+                                class="btnbtn-success">
+                            Salvar
                             <i class="fas fa-arrow-circle-right"></i>
                         </button>
                     </div>
@@ -119,17 +81,11 @@
     <script type="application/javascript">
         $(document).ready(function () {
 
-
-            var form = $('#submission_form');
             var select_el = $('#id_modality');
             var resume_el = $('#resume_el');
             var file_el = $('#file_el');
-            var save_el = $('#save_btn');
-            var new_author_btn = $('#add_author');
-            var author_list = $('#author_list');
 
             resume_el.hide();
-
             select_el.on("change", function () {
 
                 if (this.value === "resumo") {
@@ -143,23 +99,6 @@
                     resume_el.fadeOut();
                     file_el.fadeOut();
                 }
-            });
-
-            save_el.on("click", function () {
-                form.submit();
-                console.log('Submitted');
-            });
-
-            new_author_btn.on("click", function () {
-                $('<input>').attr({
-                    type: 'text',
-                    id: 'foo',
-                    name: 'bar',
-                    placeholder: 'Nome completo',
-                    class: 'form-control',
-                    maxlength: '255',
-                    style: 'margin-top: 10px'
-                }).appendTo(author_list);
             });
 
         });

@@ -17,7 +17,8 @@ class WorkAddFormView(AccountMixin, FormView):
 
         subscription_pk = self.kwargs.get('subscription_pk')
         if not subscription_pk:
-            messages.error(self.request, 'Não foi possivel resgatar o evento.')
+            messages.error(self.request, 'Não foi possivel resgatar a '
+                                         'inscrição.')
             return redirect(reverse_lazy('front:start'))
 
         self.subscription = get_object_or_404(Subscription, pk=subscription_pk)
@@ -31,7 +32,7 @@ class WorkAddFormView(AccountMixin, FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('scientific_work:work-add', kwargs={
+        return reverse_lazy('scientific_work:work-list', kwargs={
             'subscription_pk': self.subscription.pk,
         })
 
