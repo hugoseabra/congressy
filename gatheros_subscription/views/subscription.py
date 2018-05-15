@@ -17,6 +17,7 @@ from django.utils.decorators import classonlymethod
 from django.views import generic
 from wkhtmltopdf.views import PDFTemplateView
 
+from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Person
@@ -31,7 +32,7 @@ from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.models import Subscription, FormConfig
 
 
-class EventViewMixin(AccountMixin, generic.View):
+class EventViewMixin(TemplateNameableMixin, AccountMixin):
     """ Mixin de view para vincular com informações de event. """
     event = None
 
@@ -49,7 +50,7 @@ class EventViewMixin(AccountMixin, generic.View):
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
-        context = super(EventViewMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         event = self.get_event()
         context['event'] = event
@@ -295,8 +296,8 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
             'lots': self.get_lots(),
             'has_filter': self.has_filter,
             'has_paid_lots': self.has_paid_lots(),
-            'has_inside_bar' : True,
-            'active' : 'inscricoes',
+            'has_inside_bar': True,
+            'active': 'inscricoes',
         })
         return cxt
 
@@ -726,7 +727,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                            transaction.type == 'boleto':
+                                    transaction.type == 'boleto':
                         return True
 
         return False

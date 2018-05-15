@@ -1,0 +1,224 @@
+{% load static %}
+
+<div class="row tooltip-wrapper">
+    <div class="col-xl-11 col-lg-11 col-md-12">
+        <div class="buttonbar">
+            <div class="float-left">
+                <button onclick="window.location.href='{% url 'subscription:subscription-list' event.pk %}'"
+                        data-toggle="tooltip"
+                        title=""
+                        data-original-title="Voltar a lista de inscrições"
+                        class="btn btn-primary">
+                    <i class="fa fa-arrow-circle-left"></i>
+                    Inscrições
+                </button>
+            </div>
+            <div class="float-left">
+                <h3 class="text-bold" style="margin: 8px 0 0 20px;font-size:22px">Painel Financeiro do Participante</h3>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+<div class="row tooltip-wrapper">
+    <div class="col-xl-11 col-lg-11 col-md-12">
+        <section class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Informações Gerais</h3>
+            </div>
+            <div class="panel-body profile-wrapper profile-block">
+                <div class="col-md-2">
+                    <div class="profile-pic text-center">
+                        <img src="{% static 'assets/img/user_undefined.jpg' %}"
+                             alt="" width="174px" class="img-circle">
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <h1 style="margin-top:8px">{{ object.person.name }}</h1>
+                    <hr/>
+
+                    <div class="row">
+                        <div class="col-sm-6 col-md-4" style="border-right:1px solid #CCC">
+                            <table class="table table-inbox table-hover" style="margin-bottom:0">
+                                <tbody>
+                                <tr class="unread">
+                                    <td class="message" style="border-top:0">
+                                        <div>
+                                            <div class="float-left">
+                                                <span class="title">Status</span>
+                                                {% if object.status == object.CONFIRMED_STATUS %}
+                                                    <i class="fa fa-circle"
+                                                       aria-hidden="true"
+                                                       style="color:#5cb85c"></i>
+                                                {% elif object.status == object.AWAITING_STATUS %}
+                                                    <i class="fa fa-circle"
+                                                       aria-hidden="true"
+                                                       style="color: #f0ad4e"></i>
+                                                {% elif object.status == object.CANCELED_STATUS %}
+                                                    <i class="fa fa-circle"
+                                                       aria-hidden="true"
+                                                       style="color: #d9534f"></i>
+                                                {% endif %}
+                                                {{ object.get_status_display|title }}
+                                                {# Confirmado <small class="text-muted"> - 27/05/2018 17h03</small>#}
+                                            </div>
+                                            {% if object.status == object.CONFIRMED_STATUS %}
+                                                <div class="float-right"
+                                                     style="margin-left:10px;margin-top:5px;">
+                                                    <button type="button"
+                                                            data-toggle="tooltip"
+                                                            title="Abrir voucher"
+                                                            onclick="window.open('{% url 'subscription:subscription-voucher' event.pk object.pk %}')"
+                                                            class="btn btn-info btn-sm btn-trans">
+                                                        voucher
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-6 col-md-4" style="border-right:1px solid #CCC">
+                            <table class="table table-inbox table-hover" style="margin-bottom:0">
+                                <tbody>
+                                <tr class="unread">
+                                    <td class="message" style="border-top:0">
+                                        <div class="float-left">
+                                            <span class="title">Valor</span>
+                                            {% if object.status == object.CONFIRMED_STATUS %}
+                                                <strong class="text-success">{{ object.lot.display_price }}
+                                                    (pago)</strong>
+                                            {% else %}
+                                                <strong class="text-danger">{{ object.lot.display_price }}
+                                                    (não-pago)</strong>
+                                            {% endif %}
+                                        </div>
+                                        {% if object.status == object.CONFIRMED_STATUS %}
+                                            <div class="float-right"
+                                                 style="margin-left:10px;margin-top:5px;">
+                                                <button type="button"
+                                                        data-toggle="tooltip"
+                                                        title="Abrir voucher"
+                                                        onclick="window.open('{% url 'subscription:subscription-voucher' event.pk object.pk %}')"
+                                                        class="btn btn-info btn-sm btn-trans">
+                                                    detalhamento
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                        <div class="clearfix"></div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <table class="table table-inbox table-hover" style="margin-bottom:0">
+                                <tbody>
+                                <tr class="unread">
+                                    <td class="message" style="cursor:pointer;border-top:0">
+                                        <div>
+                                            <div class="float-left">
+{#                                                <i style="font-size: 40px" class="fas fa-credit-card"></i>#}
+                                                <i style="font-size: 40px"
+                                                   class="fas fa-barcode"></i>
+                                            </div>
+                                            <div class="float-left"
+                                                 style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                Boleto
+                                                <strong class="text-warning">(vencido)</strong>
+                                            </div>
+                                            <div class="float-right">
+                                                <button type="button"
+                                                        data-toggle="tooltip"
+                                                        title="Abrir documento"
+                                                        class="btn btn-default btn-sm btn-trans">
+                                                    documento
+                                                </button>
+                                                <button type="button"
+                                                        data-toggle="tooltip"
+                                                        data-placement="left"
+                                                        title="Ver histórico do pagamento"
+                                                        class="btn btn-info btn-sm btn-trans">
+                                                    histórico
+                                                </button>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <br/>
+                    <div class="row" style="padding-left:16px;">
+                        <div class="connect social">
+                            <ul>
+                                <li>
+                                    <button type="button"
+                                            class="btn btn-info btn-trans"
+                                            data-toggle="tooltip"
+                                            title="Abrir informações financeiras do participante">
+                                        <span class="far fa-user"></span>
+                                        Ver Painel Participante
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button"
+                                            class="btn btn-primary btn-trans"
+                                            data-toggle="tooltip"
+                                            title="Enviar mensagem personalizada ao participante">
+                                        <span class="fa fa-comments"></span>
+                                        Enviar mensagem
+                                    </button>
+                                </li>
+                                <li style="display: none"><a href="#"><i
+                                        class="fab fa-facebook-f fa-lg"></i></a>
+                                </li>
+                                <li style="display: none"><a href="#"><i
+                                        class="fab fa-twitter fa-lg"></i></a>
+                                </li>
+                                <li style="display: none"><a href="#"><i
+                                        class="fab fa-linkedin fa-lg"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+<div class="row tooltip-wrapper">
+    <div class="col-xl-11 col-lg-11 col-md-12">
+        <section class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Dados Financeiros</h3>
+            </div>
+            <div class="panel-body">
+
+                <table class="table table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>as</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="table-row">sdf</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
+    </div>
+</div>

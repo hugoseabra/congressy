@@ -42,6 +42,8 @@ class Transaction(models.Model):
     MANUAL_PAYMENT_PAYCHECK = 'paycheck'
     MANUAL_PAYMENT_DEBIT_CARD = 'debit_card'
     MANUAL_PAYMENT_CREDIT_CARD = 'credit_card'
+    MANUAL_PAYMENT_BANK_DEPOSIT = 'bank_deposit'
+    MANUAL_PAYMENT_BANK_TRANSAFER = 'bank_transfer'
 
     MANUAL_PAYMENT_TYPES = (
         (MANUAL_PAYMENT_MONEY, 'Dinheiro'),
