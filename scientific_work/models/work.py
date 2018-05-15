@@ -54,8 +54,6 @@ class Work(models.Model):
 
     summary = models.TextField(
         verbose_name="resumo",
-        blank=True,
-        null=True,
     )
 
     keywords = models.CharField(

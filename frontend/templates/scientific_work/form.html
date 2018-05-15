@@ -36,9 +36,7 @@
                                 {% render_generic_field form.modality %}
                                 {% render_generic_field form.area_category %}
                                 {% render_generic_field form.title %}
-                                <div id="resume_el">
-                                    {% render_generic_field form.summary %}
-                                </div>
+                                {% render_generic_field form.summary %}
                                 {% render_generic_field form.keywords %}
                                 <div id="article_file_el"
                                      style="margin-top: 15px">
@@ -87,30 +85,22 @@
     <script type="application/javascript">
         $(document).ready(function () {
 
-
-
-
             var select_el = $('#id_modality');
-            var resume_el = $('#resume_el');
             var article_file_el = $('#article_file_el');
             var banner_file_el = $('#banner_file_el');
 
-            resume_el.hide();
             banner_file_el.hide();
 
             select_el.on("change", function () {
 
                 if (this.value === "resumo") {
-                    resume_el.fadeIn("slow");
                     article_file_el.fadeOut();
                     banner_file_el.fadeOut();
                 } else if (this.value === "artigo") {
                     article_file_el.fadeIn("slow");
-                    resume_el.fadeOut();
                     banner_file_el.fadeOut();
                 } else if (this.value === "banner") {
                     banner_file_el.fadeIn("slow");
-                    resume_el.fadeOut();
                     article_file_el.fadeOut();
                 }
             });

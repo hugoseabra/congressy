@@ -18,9 +18,13 @@ class WorkAPIListView(generics.ListAPIView):
         return allowed
 
 
-class WorkAPIUpdateView(generics.UpdateAPIView):
+class WorkAPIUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = WorkSerializer
     queryset = Work.objects.all()
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['partial'] = True
+        return super().get_serializer(*args, **kwargs)
 
     def get_object(self):
         work = super().get_object()

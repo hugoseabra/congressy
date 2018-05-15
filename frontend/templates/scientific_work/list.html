@@ -5,21 +5,79 @@
 {% block content %}
 
     <div class="row">
-        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+        {% if object_list %}
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                {% for work in  object_list %}
+                    <div class="row col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">Submissão
+                                    ID:{{ work.pk }}</div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
 
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="panel-title">Submissão estatica</div>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h1> Algo vai aqui.</h1>
+                                    <div>
+                                        <h3>
+                                            Nome:
+                                            <strong>
+                                                {{ work.title }}
+                                            </strong>
+                                        </h3>
+                                    </div>
+                                    <div>
+                                        <h3>
+                                            Modalidade:
+                                            <strong>
+                                                {{ work.get_modality_display }}
+                                            </strong>
+                                        </h3>
+
+                                    </div>
+
+                                    <div>
+                                        <h3>
+                                            Área:
+                                            <strong>
+                                                {{ work.get_area_category_display }}
+                                            </strong>
+                                        </h3>
+                                    </div>
+
+                                    <div>
+                                        <h3>
+                                            Resumo:
+                                            <div style="margin-left: 75px">
+                                                <textarea>
+                                                    {{ work.summary }}
+                                                </textarea>
+                                            </div>
+
+                                        </h3>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>Nenhuma submissão até o momento.</h3>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
+
     </div>
 
 
