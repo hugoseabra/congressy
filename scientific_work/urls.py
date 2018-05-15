@@ -3,7 +3,8 @@ from django.conf.urls import include, url
 from . import views
 
 urls = [
-    url(r'^add/$', views.WorkAddFormView.as_view(), name='work-add'),
+    url(r'^add/$', views.WorkAddView.as_view(), name='work-add'),
+    url(r'^list/$', views.WorkListView.as_view(), name='work-list'),
 ]
 
 urlpatterns = [
