@@ -1,33 +1,20 @@
-import os
-from django.conf import settings
 from django.contrib import messages
-from django.core.files.storage import FileSystemStorage
-from django.http.response import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
-from formtools.wizard.views import SessionWizardView
+from django.views.generic import FormView
 
-from gatheros_event.views.mixins import AccountMixin
 from gatheros_subscription.models import Subscription
-from . import forms
-
-FORMS = [
-    ("work", forms.NewWorkForm),
-    ("author", forms.AuthorForm),
-]
-
-TEMPLATES = {
-    "work": "scientific_work/work_form.html",
-    "author": 'scientific_work/author_form.html'
-}
+from gatheros_event.views.mixins import AccountMixin
+from .forms import NewWorkForm
 
 
-class WorkAddFormView(AccountMixin, SessionWizardView):
-    file_storage = FileSystemStorage(
-        location=os.path.join(settings.MEDIA_ROOT, 'artigos'))
+class WorkAddFormView(AccountMixin, FormView):
     subscription = None
+    template_name = "scientific_work/work_form.html"
+    form_class = NewWorkForm
 
     def dispatch(self, request, *args, **kwargs):
+
         subscription_pk = self.kwargs.get('subscription_pk')
         if not subscription_pk:
             messages.error(self.request, 'Não foi possivel resgatar o evento.')
@@ -38,17 +25,18 @@ class WorkAddFormView(AccountMixin, SessionWizardView):
 
         return response
 
-    def get_form_kwargs(self, step=None):
-        kwargs = super().get_form_kwargs(step)
+    def form_valid(self, form):
+        messages.success(self.request, 'Submissão realizado com sucesso.')
+        form.save()
+        return super().form_valid(form)
 
-        if step == 'work':
-            kwargs['subscription'] = self.subscription
+    def get_success_url(self):
+        return reverse_lazy('scientific_work:work-add', kwargs={
+            'subscription_pk': self.subscription.pk,
+        })
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['subscription'] = self.subscription
         return kwargs
 
-    def get_template_names(self):
-        return [TEMPLATES[self.steps.current]]
-
-    def done(self, form_list, **kwargs):
-        messages.success(self.request, 'Submissão realizado com sucesso.')
-        return HttpResponse('fuck')
