@@ -3,8 +3,8 @@ from django.urls import reverse_lazy
 from django.views import generic
 
 from scientific_work.forms import NewWorkForm
-from .mixins import WorkViewMixin
 from scientific_work.models import Work
+from .mixins import WorkViewMixin
 
 
 class WorkAddView(WorkViewMixin, generic.FormView):
