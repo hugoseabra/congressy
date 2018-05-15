@@ -18,7 +18,7 @@ class WorkAddView(WorkViewMixin, generic.FormView):
 
     def get_success_url(self):
         return reverse_lazy('scientific_work:work-list', kwargs={
-            'subscription_pk': self.subscription.pk,
+            'pk': self.subscription.pk,
         })
 
     def get_form_kwargs(self):
