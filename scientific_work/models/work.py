@@ -77,3 +77,8 @@ class Work(models.Model):
     accepts_terms = models.BooleanField(
         verbose_name="termos de trabalhos científicos",
     )
+
+    published = models.BooleanField(
+        default=False,
+        verbose_name="publicado",
+    )

@@ -32,3 +32,46 @@ class WorkListView(WorkViewMixin, generic.ListView):
 
     def get_queryset(self):
         return Work.objects.filter(subscription=self.subscription)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        must_have = [
+            'subscription',
+            'modality',
+            'area_category',
+            'title',
+            'summary',
+            'keywords',
+            'accepts_terms',
+        ]
+
+        work_list = context['object_list']
+        work_list_with_status = []
+        for work in work_list:
+
+            if work.modality == 'artigo':
+                if 'banner_file' in must_have:
+                    must_have.remove('banner')
+                must_have.append('article_file')
+            elif work.modality == 'banner':
+                if 'article_file' in must_have:
+                    must_have.remove('article_file')
+                must_have.append('banner_file')
+            elif work.modality == 'resumo':
+                if 'article_file' in must_have:
+                    must_have.remove('article_file')
+
+                if 'banner_file' in must_have:
+                    must_have.remove('banner')
+
+
+            for item in must_have:
+                if not getattr(work, item):
+                    work.status = 'not ready'
+                else:
+                    work.status = 'ready'
+            work_list_with_status.append(work)
+
+        context['object_list'] = work_list_with_status
+
+        return context

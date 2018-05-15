@@ -12,8 +12,11 @@ class NewWorkForm(forms.ModelForm):
 
     class Meta:
         model = Work
-        exclude = [
-            'subscription',
+        fields = [
+            'modality',
+            'area_category',
+            'title',
+            'accepts_terms',
         ]
 
     def clean_accepts_terms(self):
