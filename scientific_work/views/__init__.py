@@ -1,2 +1,3 @@
 from .work import WorkAddView, WorkListView
-from .api import WorkAPIListView, WorkAPIUpdateView
+from .author import AuthorPartialListView
+from .api import WorkViewSet, AuthorViewSet

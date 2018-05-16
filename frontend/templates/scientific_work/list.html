@@ -106,6 +106,17 @@
                                                         danger-color fa-lg pull-right"></i>
 
                                                     {% endif %}
+                                                    <br>
+
+                                                    <button class="btn
+                                                            btn-trans btn-sm
+                                                            btn-success
+                                                            edit-author-btn"
+                                                            style="margin-top: 5px"
+                                                            data-author_url="{% url 'scientific_work:work-author-partial-list'  subscription_pk=subscription.pk pk=work.pk %}"
+                                                            data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}">
+                                                        Adicionar
+                                                    </button>
 
 
                                                 </td>
@@ -150,7 +161,7 @@
                                                         <button class="btn btn-trans btn-sm
                                                 btn-success edit-keywords-btn"
                                                                 data-keywords_text="{{ work.keywords }}"
-                                                                data-work_url="{% url 'scientific_work:api_work-update' pk=work.pk %}">
+                                                                data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}">
                                                             Editar
                                                         </button>
                                                         <i class="fas
@@ -159,7 +170,7 @@
                                                         <button class="btn
                                                             btn-trans btn-sm btn-success edit-keywords-btn"
                                                                 data-keywords_text="{{ work.keywords }}"
-                                                                data-work_url="{% url 'scientific_work:api_work-update' pk=work.pk %}">
+                                                                data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}">
                                                             Adicionar
                                                         </button>
                                                         <i class="fas fa-times-circle
@@ -179,7 +190,7 @@
                                                         <button class="btn btn-trans btn-sm
                                                 btn-success edit-summary-btn"
                                                                 data-summary_text="{{ work.summary }}"
-                                                                data-work_url="{% url 'scientific_work:api_work-update' pk=work.pk %}"
+                                                                data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}"
                                                                 data-work_id="{{ work.pk }}">
                                                             Editar
                                                         </button>
@@ -217,7 +228,7 @@
                                                                         type="file"/>
                                                                 <button
                                                                         class="btn btn-sm btn-success"
-                                                                        onclick="submit_article('{% url 'scientific_work:api_work-update' pk=work.pk %}', {{ work.pk }});">
+                                                                        onclick="submit_article('{% url 'scientific_work:work-detail' pk=work.pk %}', {{ work.pk }});">
                                                                     Salvar
                                                                 </button>
                                                             </div>
@@ -270,7 +281,7 @@
                                                         <strong>
                                                             <input
                                                                     class="published"
-                                                                    data-work_url="{% url 'scientific_work:api_work-update' pk=work.pk %}"
+                                                                    data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}"
                                                                     type="checkbox"
                                                                     {% if work.published %}
                                                                     checked {% endif %}  />
@@ -375,6 +386,50 @@
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="edit_authors_modal" tabindex="-1"
+                 role="dialog"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                                    data-dismiss="modal" aria-hidden="true">
+                                ×
+                            </button>
+                        </div>
+                        <div class="modal-body">
+
+                            <div id="edit_authors_modal_body">
+                                Carregando....
+                            </div>
+                            <input type="hidden" id="author_work_url">
+
+                            <form style="margin-top: 25px" class="form-inline">
+                                <div class="form-group">
+                                    <label for="new_author_name">Nome:</label>
+                                    <input type="text" class="form-control"
+                                           id="new_author_name"
+                                           placeholder="Nome completo">
+                                </div>
+
+                                <button type="button"
+                                        class="btn btn-md btn-success"
+                                        id="save_new_author">
+                                    <i class="far fa-save"></i>
+                                    Salvar
+                                </button>
+                            </form>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-md  btn-danger"
+                                    data-dismiss="modal">Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!---------------------END MODALS---------------------------------->
 
         {% else %}
@@ -411,6 +466,12 @@
             var edit_summary_modal_btn = $('#edit_summary_modal_btn');
             var edit_keywords_modal_btn = $('#edit_keywords_modal_btn');
             var edit_published_btn = $('.published');
+            var edit_author_btn = $('.edit-author-btn');
+            var save_new_author_btn = $('#save_new_author');
+            var author_work_url_el = $('#author_work_url');
+
+            // values
+            var new_author_name_value = $('#new_author_name');
 
             // modals
             var edit_summary_modal = $('#edit_summary_modal');
@@ -418,6 +479,9 @@
 
             var edit_keywords_modal = $('#edit_keywords_modal');
             var edit_keywords_modal_body = $('#edit_keywords_modal_body');
+
+            var edit_authors_modal = $('#edit_authors_modal');
+            var edit_authors_modal_body = $('#edit_authors_modal_body');
 
 
             // modal btn triggers
@@ -428,8 +492,16 @@
             });
             edit_keyword_btn.on("click", function () {
                 edit_keywords_modal_body.text($(this).data('keywords_text'));
-                edit_keyword_btn.data('work_url', $(this).data('work_url'));
+                edit_keywords_modal_btn.data('work_url', $(this).data('work_url'));
                 edit_keywords_modal.modal('show');
+            });
+            edit_author_btn.on("click", function () {
+                var author_list_url = $(this).data('author_url');
+                var work_url = $(this).data('work_url');
+                author_work_url_el.val(work_url);
+                edit_authors_modal_body.load(author_list_url);
+                edit_authors_modal.modal('show');
+
             });
 
             // save btn triggers
@@ -439,7 +511,6 @@
             edit_keywords_modal_btn.on("click", function () {
                 update_keywords($(this).data('work_url'), edit_keywords_modal_body.val());
             });
-
             edit_published_btn.on("click", function () {
 
                 var url = $(this).data('work_url');
@@ -450,6 +521,11 @@
                     updated_published_status(url, false);
                 }
             });
+            save_new_author_btn.on("click", function () {
+                var url = author_work_url_el.val();
+                add_author(url, new_author_name_value.val())
+            });
+
         });
 
 
@@ -539,7 +615,7 @@
                     location.reload(true);
                 }
             }).fail(function (err) {
-                console.error(err.status);
+                console.error(err);
             });
 
 
@@ -564,6 +640,30 @@
             }).fail(function (err) {
                 console.error(err.responseText);
             });
+        }
+
+        function add_author(url, name){
+
+            var formData = new FormData();
+            formData.append('keywords', text);
+
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                processData: false,
+                contentType: false,
+                data: formData,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function () {
+                    location.reload(true);
+                }
+            }).fail(function (err) {
+                console.error(err.status);
+            });
+
+
         }
 
 

@@ -72,5 +72,6 @@ class WorkListView(WorkViewMixin, generic.ListView):
             work_list_with_status.append(work)
 
         context['object_list'] = work_list_with_status
+        context['subscription'] = self.subscription
 
         return context

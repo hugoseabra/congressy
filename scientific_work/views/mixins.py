@@ -12,7 +12,7 @@ class WorkViewMixin(AccountMixin, generic.View):
     subscription = None
 
     def dispatch(self, request, *args, **kwargs):
-        subscription_pk = self.kwargs.get('pk')
+        subscription_pk = self.kwargs.get('subscription_pk')
         if not subscription_pk:
             messages.error(self.request, 'Não foi possivel resgatar a '
                                          'inscrição.')
