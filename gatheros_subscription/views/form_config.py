@@ -3,10 +3,12 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
 
+from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
-from gatheros_subscription.forms import FormConfigForm
+from gatheros_subscription.forms import EventSurveyForm, FormConfigForm
+from gatheros_subscription.models import EventSurvey
 
 
 class EventViewMixin(AccountMixin, generic.View):
@@ -66,7 +68,7 @@ class EventViewMixin(AccountMixin, generic.View):
         return reverse('event:event-list')
 
 
-class FormConfigView(EventViewMixin, generic.FormView):
+class FormConfigView(TemplateNameableMixin, EventViewMixin, generic.FormView):
     """ Formulário de configuração de inscrição."""
 
     form_class = FormConfigForm
@@ -123,5 +125,9 @@ class FormConfigView(EventViewMixin, generic.FormView):
         cxt['has_inside_bar'] = True
         cxt['active'] = 'form-personalizado'
         cxt['object'] = self.object
+        cxt['event'] = self.event
+        cxt['event_survey_list'] = EventSurvey.objects.all().filter(
+            event=self.event)
+        cxt['survey_list_form'] = EventSurveyForm(event=self.event)
 
         return cxt

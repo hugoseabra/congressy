@@ -1,0 +1,93 @@
+<div class="tab-content">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-right">
+                    <button type="button"
+                            class="btn btn-success"
+                            data-toggle="modal"
+                            data-target="#addSurvey">
+                        <i class="fa fa-plus"></i>
+                        Adicionar
+                    </button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+
+            {% if event_survey_list %}
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th style="width: 90%">
+                            Nome
+                        </th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for event_survey in event_survey_list %}
+                        <tr>
+                            <td>
+
+                                <a href="{% url 'subscription:survey-edit' event.pk event_survey.pk %}">
+                                    <strong>
+                                        {{ event_survey.survey.name }}
+                                    </strong>
+                                </a>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button
+                                            type="button"
+                                            class="btn
+                                btn-primary btn-trans
+                                btn-sm dropdown-toggle"
+                                            data-toggle="dropdown"
+                                            aria-expanded="false"
+                                    >
+                                        <span class="fas fa-cog"></span>
+                                    </button>
+                                    <ul
+                                            class="dropdown-menu
+                                                dropdown-menu-right"
+                                            role="menu">
+                                        <li>
+                                            <a class="open-editSurvey"
+                                               data-id="{{ event_survey.pk }}"
+                                               data-title="{{ event_survey.survey.name }}"
+                                               data-description="{{ event_survey.survey.description }}">
+                                                <i class="fas fa-pencil-alt"></i>
+                                                Editar
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="open-DeleteQuestionDialog"
+                                               data-event="{{ event.pk }}"
+                                               data-survey-name="{{ event_survey.survey.name }}"
+                                               data-survey="{{ event_survey.pk }}">
+                                                <i class="fas fa-trash-alt"></i>
+                                                Excluir
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            {% else %}
+                <h3>Nenhum formulário.</h3>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
