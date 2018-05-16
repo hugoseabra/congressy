@@ -99,19 +99,40 @@
 {% endblock %}
 
 {% block styles %}
-    <style>
-        .profile-info-padding {
-            padding: 4px 9px;
-        }
-    </style>
+<style>
+    .transaction-list span {
+        font-size: 12px;
+    }
+    .transaction-list small {
+        font-size: 10px;
+    }
+
+    .transaction-list hr {
+        margin: 5px 0;
+
+    }
+
+    .transaction-list ul {
+        padding-left:20px;
+    }
+
+    .cancelled,
+    .cancelled span,
+    .cancelled small {
+        text-decoration: line-through;
+        color: #CCC;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 
 
     <div id="main-profile-content">
-{#        {% include 'subscription/includes/profile-subscriber.html' %}#}
-        {% include 'subscription/includes/profile-financial.html' %}
-
+        {% if financial %}
+            {% include 'subscription/includes/profile-financial.html' %}
+        {% else %}
+            {% include 'subscription/includes/profile-subscriber.html' %}
+        {% endif %}
     </div>
 {% endblock %}

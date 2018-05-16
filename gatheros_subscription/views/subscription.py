@@ -24,12 +24,13 @@ from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
 )
-from gatheros_subscription.forms import (
-    SubscriptionForm,
-    SubscriptionFilterForm
-)
+from gatheros_subscription.forms import SubscriptionFilterForm, \
+    SubscriptionForm
 from gatheros_subscription.helpers.export import export_event_data
-from gatheros_subscription.models import Subscription, FormConfig
+from gatheros_subscription.helpers.report_payment import \
+    PaymentReportCalculator
+from gatheros_subscription.models import FormConfig, Subscription
+from payment.models import Transaction
 
 
 class EventViewMixin(TemplateNameableMixin, AccountMixin):
@@ -319,6 +320,73 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
     template_name = 'subscription/view.html'
     queryset = Subscription.objects.get_queryset()
+    financial = False
+    last_transaction = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.last_transaction = self._get_last_transaction()
+
+        response = super().dispatch(request, *args, **kwargs)
+
+        if self.financial is True:
+            if self.object.free:
+                messages.warning(
+                    request,
+                    'Este evento não possui relatório financeiro.'
+                )
+
+                return redirect(
+                    'subscription:subscription-view',
+                    event_pk=self.event.pk,
+                    pk=self.object.pk,
+                )
+
+            if not self.last_transaction:
+                messages.warning(
+                    request,
+                    'Este perfil não possui transações financeiras.'
+                )
+                return redirect(
+                    'subscription:subscription-view',
+                    event_pk=self.event.pk,
+                    pk=self.object.pk,
+                )
+
+
+        return response
+
+    def _get_last_transaction(self):
+        """
+        Recupera a transação mais recente.
+        Primeiro verificando se há alguma paga. Se não, pega a mais recente.
+        """
+        queryset = self.get_object().transactions
+
+        paid_transactions = queryset \
+            .filter(status=Transaction.PAID) \
+            .order_by('-date_created')
+
+        if paid_transactions:
+            return paid_transactions.first()
+
+        return queryset.all().order_by('-date_created').first()
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        calculator = PaymentReportCalculator(subscription=self.get_object())
+
+        ctx['lots'] = calculator.lots
+        ctx['transactions'] = calculator.transactions
+        ctx['full_prices'] = calculator.full_prices
+        ctx['installments'] = calculator.installments
+        ctx['has_manual'] = calculator.has_manual
+        ctx['total_paid'] = calculator.total_paid
+        ctx['dividend_amount'] = calculator.dividend_amount
+        ctx['financial'] = self.financial
+        ctx['last_transaction'] = self.last_transaction
+
+        return ctx
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):

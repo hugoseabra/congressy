@@ -21,7 +21,7 @@ urls = [
 
     url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/payments/$',
-        views.SubscriptionPaymentsView.as_view(),
+        views.SubscriptionViewFormView.as_view(financial=True),
         name='subscription-payments'
     ),
     url(
