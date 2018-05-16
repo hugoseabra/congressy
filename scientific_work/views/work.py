@@ -64,9 +64,8 @@ class WorkListView(WorkViewMixin, generic.ListView):
                 if 'banner_file' in must_have:
                     must_have.remove('banner')
 
-
             for item in must_have:
-                if not getattr(work, item):
+                if not getattr(work, item) or work.authors.all().count() < 1:
                     work.status = 'not ready'
                 else:
                     work.status = 'ready'

@@ -83,6 +83,36 @@
 
                                             <tr>
                                                 <td>
+                                                    Autores:
+                                                </td>
+
+                                                <td>
+
+                                                    {% if work.authors.count > 1 %}
+                                                        <ul class="list-group col-md-6">
+                                                            {% for author in work.authors %}
+                                                                <li class="list-group-item">
+                                                                    author.name
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    {% else %}
+                                                        <strong>
+                                                            Você deve colocar
+                                                            pelo menos um autor.
+                                                        </strong>
+
+                                                        <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
+
+                                                    {% endif %}
+
+
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
                                                     Modalidade:
 
                                                 </td>
@@ -217,7 +247,6 @@
 
                                                 </tr>
                                             {% endif %}
-
                                             <tr>
 
                                                 <td>
@@ -245,18 +274,18 @@
                                                                     type="checkbox"
                                                                     {% if work.published %}
                                                                     checked {% endif %}  />
-                                                        Status:
-                                                        {% if work.published %}
-                                                            <i class="fas
+                                                            Status:
+                                                            {% if work.published %}
+                                                                <i class="fas
                                                         fa-check-circle
                                                         success-color fa-lg
                                                         pull-right"></i>
-                                                            PUBLICADO
-                                                        {% else %}
-                                                            <i class="fas
+                                                                PUBLICADO
+                                                            {% else %}
+                                                                <i class="fas
                                                             fa-exclamation-circle  warning-color fa-lg pull-right"></i>
-                                                            NÃO-PUBLICADO
-                                                        {% endif %}
+                                                                NÃO-PUBLICADO
+                                                            {% endif %}
                                                         </strong>
 
                                                     {% endif %}
@@ -452,7 +481,7 @@
             formData.append('article_file', article_file);
             $.ajax({
                 url: url,
-                type: 'PUT',
+                type: 'PATCH',
                 processData: false,
                 contentType: false,
                 data: formData,
@@ -493,6 +522,7 @@
         }
 
         function update_keywords(url, text) {
+
             var formData = new FormData();
             formData.append('keywords', text);
 
@@ -509,8 +539,10 @@
                     location.reload(true);
                 }
             }).fail(function (err) {
-                console.error(err.responseText);
+                console.error(err.status);
             });
+
+
         }
 
         function updated_published_status(url, update_to) {
