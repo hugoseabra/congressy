@@ -3,10 +3,23 @@ from rest_framework import serializers
 from .models import Work, Author
 
 
-class WorkSerializer(serializers.HyperlinkedModelSerializer):
+class AuthorSerializer(serializers.ModelSerializer):
+    """Serializer to map the Model instance into JSON format."""
+
     class Meta:
+        """Meta class to map serializer's fields with the model fields."""
+        model = Author
+        fields = ('name', 'user')
+
+
+class WorkSerializer(serializers.ModelSerializer):
+    """Serializer to map the Model instance into JSON format."""
+
+    class Meta:
+        """Meta class to map serializer's fields with the model fields."""
         model = Work
         fields = (
+            'subscription',
             'modality',
             'area_category',
             'title',
@@ -14,17 +27,6 @@ class WorkSerializer(serializers.HyperlinkedModelSerializer):
             'keywords',
             'article_file',
             'banner_file',
-            'published',
-        )
-
-
-class AuthorSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Author
-        fields = (
-            'work',
-            'user',
-            'name',
         )
 
 
