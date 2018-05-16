@@ -390,7 +390,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
             .filter(status=Transaction.PAID) \
             .order_by('-date_created')
 
-        if paid_transactions:
+        if paid_transactions.count() > 0:
             return paid_transactions.first()
 
         return queryset.all().order_by('-date_created').first()
