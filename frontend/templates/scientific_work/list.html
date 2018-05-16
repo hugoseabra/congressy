@@ -178,15 +178,16 @@
                                                                 </a>
                                                             {% endif %}
                                                             <div class="form-inline">
-                                                                <label for="article_file"
+                                                                <label for="article_file_{{ work.pk }}"
                                                                        class="custom-file-upload">
                                                                     <i class="fas fa-cloud-upload-alt"></i>
                                                                 </label>
-                                                                <input id="article_file"
+                                                                <input
+                                                                        id="article_file_{{ work.pk }}"
                                                                        type="file"/>
                                                                 <button
                                                                         class="btn btn-sm btn-success"
-                                                                        onclick="submit_article('{% url 'scientific_work:api_work-update' pk=work.pk %}');">
+                                                                        onclick="submit_article('{% url 'scientific_work:api_work-update' pk=work.pk %}', {{ work.pk }});">
                                                                     Salvar
                                                                 </button>
                                                             </div>
@@ -426,9 +427,9 @@
         var csrftoken = getCookie('csrftoken');
 
         // functions
-        function submit_article(url) {
+        function submit_article(url, id) {
 
-            var article_file = document.getElementById('article_file').files[0];
+            var article_file = document.getElementById('article_file_' + id).files[0];
             var formData = new FormData();
             formData.append('article_file', article_file);
             $.ajax({
@@ -441,14 +442,7 @@
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 },
                 success: function (data, textStatus, xhr) {
-                    //location.reload();
-                    console.log('---------------------------------------');
-                    console.log(xhr.status);
-                    console.log('---------------------------------------');
-                    console.log(textStatus);
-                    console.log('---------------------------------------');
-                    console.log(data);
-                    console.log('---------------------------------------');
+                    location.reload(true);
 
                 }
             }).fail(function (err) {
@@ -473,7 +467,7 @@
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 },
                 success: function () {
-                    location.reload();
+                    location.reload(true);
                 }
             }).fail(function (err) {
                 console.error(err.responseText);
@@ -494,7 +488,7 @@
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 },
                 success: function () {
-                    location.reload();
+                    location.reload(true);
                 }
             }).fail(function (err) {
                 console.error(err.responseText);
