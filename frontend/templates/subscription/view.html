@@ -95,6 +95,49 @@
             el_to_show.show();
             el_to_hide.hide();
         }
+
+        function edit_payment(transaction_id, type, amount) {
+            $('#manual-payment-form-modal').modal();
+            $('#edit-transaction-id').val(transaction_id);
+            $('#id_manual_payment_type').val(type);
+            $('#id_amount').val(amount);
+        }
+
+        function delete_payment(transaction_id, amount) {
+            if (!confirm('Tem certeza que deseja deletar o lançamento de R$ '+amount+'?')) {
+                return;
+            }
+            $('#transaction_id').val(transaction_id);
+            $('#payment-delete-form').submit();
+        }
+
+        $(document).ready(function() {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom ' +
+                'messenger-on-right',
+                theme: 'flat'
+            };
+
+            {% if modal == 'manual-payment' %}
+            window.setTimeout(function() {
+                $('#manual-payment-form-modal').modal();
+            }, 300);
+            {% endif %}
+            {% if show_details %}
+            window.setTimeout(function() {
+                window.location.hash='report_detail_hidden';
+            }, 500);
+            {% endif %}
+
+            {% if messenger %}
+                {% for msg in messenger %}
+                    Messenger().post({
+                        message: '{{ msg.message }}',
+                        type: '{{ msg.type }}'
+                    });
+                {% endfor %}
+            {% endif %}
+        });
     </script>
 {% endblock %}
 
@@ -126,8 +169,6 @@
 {% endblock %}
 
 {% block content %}
-
-
     <div id="main-profile-content">
         {% if financial %}
             {% include 'subscription/includes/profile-financial.html' %}
@@ -135,4 +176,11 @@
             {% include 'subscription/includes/profile-subscriber.html' %}
         {% endif %}
     </div>
+    <form action="{% url 'subscription:payment-delete' event.pk object.pk %}" method="post" id="payment-delete-form" style="display:none">
+        {% csrf_token %}
+        <input type="hidden" name="transaction_id" id="transaction_id" value="" />
+    </form>
+{% endblock %}
+{% block modals %}
+    {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
 {% endblock %}

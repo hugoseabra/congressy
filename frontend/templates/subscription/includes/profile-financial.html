@@ -113,15 +113,9 @@
                                     <td class="message" style="border-top:0">
                                         <div class="float-left">
                                             <span class="title">Valor inscrição</span>
-                                            {% if object.status == object.CONFIRMED_STATUS %}
-                                                <strong class="text-info">
-                                                    R$ {{ object.lot.get_calculated_price|intcomma }} (pago)
-                                                </strong>
-                                            {% else %}
-                                                <strong class="text-danger">
-                                                    R$ {{ object.lot.get_calculated_price|intcomma }} (não-pago)
-                                                </strong>
-                                            {% endif %}
+                                            <strong class="text-info">
+                                                R$ {{ object.lot.get_calculated_price|intcomma }}
+                                            </strong>
                                         </div>
                                         <div class="clearfix"></div>
                                     </td>
@@ -129,7 +123,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        {% if object.status == object.CONFIRMED_STATUS %}
+                        {% if total_paid > 0 %}
                         <div class="col-sm-4 col-md-3" style="border-right:1px solid #CCC">
                             <table class="table table-inbox table-hover" style="margin-bottom:0">
                                 <tbody>
@@ -219,11 +213,11 @@
                                                          style="margin-left:10px">
                                                         <span class="title">Método</span>
                                                         Boleto
-                                                        {% if transaction.status != transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                        {% if last_transaction.status != transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                         <strong class="text-warning">(vencido)</strong>
                                                         {% endif %}
                                                     </div>
-                                                    {% if transaction.status != transaction.PAID %}
+                                                    {% if last_transaction.status != transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                                     <div class="float-right">
                                                         <button type="button"
                                                                 data-toggle="tooltip"
@@ -267,6 +261,20 @@
                                         Ver Painel Participante
                                     </button>
                                 </li>
+                                {% if dividend_amount < 0 %}
+                                <li>
+                                    <button type="button"
+                                            class="btn btn-success btn-trans"
+                                            data-toggle="tooltip"
+                                            title="Inserir novo pagamento para este participante manualmente."
+                                            onclick="$(this).parent().tooltip('hide');$('#manual-payment-form-modal').modal()">
+                                        <span class="far fa-money-bill-alt"></span>
+                                        Receber pagamento
+                                    </button>
+                                    <div>
+                                    </div>
+                                </li>
+                                {% endif %}
                                 <li>
                                     <button type="button" style="display:none"
                                             class="btn btn-primary btn-trans"

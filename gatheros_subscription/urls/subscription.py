@@ -20,6 +20,11 @@ urls = [
     # ),
 
     url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/payments/delete/$',
+        views.PaymentDeleteView.as_view(),
+        name='payment-delete'
+    ),
+    url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/payments/$',
         views.SubscriptionViewFormView.as_view(financial=True),
         name='subscription-payments'

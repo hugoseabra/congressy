@@ -30,6 +30,7 @@ from gatheros_subscription.helpers.export import export_event_data
 from gatheros_subscription.helpers.report_payment import \
     PaymentReportCalculator
 from gatheros_subscription.models import FormConfig, Subscription
+from payment import forms
 from payment.models import Transaction
 
 
@@ -319,12 +320,36 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
 class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
     template_name = 'subscription/view.html'
+    object = None
     queryset = Subscription.objects.get_queryset()
     financial = False
     last_transaction = None
 
+    def get_form(self, **kwargs):
+        return forms.ManualTransactionForm(
+            subscription=self.get_object(),
+            **kwargs
+        )
+
+    def get(self, request, *args, **kwargs):
+
+        storage = messages.get_messages(request)
+
+        messenger = []
+        for message in list(storage):
+            messenger.append({
+                'type': message.level_tag,
+                'message': message.message,
+            })
+
+        storage._loaded_messages.clear()
+
+        context = self.get_context_data(messenger=messenger)
+        return self.render_to_response(context)
+
     def dispatch(self, request, *args, **kwargs):
         self.last_transaction = self._get_last_transaction()
+        self.object = self.get_object()
 
         response = super().dispatch(request, *args, **kwargs)
 
@@ -352,7 +377,6 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
                     pk=self.object.pk,
                 )
 
-
         return response
 
     def _get_last_transaction(self):
@@ -376,6 +400,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
         calculator = PaymentReportCalculator(subscription=self.get_object())
 
+        ctx['object'] = self.object
         ctx['lots'] = calculator.lots
         ctx['transactions'] = calculator.transactions
         ctx['full_prices'] = calculator.full_prices
@@ -386,7 +411,51 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         ctx['financial'] = self.financial
         ctx['last_transaction'] = self.last_transaction
 
+        if self.request.GET.get('details'):
+            ctx['show_details'] = True
+
+        if 'manual_payment_form' not in ctx:
+            ctx['manual_payment_form'] = self.get_form()
+
         return ctx
+
+    def post(self, request, *args, **kwargs):
+
+        data = request.POST.copy()
+        data['manual_author'] = '{} ({})'.format(
+            request.user.get_full_name(),
+            request.user.email,
+        )
+        kwargs = {'data': data}
+
+        transaction_id = data.get('transaction_id')
+
+        if transaction_id:
+            instance = get_object_or_404(Transaction, pk=transaction_id)
+            kwargs.update({'instance': instance})
+
+        form = self.get_form(**kwargs)
+
+        if not form.is_valid():
+            return self.render_to_response(self.get_context_data(
+                manual_payment_form=form,
+                transaction_pk=transaction_id,
+                modal='manual-payment',
+            ))
+
+        form.save()
+
+        url = reverse('subscription:subscription-payments', kwargs={
+            'event_pk': self.event.pk,
+            'pk': self.object.pk,
+        })
+
+        if transaction_id:
+            messages.success(request, 'Recebimento editado com sucesso.')
+        else:
+            messages.success(request, 'Recebimento registrado com sucesso.')
+
+        return redirect(url + '?details=1')
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):

@@ -19,6 +19,7 @@ class Transaction(models.Model):
     REFUSED = 'refused'
     CHARGEDBACK = 'chargedback'
 
+    MANUAL = 'manual'
     BOLETO = 'boleto'
     CREDIT_CARD = 'credit_card'
 
@@ -35,7 +36,8 @@ class Transaction(models.Model):
 
     TRANSACTION_TYPES = (
         (BOLETO, 'Boleto'),
-        (CREDIT_CARD, 'Cartão de credito')
+        (CREDIT_CARD, 'Cartão de credito'),
+        (MANUAL, 'Manual'),
     )
 
     MANUAL_PAYMENT_MONEY = 'money'
@@ -47,7 +49,7 @@ class Transaction(models.Model):
 
     MANUAL_PAYMENT_TYPES = (
         (MANUAL_PAYMENT_MONEY, 'Dinheiro'),
-        (MANUAL_PAYMENT_PAYCHECK, 'Chegue'),
+        (MANUAL_PAYMENT_PAYCHECK, 'Cheque'),
         (MANUAL_PAYMENT_DEBIT_CARD, 'Cartão de Débito'),
         (MANUAL_PAYMENT_CREDIT_CARD, 'Cartão de Crédito'),
         (MANUAL_PAYMENT_BANK_DEPOSIT, 'Depósito'),
@@ -189,11 +191,15 @@ class Transaction(models.Model):
         verbose_name='author do pagamento manual',
     )
 
+    data = JSONField(
+        null=True,
+        blank=True,
+    )
+
     def save(self, *args, **kwargs):
         self.lot = self.subscription.lot
         return super().save(*args, **kwargs)
 
-    data = JSONField()
     @property
     def paid(self):
         return self.status == self.PAID

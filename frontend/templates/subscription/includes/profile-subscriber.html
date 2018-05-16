@@ -144,7 +144,7 @@
                                                 <i style="font-size: 40px" class="far fa-money-bill-alt"></i>
                                             </div>
                                             <div class="float-left" style="margin-left:10px">
-                                                <span style="font-size: 40px" class="title">Método</span>
+                                                <span class="title">Método</span>
                                                 <span>Dinheiro</span>
                                                 <small>(manual)</small>
                                             </div>
@@ -205,7 +205,7 @@
                                                 Boleto
                                                 <strong class="text-warning">(vencido)</strong>
                                             </div>
-                                            {% if transaction.status != transaction.PAID %}
+                                            {% if last_transaction.status != transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
                                             <div class="float-right">
                                                 <button type="button"
                                                         data-toggle="tooltip"
@@ -233,14 +233,18 @@
                         <tr class="unread">
                             <td class="message" style="cursor: default">
                                 <div class="float-left">
-                                    <span class="title">Valor</span>
-                                    {% if object.status == object.CONFIRMED_STATUS %}
+                                    {% if total_paid  %}
+                                        <span class="title">Valor pago</span>
                                         <strong class="text-success">
                                             R$ {{ total_paid|intcomma }} (pago)
                                         </strong>
+                                        {% if dividend_amount %}
+                                        restante: <span class="text-danger">R$ {{ dividend_amount|intcomma }}</span>
+                                        {% endif %}
                                     {% else %}
+                                        <span class="title">Valor inscrição</span>
                                         <strong class="text-danger">
-                                            R$ {{ total_paid|intcomma }} (não-pago)
+                                            R$ {{ object.lot.get_calculated_price|intcomma }}
                                         </strong>
                                     {% endif %}
                                 </div>
@@ -250,7 +254,7 @@
                                         <button type="button"
                                                 data-toggle="tooltip"
                                                 title="Ver detalhes do pagamento"
-                                                onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}'"
+                                                onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}?details=1'"
                                                 class="btn btn-info btn-sm btn-trans">
                                             detalhamento
                                         </button>

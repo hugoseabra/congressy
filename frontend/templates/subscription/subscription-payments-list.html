@@ -90,7 +90,7 @@
 </div>
 <div class="row tooltip-wrapper">
     <div class="col-xl-11 col-lg-11 col-md-12">
-        <section class="panel" id="report_detail_visible">
+        <section class="panel" id="report_detail_visible" {% if show_details %}style="display: none"{% endif %}>
             <div class="panel-heading">
                 <h3 class="panel-title">
                     Detalhamentos Financeiros <a href="#"
@@ -99,7 +99,7 @@
                 </h3>
             </div>
         </section>
-        <section class="panel panel-primary" id="report_detail_hidden" style="display:none">
+        <section class="panel panel-primary" id="report_detail_hidden" {% if not show_details %}style="display: none"{% endif %}>
             <div class="panel-heading">
                 <h3 class="panel-title">
                     Detalhamentos Financeiros <a href="#"
@@ -124,7 +124,7 @@
                         <table class="table table-hover table-striped table-bordered transaction-list">
                             <thead>
                                 <tr>
-                                    <th class="text-center" width="3%">#</th>
+                                    <th class="text-center hidden-sm hidden-xs" width="3%">#</th>
                                     <th width="12%">Data/hora</th>
                                     <th>Descrição</th>
                                     <th class="text-center" width="2%">
@@ -174,7 +174,7 @@
                                 {% filter_lookup installments lot.pk as installment %}
                                 {% if installment %}
                                 <tr>
-                                    <td class="table-row text-center">1</td>
+                                    <td class="table-row text-center">2</td>
                                     <td class="table-row text-center"><span>{{ object.created|date:"d/m/Y H\hi" }}</span></td>
                                     <td class="table-row">
                                         <div>
@@ -203,7 +203,7 @@
 
                                 {% for transaction in lot_transactions %}
                                     <tr>
-                                        <td class="table-row text-center">{{ forloop.counter|add:1 }}</td>
+                                        <td class="table-row text-center">{% if installment %}{{ forloop.counter|add:2 }}{% else %}{{ forloop.counter|add:2 }}{% endif %}</td>
                                         <td class="table-row text-center"><span>{{ transaction.date_created|date:"d/m/Y H\hi" }}</span></td>
                                         <td class="table-row">
                                             <div>
@@ -217,6 +217,14 @@
                                                                 <span class="text-bold">Dinheiro</span>
                                                                 <small>(manual)</small>
                                                             </div>
+                                                            <div class="float-right" style="margin-top:5px">
+                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                </a>
+                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                </a>
+                                                            </div>
                                                         {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_PAYCHECK %}
                                                             <div class="float-left hidden-sm hidden-xs">
                                                                 <i style="font-size:30px" class="fas fa-money-check-alt"></i>
@@ -224,6 +232,14 @@
                                                             <div class="float-left" style="margin:5px 0 0 5px">
                                                                 <span class="text-bold">Cheque</span>
                                                                 <small>(manual)</small>
+                                                            </div>
+                                                            <div class="float-right" style="margin-top:5px">
+                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                </a>
+                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                </a>
                                                             </div>
                                                         {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_DEBIT_CARD %}
                                                             <div class="float-left hidden-sm hidden-xs">
@@ -233,6 +249,14 @@
                                                                 <span class="text-bold">Cartão de Débito</span>
                                                                 <small>(manual)</small>
                                                             </div>
+                                                            <div class="float-right" style="margin-top:5px">
+                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                </a>
+                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                </a>
+                                                            </div>
                                                         {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_CREDIT_CARD %}
                                                             <div class="float-left hidden-sm hidden-xs">
                                                                 <i style="font-size:30px" class="far fa-credit-card"></i>
@@ -240,6 +264,14 @@
                                                             <div class="float-left" style="margin:5px 0 0 5px">
                                                                 <span class="text-bold">Cartão de Crédito</span>
                                                                 <small>(manual)</small>
+                                                            </div>
+                                                            <div class="float-right" style="margin-top:5px">
+                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                </a>
+                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                </a>
                                                             </div>
                                                         {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_DEPOSIT %}
                                                             <div class="float-left hidden-sm hidden-xs">
@@ -249,6 +281,14 @@
                                                                 <span class="text-bold">Depósito</span>
                                                                 <small>(manual)</small>
                                                             </div>
+                                                            <div class="float-right" style="margin-top:5px">
+                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                </a>
+                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                </a>
+                                                            </div>
                                                         {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_TRANSFER %}
                                                             <div class="float-left hidden-sm hidden-xs">
                                                                 <i style="font-size:30px" class="fas fa-exchange-alt"></i>
@@ -256,6 +296,14 @@
                                                             <div class="float-left" style="margin:5px 0 0 5px">
                                                                 <span class="text-bold">Transferência bancária</span>
                                                                 <small>(manual)</small>
+                                                            </div>
+                                                            <div class="float-right" style="margin-top:5px">
+                                                                <a href="javascript:void(0)" onclick="edit_payment('{{ transaction.pk }}', '{{ transaction.manual_payment_type }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-pencil-alt" data-toggle="tooltip" title="Editar"></i>
+                                                                </a>
+                                                                <a style="margin-left:10px;" href="javascript:void(0)" onclick="delete_payment('{{ transaction.pk }}', '{{ transaction.amount|intcomma }}')">
+                                                                    <i class="fas fa-trash-alt text-danger" data-toggle="tooltip" title="Excluir"></i>
+                                                                </a>
                                                             </div>
                                                         {% endif %}
                                                     {% else %}
@@ -293,7 +341,7 @@
                                                     {% endif %}
                                                     <div class="clearfix"></div>
                                                 </div>
-                                                {% if has_manual and transaction.manual is False and transaction.type == transaction.BOLETO %}
+                                                {% if transaction.manual is False and transaction.type == transaction.BOLETO %}
                                                 <div>
                                                     <small class="text-bold">Vencimento:</small>
                                                     <small>{{ transaction.boleto_expiration_date }}</small>

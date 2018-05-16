@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from django import forms
 from django.forms.utils import to_current_timezone
@@ -14,6 +15,23 @@ class AjaxChoiceField(forms.ChoiceField):
 
 class PriceInput(forms.TextInput):
     input_type = 'tel'
+    template_name = 'forms/widgets/price.html'
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context['lang'] = get_language()
+        return context
+
+    def value_from_datadict(self, data, files, name):
+        value = super().value_from_datadict(data, files, name)
+        if not value:
+            value = Decimal(0.00)
+
+        if isinstance(value, Decimal):
+            return value
+
+        value = value.replace('.', '').replace(',', '.')
+        return round(Decimal(value), 2)
 
 
 class TelephoneInput(forms.TextInput):
@@ -126,5 +144,3 @@ class SplitDateTimeWidget(forms.MultiWidget):
 
 class DateTimeInput(forms.DateTimeInput):
     input_type = 'tel'
-
-
