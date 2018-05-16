@@ -244,7 +244,7 @@
                                         restante: <span class="text-danger">R$ {{ dividend_amount|intcomma }}</span>
                                         {% elif dividend_amount > 0 %}
                                         em ver: <span class="text-primary">R$ {{ dividend_amount|intcomma }}</span>
-                                        {% else %}
+                                        {% endif %}
                                         <span class="title">Valor inscrição</span>
                                         <strong class="text-danger">
                                             R$ {{ object.lot.get_calculated_price|intcomma }}
