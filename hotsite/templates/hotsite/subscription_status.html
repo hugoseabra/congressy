@@ -5,7 +5,6 @@
 
     {% include 'hotsite/includes/2_cover_no_form.html' %}
 
-
     <!-- FORM
     ================================= -->
     <section id="owner" class="footer-section section">
@@ -95,8 +94,7 @@
                                                 {{ transaction.get_status_display }}
                                             </td>
                                             <td class="hidden-xs">
-                                                {% to_datetime transaction.data.date_created as created_date %}
-                                                {{ created_date }}h
+                                                {{ transaction.date_created|date:"d/m/Y H\hi" }}
                                             </td>
                                             <td>
                                                 {% if transaction.data.payment_method == 'boleto' %}

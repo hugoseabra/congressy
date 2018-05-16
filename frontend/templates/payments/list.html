@@ -143,7 +143,7 @@
                                                     <i class="fa fa-circle" aria-hidden="true"></i>
                                                 {% endif %}
                                                 <strong>{{ status.get_status_display }}</strong>
-                                                - {{ status.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                                - {{ status.date_created|date:"M d, Y -  H\hi" }}
                                                 <br />
                                             {% endfor %}'>
                                         {% else %}
@@ -175,9 +175,9 @@
                                         <div style="text-indent: 18px;font-weight: bold"
                                              class="text-muted">
                                             {% if transaction.statuses.last.date_created %}
-                                                {{ transaction.statuses.last.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                                {{ transaction.statuses.last.date_created|date:"M d, Y -  H\hi" }}
                                             {% else %}
-                                                {{ transaction.date_created|parse_date:"%Y-%m-%dT%H:%M:%S.%fZ"|date:"M d, Y -  H\hi" }}
+                                                {{ transaction.date_created|date:"M d, Y -  H\hi" }}
                                             {% endif %}
                                         </div>
                                     </td>
