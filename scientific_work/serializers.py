@@ -13,7 +13,8 @@ class WorkSerializer(serializers.HyperlinkedModelSerializer):
             'summary',
             'keywords',
             'article_file',
-            'banner_file'
+            'banner_file',
+            'published',
         )
 
 

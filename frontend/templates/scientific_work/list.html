@@ -184,7 +184,7 @@
                                                                 </label>
                                                                 <input
                                                                         id="article_file_{{ work.pk }}"
-                                                                       type="file"/>
+                                                                        type="file"/>
                                                                 <button
                                                                         class="btn btn-sm btn-success"
                                                                         onclick="submit_article('{% url 'scientific_work:api_work-update' pk=work.pk %}', {{ work.pk }});">
@@ -233,15 +233,14 @@
                                                             impossibilitam
                                                             sua publicação.
                                                         </strong>
-                                                        <input type="checkbox"
-                                                               disabled
-                                                               class="js-switch"/>
+                                                        <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
 
                                                     {% elif work.status == 'ready' %}
 
                                                         <strong>
                                                             <input
-                                                                    class="js-switch published"
+                                                                    class="published"
                                                                     data-work_url="{% url 'scientific_work:api_work-update' pk=work.pk %}"
                                                                     type="checkbox"
                                                                     {% if work.published %}
@@ -372,7 +371,6 @@
             var edit_summary_modal_btn = $('#edit_summary_modal_btn');
             var edit_keywords_modal_btn = $('#edit_keywords_modal_btn');
             var edit_published_btn = $('.published');
-            console.log(edit_published_btn);
 
             // modals
             var edit_summary_modal = $('#edit_summary_modal');
@@ -402,7 +400,16 @@
                 update_keywords($(this).data('work_url'), edit_keywords_modal_body.val());
             });
 
+            edit_published_btn.on("click", function () {
 
+                var url = $(this).data('work_url');
+
+                if (this.checked) {
+                    updated_published_status(url, true);
+                } else {
+                    updated_published_status(url, false);
+                }
+            });
         });
 
 
@@ -426,7 +433,7 @@
 
         var csrftoken = getCookie('csrftoken');
 
-        // functions
+        // updating functions
         function submit_article(url, id) {
 
             var article_file = document.getElementById('article_file_' + id).files[0];
@@ -494,6 +501,29 @@
                 console.error(err.responseText);
             });
         }
+
+        function updated_published_status(url, update_to) {
+            var formData = new FormData();
+            formData.append('published', update_to);
+
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                processData: false,
+                contentType: false,
+                data: formData,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (result) {
+                    //location.reload(true);
+                    console.log(result);
+                }
+            }).fail(function (err) {
+                console.error(err.responseText);
+            });
+        }
+
 
     </script>
 {% endblock %}
