@@ -47,11 +47,15 @@
         }
         ];
         window.onload = function () {
-            var ctx3 = document.getElementById("doughnut").getContext("2d");
-            window.myDoughnut = new Chart(ctx3).Doughnut(doughnutData, {
-                responsive: true
-            });
-        };
+            var ctx3 = document.getElementById("doughnut")
+            if (ctx3 != null) {
+                doughnut = ctx3.getContext("2d");
+                window.myDoughnut = new Chart(doughnut).Doughnut(doughnutData, {
+                    responsive: true
+                });
+            }
+        }
+        ;
 
 
     </script>
@@ -166,12 +170,13 @@
         </div>
     {% endif %}
     <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
-        <div class=" col-lg-6 col-md-6 col-sm-12 col-xs-12" style="margin-bottom: 15px ">
-            <div class="panel
+    <div class=" col-lg-6 col-md-6 col-sm-12 col-xs-12"
+         style="margin-bottom: 15px ">
+        <div class="panel
 {% if limit == 0 or  total_subscriptions  > limit %} widget-mini
 panel-solid-info {% endif %}
 panel-default">
-                {% if limit != 0 and  total_subscriptions  < limit %}
+            {% if limit != 0 and  total_subscriptions  < limit %}
                 <div class="panel-heading">
                     <h3 class="panel-title">Total de inscritos</h3>
                 </div>
@@ -180,29 +185,29 @@ panel-default">
                 {% endif %}
             {% endif %}
 
-                <div class="panel-body {% if limit == 0 %} widget-gauge
+            <div class="panel-body {% if limit == 0 %} widget-gauge
 {% endif %}">
-                    {% if limit == 0 or  total_subscriptions  > limit %}
-                        <i class="icon-user"></i>
-                        <span class="total text-center">
+                {% if limit == 0 or  total_subscriptions  > limit %}
+                    <i class="icon-user"></i>
+                    <span class="total text-center">
                             {{ total_subscriptions }}
                         <span class="title text-center">Inscritos</span>
                         </span>
 
 
-                    {% else %}
-                        <canvas width="200" height="125" id="gauge"
-                                class=""></canvas>
-                        <div class="goal-wrapper">
-                            <span class="gauge-value pull-left"></span>
-                            <span id="gauge-text" class="gauge-value
+                {% else %}
+                    <canvas width="200" height="125" id="gauge"
+                            class=""></canvas>
+                    <div class="goal-wrapper">
+                        <span class="gauge-value pull-left"></span>
+                        <span id="gauge-text" class="gauge-value
                                     pull-left">{{ total_subscriptions }}</span>
-                            <span id="goal-text" class="goal-value
+                        <span id="goal-text" class="goal-value
                                     pull-right">{{ limit }}</span>
-                        </div>
+                    </div>
 
-                    {% endif %}
-                </div>
+                {% endif %}
+            </div>
 
             </div>
         </div>

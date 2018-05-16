@@ -17,21 +17,24 @@ from django.utils.decorators import classonlymethod
 from django.views import generic
 from wkhtmltopdf.views import PDFTemplateView
 
+from core.views.mixins import TemplateNameableMixin
 from gatheros_event.forms import PersonForm
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
 )
-from gatheros_subscription.forms import (
-    SubscriptionForm,
-    SubscriptionFilterForm
-)
+from gatheros_subscription.forms import SubscriptionFilterForm, \
+    SubscriptionForm
 from gatheros_subscription.helpers.export import export_event_data
-from gatheros_subscription.models import Subscription, FormConfig
+from gatheros_subscription.helpers.report_payment import \
+    PaymentReportCalculator
+from gatheros_subscription.models import FormConfig, Subscription
+from payment import forms
+from payment.models import Transaction
 
 
-class EventViewMixin(AccountMixin, generic.View):
+class EventViewMixin(TemplateNameableMixin, AccountMixin):
     """ Mixin de view para vincular com informações de event. """
     event = None
 
@@ -49,7 +52,7 @@ class EventViewMixin(AccountMixin, generic.View):
 
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
-        context = super(EventViewMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         event = self.get_event()
         context['event'] = event
@@ -295,8 +298,8 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
             'lots': self.get_lots(),
             'has_filter': self.has_filter,
             'has_paid_lots': self.has_paid_lots(),
-            'has_inside_bar' : True,
-            'active' : 'inscricoes',
+            'has_inside_bar': True,
+            'active': 'inscricoes',
         })
         return cxt
 
@@ -317,7 +320,142 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
 class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
     template_name = 'subscription/view.html'
+    object = None
     queryset = Subscription.objects.get_queryset()
+    financial = False
+    last_transaction = None
+
+    def get_form(self, **kwargs):
+        return forms.ManualTransactionForm(
+            subscription=self.get_object(),
+            **kwargs
+        )
+
+    def get(self, request, *args, **kwargs):
+
+        storage = messages.get_messages(request)
+
+        messenger = []
+        for message in list(storage):
+            messenger.append({
+                'type': message.level_tag,
+                'message': message.message,
+            })
+
+        storage._loaded_messages.clear()
+
+        context = self.get_context_data(messenger=messenger)
+        return self.render_to_response(context)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.last_transaction = self._get_last_transaction()
+        self.object = self.get_object()
+
+        response = super().dispatch(request, *args, **kwargs)
+
+        if self.financial is True:
+            if self.object.free:
+                messages.warning(
+                    request,
+                    'Este evento não possui relatório financeiro.'
+                )
+
+                return redirect(
+                    'subscription:subscription-view',
+                    event_pk=self.event.pk,
+                    pk=self.object.pk,
+                )
+
+            if self.object.free:
+                messages.warning(
+                    request,
+                    'Este perfil não possui transações financeiras.'
+                )
+                return redirect(
+                    'subscription:subscription-view',
+                    event_pk=self.event.pk,
+                    pk=self.object.pk,
+                )
+
+        return response
+
+    def _get_last_transaction(self):
+        """
+        Recupera a transação mais recente.
+        Primeiro verificando se há alguma paga. Se não, pega a mais recente.
+        """
+        queryset = self.get_object().transactions
+
+        paid_transactions = queryset \
+            .filter(status=Transaction.PAID) \
+            .order_by('-date_created')
+
+        if paid_transactions.count() > 0:
+            return paid_transactions.first()
+
+        return queryset.all().order_by('-date_created').first()
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        calculator = PaymentReportCalculator(subscription=self.get_object())
+
+        ctx['object'] = self.object
+        ctx['lots'] = calculator.lots
+        ctx['transactions'] = calculator.transactions
+        ctx['full_prices'] = calculator.full_prices
+        ctx['installments'] = calculator.installments
+        ctx['has_manual'] = calculator.has_manual
+        ctx['total_paid'] = calculator.total_paid
+        ctx['dividend_amount'] = calculator.dividend_amount
+        ctx['financial'] = self.financial
+        ctx['last_transaction'] = self.last_transaction
+
+        if self.request.GET.get('details'):
+            ctx['show_details'] = True
+
+        if 'manual_payment_form' not in ctx:
+            ctx['manual_payment_form'] = self.get_form()
+
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+
+        data = request.POST.copy()
+        data['manual_author'] = '{} ({})'.format(
+            request.user.get_full_name(),
+            request.user.email,
+        )
+        kwargs = {'data': data}
+
+        transaction_id = data.get('transaction_id')
+
+        if transaction_id:
+            instance = get_object_or_404(Transaction, pk=transaction_id)
+            kwargs.update({'instance': instance})
+
+        form = self.get_form(**kwargs)
+
+        if not form.is_valid():
+            return self.render_to_response(self.get_context_data(
+                manual_payment_form=form,
+                transaction_pk=transaction_id,
+                modal='manual-payment',
+            ))
+
+        form.save()
+
+        url = reverse('subscription:subscription-payments', kwargs={
+            'event_pk': self.event.pk,
+            'pk': self.object.pk,
+        })
+
+        if transaction_id:
+            messages.success(request, 'Recebimento editado com sucesso.')
+        else:
+            messages.success(request, 'Recebimento registrado com sucesso.')
+
+        return redirect(url + '?details=1')
 
 
 class SubscriptionAddFormView(SubscriptionFormMixin):
@@ -726,7 +864,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                            transaction.type == 'boleto':
+                                    transaction.type == 'boleto':
                         return True
 
         return False

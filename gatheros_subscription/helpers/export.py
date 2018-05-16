@@ -161,16 +161,13 @@ def _export_payments(worksheet, event):
 
         sub = transaction.subscription
 
-        created = datetime.strptime(
-            transaction.date_created,
-            "%Y-%m-%dT%H:%M:%S.%fZ"
-        )
+        created = transaction.date_created.strftime('%d/%m/%Y %H:%M:%S')
 
         collector[row_idx].append(get_object_value(sub, 'code'))
         collector[row_idx].append(sub.person.name)
         collector[row_idx].append(transaction.get_type_display())
         collector[row_idx].append(transaction.get_status_display())
-        collector[row_idx].append(created.strftime('%d/%m/%Y %H:%M:%S'))
+        collector[row_idx].append(created)
         collector[row_idx].append(transaction.amount)
         collector[row_idx].append(transaction.liquid_amount)
 

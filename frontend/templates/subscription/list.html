@@ -100,12 +100,18 @@
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
-                <div class="float-right">
+                <div class="float-left">
                     <button type="button" class="btn btn-primary {% if not object_list %}disabled{% endif %}"
                             {% if not object_list %}disabled title="Nenhuma inscrição para exportar."{% endif %}
                             onclick="$('#export-form').submit();">
                         <i class="fa fa-download"></i>
                         Exportar
+                    </button>
+                </div>
+                <div class="float-right">
+                    <button type="button" class="btn btn-success">
+                        <i class="fa fa-plus"></i>
+                        Nova inscrição
                     </button>
                 </div>
                 <div class="clearfix"></div>
