@@ -3495,7 +3495,7 @@ label.valid {
 }
 .theme-cgsy-full .sidebar-itens:active {
   color: #F0F3F3;
-  background-color: #1f7bb6 ;
+  background-color: #1f7bb6;
 }
 .theme-cgsy-full .sidebar-itens:hover {
   color: #F0F3F3;
@@ -4046,6 +4046,18 @@ label.valid {
   top: -17px;
   font-size: 0.75em;
   margin-right: 8px;
+}
+ul.messenger-theme-flat .messenger-message.alert-success .messenger-message-inner:before {
+  background: #449D44;
+}
+ul.messenger-theme-flat .messenger-message.alert-info .messenger-message-inner:before {
+  background: #1F7BB6 !important;
+}
+ul.messenger-theme-flat .messenger-message.alert-error .messenger-message-inner:before {
+  background: #C9302C;
+}
+ul.messenger-theme-flat .messenger-message.alert-warning .messenger-message-inner:before {
+  background: #EC971F;
 }
 @media screen and (max-device-width: 320px) {
   td.nowrap,

@@ -366,7 +366,7 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
                     pk=self.object.pk,
                 )
 
-            if not self.last_transaction:
+            if self.object.free:
                 messages.warning(
                     request,
                     'Este perfil não possui transações financeiras.'

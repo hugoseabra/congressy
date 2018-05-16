@@ -48,7 +48,7 @@ class ManualTransactionForm(forms.ModelForm):
             subscription=self.subscription
         )
 
-        if calculator.dividend_amount >= 0:
+        if calculator.is_subscription_confirmed:
             self.subscription.status = self.subscription.CONFIRMED_STATUS
         else:
             self.subscription.status = self.subscription.AWAITING_STATUS

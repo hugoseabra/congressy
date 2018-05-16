@@ -261,7 +261,7 @@
                                         Ver Painel Participante
                                     </button>
                                 </li>
-                                {% if dividend_amount < 0 %}
+                                {% if not last_transaction or last_transaction and dividend_amount < 0 %}
                                 <li>
                                     <button type="button"
                                             class="btn btn-success btn-trans"

@@ -45,7 +45,7 @@ class PaymentDeleteView(EventViewMixin, generic.View):
             subscription=self.subscription
         )
 
-        if calculator.dividend_amount < 0:
+        if not calculator.is_subscription_confirmed:
             self.subscription.status = self.subscription.AWAITING_STATUS
             self.subscription.save()
 

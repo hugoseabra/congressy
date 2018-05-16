@@ -122,7 +122,7 @@
             </div>
         </div>
     </div>
-    {% if last_transaction %}
+    {% if not object.free and last_transaction %}
     <div class="col-xl-5 col-lg-5 col-md-6">
         <div class="panel">
             <div class="panel-body" style="padding:0">
@@ -248,18 +248,16 @@
                                         </strong>
                                     {% endif %}
                                 </div>
-                                {% if object.status == object.CONFIRMED_STATUS %}
-                                    <div class="float-right"
-                                         style="margin-left:10px;margin-top:5px;">
-                                        <button type="button"
-                                                data-toggle="tooltip"
-                                                title="Ver detalhes do pagamento"
-                                                onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}?details=1'"
-                                                class="btn btn-info btn-sm btn-trans">
-                                            detalhamento
-                                        </button>
-                                    </div>
-                                {% endif %}
+                                <div class="float-right"
+                                     style="margin-left:10px;margin-top:5px;">
+                                    <button type="button"
+                                            data-toggle="tooltip"
+                                            title="Ver detalhes do pagamento"
+                                            onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}?details=1'"
+                                            class="btn btn-info btn-sm btn-trans">
+                                        detalhamento
+                                    </button>
+                                </div>
                                 <div class="clearfix"></div>
                             </td>
                         </tr>
@@ -369,7 +367,7 @@
                     <div class="row" style="padding-left:16px;">
                         <div class="connect social">
                             <ul>
-                                {% if last_transaction %}
+                                {% if not object.free %}
                                 <li>
                                     <button type="button"
                                             class="btn btn-info btn-trans"

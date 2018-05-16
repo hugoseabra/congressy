@@ -19,10 +19,12 @@ class PaymentReportCalculator(object):
         self.total_paid = round(Decimal(0.00), 2)
         self.installments = {}
         self.has_manual = {}
+        self.is_subscription_confirmed = False
 
         self._fetch_lots()
         self._fetch_transactions()
         self._set_dividend_amount()
+        self._set_subscription_confirmation()
 
     def get_transactions(self):
         return self.queryset
@@ -89,3 +91,11 @@ class PaymentReportCalculator(object):
     def _set_dividend_amount(self):
         for lot_pk, amount in self.full_prices.items():
             self.dividend_amount += amount
+
+    def _set_subscription_confirmation(self):
+        """
+        Inscrição está confirmada quando não há dividendos ou está em ver com
+        o evento e há pelo menos algum valor pago.
+        """
+        self.is_subscription_confirmed = \
+            self.total_paid > 0 and self.dividend_amount >= 0
