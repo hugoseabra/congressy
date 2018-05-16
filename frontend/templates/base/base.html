@@ -57,8 +57,9 @@
     <!-- Custom styles for this theme -->
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
 
-
     <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+
+    {% block styles %}{% endblock %}
 
     {% block headscripts %}{% endblock %}
 
