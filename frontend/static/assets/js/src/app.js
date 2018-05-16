@@ -103,7 +103,8 @@
         var tooltips = function() {
             $('.tooltip-wrapper').tooltip({
                 selector: "[data-toggle=tooltip]",
-                container: "body"
+                container: "body",
+                html:true,
             })
         };
 
