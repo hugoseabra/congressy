@@ -5,7 +5,7 @@ import uuid
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
-from gatheros_subscription.models import Subscription
+from gatheros_subscription.models import Lot, Subscription
 
 
 class Transaction(models.Model):
@@ -19,6 +19,7 @@ class Transaction(models.Model):
     REFUSED = 'refused'
     CHARGEDBACK = 'chargedback'
 
+    MANUAL = 'manual'
     BOLETO = 'boleto'
     CREDIT_CARD = 'credit_card'
 
@@ -35,7 +36,24 @@ class Transaction(models.Model):
 
     TRANSACTION_TYPES = (
         (BOLETO, 'Boleto'),
-        (CREDIT_CARD, 'Cartão de credito')
+        (CREDIT_CARD, 'Cartão de credito'),
+        (MANUAL, 'Manual'),
+    )
+
+    MANUAL_PAYMENT_MONEY = 'money'
+    MANUAL_PAYMENT_PAYCHECK = 'paycheck'
+    MANUAL_PAYMENT_DEBIT_CARD = 'debit_card'
+    MANUAL_PAYMENT_CREDIT_CARD = 'credit_card'
+    MANUAL_PAYMENT_BANK_DEPOSIT = 'bank_deposit'
+    MANUAL_PAYMENT_BANK_TRANSFER = 'bank_transfer'
+
+    MANUAL_PAYMENT_TYPES = (
+        (MANUAL_PAYMENT_MONEY, 'Dinheiro'),
+        (MANUAL_PAYMENT_PAYCHECK, 'Cheque'),
+        (MANUAL_PAYMENT_DEBIT_CARD, 'Cartão de Débito'),
+        (MANUAL_PAYMENT_CREDIT_CARD, 'Cartão de Crédito'),
+        (MANUAL_PAYMENT_BANK_DEPOSIT, 'Depósito'),
+        (MANUAL_PAYMENT_BANK_TRANSFER, 'Transferência bancária'),
     )
 
     class Meta:
@@ -66,10 +84,17 @@ class Transaction(models.Model):
         blank=True,
     )
 
-    date_created = models.CharField(
+    date_created = models.DateTimeField(
         max_length=30,
         null=True,
         blank=True,
+    )
+    
+    installments = models.PositiveIntegerField(
+        default=1,
+        verbose_name='parcelas',
+        blank=True,
+        null=True,
     )
 
     amount = models.DecimalField(
@@ -77,6 +102,21 @@ class Transaction(models.Model):
         max_digits=11,
         null=True,
         blank=True,
+    )
+
+    lot_price = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        null=True,
+        blank=True,
+    )
+
+    installment_amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        verbose_name='valor da parcelas',
+        blank=True,
+        null=True,
     )
 
     liquid_amount = models.DecimalField(
@@ -98,13 +138,67 @@ class Transaction(models.Model):
         blank=True,
     )
 
+    lot = models.ForeignKey(
+        Lot,
+        on_delete=models.DO_NOTHING,
+        related_name='transactions',
+        editable=False,
+        null=True,
+        blank=True,
+    )
+
+    credit_card_holder = models.CharField(
+        max_length=80,
+        null=True,
+        blank=True,
+    )
+
+    credit_card_first_digits = models.CharField(
+        max_length=6,
+        null=True,
+        blank=True,
+    )
+
+    credit_card_last_digits = models.CharField(
+        max_length=4,
+        null=True,
+        blank=True,
+    )
+
     subscription = models.ForeignKey(
         Subscription,
         on_delete=models.DO_NOTHING,
         related_name='transactions'
     )
 
-    data = JSONField()
+    manual = models.BooleanField(
+        default=False,
+        verbose_name='lançado manualmente',
+    )
+
+    manual_payment_type = models.CharField(
+        max_length=30,
+        choices=MANUAL_PAYMENT_TYPES,
+        null=True,
+        blank=True,
+        verbose_name='tipo de recebimento manual',
+    )
+
+    manual_author = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name='author do pagamento manual',
+    )
+
+    data = JSONField(
+        null=True,
+        blank=True,
+    )
+
+    def save(self, *args, **kwargs):
+        self.lot = self.subscription.lot
+        return super().save(*args, **kwargs)
 
     @property
     def paid(self):
