@@ -1,6 +1,6 @@
 from django.db import models
 from gatheros_subscription.models import Subscription
-
+import os
 
 class Work(models.Model):
 
@@ -82,3 +82,12 @@ class Work(models.Model):
         default=False,
         verbose_name="publicado",
     )
+
+    @property
+    def article_filename(self):
+        return os.path.basename(self.article_file.name)
+
+
+    @property
+    def banner_filename(self):
+        return os.path.basename(self.banner_file.name)

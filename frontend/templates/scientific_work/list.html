@@ -5,6 +5,24 @@
 {% block sidebar %}{% endblock %}
 {% block sidebar-bars %}{% endblock %}
 {% block toptitle %}{% endblock %}
+{% block styles %}
+    <style>
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            border: 1px solid #ccc;
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        .form-inline {
+            display: inline-block;
+        }
+    </style>
+{% endblock %}
 
 
 {% block content %}
@@ -17,7 +35,7 @@
 
                 {% for work in  object_list %}
 
-                    <div class="row col-md-6">
+                    <div class="row col-md-8">
 
                         <div class="panel panel-primary">
 
@@ -102,7 +120,7 @@
                                                         <button class="btn btn-trans btn-sm
                                                 btn-success edit-keywords-btn"
                                                                 data-keywords_text="{{ work.keywords }}"
-                                                                data-work_id="{{ work.pk }}">
+                                                                data-work_url="{% url 'scientific_work:api_work-update' pk=work.pk %}">
                                                             Editar
                                                         </button>
                                                         <i class="fas
@@ -111,7 +129,7 @@
                                                         <button class="btn
                                                             btn-trans btn-sm btn-success edit-keywords-btn"
                                                                 data-keywords_text="{{ work.keywords }}"
-                                                                data-work_id="{{ work.pk }}">
+                                                                data-work_url="{% url 'scientific_work:api_work-update' pk=work.pk %}">
                                                             Adicionar
                                                         </button>
                                                         <i class="fas fa-times-circle
@@ -131,6 +149,7 @@
                                                         <button class="btn btn-trans btn-sm
                                                 btn-success edit-summary-btn"
                                                                 data-summary_text="{{ work.summary }}"
+                                                                data-work_url="{% url 'scientific_work:api_work-update' pk=work.pk %}"
                                                                 data-work_id="{{ work.pk }}">
                                                             Editar
                                                         </button>
@@ -139,6 +158,7 @@
                                                         fa-check-circle success-color fa-lg pull-right"></i>
                                                 </td>
                                             </tr>
+
                                             {% if work.modality == 'artigo' or work.modality == 'banner' %}
                                                 <tr>
 
@@ -150,28 +170,39 @@
                                                         {% endif %}
                                                     </td>
                                                     <td>
-                                                        {% if work.modality == 'artigo' and work.article_file %}
-                                                            <a target="_blank"
-                                                               href="{{ work.article_file.url }}">Artigo</a>
-                                                            <i class="fas
+                                                        {% if work.modality == 'artigo' %}
+                                                            {% if work.article_file %}
+                                                                <a target="_blank"
+                                                                   href="{{ work.article_file.url }}">
+                                                                    Artigo
+                                                                </a>
+                                                            {% endif %}
+                                                            <div class="form-inline">
+                                                                <label for="article_file"
+                                                                       class="custom-file-upload">
+                                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                                </label>
+                                                                <input id="article_file"
+                                                                       type="file"/>
+                                                                <button
+                                                                        class="btn btn-sm btn-success"
+                                                                        onclick="submit_article('{% url 'scientific_work:api_work-update' pk=work.pk %}');">
+                                                                    Salvar
+                                                                </button>
+                                                            </div>
+
+                                                            {% if work.article_file %}
+                                                                <i class="fas
                                                         fa-check-circle success-color fa-lg pull-right"></i>
+                                                            {% else %}
+                                                                <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
+                                                            {% endif %}
                                                         {% elif work.modality == 'banner' and work.banner_file %}
                                                             <a target="_blank"
                                                                href="{{ work.banner_file.url }}">Banner</a>
                                                             <i class="fas
                                                         fa-check-circle success-color fa-lg pull-right"></i>
-                                                        {% elif  work.modality == 'artigo' %}
-                                                            <input id="article_file"
-                                                                   type="file">
-                                                            <button
-                                                                    style="margin-top: 20px; margin-left: 15px"
-                                                                    class="btn btn-sm btn-success"
-                                                                    onclick="submit_article('{% url 'scientific_work:api_work-update' pk=work.pk %}');">
-                                                                Salvar
-                                                            </button>
-                                                            <i class="fas fa-times-circle
-                                                        danger-color fa-lg pull-right"></i>
-
                                                         {% elif  work.modality == 'banner' %}
                                                             Faça upload do
                                                             seu banner:
@@ -201,13 +232,19 @@
                                                             impossibilitam
                                                             sua publicação.
                                                         </strong>
-                                                        <i class="fas fa-times-circle
-                                                        danger-color fa-lg pull-right"></i>
+                                                        <input type="checkbox"
+                                                               disabled
+                                                               class="js-switch"/>
 
                                                     {% elif work.status == 'ready' %}
 
                                                         <strong>
-                                                            pode publicar seu zé
+                                                            <input
+                                                                    class="js-switch published"
+                                                                    data-work_url="{% url 'scientific_work:api_work-update' pk=work.pk %}"
+                                                                    type="checkbox"
+                                                                    {% if work.published %}
+                                                                    checked {% endif %}  />
                                                         </strong>
                                                         <i class="fas
                                                         fa-check-circle success-color fa-lg pull-right"></i>
@@ -254,7 +291,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-md btn-success"
-                                    data-dismiss="modal">
+                                    data-dismiss="modal"
+                                    id="edit_summary_modal_btn">
                                 <i class="far fa-save"></i>
                                 Salvar
                             </button>
@@ -285,7 +323,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-md btn-success"
-                                    data-dismiss="modal">
+                                    data-dismiss="modal"
+                                    id="edit_keywords_modal_btn">
                                 <i class="far fa-save"></i>
                                 Salvar
                             </button>
@@ -322,11 +361,17 @@
 
 {% block scripts %}
     <script type="application/javascript">
+
+
         $(document).ready(function () {
 
             //buttons
             var edit_summary_btn = $('.edit-summary-btn');
             var edit_keyword_btn = $('.edit-keywords-btn');
+            var edit_summary_modal_btn = $('#edit_summary_modal_btn');
+            var edit_keywords_modal_btn = $('#edit_keywords_modal_btn');
+            var edit_published_btn = $('.published');
+            console.log(edit_published_btn);
 
             // modals
             var edit_summary_modal = $('#edit_summary_modal');
@@ -336,39 +381,124 @@
             var edit_keywords_modal_body = $('#edit_keywords_modal_body');
 
 
-            // triggers
+            // modal btn triggers
             edit_summary_btn.on("click", function () {
                 edit_summary_modal_body.text($(this).data('summary_text'));
-                console.log($(this).data('summary_text'));
+                edit_summary_modal_btn.data('work_url', $(this).data('work_url'));
                 edit_summary_modal.modal('show');
             });
             edit_keyword_btn.on("click", function () {
                 edit_keywords_modal_body.text($(this).data('keywords_text'));
-                console.log($(this).data('keywords_text'));
+                edit_keyword_btn.data('work_url', $(this).data('work_url'));
                 edit_keywords_modal.modal('show');
             });
+
+            // save btn triggers
+            edit_summary_modal_btn.on("click", function () {
+                update_summary($(this).data('work_url'), edit_summary_modal_body.val());
+            });
+            edit_keywords_modal_btn.on("click", function () {
+                update_keywords($(this).data('work_url'), edit_keywords_modal_body.val());
+            });
+
 
         });
 
 
+        // CSRF code
+        function getCookie(name) {
+            var cookieValue = null;
+            var i = 0;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (i; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        var csrftoken = getCookie('csrftoken');
+
         // functions
         function submit_article(url) {
-            var article_file = document.getElementById('article_file')
-                .files[0];
 
-
+            var article_file = document.getElementById('article_file').files[0];
+            var formData = new FormData();
+            formData.append('article_file', article_file);
             $.ajax({
                 url: url,
                 type: 'PUT',
-                data: {article_file: article_file},
-                success: function (response) {
-                    alert('success')
+                processData: false,
+                contentType: false,
+                data: formData,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (data, textStatus, xhr) {
+                    //location.reload();
+                    console.log('---------------------------------------');
+                    console.log(xhr.status);
+                    console.log('---------------------------------------');
+                    console.log(textStatus);
+                    console.log('---------------------------------------');
+                    console.log(data);
+                    console.log('---------------------------------------');
+
                 }
             }).fail(function (err) {
-                console.log(err)
+                console.log('err');
+                console.log(err.responseText);
             });
 
 
+        }
+
+        function update_summary(url, text) {
+            var formData = new FormData();
+            formData.append('summary', text);
+
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                processData: false,
+                contentType: false,
+                data: formData,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function () {
+                    location.reload();
+                }
+            }).fail(function (err) {
+                console.error(err.responseText);
+            });
+        }
+
+        function update_keywords(url, text) {
+            var formData = new FormData();
+            formData.append('keywords', text);
+
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                processData: false,
+                contentType: false,
+                data: formData,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function () {
+                    location.reload();
+                }
+            }).fail(function (err) {
+                console.error(err.responseText);
+            });
         }
 
     </script>
