@@ -245,9 +245,20 @@
                                                                     type="checkbox"
                                                                     {% if work.published %}
                                                                     checked {% endif %}  />
+                                                        Status:
+                                                        {% if work.published %}
+                                                            <i class="fas
+                                                        fa-check-circle
+                                                        success-color fa-lg
+                                                        pull-right"></i>
+                                                            PUBLICADO
+                                                        {% else %}
+                                                            <i class="fas
+                                                            fa-exclamation-circle  warning-color fa-lg pull-right"></i>
+                                                            NÃO-PUBLICADO
+                                                        {% endif %}
                                                         </strong>
-                                                        <i class="fas
-                                                        fa-check-circle success-color fa-lg pull-right"></i>
+
                                                     {% endif %}
 
                                                 </td>
@@ -515,9 +526,8 @@
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 },
-                success: function (result) {
-                    //location.reload(true);
-                    console.log(result);
+                success: function () {
+                    location.reload(true);
                 }
             }).fail(function (err) {
                 console.error(err.responseText);
