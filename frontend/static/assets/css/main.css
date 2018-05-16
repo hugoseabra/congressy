@@ -2535,7 +2535,8 @@ body.fullscreen-widget-active .panel .panel-heading .actions > .fa-times {
   -o-transition: all ease 0.3s;
   -ms-transition: all ease 0.3s;
 }
-.social .fa-facebook:hover {
+.social .fa-facebook:hover,
+.social .fa-facebook-f:hover {
   background: #4060A5;
 }
 .social .fa-twitter:hover {
@@ -3494,7 +3495,7 @@ label.valid {
 }
 .theme-cgsy-full .sidebar-itens:active {
   color: #F0F3F3;
-  background-color: #1f7bb6 ;
+  background-color: #1f7bb6;
 }
 .theme-cgsy-full .sidebar-itens:hover {
   color: #F0F3F3;
@@ -3658,11 +3659,10 @@ label.valid {
   padding: 10px 5px;
 }
 .theme-cgsy-full .profile-block .profile-info .profile-info-label {
-  font-size: 0.75em;
   font-weight: bold;
 }
 .theme-cgsy-full .profile-block .profile-info .profile-info-value {
-  font-size: 0.875em;
+  color: #666;
 }
 .theme-cgsy-full .filter-box {
   display: none;
@@ -3841,8 +3841,14 @@ label.valid {
 .theme-cgsy-full .dataTables_paginate {
   font-size: 0.875em;
 }
+.theme-cgsy-full .dataTables_filter {
+  float: right;
+}
 .theme-cgsy-full .dataTables_filter input {
   margin-left: 5px;
+}
+.theme-cgsy-full .dataTables_paginate {
+  float: right;
 }
 .theme-cgsy-full .danger-box-message.danger h2 {
   font-weight: bold;
@@ -3923,11 +3929,22 @@ label.valid {
 .float-right {
   float: right;
 }
+.text-bold {
+  font-weight: bold;
+}
 .no-shadow {
   box-shadow: none !important;
 }
 .cgsy-label {
   font-size: 0.938em;
+}
+.nowrap {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.text-line-through {
+  text-decoration: line-through;
 }
 @media (max-width: 991px) {
   .text-right.left-when-small {
@@ -4029,6 +4046,18 @@ label.valid {
   top: -17px;
   font-size: 0.75em;
   margin-right: 8px;
+}
+ul.messenger-theme-flat .messenger-message.alert-success .messenger-message-inner:before {
+  background: #449D44;
+}
+ul.messenger-theme-flat .messenger-message.alert-info .messenger-message-inner:before {
+  background: #1F7BB6 !important;
+}
+ul.messenger-theme-flat .messenger-message.alert-error .messenger-message-inner:before {
+  background: #C9302C;
+}
+ul.messenger-theme-flat .messenger-message.alert-warning .messenger-message-inner:before {
+  background: #EC971F;
 }
 @media screen and (max-device-width: 320px) {
   td.nowrap,

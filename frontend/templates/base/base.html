@@ -57,8 +57,9 @@
     <!-- Custom styles for this theme -->
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
 
-
     <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+
+    {% block styles %}{% endblock %}
 
     {% block headscripts %}{% endblock %}
 
@@ -234,7 +235,7 @@
                 <p class="text-muted">
                     {% block page_description %}{% endblock %}</p>
             </div>
-            <section id="main-content">
+            <section id="main-content" class="animated fadeInUp">
                 {% block messages %}
                     {% if messages %}
                         {% for message in messages %}
@@ -263,7 +264,9 @@
 </section>
 
 <!-- Modals -->
+
 {% include 'organization/modal-switch-organization.html' %}
+{% block modals %}{% endblock %}
 
 {% include 'sentry-javascript-sdk.html' %}
 {% include 'tawto.html' %}

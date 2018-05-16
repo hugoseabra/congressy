@@ -1,5 +1,6 @@
 from .form_config import FormConfigView
 from .lot import LotAddFormView, LotDeleteView, LotEditFormView, LotListView
+from .payment import PaymentDeleteView
 from .subscription import (
     MySubscriptionsListView,
     SubscriptionAddFormView,
@@ -10,5 +11,10 @@ from .subscription import (
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
 )
-from .survey import SurveyEditView, SurveyListView, \
-    EventSurveyDeleteAjaxView, EventSurveyEditAjaxView, EventSurveyCreateView
+from .survey import (
+    EventSurveyCreateView,
+    EventSurveyDeleteAjaxView,
+    EventSurveyEditAjaxView,
+    SurveyEditView,
+    SurveyListView,
+)
