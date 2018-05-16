@@ -1,6 +1,6 @@
 import json
-from decimal import Decimal
 from datetime import datetime
+from decimal import Decimal
 
 import pagarme
 from django.conf import settings
@@ -70,7 +70,16 @@ def create_pagarme_transaction(transaction_data, subscription=None):
     transaction_instance.type = trx['payment_method']
     transaction_instance.date_created = trx['date_created']
     transaction_instance.amount = amount
+    transaction_instance.lot_price = subscription.lot.get_calculated_price()
     transaction_instance.liquid_amount = liquid_amount
+
+    if 'instalments' in trx \
+            and trx['installments'] \
+            and int(trx['installments']):
+        installments = int(trx['installments'])
+        transaction_instance.installments = installments
+        transaction_instance.installment_amount = \
+            round((amount / installments), 2)
 
     if transaction_instance.type == Transaction.BOLETO:
         boleto_exp_date = trx.get('boleto_expiration_date')
@@ -79,6 +88,12 @@ def create_pagarme_transaction(transaction_data, subscription=None):
                 boleto_exp_date,
                 "%Y-%m-%dT%H:%M:%S.%fZ"
             )
+
+    if transaction_instance.type == Transaction.CREDIT_CARD:
+        card = trx['card']
+        transaction_instance.credit_card_holder = card['holder_name']
+        transaction_instance.credit_card_first_digits = card['first_digits']
+        transaction_instance.credit_card_last_digits = card['last_digits']
 
     transaction_instance.save()
 
