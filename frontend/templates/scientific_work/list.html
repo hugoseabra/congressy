@@ -88,14 +88,18 @@
 
                                                 <td>
 
-                                                    {% if work.authors.count > 1 %}
+                                                    {% if work.authors.all.count > 1 %}
                                                         <ul class="list-group col-md-6">
-                                                            {% for author in work.authors %}
+                                                            {% for author in work.authors.all %}
                                                                 <li class="list-group-item">
-                                                                    author.name
+                                                                    {{ author.name }}
                                                                 </li>
                                                             {% endfor %}
                                                         </ul>
+                                                        <i class="fas
+                                                        fa-check-circle
+                                                        success-color fa-lg
+                                                        pull-right"></i>
                                                     {% else %}
                                                         <strong>
                                                             Você deve colocar
@@ -114,7 +118,7 @@
                                                             edit-author-btn"
                                                             style="margin-top: 5px"
                                                             data-author_url="{% url 'scientific_work:work-author-partial-list'  subscription_pk=subscription.pk pk=work.pk %}"
-                                                            data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}">
+                                                            data-work_id="{{ work.pk}}">
                                                         Adicionar
                                                     </button>
 
@@ -402,9 +406,10 @@
                             <div id="edit_authors_modal_body">
                                 Carregando....
                             </div>
-                            <input type="hidden" id="author_work_url">
+
 
                             <form style="margin-top: 25px" class="form-inline">
+                                <input type="hidden" id="author_work_id">
                                 <div class="form-group">
                                     <label for="new_author_name">Nome:</label>
                                     <input type="text" class="form-control"
@@ -468,7 +473,7 @@
             var edit_published_btn = $('.published');
             var edit_author_btn = $('.edit-author-btn');
             var save_new_author_btn = $('#save_new_author');
-            var author_work_url_el = $('#author_work_url');
+            var author_work_id_el = $('#author_work_id');
 
             // values
             var new_author_name_value = $('#new_author_name');
@@ -497,8 +502,8 @@
             });
             edit_author_btn.on("click", function () {
                 var author_list_url = $(this).data('author_url');
-                var work_url = $(this).data('work_url');
-                author_work_url_el.val(work_url);
+                var work_id = $(this).data('work_id');
+                author_work_id_el.val(work_id);
                 edit_authors_modal_body.load(author_list_url);
                 edit_authors_modal.modal('show');
 
@@ -522,8 +527,9 @@
                 }
             });
             save_new_author_btn.on("click", function () {
-                var url = author_work_url_el.val();
-                add_author(url, new_author_name_value.val())
+                var work_id = author_work_id_el.val();
+                var author_list_url = '{% url 'scientific_work:author-list' %}';
+                add_author(author_list_url, new_author_name_value.val(), work_id)
             });
 
         });
@@ -642,14 +648,19 @@
             });
         }
 
-        function add_author(url, name){
+        function add_author(url, name, work) {
+
+            console.log(work);
+            console.log(typeof (work));
 
             var formData = new FormData();
-            formData.append('keywords', text);
+            formData.append('name', name);
+            formData.append('work', parseInt(work));
+
 
             $.ajax({
                 url: url,
-                type: 'PATCH',
+                type: 'POST',
                 processData: false,
                 contentType: false,
                 data: formData,
@@ -660,7 +671,7 @@
                     location.reload(true);
                 }
             }).fail(function (err) {
-                console.error(err.status);
+                console.error(err);
             });
 
 
