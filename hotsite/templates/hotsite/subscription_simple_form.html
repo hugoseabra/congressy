@@ -27,7 +27,7 @@
                 Definir minha senha
             </button>
             {% if event.is_scientific and is_subscribed %}
-                <a href="{% url 'scientific_work:work-add' pk=subscription.pk%}"
+                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
                    class="btn btn-primary" style="margin-top: 15px">
                     Deseja submeter seu artigo cientifico?
                 </a>
@@ -96,7 +96,7 @@
                     </button>
                 </div>
                 {% if event.is_scientific and is_subscribed%}
-                    <a href="{% url 'scientific_work:work-add' pk=subscription.pk%}"
+                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
                        class="btn btn-success" style="margin-top: 15px">
                         Deseja submeter seu artigo cientifico?
                     </a>

@@ -231,7 +231,7 @@
                                         {% if item.event.is_scientific %}
 
                                             <div class="text-center">
-                                                <a href="{% url 'scientific_work:work-add' pk=item.pk%}"
+                                                <a href="{% url 'scientific_work:work-add' subscription_pk=item.pk%}"
                                                    class="btn-sm btn-primary">
                                                     Artigo Cientifico
                                                 </a>
