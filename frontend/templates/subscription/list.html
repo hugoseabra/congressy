@@ -92,10 +92,6 @@
     </script>
 {% endblock %}
 
-{% block nav_aside_itens %}
-    {% include 'event/event-menu.html' with active='inscricoes' %}
-{% endblock %}
-
 {% block content %}
     <div class="row">
         <div class="col-md-12">
@@ -216,6 +212,12 @@
                                                     <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
                                                         <i class="fa fa-eye"></i>
                                                         Visualizar
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                        Editar
                                                     </a>
                                                 </li>
                                                 {% if item.confirmed %}

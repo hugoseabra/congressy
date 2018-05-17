@@ -3916,12 +3916,12 @@ label.valid {
   text-align: left;
   font-size: 12px;
   width: 100%;
-  padding: 0 20px;
+  padding-left: 75px;
   margin-top: 10px;
   background: #fdfdfe;
   position: fixed;
   bottom: 0;
-  z-index: 1000;
+  z-index: 100;
 }
 .float-left {
   float: left;
@@ -4051,7 +4051,7 @@ ul.messenger-theme-flat .messenger-message.alert-success .messenger-message-inne
   background: #449D44;
 }
 ul.messenger-theme-flat .messenger-message.alert-info .messenger-message-inner:before {
-  background: #1F7BB6 !important;
+  background: #1F7BB6;
 }
 ul.messenger-theme-flat .messenger-message.alert-error .messenger-message-inner:before {
   background: #C9302C;

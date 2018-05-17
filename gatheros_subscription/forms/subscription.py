@@ -10,38 +10,46 @@ class SubscriptionForm(forms.ModelForm):
 
     class Meta:
         """ Meta """
-        
+
         model = Subscription
         fields = (
             'lot',
             'person',
             'origin',
             'created_by',
+            # 'completed',
         )
-        
+
     def __init__(self, event, **kwargs):
         self.event = event
         super().__init__(**kwargs)
-        
+
         self.fields['lot'].queryset = event.lots.all()
-        
-    def clean_person(self):
-        return Person.objects.get(pk=self.data['person'])
 
     def clean_lot(self):
         return Lot.objects.get(pk=self.data['lot'], event=self.event)
-    
+
     def clean(self):
-        self.cleaned_data = super().clean()
-        
-        person = self.cleaned_data.get('person')
-        
-        qs = Subscription.objects.filter(person=person, event=self.event)
-        if qs.exists():
-            self.cleaned_data.pop('person')
-            self.add_error(
-                forms.forms.NON_FIELD_ERRORS,
-                'Esta inscrição já existe'
-            )
-        
-        return self.cleaned_data
+        cleaned_data = super().clean()
+
+
+        if not self.instance:
+            person = cleaned_data.get('person')
+
+            qs = Subscription.objects.filter(person=person, event=self.event)
+            if qs.exists():
+                cleaned_data.pop('person')
+                self.add_error(
+                    forms.forms.NON_FIELD_ERRORS,
+                    'Esta inscrição já existe'
+                )
+
+        return cleaned_data
+
+    def save(self, commit=True):
+
+        lot = self.instance.lot
+        if lot.price and lot.price > 0:
+            self.instance.status = Subscription.CONFIRMED_STATUS
+
+        return super().save(commit=commit)
