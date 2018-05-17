@@ -139,18 +139,18 @@ function removerAcentos(s) {
 }
 
 
-var zip_code_el = $('#id_zip_code');
-var zip_code_initial_value = zip_code_el.val();
+var zip_code_initial_value = null;
 
 function searchByCep() {
     var el = $('#id_zip_code');
+
     var cep = el.val().replace(/\D/g, '');
 
     if (cep.length < 8) {
         return;
     }
 
-    if (cep == zip_code_initial_value.replace(/\D/g, '')) {
+    if (cep === zip_code_initial_value) {
         return;
     }
 
@@ -203,7 +203,7 @@ function searchByCep() {
 
         var cep_city = removerAcentos(response.localidade).toUpperCase();
 
-        fetch_cities(state, null, function (cities) {
+        fetch_cities(state, $('#id_city_name'), $('#id_city'), null, function (cities) {
             $.each(cities, function (i, city) {
                 if (cep_city === removerAcentos(city.name)) {
                     $('#id_city_name').val(city.id);
@@ -284,7 +284,7 @@ function hotsiteSearchByCep() {
 
         var cep_city = removerAcentos(response.localidade).toUpperCase();
 
-        fetch_cities(state, null, function (cities) {
+        fetch_cities(state, $('#id_person-city_name'), $('#id_person-city'), null, function (cities) {
             $.each(cities, function (i, city) {
                 if (cep_city === removerAcentos(city.name)) {
                     $('#id_person-city_name').val(city.id);
@@ -320,8 +320,6 @@ function hotsiteSearchByCep() {
             block.animate({"right": right}, 300);
         });
     });
-
-
 })(jQuery);
 //========================= CAIXA DE FILTROS ================================//
 window.cgsy = window.cgsy || {};
