@@ -88,7 +88,7 @@
 
                                                 <td>
 
-                                                    {% if work.authors.all.count > 1 %}
+                                                    {% if work.authors.all.count > 0 %}
                                                         <ul class="list-group col-md-6">
                                                             {% for author in work.authors.all %}
                                                                 <li class="list-group-item">
@@ -118,7 +118,7 @@
                                                             edit-author-btn"
                                                             style="margin-top: 5px"
                                                             data-author_url="{% url 'scientific_work:work-author-partial-list'  subscription_pk=subscription.pk pk=work.pk %}"
-                                                            data-work_id="{{ work.pk}}">
+                                                            data-work_id="{{ work.pk }}">
                                                         Adicionar
                                                     </button>
 
@@ -309,6 +309,25 @@
 
                                             </tr>
 
+                                            <tr>
+
+                                                <td>
+                                                    Apagar submissão:
+                                                </td>
+                                                <td>
+
+                                                    <button class="btn
+                                                            btn-trans btn-sm
+                                                            btn-danger
+                                                            delete-btn"
+                                                            data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                        Apagar
+                                                    </button>
+                                                </td>
+
+                                            </tr>
+
                                             </tbody>
 
                                         </table>
@@ -435,6 +454,29 @@
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="delete_modal" tabindex="-1"
+                 role="dialog"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <h3> Certeza que deseja apagar essa submissão?</h3>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-md btn-danger"
+                                    data-dismiss="modal"
+                                    id="confirm_delete">
+                                <i class="fas fa-trash-alt"></i>
+                                Apagar
+                            </button>
+                            <button type="button"
+                                    class="btn btn-md  btn-default"
+                                    data-dismiss="modal">Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!---------------------END MODALS---------------------------------->
 
         {% else %}
@@ -473,10 +515,13 @@
             var edit_published_btn = $('.published');
             var edit_author_btn = $('.edit-author-btn');
             var save_new_author_btn = $('#save_new_author');
+            var delete_btn = $('.delete-btn');
+            var confirm_delete_btn = $('#confirm_delete');
             var author_work_id_el = $('#author_work_id');
 
             // values
             var new_author_name_value = $('#new_author_name');
+            var submission_to_be_deleted = undefined;
 
             // modals
             var edit_summary_modal = $('#edit_summary_modal');
@@ -487,6 +532,8 @@
 
             var edit_authors_modal = $('#edit_authors_modal');
             var edit_authors_modal_body = $('#edit_authors_modal_body');
+
+            var delete_modal = $('#delete_modal');
 
 
             // modal btn triggers
@@ -509,7 +556,12 @@
 
             });
 
-            // save btn triggers
+            delete_btn.on("click", function () {
+                submission_to_be_deleted = $(this).data('work_url');
+                delete_modal.modal('show');
+            });
+
+            // Action (save, edit, delete) btn triggers
             edit_summary_modal_btn.on("click", function () {
                 update_summary($(this).data('work_url'), edit_summary_modal_body.val());
             });
@@ -531,6 +583,12 @@
                 var author_list_url = '{% url 'scientific_work:author-list' %}';
                 add_author(author_list_url, new_author_name_value.val(), work_id)
             });
+            confirm_delete_btn.on("click", function(){
+                if(submission_to_be_deleted){
+                    delete_submission(submission_to_be_deleted)
+                }
+            });
+
 
         });
 
@@ -650,9 +708,6 @@
 
         function add_author(url, name, work) {
 
-            console.log(work);
-            console.log(typeof (work));
-
             var formData = new FormData();
             formData.append('name', name);
             formData.append('work', parseInt(work));
@@ -677,6 +732,22 @@
 
         }
 
+        function delete_submission(url){
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                processData: false,
+                contentType: false,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function () {
+                    location.reload(true);
+                }
+            }).fail(function (err) {
+                console.error(err);
+            });
+        }
 
     </script>
 {% endblock %}
