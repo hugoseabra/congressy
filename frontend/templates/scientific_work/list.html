@@ -392,163 +392,8 @@
             </div>
         {% endfor %}
 
-        <!-----------------------MODALS ----------------------------------->
-        <div class="modal fade" id="edit_summary_modal" tabindex="-1"
-             role="dialog"
-             aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title">Editar Resumo: </h3>
-                        <button type="button" class="close"
-                                data-dismiss="modal" aria-hidden="true">
-                            ×
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                            <textarea id="edit_summary_modal_body" rows="10"
-                                      cols="55"></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-md btn-success"
-                                data-dismiss="modal"
-                                id="edit_summary_modal_btn">
-                            <i class="far fa-save"></i>
-                            Salvar
-                        </button>
-                        <button type="button" class="btn btn-md  btn-danger"
-                                data-dismiss="modal">Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="edit_keywords_modal" tabindex="-1"
-             role="dialog"
-             aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title">Editar palavaras chave:
-                        </h3>
-                        <button type="button" class="close"
-                                data-dismiss="modal" aria-hidden="true">
-                            ×
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                            <textarea id="edit_keywords_modal_body" rows="5"
-                                      cols="55"></textarea>
-                        <small>Separadas por virgula</small>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-md btn-success"
-                                data-dismiss="modal"
-                                id="edit_keywords_modal_btn">
-                            <i class="far fa-save"></i>
-                            Salvar
-                        </button>
-                        <button type="button" class="btn btn-md  btn-danger"
-                                data-dismiss="modal">Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="edit_authors_modal" tabindex="-1"
-             role="dialog"
-             aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close"
-                                data-dismiss="modal" aria-hidden="true">
-                            ×
-                        </button>
-                    </div>
-                    <div class="modal-body">
-
-                        <div id="edit_authors_modal_body">
-                            Carregando....
-                        </div>
-
-
-                        <form style="margin-top: 25px" class="form-inline">
-                            <input type="hidden" id="author_work_id">
-                            <div class="form-group">
-                                <label for="new_author_name">Nome:</label>
-                                <input type="html" class="form-control"
-                                       id="new_author_name"
-                                       placeholder="Nome completo">
-                            </div>
-
-                            <button type="button"
-                                    class="btn btn-md btn-success"
-                                    id="save_new_author">
-                                <i class="far fa-save"></i>
-                                Salvar
-                            </button>
-                        </form>
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-md  btn-danger"
-                                data-dismiss="modal">Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="delete_submission_modal" tabindex="-1"
-             role="dialog"
-             aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <h3> Certeza que deseja apagar essa submissão?</h3>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-md btn-danger"
-                                data-dismiss="modal"
-                                id="submission_confirm_delete">
-                            <i class="fas fa-trash-alt"></i>
-                            Apagar
-                        </button>
-                        <button type="button"
-                                class="btn btn-md  btn-default"
-                                data-dismiss="modal">Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="delete_author_modal" tabindex="-1"
-             role="dialog"
-             aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <h3> Certeza que deseja apagar esse author?</h3>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-md btn-danger"
-                                data-dismiss="modal"
-                                id="author_confirm_delete">
-                            <i class="fas fa-trash-alt"></i>
-                            Apagar
-                        </button>
-                        <button type="button"
-                                class="btn btn-md  btn-default"
-                                data-dismiss="modal">Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!---------------------END MODALS---------------------------------->
-
     {% else %}
+
         <div class="row">
 
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
@@ -569,6 +414,166 @@
     {% endif %}
 
 
+
+{% endblock %}
+
+{% block modals %}
+
+    <!-----------------------MODALS ----------------------------------->
+    <div class="modal fade" id="edit_summary_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Editar Resumo: </h3>
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                            <textarea id="edit_summary_modal_body" rows="10"
+                                      cols="55"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md btn-success"
+                            data-dismiss="modal"
+                            id="edit_summary_modal_btn">
+                        <i class="far fa-save"></i>
+                        Salvar
+                    </button>
+                    <button type="button" class="btn btn-md  btn-danger"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="edit_keywords_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Editar palavaras chave:
+                    </h3>
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                            <textarea id="edit_keywords_modal_body" rows="5"
+                                      cols="55"></textarea>
+                    <small>Separadas por virgula</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md btn-success"
+                            data-dismiss="modal"
+                            id="edit_keywords_modal_btn">
+                        <i class="far fa-save"></i>
+                        Salvar
+                    </button>
+                    <button type="button" class="btn btn-md  btn-danger"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="edit_authors_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div id="edit_authors_modal_body">
+                        Carregando....
+                    </div>
+
+
+                    <form style="margin-top: 25px" class="form-inline">
+                        <input type="hidden" id="author_work_id">
+                        <div class="form-group">
+                            <label for="new_author_name">Nome:</label>
+                            <input type="html" class="form-control"
+                                   id="new_author_name"
+                                   placeholder="Nome completo">
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-md btn-success"
+                                id="save_new_author">
+                            <i class="far fa-save"></i>
+                            Salvar
+                        </button>
+                    </form>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md  btn-danger"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="delete_submission_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h3> Certeza que deseja apagar essa submissão?</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md btn-danger"
+                            data-dismiss="modal"
+                            id="submission_confirm_delete">
+                        <i class="fas fa-trash-alt"></i>
+                        Apagar
+                    </button>
+                    <button type="button"
+                            class="btn btn-md  btn-default"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="delete_author_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h3> Certeza que deseja apagar esse author?</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md btn-danger"
+                            data-dismiss="modal"
+                            id="author_confirm_delete">
+                        <i class="fas fa-trash-alt"></i>
+                        Apagar
+                    </button>
+                    <button type="button"
+                            class="btn btn-md  btn-default"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!---------------------END MODALS---------------------------------->
 
 {% endblock %}
 
