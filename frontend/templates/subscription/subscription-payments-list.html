@@ -93,7 +93,7 @@
         <section class="panel" id="report_detail_visible" {% if show_details %}style="display: none"{% endif %}>
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    Detalhamentos Financeiros <a href="#"
+                    Detalhamentos Financeiros <a href="javascript:void(0)"
                                                  onclick="$(this).parent().parent().parent().hide();$('#report_detail_hidden').show();"
                                                  style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
                 </h3>
@@ -102,7 +102,7 @@
         <section class="panel panel-primary" id="report_detail_hidden" {% if not show_details %}style="display: none"{% endif %}>
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    Detalhamentos Financeiros <a href="#"
+                    Detalhamentos Financeiros <a href="javascript:void(0)"
                                                  onclick="$(this).parent().parent().parent().hide();$('#report_detail_visible').show();"
                                                  style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(esconder)</a>
                 </h3>

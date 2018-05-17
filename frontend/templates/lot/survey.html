@@ -1,0 +1,24 @@
+{% extends "base/base.html" %}
+
+{% load form_config_tags %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-xl-8 col-xl-push-2 col-md-12">
+        <div class="panel panel-primary">
+
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Previsão do Formulário
+                </h3>
+            </div>
+            <div class="panel-body">
+                {% for field in survey_form.visible_fields %}
+                    {% render_generic_field field %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

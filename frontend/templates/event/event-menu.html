@@ -10,8 +10,7 @@ Variáveis:
         <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
         <ul class="nav nav-pills nav-stacked">
             <li {% if active == 'panel' %}class="active"{% endif %}>
-                <a class="sidebar-itens" href="
-{% url 'event:event-panel' event.pk %}"  title="Painel">
+                <a class="sidebar-itens" href="{% url 'event:event-panel' event.pk %}"  title="Painel">
                     <i class="fas fa-tachometer-alt"></i>
                     Painel
                 </a>

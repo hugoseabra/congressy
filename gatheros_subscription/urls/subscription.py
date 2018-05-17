@@ -13,12 +13,16 @@ urls = [
     #     views.SubscriptionCancelView.as_view(),
     #     name='subscription-delete'
     # ),
-    # url(
-    #     r'^(?P<pk>[0-9A-Fa-f-]+)/edit/$',
-    #     views.SubscriptionEditFormView.as_view(),
-    #     name='subscription-edit'
-    # ),
-
+    url(
+        r'^add/$',
+        views.SubscriptionAddFormView.as_view(),
+        name='subscription-add'
+    ),
+    url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/edit/$',
+        views.SubscriptionEditFormView.as_view(),
+        name='subscription-edit'
+    ),
     url(
         r'^(?P<pk>[0-9A-Fa-f-]+)/payments/delete/$',
         views.PaymentDeleteView.as_view(),
@@ -38,11 +42,6 @@ urls = [
         r'^(?P<pk>[0-9A-Fa-f-]+)/',
         views.SubscriptionViewFormView.as_view(),
         name='subscription-view'
-    ),
-    url(
-        r'^add/$',
-        views.SubscriptionAddFormView.as_view(),
-        name='subscription-add'
     ),
     url(
         r'^attendance/search/$',

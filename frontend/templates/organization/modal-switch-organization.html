@@ -1,35 +1,28 @@
-<div class="modal fade" id="change_organization"
-                 role="dialog"  data-backdrop="true">
+<div class="modal fade" id="change_organization" role="dialog" data-backdrop="static">
     <div class="modal-dialog " role="document">
         <div class="modal-content">
-
             <div class="modal-header">
                 <button type="button" class="close"
                         data-dismiss="modal"
-                        aria-label="Close"><span
-                        aria-hidden="true">&times;</span>
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title">
-                    Minhas organizações</h4>
+                <h4 class="modal-title">Minhas organizações</h4>
             </div>
-
             <div class="modal-body modal-scroll">
                 <div class="panel panel-primary">
                     <div class="panel-body ">
                         {% if organizations %}
                             <table id="organization_table"
-                                   class="table table-striped
-                   table-bordered dataTable no-footer nowrap"
+                                   class="table table-striped table-bordered dataTable no-footer nowrap"
                                    cellspacing="0"
-                                   width="100%"
-                            >
+                                   width="100%">
                                 <thead>
                                 <tr>
                                     <th>Nome</th>
                                     <th></th>
                                 </tr>
                                 </thead>
-
                                 <tbody>
                                 {% for item in organizations %}
                                     <tr>
@@ -37,36 +30,10 @@
                                             <a>{{ item.name }}</a>
                                         </td>
                                         <td class=" text-center">
-                                            <form action="{% url 'event:organization-switch' %}"
-                                                  method="post"
-                                                  id="organization_context">
-                                                {% csrf_token %}
-
-                                                <div class="btn-group">
-                                                    <button type="button"
-                                                            class="btn
-                                    btn-success btn-trans
-                                    btn-sm dropdown-toggle"
-                                                            data-toggle="dropdown"
-                                                            aria-expanded="false"
-                                                            aria-haspopup="true"
-                                                            onclick="cgsy_submit
-                                                                    (
-                                                                    {{ item.pk }})">
-                                                        <span>Entrar</span>
-                                                    </button>
-                                                </div>
-
-
-                                                <input
-                                                        type="hidden"
-                                                        name="organization-context-pk"
-                                                        id="organization-context-pk"/>
-                                                <input
-                                                        type="hidden"
-                                                        name="next"
-                                                        value="{{ request.path }}"/>
-                                            </form>
+                                            <button type="button" class="btn btn-success btn-trans btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true"
+                                                    onclick="cgsy_submit({{ item.pk }})">
+                                                <span>Entrar</span>
+                                            </button>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -78,10 +45,11 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
-
     </div>
-
+    <form action="{% url 'event:organization-switch' %}" method="post" id="organization_context">
+        {% csrf_token %}
+        <input type="hidden" name="organization-context-pk" id="organization-context-pk"/>
+        <input type="hidden" name="next" value="{{ request.path }}"/>
+    </form>
 </div>
