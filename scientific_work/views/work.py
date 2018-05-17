@@ -53,9 +53,6 @@ class WorkConfigListView(WorkViewMixin, generic.ListView):
 
         context['object_list'] = list(self.chunks(work_list_with_status, 2))
         context['subscription'] = self.subscription
-        context['active'] = 'scientific_work'
-        context['has_inside_bar'] = True
-        context['event'] = self.subscription.event
 
         return context
 
