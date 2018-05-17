@@ -27,6 +27,7 @@ class WorkSerializer(serializers.ModelSerializer):
             'keywords',
             'article_file',
             'banner_file',
+            'published',
         )
 
 
