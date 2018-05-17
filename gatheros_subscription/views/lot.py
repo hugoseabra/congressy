@@ -10,6 +10,7 @@ from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription import forms
+from gatheros_subscription.forms import SurveyForm
 from gatheros_subscription.models import Lot, EventSurvey
 
 
@@ -322,3 +323,31 @@ class LotDeleteView(BaseLotView, DeleteViewMixin):
             )
 
         return can
+
+
+class LotSurveyView(generic.DetailView):
+    template_name = 'lot/survey.html'
+    queryset = Lot.objects.get_queryset()
+    pk_url_kwarg = 'lot_pk'
+    object = None
+    event = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.event = self.object.event
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_survey_form(self):
+        if not self.object.event_survey:
+            return None
+
+        return SurveyForm(
+            event_survey=self.object.event_survey,
+            user=self.request.user
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['survey_form'] = self.get_survey_form()
+
+        return context

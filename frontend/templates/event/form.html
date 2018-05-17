@@ -162,15 +162,7 @@
 
 {% block scripts %}
     <script src="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.full.min.js" %}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&key={{ google_maps_api_key }}"></script>
-    <script>
-        var MAP_POINTER = "{% static 'hotsite/images/contents/map-1.png'%}";
-    </script>
     <script src="{% static 'assets/js/event.js' %}"></script>
-    <!-- ref: http://maplacejs.com/ -->
-    {% if object.place and object.place.show_location is True %}
-        <script src="{% static 'hotsite/js/maplace-0.1.3.min.js' %}"></script>
-    {% endif %}
     <script>
         (function ($) {
             $(document).ready(function () {
@@ -189,10 +181,6 @@
                     $('#id_date_start_1').mask("99:99");
                     $('#id_date_end_0').mask("9999-99-99");
                     $('#id_date_end_1').mask("99:99");
-                {% endif %}
-
-                {% if object.place and object.place.show_location is True %}
-                    show_location(true);
                 {% endif %}
             });
         })(jQuery);

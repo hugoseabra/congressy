@@ -8,10 +8,6 @@
 
 {% block page_sub_title %}{{ request.user.get_full_name }}{% endblock %}
 
-{% block sidebar %}{% endblock %}
-{% block sidebar-bars %}{% endblock %}
-{% block toptitle %}{% endblock %}
-
 {% block scripts %}
     <script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
     <!-- Script used in in subscription. -->
@@ -20,46 +16,42 @@
     <script type="application/javascript">
 
         $(document).ready(function () {
-            var phone_el = $('#id_phone');
-            var uf_el = $('#id_state');
-            var city_el = $('#id_city_name');
-            var city_id_el = $('#id_city_name');
-
-            if(phone_el.val()){
-                phone_el.mask("(99) 99999-9999");
-            }
-
-
+            $('#id_cpf').mask("999.999.999-99");
+            $('#id_institution_cnpj').mask("99.999.999/9999-99");
+            $('#id_phone').mask("(99) 99999-9999");
             $('#id_zip_code').mask("99999-999");
 
-            //If we have a value already, preload results from API
-            if (city_id_el.val()) {
-                $.ajax({
-                    url: "/api/cities/" + $('#id_city').val(),
-                    success: function (result) {
-                        uf_el.val(result.uf);
-                        city_el.val(result.name);
-                        //populate the html with result here
-                    }
-                });
-            }
             showHideCepLoader();
+
+            var uf_el = $('#id_state');
+            var city_el = $('#id_city_name');
+            window.setTimeout(function () {
+                {% if person.city %}
+                    uf_el.val('{{ person.city.uf }}');
+                    fetch_cities(uf_el, $('#id_city_name'), $('#id_city'), '{{ person.city.pk }}');
+                {% else %}
+                    uf_el.val('');
+                    city_el.val('');
+                    city_el.prop('disabled', true);
+                {% endif %}
+            }, 300);
+
+            $('#id_state').change(function () {
+                city_el.html($('<option>').text('Carregando...'));
+                var that = $(this);
+                window.setTimeout(function () {
+                    fetch_cities($(that), $('#id_city_name'));
+                }, 500);
+            });
+
+            $('#id_city_name').change(function () {
+                $('#id_city').val($(this).val());
+            });
+
+            $('#id_zip_code').on('keyup', function () {
+                searchByCep();
+            });
         });
-
-        var uf_el = $('#id_state');
-        var city_el = $('#id_city_name');
-
-        window.setTimeout(function () {
-            {% if person.city %}
-                uf_el.val('{{ person.city.uf }}');
-                fetch_cities(uf_el, '{{ person.city.pk }}');
-            {% else %}
-                uf_el.val('');
-                city_el.val('');
-                city_el.prop('disabled', true);
-            {% endif %}
-        }, 300);
-
     </script>
 {% endblock %}
 
