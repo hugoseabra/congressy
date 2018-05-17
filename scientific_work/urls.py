@@ -3,16 +3,20 @@ from rest_framework import routers
 
 from . import views
 
-
 router = routers.DefaultRouter(trailing_slash=True)
 router.register(r'authors', views.AuthorViewSet)
 router.register(r'works', views.WorkViewSet)
 
-urls = [
+subscription_urls = [
     url(r'^add/$', views.WorkAddView.as_view(), name='work-add'),
-    url(r'^list/$', views.WorkListView.as_view(), name='work-list'),
+    url(r'^config-list/$', views.WorkConfigListView.as_view(),
+        name='work-config-list'),
     url(r'^(?P<pk>[\d]+)/authors$', views.AuthorPartialListView.as_view(),
         name='work-author-partial-list'),
+]
+
+event_urls = [
+    url(r'^list/$', views.WorkListView.as_view(), name='work-list'),
 ]
 
 api_urls = [
@@ -20,8 +24,8 @@ api_urls = [
 ]
 
 urlpatterns = [
-    url(r'^subscription/(?P<subscription_pk>[0-9A-Fa-f-]+)/scientific_work/',
-        include(urls)),
     url(r'^api/scientific_work/', include(api_urls)),
-
+    url(r'^subscription/(?P<subscription_pk>[0-9A-Fa-f-]+)/scientific_work/',
+        include(subscription_urls)),
+    url(r'^events/(?P<pk>[\d]+)/scientific_work/', include(event_urls)),
 ]

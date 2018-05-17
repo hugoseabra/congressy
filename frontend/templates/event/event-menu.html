@@ -80,8 +80,6 @@ Variáveis:
                 <i class="fab fa-wpforms"></i> Form. Personalizado
             </a>
         </li>
-
-    </ul>
     {#        <h5 class="sidebar-header" style="color:#4c4c4c;">Adicionais</h5>#}
     {#        <ul class="nav nav-pills nav-stacked">#}
     {#            <li>#}
@@ -96,10 +94,10 @@ Variáveis:
     {#                <i class="fas fa-address-card"></i> Certificados#}
     {#            </a>#}
     {#        </li>#}
-    {#        <li>#}
-    {#            <a class="sidebar-itens" href="#"#}
-    {#               title="Submissão de artigos">#}
-    {#                <i class="fas fa-newspaper"></i> Artigos científicos#}
-    {#            </a>#}
-    {#        </li>#}
-    {#        </ul>#}
+            <li {% if active == 'scientific_work' %}class="active"{% endif %}>
+                <a class="sidebar-itens" href="{% url 'scientific_work:work-list' event.pk%}"
+                   title="Submissão de artigos">
+                    <i class="fas fa-newspaper"></i> Artigos científicos
+                </a>
+            </li>
+            </ul>
