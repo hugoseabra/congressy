@@ -28,6 +28,22 @@
 {% block content %}
 
     <div class="row">
+        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+            <div class="buttonbar">
+                <div class="float-right">
+                    <a role="button"
+                       href="{% url 'scientific_work:work-add' subscription.pk %}"
+                       class="btn btn-success">
+                        <i class="fas fa-plus"></i>
+                        Nova submissão
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
 
         {% if object_list %}
 
@@ -93,34 +109,53 @@
                                                             {% for author in work.authors.all %}
                                                                 <li class="list-group-item">
                                                                     {{ author.name }}
+                                                                    <div
+                                                                            class="author-delete-btn btn-xs btn-danger pull-right"
+                                                                            data-author_url="{% url 'scientific_work:author-detail' pk=author.pk %}">
+                                                                        <i class="fas fa-minus"></i>
+                                                                    </div>
                                                                 </li>
                                                             {% endfor %}
                                                         </ul>
+
                                                         <i class="fas
                                                         fa-check-circle
                                                         success-color fa-lg
                                                         pull-right"></i>
+                                                        <div class="text-center">
+                                                            <button class="btn
+                                                            btn-trans btn-sm
+                                                            btn-success
+                                                            edit-author-btn"
+                                                                    style="margin-top: 5px"
+                                                                    data-author_url="{% url 'scientific_work:work-author-partial-list'  subscription_pk=subscription.pk pk=work.pk %}"
+                                                                    data-work_id="{{ work.pk }}">
+                                                                Adicionar
+                                                            </button>
+                                                        </div>
+
                                                     {% else %}
                                                         <strong>
-                                                            Você deve colocar
+                                                            Você deve adicionar
                                                             pelo menos um autor.
                                                         </strong>
 
+                                                        <div class="text-center">
+                                                            <button class="btn
+                                                            btn-trans btn-sm
+                                                            btn-success
+                                                            pull-left
+                                                            edit-author-btn"
+                                                                    style="margin-top: 5px"
+                                                                    data-author_url="{% url 'scientific_work:work-author-partial-list'  subscription_pk=subscription.pk pk=work.pk %}"
+                                                                    data-work_id="{{ work.pk }}">
+                                                                Adicionar
+                                                            </button>
+                                                        </div>
                                                         <i class="fas fa-times-circle
                                                         danger-color fa-lg pull-right"></i>
 
                                                     {% endif %}
-                                                    <br>
-
-                                                    <button class="btn
-                                                            btn-trans btn-sm
-                                                            btn-success
-                                                            edit-author-btn"
-                                                            style="margin-top: 5px"
-                                                            data-author_url="{% url 'scientific_work:work-author-partial-list'  subscription_pk=subscription.pk pk=work.pk %}"
-                                                            data-work_id="{{ work.pk }}">
-                                                        Adicionar
-                                                    </button>
 
 
                                                 </td>
@@ -198,9 +233,22 @@
                                                                 data-work_id="{{ work.pk }}">
                                                             Editar
                                                         </button>
-                                                    {% endif %}
-                                                    <i class="fas
+                                                        <i class="fas
                                                         fa-check-circle success-color fa-lg pull-right"></i>
+                                                    {% else %}
+
+                                                        <button class="btn btn-trans btn-sm
+                                                btn-success edit-summary-btn"
+                                                                data-summary_text=""
+                                                                data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}"
+                                                                data-work_id="{{ work.pk }}">
+                                                            Adicionar
+                                                        </button>
+                                                        <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
+
+                                                    {% endif %}
+
                                                 </td>
                                             </tr>
 
@@ -308,7 +356,6 @@
                                                 </td>
 
                                             </tr>
-
                                             <tr>
 
                                                 <td>
@@ -319,7 +366,7 @@
                                                     <button class="btn
                                                             btn-trans btn-sm
                                                             btn-danger
-                                                            delete-btn"
+                                                            submission-delete-btn"
                                                             data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}">
                                                         <i class="fas fa-trash-alt"></i>
                                                         Apagar
@@ -454,7 +501,7 @@
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="delete_modal" tabindex="-1"
+            <div class="modal fade" id="delete_submission_modal" tabindex="-1"
                  role="dialog"
                  aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -465,7 +512,30 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-md btn-danger"
                                     data-dismiss="modal"
-                                    id="confirm_delete">
+                                    id="submission_confirm_delete">
+                                <i class="fas fa-trash-alt"></i>
+                                Apagar
+                            </button>
+                            <button type="button"
+                                    class="btn btn-md  btn-default"
+                                    data-dismiss="modal">Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="delete_author_modal" tabindex="-1"
+                 role="dialog"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <h3> Certeza que deseja apagar esse author?</h3>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-md btn-danger"
+                                    data-dismiss="modal"
+                                    id="author_confirm_delete">
                                 <i class="fas fa-trash-alt"></i>
                                 Apagar
                             </button>
@@ -515,13 +585,16 @@
             var edit_published_btn = $('.published');
             var edit_author_btn = $('.edit-author-btn');
             var save_new_author_btn = $('#save_new_author');
-            var delete_btn = $('.delete-btn');
-            var confirm_delete_btn = $('#confirm_delete');
+            var submission_delete_btn = $('.submission-delete-btn');
+            var submission_confirm_delete_btn = $('#submission_confirm_delete');
+            var author_delete_btn = $('.author-delete-btn');
+            var author_confirm_delete_btn = $('#author_confirm_delete');
             var author_work_id_el = $('#author_work_id');
 
             // values
             var new_author_name_value = $('#new_author_name');
             var submission_to_be_deleted = undefined;
+            var author_to_be_deleted = undefined;
 
             // modals
             var edit_summary_modal = $('#edit_summary_modal');
@@ -533,7 +606,8 @@
             var edit_authors_modal = $('#edit_authors_modal');
             var edit_authors_modal_body = $('#edit_authors_modal_body');
 
-            var delete_modal = $('#delete_modal');
+            var delete_submission_modal = $('#delete_submission_modal');
+            var delete_author_modal = $('#delete_author_modal');
 
 
             // modal btn triggers
@@ -555,10 +629,13 @@
                 edit_authors_modal.modal('show');
 
             });
-
-            delete_btn.on("click", function () {
+            submission_delete_btn.on("click", function () {
                 submission_to_be_deleted = $(this).data('work_url');
-                delete_modal.modal('show');
+                delete_submission_modal.modal('show');
+            });
+            author_delete_btn.on("click", function () {
+                author_to_be_deleted = $(this).data('author_url');
+                delete_author_modal.modal('show');
             });
 
             // Action (save, edit, delete) btn triggers
@@ -583,9 +660,14 @@
                 var author_list_url = '{% url 'scientific_work:author-list' %}';
                 add_author(author_list_url, new_author_name_value.val(), work_id)
             });
-            confirm_delete_btn.on("click", function(){
-                if(submission_to_be_deleted){
-                    delete_submission(submission_to_be_deleted)
+            submission_confirm_delete_btn.on("click", function () {
+                if (submission_to_be_deleted) {
+                    delete_resource(submission_to_be_deleted)
+                }
+            });
+            author_confirm_delete_btn.on("click", function () {
+                if (author_to_be_deleted) {
+                    delete_resource(author_to_be_deleted)
                 }
             });
 
@@ -732,7 +814,7 @@
 
         }
 
-        function delete_submission(url){
+        function delete_resource(url) {
             $.ajax({
                 url: url,
                 type: 'DELETE',
