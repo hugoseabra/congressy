@@ -14,6 +14,7 @@ class Command(BaseCommand):
         all_transactions = Transaction.objects.all()
 
         updated = 0
+        updated_credit_card_data = 0
         total = all_transactions.count()
 
         for transaction in all_transactions:
@@ -36,12 +37,21 @@ class Command(BaseCommand):
                 transaction.installment_amount = \
                     round((amount / installments), 2)
 
-                transaction.save()
-                msg = 'Updated transaction id: {}'.format(str(transaction.pk))
-                self.stdout.write(
-                    self.style.SUCCESS(msg))
+                if transaction.type == Transaction.CREDIT_CARD:
+                    transaction.credit_card_holder = trx['card_holder_name']
+                    transaction.credit_card_first_digits = \
+                        trx['card_first_digits']
+                    transaction.credit_card_last_digits = \
+                        trx['card_last_digits']
+                    updated_credit_card_data += 1
 
-        msg = 'Total transactions: {}'.format(str(total))
+                transaction.save()
+                msg = 'Updated transaction id: {}'.format(transaction.pk)
+                self.stdout.write(self.style.SUCCESS(msg))
+
+        msg = 'Total transactions: {}'.format(total)
         self.stdout.write(self.style.SUCCESS(msg))
-        msg = 'Updated  total transactions: {}'.format(str(updated))
+        msg = 'Updated  total transactions: {}'.format(updated)
+        self.stdout.write(self.style.SUCCESS(msg))
+        msg = 'Updated {} credit card data'.format(updated_credit_card_data)
         self.stdout.write(self.style.SUCCESS(msg))
