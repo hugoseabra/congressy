@@ -6,6 +6,7 @@ from django.views.generic import FormView, ListView, View
 
 from gatheros_event.forms import OrganizationManageMembershipForm
 from gatheros_event.helpers import account
+from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Member, Organization
 from gatheros_event.views.mixins import DeleteViewMixin
 from .mixins import AccountMixin
@@ -47,6 +48,17 @@ class MemberListView(BaseOrganizationMixin, ListView):
     model = Member
     template_name = 'member/list.html'
 
+    def dispatch(self, request, *args, **kwargs):
+
+        member_org = self.get_member_organization()
+        update_account(
+            request=self.request,
+            organization=member_org,
+            force=True
+        )
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         query_set = super(MemberListView, self).get_queryset()
         # organization = self.get_member_organization()
@@ -85,6 +97,8 @@ class MemberListView(BaseOrganizationMixin, ListView):
             # 'member_organization': self.get_member_organization(),
             'member_organization': self.organization,
             'member_active_list': member_active_list,
+            'has_inside_bar': True,
+            'active': 'membros',
             'member_inactive_list': member_inactive_list,
         })
 

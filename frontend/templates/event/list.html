@@ -1,5 +1,4 @@
 {% extends "base/base.html" %}
-
 {% load static event_tags %}
 
 {% block title %} Eventos | Congressy{% endblock %}
@@ -73,9 +72,40 @@
     </script>
 {% endblock %}
 
-{% block sidebar %}{% endblock %}
+{% block nav_aside_itens %}
+    <span class ="visible-xs">
+        <a href="{% url 'event:event-add' %}" class="btn btn-block
+    btn-success navbar-btn">
+        <i class="fa fa-plus"></i>
+            Novo Evento
+        </a>
+    </span>
+    <h5 class="sidebar-header">Início</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-list' %}"
+               title="Eventos">
+                <i class="fa fa-calendar"></i>
+                Eventos
+            </a>
+        </li>
+        <li>
+            <a href="#"
+               title="Inscrições">
+                <i class="fa fa-list"></i>
+                Inscrições
+            </a>
+        </li>
+        <li>
+            <a href="#"
+               title="Organizações">
+                <i class="fa fa-sitemap"></i>
+                Organizações
+            </a>
+        </li>
+     </ul>
 
-{% block sidebar-bars %}{% endblock %}
+    {% endblock %}
 
 {% block content %}
 
@@ -119,7 +149,8 @@
                                     <td>
 {#                                        <a href="{% url 'event:event-panel' event.pk %}">#}
 {#                                        <a href="{% url 'subscription:subscription-list' event.pk %}">#}
-                                        <a href="{% url 'event:event-hotsite' event.pk %}">
+                                        <a href="
+{% url 'event:event-panel' event.pk %}">
                                             {{ event.name }}
                                             {% if event.published == True %}
                                                 &nbsp;&nbsp;

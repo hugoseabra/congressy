@@ -8,12 +8,14 @@
 {% endblock %}
 
 {% block page_title %}
-    {% if object %}Editar{% else %}Novo{% endif %} Lotes/Categorias
+    {% if object %}Editar{% else %}Novo{% endif %} Lote
 {% endblock %}
 
 {% block page_sub_title %}
-    {% if form_title %}
-        {{ form_title }}
+    {{ event.name }}
+    <
+    {% if object %}
+        {{ object.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
 
@@ -390,54 +392,9 @@
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li class="active">
-            <a href="{% url 'subscription:lot-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Lotes/Categorias
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
-            </a>
-        </li>
-        {#        <li>#}
-        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fa  fa-fw fa-rocket"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-        {% if has_paid_lots %}
-            <li>
-                <a href="{% url 'payment:event-payments' event.pk %}"
-                   title="Pagamentos">
-                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
-                </a>
-            </li>
-        {% endif %}
-    </ul>
+
+    {% include 'event/event-menu.html' with active='lotes-categorias' %}
+
 {% endblock %}
 
 {% block content %}
@@ -458,7 +415,7 @@
         {% endfor %}
 
         <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+            <div class="col-lg-12 col-xl-8 col-xl-push-2">
                 <div class="buttonbar">
                     <div class="float-right">
                         <a href="{% url 'subscription:lot-list' event.pk %}"
@@ -478,7 +435,7 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+            <div class="col-lg-12 col-xl-8 col-xl-push-2">
 
                 <div class="panel panel-primary">
                     <div class="panel-heading">
@@ -726,7 +683,7 @@
         </div>
 
         <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+            <div class="col-lg-12 col-xl-8 col-xl-push-2">
                 <div class="buttonbar bottom">
                     <div class="float-right">
                         <a href="{% url 'subscription:lot-list' event.pk %}"

@@ -1,0 +1,431 @@
+{% extends "base/base.html" %}
+
+{% load static i18n widget_tweaks queryset_filter form_config_tags %}
+
+{% block title %} Página do Evento | Congressy{% endblock %}
+
+{% block page_title %}Página do Evento{% endblock %}
+
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+
+{% block page_description %}Configuração da página do evento.{% endblock %}
+
+{% block styles %}
+    <style>
+        .event-info-status-item {
+            text-align: center;
+            padding: 10px 20px;
+        }
+
+        .event-info-status-item .title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .event-info-status-item .description {
+            font-size: 12px;
+        }
+
+        .django-ckeditor-widget {
+            display: block !important;
+        }
+        #map, #map_banner {
+            width: 100%;
+            height: 600px;
+            border: 3px solid #DDD;
+        }
+        #map_banner div {
+            width: 32%;
+            margin: 15% auto;
+            text-align: center;
+        }
+        .address-row {
+{#            display: none;#}
+        }
+    </style>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <!-- ckeditor -->
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+    <script src="{% static "hotsite/js/subscription.js" %}"></script>
+    <script>
+        window.cgsy = window.cgsy || {};
+        cgsy.maps = cgsy.maps || {};
+
+        (function($, window) {
+            window.cgsy.maps.retrieveAddress = function() {
+                var name = $('#id_name');
+                var street = $('#id_street');
+                var city = $('#id_city_name :selected');
+                var state = $('#id_state :selected');
+                var zip_code = $('#id_zip_code');
+
+                var address = name.val();
+{#                    address += ', ' + street.val();#}
+{#                    address += ', ' + city.text();#}
+{#                    address += ', ' + state.text();#}
+{#                    address += '. ' + zip_code.val();#}
+
+                var map = new window.google.maps.Map(
+                    document.getElementById("map"),
+                    {
+                        zoom: 18,
+                        center: {lat: 40.731, lng: -73.997}
+                    }
+                );
+
+                window.cgsy.maps.searchByAddress(map, address);
+            };
+
+            window.cgsy.maps.hideMap = function() {
+                $('#map').hide();
+                $('#map_banner').show();
+            };
+
+            window.cgsy.maps.showMap = function() {
+                $('#map').show();
+                $('#map_banner').hide();
+            };
+
+            window.cgsy.maps.init = function(lat, long, zoom) {
+                $('#map-loader').show();
+                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
+                var map = new window.google.maps.Map(
+                    document.getElementById("map"),
+                    {
+                        center: {lat: parseFloat(lat), lng: parseFloat(long) },
+                        zoom: parseInt(zoom) || 18
+                    }
+                );
+                window.cgsy.maps.addMarker(
+                    map,
+                    {lat: parseFloat(lat), lng: parseFloat(long) }
+                );
+            };
+
+            window.cgsy.maps.setCenter = function(map, location) {
+                map.setCenter(location);
+            };
+
+            window.cgsy.maps.addMarker = function(map, location) {
+                window.cgsy.maps.showMap();
+
+                window.cgsy.maps.setCenter(map, location);
+
+                var marker = new window.google.maps.Marker({
+                    position: location,
+                    map: map,
+                    draggable: true
+                });
+
+                var lat_el = $('#id_lat');
+                var lng_el = $('#id_long');
+                var zoom_el = $('#id_zoom');
+
+                lat_el.val(marker.position.lat());
+                lng_el.val(marker.position.lng());
+                zoom_el.val(map.getZoom());
+
+                window.google.maps.event.addListener(marker, 'dragend', function () {
+                    lat_el.val(marker.position.lat());
+                    lng_el.val(marker.position.lng());
+                });
+
+                window.google.maps.event.addListener(map, 'zoom_changed', function () {
+                    zoom_el.val(map.getZoom());
+                });
+
+                $('#map-loader').hide();
+                $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
+            };
+
+            window.cgsy.maps.searchByAddress = function(map, address) {
+                $('#map-loader').show();
+                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
+                var geocoder = new window.google.maps.Geocoder;
+                geocoder.geocode({'address': address}, function(results, status) {
+                    if (status !== 'OK') {
+                        alert('Geocode was not successful for the following reason: ' + status);
+                        return;
+                    }
+                    var components = results[0].address_components;
+                    if (components.length) {
+                        var uf, city;
+                        $.each(components, function(i, component) {
+                            if ($.inArray('postal_code', component.types)!=-1) {
+                                $('#id_zip_code').val(component.short_name);
+                                searchByCep();
+                            }
+                            if ($.inArray('sublocality_level_1', component.types)!=-1) {
+                                $('#id_street').val(component.short_name);
+                            }
+                            if ($.inArray('street_number', component.types)!=-1) {
+                                $('#id_number').val(component.short_name);
+                            }
+                            if ($.inArray('administrative_area_level_1', component.types)!=-1) {
+                                uf = component.short_name;
+                            }
+                            if ($.inArray('administrative_area_level_2', component.types)!=-1) {
+                                city = component.short_name.toUpperCase();
+                            }
+                        });
+
+                        if (uf) {
+                            $('#id_state').val(uf);
+
+                            if (city) {
+                                fetch_cities($('#id_state'), null, function(results) {
+                                    if (!results.length) {
+                                        return;
+                                    }
+                                    $.each(results, function(i, city_obj) {
+                                        if (city_obj.name == city) {
+                                            var options = $('#id_city_name').find('option:contains('+city+')');
+                                            $.each(options, function(ii, option) {
+                                                var el = $(option);
+                                                if (el.text() == city) {
+                                                    $('#id_city_name').val(city_obj.id);
+                                                }
+                                            });
+                                        }
+                                    });
+                                });
+                            }
+                        }
+                    }
+
+                    var location = results[0].geometry.location;
+                    window.cgsy.maps.addMarker(map, location);
+                });
+            };
+
+        })(jQuery, window);
+
+        function resize_status_block() {
+            var form_height = $('#block-form').height();
+            var icons_height = $('#block-status-icons').height();
+            if (form_height > icons_height) {
+                $('#block-status-icons').height(form_height);
+            }
+
+            if (icons_height > form_height) {
+                $('#block-form').height(icons_height);
+            }
+        }
+
+        $(document).ready(function () {
+            $(window).on('resize', function() {
+                window.setTimeout(function() {
+                    resize_status_block();
+                }, 400);
+            });
+            window.setTimeout(function() {
+                resize_status_block();
+            }, 400);
+
+            var uf_el = $('#id_state');
+            var city_el = $('#id_city_name');
+
+            $('#id_zip_code').mask("99999-999");
+
+            showHideCepLoader();
+
+            window.setTimeout(function () {
+                {% if event.place and event.place.city %}
+                    uf_el.val('{{ event.place.city.uf }}');
+                    fetch_cities(uf_el, '{{ event.place.city.pk }}');
+                {% else %}
+                    uf_el.val('');
+                    city_el.val('');
+                    city_el.prop('disabled', true);
+                {% endif %}
+            }, 300);
+        });
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&language=pt-BR&region=BR"></script>
+
+    <script>
+    $(document).ready(function () {
+        google.maps.event.addDomListener(
+            window,
+            "load",
+            function() {
+                {% if event.place.lat and event.place.long %}
+                    window.cgsy.maps.init(
+                        '{{ event.place.lat }}',
+                        '{{ event.place.long }}',
+                        '{{ event.place.zoom|default_if_none:18 }}'
+                    );
+                {% else %}
+                    {% if event.place.name or event.place.street %}
+                        window.cgsy.maps.retrieveAddress();
+                    {% else %}
+                        window.cgsy.maps.hideMap();
+                    {% endif %}
+                {% endif %}
+            }
+        );
+
+        (function($) {
+            var map_reload_timer = null;
+            function reloadMap() {
+                $('#map-loader').show();
+                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
+                window.clearTimeout(map_reload_timer);
+
+                $('#id_zip_code').val('');
+                $('#id_street').val('');
+                $('#id_number').val('');
+                $('#id_complement').val('');
+                $('#id_village').val('');
+                $('#id_state').val('');
+                $('#id_city_name').prop('disabled', true);
+
+                map_reload_timer = window.setTimeout(function() {
+                    window.cgsy.maps.retrieveAddress();
+                }, 1500);
+            }
+
+            $('#id_name').on('keypress', function(e) {
+                if(e.which == 13) {
+                    reloadMap();
+                }
+            });
+            $('#reload-map-button').on('click', function() { reloadMap(); });
+            $('.submit-button').click(function() {
+                $('#hotsite-form').submit();
+            });
+        })(jQuery);
+    });
+    </script>
+{% endblock %}
+
+{% block new_nav %}
+    <ul class="nav nav-pills nav-stacked" style="width:70px">
+        <li>
+            <a href="{% url 'event:event-list' %}"
+               title="Eventos"class="fa fa-calendar">
+            </a>
+        </li>
+        <li>
+            <a href="#"
+               title="Inscrições"class="fa fa-list"></a>
+        </li>
+        <li>
+            <a href="#"
+               title="Organizações" class="fa fa-sitemap"></a>
+        </li>
+    </ul>
+
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <span class ="visible-xs">
+        <a href="{% url 'event:event-add' %}" class="btn
+    btn-success navbar-btn">
+        <i class="fa fa-plus"></i>
+            Novo Evento
+        </a>
+    </span>
+    <h5 class="sidebar-header">Início</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="#"
+               title="Painel">
+                <i class="fas fa-tachometer-alt"></i>
+                Painel
+            </a>
+        </li>
+     </ul>
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+            <li>
+                <a href="{% url 'subscription:lot-list' event.pk %}"
+                   title="Inscrições">
+                    <i class="fas fa-th-large"></i>
+                    Lotes/Categorias
+                </a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa fa-clipboard"></i>
+                Inscrições
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+            </a>
+        </li>
+                <li>
+                    <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+                       title="Check-in">
+                        <i class="fas fa-calendar-check"></i>
+                        Check-in
+                    </a>
+                </li>
+    </ul>
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li class="active">
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fas fa-file-alt"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'event:event-edit' event.pk %}"
+               title="Configurações gerais">
+                <i class="fas fa-cog"></i> Configurações gerais
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fab fa-wpforms"></i> Formulário
+            </a>
+        </li>
+        {% if has_paid_lots %}
+            <li>
+                <a href="{% url 'payment:event-payments' event.pk %}"
+                   title="Pagamentos">
+                    <i class="fas fa-money-bill-alt"></i> Pagamentos
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+    <h5 class="sidebar-header">Adicionais</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="#"
+               title="Opicionais">
+                <i class="far fa-calendar-plus"></i> Opicionais
+            </a>
+        </li>
+        <li>
+            <a href="#"
+               title="Certificados">
+                <i class="fas fa-address-card"></i> Certificados
+            </a>
+        </li>
+        <li>
+            <a href="#"
+               title="Submissão de artigos">
+                <i class="fas fa-newspaper"></i> Submissão de artigos
+            </a>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}

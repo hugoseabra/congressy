@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView
+from gatheros_event.helpers.account import update_account
 
 from gatheros_event.models import Member, Organization
 from gatheros_event.views.mixins import AccountMixin
@@ -14,8 +15,21 @@ class OrganizationPanelView(AccountMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
 
+        try:
+            organization = Organization.objects.get(
+                pk=self.kwargs.get('pk')
+            )
+        except Organization.DoesNotExist:
+            organization = self.organization
+
+        update_account(
+            request=self.request,
+            organization=organization,
+            force=True
+        )
+
         return redirect(reverse('event:member-list', kwargs={
-            'organization_pk': self.organization.pk
+            'organization_pk': organization.pk
         }))
 
         # dispatch = super(OrganizationPanelView, self).dispatch(

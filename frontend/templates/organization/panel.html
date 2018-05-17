@@ -12,15 +12,19 @@
 {% block nav_aside_itens %}
     {% if can_view_members or can_manage_members %}
         <li>
-            <a href="{% url 'event:member-list' object.pk %}" title="Membros">
-                <i class="fa  fa-fw fa-rocket"></i> Membros
+            <a class="sidebar-itens" href=
+                    "{% url 'event:member-list' object.pk %}"
+               title="Membros">
+                <i class="fas fa-users"></i> Membros
             </a>
         </li>
     {% endif %}
     {% if can_manage_invitations %}
         <li>
-            <a href="{% url 'event:invitation-list' object.pk %}" title="Convites">
-                <i class="fa  fa-fw fa-rocket"></i> Convites
+            <a class="sidebar-itens" href=
+"{% url 'event:invitation-list' object.pk %}"
+               title="Convites">
+                <i class="fas fa-envelope-open"></i> Convites
             </a>
         </li>
     {% endif %}

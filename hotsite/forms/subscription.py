@@ -37,7 +37,8 @@ class SubscriptionForm(forms.Form):
             subscription = Subscription(
                 person=person,
                 event=event,
-                created_by=person.user.pk
+                created_by=person.user.pk,
+                origin=Subscription.DEVICE_ORIGIN_HOTSITE,
             )
 
         subscription.lot = lot

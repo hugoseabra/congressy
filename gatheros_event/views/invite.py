@@ -34,7 +34,8 @@ class InvitationListView(AccountMixin, ListView):
 
         context['open_invitations'] = open_list
         context['expired_invitations'] = expired_list
-
+        context['has_inside_bar'] = True
+        context['active'] = 'convites'
         context['can_view_members'] = self._can_view_members()
         context['can_manage_members'] = self._can_manage_members()
 
@@ -109,7 +110,8 @@ class InvitationCreateView(AccountMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(InvitationCreateView, self).get_context_data(**kwargs)
         context['invitation_organization'] = self.get_invitation_organization()
-
+        context['has_inside_bar'] = True
+        context['active'] = 'convites'
         context['can_view_members'] = self._can_view_members()
         context['can_manage_members'] = self._can_manage_members()
 

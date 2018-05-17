@@ -1,332 +1,318 @@
 {% extends "base/base.html" %}
 {# @TODO Change the icons in nav_aside_itens  #}
-{% load static %}
-{% load event_tags %}
-{% block title %} Painel do Evento | Congressy{% endblock %}
+
+{% load static event_tags  base_tags  widget_tweaks form_config_tags humanize l10n %}
+{% load queryset_filter %}
+{% block scripts %}
+    <script src="{% static "/assets/plugins/gauge/gauge.min.js" %}"></script>
+    <script src="{% static "/assets/plugins/chartjs/Chart.min.js" %}"></script>
+    <script>
+        //=================Gauge Inscritos=================================
+        var opts = {
+            lines: 12, // The number of lines to draw
+            angle: 0, // The length of each line
+            lineWidth: 0.4, // The line thickness
+            pointer: {
+                length: 0.75, // The radius of the inner circle
+                strokeWidth: 0.042, // The rotation offset
+                color: '#1D212A' // Fill color
+            },
+            limitMax: 'false',   // If true, the pointer will not go past the end of the gauge
+            colorStart: '#1f7bb6',   // Colors
+            colorStop: '#1f7bb6',    // just experiment with them
+            strokeColor: '#F0F3F3',   // to see which ones work best for you
+            generateGradient: true
+        };
+        var target = document.getElementById('gauge');
+        if (target != null) {
+            var gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+// your canvas element
+            gauge.maxValue = {{ limit }}; // set max gauge value
+            gauge.animationSpeed = 32; // set animation speed (32 is default value)
+            gauge.set({{total_subscriptions}}); // set actual value
+            gauge.setTextField(document.getElementById("gauge-text"));
+        }
+        //==================================================
+        //=================Doughnut Genero=================================
+        var doughnutData = [{
+            value: {{gender.men}},
+            color: "#1F7BB6",
+            highlight: "#1F7BB6",
+            label: "Homens"
+        }, {
+            value: {{gender.women}},
+            color: "#FF80AB",
+            highlight: "#FF80AB",
+            label: "Mulheres"
+        }
+        ];
+        window.onload = function () {
+            var ctx3 = document.getElementById("doughnut")
+            if (ctx3 != null) {
+                doughnut = ctx3.getContext("2d");
+                window.myDoughnut = new Chart(doughnut).Doughnut(doughnutData, {
+                    responsive: true
+                });
+            }
+        }
+        ;
+
+
+    </script>
+{% endblock %}
+{% block styles %}
+    <style>
+        .todo_list_element {
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .new_nav_items {
+            width: 40px;
+        }
+
+        .divider {
+            height: 1px;
+            margin: 9px 0;
+            overflow: hidden;
+            background-color: #e5e5e5;
+        }
+
+        .sidebar-left .nav > li.active > a {
+            color: #6FAFC0;
+        }
+    </style>
+{% endblock %}
 {% block pageheader %}
     <div class="pageheader">
         <h2>Painel do Evento</h2>
     </div>
 {% endblock %}
 
-{% block nav_aside_itens %}
-    <li style="font-weight: bold; color: #ffffff">Inscrições</li>
-    {#    {% event_payment_type object as payment_type %}#}
-    {#    {% if can_change and object.subscription_type != object.SUBSCRIPTION_DISABLED and payment_type != 'free' %}#}
-    {#        <li>#}
-    {#            <a href="{% url 'subscription:lot-list' object.pk %}"#}
-    {#               title="Lotes">#}
-    {#                <i class="fa  fa-fw fa-rocket"></i> Lotes#}
-    {#            </a>#}
-    {#        </li>#}
-    {#    {% endif %}#}
-    <li>
-        <a href="{% url 'subscription:subscription-list' object.pk %}"
-           title="Inscrições">
-            <i class="fa  fa-fw fa-rocket"></i> Inscrições
-        </a>
-    </li>
+{% block title %} Painel do evento | Congressy{% endblock %}
 
-    <li>
-        <a href="{% url 'payment:event-payments' event.pk %}"
-           title="Formulário">
-            <i class="fa  fa-fw fa-rocket"></i> Formulário
-        </a>
-    </li>
-    {#    <li>#}
-    {#        <a href="{% url 'subscription:subscription-attendance-search' object.pk %}"#}
-    {#           title="Credenciamento">#}
-    {#            <i class="fa  fa-fw fa-rocket"></i> Credenciamento#}
-    {#        </a>#}
-    {#    </li>#}
+{% block page_title %}{{ object.name }}{% endblock %}
 
-
-
-
-
+{% block new_nav %}
+    <ul class="nav nav-pills nav-stacked " style="width:70px;font-size: 25px;">
+        <li class="new_nav_items">
+            <a href="{% url 'event:event-list' %}"
+               title="Eventos" class="fa fa-calendar" style="color:white;">
+            </a>
+        </li>
+        <li class="new_nav_items">
+            <a href="#"
+               title="Inscrições" class="fa fa-list" style="color:white;"></a>
+        </li>
+        <li class="new_nav_items">
+            <a href="#"
+               title="Organizações" class="fa fa-sitemap" style="color:white;"
+            ></a>
+        </li>
+    </ul>
 
 {% endblock %}
-{% block page_title %}Painel de Evento{% endblock %}
-{% block page_sub_title %}{{ object.name }}{% endblock %}
+
 
 {% block content %}
-
-    <div class="row">
-        <div class="col-md-9 ">
-            <div class="panel panel-primary">
-                <div class="panel-body">
-
-                    {% if object.subscription_type == object.SUBSCRIPTION_BY_LOTS %}
-                        <div style="padding: 10px 0 0;">
-                            <div style="text-align: left">
-                                <strong>Inscrições:</strong>
-                            </div>
-                            <div style="color: #333;margin: 5px 10px">
-                                <table border="0" width="100%" cellpadding="10"
-                                       cellspacing="0">
-                                    <thead>
-                                    <tr>
-                                        <th width="2%">#</th>
-                                        <th style="text-align: left;">Lote</th>
-                                        <th width="30%">Insc.</th>
-                                        <th width="15%">Limite</th>
-                                        <th width="20%"
-                                            style="text-align: left;">Status
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for lot in object.lots.all %}
-                                        <tr>
-                                            <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ forloop.counter }}</td>
-                                            <td style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">{{ lot.name }}</td>
-                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
-                                                {{ lot.subscriptions.count }}
-                                                {% if lot.limit %}/
-                                                    {{ lot.limit }}{% endif %}
-                                            </td>
-                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
-                                                {% if lot.percent_completed %}
-                                                    {{ lot.percent_completed }}
-                                                    %{% else %}
-                                                    Livre{% endif %}
-                                            </td>
-                                            <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:{% if lot.status == lot.LOT_STATUS_FINISHED %}darkred{% elif lot.status == lot.LOT_STATUS_RUNNING %}green{% else %}dimgray{% endif %}">
-                                                {% if lot.status %}
-                                                    {{ lot.get_status_display|capfirst }}
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    <tr>
-                                        <td colspan="2"
-                                            style="border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:dimgray">
-                                            <strong>TOTAIS</strong></td>
-                                        <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;font-size: 16px; color:#333">
-                                            {{ object.subscriptions.count }}
-                                        </td>
-                                        <td style="text-align: center;border-bottom:1px solid lightgray;font-weight: bold;">{{ object.percent_completed }}%</td>
-                                        <td style="text-align: center;border-bottom:1px solid lightgray;"></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    {% elif object.subscription_type == object.SUBSCRIPTION_SIMPLE %}
-                        {% if object.limit %}
-                            <div style="padding: 10px 0 0;text-align: center;">
-                                <div style="text-align: left;">
-                                    <strong>Inscrições:</strong></div>
-                                <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                    {{ object.subscriptions.count }}
-                                    {% if object.limit %}/
-                                        {{ object.limit }}{% endif %}
-                                </div>
-                                <div style="color: #333">(25%)</div>
-                                <div style="color: dimgray;padding:10px">
-                                    Limitadas
-                                </div>
-                            </div>
-                        {% else %}
-                            <div style="padding: 10px 0 30px;text-align: center;">
-                                <div style="text-align: left;">
-                                    <strong>Inscrições: {{ object.subscriptions.count }}</strong>
-                                </div>
-
-                            </div>
-                        {% endif %}
-                    {% else %}
-                        <div style="padding: 10px 0 0;text-align: left;">
-                            <div style="text-align: left;">
-                                <strong>Inscrições:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: darkred;padding: 10px 0">
-                                Desativadas
-                            </div>
-                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                {% if can_change %}
-                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Ativar</a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endif %}
-
-
+    {% if has_paid_lots %}
+        <div class="col-md-12 col-lg-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="panel panel-solid-success widget-mini">
+                    <div class="panel-body">
+                        <i class="icon-wallet"></i>
+                        <span class="total text-center">
+                            R$ {{ totals.paid|money_divide|intcomma }}
+                        </span>
+                        <span class="title text-center">Saldo das
+                            inscrições pagas</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="panel widget-mini">
+                    <div class="panel-body">
+                        <i class=" icon-clock"></i>
+                        <span class="total text-center">
+                             R$ {{ totals.pending|money_divide|intcomma }}
+                        </span>
+                        <span class="title text-center">Pendentes de
+                            pagamento</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="panel widget-mini">
+                    <div class="panel-body">
+                        <i class="icon-bar-chart"></i>
+                        <span class="total text-center">
+                            R$ {{ totals.total|money_divide|intcomma }}
+                        </span>
+                        <span class="title text-center">Potencial de
+                            faturamento atual</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="panel widget-mini">
+                    <div class="panel-body">
+                        <i class="fas fa-tasks"></i>
+                        <span class="total text-center">
+                            {{ pending }} / {{ total_subscriptions }}
+                        </span>
+                        <span class="title text-center">Número de
+                            inscrições pendentes</span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 ">
-            <div class="panel panel-primary">
-                <div class="panel-body">
-                    <form name="change_status"
-                          action="{% url 'event:event-edit-publication' object.pk %}"
-                          method="post">
-                        {% csrf_token %}
-                        {% if status.published %}
-                            {% if status.status == 'future' %}
-                                <div style="padding: 10px 0 0;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: darkgreen;padding: 10px 0">
-                                        Publicado
-                                    </div>
-                                    <div style="color: dimgray;padding:10px">
-                                        Faltam
-                                        <strong>{{ status.remaining }}</strong>
-                                    </div>
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                        {% if can_change %}
-                                            <a href="#"
-                                               onclick="document.change_status.submit()">Despublicar</a>
-                                            <input type="hidden"
-                                                   name="published"
-                                                   value="0"/>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% elif status.status == 'running' %}
-                                <div style="padding: 10px 0 30px;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: darkgreen;padding: 10px 0">
-                                        Em andamento
-                                    </div>
-                                </div>
-                            {% elif status.status == 'finished' %}
-                                <div style="padding: 10px 0 30px;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
-                                        Encerrado
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% else %}
-                            {% if status.status == 'future' %}
-                                <div style="padding: 10px 0 0;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: darkred;padding: 10px 0">
-                                        Não publicado
-                                    </div>
-                                    <div style="color: dimgray;padding:10px">
-                                        Faltam
-                                        <strong>{{ status.remaining }}</strong>
-                                    </div>
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                        {% if can_change %}
-                                            <a href="{% url 'event:event-edit-dates' object.pk %}">Alterar
-                                                data</a>
-                                            &nbsp;&nbsp; | &nbsp;&nbsp;
-                                            <a href="#"
-                                               onclick="document.change_status.submit()">Publicar</a>
-                                            <input type="hidden"
-                                                   name="published" value="1"/>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% elif status.status == 'expired' %}
-                                <div style="padding: 10px 0 0;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
-                                        Expirado
-                                    </div>
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                        {% if can_change %}
-                                            <a href="{% url 'event:event-edit-dates' object.pk %}">Alterar
-                                                data</a>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% elif status.status == 'running' %}
-                                <div style="padding: 10px 0 0;text-align: center;">
-                                    <div style="text-align: left;">
-                                        <strong>Status:</strong></div>
-                                    <div style="font-weight: bold;font-size: 20px;color: #666;padding: 10px 0">
-                                        Em andamento
-                                    </div>
-                                    <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                        {% if can_change %}
-                                            <a href="#"
-                                               onclick="document.change_status.submit()">Publicar</a>
-                                            <input type="hidden"
-                                                   name="published"
-                                                   value="1"/>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% endif %}
-                        {% endif %}
-
-                    </form>
+    {% endif %}
+    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    <div class=" col-lg-6 col-md-6 col-sm-12 col-xs-12"
+         style="margin-bottom: 15px ">
+        <div class="panel
+{% if limit == 0 or  total_subscriptions  > limit %} widget-mini
+panel-solid-info {% endif %}
+panel-default">
+            {% if limit != 0 and  total_subscriptions  < limit %}
+                <div class="panel-heading">
+                    <h3 class="panel-title">Total de inscritos</h3>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class=" pull-right col-md-3 ">
-            <div class="panel panel-primary">
-                <div class="panel-body">
+                {% if limit == 0 or  total_subscriptions  > limit %}
+                    <div class="panel widget-mini">
+                {% endif %}
+            {% endif %}
 
-                    <div style="padding: 10px 0 0;text-align: center;">
+            <div class="panel-body {% if limit == 0 %} widget-gauge
+{% endif %}">
+                {% if limit == 0 or  total_subscriptions  > limit %}
+                    <i class="icon-user"></i>
+                    <span class="total text-center">
+                            {{ total_subscriptions }}
+                        <span class="title text-center">Inscritos</span>
+                        </span>
 
+
+                {% else %}
+                    <canvas width="200" height="125" id="gauge"
+                            class=""></canvas>
+                    <div class="goal-wrapper">
+                        <span class="gauge-value pull-left"></span>
+                        <span id="gauge-text" class="gauge-value
+                                    pull-left">{{ total_subscriptions }}</span>
+                        <span id="goal-text" class="goal-value
+                                    pull-right">{{ limit }}</span>
                     </div>
 
-                    {% event_payment_type object as payment_type %}
-                    {% if payment_type == 'free' %}
-                        <div style="padding: 10px 0 0;text-align: center">
-                            <div style="text-align: left;"><strong>Tipo de
-                                inscrição:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                Gratuitas
-                            </div>
-                            {% if object.subscription_offline %}
-                                <div style="color: dimgray;padding:10px">
-                                    <strong>Inscrições off-line
-                                        ativas</strong>
-                                </div>
-                            {% endif %}
-                            <div style="margin-top:10px; padding: 10px;background-color: #DDDDDD;text-align: center;border-bottom:1px solid dimgray">
-                                {% if can_change %}
-                                    <a href="{% url 'event:event-edit-subscription_type' object.pk %}">Alterar</a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% elif payment_type == 'mixed' %}
-                        <div style="padding: 10px 0 30px;text-align: center">
-                            <div style="text-align: left;"><strong>Tipo de
-                                inscrição:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                Mistas
-                            </div>
-                            <div style="color: dimgray;padding:10px">
-                                Gratuitas e
-                                pagas
-                            </div>
-                            {% if object.subscription_offline %}
-                                <div style="color: dimgray;padding:10px">
-                                    <strong>Inscrições off-line
-                                        ativas</strong>
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% elif payment_type == 'paied' %}
-                        <div style="padding: 10px 0 0;text-align: center">
-                            <div style="text-align: left;"><strong>Tipo de
-                                inscrição:</strong></div>
-                            <div style="font-weight: bold;font-size: 20px;color: #333;padding: 10px 0">
-                                Pagas
-                            </div>
-                        </div>
-                    {% endif %}
+                {% endif %}
+            </div>
 
-
-                </div>
             </div>
         </div>
+        {% if gender.men != 0 or gender.women != 0 %}
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
+                 style="padding-bottom: 20px;margin-bottom: 20px ">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Gênero dos participantes</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class=" col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                <ul class="nav nav-pills nav-stacked">
+                                    <li><i class="fa fa-circle"
+                                           style="color: #1F7BB6 "></i>
+                                        Homens
+                                    </li>
+                                    <li><i class="fa fa-circle "
+                                           style="color: #FF80AB;"></i>
+                                        Mulheres
+                                    </li>
+
+                                </ul>
+                            </div>
+                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                <div>
+                                    <canvas id="doughnut" width="100%"
+                                            height="100%"
+                                    ></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
-
+    {#    <div class="panel panel-primary col-sm-5 col-md-6"#}
+    {#         style="padding: 0;margin-left: 25px">#}
+    {##}
+    {#        <div class="panel-heading">#}
+    {#            <div class="panel-title">Criação do seu evento</div>#}
+    {#        </div>#}
+    {#        <div class="panel-body">#}
+    {#            <div class="progress">#}
+    {#                <div class="progress-bar progress-bar-info" role="progressbar"#}
+    {#                     aria-valuenow="75"#}
+    {#                     aria-valuemin="0" aria-valuemax="100" style="width: 75%;">#}
+    {#                    75%#}
+    {#                </div>#}
+    {#            </div>#}
+    {#            <ul class="nav nav-pills nav-stacked">#}
+    {#                <li class="todo_list_element" role="presentation">#}
+    {#                    <row>#}
+    {#                        <i class="fas fa-check success-color"></i>#}
+    {#                        <a href="#">Criar evento</a>#}
+    {#                    </row>#}
+    {#                </li>#}
+    {#                <li class="todo_list_element" role="presentation">#}
+    {#                    <row>#}
+    {#                        <i class="fas fa-check"></i>#}
+    {#                        <a href="#">Criar hot-site</a>#}
+    {#                    </row>#}
+    {#                </li>#}
+    {##}
+    {#                <li class="todo_list_element" role="presentation">#}
+    {#                    <row>#}
+    {#                        <i class="fas fa-check"></i>#}
+    {#                        <a href="#">Configurar lote</a>#}
+    {#                    </row>#}
+    {#                </li>#}
+    {##}
+    {#                <li class="todo_list_element" role="presentation">#}
+    {#                    <row>#}
+    {#                        <i class="fas fa-check"></i>#}
+    {#                        <a href="#">Configurar dados bancários</a>#}
+    {#                    </row>#}
+    {#                </li>#}
+    {##}
+    {#                <li class="todo_list_element" role="presentation">#}
+    {#                    <row>#}
+    {#                        <a href="#">Configurar#}
+    {#                            cerficados</a>#}
+    {#                    </row>#}
+    {#                </li>#}
+    {##}
+    {#                <li role="separator" class="divider"></li>#}
+    {##}
+    {#                <li class="todo_list_element" role="presentation">#}
+    {#                    <row>#}
+    {#                        <i class="fas fa-plus"></i>#}
+    {#                        <a href="#">Opicionais</a>#}
+    {#                    </row>#}
+    {#                </li>#}
+    {#                <li class="todo_list_element" role="presentation">#}
+    {#                    <row>#}
+    {#                        <i class="fas fa-plus"></i>#}
+    {#                        <a href="#">Submissão de artigos científicos</a>#}
+    {#                    </row>#}
+    {#                </li>#}
+    {##}
+    {##}
+    {#            </ul>#}
+    {#        </div>#}
+    {#    </div>#}
 {% endblock %}

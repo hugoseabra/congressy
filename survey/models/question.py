@@ -12,7 +12,6 @@ from survey.models.mixins import Entity
 
 
 class QuestionManager(models.Manager):
-
     def next_order(self, survey):
         """ Resgata próximo número de da pergunta. """
 
@@ -23,7 +22,6 @@ class QuestionManager(models.Manager):
                 return order_max['order__max'] + 1
 
         return 1
-
 
 
 @track_data('order')
@@ -139,6 +137,11 @@ class Question(Entity, models.Model):
             return True
 
         return False
+
+    @property
+    def is_multiple(self):
+        """ Verifica se pergunta possui suporte a múltiplas respostas. """
+        return self.type in [self.FIELD_CHECKBOX_GROUP]
 
     @property
     def has_answers(self):

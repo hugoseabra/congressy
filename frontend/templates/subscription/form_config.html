@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load i18n static widget_tweaks queryset_filter %}
+{% load i18n static widget_tweaks base_tags queryset_filter form_config_tags %}
 
 {% block title %}
     Formulário de Inscrição | Congressy
@@ -13,58 +13,6 @@
     <div>{{ event.name }}</div>
 {% endblock %}
 
-{% block nav_aside_itens %}
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
-            <li>
-                <a href="{% url 'subscription:lot-list' event.pk %}"
-                   title="Inscrições">
-                    <i class="fa  fa-fw fa-rocket"></i>
-                    Lotes/Categorias
-                </a>
-            </li>
-        {% endif %}
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
-            </a>
-        </li>
-        {#        <li>#}
-        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fa  fa-fw fa-rocket"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li class="active">
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-        {% if has_paid_lots %}
-            <li>
-                <a href="{% url 'payment:event-payments' event.pk %}"
-                   title="Pagamentos">
-                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
-                </a>
-            </li>
-        {% endif %}
-    </ul>
-{% endblock %}
 
 {% block content %}
 
@@ -138,71 +86,6 @@
         <div class="row">
 
             <div class="col-md-6">
-                <div class="panel panel-primary"
-                     id="survey-list-panel"
-                     style="display: none">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            Formulários Personalizados
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div id="survey-list"></div>
-                        <small class="text-muted">Você deve adicionar o formulário no lote desejado.
-                            Ir para <strong><a href="{% url 'subscription:lot-list' event.pk %}">Lotes</a></strong>.
-                        </small>
-                    </div>
-                </div>
-
-                <div class="panel panel-primary ">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            Campos pré-definidos
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="well text-info small">
-                            Campos que já existem no formulário e
-                            não podem ser
-                            removidos.
-                        </div>
-                        {% for field in form %}
-                            {% if field.field.widget.input_type == 'checkbox' %}
-                                <div class="form-group">
-                                    <label for="{{ field.id_for_label }}">
-                                        {{ field.label }}
-                                    </label>
-                                    {{ field |add_class:"js-switch"|attr:"style:display:none" }}
-                                    {% if field.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="alert alert-danger
-                                        alert-dismissable">
-                                                <button type="button"
-                                                        class="close"
-                                                        data-dismiss="alert"
-                                                        aria-hidden="true">
-                                                    ×
-                                                </button>
-                                                {{ error }}
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                    {% if field.help_text %}
-                                        <div>
-                                            <small class="text-muted">{{ field.help_text|safe }}</small>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-
-
-
-            </div>
-
-            <div class="col-md-6">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">
@@ -251,6 +134,71 @@
                             {% endif %}
                         {% endfor %}
 
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="panel panel-primary"
+                     id="survey-list-panel">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Formulários Personalizados
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div id="survey-list">
+                            {% include 'subscription/includes/survey_form.html' %}
+                        </div>
+                        <small class="text-muted">Você deve adicionar o
+                            formulário no lote desejado.
+                            Ir para <strong><a
+                                    href="{% url 'subscription:lot-list' event.pk %}">Lotes</a></strong>.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="panel panel-primary ">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Campos pré-definidos
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="well text-info small">
+                            Campos que já existem no formulário e
+                            não podem ser
+                            removidos.
+                        </div>
+                        {% for field in form %}
+                            {% if field.field.widget.input_type == 'checkbox' %}
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}">
+                                        {{ field.label }}
+                                    </label>
+                                    {{ field |add_class:"js-switch"|attr:"style:display:none" }}
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="alert alert-danger
+                                        alert-dismissable">
+                                                <button type="button"
+                                                        class="close"
+                                                        data-dismiss="alert"
+                                                        aria-hidden="true">
+                                                    ×
+                                                </button>
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <div>
+                                            <small class="text-muted">{{ field.help_text|safe }}</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -348,7 +296,7 @@
 
         $(document).ready(function () {
 
-            loadList();
+            //loadList();
 
             $('#id_city').on('change', function () {
                 var address_required_el = $('input[value=address-show]');
@@ -374,6 +322,384 @@
                 }
             });
 
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom ' +
+                'messenger-on-right',
+                theme: 'flat'
+            };
+
+            create_events();
         });
+
+
+        function editEventSurvey(form) {
+
+            $('#editSurvey').modal('hide');
+
+            var values = {};
+
+            $.each($(form).serializeArray(), function (i, field) {
+                values[field.name] = field.value;
+            });
+
+            var payload = {
+                action: 'edit',
+                event_survey_id: values['event_survey_id'],
+                survey_edit_title: values['survey_edit_title'],
+                survey_edit_description: values['survey_edit_description']
+            };
+
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            $.ajax({
+                type: "POST",
+                url: '{% url 'subscription:survey-ajax-edit' event.pk%}',
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                data: payload,
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Formulário editado com sucesso!',
+                        type: 'success'
+                    });
+                    updateSurveyList();
+                },
+                error: function () {
+
+                    Messenger().post({
+                        message: 'Não foi possivel editar seu formulário.',
+                        type: 'error'
+                    });
+                }
+            });
+
+            return false;
+
+        }
+
+        function updateSurveyList() {
+            $.ajax({
+                url: '{% url 'subscription:form-config' event.pk %}' +
+                '?template_name=subscription/includes/survey_form',
+                success:
+                    function
+                        (result) {
+                        $("#survey-list").html(result);
+                        create_events();
+                    }
+            });
+        }
+
+        function createEventSurvey(form) {
+
+            $('#addSurvey').modal('hide');
+
+            var url = "{% url 'subscription:survey-create' event.pk %}";
+
+            var values = {};
+            $.each($(form).serializeArray(), function (i, field) {
+                values[field.name] = field.value;
+            });
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: values, // serializes the form's elements.
+                error: function (err) {
+                    Messenger().post({
+                        message: 'Não foi possivel criar este ' +
+                        'formulário.',
+                        type: 'danger'
+                    });
+
+                    throw err.textField;
+                },
+                success: function (res) {
+                    Messenger().post({
+                        message: 'Formulário criado com sucesso!',
+                        type: 'success'
+                    });
+                    updateSurveyList();
+                }
+            });
+        }
+
+        function create_events() {
+
+            $(".open-editSurvey").click(function () {
+                $('#surveyEditId').val($(this).data('id'));
+                $('#surveyEditTitle').val($(this).data('title'));
+                $('#surveyEditDescription').val($(this).data('description'));
+                $('#edit_event_survey_id').val($(this).data('id'));
+                $('input.action').val('edit');
+                $('#editSurvey').modal('show');
+            });
+
+            $(".open-deleteSurvey").click(function () {
+                $('#surveyDeleteId').val($(this).data('id'));
+                $('#surveyDeleteTitle').val($(this).data('title'));
+                $('#surveyDeleteDescription').val($(this).data('description'));
+                $('#delete_event_survey_id').val($(this).data('id'));
+                $('input.action').val('delete');
+                $('#deleteSurvey').modal('show');
+                create_events();
+            });
+
+            $(".open-AddSimpleQuestionDialog").click(function () {
+                var typeOfField = $(this).data('field-type');
+                var IconOfField = $(this).data('field-icon');
+                var typeEl = $('.modal-body .typeOfField');
+                var iconEl = $('.modal-body .iconOfField');
+                var formTypeEl = $('#id_simple_form-type');
+
+                typeEl.text(typeOfField);
+                iconEl.attr('class', 'iconOfField');
+                iconEl.addClass(IconOfField);
+                formTypeEl.val('simple');
+                $('#options').hide();
+                $('#addQuestion').modal('show');
+            });
+
+            $(".open-AddComplexQuestionDialog").click(function () {
+
+                var typeOfField = $(this).data('field-type');
+                var IconOfField = $(this).data('field-icon');
+                var typeEl = $('.modal-body .typeOfField');
+                var iconEl = $('.modal-body .iconOfField');
+                var formTypeEl = $('#id_complex_form-type');
+
+                typeEl.text(typeOfField);
+                iconEl.attr('class', 'iconOfField');
+                iconEl.addClass(IconOfField);
+                formTypeEl.val('complex');
+                $('#options').show();
+                $('#addQuestion').modal('show');
+            });
+
+            $(".open-DeleteQuestionDialog").click(function () {
+
+                var survey_id = $(this).data('survey');
+                var survey_name = $(this).data('survey-name');
+
+                $.get('{% url 'subscription:survey-ajax-delete' event.pk%}',
+                    function (data) {
+                        $('#question_delete_modal').html(data);
+                        $('#deleteSurvey').modal('show');
+                        $("#survey_name").text(survey_name);
+                        $("#delete_event_survey_id").val(survey_id);
+                    })
+                    .fail(function (err) {
+
+                        Messenger().post({
+                            message: 'Não foi possivel realizar essa ação ' +
+                            'nesse momento.',
+                            type: 'error'
+                        });
+
+                        throw err.responseText;
+
+                    });
+            });
+
+
+            //Disable btn save on first click
+            $(".new_survey_save").click(function () {
+                this.disabled = true;
+            });
+
+        }
+
     </script>
+{% endblock %}
+{% block modals %}
+
+    <div class="modal fade" id="addSurvey"
+         role="dialog">
+
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">
+                        Novo formulário</h4>
+                </div>
+
+                <form id="createSurveyForm" onsubmit="createEventSurvey(this);
+                return false;">
+
+                    {% csrf_token %}
+
+                    <div class="modal-body">
+                        {% render_generic_field survey_list_form.name autofocus=True %}
+                        {% render_generic_field survey_list_form.description %}
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-success">
+                            Salvar
+                        </button>
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal fade" id="editSurvey"
+         role="dialog">
+
+        <div class="modal-dialog " role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">
+                        Editar questionário</h4>
+                </div>
+
+                <form onsubmit="editEventSurvey(this); return false;">
+
+                    {% csrf_token %}
+
+
+                    <div class="modal-body">
+
+                        <div class="form-group">
+
+                            <label>Nome:</label>
+
+                            <small style="color:#C9302C">
+                                *
+                            </small>
+
+
+                            <div>
+
+                                <input type="text"
+                                       maxlength="255"
+                                       autofocus=""
+                                       required=""
+                                       class="form-control form-control"
+                                       name="survey_edit_title"
+                                       id="surveyEditTitle">
+
+
+                                <div>
+                                    <small class="text-muted">
+                                        Nome do seu
+                                        questionário
+                                    </small>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <label>Descrição:</label>
+
+                            <div>
+
+                                <textarea cols="20" rows="3"
+                                          class="form-control"
+                                          name="survey_edit_description"
+                                          id="surveyEditDescription"></textarea>
+
+                                <div>
+                                    <small class="text-muted">
+                                        Uma descrição
+                                        para
+                                        te ajudar a
+                                        identificar este
+                                        questionário.
+                                    </small>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <input type="hidden"
+                               name="action">
+                        <input type="hidden"
+                               name="event_survey_id"
+                               id="edit_event_survey_id">
+
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-success new_survey_save ">
+                            Salvar
+                        </button>
+                    </div>
+
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="modal fade" id="deleteSurvey"
+         role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div id="question_delete_modal"></div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block styles %}
+
+    <style>
+
+        .list-group-item .control-buttons {
+            visibility: hidden;
+        }
+
+        .list-group-item:hover .control-buttons {
+            visibility: visible;
+        }
+
+        .noborder td, .noborder th {
+            border: none !important;
+        }
+
+    </style>
+
 {% endblock %}

@@ -67,6 +67,9 @@ class EventPaymentView(AccountMixin, ListView):
         context = super(EventPaymentView, self).get_context_data(**kwargs)
         context['event'] = self.event
         context['totals'] = self._get_payables()
+        context['has_inside_bar'] = True
+        context['active'] = 'pagamentos'
+        context['has_paid_lots'] = True
 
         return context
 

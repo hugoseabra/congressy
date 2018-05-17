@@ -92,71 +92,23 @@
     </script>
 {% endblock %}
 
-{% block nav_aside_itens %}
-
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
-            <li>
-                <a href="{% url 'subscription:lot-list' event.pk %}"
-                   title="Inscrições">
-                    <i class="fa  fa-fw fa-rocket"></i>
-                    Lotes/Categorias
-                </a>
-            </li>
-        {% endif %}
-        <li class="active">
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
-            </a>
-        </li>
-        {#        <li>#}
-        {#            <a href="{% url 'subscription:\subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fa  fa-fw fa-rocket"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-        {% if has_paid_lots %}
-            <li>
-                <a href="{% url 'payment:event-payments' event.pk %}"
-                   title="Pagamentos">
-                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
-                </a>
-            </li>
-        {% endif %}
-    </ul>
-{% endblock %}
-
 {% block content %}
     <div class="row">
         <div class="col-md-12">
             <div class="buttonbar">
-                <div class="float-right">
+                <div class="float-left">
                     <button type="button" class="btn btn-primary {% if not object_list %}disabled{% endif %}"
                             {% if not object_list %}disabled title="Nenhuma inscrição para exportar."{% endif %}
                             onclick="$('#export-form').submit();">
                         <i class="fa fa-download"></i>
                         Exportar
                     </button>
+                </div>
+                <div class="float-right">
+                    <a role="button" class="btn btn-success" href="{% url 'subscription:subscription-add' event.pk%}">
+                        <i class="fa fa-plus"></i>
+                        Nova inscrição
+                    </a>
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -260,6 +212,12 @@
                                                     <a href="{% url 'subscription:subscription-view' event.pk item.pk %}">
                                                         <i class="fa fa-eye"></i>
                                                         Visualizar
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                        Editar
                                                     </a>
                                                 </li>
                                                 {% if item.confirmed %}

@@ -1,0 +1,341 @@
+{% load i18n static base_tags %}
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<!DOCTYPE html>
+<!--[if lt IE 7 ]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<![endif]-->
+<!--[if IE 7 ]>
+<html class="no-js lt-ie9 lt-ie8" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<![endif]-->
+<!--[if IE 8 ]>
+<html class="no-js lt-ie9" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<![endif]-->
+<!--[if (gte IE 9)|!(IE)]>
+<html class="no-js" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}Congressy{% endblock %}</title>
+    <meta name="description" content="">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap/css/bootstrap-xl.css" %}">
+
+    <!-- Bootstrap Accessibility -->
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap-accessibility/css/bootstrap-accessibility_1.0.3.css" %}">
+
+    <!-- Fonts  -->
+    <link rel="stylesheet"
+          href="{% static "assets/css/fontawesome-all.min.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/css/simple-line-icons.css" %}">
+    <!-- CSS Animate -->
+    <link rel="stylesheet" href="{% static "assets/css/animate.css" %}">
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/icheck/css/all.css' %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/switchery/switchery.min.css" %}">
+
+    <!-- Messenger -->
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/messenger.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/messenger-theme-flat.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/messenger/css/location-sel.css" %}">
+
+
+    <!-- Custom styles for this theme -->
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+
+    {% block styles %}
+    {% endblock %}
+
+    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
+
+    {% block headscripts %}{% endblock %}
+
+    {% if form %}
+        {{ form.media.css }}
+    {% endif %}
+
+    <!-- Feature detection -->
+    <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="{% static "assets/js/vendor/html5shiv.js"%}"></script>
+        <script src="{% static "assets/js/vendor/respond.min.js"%}"></script>
+    <![endif]-->
+</head>
+<body>
+
+
+<section id="main-wrapper" class="theme-cgsy-full">
+    <header id="header" style="background-color: #F0F3F3">
+
+        <!--logo start-->
+        <div class="brand" style="background-color: #F0F3F3">
+            <a href="{% url 'front:start' %}">
+                <img class="base_logo" src=
+                        "{% static "assets/img/header-logo_black.png" %}"
+                />
+            </a>
+        </div>
+        <!--logo end-->
+
+        {% block navbar %}
+            {% if user %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li style="padding-top: 5px">
+                        <span class="meta hidden-xs">
+                            <button type="button" onclick="location.href=
+                                    '{% url 'event:event-add' %}'"
+                                    class="btn btn-sm
+                        btn-success navbar-btn">
+                            <i class="fa fa-plus"></i>
+                                Novo Evento
+                            </button>
+                        </span>
+                    </li>
+                    <li class="dropdown profile hidden-xs"
+                        style="background-color: #F0F3F3">
+                        <a href="javascript:void(0);" class="dropdown-toggle"
+                           data-toggle="dropdown">
+                                <span class="meta" style="color: black">
+                                    <span class="fas fa-user"></span>
+                                    <span class="text  hidden-xs">{{ user.first_name }}</span>
+                                    <span class="caret hidden-xs"></span>
+                                </span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight "
+                            role="menu">
+                            <li>
+                                <a href="{% url 'event:profile' %}">
+                                    <span class="icon">
+                                        <i class="fas fa-list-alt"></i>
+                                    </span>
+                                    Meus Dados
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'public:logout' %}">
+                                    <span class="icon">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    </span>
+                                    Sair
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            {% endif %}
+        {% endblock %}
+    </header>
+
+    <div class="row">
+        <div class="navbar-header">
+            <button type="button" class="sidebar-toggle navbar-toggle
+            collapsed" data-toggle="collapse" data-target="#sidebar"
+                    aria-expanded="false" style="z-index: 1000;text-align:
+                    right ">
+                <i class="fas fa-bars"
+                   style="font-size: 20px;"></i>
+
+            </button>
+        </div>
+        <div class="tooltip-wrapper collapse navbar-collapse col-xs-12
+            col-sm-4 col-lg-4
+            col-xl-4" id="sidebar" data-animated="fadeInRight">
+            <div class="principal_sidebar col-xs-1 col-sm-1 col-lg-1
+                col-xl-1">
+                <div class="new_nav sidebar-left sidebar" style="width:
+                    50px; padding-top: 0">
+                    <ul class="col nav nav-pills nav-stacked " style="
+                            font-size: 25px;text-align: center; margin: 0">
+                        <li class="dropdown visible-xs" style="width: 50px">
+                            <a class="dropdown-toggle"
+                               data-toggle="dropdown">
+
+                                    <span class="meta">
+                                        <span class="fas fa-user"></span>
+                                    </span>
+                            </a>
+                            <ul class="col nav nav-pills nav-stacked
+                                " role="menu"
+                                style="display: block;font-size: 20px">
+                                <li>
+                                    <a href="{% url 'event:profile' %}"
+                                       data-toggle="tooltip"
+                                       data-placement="right"
+                                       title=""
+                                       data-original-title="Meus dados">
+                                        <i class=" fas fa-list-alt"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'public:logout' %}"
+                                       data-toggle="tooltip"
+                                       data-placement="right"
+                                       title=""
+                                       data-original-title="Sair">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="divider visible-xs" style="height: 1px;
+                                margin: 9px 0;width: 50px;
+                                overflow: hidden;
+                                background-color: #52AEE9;"></li>
+
+                        <li style="width: 50px">
+                            <a href="{% url 'event:event-list' %}"
+                               data-toggle="tooltip"
+                               data-placement="right"
+                               title=""
+                               data-original-title="Eventos"
+                               class="fa fa-calendar">
+                            </a>
+                        </li>
+                        <li style="width: 50px">
+                            <a href="{% url 'subscription:my-subscriptions' %}"
+                               data-toggle="tooltip"
+                               data-placement="right"
+                               data-original-title="Inscrições"
+                               title="Inscrições" class="fa fa-list"></a>
+                        </li>
+                        <li style="width: 50px">
+                            <a href="{% url 'event:organization-list' %}"
+                               title="Organizações" class="fa fa-sitemap"
+                               data-toggle="tooltip"
+                               data-placement="right"
+                               data-original-title="Organizações"
+
+                            ></a>
+                        </li>
+                    </ul>
+                    <ul class="col nav nav-pills nav-stacked visible-xs"
+                        style="
+                            font-size: 30px;text-align: center;margin: 0;">
+                        <li class="divider visible-xs" style="height: 1px;
+                                width: 50px; overflow: hidden;margin: 0;
+                                background-color: #52AEE9;"></li>
+                        <li>
+                            <a href="{% url 'event:event-add' %}" class="btn
+                    " style="width: 50px;height:
+                    50px" data-toggle="tooltip"
+                               data-placement="right"
+                               title=""
+                               data-original-title="Novo evento">
+                                <i class="fa fa-plus"
+                                   style="color:#4caf4c"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="manage_sidebar col-xs-3 col-sm-3 col-lg-3 col-xl-3">
+                <div>
+
+                    {% if organization %}
+                        <nav style="color: #383838">
+                            {% block nav_aside_itens %}{% endblock %}
+                        </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-xs-12  col-sm-8 col-lg-9 col-xl-9">
+            <!--main content start-->
+            <section class="main-content-wrapper" style="position: relative;">
+                <div class="pageheader">
+                    <h1>{% block page_title %}{% endblock %}</h1>
+                    <h2>{% block page_sub_title %}{% endblock %}</h2>
+                    <p class="text-muted">
+                        {% block page_description %}{% endblock %}</p>
+                </div>
+                <section id="main-content">
+                    {% block messages %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissable">
+                                    <button type="button" class="close"
+                                            data-dismiss="alert"
+                                            aria-hidden="true">×
+                                    </button>
+                                    {{ message|capfirst }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endblock messages %}
+                    {% block content %}{% endblock %}
+
+                </section>
+                <!-- main content end -->
+
+            </section>
+        </div>
+    </div>
+    <section class="cgsy-footer footer-wrapper"
+             style="z-index:10000;">
+        {% include "base/footer.html" %}
+    </section>
+
+</section>
+
+{% include 'sentry-javascript-sdk.html' %}
+{% include 'tawto.html' %}
+{% include 'hotjar.html' %}
+{% include 'smartlook.html' %}
+
+<!--Global JS-->
+<script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>
+<script src="{% static "assets/plugins/bootstrap-accessibility/js/bootstrap-accessibility_1.0.3.js" %}"></script>
+<script src="{% static "assets/plugins/navgoco/jquery.navgoco.min.js" %}"></script>
+<script src="{% static "assets/plugins/pace/pace.min.js" %}"></script>
+<script src="{% static "assets/plugins/switchery/switchery.min.js" %}"></script>
+<script src="{% static 'assets/plugins/icheck/js/icheck.min.js' %}"></script>
+<script src="{% static "assets/plugins/mask/mask.min.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger.min.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger-theme-flat.js" %}"></script>
+<script src="{% static "assets/plugins/messenger/js/messenger-theme-future.js" %}"></script>
+<script src="{% static "assets/plugins/sortable/js/Sortable.min.js" %}"></script>
+<script src="{% static "assets/js/src/app.js" %}"></script>
+<script src="{% static "assets/js/cgsy.js" %}"></script>
+
+<script type="application/javascript">
+
+    $(document).ready(function () {
+        $('.cgsy-date-input').mask("99/99/9999");
+        $('.cgsy-time-input').mask("99:99");
+    });
+
+
+    function cgsy_submit(value) {
+        console.log(typeof(value));
+        console.log(value);
+        var org_context = document.getElementById('organization-context-pk');
+        org_context.value = value;
+        document.getElementById("organization_context").submit();
+        console.log('SUBMITTED' + org_context.value)
+    }
+</script>
+
+{% block scripts %}{% endblock %}
+
+{% if form %}
+    {{ form.media.js }}
+{% endif %}
+</body>
+</html>

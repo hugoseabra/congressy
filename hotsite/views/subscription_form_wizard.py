@@ -223,14 +223,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         # Insere ou edita lote
         subscription.lot = lot
-        if not lot.price or lot.price == 0:
-
-            subscription.status = Subscription.CONFIRMED_STATUS
-
-            if new_account and new_subscription:
-                notify_new_user_and_free_subscription(self.event, subscription)
-            else:
-                notify_new_free_subscription(self.event, subscription)
+        subscription.save()
 
         if 'lot' in self.request.session:
             del self.request.session['lot']
@@ -238,23 +231,38 @@ class SubscriptionWizardView(SessionWizardView):
         if 'person' in self.request.session:
             del self.request.session['person']
 
-        subscription.save()
+        if not lot.price or lot.price == 0:
+
+            subscription.status = Subscription.CONFIRMED_STATUS
+            subscription.save()
+
+            if new_account and new_subscription:
+                notify_new_user_and_free_subscription(self.event, subscription)
+            else:
+                notify_new_free_subscription(self.event, subscription)
+
+            response = HttpResponseRedirect(reverse_lazy(
+                'public:hotsite', kwargs={'slug': self.event.slug,}
+            ))
+
+        else:
+            response = HttpResponseRedirect(reverse_lazy(
+                'public:hotsite-subscription-status',
+                kwargs={'slug': self.event.slug,}
+            ))
+
+        if 'lot' in self.request.session:
+            del self.request.session['lot']
+
+        if 'person' in self.request.session:
+            del self.request.session['person']
 
         messages.success(
             self.request,
             'Inscrição realizada com sucesso!'
         )
 
-        if subscription.lot.price and subscription.lot.price > 0:
-            return HttpResponseRedirect(reverse_lazy(
-                'public:hotsite-subscription-status', kwargs={
-                    'slug': self.event.slug,
-                }))
-
-        return HttpResponseRedirect(reverse_lazy(
-            'public:hotsite', kwargs={
-                'slug': self.event.slug,
-            }))
+        return response
 
     def get_form_initial(self, step):
 

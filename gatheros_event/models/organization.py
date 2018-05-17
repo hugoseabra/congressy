@@ -30,6 +30,7 @@ class Organization(models.Model, GatherosModelMixin):
     CAIXA_ECONOMICA = "104"
     BANCOOB = "756"
     SICOOB = "756"
+    BANCO_COOPERATIVO_SICREDI = "748"
 
     ACCOUNT_TYPES = (
         (CONTA_CORRENTE, 'Conta corrente'),
@@ -46,6 +47,7 @@ class Organization(models.Model, GatherosModelMixin):
         (CAIXA_ECONOMICA, 'Caixa Economica'),
         (BANCOOB, 'BANCOOB - Banco Cooperativo do Brasil'),
         (SICOOB, 'Sicoob'),
+        (BANCO_COOPERATIVO_SICREDI, 'BANCO COOPERATIVO SICREDI S.A.'),
     )
 
     """ Organização """

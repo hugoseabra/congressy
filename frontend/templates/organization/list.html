@@ -1,9 +1,6 @@
 {% extends "base/base.html" %}
-{% load static organization_tags%}
+{% load static organization_tags %}
 
-{% block navbar %}
-    {% include "base/simple-navbar.html" %}
-{% endblock %}
 
 {% block sidebar %}{% endblock %}
 {% block sidebar-bars %}{% endblock %}
@@ -89,64 +86,65 @@
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-primary">
-                <div class="panel-body">
+                <div class="panel-body ">
                     {% if object_list %}
                         <table id="organization_table"
-                               class="table table-striped table-bordered dataTable no-footer nowrap"
+                               class="table table-striped
+                               table-bordered dataTable no-footer nowrap"
                                cellspacing="0"
                                width="100%"
                         >
                             <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Cargo</th>
+                                <th class="hidden-sm hidden-xs">Cargo</th>
                                 <th></th>
                             </tr>
                             </thead>
 
                             <tbody>
                             {% for item in object_list %}
-                                {% get_member_group item user as member_group %}
                                 <tr>
-                                    <td>
-                                        <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
-                                    </td>
-                                    <td>
-                                        {% get_member_group_name item user %}
-                                    </td>
-                                    <td>
-                                        {% if member_group == member.ADMIN %}
-                                            <div class="btn-group">
-                                                <button
-                                                        type="button"
-                                                        class="btn
+                                {% get_member_group item user as member_group %}
+                                <td>
+                                    <a href="{% url 'event:organization-panel' item.pk %}">{{ item.name }}</a>
+                                </td>
+                                <td>
+                                    {% get_member_group_name item user %}
+                                </td>
+                                <td>
+                                    {% if member_group == member.ADMIN %}
+                                        <div class="btn-group">
+                                            <button
+                                                    type="button"
+                                                    class="btn
                                                 btn-primary btn-trans
                                                 btn-sm dropdown-toggle"
-                                                        data-toggle="dropdown"
-                                                        aria-expanded="false"
-                                                >
-                                                    <span class="fas fa-cog"></span>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-right"
-                                                    role="menu">
+                                                    data-toggle="dropdown"
+                                                    aria-expanded="false"
+                                            >
+                                                <span class="fas fa-cog"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right"
+                                                role="menu">
+                                                <li>
+                                                    <a href="{% url 'event:organization-edit' item.pk %}">
+                                                        <i class="fas fa-pencil-alt"></i>
+                                                        Editar
+                                                    </a>
+                                                </li>
+                                                {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
                                                     <li>
-                                                        <a href="{% url 'event:organization-edit' item.pk %}">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                            Editar
+                                                        <a href="{% url 'event:organization-delete' item.pk %}">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                            Excluir
                                                         </a>
                                                     </li>
-                                                    {% if item.is_deletable and user has 'gatheros_event.delete_organization' of item %}
-                                                        <li>
-                                                            <a href="{% url 'event:organization-delete' item.pk %}">
-                                                                <i class="fas fa-trash-alt"></i>
-                                                                Excluir
-                                                            </a>
-                                                        </li>
-                                                    {% endif %}
-                                                </ul>
-                                            </div>
-                                        {% endif %}
-                                    </td>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </td>
                                 </tr>
                             {% endfor %}
                             </tbody>

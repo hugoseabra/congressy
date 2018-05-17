@@ -9,6 +9,7 @@
             profileToggle();
             switcheryToggle();
             icheckStart();
+            tooltips();
         });
 
 
@@ -96,6 +97,15 @@
             if (disable === false && checkbox.prop('disabled') === true) {
                 checkbox.enable();
             }
+        };
+
+        //tooltips
+        var tooltips = function() {
+            $('.tooltip-wrapper').tooltip({
+                selector: "[data-toggle=tooltip]",
+                container: "body",
+                html:true,
+            })
         };
 
         //return functions
