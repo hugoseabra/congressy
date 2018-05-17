@@ -43,15 +43,13 @@
         </div>
     </div>
 
-    <div class="row">
+    {% if object_list %}
 
-        {% if object_list %}
+        {% for row in object_list %}
+            <div class="row">
+                {% for work in row %}
 
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-
-                {% for work in  object_list %}
-
-                    <div class="row col-md-8">
+                    <div class="col-md-6">
 
                         <div class="panel panel-primary">
 
@@ -122,7 +120,7 @@
                                                         fa-check-circle
                                                         success-color fa-lg
                                                         pull-right"></i>
-                                                        <div class="text-center">
+                                                        <div class="html-center">
                                                             <button class="btn
                                                             btn-trans btn-sm
                                                             btn-success
@@ -136,11 +134,13 @@
 
                                                     {% else %}
                                                         <strong>
-                                                            Você deve adicionar
-                                                            pelo menos um autor.
+                                                            Você deve
+                                                            adicionar
+                                                            pelo menos um
+                                                            autor.
                                                         </strong>
 
-                                                        <div class="text-center">
+                                                        <div class="html-center">
                                                             <button class="btn
                                                             btn-trans btn-sm
                                                             btn-success
@@ -317,19 +317,7 @@
                                                 </td>
                                                 <td>
 
-                                                    {% if work.status == 'not ready' %}
-                                                        <strong>
-                                                            Há pendencias
-                                                            nessa submissão
-                                                            que
-                                                            impossibilitam
-                                                            sua publicação.
-                                                        </strong>
-                                                        <i class="fas fa-times-circle
-                                                        danger-color fa-lg pull-right"></i>
-
-                                                    {% elif work.status == 'ready' %}
-
+                                                    {% if  work.ready %}
                                                         <strong>
                                                             <input
                                                                     class="published"
@@ -350,6 +338,17 @@
                                                                 NÃO-PUBLICADO
                                                             {% endif %}
                                                         </strong>
+                                                    {% else %}
+
+                                                        <strong>
+                                                            Há pendencias
+                                                            nessa submissão
+                                                            que
+                                                            impossibilitam
+                                                            sua publicação.
+                                                        </strong>
+                                                        <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
 
                                                     {% endif %}
 
@@ -390,166 +389,167 @@
                     </div>
 
                 {% endfor %}
-
             </div>
+        {% endfor %}
 
-            <!-----------------------MODALS ----------------------------------->
-            <div class="modal fade" id="edit_summary_modal" tabindex="-1"
-                 role="dialog"
-                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3 class="modal-title">Editar Resumo: </h3>
-                            <button type="button" class="close"
-                                    data-dismiss="modal" aria-hidden="true">
-                                ×
-                            </button>
-                        </div>
-                        <div class="modal-body">
+        <!-----------------------MODALS ----------------------------------->
+        <div class="modal fade" id="edit_summary_modal" tabindex="-1"
+             role="dialog"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Editar Resumo: </h3>
+                        <button type="button" class="close"
+                                data-dismiss="modal" aria-hidden="true">
+                            ×
+                        </button>
+                    </div>
+                    <div class="modal-body">
                             <textarea id="edit_summary_modal_body" rows="10"
                                       cols="55"></textarea>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-md btn-success"
-                                    data-dismiss="modal"
-                                    id="edit_summary_modal_btn">
-                                <i class="far fa-save"></i>
-                                Salvar
-                            </button>
-                            <button type="button" class="btn btn-md  btn-danger"
-                                    data-dismiss="modal">Close
-                            </button>
-                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-md btn-success"
+                                data-dismiss="modal"
+                                id="edit_summary_modal_btn">
+                            <i class="far fa-save"></i>
+                            Salvar
+                        </button>
+                        <button type="button" class="btn btn-md  btn-danger"
+                                data-dismiss="modal">Close
+                        </button>
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="edit_keywords_modal" tabindex="-1"
-                 role="dialog"
-                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3 class="modal-title">Editar palavaras chave:
-                            </h3>
-                            <button type="button" class="close"
-                                    data-dismiss="modal" aria-hidden="true">
-                                ×
-                            </button>
-                        </div>
-                        <div class="modal-body">
+        </div>
+        <div class="modal fade" id="edit_keywords_modal" tabindex="-1"
+             role="dialog"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Editar palavaras chave:
+                        </h3>
+                        <button type="button" class="close"
+                                data-dismiss="modal" aria-hidden="true">
+                            ×
+                        </button>
+                    </div>
+                    <div class="modal-body">
                             <textarea id="edit_keywords_modal_body" rows="5"
                                       cols="55"></textarea>
-                            <small>Separadas por virgula</small>
+                        <small>Separadas por virgula</small>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-md btn-success"
+                                data-dismiss="modal"
+                                id="edit_keywords_modal_btn">
+                            <i class="far fa-save"></i>
+                            Salvar
+                        </button>
+                        <button type="button" class="btn btn-md  btn-danger"
+                                data-dismiss="modal">Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="edit_authors_modal" tabindex="-1"
+             role="dialog"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close"
+                                data-dismiss="modal" aria-hidden="true">
+                            ×
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div id="edit_authors_modal_body">
+                            Carregando....
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-md btn-success"
-                                    data-dismiss="modal"
-                                    id="edit_keywords_modal_btn">
+
+
+                        <form style="margin-top: 25px" class="form-inline">
+                            <input type="hidden" id="author_work_id">
+                            <div class="form-group">
+                                <label for="new_author_name">Nome:</label>
+                                <input type="html" class="form-control"
+                                       id="new_author_name"
+                                       placeholder="Nome completo">
+                            </div>
+
+                            <button type="button"
+                                    class="btn btn-md btn-success"
+                                    id="save_new_author">
                                 <i class="far fa-save"></i>
                                 Salvar
                             </button>
-                            <button type="button" class="btn btn-md  btn-danger"
-                                    data-dismiss="modal">Close
-                            </button>
-                        </div>
+                        </form>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-md  btn-danger"
+                                data-dismiss="modal">Close
+                        </button>
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="edit_authors_modal" tabindex="-1"
-                 role="dialog"
-                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close"
-                                    data-dismiss="modal" aria-hidden="true">
-                                ×
-                            </button>
-                        </div>
-                        <div class="modal-body">
-
-                            <div id="edit_authors_modal_body">
-                                Carregando....
-                            </div>
-
-
-                            <form style="margin-top: 25px" class="form-inline">
-                                <input type="hidden" id="author_work_id">
-                                <div class="form-group">
-                                    <label for="new_author_name">Nome:</label>
-                                    <input type="text" class="form-control"
-                                           id="new_author_name"
-                                           placeholder="Nome completo">
-                                </div>
-
-                                <button type="button"
-                                        class="btn btn-md btn-success"
-                                        id="save_new_author">
-                                    <i class="far fa-save"></i>
-                                    Salvar
-                                </button>
-                            </form>
-
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-md  btn-danger"
-                                    data-dismiss="modal">Close
-                            </button>
-                        </div>
+        </div>
+        <div class="modal fade" id="delete_submission_modal" tabindex="-1"
+             role="dialog"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h3> Certeza que deseja apagar essa submissão?</h3>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-md btn-danger"
+                                data-dismiss="modal"
+                                id="submission_confirm_delete">
+                            <i class="fas fa-trash-alt"></i>
+                            Apagar
+                        </button>
+                        <button type="button"
+                                class="btn btn-md  btn-default"
+                                data-dismiss="modal">Close
+                        </button>
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="delete_submission_modal" tabindex="-1"
-                 role="dialog"
-                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <h3> Certeza que deseja apagar essa submissão?</h3>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-md btn-danger"
-                                    data-dismiss="modal"
-                                    id="submission_confirm_delete">
-                                <i class="fas fa-trash-alt"></i>
-                                Apagar
-                            </button>
-                            <button type="button"
-                                    class="btn btn-md  btn-default"
-                                    data-dismiss="modal">Close
-                            </button>
-                        </div>
+        </div>
+        <div class="modal fade" id="delete_author_modal" tabindex="-1"
+             role="dialog"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h3> Certeza que deseja apagar esse author?</h3>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-md btn-danger"
+                                data-dismiss="modal"
+                                id="author_confirm_delete">
+                            <i class="fas fa-trash-alt"></i>
+                            Apagar
+                        </button>
+                        <button type="button"
+                                class="btn btn-md  btn-default"
+                                data-dismiss="modal">Close
+                        </button>
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="delete_author_modal" tabindex="-1"
-                 role="dialog"
-                 aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <h3> Certeza que deseja apagar esse author?</h3>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-md btn-danger"
-                                    data-dismiss="modal"
-                                    id="author_confirm_delete">
-                                <i class="fas fa-trash-alt"></i>
-                                Apagar
-                            </button>
-                            <button type="button"
-                                    class="btn btn-md  btn-default"
-                                    data-dismiss="modal">Close
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!---------------------END MODALS---------------------------------->
+        </div>
+        <!---------------------END MODALS---------------------------------->
 
-        {% else %}
+    {% else %}
+        <div class="row">
 
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
 
@@ -564,9 +564,11 @@
                 </div>
             </div>
 
-        {% endif %}
+        </div>
 
-    </div>
+    {% endif %}
+
+
 
 {% endblock %}
 
@@ -612,12 +614,13 @@
 
             // modal btn triggers
             edit_summary_btn.on("click", function () {
-                edit_summary_modal_body.text($(this).data('summary_text'));
+                edit_summary_modal_body.html($(this).data('summary_text'));
+                console.log($(this).data('summary_text'));
                 edit_summary_modal_btn.data('work_url', $(this).data('work_url'));
                 edit_summary_modal.modal('show');
             });
             edit_keyword_btn.on("click", function () {
-                edit_keywords_modal_body.text($(this).data('keywords_text'));
+                edit_keywords_modal_body.html($(this).data('keywords_text'));
                 edit_keywords_modal_btn.data('work_url', $(this).data('work_url'));
                 edit_keywords_modal.modal('show');
             });
@@ -722,9 +725,9 @@
 
         }
 
-        function update_summary(url, text) {
+        function update_summary(url, html) {
             var formData = new FormData();
-            formData.append('summary', text);
+            formData.append('summary', html);
 
             $.ajax({
                 url: url,
@@ -743,10 +746,10 @@
             });
         }
 
-        function update_keywords(url, text) {
+        function update_keywords(url, html) {
 
             var formData = new FormData();
-            formData.append('keywords', text);
+            formData.append('keywords', html);
 
             $.ajax({
                 url: url,
@@ -762,6 +765,7 @@
                 }
             }).fail(function (err) {
                 console.error(err);
+                location.reload(true);
             });
 
 
@@ -809,6 +813,7 @@
                 }
             }).fail(function (err) {
                 console.error(err);
+                location.reload(true);
             });
 
 
@@ -828,6 +833,7 @@
                 }
             }).fail(function (err) {
                 console.error(err);
+                location.reload(true);
             });
         }
 

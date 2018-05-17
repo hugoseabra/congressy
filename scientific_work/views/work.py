@@ -35,6 +35,23 @@ class WorkListView(WorkViewMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        work_list = context['object_list']
+        work_list_with_status = []
+        for work in work_list:
+
+            work.ready = self.is_ready(work)
+
+            work_list_with_status.append(work)
+
+        context['object_list'] = list(self.chunks(work_list_with_status, 2))
+        context['subscription'] = self.subscription
+
+        return context
+
+    @staticmethod
+    def is_ready(work):
+
         must_have = [
             'subscription',
             'modality',
@@ -45,33 +62,32 @@ class WorkListView(WorkViewMixin, generic.ListView):
             'accepts_terms',
         ]
 
-        work_list = context['object_list']
-        work_list_with_status = []
-        for work in work_list:
+        if work.modality == 'artigo':
+            if 'banner_file' in must_have:
+                must_have.remove('banner')
+            must_have.append('article_file')
+        elif work.modality == 'banner':
+            if 'article_file' in must_have:
+                must_have.remove('article_file')
+            must_have.append('banner_file')
+        elif work.modality == 'resumo':
+            if 'article_file' in must_have:
+                must_have.remove('article_file')
 
-            if work.modality == 'artigo':
-                if 'banner_file' in must_have:
-                    must_have.remove('banner')
-                must_have.append('article_file')
-            elif work.modality == 'banner':
-                if 'article_file' in must_have:
-                    must_have.remove('article_file')
-                must_have.append('banner_file')
-            elif work.modality == 'resumo':
-                if 'article_file' in must_have:
-                    must_have.remove('article_file')
+            if 'banner_file' in must_have:
+                must_have.remove('banner')
 
-                if 'banner_file' in must_have:
-                    must_have.remove('banner')
+        for item in must_have:
+            if not getattr(work, item) or work.authors.all().count() < 1:
+                return False
 
-            for item in must_have:
-                if not getattr(work, item) or work.authors.all().count() < 1:
-                    work.status = 'not ready'
-                else:
-                    work.status = 'ready'
-            work_list_with_status.append(work)
+        return True
 
-        context['object_list'] = work_list_with_status
-        context['subscription'] = self.subscription
+    @staticmethod
+    def chunks(l, n):
+        """Yield successive n-sized chunks from l."""
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
 
-        return context
+
+
