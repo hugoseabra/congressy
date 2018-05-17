@@ -102,6 +102,7 @@ class Transaction(models.Model):
         max_digits=11,
         null=True,
         blank=True,
+        verbose_name='valor do pagamento',
     )
 
     lot_price = models.DecimalField(
@@ -124,6 +125,7 @@ class Transaction(models.Model):
         max_digits=11,
         null=True,
         blank=True,
+        verbose_name='valor líquido do organizador'
     )
 
     boleto_url = models.TextField(
