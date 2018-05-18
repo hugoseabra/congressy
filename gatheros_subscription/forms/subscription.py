@@ -48,8 +48,7 @@ class SubscriptionForm(forms.ModelForm):
 
     def save(self, commit=True):
 
-        lot = self.instance.lot
-        if lot.price and lot.price > 0:
+        if self.instance.free:
             self.instance.status = Subscription.CONFIRMED_STATUS
 
         return super().save(commit=commit)
