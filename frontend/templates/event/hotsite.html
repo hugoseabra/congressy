@@ -229,14 +229,6 @@
         }
 
         $(document).ready(function () {
-            $(window).on('resize', function () {
-                window.setTimeout(function () {
-                    resize_status_block();
-                }, 400);
-            });
-            window.setTimeout(function () {
-                resize_status_block();
-            }, 400);
 
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
@@ -266,7 +258,6 @@
                 window,
                 "load",
                 function () {
-                    $('#add_area_category').val('');
                     {% if event.place.lat and event.place.long %}
                         window.cgsy.maps.init(
                             '{{ event.place.lat }}',
@@ -305,118 +296,6 @@
                     }, 1500);
                 }
 
-                // CSRF code
-                function getCookie(name) {
-                    var cookieValue = null;
-                    var i = 0;
-                    if (document.cookie && document.cookie !== '') {
-                        var cookies = document.cookie.split(';');
-                        for (i; i < cookies.length; i++) {
-                            var cookie = jQuery.trim(cookies[i]);
-                            // Does this cookie string begin with the name we want?
-                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                                break;
-                            }
-                        }
-                    }
-                    return cookieValue;
-                }
-
-                var csrftoken = getCookie('csrftoken');
-
-                // Action(update, delete) functions
-                function add_area_category(name) {
-
-                    var formData = new FormData();
-                    formData.append('name', name);
-                    formData.append('event', {{ event.pk }});
-
-                    $.ajax({
-                        url: '{% url 'scientific_work:areacategory-list' %}',
-                        type: 'POST',
-                        processData: false,
-                        contentType: false,
-                        data: formData,
-                        beforeSend: function (xhr) {
-                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                        },
-                        success: function () {
-                            update_area_category_list();
-                            $('#add_area_category').val('');
-                        }
-                    }).fail(function (err) {
-                        console.error(err);
-                    });
-
-
-                }
-                function delete_area_category(url) {
-
-
-                    $.ajax({
-                        url: url,
-                        type: 'DELETE',
-                        processData: false,
-                        contentType: false,
-                        beforeSend: function (xhr) {
-                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                        },
-                        success: function () {
-                            update_area_category_list();
-                            $('#add_area_category').val('');
-                        }
-                    }).fail(function (err) {
-                        console.error(err);
-                    });
-
-
-                }
-
-                function update_area_category_list() {
-                    $.ajax({
-                        url: '{% url 'event:event-hotsite' event.pk %}' +
-                        '?template_name=event/includes/area_category_list',
-                        type: 'GET',
-                        processData: false,
-                        contentType: false,
-                        beforeSend: function (xhr) {
-                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                        },
-                        success: function (response) {
-                            $('#area_category_list').html(response);
-                            recreate_event_triggers();
-                        }
-                    }).fail(function (err) {
-                        console.error(err);
-                    });
-                }
-
-                function recreate_event_triggers() {
-
-
-                    var new_area_category_btn = $('.new-area-category');
-                    var add_area_category_modal_btn = $('#add_area_category_modal_btn');
-                    var add_area_category_modal = $('#add_area_category_modal');
-
-                    new_area_category_btn.unbind("click");
-                    add_area_category_modal_btn.unbind("click");
-
-
-                    // Triggers
-                    new_area_category_btn.on("click", function () {
-                        add_area_category_modal.modal('show');
-                    });
-                    add_area_category_modal_btn.on("click", function () {
-                        var category_name = $('#add_area_category').val();
-
-                        if (category_name && category_name !== "") {
-                            add_area_category(category_name);
-                        }
-                    })
-                }
-
-                recreate_event_triggers();
                 $('#id_name').on('keypress', function (e) {
                     if (e.which == 13) {
                         reloadMap();
@@ -428,64 +307,14 @@
                 $('.submit-button').on("click", function () {
                     $('#hotsite-form').submit();
                 });
-                $('.delete-area-category').on("click", function () {
-                    var res = confirm("Certeza que deseja excluir este?");
-                    if(res){
-                        delete_area_category($(this).data('url'))
-                    }
 
-                });
 
             })(jQuery);
         });
     </script>
 {% endblock %}
 
-{% block modals %}
-    <!-----------------------MODALS ----------------------------------->
-    <div class="modal fade" id="add_area_category_modal" tabindex="-1"
-         role="dialog"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Nova área temática: </h3>
-                    <button type="button" class="close"
-                            data-dismiss="modal" aria-hidden="true">
-                        ×
-                    </button>
-                </div>
-                <div class="modal-body">
 
-                    <div class="form-group">
-
-                        <label for="add_area_category">Nome:</label>
-                        <div>
-                            <input name="add_area_category" maxlength="255"
-                                   class="form-control" id="add_area_category"
-                                   type="text">
-                        </div>
-                    </div>
-
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-md btn-success"
-                            data-dismiss="modal"
-                            id="add_area_category_modal_btn">
-                        <i class="far fa-save"></i>
-                        Salvar
-                    </button>
-                    <button type="button" class="btn btn-md  btn-danger"
-                            data-dismiss="modal">Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!---------------------END MODALS---------------------------------->
-
-{% endblock %}
 
 
 
@@ -541,11 +370,6 @@
                                 </div>
                             </div>
                             <div class="panel-body">
-                                {% if event.is_scientific %}
-                                    <div id="area_category_list">
-                                        {% include 'event/includes/area_category_list.html' %}
-                                    </div>
-                                {% endif %}
                                 <div class="row">
                                     <div class="col-md-12">
                                         {% render_generic_field form.image_main %}
@@ -561,6 +385,26 @@
                                         {% render_generic_field form.description_html %}
                                     </div>
                                 </div>
+                                <button type="button"
+                                        class="btn btn-success submit-button"
+                                        style=" float: right; margin-right:
+                                        10px">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    Configurações científica
+                                </div>
+                            </div>
+                            <div class="panel-body">
 
                                 {% if event.is_scientific %}
 
@@ -634,13 +478,20 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
                                         <i class="fas fa-check-circle fa-4x
 {% if info and info.description_html %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
-                                        <div class="title">Sobre o evento</div>
+                                        <div class="title">
+                                            {% if event.is_scientific %}
+                                                Apresentação do evento
+                                            {% else %}
+                                                Sobre do evento
+                                            {% endif %}
+                                        </div>
                                         <div class="text-muted description">
                                             Deixa claro para o visitante que
                                             ainda não
@@ -650,6 +501,50 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                {% if event.is_scientific %}
+
+                                    <div class="col-md-12 event-info-status-item">
+                                        <div>
+                                            <i class="fas fa-check-circle fa-4x
+{% if info and info.editorial_body %}success-color{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="title">
+                                                Corpo editorial
+                                            </div>
+                                            <div class="text-muted description">
+                                                Lorem ipsum dolor sit amet,
+                                                consectetur adipiscing elit.
+                                                Aliquam
+                                                vitae elementum ex, eu ultrices
+                                                massa.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 event-info-status-item">
+                                        <div>
+                                            <i class="fas fa-check-circle fa-4x
+{% if info and info.scientific_rules %}success-color{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="title">
+                                                Normas
+                                            </div>
+                                            <div class="text-muted description">
+                                                Lorem ipsum dolor sit amet,
+                                                consectetur adipiscing elit.
+                                                Aliquam
+                                                vitae elementum ex, eu ultrices
+                                                massa.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% endif %}
+
+
                             </div>
                         </div>
                     </div>

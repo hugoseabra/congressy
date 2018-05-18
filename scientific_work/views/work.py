@@ -80,7 +80,7 @@ class WorkListView(EventViewMixin, generic.ListView):
             work_list_with_status.append(work)
 
         context['object_list'] = work_list_with_status
-        context['active'] = 'scientific_work'
+        context['active'] = 'scientific_work_list'
         context['has_inside_bar'] = True
         context['event'] = self.event
 
