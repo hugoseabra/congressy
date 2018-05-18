@@ -183,7 +183,7 @@
                                                 </td>
                                                 <td>
                                                     <strong>
-                                                        {{ work.get_area_category_display }}
+                                                        {{ work.area_category.name }}
                                                     </strong>
                                                     <i class="fas
                                                         fa-check-circle success-color fa-lg pull-right"></i>
@@ -620,7 +620,6 @@
             // modal btn triggers
             edit_summary_btn.on("click", function () {
                 edit_summary_modal_body.html($(this).data('summary_text'));
-                console.log($(this).data('summary_text'));
                 edit_summary_modal_btn.data('work_url', $(this).data('work_url'));
                 edit_summary_modal.modal('show');
             });

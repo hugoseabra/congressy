@@ -51,6 +51,12 @@ class InfoForm(BaseModelFileForm):
     def __init__(self, event=None, **kwargs):
         self.event = event
         super().__init__(**kwargs)
+        if self.event.is_scientific:
+            self.fields['scientific_rules'] = forms.CharField(
+                widget=CKEditorWidget(), label="Normas do evento")
+            self.fields['editorial_body'] = forms.CharField(
+                widget=CKEditorWidget(), label="Corpo editorial")
+            self.fields['description_html'].label = "Apresentação do evento"
 
     def clean_event(self):
         return self.event

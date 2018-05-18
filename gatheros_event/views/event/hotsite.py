@@ -7,9 +7,10 @@ from gatheros_event import forms
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Info
 from gatheros_event.views.mixins import AccountMixin
+from core.views.mixins import TemplateNameableMixin
 
 
-class EventHotsiteView(AccountMixin, FormView):
+class EventHotsiteView(TemplateNameableMixin, AccountMixin, FormView):
     form_class = forms.HotsiteForm
     template_name = 'event/hotsite.html'
     event = None
@@ -40,6 +41,18 @@ class EventHotsiteView(AccountMixin, FormView):
 
         self.event = get_object_or_404(Event, pk=self.kwargs.get('pk'))
         return self.event
+
+    def _get_area_categories(self):
+        categories = None
+        event = self.event
+
+        if not event:
+            event = self._get_event()
+
+        if event.area_categories.all().count() > 0:
+            categories = event.area_categories.all()
+
+        return categories
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -78,6 +91,7 @@ class EventHotsiteView(AccountMixin, FormView):
         context['event'] = event
         context['has_paid_lots'] = self.has_paid_lots()
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY
+        context['area_categories'] = self._get_area_categories()
 
         try:
             context['info'] = event.info

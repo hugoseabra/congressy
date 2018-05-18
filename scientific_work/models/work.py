@@ -1,6 +1,7 @@
 from django.db import models
 from gatheros_subscription.models import Subscription
 import os
+from .area_category import AreaCategory
 
 class Work(models.Model):
 
@@ -12,18 +13,6 @@ class Work(models.Model):
         (ARTICLE, 'Artigo'),
         (BANNER, 'Banner'),
         (SUMMARY, 'Resumo'),
-    )
-
-    ACADEMIC = 'ensino'
-    MANAGEMENT = 'gestao'
-    MARKETING = 'marketing'
-    RESEARCH = 'pesquisa'
-
-    AREA_CATEGORIES = (
-        (ACADEMIC, 'Ensino'),
-        (MANAGEMENT, 'Gestão'),
-        (MARKETING, 'Marketing'),
-        (RESEARCH, 'Pesquisa'),
     )
 
     subscription = models.ForeignKey(
@@ -40,11 +29,10 @@ class Work(models.Model):
         default=ARTICLE,
     )
 
-    area_category = models.CharField(
-        max_length=25,
-        verbose_name="área temática",
-        choices=AREA_CATEGORIES,
-        default=ACADEMIC,
+    area_category = models.ForeignKey(
+        AreaCategory,
+        on_delete=models.DO_NOTHING,
+        related_name="works",
     )
 
     title = models.CharField(

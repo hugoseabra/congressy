@@ -1,14 +1,18 @@
 from django import forms
-from scientific_work.models import Work
+
+from scientific_work.models import Work, AreaCategory
 
 
 class NewWorkForm(forms.ModelForm):
-
     subscription = None
 
     def __init__(self, subscription, *args, **kwargs):
         self.subscription = subscription
         super().__init__(*args, **kwargs)
+        self.fields['area_category'] = forms.ModelChoiceField(
+            queryset=AreaCategory.objects.filter(
+                event=self.subscription.event),
+        )
 
     class Meta:
         model = Work
