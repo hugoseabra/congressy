@@ -247,72 +247,88 @@ panel-default">
         {% endif %}
     </div>
 
-    {#    <div class="panel panel-primary col-sm-5 col-md-6"#}
-    {#         style="padding: 0;margin-left: 25px">#}
-    {##}
-    {#        <div class="panel-heading">#}
-    {#            <div class="panel-title">Criação do seu evento</div>#}
-    {#        </div>#}
-    {#        <div class="panel-body">#}
-    {#            <div class="progress">#}
-    {#                <div class="progress-bar progress-bar-info" role="progressbar"#}
-    {#                     aria-valuenow="75"#}
-    {#                     aria-valuemin="0" aria-valuemax="100" style="width: 75%;">#}
-    {#                    75%#}
-    {#                </div>#}
-    {#            </div>#}
-    {#            <ul class="nav nav-pills nav-stacked">#}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-check success-color"></i>#}
-    {#                        <a href="#">Criar evento</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-check"></i>#}
-    {#                        <a href="#">Criar hot-site</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {##}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-check"></i>#}
-    {#                        <a href="#">Configurar lote</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {##}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-check"></i>#}
-    {#                        <a href="#">Configurar dados bancários</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {##}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <a href="#">Configurar#}
-    {#                            cerficados</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {##}
-    {#                <li role="separator" class="divider"></li>#}
-    {##}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-plus"></i>#}
-    {#                        <a href="#">Opicionais</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-plus"></i>#}
-    {#                        <a href="#">Submissão de artigos científicos</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {##}
-    {##}
-    {#            </ul>#}
-    {#        </div>#}
-    {#    </div>#}
+    <div class="panel panel-primary col-sm-5 col-md-6"
+         style="padding: 0;margin-left: 25px">
+
+        <div class="panel-heading">
+            <div class="panel-title">Criação do seu evento</div>
+        </div>
+        <div class="panel-body">
+            <div class="progress">
+                <div class="progress-bar progress-bar-info" role="progressbar"
+                     aria-valuenow="75"
+                     aria-valuemin="0" aria-valuemax="100" style="width: 75%;">
+                    75%
+                </div>
+            </div>
+
+            <table class="table table-hover">
+                <tbody>
+                <tr class="todo_list_element" role="presentation">
+                    <td>
+                        <i class="fas fa-check-circle success-color
+                            pull-right fa-2x"></i>
+                        <h1>Criar evento</h1>
+                    </td>
+                </tr>
+                <tr class="todo_list_element" role="presentation">
+                    <td>
+                        {% if info and info.description_html %}
+                            <i class="fas fa-check-circle success-color
+                                pull-right fa-2x"></i>
+                        {% else %}
+                            <i class="fas fa-times-circle danger-color
+                                pull-right fa-2x"></i>
+                        {% endif %}
+                        <h1><a href="{% url 'event:event-hotsite' event.pk %}">
+                            Criar hot-site</a>
+                        </h1>
+                    </td>
+                </tr>
+
+                {% if event.payment_type == 'paid' or has_paid_lots %}
+                    <tr class="todo_list_element" role="presentation">
+                        <td>
+                            {% if has_paid_lots %}
+                                <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+                            {% else %}
+                                <i class="fas fa-times-circle danger-color
+                                    pull-right fa-2x"></i>
+                            {% endif %}
+                            <h1><a href=
+                                           "{% url 'subscription:lot-list' event.pk %}">Configurar
+                                lote</a></h1>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% if event.payment_type == 'paid' or has_paid_lots %}
+                    <tr class="todo_list_element" role="presentation">
+                        <td>
+                            {% if full_banking %}
+                                <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+                            {% else %}
+                                <i class="fas fa-times-circle danger-color
+                                    pull-right fa-2x"></i>
+                            {% endif %}
+                            <h1>
+                                <a href="{% url 'event:organization-edit' organization.pk %}">Configurar
+                                    dados bancários</a></h1>
+                        </td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+
+            <table class="table table-hover">
+                <tbody>
+                <tr>
+                    <td>teste</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

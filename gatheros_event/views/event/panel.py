@@ -8,7 +8,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView
 
 from gatheros_event.helpers.account import update_account
-from gatheros_event.models import Event
+from gatheros_event.models import Event, Info, Organization, Member, Person
 from gatheros_event.views.mixins import AccountMixin
 from payment.models import Transaction, TransactionStatus
 
@@ -44,6 +44,7 @@ class EventPanelView(AccountMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(EventPanelView, self).get_context_data(**kwargs)
+        context['event'] = self.event
         context['status'] = self._get_status()
         context['totals'] = self._get_payables()
         context['limit'] = self._get_limit()
@@ -63,6 +64,11 @@ class EventPanelView(AccountMixin, DetailView):
             'number': str(self.object.percent_attended).replace(',', '.'),
         }
         context['report'] = self._get_report()
+        context['full_banking'] = self._get_full_banking()
+        try:
+            context['info'] = self.event.info
+        except Info.DoesNotExist:
+            pass
 
         return context
 
@@ -77,6 +83,27 @@ class EventPanelView(AccountMixin, DetailView):
                 return True
 
         return False
+
+
+
+    def _get_full_banking(self):
+
+        if not self.organization:
+            return False
+
+        banking_required_fields = ['bank_code', 'agency', 'account',
+                                   'cnpj_ou_cpf', 'account_type']
+
+        for field in Organization._meta.get_fields():
+
+            for required_field in banking_required_fields:
+
+                if field.name == required_field:
+
+                    if not getattr(self.organization, field.name):
+                        return False
+
+        return True
 
     def _get_gender(self):
         return self.event.get_report()

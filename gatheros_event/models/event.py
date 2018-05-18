@@ -58,6 +58,13 @@ class Event(models.Model, GatherosModelMixin):
         (EVENT_STATUS_FINISHED, 'finalizado'),
     )
 
+    PAYMENT_TYPE_FREE = 'free'
+    PAYMENT_TYPE_PAID = 'paid'
+
+    PAYMENT_TYPES = (
+        (PAYMENT_TYPE_FREE, 'Gratuito'),
+        (PAYMENT_TYPE_PAID, 'Pago'),
+    )
     name = models.CharField(max_length=255, verbose_name='nome')
 
     organization = models.ForeignKey(
@@ -71,6 +78,14 @@ class Event(models.Model, GatherosModelMixin):
         Category,
         on_delete=models.PROTECT,
         verbose_name='categoria'
+    )
+
+    payment_type = models.CharField(
+        max_length=15,
+        choices=PAYMENT_TYPES,
+        default=PAYMENT_TYPE_FREE,
+        verbose_name='Tipo de evento',
+        help_text="Como será seu evento?"
     )
 
     subscription_type = models.CharField(

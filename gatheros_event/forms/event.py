@@ -25,6 +25,7 @@ class EventForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
+            'payment_type',
         ]
 
         widgets = {
@@ -32,6 +33,7 @@ class EventForm(forms.ModelForm):
             'subscription_type': forms.RadioSelect,
             'date_start': SplitDateTimeWidget(),
             'date_end': SplitDateTimeWidget(),
+            'payment_type': forms.RadioSelect(),
         }
 
     def __init__(self, user, lang='pt-br', *args, **kwargs):
