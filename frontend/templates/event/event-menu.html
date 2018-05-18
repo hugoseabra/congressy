@@ -30,15 +30,6 @@ Variáveis:
             <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
         </a>
     </li>
-    {% if event.is_scientific %}
-        <li {% if active == 'scientific_work_list' %}class="active"{% endif %}>
-            <a class="sidebar-itens"
-               href="{% url 'scientific_work:work-list' event.pk %}"
-               title="Submissão de artigos">
-                <i class="fas fa-newspaper"></i> Artigos científicos
-            </a>
-        </li>
-    {% endif %}
     {% if has_paid_lots %}
         <li {% if active == 'pagamentos' %}class="active"{% endif %}>
             <a class="sidebar-itens" href=
@@ -83,17 +74,6 @@ Variáveis:
             <i class="fas fa-cog"></i> Dados do evento
         </a>
     </li>
-    {% if event.is_scientific %}
-        <li {% if active == 'scientific_work' %}class="active"{% endif %}>
-            <a class="sidebar-itens text-center"
-               href="{% url 'scientific_work:area_category_config' event.pk %}"
-               title="Submissão de artigos">
-                <i class="fas fa-cog"></i> Áreas Temáticas
-            </a>
-
-
-        </li>
-    {% endif %}
     <li {% if active == 'form-personalizado' %}class="active"{% endif %}>
         <a class="sidebar-itens" href=
                 "{% url 'subscription:form-config' event.pk %}"
@@ -117,3 +97,23 @@ Variáveis:
     {#        </li>#}
 
 </ul>
+{% if event.is_scientific %}
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Artigos científicos</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li {% if active == 'scientific_work_list' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'scientific_work:work-list' event.pk %}"
+               title="Submissão de artigos">
+                <i class="fas fa-newspaper"></i> Todos trabalhos
+            </a>
+        </li>
+        <li {% if active == 'scientific_work' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'scientific_work:scientific_event_config' event.pk %}"
+               title="Submissão de artigos">
+                <i class="fas fa-cog"></i> Configurações
+            </a>
+        </li>
+
+    </ul>
+{% endif %}

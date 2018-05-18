@@ -19,7 +19,7 @@ subscription_urls = [
 event_urls = [
     url(r'^list/$', views.WorkListView.as_view(), name='work-list'),
     url(r'^area-categories-config/$', views.AreaCategoryConfigView.as_view(),
-        name='area_category_config'),
+        name='scientific_event_config'),
 ]
 
 api_urls = [

@@ -113,7 +113,7 @@
 
                 function update_area_category_list() {
                     $.ajax({
-                        url: '{% url 'scientific_work:area_category_config' event.pk %}' +
+                        url: '{% url 'scientific_work:scientific_event_config' event.pk %}' +
                         '?template_name=scientific_work/includes' +
                         '/area_category_list',
                         type: 'GET',
