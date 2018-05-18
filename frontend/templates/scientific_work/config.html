@@ -20,9 +20,30 @@
                         Período de Submissão
                     </div>
                 </div>
-                <div class="panel-body">
+                <form id="work_config_date_form">
+                    <div class="panel-body">
+                        <div class="row">
 
-                </div>
+                            <div class="col-md-6">
+                                {% render_generic_field form.date_start required=True %}
+                            </div>
+                            <div class="col-md-6">
+                                {% render_generic_field form.date_end required=True%}
+                            </div>
+
+                            {% render_generic_field form.event %}
+
+                            <div style="margin-right: 20px">
+                                <button type="button" class="btn btn-success pull-right
+                        work-config-date-save">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
             </div>
         </div>
         <div class="col-md-6">
@@ -43,6 +64,21 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Tipos de Apresentações
+                    </div>
+                </div>
+                <div class="panel-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -51,7 +87,6 @@
         $(document).ready(function () {
 
             $('#add_area_category').val('');
-
 
             (function ($) {
 
@@ -147,16 +182,17 @@
 
                 function recreate_event_triggers() {
 
-
                     var new_area_category_btn = $('.new-area-category');
                     var add_area_category_modal_btn = $('#add_area_category_modal_btn');
                     var add_area_category_modal = $('#add_area_category_modal');
                     var delete_area_category_btn = $('.delete-area-category');
+                    var date_save_btn = $('.work-config-date-save');
+                    var date_form = $('#work_config_date_form');
 
                     new_area_category_btn.unbind("click");
                     add_area_category_modal_btn.unbind("click");
                     delete_area_category_btn.unbind("click");
-
+                    date_save_btn.unbind("click");
 
                     // Triggers
                     new_area_category_btn.on("click", function () {
@@ -176,7 +212,27 @@
                         }
 
                     });
+                    date_save_btn.on("click", function () {
+                        console.log('got called');
+                        var form_data = new FormData(date_form[0]);
+                        $.ajax({
+                            url: '{% url 'scientific_work:workconfig-detail' work_config.pk %}',
+                            type: 'PATCH',
+                            processData: false,
+                            data: form_data,
+                            contentType: false,
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                            },
+                            success: function (res) {
+                                console.log(res);
+                            }
+                        }).fail(function (err) {
+                            console.error(err.responseText);
+                        });
 
+
+                    });
                 }
 
                 recreate_event_triggers();

@@ -14,14 +14,22 @@ class WorkConfig(models.Model):
         (ORAL_AND_POSTER, 'Oral e Poster'),
     )
 
-    event = models.ForeignKey(
+    event = models.OneToOneField(
         Event,
         on_delete=models.CASCADE,
-        related_name="submission_configs",
+        related_name="work_config",
     )
 
-    date_start = models.DateTimeField(verbose_name='data inicial')
-    date_end = models.DateTimeField(verbose_name='data final')
+    date_start = models.DateTimeField(
+        verbose_name='data inicial',
+        blank=True,
+        null=True,
+    )
+    date_end = models.DateTimeField(
+        verbose_name='data final',
+        blank=True,
+        null=True,
+    )
 
     presenting_type = models.CharField(
         max_length=25,
