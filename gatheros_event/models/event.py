@@ -181,17 +181,7 @@ class Event(models.Model, GatherosModelMixin):
         verbose_name='evento científico',
     )
 
-    scientific_rules = models.TextField(
-        verbose_name="normas de evento cientifico",
-        null=True,
-        blank=True,
-    )
 
-    editorial_body = models.TextField(
-        verbose_name="corpo editorial",
-        null=True,
-        blank=True,
-    )
 
     class Meta:
         verbose_name = 'evento'
