@@ -3,6 +3,7 @@ from gatheros_subscription.models import Subscription
 import os
 from .area_category import AreaCategory
 
+
 class Work(models.Model):
 
     ARTICLE = 'artigo'
