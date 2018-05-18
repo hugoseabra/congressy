@@ -53,14 +53,18 @@ class InfoForm(BaseModelFileForm):
             'editorial_body': CKEditorWidget(),
         }
 
+        help_texts = {
+            'editorial_body': 'Corpo editorial que compõem sua organização',
+            'scientific_rules': 'Normas do seu evento científico'
+        }
+        labels = {
+            'editorial_body': "Corpo editorial",
+            'scientific_rules': "Normas do evento"
+        }
+
     def __init__(self, event=None, **kwargs):
         self.event = event
         super().__init__(**kwargs)
-        self.fields['scientific_rules'].required = False
-        self.fields['editorial_body'].required = False
-
-        self.fields['scientific_rules'].label = "Normas do evento"
-        self.fields['editorial_body'].label = "Corpo editorial"
 
         if self.event.is_scientific:
             self.fields['description_html'].label = "Apresentação do evento"
