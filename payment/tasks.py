@@ -73,7 +73,7 @@ def create_pagarme_transaction(transaction_data, subscription=None):
     transaction_instance.lot_price = subscription.lot.get_calculated_price()
     transaction_instance.liquid_amount = liquid_amount
 
-    if 'instalments' in trx \
+    if 'installments' in trx \
             and trx['installments'] \
             and int(trx['installments']):
         installments = int(trx['installments'])
