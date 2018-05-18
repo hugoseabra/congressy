@@ -43,6 +43,17 @@
                 {% endif %}
                 <br>
 
+            {% elif field.field.widget.input_type == "file" %}
+
+
+                <label for="{{ field.id_for_label }}"
+                       class="custom-file-upload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Enviar arquivo
+                </label>
+                {{ field }}
+
+
             {% else %}
 
                 {% if  required  or required == 'True' %}
