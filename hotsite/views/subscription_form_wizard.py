@@ -1,12 +1,12 @@
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.forms import ValidationError
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
@@ -43,7 +43,6 @@ class InvalidStateStepError(Exception):
     """ Exceção acontece quando um step de formulário não possui
      um estado esperado. """
     pass
-
 
 
 def is_paid_lot(wizard):
@@ -231,7 +230,7 @@ class SubscriptionWizardView(SessionWizardView):
         if 'person' in self.request.session:
             del self.request.session['person']
 
-        if not lot.price or lot.price == 0:
+        if not subscription.free:
 
             subscription.status = Subscription.CONFIRMED_STATUS
             subscription.save()
@@ -241,15 +240,24 @@ class SubscriptionWizardView(SessionWizardView):
             else:
                 notify_new_free_subscription(self.event, subscription)
 
-            response = HttpResponseRedirect(reverse_lazy(
-                'public:hotsite', kwargs={'slug': self.event.slug,}
-            ))
+            msg = 'Inscrição realizada com sucesso!' \
+                  ' Nós lhe enviamos um e-mail de confirmação de sua' \
+                  ' inscrição. Porém, o seu voucher estará disponível apenas' \
+                  ' após a confirmação de seu pagamento.'
+
+            success_url = reverse_lazy(
+                'public:hotsite', kwargs={'slug': self.event.slug, }
+            )
 
         else:
-            response = HttpResponseRedirect(reverse_lazy(
+            msg = 'Inscrição realizada com sucesso!' \
+                  ' Nós lhe enviamos um e-mail de confirmação de sua' \
+                  ' inscrição juntamente com seu voucher.'
+
+            success_url = reverse_lazy(
                 'public:hotsite-subscription-status',
-                kwargs={'slug': self.event.slug,}
-            ))
+                kwargs={'slug': self.event.slug, }
+            )
 
         if 'lot' in self.request.session:
             del self.request.session['lot']
@@ -257,12 +265,8 @@ class SubscriptionWizardView(SessionWizardView):
         if 'person' in self.request.session:
             del self.request.session['person']
 
-        messages.success(
-            self.request,
-            'Inscrição realizada com sucesso!'
-        )
-
-        return response
+        messages.success(self.request, msg)
+        return redirect(success_url)
 
     def get_form_initial(self, step):
 

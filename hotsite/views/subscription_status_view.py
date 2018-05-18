@@ -70,7 +70,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         lot = self.subscription.lot
 
         if lot.private is True:
-            
+
             if lot.status == lot.LOT_STATUS_RUNNING:
                 context['lot_is_still_valid'] = True
                 self.request.session['exhibition_code'] = lot.exhibition_code

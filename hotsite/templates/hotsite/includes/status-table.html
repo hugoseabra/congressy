@@ -1,0 +1,86 @@
+{% load base_tags humanize l10n %}
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th class="col-xs-1 hidden-xs">Status
+        </th>
+        <th class="col-xs-2 hidden-xs">Data</th>
+        <th class="col-xs-3">Forma de
+            Pagamento
+        </th>
+        <th class="col-xs-2 hidden-xs">
+            Valor (R$)
+        </th>
+        <th class="col-xs-1">Voucher</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for transaction in transactions %}
+        <tr>
+            <td class="hidden-xs">
+
+                {% if transaction.status == 'processing' or transaction.status == 'waiting_payment' or transaction.status == 'pending_refund' or transaction.status == 'chargedback' %}
+                    <i class="fa fa-circle"
+                       aria-hidden="true"
+                       style="color: #f0ad4e"></i>
+                {% elif transaction.status == 'authorized' or transaction.status == 'paid' or transaction.status == 'refunded' %}
+                    <i class="fa fa-circle"
+                       aria-hidden="true"
+                       style="color:#5cb85c"></i>
+                {% elif transaction.status == 'refused' %}
+                    <i class="fa fa-circle"
+                       aria-hidden="true"
+                       style="color: #d9534f"></i>
+                {% else %}
+                    <i class="fa fa-circle"
+                       aria-hidden="true"></i>
+                {% endif %}
+                {{ transaction.get_status_display }}
+            </td>
+            <td class="hidden-xs">
+                {{ transaction.date_created|date:"d/m/Y H\hi" }}
+            </td>
+            <td>
+                {% if transaction.data.payment_method == 'boleto' %}
+                    Boleto
+                    <br>
+                    <small>
+                        {% if transaction.boleto_url %}
+                            <a target="_blank" class="text-muted"
+                               href="{{ transaction.boleto_url }}">
+                                Link para boleto
+                            </a>
+                        {% else %}
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-success progress-bar-striped active"
+                                     role="progressbar"
+                                     style="width: 100%;background-color:#5cb85c!important;">
+                                    <span class="sr-only"></span>
+                                </div>
+                            </div>
+                            Seu link para o boleto estará pronto em breve.
+                        {% endif %}
+                    </small>
+                {% elif transaction.data.payment_method == 'credit_card' %}
+                    Cartão de Crédito
+                {% else %}
+                    Error
+                {% endif %}
+            </td>
+            <td>
+                R$ {{ transaction.amount|money_divide|intcomma }}
+            </td>
+            <td>
+                {% if transaction.status == transaction.PAID %}
+                    <a href="{% url 'subscription:subscription-voucher' transaction.subscription.event.pk transaction.subscription.pk %}">
+                        <i class="fas fa-file-pdf"></i>
+                    </a>
+                {% else %}
+                    ---
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
