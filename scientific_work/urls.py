@@ -7,6 +7,7 @@ router = routers.DefaultRouter(trailing_slash=True)
 router.register(r'authors', views.AuthorViewSet)
 router.register(r'works', views.WorkViewSet)
 router.register(r'area_categories', views.AreaCategoryViewSet)
+router.register(r'work_configs', views.WorkConfigViewSet)
 
 subscription_urls = [
     url(r'^add/$', views.WorkAddView.as_view(), name='work-add'),

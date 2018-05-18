@@ -1,8 +1,8 @@
 from rest_framework import viewsets
 
-from scientific_work.models import Work, Author, AreaCategory
+from scientific_work.models import Work, Author, AreaCategory, WorkConfig
 from scientific_work.serializers import WorkSerializer, AuthorSerializer, \
-    AreaCategorySerializer
+    AreaCategorySerializer, WorkConfigSerializer
 
 
 class WorkViewSet(viewsets.ModelViewSet):
@@ -27,3 +27,11 @@ class AreaCategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = AreaCategory.objects.all()
     serializer_class = AreaCategorySerializer
+
+
+class WorkConfigViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows AreaCategories to be viewed or edited.
+    """
+    queryset = WorkConfig.objects.all()
+    serializer_class = WorkConfigSerializer

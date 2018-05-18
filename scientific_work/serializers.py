@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Work, Author, AreaCategory
+from .models import Work, Author, AreaCategory, WorkConfig
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -19,6 +19,20 @@ class AreaCategorySerializer(serializers.ModelSerializer):
         """Meta class to map serializer's fields with the model fields."""
         model = AreaCategory
         fields = ('name', 'event')
+
+
+class WorkConfigSerializer(serializers.ModelSerializer):
+    """Serializer to map the Model instance into JSON format."""
+
+    class Meta:
+        """Meta class to map serializer's fields with the model fields."""
+        model = WorkConfig
+        fields = (
+            'date_start',
+            'date_end',
+            'presenting_type',
+            'event',
+        )
 
 
 class WorkSerializer(serializers.ModelSerializer):
