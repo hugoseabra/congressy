@@ -183,7 +183,7 @@
 
                             <li style="padding-left:
                                  5px; padding-right: 5px;">
-                                <span class="text" >
+                                <span class="text">
                                     {{ organization.name|truncatechars:15 }}
                                 </span>
                             </li>
@@ -212,9 +212,9 @@
                     </li>
                 {% endif %}
                 <li role="presentation">
-                    <button type="button" class="sidebar-toggle navbar-toggle
-            collapsed" data-toggle="collapse" data-target="#sidebar"
-                            aria-expanded="false" style="text-align:
+                    <button type="button" id="button-toggle"
+                            class="navbar-toggle
+            "style="text-align:
                     right;width: 50px; ">
                         <i class="fas fa-bars"
                            style="font-size: 30px;"></i>
@@ -300,10 +300,13 @@
             navMain.collapse('hide');
         });
     });
+    $(function () {
+        $('#button-toggle').click(function () {
+            $('#sidebar').toggle();
+        });
+    })
 
     function cgsy_submit(value) {
-        console.log(typeof(value));
-        console.log(value);
         var org_context = document.getElementById('organization-context-pk');
         org_context.value = value;
         document.getElementById("organization_context").submit();
