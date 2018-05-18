@@ -8,7 +8,7 @@ from .mixins import EventViewMixin
 class AreaCategoryConfigView(TemplateNameableMixin, EventViewMixin,
                              AccountMixin,
                              TemplateView):
-    template_name = 'scientific_work/area_config_form.html'
+    template_name = 'scientific_work/config.html'
 
     def _get_area_categories(self):
         categories = None
