@@ -10,8 +10,8 @@
             {% if info.image_main.default %}
                 <!-- DESCRIPTION IMAGE -->
                 <div class="about-image col-md-6" data-animation="fadeIn">
-                    <img src="{{ info.image_main.default.url }}" alt="" class="img-responsive">
-
+                    <img src="{{ info.image_main.default.url }}" alt=""
+                         class="img-responsive">
                 </div>
 
                 <!-- DESCRIPTION TEXT -->
@@ -27,6 +27,31 @@
             {% endif %}
 
         </div>
+
+        <!-- Editorial Text -->
+        {% if info.editorial_body %}
+            <h2 class="section-heading text-center">Corpo editorial</h2>
+
+            <div class="about-row row">
+                <div class="about-text col-md-12">
+                    {{ info.editorial_body|safe }}
+                </div>
+
+            </div>
+        {% endif %}
+
+
+        <!-- Scientific Rules Text -->
+        {% if info.scientific_rules %}
+            <h2 class="section-heading text-center">Normas</h2>
+
+            <div class="about-row row">
+                <div class="about-text col-md-12">
+                    {{ info.scientific_rules|safe }}
+                </div>
+
+            </div>
+        {% endif %}
 
     </div>
 
