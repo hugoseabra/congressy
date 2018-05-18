@@ -48,6 +48,28 @@ Variáveis:
     {#            </a>#}
     {#        </li>#}
 </ul>
+
+{% if event.is_scientific %}
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Artigos científicos</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li {% if active == 'scientific_work_list' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'scientific_work:work-list' event.pk %}"
+               title="Submissão de artigos">
+                <i class="fas fa-newspaper"></i> Todos trabalhos
+            </a>
+        </li>
+        <li {% if active == 'scientific_work' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'scientific_work:scientific_event_config' event.pk %}"
+               title="Submissão de artigos">
+                <i class="fas fa-cog"></i> Configurações
+            </a>
+        </li>
+
+    </ul>
+{% endif %}
+
 <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
 <ul class="nav nav-pills nav-stacked">
     <li {% if active == 'pagina-do-evento' %}class="active"{% endif %}>
@@ -97,23 +119,3 @@ Variáveis:
     {#        </li>#}
 
 </ul>
-{% if event.is_scientific %}
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Artigos científicos</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li {% if active == 'scientific_work_list' %}class="active"{% endif %}>
-            <a class="sidebar-itens"
-               href="{% url 'scientific_work:work-list' event.pk %}"
-               title="Submissão de artigos">
-                <i class="fas fa-newspaper"></i> Todos trabalhos
-            </a>
-        </li>
-        <li {% if active == 'scientific_work' %}class="active"{% endif %}>
-            <a class="sidebar-itens"
-               href="{% url 'scientific_work:scientific_event_config' event.pk %}"
-               title="Submissão de artigos">
-                <i class="fas fa-cog"></i> Configurações
-            </a>
-        </li>
-
-    </ul>
-{% endif %}
