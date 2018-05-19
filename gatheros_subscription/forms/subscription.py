@@ -32,8 +32,7 @@ class SubscriptionForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-
-        if not self.instance:
+        if not self.instance or not self.instance.pk:
             person = cleaned_data.get('person')
 
             qs = Subscription.objects.filter(person=person, event=self.event)
@@ -48,7 +47,7 @@ class SubscriptionForm(forms.ModelForm):
 
     def save(self, commit=True):
 
-        if self.instance.free:
+        if self.instance.free is True:
             self.instance.status = Subscription.CONFIRMED_STATUS
 
         return super().save(commit=commit)
