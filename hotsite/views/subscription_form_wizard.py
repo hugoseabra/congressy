@@ -230,7 +230,7 @@ class SubscriptionWizardView(SessionWizardView):
         if 'person' in self.request.session:
             del self.request.session['person']
 
-        if not subscription.free:
+        if subscription.free is True:
 
             subscription.status = Subscription.CONFIRMED_STATUS
             subscription.save()
@@ -242,8 +242,7 @@ class SubscriptionWizardView(SessionWizardView):
 
             msg = 'Inscrição realizada com sucesso!' \
                   ' Nós lhe enviamos um e-mail de confirmação de sua' \
-                  ' inscrição. Porém, o seu voucher estará disponível apenas' \
-                  ' após a confirmação de seu pagamento.'
+                  ' inscrição juntamente com seu voucher.'
 
             success_url = reverse_lazy(
                 'public:hotsite', kwargs={'slug': self.event.slug, }
@@ -252,7 +251,8 @@ class SubscriptionWizardView(SessionWizardView):
         else:
             msg = 'Inscrição realizada com sucesso!' \
                   ' Nós lhe enviamos um e-mail de confirmação de sua' \
-                  ' inscrição juntamente com seu voucher.'
+                  ' inscrição. Porém, o seu voucher estará disponível apenas' \
+                  ' após a confirmação de seu pagamento.'
 
             success_url = reverse_lazy(
                 'public:hotsite-subscription-status',
