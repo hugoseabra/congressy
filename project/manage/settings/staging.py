@@ -12,7 +12,6 @@ from fnmatch import fnmatch
 DEBUG = True
 # ================================= APPS ==================================== #
 INSTALLED_APPS.extend([
-    'debug_toolbar',
     'django_nose',
     'logtailer',
 ])
