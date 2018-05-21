@@ -701,7 +701,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         try:
             subscription = self.event.subscriptions.get(
-                person__user=self.request.user, lot=lot)
+                person__user=self.request.user)
 
             all_transactions = Transaction.objects.filter(
                 subscription=subscription,
