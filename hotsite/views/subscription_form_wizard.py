@@ -180,16 +180,6 @@ class SubscriptionWizardView(SessionWizardView):
         if self.storage.current_step == 'lot':
             context['has_coupon'] = self.has_coupon()
 
-        if self.storage.current_step == 'payment':
-            context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
-            now = datetime.now()
-            margin = self.event.date_start
-
-            if has_open_boleto or margin - now < timedelta(days=5):
-                context['allowed_transaction_types'] = 'credit_card'
-            else:
-                context['allowed_transaction_types'] = 'credit_card,boleto'
-
         if self.storage.current_step == 'person':
 
             try:
@@ -207,6 +197,27 @@ class SubscriptionWizardView(SessionWizardView):
                 config.address = config.ADDRESS_SHOW
 
             context['config'] = config
+
+            if not is_paid_lot(self) and not has_survey(self):
+                context['is_last'] = True
+            else:
+                context['is_last'] = False
+
+        if self.storage.current_step == 'survey':
+            if not is_paid_lot(self):
+                context['is_last'] = True
+            else:
+                context['is_last'] = False
+
+        if self.storage.current_step == 'payment':
+            context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
+            now = datetime.now()
+            margin = self.event.date_start
+
+            if has_open_boleto or margin - now < timedelta(days=5):
+                context['allowed_transaction_types'] = 'credit_card'
+            else:
+                context['allowed_transaction_types'] = 'credit_card,boleto'
 
         return context
 
