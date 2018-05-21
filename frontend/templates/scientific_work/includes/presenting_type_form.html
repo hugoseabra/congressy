@@ -1,0 +1,21 @@
+{% load i18n static widget_tweaks form_config_tags %}
+<form id="work_config_presenting_type_form">
+    <div class="panel-body">
+        <div class="row">
+
+            <div class="col-md-12">
+                {% render_generic_field form.presenting_type required=True %}
+            </div>
+
+            {% render_generic_field form.event %}
+
+            <div style="margin-right: 20px">
+                <button type="button" class="btn btn-success pull-right
+                        work-config-presenting-save">
+                    <i class="fa fa-save"></i>
+                    Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</form>

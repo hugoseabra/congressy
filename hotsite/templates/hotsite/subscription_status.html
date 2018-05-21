@@ -2,24 +2,26 @@
 {% load static base_tags humanize l10n %}
 
 {% block scripts %}
-<script src="{% static 'hotsite/js/subscription-status.js' %}"></script>
-<script>
-    function render_status_table() {
-        var url = window.location.href + '?template_name=hotsite/includes/status-table';
-        var sender = new window.cgsy.AjaxSender(url);
-            sender.setSuccessCallback(function(response) {
+    <script src="{% static 'hotsite/js/subscription-status.js' %}"></script>
+    <script>
+        function render_status_table() {
+            var url = window.location.href + '?template_name=hotsite/includes/status-table';
+            var sender = new window.cgsy.AjaxSender(url);
+            sender.setSuccessCallback(function (response) {
                 $('#status-table').html(response);
                 render_status_table();
             });
-        window.setTimeout(function() { sender.send('GET'); }, 3500);
-    }
+            window.setTimeout(function () {
+                sender.send('GET');
+            }, 3500);
+        }
 
-    $(document).ready(function() {
-        {% if not subscription.confirmed %}
-        render_status_table();
-        {% endif %}
-    });
-</script>
+        $(document).ready(function () {
+            {% if not subscription.confirmed %}
+                render_status_table();
+            {% endif %}
+        });
+    </script>
 {% endblock %}
 {% block content %}
 
@@ -37,16 +39,18 @@
                             {% block messages %}
                                 {% if messages %}
                                     <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                                    {% for message in messages %}
-                                        <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
-                                            <button type="button" class="close"
-                                                    data-dismiss="alert"
-                                                    aria-label="Close"><span
-                                                    aria-hidden="true">&times;</span>
-                                            </button>
-                                            {{ message|capfirst }}
-                                        </div>
-                                    {% endfor %}
+                                        {% for message in messages %}
+                                            <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible"
+                                                 role="alert">
+                                                <button type="button"
+                                                        class="close"
+                                                        data-dismiss="alert"
+                                                        aria-label="Close"><span
+                                                        aria-hidden="true">&times;</span>
+                                                </button>
+                                                {{ message|capfirst }}
+                                            </div>
+                                        {% endfor %}
                                     </div>
                                 {% endif %}
                             {% endblock messages %}
@@ -63,7 +67,8 @@
                                     </a>
                                 {% else %}
                                     <a href="{% url 'public:hotsite' event.slug %}"
-                                       class="btn btn-success btn-xs">Novo pagamento
+                                       class="btn btn-success btn-xs">Novo
+                                        pagamento
                                     </a>
                                 {% endif %}
                             {% else %}
@@ -71,12 +76,20 @@
                                    class="btn btn-success btn-xs">Novo pagamento
                                 </a>
                             {% endif %}
+                            {% if event.is_scientific %}
+                                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                                   class="btn btn-primary"
+                                   style="margin-top: 15px">
+                                    Deseja submeter seu artigo cientifico?
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-10">
-                <div class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
+                <div class="text-right cgsy-footer footer-wrapper text-muted"
+                     style="font-size:12px;color:lightgrey">
                     {% include "base/footer.html" %}
                 </div>
             </div>

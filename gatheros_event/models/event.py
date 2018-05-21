@@ -183,6 +183,13 @@ class Event(models.Model, GatherosModelMixin):
 
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
 
+    is_scientific = models.BooleanField(
+        default=False,
+        verbose_name='evento científico',
+    )
+
+
+
     class Meta:
         verbose_name = 'evento'
         verbose_name_plural = 'eventos'

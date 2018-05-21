@@ -229,14 +229,6 @@
         }
 
         $(document).ready(function () {
-            $(window).on('resize', function () {
-                window.setTimeout(function () {
-                    resize_status_block();
-                }, 400);
-            });
-            window.setTimeout(function () {
-                resize_status_block();
-            }, 400);
 
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
@@ -312,13 +304,17 @@
                 $('#reload-map-button').on('click', function () {
                     reloadMap();
                 });
-                $('.submit-button').click(function () {
+                $('.submit-button').on("click", function () {
                     $('#hotsite-form').submit();
                 });
+
+
             })(jQuery);
         });
     </script>
 {% endblock %}
+
+
 
 
 
@@ -400,6 +396,44 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    Configurações científica
+                                </div>
+                            </div>
+                            <div class="panel-body">
+
+                                {% if event.is_scientific %}
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.editorial_body %}
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.scientific_rules %}
+                                        </div>
+                                    </div>
+
+
+                                {% endif %}
+
+                                <button type="button"
+                                        class="btn btn-success submit-button"
+                                        style=" float: right; margin-right:
+                                        10px">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-md-3 hidden-xs hidden-sm">
 
@@ -444,13 +478,20 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
                                         <i class="fas fa-check-circle fa-4x
 {% if info and info.description_html %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
-                                        <div class="title">Sobre o evento</div>
+                                        <div class="title">
+                                            {% if event.is_scientific %}
+                                                Apresentação do evento
+                                            {% else %}
+                                                Sobre do evento
+                                            {% endif %}
+                                        </div>
                                         <div class="text-muted description">
                                             Deixa claro para o visitante que
                                             ainda não
@@ -460,6 +501,50 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                {% if event.is_scientific %}
+
+                                    <div class="col-md-12 event-info-status-item">
+                                        <div>
+                                            <i class="fas fa-check-circle fa-4x
+{% if info and info.editorial_body %}success-color{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="title">
+                                                Corpo editorial
+                                            </div>
+                                            <div class="text-muted description">
+                                                Lorem ipsum dolor sit amet,
+                                                consectetur adipiscing elit.
+                                                Aliquam
+                                                vitae elementum ex, eu ultrices
+                                                massa.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 event-info-status-item">
+                                        <div>
+                                            <i class="fas fa-check-circle fa-4x
+{% if info and info.scientific_rules %}success-color{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="title">
+                                                Normas
+                                            </div>
+                                            <div class="text-muted description">
+                                                Lorem ipsum dolor sit amet,
+                                                consectetur adipiscing elit.
+                                                Aliquam
+                                                vitae elementum ex, eu ultrices
+                                                massa.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% endif %}
+
+
                             </div>
                         </div>
                     </div>
@@ -560,9 +645,10 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12" >
+                        <div class="col-md-12">
                             <div class="buttonbar bottom">
-                                <div class="float-right"style="margin-right: 20px">
+                                <div class="float-right"
+                                     style="margin-right: 20px">
                                     <button type="button"
                                             class="btn btn-success submit-button">
                                         <i class="fa fa-save"></i>
