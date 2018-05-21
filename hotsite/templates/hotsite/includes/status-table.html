@@ -31,7 +31,9 @@
                     {{ transaction.date_created|date:"d/m/Y H\hi" }}
                 </td>
                 <td>
-                    {{ transaction.lot.name }}
+                    <div data-toggle="tooltip" title="{{ transaction.lot.name }}">
+                        {{ transaction.lot.name|truncatechars:20 }}
+                    </div>
                 </td>
                 <td>
                     {% if transaction.data.payment_method == 'boleto' %}
