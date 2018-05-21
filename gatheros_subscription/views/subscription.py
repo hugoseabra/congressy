@@ -135,13 +135,14 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
 
     def pre_dispatch(self, request):
         self.event = self.get_event()
+
         if self.event.allow_internal_subscription is False:
             self.permission_denied_url = reverse(
                 'subscription:subscription-list', kwargs={
                     'event_pk': self.event.pk,
                 }
             )
-            raise PermissionDenied('Você não pode realizar esta ação')
+            raise PermissionDenied('Você não pode realizar esta ação.')
 
     def dispatch(self, request, *args, **kwargs):
         if self.kwargs.get('pk'):

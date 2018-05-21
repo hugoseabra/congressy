@@ -10,15 +10,12 @@ from fnmatch import fnmatch
 
 # ========================== BASE CONFIGURATION ============================= #
 DEBUG = True
+STAGING = True
 # ================================= APPS ==================================== #
 INSTALLED_APPS.extend([
-    'debug_toolbar',
     'django_nose',
     'logtailer',
 ])
-# ============================= MIDDLEWARES ================================= #
-# Django debug toolbar
-MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 # ========================= SERVER CONFIGURATION ============================ #
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media_staging')
 # ================================= E-MAIL ================================== #

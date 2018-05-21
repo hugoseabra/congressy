@@ -175,7 +175,7 @@ class SubscriptionWizardView(SessionWizardView):
             now = datetime.now()
             margin = self.event.date_start
 
-            if margin - now < timedelta(days=5):
+            if margin - now < timedelta(days=self.event.boleto_limit_days):
                 context['allowed_transaction_types'] = 'credit_card'
             else:
                 context['allowed_transaction_types'] = 'credit_card,boleto'
