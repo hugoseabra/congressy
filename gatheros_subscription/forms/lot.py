@@ -132,4 +132,12 @@ class LotForm(forms.ModelForm):
         code = self.cleaned_data.get('exhibition_code')
         if code:
             code = ''.join(code.split()).upper()
+
+        queryset = Lot.objects.filter(exhibition_code=code)
+        if self.instance.pk is not None:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.count() > 0:
+            raise forms.ValidationError('Este código já existe.')
+
         return code
