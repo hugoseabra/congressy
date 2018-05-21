@@ -20,6 +20,12 @@
             {% if not subscription.confirmed %}
                 render_status_table();
             {% endif %}
+
+            $('.tooltip-wrapper').tooltip({
+                selector: "[data-toggle=tooltip]",
+                container: "body",
+                html:true
+            });
         });
     </script>
 {% endblock %}
@@ -29,11 +35,11 @@
 
     <!-- FORM
     ================================= -->
-    <section id="owner" class="footer-section section">
+    <section id="owner" class="footer-section section tooltip-wrapper">
         <h2 class="section-heading text-center">Status da Inscrição</h2>
         <div class="container">
             <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-12">
                     <div class="row">
                         <div class="col-md-12" style="text-align: left;">
                             {% block messages %}
@@ -61,33 +67,43 @@
                             {% endif %}
                             {% if is_private_event %}
                                 {% if lot_is_still_valid %}
-                                    <a href="{% url 'public:hotsite-subscription' event.slug %}"
-                                       class="btn btn-success btn-xs">Novo
-                                        pagamento
+                                    <a href="{% url 'public:hotsite-subscription' event.slug %}" class="btn btn-success btn-xs"
+                                       data-toggle="tooltip" title="Realize um novo pagamento.">
+                                        Novo pagamento
+                                    </a>
+                                    <a href="#" class="btn btn-primary btn-xs"
+                                       data-toggle="tooltip" title="Entrar com cupom diferente para mudar de lote."
+                                       onclick="$('#force-coupon-form').submit();">
+                                        Outro Cupom
                                     </a>
                                 {% else %}
-                                    <a href="{% url 'public:hotsite' event.slug %}"
-                                       class="btn btn-success btn-xs">Novo
-                                        pagamento
+                                    <hr />
+                                    <div class="alert alert-warning alert-dismissible" role="alert">
+                                        O lote que você está inscrito já expirou. Deseja fazer inscrição com novo cupom?
+                                    </div>
+                                    <a href="#" class="btn btn-primary btn-xs"
+                                       data-toggle="tooltip" title="Entrar com cupom diferente para mudar de lote."
+                                       onclick="$('#force-coupon-form').submit();">
+                                        Inserir Novo cupom
                                     </a>
                                 {% endif %}
                             {% else %}
-                                <a href="{% url 'public:hotsite-subscription' event.slug %}"
-                                   class="btn btn-success btn-xs">Novo pagamento
+                                <a href="{% url 'public:hotsite-subscription' event.slug %}" class="btn btn-success btn-xs"
+                                   data-toggle="tooltip" title="Realize um novo pagamento ou mude de lote quando desejar.">
+                                    Novo pagamento
                                 </a>
                             {% endif %}
                             {% if event.is_scientific %}
-                                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
-                                   class="btn btn-primary"
-                                   style="margin-top: 15px">
-                                    Deseja submeter seu artigo cientifico?
+                                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}" class="btn btn-primary" style="margin-top: 15px"
+                                   data-toggle="tooltip" title="Submeter artigos científicos para o evento">
+                                    Enviar Artigo Certificado
                                 </a>
                             {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-10">
+            <div class="col-md-12">
                 <div class="text-right cgsy-footer footer-wrapper text-muted"
                      style="font-size:12px;color:lightgrey">
                     {% include "base/footer.html" %}
@@ -95,4 +111,11 @@
             </div>
         </div>
     </section>
+
+    <div style="display:none">
+        <form action="" method="post" id="force-coupon-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="force-coupon">
+        </form>
+    </div>
 {% endblock %}

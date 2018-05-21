@@ -17,8 +17,8 @@ from hotsite.views import SubscriptionFormMixin
 
 class HotsiteView(SubscriptionFormMixin, generic.View):
     template_name = 'hotsite/main.html'
-
     has_private_subscription = False
+    private_still_available = False
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -27,16 +27,21 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
             subscription_id = self.request.session['has_private_subscription']
 
             try:
-                Subscription.objects.get(pk=subscription_id, event=self.event)
+                Subscription.objects.get(
+                    pk=subscription_id,
+                    lot__private=True,
+                    event__slug=self.kwargs.get('slug')
+                )
                 self.has_private_subscription = True
             except Subscription.DoesNotExist:
                 pass
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
         context['has_private_subscription'] = self.has_private_subscription
+        context['private_still_available'] = self.has_private_subscription
         return context
 
     @method_decorator(sensitive_post_parameters())
