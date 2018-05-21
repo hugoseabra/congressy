@@ -171,8 +171,8 @@ class Organization(models.Model, GatherosModelMixin):
         null=True,
         verbose_name='Nome completo ou razão social',
         help_text='IMPORTANTE: este campo não pode ser muito diferente do'
-                  ' titular da conta. Se o titular tiver mais de 30 caracteres,'
-                  ' informe até onde os caracteres.'
+                  ' titular da conta. Se o titular tiver mais de 30'
+                  ' caracteres, informe até onde os caracteres.'
     )
 
     # Obrigatório - Tipo da conta
@@ -222,6 +222,13 @@ class Organization(models.Model, GatherosModelMixin):
         verbose_name='e-mail',
         null=True,
         blank=True,
+    )
+
+    allow_internal_subscription = models.BooleanField(
+        default=False,
+        verbose_name='permitir inscrição interna',
+        help_text='Se ativado, organizadores poderão inserir inscrição interna'
+                  ' manualmente.'
     )
 
     class Meta:

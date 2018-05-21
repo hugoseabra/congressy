@@ -141,8 +141,6 @@ function process_single_lot_payment(
     var allow_installment = lot.allow_installment === true;
     var installment_limit = lot.installment_limit;
     var free_installment = parseInt(lot.free_installment);
-
-    transactions = transactions || 'credit_card,boleto';
     allow_installment = allow_installment === true;
 
     function handleSuccess(data) {

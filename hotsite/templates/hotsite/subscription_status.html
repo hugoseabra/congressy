@@ -1,6 +1,26 @@
 {% extends 'hotsite/base.html' %}
 {% load static base_tags humanize l10n %}
 
+{% block scripts %}
+<script src="{% static 'hotsite/js/subscription-status.js' %}"></script>
+<script>
+    function render_status_table() {
+        var url = window.location.href + '?template_name=hotsite/includes/status-table';
+        var sender = new window.cgsy.AjaxSender(url);
+            sender.setSuccessCallback(function(response) {
+                $('#status-table').html(response);
+                render_status_table();
+            });
+        window.setTimeout(function() { sender.send('GET'); }, 3500);
+    }
+
+    $(document).ready(function() {
+        {% if not subscription.confirmed %}
+        render_status_table();
+        {% endif %}
+    });
+</script>
+{% endblock %}
 {% block content %}
 
     {% include 'hotsite/includes/2_cover_no_form.html' %}
@@ -18,164 +38,48 @@
                                 {% if messages %}
                                     <div style="width:100%;margin-top:3px;padding-bottom:10px">
                                     {% for message in messages %}
-
-                                        {% if message.tags %}
-                                            <div class="alert alert-{{ message.tags }} alert-dismissible"
-                                                 role="alert">
-
-                                        {% else %}
-                                            <div class="alert alert-warning alert-dismissible"
-                                                 role="alert">
-                                        {% endif %}
-
-                                    <button type="button" class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"><span
-                                            aria-hidden="true">&times;</span>
-                                    </button>
-                                    {{ message|capfirst }}
-                                    </div>
-
+                                        <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
+                                            <button type="button" class="close"
+                                                    data-dismiss="alert"
+                                                    aria-label="Close"><span
+                                                    aria-hidden="true">&times;</span>
+                                            </button>
+                                            {{ message|capfirst }}
+                                        </div>
                                     {% endfor %}
-                                </div>
+                                    </div>
                                 {% endif %}
                             {% endblock messages %}
                             {% if transactions %}
-                                <table class="table table-hover">
-                                    <thead>
-                                    <tr>
-                                        <th class="col-xs-1 hidden-xs">Status
-                                        </th>
-                                        <th class="col-xs-2 hidden-xs">Data</th>
-                                        <th class="col-xs-3">Forma de
-                                            Pagamento
-                                        </th>
-                                        <th class="col-xs-2 hidden-xs">
-                                            Valor (R$)
-                                        </th>
-                                        <th class="col-xs-1">Voucher</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for transaction in transactions %}
-                                        <tr>
-                                            <td class="hidden-xs">
-
-                                                {% if transaction.status == 'processing' or transaction.status == 'waiting_payment' or transaction.status == 'pending_refund' or transaction.status == 'chargedback' %}
-                                                    <i class="fa fa-circle"
-                                                       aria-hidden="true"
-                                                       style="color: #f0ad4e"></i>
-                                                {% elif transaction.status == 'authorized' or transaction.status == 'paid' or transaction.status == 'refunded' %}
-                                                    <i class="fa fa-circle"
-                                                       aria-hidden="true"
-                                                       style="color:#5cb85c"></i>
-                                                {% elif transaction.status == 'refused' %}
-                                                    <i class="fa fa-circle"
-                                                       aria-hidden="true"
-                                                       style="color: #d9534f"></i>
-                                                {% else %}
-                                                    <i class="fa fa-circle"
-                                                       aria-hidden="true"></i>
-                                                {% endif %}
-                                                {{ transaction.get_status_display }}
-                                            </td>
-                                            <td class="hidden-xs">
-                                                {{ transaction.date_created|date:"d/m/Y H\hi" }}
-                                            </td>
-                                            <td>
-                                                {% if transaction.data.payment_method == 'boleto' %}
-                                                    Boleto
-                                                    <br>
-                                                    <small>
-                                                        {% if "None" not in  transaction.data.boleto_url %}
-                                                            <a target="_blank"
-                                                               class="text-muted"
-                                                               href="{{ transaction.data.boleto_url }}">
-                                                                Link para
-                                                                boleto
-                                                            </a>
-                                                        {% else %}
-                                                            Seu link para o
-                                                            boleto estará
-                                                            pronto em breve.
-                                                        {% endif %}
-                                                    </small>
-                                                {% elif transaction.data.payment_method == 'credit_card' %}
-                                                    Cartão de Crédito
-                                                {% else %}
-                                                    Error
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                R$ {{ transaction.amount|money_divide|intcomma }}
-                                            </td>
-                                            <td>
-                                                {% if transaction.status == transaction.PAID %}
-
-                                                    <a href="{% url 'subscription:subscription-voucher' transaction.subscription.event.pk transaction.subscription.pk %}">
-                                                        <i class="fas fa-file-pdf"></i>
-                                                    </a>
-                                                {% else %}
-                                                    ---
-                                                {% endif %}
-
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
+                                <div id="status-table">
+                                    {% include 'hotsite/includes/status-table.html' %}
+                                </div>
                             {% endif %}
-
                             {% if is_private_event %}
-
                                 {% if lot_is_still_valid %}
-
                                     <a href="{% url 'public:hotsite-subscription' event.slug %}"
                                        class="btn btn-success btn-xs">Novo
                                         pagamento
                                     </a>
                                 {% else %}
-
                                     <a href="{% url 'public:hotsite' event.slug %}"
-                                       class="btn btn-success btn-xs">Novo
-                                        pagamento
+                                       class="btn btn-success btn-xs">Novo pagamento
                                     </a>
-
                                 {% endif %}
-
                             {% else %}
-
                                 <a href="{% url 'public:hotsite-subscription' event.slug %}"
-                                   class="btn btn-success btn-xs">Novo
-                                    pagamento
-                                </a>
-
-                                <br>
-
-                            {% endif %}
-
-                            {% if event.is_scientific %}
-
-                                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
-                                   class="btn btn-primary"
-                                   style="margin-top: 15px">
-                                    Deseja submeter seu artigo cientifico?
+                                   class="btn btn-success btn-xs">Novo pagamento
                                 </a>
                             {% endif %}
-
-                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-10">
-                    <div class="text-right cgsy-footer footer-wrapper text-muted"
-                         style="font-size:12px;color:lightgrey">
-                        {% include "base/footer.html" %}
-                    </div>
+            </div>
+            <div class="col-md-10">
+                <div class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
+                    {% include "base/footer.html" %}
                 </div>
             </div>
-
+        </div>
     </section>
-
-
 {% endblock %}
