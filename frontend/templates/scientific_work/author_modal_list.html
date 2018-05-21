@@ -1,0 +1,12 @@
+<h1>Autores:</h1>
+
+{% if object_list %}
+    <ul>
+        {% for author in object_list %}
+            <ol>{{ author.name }}</ol>
+        {% endfor %}
+    </ul>
+
+{% else %}
+    Nenhum author até o momento.
+{% endif %}

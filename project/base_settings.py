@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'captcha',
     'wkhtmltopdf',
+    'formtools',
 
     # KANU_APPS
     'kanu_locations',
