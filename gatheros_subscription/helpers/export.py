@@ -82,6 +82,7 @@ def _export_subscriptions(worksheet, subscriptions):
         'LOTE',
         'STATUS',
         'NOME',
+        'CPF',
         'DATA NASC',
         'IDADE',
         'EMAIL',
@@ -112,6 +113,7 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(get_object_value(sub.lot, 'name'))
         collector[row_idx].append(sub.get_status_display())
         collector[row_idx].append(get_object_value(person, 'name'))
+        collector[row_idx].append(get_object_value(person, 'cpf'))
 
         if person.birth_date:
             collector[row_idx].append(person.age)

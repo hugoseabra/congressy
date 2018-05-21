@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -170,6 +172,13 @@ class SubscriptionWizardView(SessionWizardView):
 
         if self.storage.current_step == 'payment':
             context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
+            now = datetime.now()
+            margin = self.event.date_start
+
+            if margin - now < timedelta(days=self.event.boleto_limit_days):
+                context['allowed_transaction_types'] = 'credit_card'
+            else:
+                context['allowed_transaction_types'] = 'credit_card,boleto'
 
         if self.storage.current_step == 'person':
 

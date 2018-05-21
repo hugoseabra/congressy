@@ -92,8 +92,9 @@ if settings.DEBUG:
     if os.environ.get('DJANGO_SETTINGS_MODULE') == 'project.settings.staging':
         urlpatterns += [url(r'^logs/', include('logtailer.urls')), ]
 
-    import debug_toolbar
+    if not hasattr(settings, 'STAGING'):
+        import debug_toolbar
 
-    urlpatterns = [
-                      url(r'^__debug__/', include(debug_toolbar.urls)),
-                  ] + urlpatterns
+        urlpatterns = [
+                          url(r'^__debug__/', include(debug_toolbar.urls)),
+                      ] + urlpatterns
