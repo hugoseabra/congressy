@@ -22,13 +22,14 @@
 
 
     <style media="screen" type="text/css">
-+     td {
-+       max-width: 120px;
-+       white-space: nowrap;
-+       text-overflow: ellipsis;
-+     }
+        + td {
+        + max-width: 120 px;
+        + white-space: nowrap;
+        + text-overflow: ellipsis;
+        +
+        }
 
-+    </style>
+        +    </style>
 {% endblock %}
 
 {% block scripts %}
@@ -123,9 +124,9 @@
         </li>
         <li>
             <a href="#"
-                class="popover_toogle fa fa-list" style="color:white;"
-                data-trigger="hover" rel="popover" data-placement="right"
-                data-content="Inscrições">
+               class="popover_toogle fa fa-list" style="color:white;"
+               data-trigger="hover" rel="popover" data-placement="right"
+               data-content="Inscrições">
             </a>
         </li>
         <li>
@@ -168,6 +169,7 @@
                                     <th>Boleto</th>
                                 {% endif %}
                                 <th>Voucher</th>
+                                <th></th>
                             </tr>
 
                             </thead>
@@ -219,21 +221,22 @@
                                     </td>
                                     {% if needs_boleto_link %}
                                         <td>
-                                        {% if item.transactions.count > 0 %}
-                                            {% for transaction in item.transactions.all %}
-                                                <div class="text-center">
-                                                {% if transaction.status == transaction.WAITING_PAYMENT and transaction.type == transaction.BOLETO %}
-                                                    <a target="_blank" href="{{ transaction.data.boleto_url }}">
-                                                        <i class="fas fa-link"></i>
-                                                    </a>
-                                                {% else %}
-                                                    ---
-                                                {% endif %}
-                                                </div>
-                                            {% endfor %}
-                                        {% else %}
-                                        ---
-                                        {% endif %}
+                                            {% if item.transactions.count > 0 %}
+                                                {% for transaction in item.transactions.all %}
+                                                    <div class="text-center">
+                                                        {% if transaction.status == transaction.WAITING_PAYMENT and transaction.type == transaction.BOLETO %}
+                                                            <a target="_blank"
+                                                               href="{{ transaction.data.boleto_url }}">
+                                                                <i class="fas fa-link"></i>
+                                                            </a>
+                                                        {% else %}
+                                                            ---
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                ---
+                                            {% endif %}
                                         </td>
                                     {% endif %}
                                     <td>
@@ -248,6 +251,19 @@
                                             ---
                                         {% endif %}
 
+                                    </td>
+                                    <td>
+                                        {% if item.event.is_scientific %}
+
+                                            <div class="text-center">
+                                                <a href="{% url 'scientific_work:work-add' subscription_pk=item.pk %}"
+                                                   class="btn-sm btn-success">
+                                                    <i class="fas fa-plus"></i>
+                                                    Novo trabalho
+                                                </a>
+                                            </div>
+
+                                        {% endif %}
                                     </td>
 
                                 </tr>
