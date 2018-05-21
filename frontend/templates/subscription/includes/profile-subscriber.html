@@ -16,7 +16,7 @@
             <div class="float-left">
                 <h3 class="text-bold" style="margin: 8px 0 0 20px;font-size:22px">Painel Geral do Participante</h3>
             </div>
-            {% if event.allow_internal_subscription %}
+            {% if event.allow_internal_subscription or event.running %}
             <div class="float-right">
                 <button onclick="window.location.href='{% url 'subscription:subscription-edit' event.pk object.pk %}'"
                         class="btn btn-info btn-trans"

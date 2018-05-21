@@ -135,7 +135,10 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
 
     def pre_dispatch(self, request):
         self.event = self.get_event()
-        if self.event.allow_internal_subscription is False:
+
+        allow_subs = self.event.allow_internal_subscription
+
+        if allow_subs is False and not self.event.running:
             self.permission_denied_url = reverse(
                 'subscription:subscription-list', kwargs={
                     'event_pk': self.event.pk,
