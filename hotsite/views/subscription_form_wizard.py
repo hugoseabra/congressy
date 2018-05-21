@@ -165,11 +165,13 @@ class SubscriptionWizardView(SessionWizardView):
         context['event'] = self.event
         context['is_private_event'] = self.is_private_event()
         context['num_lots'] = self.get_num_lots()
-        has_open_boleto = self.get_open_boleto()
-        context['has_open_boleto'] = has_open_boleto
+        has_open_boleto = False
 
         if self.storage.current_step not in ['lot', 'private_lot']:
-            context['selected_lot'] = self.get_lot_from_session()
+            selected_lot = self.get_lot_from_session()
+            context['selected_lot'] = selected_lot
+            has_open_boleto = self.get_open_boleto(lot=selected_lot)
+            context['has_open_boleto'] = has_open_boleto
 
         if self.storage.current_step == 'private_lot':
             code = self.request.session.get('exhibition_code')
@@ -693,7 +695,7 @@ class SubscriptionWizardView(SessionWizardView):
         ]
         return len(lots)
 
-    def get_open_boleto(self):
+    def get_open_boleto(self, lot):
 
         now = datetime.now()
 
@@ -703,7 +705,7 @@ class SubscriptionWizardView(SessionWizardView):
 
             all_transactions = Transaction.objects.filter(
                 subscription=subscription,
-                lot=subscription.lot)
+                lot=lot)
 
             for trans in all_transactions:
                 if trans.boleto_expiration_date:
