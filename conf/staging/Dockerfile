@@ -83,7 +83,7 @@ WORKDIR /var/www/cgsy
 # to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
 COPY ./requirements.pip ./.
 COPY ./requirements_dev.pip ./.
-RUN pip install --no-cache-dir --upgrade -r requirements_dev.pip
+RUN pip install --no-cache-dir --upgrade -r requirements_staging.pip
 
 # -----------------------------------------------------------------------------
 # Setup configuration files
