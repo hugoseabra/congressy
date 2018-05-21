@@ -1,0 +1,23 @@
+<form id="work_config_date_form">
+                    <div class="panel-body">
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                {% render_generic_field form.date_start required=True %}
+                            </div>
+                            <div class="col-md-6">
+                                {% render_generic_field form.date_end required=True %}
+                            </div>
+
+                            {% render_generic_field form.event %}
+
+                            <div style="margin-right: 20px">
+                                <button type="button" class="btn btn-success pull-right
+                        work-config-date-save">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>

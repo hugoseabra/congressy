@@ -20,30 +20,9 @@
                         Período de Submissão
                     </div>
                 </div>
-                <form id="work_config_date_form">
-                    <div class="panel-body">
-                        <div class="row">
-
-                            <div class="col-md-6">
-                                {% render_generic_field form.date_start required=True %}
-                            </div>
-                            <div class="col-md-6">
-                                {% render_generic_field form.date_end required=True%}
-                            </div>
-
-                            {% render_generic_field form.event %}
-
-                            <div style="margin-right: 20px">
-                                <button type="button" class="btn btn-success pull-right
-                        work-config-date-save">
-                                    <i class="fa fa-save"></i>
-                                    Salvar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                </form>
+                <div id="date_period_form">
+                    {% include 'scientific_work/includes/date_period_form.html' %}
+                </div>
             </div>
         </div>
         <div class="col-md-6">
@@ -72,9 +51,10 @@
                         Tipos de Apresentações
                     </div>
                 </div>
-                <div class="panel-body">
-
+                <div id="presenting_form">
+                    {% include 'scientific_work/includes/presenting_type_form.html' %}
                 </div>
+
             </div>
         </div>
     </div>
@@ -180,6 +160,46 @@
                     });
                 }
 
+                function update_presenting_form() {
+                    $.ajax({
+                        url: '{% url 'scientific_work:scientific_event_config' event.pk %}' +
+                        '?template_name=scientific_work/includes' +
+                        '/presenting_type_form',
+                        type: 'GET',
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        },
+                        success: function (response) {
+                            $('#presenting_form').html(response);
+                            recreate_event_triggers();
+                        }
+                    }).fail(function (err) {
+                        console.error(err);
+                    });
+                }
+
+                function update_date_period_form() {
+                    $.ajax({
+                        url: '{% url 'scientific_work:scientific_event_config' event.pk %}' +
+                        '?template_name=scientific_work/includes' +
+                        '/date_period_form',
+                        type: 'GET',
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        },
+                        success: function (response) {
+                            $('#date_period_form').html(response);
+                            recreate_event_triggers();
+                        }
+                    }).fail(function (err) {
+                        console.error(err);
+                    });
+                }
+
                 function recreate_event_triggers() {
 
                     var new_area_category_btn = $('.new-area-category');
@@ -187,12 +207,15 @@
                     var add_area_category_modal = $('#add_area_category_modal');
                     var delete_area_category_btn = $('.delete-area-category');
                     var date_save_btn = $('.work-config-date-save');
+                    var presenting_save_btn = $('.work-config-presenting-save');
                     var date_form = $('#work_config_date_form');
+                    var presenting_form =$('#work_config_presenting_type_form');
 
                     new_area_category_btn.unbind("click");
                     add_area_category_modal_btn.unbind("click");
                     delete_area_category_btn.unbind("click");
                     date_save_btn.unbind("click");
+                    presenting_save_btn.unbind("click");
 
                     // Triggers
                     new_area_category_btn.on("click", function () {
@@ -224,8 +247,30 @@
                             beforeSend: function (xhr) {
                                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
                             },
-                            success: function (res) {
-                                console.log(res);
+                            success: function () {
+                                update_date_period_form();
+                            }
+                        }).fail(function (err) {
+                            console.error(err.responseText);
+                        });
+
+
+                    });
+                    presenting_save_btn.on("click", function () {
+
+                        var form_data = new FormData(presenting_form[0]);
+
+                        $.ajax({
+                            url: '{% url 'scientific_work:workconfig-detail' work_config.pk %}',
+                            type: 'PATCH',
+                            processData: false,
+                            data: form_data,
+                            contentType: false,
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                            },
+                            success: function () {
+                                update_presenting_form();
                             }
                         }).fail(function (err) {
                             console.error(err.responseText);
