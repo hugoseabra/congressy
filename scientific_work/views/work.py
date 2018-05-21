@@ -14,8 +14,6 @@ class WorkAddView(WorkViewMixin, generic.FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active'] = 'scientific_work'
-        context['has_inside_bar'] = True
         context['event'] = self.subscription.event
         return context
 

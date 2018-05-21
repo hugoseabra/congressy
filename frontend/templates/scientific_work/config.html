@@ -68,6 +68,12 @@
 
             $('#add_area_category').val('');
 
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom ' +
+                'messenger-on-right',
+                theme: 'flat'
+            };
+
             (function ($) {
 
 
@@ -109,10 +115,20 @@
                         },
                         success: function () {
                             update_area_category_list();
+                            Messenger().post({
+                                message: 'Área temática adicionada com ' +
+                                'sucesso!',
+                                type: 'success'
+                            });
                             $('#add_area_category').val('');
                         }
                     }).fail(function (err) {
                         console.error(err);
+                        Messenger().post({
+                            message: 'Não foi possivel adicionar essa ' +
+                            'área temática.',
+                            type: 'danger'
+                        });
                     });
 
 
@@ -131,10 +147,20 @@
                         },
                         success: function () {
                             update_area_category_list();
+                            Messenger().post({
+                                message: 'Área temática removida com ' +
+                                'sucesso!',
+                                type: 'success'
+                            });
                             $('#add_area_category').val('');
                         }
                     }).fail(function (err) {
                         console.error(err);
+                        Messenger().post({
+                            message: 'Não foi possivel remover essa área ' +
+                            'temática.',
+                            type: 'danger'
+                        });
                     });
 
 
@@ -173,10 +199,20 @@
                         },
                         success: function (response) {
                             $('#presenting_form').html(response);
+                            Messenger().post({
+                                message: 'Tipo de apresentação alterado com ' +
+                                'sucesso!',
+                                type: 'success'
+                            });
                             recreate_event_triggers();
                         }
                     }).fail(function (err) {
                         console.error(err);
+                        Messenger().post({
+                            message: 'Não foi possivel alertar o tipo de ' +
+                            'apresentação.',
+                            type: 'danger'
+                        });
                     });
                 }
 
@@ -193,10 +229,20 @@
                         },
                         success: function (response) {
                             $('#date_period_form').html(response);
+                            Messenger().post({
+                                message: 'Periodo de submissão alterado com ' +
+                                'sucesso!',
+                                type: 'success'
+                            });
                             recreate_event_triggers();
                         }
                     }).fail(function (err) {
                         console.error(err);
+                        Messenger().post({
+                            message: 'Não foi possivel alterar o periodo de ' +
+                            'submissão.',
+                            type: 'danger'
+                        });
                     });
                 }
 
