@@ -174,6 +174,13 @@ class Event(models.Model, GatherosModelMixin):
         help_text="Valor percentual da congressy caso o evento seja pago."
     )
 
+    allow_internal_subscription = models.BooleanField(
+        default=False,
+        verbose_name='permitir inscrição interna',
+        help_text='Se ativado, organizadores poderão inserir inscrição interna'
+                  ' manualmente.'
+    )
+
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
 
     class Meta:

@@ -52,7 +52,10 @@ class EventAdmin(admin.ModelAdmin):
             ),
         }),
         ('Inscrições', {
-            'fields': ('subscription_type', 'subscription_offline'),
+            'fields': (
+                'allow_internal_subscription',
+                # 'subscription_offline',
+            ),
         }),
         ('Publicação', {
             'fields': (
