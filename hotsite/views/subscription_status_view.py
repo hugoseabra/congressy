@@ -79,16 +79,25 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
 
         lot = self.subscription.lot
 
-        if lot.private is True:
-
-            if lot.status == lot.LOT_STATUS_RUNNING:
-                context['lot_is_still_valid'] = True
-                self.request.session['exhibition_code'] = lot.exhibition_code
-
-            self.request.session['has_private_subscription'] = \
-                str(self.subscription.pk)
+        if lot.private is True and lot.status == lot.LOT_STATUS_RUNNING:
+            context['lot_is_still_valid'] = True
+            self.request.session['exhibition_code'] = lot.exhibition_code
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get('action')
+
+        if action == 'force-coupon':
+            lot = self.subscription.lot
+
+            if lot.private is True:
+                self.request.session['has_private_subscription'] = \
+                    str(self.subscription.pk)
+
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        return redirect('public:hotsite-status', slug=self.event.slug)
 
     def get_person(self):
         """ Se usuario possui person """

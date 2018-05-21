@@ -71,8 +71,9 @@
                                        data-toggle="tooltip" title="Realize um novo pagamento.">
                                         Novo pagamento
                                     </a>
-                                    <a href="{% url 'public:hotsite' event.slug %}" class="btn btn-primary btn-xs"
-                                       data-toggle="tooltip" title="Entrar com cupom diferente para mudar de lote.">
+                                    <a href="#" class="btn btn-primary btn-xs"
+                                       data-toggle="tooltip" title="Entrar com cupom diferente para mudar de lote."
+                                       onclick="$('#force-coupon-form').submit();">
                                         Outro Cupom
                                     </a>
                                 {% else %}
@@ -80,8 +81,9 @@
                                     <div class="alert alert-warning alert-dismissible" role="alert">
                                         O lote que você está inscrito já expirou. Deseja fazer inscrição com novo cupom?
                                     </div>
-                                    <a href="{% url 'public:hotsite' event.slug %}" class="btn btn-primary btn-xs"
-                                       data-toggle="tooltip" title="Entrar com cupom diferente para mudar de lote.">
+                                    <a href="#" class="btn btn-primary btn-xs"
+                                       data-toggle="tooltip" title="Entrar com cupom diferente para mudar de lote."
+                                       onclick="$('#force-coupon-form').submit();">
                                         Inserir Novo cupom
                                     </a>
                                 {% endif %}
@@ -109,4 +111,11 @@
             </div>
         </div>
     </section>
+
+    <div style="display:none">
+        <form action="" method="post" id="force-coupon-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="force-coupon">
+        </form>
+    </div>
 {% endblock %}
