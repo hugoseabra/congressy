@@ -25,8 +25,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
             return redirect('https://congressy.com')
 
         self.event = get_object_or_404(Event, slug=slug)
-        response = super().dispatch(request, *args, **kwargs)
-        return response
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -117,7 +116,7 @@ class EventMixin(TemplateNameableMixin, generic.View):
     def get_lots(self):
         return [
             lot
-            for lot in self.event.lots.filter(private=False )
+            for lot in self.event.lots.filter(private=False)
             if lot.status == lot.LOT_STATUS_RUNNING
         ]
 
@@ -203,10 +202,13 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
 
         if person:
             try:
-                context['subscription'] = \
-                    Subscription.objects.get(person=person,
-                                             event=self.event)
+                sub = Subscription.objects.get(person=person, event=self.event)
+
+                context['subscription'] = sub
                 context['is_subscribed'] = True
+                context['lot_still_available'] = \
+                    sub.lot.status == sub.lot.LOT_STATUS_RUNNING
+
             except Subscription.DoesNotExist:
                 context['is_subscribed'] = False
 

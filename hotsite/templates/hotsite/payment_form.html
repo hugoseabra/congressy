@@ -75,14 +75,15 @@
                                     <img class="img-responsive"
                                          src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
                                 </button>
-
-                                <br/>
-
-                                <a id="id_remove"
-                                   style="margin-top: 11px; font-size: 12px;display: none">
-                                    Remover
-                                </a>
                             </div>
+                            {% if has_open_boleto %}
+                                <div class="col-md-12">
+                                    <div class="alert alert-info text-center">
+                                        Somente pagamento com <strong>Cartão de Crédito</strong>
+                                        está disponível, pois você já possui um boleto em aberto.
+                                    </div>
+                                </div>
+                            {% endif %}
 
                             <div class="text-center">
                                 <img style="width: 80%; margin-top: 20px"
