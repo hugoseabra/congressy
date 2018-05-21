@@ -648,7 +648,8 @@ class SubscriptionWizardView(SessionWizardView):
         """
         if code:
             for lot in self.event.lots.filter(private=True):
-                if lot.exhibition_code.upper() == code.upper():
+                running = lot.status == lot.LOT_STATUS_RUNNING
+                if lot.exhibition_code.upper() == code.upper() and running:
                     return True
 
         return False
