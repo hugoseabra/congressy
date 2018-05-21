@@ -1,6 +1,7 @@
 """
     View usada para verificar o status da sua inscrição
 """
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
@@ -107,11 +108,18 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
 
     def get_transactions(self):
 
-        transactions = Transaction.objects.filter(
+        transactions = []
+
+        all_transactions = Transaction.objects.filter(
             subscription=self.subscription,
             lot=self.subscription.lot)
-        if transactions.count() <= 0:
-            transactions = False
+
+        for transaction in all_transactions:
+            if transaction.boleto_expiration_date:
+                if transaction.boleto_expiration_date > datetime.now().date():
+                    transactions.append(transaction)
+            else:
+                transactions.append(transaction)
 
         return transactions
 
