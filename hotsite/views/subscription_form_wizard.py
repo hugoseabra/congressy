@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.forms import ValidationError
-from django.http import HttpResponseRedirect, QueryDict
+from django.http import QueryDict
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
@@ -21,6 +21,7 @@ from mailer.services import (
 )
 from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
+from payment.models import Transaction
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
@@ -156,6 +157,8 @@ class SubscriptionWizardView(SessionWizardView):
         context['event'] = self.event
         context['is_private_event'] = self.is_private_event()
         context['num_lots'] = self.get_num_lots()
+        has_open_boleto = self.get_open_boleto()
+        context['has_open_boleto'] = has_open_boleto
 
         if self.storage.current_step not in ['lot', 'private_lot']:
             context['selected_lot'] = self.get_lot_from_session()
@@ -175,7 +178,7 @@ class SubscriptionWizardView(SessionWizardView):
             now = datetime.now()
             margin = self.event.date_start
 
-            if margin - now < timedelta(days=5):
+            if has_open_boleto or margin - now < timedelta(days=5):
                 context['allowed_transaction_types'] = 'credit_card'
             else:
                 context['allowed_transaction_types'] = 'credit_card,boleto'
@@ -530,7 +533,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                    self.storage.current_step is not None):
+                self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -670,6 +673,27 @@ class SubscriptionWizardView(SessionWizardView):
             if lot.status == lot.LOT_STATUS_RUNNING
         ]
         return len(lots)
+
+    def get_open_boleto(self):
+
+        now = datetime.now()
+
+        try:
+            subscription = self.event.subscriptions.get(
+                person__user=self.request.user)
+
+            all_transactions = Transaction.objects.filter(
+                subscription=subscription,
+                lot=subscription.lot)
+
+            for trans in all_transactions:
+                if trans.boleto_expiration_date:
+                    if trans.boleto_expiration_date > now.date():
+                        return trans
+        except Subscription.DoesNotExist:
+            pass
+
+        return None
 
     @staticmethod
     def is_lot_available(lot):
