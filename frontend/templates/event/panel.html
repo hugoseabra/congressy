@@ -8,6 +8,8 @@
     <script src="{% static "/assets/plugins/chartjs/Chart.min.js" %}"></script>
     <script>
         //=================Gauge Inscritos=================================
+
+
         var opts = {
             lines: 12, // The number of lines to draw
             angle: 0, // The length of each line
@@ -47,16 +49,26 @@
         }
         ];
         window.onload = function () {
-            var ctx3 = document.getElementById("doughnut")
+            var ctx3 = document.getElementById("doughnut");
             if (ctx3 != null) {
-                doughnut = ctx3.getContext("2d");
-                window.myDoughnut = new Chart(doughnut).Doughnut(doughnutData, {
+                ctx3 = ctx3.getContext('2d');
+                window.myDoughnut = new Chart(ctx3).Doughnut(doughnutData, {
                     responsive: true
                 });
             }
-        }
-        ;
 
+            var num_todo_elements = $('#todo-list tr').length;
+
+            var num_todo_complet = $('#todo-list tr .fa-check-circle ')
+                .length;
+
+            var progress = ((num_todo_complet / num_todo_elements) * 100)
+                .toFixed(1);
+
+            $('.progress-bar').text(progress + '%');
+            $('.progress-bar').attr('aria-valuenow', progress);
+            $('.progress-bar').css('width', progress + '%');
+        };
 
     </script>
 {% endblock %}
@@ -175,7 +187,7 @@
         <div class="panel
 {% if limit == 0 or  total_subscriptions  > limit %} widget-mini
 panel-solid-info {% endif %}
-panel-default">
+panel-primary">
             {% if limit != 0 and  total_subscriptions  < limit %}
                 <div class="panel-heading">
                     <h3 class="panel-title">Total de inscritos</h3>
@@ -214,7 +226,7 @@ panel-default">
         {% if gender.men != 0 or gender.women != 0 %}
             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
                  style="padding-bottom: 20px;margin-bottom: 20px ">
-                <div class="panel panel-default">
+                <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">Gênero dos participantes</h3>
                     </div>
@@ -236,7 +248,7 @@ panel-default">
                             <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                                 <div>
                                     <canvas id="doughnut" width="100%"
-                                            height="100%"
+                                            height="88%"
                                     ></canvas>
                                 </div>
                             </div>
@@ -247,22 +259,21 @@ panel-default">
         {% endif %}
     </div>
 
-    <div class="panel panel-primary col-sm-5 col-md-6"
+    <div class="panel panel-primary col-xs-12 col-xl-12 col-sm-12 col-md-12"
          style="padding: 0;margin-left: 25px">
 
         <div class="panel-heading">
             <div class="panel-title">Criação do seu evento</div>
         </div>
-        <div class="panel-body">
+        <div class="panel-body tooltip-wrapper">
             <div class="progress">
-                <div class="progress-bar progress-bar-info" role="progressbar"
-                     aria-valuenow="75"
-                     aria-valuemin="0" aria-valuemax="100" style="width: 75%;">
-                    75%
+                <div class="progress-bar progress-bar-info"
+                     role="progressbar"
+                     aria-valuemin="0" aria-valuemax="100">
                 </div>
             </div>
 
-            <table class="table table-hover">
+            <table id="todo-list" class="table table-hover">
                 <tbody>
                 <tr class="todo_list_element" role="presentation">
                     <td>
@@ -277,7 +288,7 @@ panel-default">
                             <i class="fas fa-check-circle success-color
                                 pull-right fa-2x"></i>
                         {% else %}
-                            <i class="fas fa-times-circle danger-color
+                            <i class="fas fa-exclamation-circle warning-color
                                 pull-right fa-2x"></i>
                         {% endif %}
                         <h1><a href="{% url 'event:event-hotsite' event.pk %}">
@@ -287,13 +298,22 @@ panel-default">
                 </tr>
 
                 {% if event.payment_type == 'paid' or has_paid_lots %}
-                    <tr class="todo_list_element" role="presentation">
+                    <tr class="todo_list_element {% if not has_paid_lots %}
+                    warning {% endif %}"
+                        role="presentation"
+                            {% if not has_paid_lots %}
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title=""
+                        data-original-title="Para que seu evento seja
+                           efetivamente pago você deve criar um lote pago"
+                            {% endif %}>
                         <td>
                             {% if has_paid_lots %}
                                 <i class="fas fa-check-circle success-color
                                     pull-right fa-2x"></i>
                             {% else %}
-                                <i class="fas fa-times-circle danger-color
+                                <i class="fas fa-exclamation-circle warning-color
                                     pull-right fa-2x"></i>
                             {% endif %}
                             <h1><a href=
@@ -310,7 +330,7 @@ panel-default">
                                 <i class="fas fa-check-circle success-color
                                     pull-right fa-2x"></i>
                             {% else %}
-                                <i class="fas fa-times-circle danger-color
+                                <i class="fas fa-exclamation-circle warning-color
                                     pull-right fa-2x"></i>
                             {% endif %}
                             <h1>
@@ -325,7 +345,6 @@ panel-default">
             <table class="table table-hover">
                 <tbody>
                 <tr>
-                    <td>teste</td>
                 </tr>
                 </tbody>
             </table>
