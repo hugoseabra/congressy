@@ -397,7 +397,7 @@ class Lot(models.Model, GatherosModelMixin):
             return 0
 
         minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
-        congressy_plan_percent= \
+        congressy_plan_percent = \
             Decimal(self.event.congressy_percent) / 100
 
         congressy_amount = self.price * congressy_plan_percent

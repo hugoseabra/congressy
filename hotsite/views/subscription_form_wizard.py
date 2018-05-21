@@ -142,6 +142,7 @@ class SubscriptionWizardView(SessionWizardView):
             )
             self.clear_session_exhibition_code()
             return redirect('public:hotsite', slug=self.event.slug)
+
         try:
             return super().dispatch(request, *args, **kwargs)
         except InvalidStateStepError:
@@ -214,7 +215,7 @@ class SubscriptionWizardView(SessionWizardView):
             now = datetime.now()
             margin = self.event.date_start
 
-            if has_open_boleto or margin - now < timedelta(days=5):
+            if has_open_boleto or margin - now < timedelta(days=self.event.boleto_limit_days):
                 context['allowed_transaction_types'] = 'credit_card'
             else:
                 context['allowed_transaction_types'] = 'credit_card,boleto'
