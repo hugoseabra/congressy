@@ -10,6 +10,7 @@ from fnmatch import fnmatch
 
 # ========================== BASE CONFIGURATION ============================= #
 DEBUG = True
+STAGING = True
 # ================================= APPS ==================================== #
 INSTALLED_APPS.extend([
     'django_nose',
