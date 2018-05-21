@@ -1,0 +1,835 @@
+{% extends "base/base.html" %}
+{% load i18n static widget_tweaks form_config_tags %}
+{% block title %}Minhas submissões | Congressy{% endblock %}
+{% block page_title %}Minhas submissões{% endblock %}
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
+{% block toptitle %}{% endblock %}
+{% block styles %}
+    <style>
+        .form-inline {
+            display: inline-block;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-lg-9 col-lg-push-3 col-xl-9 col-xl-push-3">
+            <div class="buttonbar">
+                <div class="float-right">
+                    <a role="button"
+                       href="{% url 'scientific_work:work-add' subscription.pk %}"
+                       class="btn btn-success">
+                        <i class="fas fa-plus"></i>
+                        Nova submissão
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    {% if object_list %}
+
+        {% for row in object_list %}
+            <div class="row">
+                {% for work in row %}
+
+                    <div class="col-md-6">
+
+                        <div class="panel panel-primary">
+
+                            <div class="panel-heading">
+
+                                <div class="panel-title">
+
+                                    Submissão ID:{{ work.pk }}
+
+                                </div>
+
+                            </div>
+
+                            <div class="panel-body">
+
+                                <div class="row">
+
+                                    <div class="table-responsive">
+
+                                        <table class="table">
+
+                                            <thead>
+
+                                            <tr>
+                                                <th></th>
+                                                <th></th>
+                                            </tr>
+
+                                            </thead>
+
+                                            <tbody>
+
+                                            <tr>
+                                                <td>Nome:
+
+                                                </td>
+                                                <td>
+                                                    <strong>
+                                                        {{ work.title }}
+                                                    </strong>
+                                                    <i class="fas
+                                                        fa-check-circle success-color fa-lg pull-right"></i>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    Autores:
+                                                </td>
+
+                                                <td>
+
+                                                    {% if work.authors.all.count > 0 %}
+                                                        <ul class="list-group col-md-6">
+                                                            {% for author in work.authors.all %}
+                                                                <li class="list-group-item">
+                                                                    {{ author.name }}
+                                                                    <div
+                                                                            class="author-delete-btn btn-xs btn-danger pull-right"
+                                                                            data-author_url="{% url 'scientific_work:author-detail' pk=author.pk %}">
+                                                                        <i class="fas fa-minus"></i>
+                                                                    </div>
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+
+                                                        <i class="fas
+                                                        fa-check-circle
+                                                        success-color fa-lg
+                                                        pull-right"></i>
+                                                        <div class="html-center">
+                                                            <button class="btn
+                                                            btn-trans btn-sm
+                                                            btn-success
+                                                            edit-author-btn"
+                                                                    style="margin-top: 5px"
+                                                                    data-author_url="{% url 'scientific_work:work-author-partial-list'  subscription_pk=subscription.pk pk=work.pk %}"
+                                                                    data-work_id="{{ work.pk }}">
+                                                                Adicionar
+                                                            </button>
+                                                        </div>
+
+                                                    {% else %}
+                                                        <strong>
+                                                            Você deve
+                                                            adicionar
+                                                            pelo menos um
+                                                            autor.
+                                                        </strong>
+
+                                                        <div class="html-center">
+                                                            <button class="btn
+                                                            btn-trans btn-sm
+                                                            btn-success
+                                                            pull-left
+                                                            edit-author-btn"
+                                                                    style="margin-top: 5px"
+                                                                    data-author_url="{% url 'scientific_work:work-author-partial-list'  subscription_pk=subscription.pk pk=work.pk %}"
+                                                                    data-work_id="{{ work.pk }}">
+                                                                Adicionar
+                                                            </button>
+                                                        </div>
+                                                        <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
+
+                                                    {% endif %}
+
+
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    Modalidade:
+
+                                                </td>
+                                                <td>
+                                                    <strong>
+                                                        {{ work.get_modality_display }}
+                                                    </strong>
+                                                    <i class="fas
+                                                        fa-check-circle
+                                                        success-color fa-lg
+                                                        pull-right"></i>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    Área:
+                                                </td>
+                                                <td>
+                                                    <strong>
+                                                        {{ work.area_category.name }}
+                                                    </strong>
+                                                    <i class="fas
+                                                        fa-check-circle success-color fa-lg pull-right"></i>
+                                                </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    Palavras chave:
+                                                </td>
+                                                <td>
+                                                    {% if work.keywords %}
+                                                        <button class="btn btn-trans btn-sm
+                                                btn-success edit-keywords-btn"
+                                                                data-keywords_text="{{ work.keywords }}"
+                                                                data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}">
+                                                            Editar
+                                                        </button>
+                                                        <i class="fas
+                                                        fa-check-circle success-color fa-lg pull-right"></i>
+                                                    {% else %}
+                                                        <button class="btn
+                                                            btn-trans btn-sm btn-success edit-keywords-btn"
+                                                                data-keywords_text="{{ work.keywords }}"
+                                                                data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}">
+                                                            Adicionar
+                                                        </button>
+                                                        <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
+                                                    {% endif %}
+                                                </td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    Resumo:
+                                                </td>
+                                                <td>
+                                                    {% if work.summary %}
+
+                                                        <button class="btn btn-trans btn-sm
+                                                btn-success edit-summary-btn"
+                                                                data-summary_text="{{ work.summary }}"
+                                                                data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}"
+                                                                data-work_id="{{ work.pk }}">
+                                                            Editar
+                                                        </button>
+                                                        <i class="fas
+                                                        fa-check-circle success-color fa-lg pull-right"></i>
+                                                    {% else %}
+
+                                                        <button class="btn btn-trans btn-sm
+                                                btn-success edit-summary-btn"
+                                                                data-summary_text=""
+                                                                data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}"
+                                                                data-work_id="{{ work.pk }}">
+                                                            Adicionar
+                                                        </button>
+                                                        <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
+
+                                                    {% endif %}
+
+                                                </td>
+                                            </tr>
+
+                                            {% if work.modality == 'artigo' or work.modality == 'banner' %}
+                                                <tr>
+
+                                                    <td>
+                                                        {% if work.modality == 'artigo' %}
+                                                            Artigo:
+                                                        {% elif work.modality == 'banner' %}
+                                                            Banner:
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if work.modality == 'artigo' %}
+                                                            {% if work.article_file %}
+                                                                <a target="_blank"
+                                                                   href="{{ work.article_file.url }}">
+                                                                    Artigo
+                                                                </a>
+                                                            {% endif %}
+                                                            <div class="form-inline">
+                                                                <label for="article_file_{{ work.pk }}"
+                                                                       class="custom-file-upload">
+                                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                                </label>
+                                                                <input
+                                                                        id="article_file_{{ work.pk }}"
+                                                                        type="file"/>
+                                                                <button
+                                                                        class="btn btn-sm btn-success"
+                                                                        onclick="submit_article('{% url 'scientific_work:work-detail' pk=work.pk %}', {{ work.pk }});">
+                                                                    Salvar
+                                                                </button>
+                                                            </div>
+
+                                                            {% if work.article_file %}
+                                                                <i class="fas
+                                                        fa-check-circle success-color fa-lg pull-right"></i>
+                                                            {% else %}
+                                                                <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
+                                                            {% endif %}
+                                                        {% elif work.modality == 'banner' and work.banner_file %}
+                                                            <a target="_blank"
+                                                               href="{{ work.banner_file.url }}">Banner</a>
+                                                            <i class="fas
+                                                        fa-check-circle success-color fa-lg pull-right"></i>
+                                                        {% elif  work.modality == 'banner' %}
+                                                            Faça upload do
+                                                            seu banner:
+                                                            <input
+                                                                    id="banner_file"
+                                                                    type="file">
+                                                            <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
+                                                        {% endif %}
+                                                    </td>
+
+                                                </tr>
+                                            {% endif %}
+                                            <tr>
+
+                                                <td>
+                                                    Publicar:
+                                                </td>
+                                                <td>
+
+                                                    {% if  work.ready %}
+                                                        <strong>
+                                                            <input
+                                                                    class="published"
+                                                                    data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}"
+                                                                    type="checkbox"
+                                                                    {% if work.published %}
+                                                                    checked {% endif %}  />
+                                                            Status:
+                                                            {% if work.published %}
+                                                                <i class="fas
+                                                        fa-check-circle
+                                                        success-color fa-lg
+                                                        pull-right"></i>
+                                                                PUBLICADO
+                                                            {% else %}
+                                                                <i class="fas
+                                                            fa-exclamation-circle  warning-color fa-lg pull-right"></i>
+                                                                NÃO-PUBLICADO
+                                                            {% endif %}
+                                                        </strong>
+                                                    {% else %}
+
+                                                        <strong>
+                                                            Há pendencias
+                                                            nessa submissão
+                                                            que
+                                                            impossibilitam
+                                                            sua publicação.
+                                                        </strong>
+                                                        <i class="fas fa-times-circle
+                                                        danger-color fa-lg pull-right"></i>
+
+                                                    {% endif %}
+
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+
+                                                <td>
+                                                    Apagar submissão:
+                                                </td>
+                                                <td>
+
+                                                    <button class="btn
+                                                            btn-trans btn-sm
+                                                            btn-danger
+                                                            submission-delete-btn"
+                                                            data-work_url="{% url 'scientific_work:work-detail' pk=work.pk %}">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                        Apagar
+                                                    </button>
+                                                </td>
+
+                                            </tr>
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+    {% else %}
+
+        <div class="row">
+
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>Nenhuma submissão até o momento.</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+
+{% endblock %}
+
+{% block modals %}
+
+    <!-----------------------MODALS ----------------------------------->
+    <div class="modal fade" id="edit_summary_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Editar Resumo: </h3>
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                            <textarea id="edit_summary_modal_body" rows="10"
+                                      cols="55"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md btn-success"
+                            data-dismiss="modal"
+                            id="edit_summary_modal_btn">
+                        <i class="far fa-save"></i>
+                        Salvar
+                    </button>
+                    <button type="button" class="btn btn-md  btn-danger"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="edit_keywords_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Editar palavaras chave:
+                    </h3>
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+                            <textarea id="edit_keywords_modal_body" rows="5"
+                                      cols="55"></textarea>
+                    <small>Separadas por virgula</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md btn-success"
+                            data-dismiss="modal"
+                            id="edit_keywords_modal_btn">
+                        <i class="far fa-save"></i>
+                        Salvar
+                    </button>
+                    <button type="button" class="btn btn-md  btn-danger"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="edit_authors_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div id="edit_authors_modal_body">
+                        Carregando....
+                    </div>
+
+
+                    <form style="margin-top: 25px" class="form-inline">
+                        <input type="hidden" id="author_work_id">
+                        <div class="form-group">
+                            <label for="new_author_name">Nome:</label>
+                            <input type="html" class="form-control"
+                                   id="new_author_name"
+                                   placeholder="Nome completo">
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-md btn-success"
+                                id="save_new_author">
+                            <i class="far fa-save"></i>
+                            Salvar
+                        </button>
+                    </form>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md  btn-danger"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="delete_submission_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h3> Certeza que deseja apagar essa submissão?</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md btn-danger"
+                            data-dismiss="modal"
+                            id="submission_confirm_delete">
+                        <i class="fas fa-trash-alt"></i>
+                        Apagar
+                    </button>
+                    <button type="button"
+                            class="btn btn-md  btn-default"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="delete_author_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h3> Certeza que deseja apagar esse author?</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md btn-danger"
+                            data-dismiss="modal"
+                            id="author_confirm_delete">
+                        <i class="fas fa-trash-alt"></i>
+                        Apagar
+                    </button>
+                    <button type="button"
+                            class="btn btn-md  btn-default"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!---------------------END MODALS---------------------------------->
+
+{% endblock %}
+
+
+{% block scripts %}
+    <script type="application/javascript">
+
+
+        $(document).ready(function () {
+
+            //buttons
+            var edit_summary_btn = $('.edit-summary-btn');
+            var edit_keyword_btn = $('.edit-keywords-btn');
+            var edit_summary_modal_btn = $('#edit_summary_modal_btn');
+            var edit_keywords_modal_btn = $('#edit_keywords_modal_btn');
+            var edit_published_btn = $('.published');
+            var edit_author_btn = $('.edit-author-btn');
+            var save_new_author_btn = $('#save_new_author');
+            var submission_delete_btn = $('.submission-delete-btn');
+            var submission_confirm_delete_btn = $('#submission_confirm_delete');
+            var author_delete_btn = $('.author-delete-btn');
+            var author_confirm_delete_btn = $('#author_confirm_delete');
+            var author_work_id_el = $('#author_work_id');
+
+            // values
+            var new_author_name_value = $('#new_author_name');
+            var submission_to_be_deleted = undefined;
+            var author_to_be_deleted = undefined;
+
+            // modals
+            var edit_summary_modal = $('#edit_summary_modal');
+            var edit_summary_modal_body = $('#edit_summary_modal_body');
+
+            var edit_keywords_modal = $('#edit_keywords_modal');
+            var edit_keywords_modal_body = $('#edit_keywords_modal_body');
+
+            var edit_authors_modal = $('#edit_authors_modal');
+            var edit_authors_modal_body = $('#edit_authors_modal_body');
+
+            var delete_submission_modal = $('#delete_submission_modal');
+            var delete_author_modal = $('#delete_author_modal');
+
+
+            // modal btn triggers
+            edit_summary_btn.on("click", function () {
+                edit_summary_modal_body.html($(this).data('summary_text'));
+                edit_summary_modal_btn.data('work_url', $(this).data('work_url'));
+                edit_summary_modal.modal('show');
+            });
+            edit_keyword_btn.on("click", function () {
+                edit_keywords_modal_body.html($(this).data('keywords_text'));
+                edit_keywords_modal_btn.data('work_url', $(this).data('work_url'));
+                edit_keywords_modal.modal('show');
+            });
+            edit_author_btn.on("click", function () {
+                var author_list_url = $(this).data('author_url');
+                var work_id = $(this).data('work_id');
+                author_work_id_el.val(work_id);
+                edit_authors_modal_body.load(author_list_url);
+                edit_authors_modal.modal('show');
+
+            });
+            submission_delete_btn.on("click", function () {
+                submission_to_be_deleted = $(this).data('work_url');
+                delete_submission_modal.modal('show');
+            });
+            author_delete_btn.on("click", function () {
+                author_to_be_deleted = $(this).data('author_url');
+                delete_author_modal.modal('show');
+            });
+
+            // Action (save, edit, delete) btn triggers
+            edit_summary_modal_btn.on("click", function () {
+                update_summary($(this).data('work_url'), edit_summary_modal_body.val());
+            });
+            edit_keywords_modal_btn.on("click", function () {
+                update_keywords($(this).data('work_url'), edit_keywords_modal_body.val());
+            });
+            edit_published_btn.on("click", function () {
+
+                var url = $(this).data('work_url');
+
+                if (this.checked) {
+                    updated_published_status(url, true);
+                } else {
+                    updated_published_status(url, false);
+                }
+            });
+            save_new_author_btn.on("click", function () {
+                var work_id = author_work_id_el.val();
+                var author_list_url = '{% url 'scientific_work:author-list' %}';
+                add_author(author_list_url, new_author_name_value.val(), work_id)
+            });
+            submission_confirm_delete_btn.on("click", function () {
+                if (submission_to_be_deleted) {
+                    delete_resource(submission_to_be_deleted)
+                }
+            });
+            author_confirm_delete_btn.on("click", function () {
+                if (author_to_be_deleted) {
+                    delete_resource(author_to_be_deleted)
+                }
+            });
+
+
+        });
+
+
+        // CSRF code
+        function getCookie(name) {
+            var cookieValue = null;
+            var i = 0;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (i; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        var csrftoken = getCookie('csrftoken');
+
+        // Action(update, delete) functions
+        function submit_article(url, id) {
+
+            var article_file = document.getElementById('article_file_' + id).files[0];
+            var formData = new FormData();
+            formData.append('article_file', article_file);
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                processData: false,
+                contentType: false,
+                data: formData,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (data, textStatus, xhr) {
+                    location.reload(true);
+
+                }
+            }).fail(function (err) {
+                console.log('err');
+                console.log(err.responseText);
+            });
+
+
+        }
+
+        function update_summary(url, html) {
+            var formData = new FormData();
+            formData.append('summary', html);
+
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                processData: false,
+                contentType: false,
+                data: formData,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function () {
+                    location.reload(true);
+                }
+            }).fail(function (err) {
+                console.error(err.responseText);
+            });
+        }
+
+        function update_keywords(url, html) {
+
+            var formData = new FormData();
+            formData.append('keywords', html);
+
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                processData: false,
+                contentType: false,
+                data: formData,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function () {
+                    location.reload(true);
+                }
+            }).fail(function (err) {
+                console.error(err);
+                location.reload(true);
+            });
+
+
+        }
+
+        function updated_published_status(url, update_to) {
+            var formData = new FormData();
+            formData.append('published', update_to);
+
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                processData: false,
+                contentType: false,
+                data: formData,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function () {
+                    location.reload(true);
+                }
+            }).fail(function (err) {
+                console.error(err.responseText);
+            });
+        }
+
+        function add_author(url, name, work) {
+
+            var formData = new FormData();
+            formData.append('name', name);
+            formData.append('work', parseInt(work));
+
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                data: formData,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function () {
+                    location.reload(true);
+                }
+            }).fail(function (err) {
+                console.error(err);
+                location.reload(true);
+            });
+
+
+        }
+
+        function delete_resource(url) {
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                processData: false,
+                contentType: false,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function () {
+                    location.reload(true);
+                }
+            }).fail(function (err) {
+                console.error(err);
+                location.reload(true);
+            });
+        }
+
+    </script>
+{% endblock %}
+

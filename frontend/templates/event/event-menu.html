@@ -7,81 +7,102 @@ Variáveis:
 - has_paid_lots
 
 {% endcomment %}
-        <h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
-        <ul class="nav nav-pills nav-stacked">
-            <li {% if active == 'panel' %}class="active"{% endif %}>
-                <a class="sidebar-itens" href="{% url 'event:event-panel' event.pk %}"  title="Painel">
-                    <i class="fas fa-tachometer-alt"></i>
-                    Painel
-                </a>
-            </li>
-        </ul>
+<h5 class="sidebar-header" style="color:#4c4c4c;">Início</h5>
+<ul class="nav nav-pills nav-stacked">
+    <li {% if active == 'panel' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href="{% url 'event:event-panel' event.pk %}"
+           title="Painel">
+            <i class="fas fa-tachometer-alt"></i>
+            Painel
+        </a>
+    </li>
+</ul>
 
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
+<h5 class="sidebar-header" style="color:#4c4c4c;">Participantes</h5>
+<ul class="nav nav-pills nav-stacked">
 
-        <li {% if active == 'inscricoes' %}class="active"{% endif %}>
+    <li {% if active == 'inscricoes' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href=
+                "{% url 'subscription:subscription-list' event.pk %}"
+           title="Inscrições">
+            <i class="fa fa-clipboard"></i>
+            Inscrições
+            <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+        </a>
+    </li>
+    {% if has_paid_lots %}
+        <li {% if active == 'pagamentos' %}class="active"{% endif %}>
             <a class="sidebar-itens" href=
-                    "{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa fa-clipboard"></i>
-                Inscrições
-                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+                    "{% url 'payment:event-payments' event.pk %}"
+               title="Pagamentos">
+                <i class="fas fa-credit-card"></i> Pagamentos
             </a>
         </li>
-        {% if has_paid_lots %}
-            <li {% if active == 'pagamentos' %}class="active"{% endif %}>
-                <a class="sidebar-itens" href=
-                        "{% url 'payment:event-payments' event.pk %}"
-                   title="Pagamentos">
-                    <i class="fas fa-credit-card"></i> Pagamentos
-                </a>
-            </li>
-        {% endif %}
-        {#        <li>#}
-        {#            <a class="sidebar-itens" href=#}
-        {#                    "{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fas fa-calendar-check"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
+    {% endif %}
+    {#        <li>#}
+    {#            <a class="sidebar-itens" href=#}
+    {#                    "{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+    {#               title="Check-in">#}
+    {#                <i class="fas fa-calendar-check"></i>#}
+    {#                Check-in#}
+    {#            </a>#}
+    {#        </li>#}
+</ul>
+
+{% if event.is_scientific %}
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Artigos científicos</h5>
     <ul class="nav nav-pills nav-stacked">
-        <li {% if active == 'pagina-do-evento' %}class="active"{% endif %}>
-            <a class="sidebar-itens" href=
-                    "{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fas fa-file-alt"></i> Página do evento
+        <li {% if active == 'scientific_work_list' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'scientific_work:work-list' event.pk %}"
+               title="Submissão de artigos">
+                <i class="fas fa-newspaper"></i> Ver trabalhos
             </a>
         </li>
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
-            <li {% if active == 'lotes-categorias' %}class="active"{% endif %}>
-                <a class="sidebar-itens" href=
-                        "{% url 'subscription:lot-list' event.pk %}"
-                   title="Lotes/Categorias">
-                    <i class="fas fa-th-large"></i>
-                    Lotes/Categorias
-                </a>
-            </li>
-        {% endif %}
-        <li {% if active == 'dados-do-evento' %}class="active"{% endif %}>
-            <a class="sidebar-itens" href=
-                    "{% url 'event:event-edit' event.pk %}"
-               title="Dados do evento">
-                <i class="fas fa-cog"></i> Dados do evento
-            </a>
-        </li>
-        <li {% if active == 'form-personalizado' %}class="active"{% endif %}>
-            <a class="sidebar-itens" href=
-                    "{% url 'subscription:form-config' event.pk %}"
-               title="Form. Personalizado" style="padding-right: 0;font-size: 15px">
-                <i class="fab fa-wpforms"></i> Form. Personalizado
+        <li {% if active == 'scientific_work' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'scientific_work:scientific_event_config' event.pk %}"
+               title="Submissão de artigos">
+                <i class="fas fa-cog"></i> Configurações
             </a>
         </li>
 
     </ul>
+{% endif %}
+
+<h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
+<ul class="nav nav-pills nav-stacked">
+    <li {% if active == 'pagina-do-evento' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href=
+                "{% url 'event:event-hotsite' event.pk %}"
+           title="Página do evento">
+            <i class="fas fa-file-alt"></i> Página do evento
+        </a>
+    </li>
+    {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
+        <li {% if active == 'lotes-categorias' %}class="active"{% endif %}>
+            <a class="sidebar-itens" href=
+                    "{% url 'subscription:lot-list' event.pk %}"
+               title="Lotes/Categorias">
+                <i class="fas fa-th-large"></i>
+                Lotes/Categorias
+            </a>
+        </li>
+    {% endif %}
+    <li {% if active == 'dados-do-evento' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href=
+                "{% url 'event:event-edit' event.pk %}"
+           title="Dados do evento">
+            <i class="fas fa-cog"></i> Dados do evento
+        </a>
+    </li>
+    <li {% if active == 'form-personalizado' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href=
+                "{% url 'subscription:form-config' event.pk %}"
+           title="Form. Personalizado" style="padding-right: 0;font-size: 15px">
+            <i class="fab fa-wpforms"></i> Form. Personalizado
+        </a>
+    </li>
     {#        <h5 class="sidebar-header" style="color:#4c4c4c;">Adicionais</h5>#}
     {#        <ul class="nav nav-pills nav-stacked">#}
     {#            <li>#}
@@ -96,10 +117,5 @@ Variáveis:
     {#                <i class="fas fa-address-card"></i> Certificados#}
     {#            </a>#}
     {#        </li>#}
-    {#        <li>#}
-    {#            <a class="sidebar-itens" href="#"#}
-    {#               title="Submissão de artigos">#}
-    {#                <i class="fas fa-newspaper"></i> Artigos científicos#}
-    {#            </a>#}
-    {#        </li>#}
-    {#        </ul>#}
+
+</ul>

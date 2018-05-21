@@ -13,6 +13,13 @@
         {% if  required  or required == 'True' %}
             <small style="color:#C9302C">*</small>
         {% endif %}
+        {% if help_text and 'textarea' in field.field.widget.template_name %}
+            <div style="margin-bottom: 3px">
+                <small class="text-muted help-text">
+                    {{ help_text|safe }}
+                </small>
+            </div>
+        {% endif %}
 
         <div
                 {% if field.field.widget.input_type == "checkbox" or field.field.widget.input_type == "radio" %}
@@ -36,6 +43,17 @@
                 {% endif %}
                 <br>
 
+            {% elif field.field.widget.input_type == "file" %}
+
+
+                <label for="{{ field.id_for_label }}"
+                       class="custom-file-upload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Enviar arquivo
+                </label>
+                {{ field }}
+
+
             {% else %}
 
                 {% if  required  or required == 'True' %}
@@ -47,7 +65,7 @@
             {% endif %}
 
 
-            {% if help_text %}
+            {% if help_text and 'textarea' not in field.field.widget.template_name %}
                 <div>
                     <small class="text-muted help-text">
                         {{ help_text|safe }}
