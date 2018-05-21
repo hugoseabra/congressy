@@ -209,7 +209,7 @@
                     var date_save_btn = $('.work-config-date-save');
                     var presenting_save_btn = $('.work-config-presenting-save');
                     var date_form = $('#work_config_date_form');
-                    var presenting_form =$('#work_config_presenting_type_form');
+                    var presenting_form = $('#work_config_presenting_type_form');
 
                     new_area_category_btn.unbind("click");
                     add_area_category_modal_btn.unbind("click");
@@ -236,7 +236,6 @@
 
                     });
                     date_save_btn.on("click", function () {
-                        console.log('got called');
                         var form_data = new FormData(date_form[0]);
                         $.ajax({
                             url: '{% url 'scientific_work:workconfig-detail' work_config.pk %}',
@@ -259,7 +258,6 @@
                     presenting_save_btn.on("click", function () {
 
                         var form_data = new FormData(presenting_form[0]);
-
                         $.ajax({
                             url: '{% url 'scientific_work:workconfig-detail' work_config.pk %}',
                             type: 'PATCH',
