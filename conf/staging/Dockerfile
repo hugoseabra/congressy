@@ -82,7 +82,7 @@ WORKDIR /var/www/cgsy
 # COPY requirements.txt and RUN pip install BEFORE adding the rest of your code, this will cause Docker's caching mechanism
 # to prevent re-installing (all your) dependencies when you made a change a line or two in your app.
 COPY ./requirements.pip ./.
-COPY ./requirements_requirements.pip ./.
+COPY ./requirements_staging.pip ./.
 RUN pip install --no-cache-dir --upgrade -r requirements_staging.pip
 
 # -----------------------------------------------------------------------------
