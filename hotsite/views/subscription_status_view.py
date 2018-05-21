@@ -107,11 +107,11 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
 
     def get_transactions(self):
 
-        try:
-            transactions = Transaction.objects.filter(
-                subscription=self.subscription)
-        except Transaction.DoesNotExist:
-            return False
+        transactions = Transaction.objects.filter(
+            subscription=self.subscription,
+            lot=self.subscription.lot)
+        if transactions.count() <= 0:
+            transactions = False
 
         return transactions
 
