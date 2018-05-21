@@ -174,13 +174,6 @@ class Event(models.Model, GatherosModelMixin):
         help_text="Valor percentual da congressy caso o evento seja pago."
     )
 
-    allow_internal_subscription = models.BooleanField(
-        default=False,
-        verbose_name='permitir inscrição interna',
-        help_text='Se ativado, organizadores poderão inserir inscrição interna'
-                  ' manualmente.'
-    )
-
     boleto_limit_days = models.PositiveSmallIntegerField(
         default=3,
         verbose_name='Limite para boleto (dias)',
@@ -254,6 +247,13 @@ class Event(models.Model, GatherosModelMixin):
     @property
     def running(self):
         return self.status == Event.EVENT_STATUS_RUNNING
+
+    @property
+    def allow_internal_subscription(self):
+        if self.running is True:
+            return True
+
+        return self.organization.allow_internal_subscription
 
     def get_status_display(self):
         """ Recupera o status do evento de acordo com a propriedade 'status'"""

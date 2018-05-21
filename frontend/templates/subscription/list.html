@@ -106,7 +106,7 @@
                         </form>
                     </div>
                 </div>
-                {% if event.allow_internal_subscription or event.running %}
+                {% if event.allow_internal_subscription %}
                 <div class="float-right">
                     <a role="button" class="btn btn-success" href="{% url 'subscription:subscription-add' event.pk%}">
                         <i class="fa fa-plus"></i>
@@ -211,7 +211,7 @@
                                                             Visualizar
                                                         </a>
                                                     </li>
-                                                    {% if event.allow_internal_subscription or event.running %}
+                                                    {% if event.allow_internal_subscription %}
                                                     <li>
                                                         <a href="{% url 'subscription:subscription-edit' event.pk item.pk %}">
                                                             <i class="fas fa-pencil-alt"></i>
