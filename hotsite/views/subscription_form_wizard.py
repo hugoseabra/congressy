@@ -126,6 +126,14 @@ class SubscriptionWizardView(SessionWizardView):
         if not isinstance(user, User):
             return redirect('public:hotsite', slug=self.event.slug)
 
+        if self.has_paid_subscription():
+            messages.warning(
+                request,
+                "Atenção! Você já possui uma inscrição paga neste evento."
+            )
+            return redirect('public:hotsite-subscription-status',
+                            slug=self.event.slug)
+
         if self.is_private_event() and not self.has_previous_valid_code():
             messages.error(
                 request,
@@ -134,7 +142,6 @@ class SubscriptionWizardView(SessionWizardView):
             )
             self.clear_session_exhibition_code()
             return redirect('public:hotsite', slug=self.event.slug)
-
         try:
             return super().dispatch(request, *args, **kwargs)
         except InvalidStateStepError:
@@ -694,6 +701,21 @@ class SubscriptionWizardView(SessionWizardView):
             pass
 
         return None
+
+    def has_paid_subscription(self):
+
+        try:
+            subscription = self.event.subscriptions.get(
+                person__user=self.request.user)
+
+            for trans in subscription.transactions.all():
+                if trans.status == Transaction.PAID:
+                    return True
+
+        except Subscription.DoesNotExist:
+            pass
+
+        return False
 
     @staticmethod
     def is_lot_available(lot):
