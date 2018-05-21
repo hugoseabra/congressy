@@ -397,6 +397,14 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
 
     def post(self, request, *args, **kwargs):
 
+        if self.event.allow_internal_subscription is False:
+            self.permission_denied_url = reverse(
+                'subscription:subscription-list', kwargs={
+                    'event_pk': self.event.pk,
+                }
+            )
+            raise PermissionDenied('Você não pode realizar esta ação.')
+
         data = request.POST.copy()
         data['manual_author'] = '{} ({})'.format(
             request.user.get_full_name(),
