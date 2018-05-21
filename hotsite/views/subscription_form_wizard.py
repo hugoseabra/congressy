@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.forms import ValidationError
-from django.http import HttpResponseRedirect, QueryDict
+from django.http import QueryDict
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
@@ -21,6 +21,7 @@ from mailer.services import (
 )
 from payment.exception import TransactionError
 from payment.helpers import PagarmeTransactionInstanceData
+from payment.models import Transaction
 from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
@@ -125,6 +126,14 @@ class SubscriptionWizardView(SessionWizardView):
         if not isinstance(user, User):
             return redirect('public:hotsite', slug=self.event.slug)
 
+        if self.has_paid_subscription():
+            messages.warning(
+                request,
+                "Atenção! Você já possui uma inscrição paga neste evento."
+            )
+            return redirect('public:hotsite-subscription-status',
+                            slug=self.event.slug)
+
         if self.is_private_event() and not self.has_previous_valid_code():
             messages.error(
                 request,
@@ -156,9 +165,13 @@ class SubscriptionWizardView(SessionWizardView):
         context['event'] = self.event
         context['is_private_event'] = self.is_private_event()
         context['num_lots'] = self.get_num_lots()
+        has_open_boleto = False
 
         if self.storage.current_step not in ['lot', 'private_lot']:
-            context['selected_lot'] = self.get_lot_from_session()
+            selected_lot = self.get_lot_from_session()
+            context['selected_lot'] = selected_lot
+            has_open_boleto = self.get_open_boleto(lot=selected_lot)
+            context['has_open_boleto'] = has_open_boleto
 
         if self.storage.current_step == 'private_lot':
             code = self.request.session.get('exhibition_code')
@@ -169,16 +182,6 @@ class SubscriptionWizardView(SessionWizardView):
 
         if self.storage.current_step == 'lot':
             context['has_coupon'] = self.has_coupon()
-
-        if self.storage.current_step == 'payment':
-            context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
-            now = datetime.now()
-            margin = self.event.date_start
-
-            if margin - now < timedelta(days=self.event.boleto_limit_days):
-                context['allowed_transaction_types'] = 'credit_card'
-            else:
-                context['allowed_transaction_types'] = 'credit_card,boleto'
 
         if self.storage.current_step == 'person':
 
@@ -197,6 +200,27 @@ class SubscriptionWizardView(SessionWizardView):
                 config.address = config.ADDRESS_SHOW
 
             context['config'] = config
+
+            if not is_paid_lot(self) and not has_survey(self):
+                context['is_last'] = True
+            else:
+                context['is_last'] = False
+
+        if self.storage.current_step == 'survey':
+            if not is_paid_lot(self):
+                context['is_last'] = True
+            else:
+                context['is_last'] = False
+
+        if self.storage.current_step == 'payment':
+            context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
+            now = datetime.now()
+            margin = self.event.date_start
+
+            if has_open_boleto or margin - now < timedelta(days=self.event.boleto_limit_days):
+                context['allowed_transaction_types'] = 'credit_card'
+            else:
+                context['allowed_transaction_types'] = 'credit_card,boleto'
 
         return context
 
@@ -530,7 +554,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                    self.storage.current_step is not None):
+                self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -670,6 +694,42 @@ class SubscriptionWizardView(SessionWizardView):
             if lot.status == lot.LOT_STATUS_RUNNING
         ]
         return len(lots)
+
+    def get_open_boleto(self, lot):
+
+        now = datetime.now()
+
+        try:
+            subscription = self.event.subscriptions.get(
+                person__user=self.request.user)
+
+            all_transactions = Transaction.objects.filter(
+                subscription=subscription,
+                lot=lot)
+
+            for trans in all_transactions:
+                if trans.boleto_expiration_date:
+                    if trans.boleto_expiration_date > now.date():
+                        return trans
+        except Subscription.DoesNotExist:
+            pass
+
+        return None
+
+    def has_paid_subscription(self):
+
+        try:
+            subscription = self.event.subscriptions.get(
+                person__user=self.request.user)
+
+            for trans in subscription.transactions.all():
+                if trans.status == Transaction.PAID:
+                    return True
+
+        except Subscription.DoesNotExist:
+            pass
+
+        return False
 
     @staticmethod
     def is_lot_available(lot):

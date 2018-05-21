@@ -46,12 +46,12 @@
                     Boleto
                     <br>
                     <small>
-                        {% if transaction.boleto_url %}
+                        {% if transaction.boleto_url  and not has_paid_transaction %}
                             <a target="_blank" class="text-muted"
                                href="{{ transaction.boleto_url }}">
                                 Link para boleto
                             </a>
-                        {% else %}
+                        {% elif not transaction.boleto_url %}
                             <div class="progress">
                                 <div class="progress-bar progress-bar-success progress-bar-striped active"
                                      role="progressbar"
