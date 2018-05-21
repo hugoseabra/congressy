@@ -54,6 +54,7 @@ class EventAdmin(admin.ModelAdmin):
         ('Inscrições', {
             'fields': (
                 'allow_internal_subscription',
+                'boleto_limit_days',
                 # 'subscription_offline',
             ),
         }),
