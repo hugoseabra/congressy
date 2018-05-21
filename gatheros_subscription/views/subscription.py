@@ -23,6 +23,7 @@ from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Person
 from gatheros_event.views.mixins import (
     AccountMixin,
+    PermissionDenied,
 )
 from gatheros_subscription.forms import SubscriptionFilterForm, \
     SubscriptionForm
@@ -131,6 +132,16 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
 
     def get_error_url(self):
         return self.error_url
+
+    def pre_dispatch(self, request):
+        self.event = self.get_event()
+        if self.event.allow_internal_subscription is False:
+            self.permission_denied_url = reverse(
+                'subscription:subscription-list', kwargs={
+                    'event_pk': self.event.pk,
+                }
+            )
+            raise PermissionDenied('Você não pode realizar esta ação')
 
     def dispatch(self, request, *args, **kwargs):
         if self.kwargs.get('pk'):
