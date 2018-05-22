@@ -22,7 +22,6 @@ class WorkAddView(WorkViewMixin, generic.FormView):
                                     "submissão neste momento.")
             return redirect('front:start')
 
-
         return response
 
     def get_context_data(self, **kwargs):
