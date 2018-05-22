@@ -49,7 +49,8 @@
 {% block content %}
     <div class="row">
         <div class="col-md-4">
-            <div class="type_event panel panel-primary">
+            <div class="type_event panel panel-primary"
+                 href="javascript:void(0)" onclick="choose_type('free')">
                 <div class="panel-heading">
                     <h3 class="panel-title" style="text-align: center;">
                         Evento
@@ -60,12 +61,24 @@
                     30%;" src=
                             "{% static "assets/img/free-event.svg" %}"
                     />
-                    <div class="overlay"></div>
                 </div>
+                <div class="panel-footer">
+                    <h3> Lorem ipsum iaculis nisi proin primis  fusce proin
+                        lacinia volutpat, tempor class orci neque pretium
+                        fames fusce orci diam vitae, nulla nibh ornare
+                        torquent  praesent fringilla sapien conubia. curae a
+                        massa tortor accumsan conubia maecenas sagittis
+                        morbi  maecenas, luctus tincidunt augue sodales
+                         quam aenean convallis, posuere sit augue hendrerit.
+                    </h3>
+                </div>
+                <i class="overlay far fa-check-circle fa-10x"
+                ></i>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="type_event panel panel-primary">
+            <div class="type_event panel panel-primary"
+                 href="javascript:void(0)" onclick="choose_type('paid')">
                 <div class="panel-heading">
                     <h1 class="panel-title" style="text-align: center;"> Evento
                         Pago</h1>
@@ -75,13 +88,25 @@
                          src=
                                  "{% static "assets/img/paid-event.svg" %}"
                     />
-                    <div class="overlay"></div>
                 </div>
+                <div class="panel-footer">
+                    <h3> Lorem ipsum iaculis nisi proin primis  fusce proin
+                        lacinia volutpat, tempor class orci neque pretium
+                        fames fusce orci diam vitae, nulla nibh ornare
+                        torquent  praesent fringilla sapien conubia. curae a
+                        massa tortor accumsan conubia maecenas sagittis
+                        morbi  maecenas, luctus tincidunt augue sodales
+                         quam aenean convallis, posuere sit augue hendrerit.
+                    </h3>
+                </div>
+                <i class="overlay far fa-check-circle fa-10x"
+                ></i>
 
             </div>
         </div>
         <div class="col-md-4">
-            <div class="type_event panel panel-primary">
+            <div class="type_event panel panel-primary"
+                 href="javascript:void(0)" onclick="choose_type('scientific')">
                 <div class="panel-heading">
                     <h3 class="panel-title" style="text-align: center;"> Evento
                         Científico</h3>
@@ -89,16 +114,32 @@
                 <div class="panel-body" style="text-align: center">
                     <img style="width: 50%; height: 30%;"
                          class="type-image" src=
-                                 "{% static "assets/img/cientific-event.svg" %}"
+                                 "{% static "assets/img/scientific-event.svg" %}"
                     />
 
                 </div>
-                 <div class="overlay"></div>
-
+                <div class="panel-footer">
+                    <h3> Lorem ipsum iaculis nisi proin primis  fusce proin
+                        lacinia volutpat, tempor class orci neque pretium
+                        fames fusce orci diam vitae, nulla nibh ornare
+                        torquent  praesent fringilla sapien conubia. curae a
+                        massa tortor accumsan conubia maecenas sagittis
+                        morbi  maecenas, luctus tincidunt augue sodales
+                         quam aenean convallis, posuere sit augue hendrerit.
+                    </h3>
+                </div>
+                <i class="overlay far fa-check-circle fa-10x"
+                ></i>
             </div>
         </div>
 
     </div>
+    <form action="{% url 'event:event-add'%}"
+          method="post" id="choose-type-form" style="display:none">
+        {% csrf_token %}
+        <input type="hidden" name="event_type" id="event_type" value="" />
+    </form>
+
 {% endblock %}
 
 
@@ -221,6 +262,10 @@
     <script src="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.full.min.js" %}"></script>
     <script src="{% static 'assets/js/event.js' %}"></script>
     <script>
+        function choose_type(chosen_type) {
+            $('#transaction_id').val(chosen_type);
+            $('#choose-type-form').submit();
+        }
         (function ($) {
             $(document).ready(function () {
                 {% if LANGUAGE_CODE == 'pt-br' %}
@@ -239,6 +284,14 @@
                     $('#id_date_end_0').mask("9999-99-99");
                     $('#id_date_end_1').mask("99:99");
                 {% endif %}
+
+
+                $('.type_event').on('click', function () {
+                    $('.type_event').find('.overlay').each(function() {
+                        $(this).removeClass('active');
+                    });
+                    $('.type_event:hover > .overlay').toggleClass('active');
+                });
             });
         })(jQuery);
     </script>
@@ -249,14 +302,18 @@
           href="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.min.css" %}">
 
     <style>
-        .type_event:hover > .overlay {
+        .overlay {
+            display: none;
+        }
+
+        .active {
             position: absolute;
-            top: 0;
+            text-align: center;
+            color: #0e90d2;
+            top: 15%;
             width: 100%;
             height: 100%;
-            left: 0;
-            background-color: #000;
-            opacity: 0.1;
+        {#background-color: #000;#} opacity: 1;
             z-index: 100;
             display: block;
         }
