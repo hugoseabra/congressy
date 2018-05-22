@@ -45,7 +45,6 @@ class EventForm(forms.ModelForm):
         self.fields['is_scientific'].help_text = 'Trata-se de um evento com ' \
                                                  'submissão de artigos ' \
                                                  'cientificos?'
-        self.fields['is_scientific'].required = True
 
         if instance is None:
             self._configure_organization_field()
