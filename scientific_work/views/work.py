@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views import generic
+from django.shortcuts import redirect
 
 from scientific_work.forms import NewWorkForm
 from scientific_work.models import Work
@@ -11,6 +12,18 @@ from .mixins import WorkViewMixin, EventViewMixin
 class WorkAddView(WorkViewMixin, generic.FormView):
     template_name = "scientific_work/form.html"
     form_class = NewWorkForm
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+
+        if not self.subscription.event.work_config or not \
+                self.subscription.event.work_config.is_submittable:
+            messages.error(request, "Este evento está indisponivel para "
+                                    "submissão neste momento.")
+            return redirect('front:start')
+
+
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -93,7 +93,7 @@
                                     Novo pagamento
                                 </a>
                             {% endif %}
-                            {% if event.is_scientific %}
+                            {% if event.is_scientific and event.work_config and event.work_config.is_submittable %}
                                 <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}" class="btn btn-primary" style="margin-top: 15px"
                                    data-toggle="tooltip" title="Submeter artigos científicos para o evento">
                                     Enviar Artigo Certificado

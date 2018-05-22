@@ -26,7 +26,7 @@
             <button type="submit" class="btn btn-primary">
                 Definir minha senha
             </button>
-            {% if event.is_scientific and is_subscribed %}
+            {% if event.is_scientific and is_subscribed and event.work_config and event.work_config.is_submittable %}
                 <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
                    class="btn btn-primary" style="margin-top: 15px">
                     Deseja submeter seu artigo cientifico?
@@ -94,7 +94,7 @@
                     <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                         {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                     </div>
-                    {% if event.is_scientific and is_subscribed %}
+                    {% if event.is_scientific and is_subscribed  and event.work_config and event.work_config.is_submittable %}
                         <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
                            class="btn btn-success" style="margin-top: 15px">
                             Deseja submeter seu artigo cientifico?
@@ -142,7 +142,7 @@
                 <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
-                {% if event.is_scientific and is_subscribed %}
+                {% if event.is_scientific and is_subscribed and event.work_config and event.work_config.is_submittable %}
                     <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
                        class="btn btn-success" style="margin-top: 15px">
                         Deseja submeter seu artigo cientifico?
@@ -217,7 +217,7 @@
                 <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
-                {% if event.is_scientific and is_subscribed %}
+                {% if event.is_scientific and is_subscribed  %}
                     <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
                        class="btn btn-success" style="margin-top: 15px">
                         Deseja submeter seu artigo cientifico?

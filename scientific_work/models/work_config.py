@@ -1,9 +1,11 @@
+from datetime import datetime
+
 from django.db import models
+
 from gatheros_event.models import Event
 
 
 class WorkConfig(models.Model):
-
     ORAL = 'oral'
     POSTER = 'poster'
     ORAL_AND_POSTER = 'oral e poster'
@@ -38,6 +40,15 @@ class WorkConfig(models.Model):
         default=ORAL,
     )
 
+    @property
+    def is_submittable(self):
+        now = datetime.now()
+        area_categories = self.event.area_categories.all()
+        if self.date_start <= now <= self.date_end \
+                and area_categories.count() > 0:
+            return True
+
+        return False
+
     def __str__(self):
         return "Configurações cientificas do " + self.event.name
-
