@@ -14,6 +14,8 @@ from django.urls import reverse, reverse_lazy
 from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.views import generic
+from django.db.models import Q
+
 from wkhtmltopdf.views import PDFTemplateView
 
 from core.forms.cleaners import clear_string
@@ -712,20 +714,54 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         cxt.update({
             'attendances': self.get_attendances(),
             'search_by': self.search_by,
-            'has_inside_bar' : True,
-            'active' : 'checkin'
+            'has_inside_bar': True,
+            'active': 'checkin',
+            'confirmed': self.get_number_confirmed(),
+            'number_attendances': self.get_number_attendances(),
+            'total_subscriptions': self.get_number_subscription()
         })
         return cxt
 
     def get_attendances(self):
         try:
-            return Subscription.objects.filter(
+            list = Subscription.objects.filter(
                 attended=True,
                 event=self.get_event(),
             ).order_by('-attended_on')
+            return list[0:5]
+
 
         except Subscription.DoesNotExist:
             return []
+
+    def get_number_attendances(self):
+        try:
+            return Subscription.objects.filter(
+                attended=True,
+                event=self.get_event(),
+            ).count()
+
+        except Subscription.DoesNotExist:
+            return []
+
+    def get_number_subscription(self):
+
+        total = \
+            Subscription.objects.filter(
+                event=self.get_event()
+            ).count()
+
+        return total
+
+    def get_number_confirmed(self):
+
+        confirmed = \
+            Subscription.objects.filter(
+                status=Subscription.CONFIRMED_STATUS,
+                event=self.get_event()
+            ).count()
+
+        return confirmed
 
     def search_subscription(self, search_by, value):
         """ Busca inscrições de acordo com o valor passado. """
@@ -761,6 +797,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             return event.subscriptions.get(person__email=email.strip())
         except Subscription.DoesNotExist:
             return None
+
 
 class MySubscriptionsListView(AccountMixin, generic.ListView):
     """ Lista de inscrições """
@@ -847,7 +884,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                                    transaction.type == 'boleto':
+                            transaction.type == 'boleto':
                         return True
 
         return False
