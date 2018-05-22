@@ -3,11 +3,11 @@ from django.conf.urls import include, url
 from gatheros_subscription import views
 
 urls = [
-    # url(
-    #     r'^(?P<pk>[0-9A-Fa-f-]+)/attendance/$',
-    #     views.SubscriptionAttendanceView.as_view(),
-    #     name='subscription-attendance'
-    # ),
+    url(
+        r'^(?P<pk>[0-9A-Fa-f-]+)/attendance/$',
+        views.SubscriptionAttendanceView.as_view(),
+        name='subscription-attendance'
+    ),
     # url(
     #     r'^(?P<pk>[0-9A-Fa-f-]+)/delete/$',
     #     views.SubscriptionCancelView.as_view(),

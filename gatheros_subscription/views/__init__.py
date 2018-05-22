@@ -10,6 +10,7 @@ from .payment import PaymentDeleteView
 from .subscription import (
     MySubscriptionsListView,
     SubscriptionAddFormView,
+    SubscriptionAttendanceView,
     SubscriptionAttendanceSearchView,
     SubscriptionCancelView,
     SubscriptionEditFormView,

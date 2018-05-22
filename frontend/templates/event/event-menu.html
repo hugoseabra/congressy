@@ -39,14 +39,14 @@ Variáveis:
             </a>
         </li>
     {% endif %}
-    {#        <li>#}
-    {#            <a class="sidebar-itens" href=#}
-    {#                    "{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-    {#               title="Check-in">#}
-    {#                <i class="fas fa-calendar-check"></i>#}
-    {#                Check-in#}
-    {#            </a>#}
-    {#        </li>#}
+    <li>
+        <a class="sidebar-itens" href=
+                "{% url 'subscription:subscription-attendance-search' event.pk %}"
+           title="Check-in">
+            <i class="fas fa-calendar-check"></i>
+            Check-in
+        </a>
+    </li>
 </ul>
 
 {% if event.is_scientific %}
