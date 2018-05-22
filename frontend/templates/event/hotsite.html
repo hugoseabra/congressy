@@ -396,6 +396,7 @@
                         </div>
                     </div>
                 </div>
+                {% if event.is_scientific %}
                 <div class="row">
                     <div class="col-md-12">
                         <div class="panel panel-primary">
@@ -405,8 +406,6 @@
                                 </div>
                             </div>
                             <div class="panel-body">
-
-                                {% if event.is_scientific %}
 
                                     <div class="row">
                                         <div class="col-md-12">
@@ -420,9 +419,6 @@
                                         </div>
                                     </div>
 
-
-                                {% endif %}
-
                                 <button type="button"
                                         class="btn btn-success submit-button"
                                         style=" float: right; margin-right:
@@ -434,6 +430,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
             <div class="col-md-3 hidden-xs hidden-sm">
 

@@ -192,6 +192,7 @@ class OrganizationAdmin(admin.ModelAdmin):
         ('Inscrições', {
             'fields': (
                 'allow_internal_subscription',
+                'is_scientific',
             ),
         }),
         ('Site e Redes Sociais', {

@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-        {% elif has_private_subscription and lot_still_available %}
+        {% elif is_subscribed and has_private_subscription and lot_still_available %}
             <p style="font-size: 18px">
                 Você já está inscrito(a) neste evento.
             </p>
@@ -149,7 +149,7 @@
                     </a>
                 {% endif %}
             </div>
-        {% elif has_private_subscription and not lot_still_available %}
+        {% elif is_subscribed and has_private_subscription and not lot_still_available %}
             <p class="text-muted">
                 Preencha os dados seguintes para refazer sua inscrição.
             </p>
@@ -184,7 +184,6 @@
             </div>
 
         {% else %}
-
             {% if not person or not person.email or not person.name %}
                 <p class="text-muted">
                     Preencha os dados seguintes para inicar sua inscrição.
@@ -195,7 +194,7 @@
                 {% render_generic_field form.name autofocus=True %}
             {% endif %}
 
-            {% if not person or person and not person.email %}
+            {% if not person or person and user and not user.email %}
                 {% render_generic_field form.email required=True %}
             {% endif %}
 

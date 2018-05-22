@@ -199,6 +199,7 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
             pass
 
         person = self.get_person()
+        context['person'] = person
 
         if person:
             try:
@@ -215,14 +216,12 @@ class SubscriptionFormMixin(EventMixin, generic.FormView):
         else:
             context['is_subscribed'] = False
 
-        context['person'] = person
-
         return context
 
     def get_person(self):
         """ Se usuario possui person """
 
-        if self.person or not self.request.user.is_authenticated:
+        if self.person or not self.request.user.is_authenticated():
             return self.person
 
         try:
