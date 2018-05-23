@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'captcha',
     'wkhtmltopdf',
+    'formtools',
 
     # KANU_APPS
     'kanu_locations',
@@ -195,7 +196,6 @@ CKEDITOR_CONFIGS = {
             {
                 'name': 'styles',
                 'items': [
-                    'Styles',
                     'Format',
                     'FontSize'
                 ]
@@ -272,6 +272,7 @@ CKEDITOR_CONFIGS = {
         'height': 150,
     },
 }
+
 # ============================= MESSAGES ==================================== #
 MESSAGE_TAGS = {
     message_constants.DEBUG: 'debug',

@@ -17,6 +17,9 @@
 
                 <div class="col-md-9 col-md-offset-2">
 
+                    {% include "hotsite/includes/greetings.html" %}
+                    {% include "hotsite/includes/selected-lot.html" %}
+
                     <form method="post" action="" id="person_form">
 
                         {% csrf_token %}
@@ -215,7 +218,13 @@
 
                             <button type="submit"
                                     class="btn btn-primary pull-right">
-                                Próximo
+
+                                {% if is_last %}
+                                    Finalizar
+                                {% else %}
+                                    Próximo
+                                {% endif %}
+
                                 <i class="fas fa-chevron-circle-right"></i>
                             </button>
 

@@ -1,0 +1,48 @@
+{% load form_config_tags %}
+
+<div class="modal" id="manual-payment-form-modal" role="dialog" data-backdrop="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <form action="" method="post" class="form-horizontal" role="form" name="manual-payment-form" onsubmit="$(this).find('button[type=submit]').attr('disabled', '').text('Aguarde...')">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-bold">
+                        Receber Pagamento
+                    </h4>
+                </div>
+                <div class="modal-body">
+                        <div class="row">
+                            {% csrf_token %}
+
+                            {% if form.non_field_errors %}
+                                {% render_errors form.non_field_errors %}
+                            {% endif %}
+
+                            {% for hidden_field in form.hidden_fields %}
+                                {% if hidden_field.errors %}
+                                    {% render_errors hidden_field.errors %}
+                                {% endif %}
+                                {{ hidden_field }}
+                            {% endfor %}
+
+                            <div class="col-xs-10 col-xs-push-1">
+                                {% render_generic_field form.manual_payment_type autofocus=True required=True %}
+                            </div>
+                            <div class="col-xs-10 col-xs-push-1">
+                                {% render_generic_field form.amount %}
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <input type="hidden" name="transaction_id" id="edit-transaction-id" value="{{ transaction_pk|default:'' }}">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

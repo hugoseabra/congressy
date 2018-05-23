@@ -52,6 +52,8 @@ class SurveyEditView(EventViewMixin, AccountMixin, generic.TemplateView,
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
         context['survey'] = self.survey
+        context['has_inside_bar'] = True
+        context['active'] = 'form-personalizado'
         context['form'] = QuestionForm(survey=self.survey)
         context['full_survey_form'] = SurveyForm(
             survey=self.survey)

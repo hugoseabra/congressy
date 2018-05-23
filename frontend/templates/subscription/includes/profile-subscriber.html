@@ -1,0 +1,568 @@
+{% load static humanize %}
+
+<div class="row tooltip-wrapper">
+    <div class="col-xl-11 col-lg-11 col-md-12">
+        <div class="buttonbar">
+            <div class="float-left">
+                <button onclick="window.location.href='{% url 'subscription:subscription-list' event.pk %}'"
+                        data-toggle="tooltip"
+                        title=""
+                        data-original-title="Voltar a lista de inscrições"
+                        class="btn btn-primary">
+                    <i class="fa fa-arrow-circle-left"></i>
+                    Inscrições
+                </button>
+            </div>
+            <div class="float-left">
+                <h3 class="text-bold" style="margin: 8px 0 0 20px;font-size:22px">Painel Geral do Participante</h3>
+            </div>
+            {% if event.allow_internal_subscription %}
+            <div class="float-right">
+                <button onclick="window.location.href='{% url 'subscription:subscription-edit' event.pk object.pk %}'"
+                        class="btn btn-info btn-trans"
+                        data-toggle="tooltip"
+                        title="Editar">
+                    <i class="fas fa-pencil-alt"></i>
+                </button>
+            </div>
+            {% endif %}
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+<div class="row tooltip-wrapper ">
+    <div class="col-md-3">
+        <div class="panel">
+            <div class="panel">
+                <div class="panel-body" style="padding:0">
+                    <div style="border:1px solid #ddd">
+                        <table class="table table-inbox table-hover"
+                               style="margin-bottom:0">
+                            <thead>
+                            <tr>
+                                <th>Identificadores</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="unread">
+                                <td class="message" style="cursor: default">
+                                    <span class="title">Código</span>
+                                    {{ object.code }} (Nº.: {{ object.count }})
+                                </td>
+                            </tr>
+                            <tr class="unread">
+                                <td class="message"
+                                    style="cursor: default;overflow:hidden">
+                                    <span class="title">Lote</span>
+                                    <div data-toggle="tooltip"
+                                         title="{{ object.lot.name }}">
+                                        {{ object.lot.name|truncatechars:29 }}
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="panel">
+            <div class="panel-body" style="padding:0">
+                <div style="border:1px solid #ddd">
+                    <table class="table table-inbox table-hover"
+                           style="margin-bottom:0">
+                        <thead>
+                        <tr>
+                            <th>Situação</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="unread">
+                            <td class="message"
+                                style="cursor: default;border-top:0">
+                                <span class="title">Presente</span>
+                                {% if object.attended %}Sim{% else %}
+                                    Não{% endif %}
+                                {#                                        Sim <small class="text-muted">- 27/05/2018 17h03</small>#}
+                            </td>
+                        </tr>
+                        <tr class="unread">
+                            <td class="message" style="cursor: default">
+                                <div>
+                                    <div class="float-left">
+                                        <span class="title">Status</span>
+                                        {% if object.status == object.CONFIRMED_STATUS %}
+                                            <i class="fa fa-circle"
+                                               aria-hidden="true"
+                                               style="color:#5cb85c"></i>
+                                        {% elif object.status == object.AWAITING_STATUS %}
+                                            <i class="fa fa-circle"
+                                               aria-hidden="true"
+                                               style="color: #f0ad4e"></i>
+                                        {% elif object.status == object.CANCELED_STATUS %}
+                                            <i class="fa fa-circle"
+                                               aria-hidden="true"
+                                               style="color: #d9534f"></i>
+                                        {% endif %}
+                                        {{ object.get_status_display|title }}
+                                        {# Confirmado <small class="text-muted"> - 27/05/2018 17h03</small>#}
+                                    </div>
+                                    {% if object.status == object.CONFIRMED_STATUS %}
+                                        <div class="float-right"
+                                             style="margin-left:10px;margin-top:5px;">
+                                            <button type="button"
+                                                    data-toggle="tooltip"
+                                                    title="Abrir voucher"
+                                                    onclick="window.open('{% url 'subscription:subscription-voucher' event.pk object.pk %}')"
+                                                    class="btn btn-info btn-sm btn-trans">
+                                                voucher
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                    <div class="clearfix"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if not object.free and last_transaction %}
+    <div class="col-xl-5 col-lg-5 col-md-6">
+        <div class="panel">
+            <div class="panel-body" style="padding:0">
+                <div style="border:1px solid #ddd">
+                    <table class="table table-inbox table-hover"
+                           style="margin-bottom:0">
+                        <thead>
+                        <tr>
+                            <th>Sobre o Pagamento</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="unread">
+                            <td class="message" style="cursor: default;border-top:0">
+                                <div>
+                                    {% if last_transaction.manual is True %}
+                                        {% if transaction.manual_payment_type == transaction.MANUAL_PAYMENT_MONEY %}
+                                            <div class="float-left">
+                                                <i style="font-size: 40px" class="far fa-money-bill-alt"></i>
+                                            </div>
+                                            <div class="float-left" style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                <span>Dinheiro</span>
+                                                <small>(manual)</small>
+                                            </div>
+                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_PAYCHECK %}
+                                            <div class="float-left">
+                                                <i style="font-size: 40px" class="fas fa-money-check-alt"></i>
+                                            </div>
+                                            <div class="float-left" style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                <span>Cheque</span>
+                                                <small>(manual)</small>
+                                            </div>
+                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_DEBIT_CARD %}
+                                            <div class="float-left">
+                                                <i style="font-size: 40px" class="far fa-credit-card"></i>
+                                            </div>
+                                            <div class="float-left" style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                <span>Cartão de Débito</span>
+                                                <small>(manual)</small>
+                                            </div>
+                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_CREDIT_CARD %}
+                                            <div class="float-left">
+                                                <i style="font-size: 40px" class="far fa-credit-card"></i>
+                                            </div>
+                                            <div class="float-left" style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                <span>Cartão de Crédito</span>
+                                                <small>(manual)</small>
+                                            </div>
+                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_DEPOSIT %}
+                                            <div class="float-left">
+                                                <i style="font-size: 40px" class="fas fa-university"></i>
+                                            </div>
+                                            <div class="float-left" style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                <span>Depósito</span>
+                                                <small>(manual)</small>
+                                            </div>
+                                        {% elif transaction.manual_payment_type == transaction.MANUAL_PAYMENT_BANK_TRANSFER %}
+                                            <div class="float-left">
+                                                <i style="font-size: 40px" class="fas fa-exchange-alt"></i>
+                                            </div>
+                                            <div class="float-left" style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                <span>Transferência bancária</span>
+                                                <small>(manual)</small>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if last_transaction.type == last_transaction.BOLETO %}
+                                            <div class="float-left">
+                                                <i style="font-size: 40px" class="fas fa-barcode"></i>
+                                            </div>
+                                            <div class="float-left"
+                                                 style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                Boleto
+                                                {% if last_transaction.status != last_transaction.PAID and today > last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                                <strong class="text-warning">(vencido)</strong>
+                                                {% endif %}
+                                            </div>
+                                            {% if last_transaction.status != transaction.PAID and today <= last_transaction.boleto_expiration_date|date:'Y-m-d' %}
+                                            <div class="float-right">
+                                                <button type="button"
+                                                        data-toggle="tooltip"
+                                                        title="Abrir documento"
+                                                        class="btn btn-default btn-sm btn-trans"
+                                                        onclick="window.open('{{ last_transaction.boleto_url }}')">
+                                                    documento
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                        {% elif last_transaction.type == last_transaction.CREDIT_CARD %}
+                                            <div class="float-left">
+                                                <i style="font-size: 40px" class="far fa-credit-card"></i>
+                                            </div>
+                                            <div class="float-left" style="margin-left:10px">
+                                                <span class="title">Método</span>
+                                                Cartão de Crédito
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                    <div class="clearfix"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="unread">
+                            <td class="message" style="cursor: default">
+                                <div class="float-left">
+                                    {% if total_paid  %}
+                                        <span class="title">Valor pago</span>
+                                        <strong class="text-success">
+                                            R$ {{ total_paid|intcomma }} (pago)
+                                        </strong>
+                                        {% if dividend_amount < 0 %}
+                                        restante: <span class="text-danger">R$ {{ dividend_amount|intcomma }}</span>
+                                        {% elif dividend_amount > 0 %}
+                                        em ver: <span class="text-primary">R$ {{ dividend_amount|intcomma }}</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="title">Valor inscrição</span>
+                                        <strong class="text-danger">
+                                            R$ {{ object.lot.get_calculated_price|intcomma }}
+                                        </strong>
+                                    {% endif %}
+                                </div>
+                                <div class="float-right"
+                                     style="margin-left:10px;margin-top:5px;">
+                                    <button type="button"
+                                            data-toggle="tooltip"
+                                            title="Ver detalhes do pagamento"
+                                            onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}?details=1'"
+                                            class="btn btn-info btn-sm btn-trans">
+                                        detalhamento
+                                    </button>
+                                </div>
+                                <div class="clearfix"></div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row tooltip-wrapper">
+    <div class="col-xl-11 col-lg-11 col-md-12">
+        <section class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Informações Gerais</h3>
+            </div>
+            <div class="panel-body profile-wrapper profile-block">
+                <div class="col-md-2">
+                    <div class="profile-pic text-center">
+                        <img src="{% static 'assets/img/user_undefined.jpg' %}"
+                             alt="" width="174px" class="img-circle">
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div>
+                        <div class="float-left">
+                            <h1 style="margin-top:8px">{{ object.person.name }}</h1>
+                        </div>
+                        <div class="float-right">
+                            {% if dividend_amount < 0 %}
+                                <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
+                                   data-toggle="tooltip"
+                                   title="Participante com dívidas."
+                                ></i>
+                            {% elif dividend_amount > 0 %}
+                                <i class="fas fa-exclamation-triangle text-warning animated shake" style="margin-left:20px"
+                                   data-toggle="tooltip"
+                                   title="Participante com valor em ver com o evento."
+                                ></i>
+                            {% elif dividend_amount == 0 %}
+                                <i class="fas fa-check text-success" style="margin-left:20px"
+                                   data-toggle="tooltip"
+                                   title="Participante sem dívidas."
+                                ></i>
+                            {% endif %}
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <hr/>
+                    <small class="text-muted"><strong>Criado
+                        em:</strong> {{ object.created|date:"d/m/Y H\hi" }}
+                    </small>
+                    <div class="row" style="padding-left:16px;">
+                        <div class="profile-info col-lg-3  col-md-6">
+                            <div class="profile-info-label">
+                                Sexo:
+                            </div>
+                            {% if object.person.gender %}
+                                <div class="profile-info-value">{{ object.person.get_gender_display }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="profile-info col-lg-3 col-md-6">
+                            <div class="profile-info-label">
+                                E-mail:
+                            </div>
+                            {% if object.person.email %}
+                                <div class="profile-info-value">{{ object.person.email }}</div>
+                            {% endif %}
+                        </div>
+                        {% if config.cpf and object.person.cpf %}
+                            <div class="profile-info col-lg-3 col-md-6">
+                                <div class="profile-info-label">
+                                    CPF:
+                                </div>
+                                <div class="profile-info-value">{{ object.person.get_cpf_display }}</div>
+                            </div>
+                        {% endif %}
+                        {% if config.phone and object.person.phone %}
+                            <div class="profile-info col-lg-3 col-md-6">
+                                <div class="profile-info-label">
+                                    Celular:
+                                </div>
+                                <div class="profile-info-value">{{ object.person.get_phone_display }}</div>
+                            </div>
+                        {% endif %}
+                        {% if object.person.city.name %}
+                            <div class="profile-info col-lg-3 col-md-6">
+                                <div class="profile-info-label">Cidade-UF:
+                                </div>
+                                <div class="profile-info-value">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
+                            </div>
+                        {% endif %}
+                        {% if config.city and object.person.birth_date %}
+                            <div class="profile-info col-lg-3 col-md-6">
+                                <div class="profile-info-label">Dt. de
+                                    Nascimento:
+                                </div>
+                                <div class="profile-info-value">{{ object.person.get_birth_date_display }}
+                                    ({{ object.person.age }} anos)
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <br/>
+                    <div class="row" style="padding-left:16px;">
+                        <div class="connect social">
+                            <ul>
+                                {% if not object.free %}
+                                <li>
+                                    <button type="button"
+                                            class="btn btn-info btn-trans"
+                                            data-toggle="tooltip"
+                                            title="Abrir informações financeiras do participante"
+                                            onclick="window.location.href='{% url 'subscription:subscription-payments' event.pk object.pk %}'">
+                                        <span class="far fa-money-bill-alt"></span>
+                                        Ver Painel Financeiro
+                                    </button>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <button type="button" style="display:none"
+                                            class="btn btn-primary btn-trans"
+                                            data-toggle="tooltip"
+                                            title="Enviar mensagem personalizada ao participante">
+                                        <span class="fa fa-comments"></span>
+                                        Enviar mensagem
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" style="display:none"
+                                            class="btn btn-primary btn-trans"
+                                            data-toggle="tooltip"
+                                            title="Enviar mensagem personalizada ao participante">
+                                        <span class="fa fa-comments"></span>
+                                        Enviar mensagem
+                                    </button>
+                                </li>
+                                <li style="display: none"><a href="#"><i
+                                        class="fab fa-facebook-f fa-lg"></i></a>
+                                </li>
+                                <li style="display: none"><a href="#"><i
+                                        class="fab fa-twitter fa-lg"></i></a>
+                                </li>
+                                <li style="display: none"><a href="#"><i
+                                        class="fab fa-linkedin fa-lg"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% if config.address == config.ADDRESS_SHOW %}
+    <div class="row">
+        <div class="col-xl-11 col-lg-11 col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel" id="address-block-hidden">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Endereço <a href="#"
+                                                                onclick="show_block('#address-block-visible', '#address-block-hidden');return false;"
+                                                                class="btn btn-link"
+                                                                style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="panel panel-primary" style="display:none"
+                         id="address-block-visible">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Endereço <a href="#"
+                                            onclick="show_block('#address-block-hidden', '#address-block-visible');return false;"
+                                            class="btn btn-link"
+                                            style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Logradouro (Rua/Av.):</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.street|default:'-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Número:</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.number|default:'-' }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label>Complemento:</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.complemento|default:'-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-xl-4">
+                                    <div class="form-group">
+                                        <label>Bairro:</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.village|default:'-' }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-xl-8">
+                                    <div class="form-group">
+                                        <label>Cidade:</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>CEP:</label>
+                                        <div class="well well-sm profile-info-padding">{{ object.person.get_zip_code_display }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% if config.institution_show or config.institution_cnpj_show or config.function_show %}
+    <div class="row">
+        <div class="col-xl-11 col-lg-11 col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel" id="institution-block-hidden">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Dados Institucionais <a
+                                    href="#"
+                                    onclick="show_block('#institution-block-visible', '#institution-block-hidden');return false;"
+                                    class="btn btn-link"
+                                    style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="panel panel-primary" style="display:none"
+                         id="institution-block-visible">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Dados Institucionais <a
+                                    href="#"
+                                    onclick="show_block('#institution-block-hidden', '#institution-block-visible');return false;"
+                                    class="btn btn-link"
+                                    style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="row">
+                                    {% if config.institution_show %}
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Instituição:</label>
+                                                <div class="well well-sm profile-info-padding">{{ object.person.institution|default:'-' }}</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if config.institution_cnpj_show %}
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>CNPJ da
+                                                    Instituição:</label>
+                                                <div class="well well-sm profile-info-padding">{{ object.person.get_institution_cnpj_display|default:'-' }}</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if config.function_show %}
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Cargo:</label>
+                                                <div class="well well-sm profile-info-padding">{{ object.person.function|default:'-' }}</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

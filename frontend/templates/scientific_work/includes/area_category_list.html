@@ -1,0 +1,68 @@
+{% load i18n static widget_tweaks form_config_tags %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+
+            <label>
+                Áreas Temáticas:
+            </label>
+
+            <div>
+                {% if area_categories %}
+
+                    <table class="table">
+
+                        <thead>
+
+                        <tr>
+                            <th>Nome:</th>
+                            <th></th>
+                        </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        {% for category in area_categories %}
+                            <tr>
+                                <td>
+                                    {{ category.name }}
+                                </td>
+                                <td class="col-sm-1">
+                                    <i class="fas fa-trash-alt danger-color
+                                delete-area-category"
+                                       data-url="{% url 'scientific_work:areacategory-detail' category.pk %}">
+                                    </i>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle
+                        warning-color"></i>
+                        <strong>Atenção!</strong>
+                        Seus participantes
+                        não irão
+                        conseguir
+                        submeter
+                        trabalhos até que
+                        seja configurado
+                        pelo menos uma
+                        área temática!
+                    </div>
+                {% endif %}
+                <button type="button"
+                        class="btn btn-trans btn-success new-area-category">
+                    Cadastrar nova área
+                    temática
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

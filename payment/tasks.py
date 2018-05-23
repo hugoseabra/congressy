@@ -1,6 +1,6 @@
 import json
-from decimal import Decimal
 from datetime import datetime
+from decimal import Decimal
 
 import pagarme
 from django.conf import settings
@@ -73,13 +73,21 @@ def create_pagarme_transaction(transaction_data, subscription=None):
         if item['category'] == 'inscrição':
             trx_subscription = item
 
+    # Separar centavos
+    amount = str(trx['amount'])
+    size = len(amount)
+    cents = amount[-2] + amount[-1]
+    amount = '{}.{}'.format(amount[0:size - 2], cents)
+    amount = Decimal(amount)
+
     transaction_instance.data = trx
     transaction_instance.status = trx['status']
     transaction_instance.type = trx['payment_method']
     transaction_instance.date_created = trx['date_created']
-    transaction_instance.subscription_amount = separate_amount(
-        trx_subscription['unit_price'])
-    transaction_instance.subscription_liquid_amount = liquid_amount
+    transaction_instance.amount = amount
+    transaction_instance.lot_price = subscription.lot.get_calculated_price()
+    transaction_instance.liquid_amount = liquid_amount
+
     optional_total = 0
 
     for item in items:
@@ -89,6 +97,14 @@ def create_pagarme_transaction(transaction_data, subscription=None):
     # @TODO add optional liquid amount
     transaction_instance.optional_amount = optional_total
 
+    if 'installments' in trx \
+            and trx['installments'] \
+            and int(trx['installments']):
+        installments = int(trx['installments'])
+        transaction_instance.installments = installments
+        transaction_instance.installment_amount = \
+            round((amount / installments), 2)
+
     if transaction_instance.type == Transaction.BOLETO:
         boleto_exp_date = trx.get('boleto_expiration_date')
         if boleto_exp_date:
@@ -96,6 +112,12 @@ def create_pagarme_transaction(transaction_data, subscription=None):
                 boleto_exp_date,
                 "%Y-%m-%dT%H:%M:%S.%fZ"
             )
+
+    if transaction_instance.type == Transaction.CREDIT_CARD:
+        card = trx['card']
+        transaction_instance.credit_card_holder = card['holder_name']
+        transaction_instance.credit_card_first_digits = card['first_digits']
+        transaction_instance.credit_card_last_digits = card['last_digits']
 
     transaction_instance.save()
 

@@ -73,6 +73,8 @@ class EventHotsiteView(AccountMixin, FormView):
         event = self._get_event()
 
         context = super().get_context_data(**kwargs)
+        context['has_inside_bar'] = True
+        context['active'] = 'pagina-do-evento'
         context['event'] = event
         context['has_paid_lots'] = self.has_paid_lots()
         context['google_maps_api_key'] = settings.GOOGLE_MAPS_API_KEY

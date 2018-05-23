@@ -5,10 +5,10 @@ feita por um organizador de evento, dono de uma organização, e que deseja
 apresentar informações ligadas a ela a pessoa que possam se interessar em
 participar do evento.
 """
-from datetime import datetime
-
 import os
 from collections import Counter
+from datetime import datetime
+
 from django.db import models
 from django.utils.encoding import force_text
 from stdimage import StdImageField
@@ -195,7 +195,19 @@ class Event(models.Model, GatherosModelMixin):
         help_text="Valor percentual da congressy caso o evento seja pago."
     )
 
+    boleto_limit_days = models.PositiveSmallIntegerField(
+        default=3,
+        verbose_name='Limite para boleto (dias)',
+        help_text='Limite (em dias) para permissão de pagamento de boleto'
+                  ' do evento.'
+    )
+
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
+
+    is_scientific = models.BooleanField(
+        default=False,
+        verbose_name='evento científico',
+    )
 
     class Meta:
         verbose_name = 'evento'
@@ -262,6 +274,17 @@ class Event(models.Model, GatherosModelMixin):
     def has_rsvp(self):
         """ Verifica se organização possui associados. """
         return self.organization.associates.count() > 0
+
+    @property
+    def running(self):
+        return self.status == Event.EVENT_STATUS_RUNNING
+
+    @property
+    def allow_internal_subscription(self):
+        if self.running is True:
+            return True
+
+        return self.organization.allow_internal_subscription
 
     def get_status_display(self):
         """ Recupera o status do evento de acordo com a propriedade 'status'"""
@@ -350,6 +373,8 @@ class Event(models.Model, GatherosModelMixin):
         num_cities = len(Counter(cities))
 
         return {
+            'men': num_men,
+            'women': num_women,
             'num_men': '{} ({})'.format(num_men, perc(num_men, total)),
             'num_women': '{} ({})'.format(num_women, perc(num_women, total)),
             'num_pnes': '{} ({})'.format(num_pnes, perc(num_pnes, total)),

@@ -114,7 +114,14 @@ class PagarmeTransactionInstanceData:
             "items": self.items_list,
 
             "metadata": {
-                "evento": self.event.name,
+                "evento": '{} (#{})'.format(
+                    self.event.name,
+                    self.event.pk
+                ),
+                "lote": '{} (#{})'.format(
+                    self.subscription.lot.name,
+                    self.subscription.lot.pk
+                ),
                 "inscricao": str(self.subscription.pk)
             },
 

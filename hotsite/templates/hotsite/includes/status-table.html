@@ -1,0 +1,97 @@
+{% load base_tags humanize l10n %}
+
+<div class="table-responsive">
+    <table class="table table-hover table-stripped">
+        <thead>
+        <tr>
+            <th class="col-xs-1 col-sm-2">Status</th>
+            <th class="col-xs-1 hidden-xs">Data</th>
+            <th class="col-xs-3">Ingresso/Lote</th>
+            <th class="col-xs-3">Método</th>
+            <th class="col-xs-2 hidden-xs text-center">Valor (R$)</th>
+            <th class="col-xs-1 text-center">Voucher</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for transaction in transactions %}
+            <tr>
+                <td>
+                    {% if transaction.status == 'processing' or transaction.status == 'waiting_payment' or transaction.status == 'pending_refund' or transaction.status == 'chargedback' %}
+                        <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>
+                    {% elif transaction.status == 'authorized' or transaction.status == 'paid' or transaction.status == 'refunded' %}
+                        <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
+                    {% elif transaction.status == 'refused' %}
+                        <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>
+                    {% else %}
+                        <i class="fa fa-circle" aria-hidden="true"></i>
+                    {% endif %}
+                    <span class="hidden-xs">{{ transaction.get_status_display }}</span>
+                </td>
+                <td class="hidden-xs">
+                    {{ transaction.date_created|date:"d/m/Y H\hi" }}
+                </td>
+                <td>
+                    <div data-toggle="tooltip" title="{{ transaction.lot.name }}">
+                        {{ transaction.lot.name|truncatechars:50 }}
+                    </div>
+                </td>
+                <td>
+                    {% if transaction.data.payment_method == 'boleto' %}
+                        <div>
+                            <div style="float:left">
+                                <i style="font-size:28px;" class="fas fa-barcode"></i>
+                            </div>
+                            <div style="float:left;margin: 3px 0 0 4px;">
+                                Boleto
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <small>
+                            {% if transaction.boleto_url  and not has_paid_transaction %}
+                                <a target="_blank" class="text-muted"
+                                   href="{{ transaction.boleto_url }}">
+                                    Link para boleto
+                                </a>
+                            {% elif not transaction.boleto_url %}
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-success progress-bar-striped active"
+                                         role="progressbar"
+                                         style="width: 100%;background-color:#5cb85c!important;">
+                                        <span class="sr-only"></span>
+                                    </div>
+                                </div>
+                                Seu link para o boleto estará pronto em breve.
+                            {% endif %}
+                        </small>
+                    {% elif transaction.data.payment_method == 'credit_card' %}
+                        <div>
+                            <div style="float:left">
+                                <i style="font-size:28px;" class="far fa-credit-card"></i>
+                            </div>
+                            <div style="float:left;margin: 3px 0 0 4px;">
+                                Cartão de Crédito
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+
+                    {% else %}
+                        Error
+                    {% endif %}
+                </td>
+                <td class="text-right">
+                    R$ {{ transaction.amount|intcomma }}
+                </td>
+                <td class="text-center">
+                    {% if transaction.status == transaction.PAID %}
+                        <a href="{% url 'subscription:subscription-voucher' transaction.subscription.event.pk transaction.subscription.pk %}">
+                            <i class="fas fa-file-pdf"></i>
+                        </a>
+                    {% else %}
+                        ---
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

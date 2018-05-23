@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='transaction',
             name='amount',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True),
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True, verbose_name='valor do pagamento'),
         ),
     ]

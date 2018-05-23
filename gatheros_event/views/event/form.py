@@ -198,6 +198,26 @@ class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
 
         return super(EventEditFormView, self).get_success_url()
 
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+            if lot.price is None:
+                continue
+
+            if lot.price > 0:
+                return True
+
+        return False
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['has_inside_bar'] = True
+        context['active'] = 'dados-do-evento'
+        context['has_paid_lots'] = self.has_paid_lots()
+
+        return context
+
+
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():

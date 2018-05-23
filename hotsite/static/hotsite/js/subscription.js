@@ -56,12 +56,13 @@ function show_hide_payment_block(action) {
     }
 }
 
-function fetch_cities(uf_el, selected_value, callback) {
+function fetch_cities(uf_el, city_list_el, city_hidden_el, selected_value, callback) {
     uf_el = $(uf_el);
+    city_list_el = $(city_list_el);
+    city_hidden_el = $(city_hidden_el);
     selected_value = selected_value || '';
     callback = callback || null;
 
-    var city_el = $('#id_person-city_name');
     $.ajax({
         url: "/api/cities/?uf=" + $(uf_el).val() + '&length=1000',
         success: function (result) {
@@ -74,17 +75,18 @@ function fetch_cities(uf_el, selected_value, callback) {
                 ids.push(value.id)
             });
 
+            city_list_el.html(listitems.join(''));
+            city_list_el.prop('disabled', false);
+
             if (selected_value) {
                 window.setTimeout(function () {
-                    city_el.val(selected_value);
-                    $("#id_person-city").val(selected_value);
+                    city_list_el.val(selected_value);
+                    city_hidden_el.val(selected_value);
                 }, 500);
             } else {
-                $("#id_person-city").val(ids[0]);
+                city_list_el.val(ids[0]);
+                city_hidden_el.val(ids[0]);
             }
-
-            city_el.html(listitems.join(''));
-            city_el.prop('disabled', false);
 
             if (callback) {
                 callback(result.results)
@@ -94,6 +96,24 @@ function fetch_cities(uf_el, selected_value, callback) {
             throw err;
         }
     });
+}
+
+function hotsiteShowHideCepLoader(show) {
+
+    var cep_el = $('#id_person-zip_code');
+    if (!cep_el.length) {
+        return;
+    }
+    var el = $('#cep_loader');
+    if (show === true) {
+        el.fadeIn();
+        cep_el.attr('disabled', 'disabled').addClass('disabled');
+        cep_el.css('background-color', '#fff');
+    } else {
+        el.fadeOut();
+        cep_el.removeAttr('disabled').removeClass('disabled');
+        cep_el.removeAttr('style');
+    }
 }
 
 function repopulate_cities(uf_el, selected_value, callback) {
@@ -275,12 +295,11 @@ function start_popover() {
             var city_el = $('#id_person-city_name');
 
             $('#id_person-state').change(function () {
-                city_el.empty();
+                city_el.html($('<option>').text('Carregando...'));
 
                 var that = $(this);
                 window.setTimeout(function () {
-                    city_el.append($('<option>').text('Carregando...'));
-                    fetch_cities($(that));
+                    fetch_cities($(that), $('#id_person-city_name'), $('#id_person-city'));
                 }, 500);
             });
 

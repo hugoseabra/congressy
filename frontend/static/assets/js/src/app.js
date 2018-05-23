@@ -8,8 +8,8 @@
             navToggleSub();
             profileToggle();
             switcheryToggle();
-            tooltips();
             icheckStart();
+            tooltips();
         });
 
 
@@ -103,7 +103,8 @@
         var tooltips = function() {
             $('.tooltip-wrapper').tooltip({
                 selector: "[data-toggle=tooltip]",
-                container: "body"
+                container: "body",
+                html:true
             })
         };
 

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django import forms
 
 from core.forms import PriceInput, SplitDateTimeWidget
-from gatheros_subscription.models import LotCategory, Lot, EventSurvey
+from gatheros_subscription.models import EventSurvey, LotCategory, Lot
 
 INSTALLMENT_CHOICES = (
     (2, 2),
@@ -32,11 +32,15 @@ class LotForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
+            'limit',
             'price',
+            'private',
+            'exhibition_code',
             'transfer_tax',
             'allow_installment',
             'installment_limit',
             'num_install_interest_absortion',
+            'event_survey',
         ]
 
         widgets = {
@@ -52,7 +56,17 @@ class LotForm(forms.ModelForm):
             ),
         }
 
-    def __init__(self, **kwargs):
+    def __init__(self,**kwargs):
+        self.event = kwargs.get('initial').get('event')
+
+        instance = kwargs.get('instance')
+        if not instance or instance and not instance.exhibition_code:
+            initial = kwargs.get('initial', {})
+            initial.update(
+                {'exhibition_code': Lot.objects.generate_promo_code()}
+            )
+            kwargs['initial'] = initial
+
         super(LotForm, self).__init__(**kwargs)
 
         initial = kwargs.get('initial')
@@ -63,11 +77,34 @@ class LotForm(forms.ModelForm):
             label='Categoria',
         )
 
+        self.fields['event_survey'] = forms.ModelChoiceField(
+            queryset=EventSurvey.objects.filter(event=self.event),
+            label='Selecione um questionário',
+            required=False,
+        )
+        self.fields['event_survey'].empty_label = '- Selecione -'
+
         if self.instance.pk and self.instance.subscriptions.filter(
             completed=True
         ).count() > 0:
             self.fields['price'].widget.attrs['disabled'] = 'disabled'
             self.fields['price'].disabled = True
+
+            self.fields['transfer_tax'].widget.attrs['disabled'] = 'disabled'
+            self.fields['transfer_tax'].disabled = True
+
+            self.fields['allow_installment'].widget.attrs['disabled'] = \
+                'disabled'
+            self.fields['allow_installment'].disabled = True
+
+            self.fields['installment_limit'].widget.attrs['disabled'] = \
+                'disabled'
+            self.fields['installment_limit'].disabled = True
+
+            self.fields[
+                'num_install_interest_absortion'
+            ].widget.attrs['disabled'] = 'disabled'
+            self.fields['num_install_interest_absortion'].disabled = True
 
     def clean_date_end(self):
         date_end = self.cleaned_data.get('date_end')
@@ -100,3 +137,16 @@ class LotForm(forms.ModelForm):
 
         return price
 
+    def clean_exhibition_code(self):
+        code = self.cleaned_data.get('exhibition_code')
+        if code:
+            code = ''.join(code.split()).upper()
+
+        queryset = Lot.objects.filter(exhibition_code=code)
+        if self.instance.pk is not None:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.count() > 0:
+            raise forms.ValidationError('Este código já existe.')
+
+        return code

@@ -1,7 +1,6 @@
 {% extends "base/base.html" %}
 
-{% load static i18n widget_tweaks form_config_tags %}
-{% load subscription_tags %}
+{% load static i18n widget_tweaks queryset_filter form_config_tags %}
 
 {% block title %} Página do Evento | Congressy{% endblock %}
 
@@ -30,18 +29,25 @@
         .django-ckeditor-widget {
             display: block !important;
         }
+
         #map, #map_banner {
             width: 100%;
             height: 600px;
             border: 3px solid #DDD;
         }
+
         #map_banner div {
             width: 32%;
             margin: 15% auto;
             text-align: center;
         }
+
         .address-row {
-{#            display: none;#}
+        {#            display: none;#}
+        }
+
+        .nav-pills > li.active > a {
+            background-color: #1f7bb6;
         }
     </style>
 {% endblock %}
@@ -59,8 +65,8 @@
         window.cgsy = window.cgsy || {};
         cgsy.maps = cgsy.maps || {};
 
-        (function($, window) {
-            window.cgsy.maps.retrieveAddress = function() {
+        (function ($, window) {
+            window.cgsy.maps.retrieveAddress = function () {
                 var name = $('#id_name');
                 var street = $('#id_street');
                 var city = $('#id_city_name :selected');
@@ -68,10 +74,10 @@
                 var zip_code = $('#id_zip_code');
 
                 var address = name.val();
-{#                    address += ', ' + street.val();#}
-{#                    address += ', ' + city.text();#}
-{#                    address += ', ' + state.text();#}
-{#                    address += '. ' + zip_code.val();#}
+                {#                    address += ', ' + street.val();#}
+                {#                    address += ', ' + city.text();#}
+                {#                    address += ', ' + state.text();#}
+                {#                    address += '. ' + zip_code.val();#}
 
                 var map = new window.google.maps.Map(
                     document.getElementById("map"),
@@ -84,38 +90,38 @@
                 window.cgsy.maps.searchByAddress(map, address);
             };
 
-            window.cgsy.maps.hideMap = function() {
+            window.cgsy.maps.hideMap = function () {
                 $('#map').hide();
                 $('#map_banner').show();
             };
 
-            window.cgsy.maps.showMap = function() {
+            window.cgsy.maps.showMap = function () {
                 $('#map').show();
                 $('#map_banner').hide();
             };
 
-            window.cgsy.maps.init = function(lat, long, zoom) {
+            window.cgsy.maps.init = function (lat, long, zoom) {
                 $('#map-loader').show();
                 $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
 
                 var map = new window.google.maps.Map(
                     document.getElementById("map"),
                     {
-                        center: {lat: parseFloat(lat), lng: parseFloat(long) },
+                        center: {lat: parseFloat(lat), lng: parseFloat(long)},
                         zoom: parseInt(zoom) || 18
                     }
                 );
                 window.cgsy.maps.addMarker(
                     map,
-                    {lat: parseFloat(lat), lng: parseFloat(long) }
+                    {lat: parseFloat(lat), lng: parseFloat(long)}
                 );
             };
 
-            window.cgsy.maps.setCenter = function(map, location) {
+            window.cgsy.maps.setCenter = function (map, location) {
                 map.setCenter(location);
             };
 
-            window.cgsy.maps.addMarker = function(map, location) {
+            window.cgsy.maps.addMarker = function (map, location) {
                 window.cgsy.maps.showMap();
 
                 window.cgsy.maps.setCenter(map, location);
@@ -147,12 +153,12 @@
                 $('#reload-map-button').removeClass('disabled').removeAttr('disabled');
             };
 
-            window.cgsy.maps.searchByAddress = function(map, address) {
+            window.cgsy.maps.searchByAddress = function (map, address) {
                 $('#map-loader').show();
                 $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
 
                 var geocoder = new window.google.maps.Geocoder;
-                geocoder.geocode({'address': address}, function(results, status) {
+                geocoder.geocode({'address': address}, function (results, status) {
                     if (status !== 'OK') {
                         alert('Geocode was not successful for the following reason: ' + status);
                         return;
@@ -160,21 +166,21 @@
                     var components = results[0].address_components;
                     if (components.length) {
                         var uf, city;
-                        $.each(components, function(i, component) {
-                            if ($.inArray('postal_code', component.types)!=-1) {
+                        $.each(components, function (i, component) {
+                            if ($.inArray('postal_code', component.types) != -1) {
                                 $('#id_zip_code').val(component.short_name);
                                 searchByCep();
                             }
-                            if ($.inArray('sublocality_level_1', component.types)!=-1) {
+                            if ($.inArray('sublocality_level_1', component.types) != -1) {
                                 $('#id_street').val(component.short_name);
                             }
-                            if ($.inArray('street_number', component.types)!=-1) {
+                            if ($.inArray('street_number', component.types) != -1) {
                                 $('#id_number').val(component.short_name);
                             }
-                            if ($.inArray('administrative_area_level_1', component.types)!=-1) {
+                            if ($.inArray('administrative_area_level_1', component.types) != -1) {
                                 uf = component.short_name;
                             }
-                            if ($.inArray('administrative_area_level_2', component.types)!=-1) {
+                            if ($.inArray('administrative_area_level_2', component.types) != -1) {
                                 city = component.short_name.toUpperCase();
                             }
                         });
@@ -183,14 +189,14 @@
                             $('#id_state').val(uf);
 
                             if (city) {
-                                fetch_cities($('#id_state'), null, function(results) {
+                                fetch_cities($('#id_state'), null, function (results) {
                                     if (!results.length) {
                                         return;
                                     }
-                                    $.each(results, function(i, city_obj) {
+                                    $.each(results, function (i, city_obj) {
                                         if (city_obj.name == city) {
-                                            var options = $('#id_city_name').find('option:contains('+city+')');
-                                            $.each(options, function(ii, option) {
+                                            var options = $('#id_city_name').find('option:contains(' + city + ')');
+                                            $.each(options, function (ii, option) {
                                                 var el = $(option);
                                                 if (el.text() == city) {
                                                     $('#id_city_name').val(city_obj.id);
@@ -223,14 +229,6 @@
         }
 
         $(document).ready(function () {
-            $(window).on('resize', function() {
-                window.setTimeout(function() {
-                    resize_status_block();
-                }, 400);
-            });
-            window.setTimeout(function() {
-                resize_status_block();
-            }, 400);
 
             var uf_el = $('#id_state');
             var city_el = $('#id_city_name');
@@ -255,129 +253,76 @@
     <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&language=pt-BR&region=BR"></script>
 
     <script>
-    $(document).ready(function () {
-        google.maps.event.addDomListener(
-            window,
-            "load",
-            function() {
-                {% if event.place.lat and event.place.long %}
-                    window.cgsy.maps.init(
-                        '{{ event.place.lat }}',
-                        '{{ event.place.long }}',
-                        '{{ event.place.zoom|default_if_none:18 }}'
-                    );
-                {% else %}
-                    {% if event.place.name or event.place.street %}
-                        window.cgsy.maps.retrieveAddress();
+        $(document).ready(function () {
+            google.maps.event.addDomListener(
+                window,
+                "load",
+                function () {
+                    {% if event.place.lat and event.place.long %}
+                        window.cgsy.maps.init(
+                            '{{ event.place.lat }}',
+                            '{{ event.place.long }}',
+                            '{{ event.place.zoom|default_if_none:18 }}'
+                        );
                     {% else %}
-                        window.cgsy.maps.hideMap();
+                        {% if event.place.name or event.place.street %}
+                            window.cgsy.maps.retrieveAddress();
+                        {% else %}
+                            window.cgsy.maps.hideMap();
+                        {% endif %}
                     {% endif %}
-                {% endif %}
-            }
-        );
-
-        (function($) {
-            var map_reload_timer = null;
-            function reloadMap() {
-                $('#map-loader').show();
-                $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
-
-                window.clearTimeout(map_reload_timer);
-
-                $('#id_zip_code').val('');
-                $('#id_street').val('');
-                $('#id_number').val('');
-                $('#id_complement').val('');
-                $('#id_village').val('');
-                $('#id_state').val('');
-                $('#id_city_name').prop('disabled', true);
-
-                map_reload_timer = window.setTimeout(function() {
-                    window.cgsy.maps.retrieveAddress();
-                }, 1500);
-            }
-
-            $('#id_name').on('keypress', function(e) {
-                if(e.which == 13) {
-                    reloadMap();
                 }
-            });
-            $('#reload-map-button').on('click', function() { reloadMap(); });
-            $('.submit-button').click(function() {
-                $('#hotsite-form').submit();
-            });
-        })(jQuery);
-    });
+            );
+
+            (function ($) {
+                var map_reload_timer = null;
+
+                function reloadMap() {
+                    $('#map-loader').show();
+                    $('#reload-map-button').addClass('disabled').attr('disabled', 'disabled');
+
+                    window.clearTimeout(map_reload_timer);
+
+                    $('#id_zip_code').val('');
+                    $('#id_street').val('');
+                    $('#id_number').val('');
+                    $('#id_complement').val('');
+                    $('#id_village').val('');
+                    $('#id_state').val('');
+                    $('#id_city_name').prop('disabled', true);
+
+                    map_reload_timer = window.setTimeout(function () {
+                        window.cgsy.maps.retrieveAddress();
+                    }, 1500);
+                }
+
+                $('#id_name').on('keypress', function (e) {
+                    if (e.which == 13) {
+                        reloadMap();
+                    }
+                });
+                $('#reload-map-button').on('click', function () {
+                    reloadMap();
+                });
+                $('.submit-button').on("click", function () {
+                    $('#hotsite-form').submit();
+                });
+
+
+            })(jQuery);
+        });
     </script>
 {% endblock %}
 
-{% block nav_aside_itens %}
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
-            <li>
-                <a href="{% url 'subscription:lot-list' event.pk %}"
-                   title="Inscrições">
-                    <i class="fa  fa-fw fa-rocket"></i>
-                    Lotes/Categorias
-                </a>
-            </li>
-        {% endif %}
-        <li>
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-                <span class="badge float-right">{% event_count_completed_subscriptions event %}</span>
-            </a>
-        </li>
-        {#        <li>#}
-        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fa  fa-fw fa-rocket"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li class="active">
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'addon:optional-service-list' event.pk %}"
-               title="Atividades Extras">
-                <i class="fa  fa-fw fa-rocket"></i> Atividades Extras
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'addon:optional-product-list' event.pk %}"
-               title="Produtos / Serviços">
-                <i class="fa  fa-fw fa-rocket"></i> Produtos / Serviços
-            </a>
-        </li>
-        {% if has_paid_lots %}
-            <li>
-                <a href="{% url 'payment:event-payments' event.pk %}"
-                   title="Pagamentos">
-                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
-                </a>
-            </li>
-        {% endif %}
-    </ul>
-{% endblock %}
+
+
+
+
+{% include 'event/event-menu.html' %}
 
 {% block content %}
-    <form id="hotsite-form" action="" method="post" class="form-horizontal" enctype="multipart/form-data" role="form">
+    <form id="hotsite-form" action="" method="post" class="form-horizontal"
+          enctype="multipart/form-data" role="form">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -392,14 +337,24 @@
         {% endfor %}
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-3 float-right">
                 <div class="buttonbar">
-                    <div class="float-right">
-                        <button type="button" class="btn btn-success submit-button">
-                            <i class="fa fa-save"></i>
-                            Salvar
+                    {% if info and info.description_html %}
+                        <a href="{% url 'public:hotsite' info.event.slug %}"
+                           target="_blank"
+                           class="btn btn-success btn-block">
+                            <i class="fa fa-globe"></i>
+                            Link do Evento
+                        </a>
+                    {% else %}
+                        <button type="button"
+                                class="btn btn-default btn-trans
+                                            btn-block disabled"
+                                title="Você deve configurar pelo menos a descrição do seu evento.">
+                            <i class="fa fa-globe"></i>
+                            Link do Evento
                         </button>
-                    </div>
+                    {% endif %}
                     <div class="clearfix"></div>
                 </div>
             </div>
@@ -430,12 +385,55 @@
                                         {% render_generic_field form.description_html %}
                                     </div>
                                 </div>
+                                <button type="button"
+                                        class="btn btn-success submit-button"
+                                        style=" float: right; margin-right:
+                                        10px">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% if event.is_scientific %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">
+                                    Configurações científica
+                                </div>
+                            </div>
+                            <div class="panel-body">
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.editorial_body %}
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.scientific_rules %}
+                                        </div>
+                                    </div>
+
+                                <button type="button"
+                                        class="btn btn-success submit-button"
+                                        style=" float: right; margin-right:
+                                        10px">
+                                    <i class="fa fa-save"></i>
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
             <div class="col-md-3 hidden-xs hidden-sm">
+
                 <div class="panel panel-primary" id="block-status-icons">
                     <div class="panel-heading">
                         <div class="panel-title">
@@ -444,59 +442,106 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-12">
-                                {% if info and info.description_html %}
-                                    <a href="{% url 'public:hotsite' info.event.slug %}"
-                                       target="_blank"
-                                       class="btn btn-primary btn-block">
-                                        <i class="fa fa-globe"></i>
-                                        Visualizar página
-                                    </a>
-                                {% else %}
-                                    <button type="button"
-                                            class="btn btn-primary btn-trans btn-block disabled"
-                                            title="Você deve configurar pelo menos a descrição do seu evento.">
-                                        <i class="fa fa-globe"></i>
-                                        Visualizar página
-                                    </button>
-                                {% endif %}
+                            <div class="col-md-12" style="text-align: center">
+
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
-                                        <i class="fas fa-check-circle fa-5x {% if info and info.image_main %}success-color{% endif %}"></i>
+                                        <i class="fas fa-check-circle fa-4x
+{% if info and info.image_main %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
-                                        <div class="title">Banner principal</div>
+                                        <div class="title">Banner principal
+                                        </div>
                                         <div class="text-muted description">
-                                            Deixa o site do evento mais apresentável.
+                                            Deixa o site do evento mais
+                                            apresentável.
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
-                                        <i class="fas fa-check-circle fa-5x {% if info and info.lead %}success-color{% endif %}"></i>
+                                        <i class="fas fa-check-circle fa-4x
+{% if info and info.lead %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
-                                        <div class="title">Descrição rápida</div>
+                                        <div class="title">Descrição rápida
+                                        </div>
                                         <div class="text-muted description">
-                                            Motive o visitante a permanecer no site,
-                                            aumentando a possibilidade de conclusão de
+                                            Motive o visitante a permanecer no
+                                            site,
+                                            aumentando a possibilidade de
+                                            conclusão de
                                             sua inscrição.
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-12 event-info-status-item">
                                     <div>
-                                        <i class="fas fa-check-circle fa-5x  {% if info and info.description_html %}success-color{% endif %}"></i>
+                                        <i class="fas fa-check-circle fa-4x
+{% if info and info.description_html %}success-color{% endif %}"></i>
                                     </div>
                                     <div>
-                                        <div class="title">Sobre o evento</div>
+                                        <div class="title">
+                                            {% if event.is_scientific %}
+                                                Apresentação do evento
+                                            {% else %}
+                                                Sobre do evento
+                                            {% endif %}
+                                        </div>
                                         <div class="text-muted description">
-                                            Deixa claro para o visitante que ainda não
-                                            conhece os detalhes do evento e gostaria de
+                                            Deixa claro para o visitante que
+                                            ainda não
+                                            conhece os detalhes do evento e
+                                            gostaria de
                                             saber do que se trata.
                                         </div>
                                     </div>
                                 </div>
+
+                                {% if event.is_scientific %}
+
+                                    <div class="col-md-12 event-info-status-item">
+                                        <div>
+                                            <i class="fas fa-check-circle fa-4x
+{% if info and info.editorial_body %}success-color{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="title">
+                                                Corpo editorial
+                                            </div>
+                                            <div class="text-muted description">
+                                                Lorem ipsum dolor sit amet,
+                                                consectetur adipiscing elit.
+                                                Aliquam
+                                                vitae elementum ex, eu ultrices
+                                                massa.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 event-info-status-item">
+                                        <div>
+                                            <i class="fas fa-check-circle fa-4x
+{% if info and info.scientific_rules %}success-color{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <div class="title">
+                                                Normas
+                                            </div>
+                                            <div class="text-muted description">
+                                                Lorem ipsum dolor sit amet,
+                                                consectetur adipiscing elit.
+                                                Aliquam
+                                                vitae elementum ex, eu ultrices
+                                                massa.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% endif %}
+
+
                             </div>
                         </div>
                     </div>
@@ -523,15 +568,22 @@
                                     <div class="col-md-12 col-lg-8 col-xl-9">
                                         {% render_generic_field form.name help_text='Pesquise pelo nome do local.' %}
                                     </div>
-                                    <div class="col-md-12 col-lg-4 col-xl-3" style="padding-left: 30px;padding-right: 30px">
-                                        <div class="hidden-xs hidden-sm hidden-md" style="height:32px" ></div>
-                                        <button id="reload-map-button" type="button" class="btn btn-sm btn-block btn-primary">Buscar</button>
-                                        <div class="hidden-lg" style="height:32px" ></div>
+                                    <div class="col-md-12 col-lg-4 col-xl-3"
+                                         style="padding-left: 30px;padding-right: 30px">
+                                        <div class="hidden-xs hidden-sm hidden-md"
+                                             style="height:32px"></div>
+                                        <button id="reload-map-button"
+                                                type="button"
+                                                class="btn btn-sm btn-block btn-primary">
+                                            Buscar
+                                        </button>
+                                        <div class="hidden-lg"
+                                             style="height:32px"></div>
                                     </div>
                                 </div>
                                 <div class="row address-row">
                                     <div class="col-md-6 col-xl-4">
-                                        {% render_generic_field form.zip_code  help_text='Informe o CEP para encontrar o endereço.' %}
+                                        {% render_generic_field form.zip_code help_text='Informe o CEP para encontrar o endereço.' %}
                                         <div id="cep_loader" style="width: 22px;position: absolute;
                                              top: 33px;right: 33px;">
                                             <img src="{% static 'assets/img/loader.gif' %}"/>
@@ -564,37 +616,46 @@
                                         {% render_generic_field form.city_name %}
                                     </div>
                                 </div>
-                                <hr />
-                                <div class="text-center text-muted" style="font-size:12px">
-                                    A Congressy não se responsabiliza pelos dados de pesquisa advindos
+                                <hr/>
+                                <div class="text-center text-muted"
+                                     style="font-size:12px">
+                                    A Congressy não se responsabiliza pelos
+                                    dados de pesquisa advindos
                                     do Google.
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div id="map-loader" class="fas info-color fa-2x fa-circle-notch fa-spin" style="position:absolute;z-index:1000;top:0;display:none"></div>
+                                <div id="map-loader"
+                                     class="fas info-color fa-2x fa-circle-notch fa-spin"
+                                     style="position:absolute;z-index:1000;top:0;display:none"></div>
                                 <div class="text-center" style="padding:10px;">
                                     Arraste o marcador para a posição desejada.
                                 </div>
                                 <div id="map" style="display:none"></div>
                                 <div id="map_banner" style="display:none">
-                                    <div class="text-muted">Informe o local para ver o mapa.</div>
-                                </span>
+                                    <div class="text-muted">Informe o local
+                                        para ver o mapa.
+                                    </div>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="buttonbar bottom">
-                    <div class="float-right">
-                        <button type="button" class="btn btn-success submit-button">
-                            <i class="fa fa-save"></i>
-                            Salvar
-                        </button>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="buttonbar bottom">
+                                <div class="float-right"
+                                     style="margin-right: 20px">
+                                    <button type="button"
+                                            class="btn btn-success submit-button">
+                                        <i class="fa fa-save"></i>
+                                        Salvar
+                                    </button>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="clearfix"></div>
                 </div>
             </div>
         </div>

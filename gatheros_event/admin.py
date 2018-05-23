@@ -52,7 +52,10 @@ class EventAdmin(admin.ModelAdmin):
             ),
         }),
         ('Inscrições', {
-            'fields': ('subscription_type', 'subscription_offline'),
+            'fields': (
+                'boleto_limit_days',
+                # 'subscription_offline',
+            ),
         }),
         ('Publicação', {
             'fields': (
@@ -184,6 +187,12 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'avatar',
                 'active',
                 'internal',
+                'is_scientific',
+            ),
+        }),
+        ('Inscrições', {
+            'fields': (
+                'allow_internal_subscription',
             ),
         }),
         ('Site e Redes Sociais', {

@@ -18,6 +18,24 @@ def get_object_value(obj, attr):
     return getattr(obj, attr)
 
 
+def clean_sheet_title(title):
+    """ Limpa título de guia da planilha. """
+    title = str(title)
+
+    invalid_chars = (
+        '!',
+        '@',
+        '#',
+        '/',
+        '&',
+        '*',
+    )
+    for char in invalid_chars:
+        title = title.replace(char, '_')
+
+    return title
+
+
 def export_event_data(event):
     """
     Exportação do queryset de inscrições em formato xlsx
@@ -30,7 +48,7 @@ def export_event_data(event):
     wb = Workbook()
 
     ws1 = wb.active
-    ws1.title = 'Participantes'
+    ws1.title = clean_sheet_title('Participantes')
 
     subscriptions = event.subscriptions.all()
 
@@ -46,7 +64,9 @@ def export_event_data(event):
         _export_payments(wb.create_sheet(title='Pagamentos'), event)
 
     for ev_survey in event.surveys.all():
-        title = 'Formulário - {}'.format(ev_survey.survey.name)
+        title = clean_sheet_title(
+            'Formulário-{}'.format(ev_survey.survey.name)
+        )
         _export_survey_answers(wb.create_sheet(title=title), ev_survey)
 
     wb.save(stream)
@@ -63,6 +83,7 @@ def _export_subscriptions(worksheet, subscriptions):
         'LOTE',
         'STATUS',
         'NOME',
+        'CPF',
         'DATA NASC',
         'IDADE',
         'EMAIL',
@@ -94,6 +115,7 @@ def _export_subscriptions(worksheet, subscriptions):
         collector[row_idx].append(get_object_value(sub.lot, 'name'))
         collector[row_idx].append(sub.get_status_display())
         collector[row_idx].append(get_object_value(person, 'name'))
+        collector[row_idx].append(get_object_value(person, 'cpf'))
 
         if person.birth_date:
             collector[row_idx].append(person.birth_date.strftime('%d/%m/%Y'))
@@ -143,16 +165,13 @@ def _export_payments(worksheet, event):
 
         sub = transaction.subscription
 
-        created = datetime.strptime(
-            transaction.date_created,
-            "%Y-%m-%dT%H:%M:%S.%fZ"
-        )
+        created = transaction.date_created.strftime('%d/%m/%Y %H:%M:%S')
 
         collector[row_idx].append(get_object_value(sub, 'code'))
         collector[row_idx].append(sub.person.name)
         collector[row_idx].append(transaction.get_type_display())
         collector[row_idx].append(transaction.get_status_display())
-        collector[row_idx].append(created.strftime('%d/%m/%Y %H:%M:%S'))
+        collector[row_idx].append(created)
         collector[row_idx].append(transaction.amount)
         collector[row_idx].append(transaction.liquid_amount)
 

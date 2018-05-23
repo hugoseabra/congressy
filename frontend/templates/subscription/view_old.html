@@ -1,6 +1,5 @@
 {% extends "base/base.html" %}
-{% load i18n static widget_tweaks form_config_tags user_agents user_agent_tag %}
-{% load subscription_tags %}
+{% load i18n static widget_tweaks form_config_tags user_agents user_agent_tag queryset_filter %}
 
 {% block title %}
     Inscrição | Congressy
@@ -50,7 +49,7 @@
                title="Inscrições">
                 <i class="fa  fa-fw fa-rocket"></i>
                 Inscrições
-                <span class="badge float-right">{% event_count_completed_subscriptions event %}</span>
+                <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
             </a>
         </li>
         {#        <li>#}
@@ -73,18 +72,6 @@
             <a href="{% url 'subscription:form-config' event.pk %}"
                title="Formulário">
                 <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'addon:optional-service-list' event.pk %}"
-               title="Atividades Extras">
-                <i class="fa  fa-fw fa-rocket"></i> Atividades Extras
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'addon:optional-product-list' event.pk %}"
-               title="Produtos / Serviços">
-                <i class="fa  fa-fw fa-rocket"></i> Produtos / Serviços
             </a>
         </li>
         {% if has_paid_lots %}

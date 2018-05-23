@@ -249,12 +249,44 @@ class Person(models.Model, GatherosModelMixin):
         cnpj = str(self.institution_cnpj)
         if not cnpj:
             return ''
+
         return '{0}.{1}.{2}/{3}-{4}'.format(
             cnpj[:2],
             cnpj[2:5],
             cnpj[5:8],
             cnpj[8:12],
-            cnpj[12:14],
+            cnpj[12:14]
+        )
+
+    def get_phone_display(self):
+        """
+        Recupera CPF formatado.
+
+        :return: string
+        """
+        phone = str(self.phone)
+        if not phone:
+            return ''
+        return '+55 ({0}) {1} {2}-{3}'.format(
+            phone[0:2],
+            phone[2],
+            phone[3:7],
+            phone[7:11]
+        )
+
+    def get_zip_code_display(self):
+        """
+        Recupera CPF formatado.
+
+        :return: string
+        """
+        zip_code = str(self.zip_code)
+        if not zip_code:
+            return ''
+        return '{0}{1}-{2}'.format(
+            zip_code[0:1],
+            zip_code[1:5],
+            zip_code[5:],
         )
 
     def get_birth_date_display(self):

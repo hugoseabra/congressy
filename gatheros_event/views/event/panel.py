@@ -1,4 +1,7 @@
 from datetime import datetime
+from decimal import Decimal
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
@@ -6,7 +9,9 @@ from django.views.generic import DetailView
 
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
+from gatheros_subscription.models import Subscription
 from gatheros_event.views.mixins import AccountMixin
+from payment.models import Transaction, TransactionStatus
 
 
 class EventPanelView(AccountMixin, DetailView):
@@ -30,16 +35,25 @@ class EventPanelView(AccountMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
+        self.event = get_object_or_404(Event, pk=self.kwargs.get('pk'))
 
-        return redirect(reverse('subscription:subscription-list', kwargs={
-            'event_pk': self.object.pk
-        }))
+        # return redirect(reverse('subscription:subscription-list', kwargs={
+        #     'event_pk': self.object.pk
+        # }))
 
-        # return super().dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(EventPanelView, self).get_context_data(**kwargs)
         context['status'] = self._get_status()
+        context['totals'] = self._get_payables()
+        context['limit'] = self._get_limit()
+        context['has_paid_lots'] = self.has_paid_lots()
+        context['gender'] = self._get_gender()
+        context['pending'] = self._get_number_pending()
+        context['has_inside_bar'] = True
+        context['active'] = 'panel'
+        context['total_subscriptions'] = self._get_total_subscriptions()
         context['can_transfer'] = self._can_transfer
         context['can_change'] = self._can_change
         context['can_delete'] = self._can_delete
@@ -52,6 +66,27 @@ class EventPanelView(AccountMixin, DetailView):
         context['report'] = self._get_report()
 
         return context
+
+    def has_paid_lots(self):
+        """ Retorna se evento possui algum lote pago. """
+        for lot in self.event.lots.all():
+            price = lot.price
+            if price is None:
+                continue
+
+            if lot.price > 0:
+                return True
+
+        return False
+
+    def _get_gender(self):
+        return self.event.get_report()
+
+    def _get_limit(self):
+        return self.event.limit
+
+    def _get_total_subscriptions(self):
+        return self.event.subscriptions.count()
 
     def can_access(self):
         event = self.get_object()
@@ -153,3 +188,37 @@ class EventPanelView(AccountMixin, DetailView):
     def _get_report(self):
         """ Resgata informações gerais do evento. """
         return self.object.get_report()
+
+    def _get_payables(self):
+
+        totals = {
+            'total': Decimal(0.00),
+            'pending': Decimal(0.00),
+            'paid': Decimal(0.00),
+        }
+
+        transactions = \
+            Transaction.objects.filter(Q(subscription__event=self.event) & (Q(
+                status=Transaction.PAID) | Q(
+                status=Transaction.WAITING_PAYMENT)))
+
+        for transaction in transactions:
+            totals['total'] += transaction.liquid_amount or Decimal(0.00)
+
+            if transaction.paid:
+                totals['paid'] += transaction.liquid_amount or Decimal(0.00)
+
+            if transaction.pending:
+                totals['pending'] += transaction.liquid_amount or Decimal(0.00)
+
+        return totals
+
+    def _get_number_pending(self):
+
+        pending = \
+            Subscription.objects.filter(
+                status=Subscription.AWAITING_STATUS,
+                event=self.event
+            ).count()
+
+        return pending

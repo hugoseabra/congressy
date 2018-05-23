@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
-{% load i18n static widget_tweaks form_config_tags user_agents user_agent_tag %}
-{% load subscription_tags %}
+{% load i18n static queryset_filter %}
+
 
 {% block title %}
     Inscrição | Congressy
@@ -14,484 +14,106 @@
     <div>{{ event.name }}</div>
     {% if object %}
         <div class="text-muted" style="margin-top: 12px;">
-        {{ object.name }}
+            {{ object.name }}
         </div>
     {% endif %}
-{% endblock %}
-
-{% block messages %}
-    {{ block.super }}
-
-    {% if subscription_exists %}
-    <div class="text-center alert alert-warning alert-dismissable">
-        Esta pessoa já está inscrita neste evento.
-        <br />
-        <br />
-        <a href="#" class="btn btn-primary">Ver inscrição</a>
-    </div>
-    {% endif %}
-{% endblock messages %}
-
-{% block nav_aside_itens %}
-
-    <h5 class="sidebar-header">Participantes</h5>
-    <ul class="nav nav-pills nav-stacked">
-        {% if event.subscription_type != event.SUBSCRIPTION_SIMPLE %}
-            <li>
-                <a href="{% url 'subscription:lot-list' event.pk %}"
-                   title="Inscrições">
-                    <i class="fa  fa-fw fa-rocket"></i>
-                    Lotes/Categorias
-                </a>
-            </li>
-        {% endif %}
-        <li class="active">
-            <a href="{% url 'subscription:subscription-list' event.pk %}"
-               title="Inscrições">
-                <i class="fa  fa-fw fa-rocket"></i>
-                Inscrições
-                <span class="badge float-right">{% event_count_completed_subscriptions event %}</span>
-            </a>
-        </li>
-        {#        <li>#}
-        {#            <a href="{% url 'subscription:\subscription-attendance-search' event.pk %}"#}
-        {#               title="Check-in">#}
-        {#                <i class="fa  fa-fw fa-rocket"></i>#}
-        {#                Check-in#}
-        {#            </a>#}
-        {#        </li>#}
-    </ul>
-    <h5 class="sidebar-header">Configurações</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li>
-            <a href="{% url 'event:event-hotsite' event.pk %}"
-               title="Página do evento">
-                <i class="fa  fa-fw fa-rocket"></i> Página do evento
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'subscription:form-config' event.pk %}"
-               title="Formulário">
-                <i class="fa  fa-fw fa-rocket"></i> Formulário
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'addon:optional-service-list' event.pk %}"
-               title="Atividades Extras">
-                <i class="fa  fa-fw fa-rocket"></i> Atividades Extras
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'addon:optional-product-list' event.pk %}"
-               title="Produtos / Serviços">
-                <i class="fa  fa-fw fa-rocket"></i> Produtos / Serviços
-            </a>
-        </li>
-        {% if has_paid_lots %}
-            <li>
-                <a href="{% url 'payment:event-payments' event.pk %}"
-                   title="Pagamentos">
-                    <i class="fa  fa-fw fa-rocket"></i> Pagamentos
-                </a>
-            </li>
-        {% endif %}
-    </ul>
 {% endblock %}
 
 {% block scripts %}
     <script>
-    function show_block(el_to_show, el_to_hide) {
-        el_to_show = $(el_to_show);
-        el_to_hide = $(el_to_hide);
+        function show_block(el_to_show, el_to_hide) {
+            el_to_show = $(el_to_show);
+            el_to_hide = $(el_to_hide);
 
-        el_to_show.show();
-        el_to_hide.hide();
-    }
+            el_to_show.show();
+            el_to_hide.hide();
+        }
+
+        function edit_payment(transaction_id, type, amount) {
+            $('#manual-payment-form-modal').modal();
+            $('#edit-transaction-id').val(transaction_id);
+            $('#id_manual_payment_type').val(type);
+            $('#id_amount').val(amount);
+        }
+
+        function delete_payment(transaction_id, amount) {
+            if (!confirm('Tem certeza que deseja deletar o lançamento de R$ '+amount+'?')) {
+                return;
+            }
+            $('#transaction_id').val(transaction_id);
+            $('#payment-delete-form').submit();
+        }
+
+        $(document).ready(function() {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom ' +
+                'messenger-on-right',
+                theme: 'flat'
+            };
+
+            {% if modal == 'manual-payment' %}
+            window.setTimeout(function() {
+                $('#manual-payment-form-modal').modal();
+            }, 300);
+            {% endif %}
+            {% if show_details %}
+            window.setTimeout(function() {
+                window.location.hash='report_detail_hidden';
+            }, 500);
+            {% endif %}
+
+            {% if messenger %}
+                {% for msg in messenger %}
+                    Messenger().post({
+                        message: '{{ msg.message }}',
+                        type: '{{ msg.type }}'
+                    });
+                {% endfor %}
+            {% endif %}
+        });
     </script>
 {% endblock %}
 
 {% block styles %}
-    <style>
-    .profile-info-padding {
-        padding: 4px 9px;
+<style>
+    .transaction-list span {
+        font-size: 12px;
     }
-    </style>
+    .transaction-list small {
+        font-size: 10px;
+    }
+
+    .transaction-list hr {
+        margin: 5px 0;
+
+    }
+
+    .transaction-list ul {
+        padding-left:20px;
+    }
+
+    .cancelled,
+    .cancelled span,
+    .cancelled small {
+        text-decoration: line-through;
+        color: #CCC;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-    <div class="row tooltip-wrapper">
-        <div class="col-md-12">
-            <div class="buttonbar">
-                <div class="float-left">
-                    <button onclick="window.location.href='{% url 'subscription:subscription-list' event.pk %}'"
-                        data-toggle="tooltip"
-                        title=""
-                        data-original-title="Voltar a lista de inscrições"
-                        class="btn btn-primary">
-                        <i class="fa fa-arrow-circle-left"></i>
-                        Inscrições
-                    </button>
-                </div>
-                <div class="float-right">
-                    <button
-                        data-toggle="tooltip"
-                        title="Abrir informações financeiras do participante"
-                        class="btn btn-info btn-trans">
-                        <i class="far fa-money-bill-alt"></i>
-                        Financeiro
-                    </button>
-                    <button
-                        data-toggle="tooltip"
-                        title="Enviar boleto para o participante"
-                        class="btn btn-success btn-trans">
-                        <i class="fas fa-barcode"></i>
-                        Enviar Boleto
-                    </button>
-                    <button
-                        data-toggle="tooltip"
-                        data-placement="left"
-                        title="Enviar mensagem personalizada ao participante"
-                        class="btn btn-success btn-trans">
-                        <i class="far fa-envelope"></i>
-                        Mensagem
-                    </button>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row tooltip-wrapper">
-        <div class="col-md-3">
-            <div class="panel">
-                <div class="panel">
-                    <div class="panel-body" style="padding:0">
-                        <div style="border:1px solid #ddd">
-                            <table class="table table-inbox table-hover" style="margin-bottom:0">
-                                <thead>
-                                    <tr>
-                                        <th>Identificadores</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="unread">
-                                        <td class="message" style="cursor: default;border-top:0">
-                                            <span class="title">ID</span>
-                                            {{ object.pk }}
-                                        </td>
-                                    </tr>
-                                    <tr class="unread">
-                                        <td class="message">
-                                            <span class="title">Código</span>
-                                            {{ object.code }} (#{{ object.count }})
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="panel">
-                <div class="panel-body" style="padding:0">
-                    <div style="border:1px solid #ddd">
-                        <table class="table table-inbox table-hover" style="margin-bottom:0">
-                            <thead>
-                                <tr>
-                                    <th>Situação</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="unread">
-                                    <td class="message" style="cursor: default;border-top:0">
-                                        <span class="title">Presente</span>
-{#                                        {% if object.attended %}Sim{% else %}Não{% endif %}#}
-                                        Sim <small class="text-muted">- 27/05/2018 17h03</small>
-                                    </td>
-                                </tr>
-                                <tr class="unread">
-                                    <td class="message">
-                                        <div>
-                                            <div class="float-left">
-                                                <span class="title">Status</span>
-{#                                                {% if object.status == object.CONFIRMED_STATUS %}#}
-{#                                                <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>#}
-{#                                                {% elif object.status == object.AWAITING_STATUS %}#}
-{#                                                <i class="fa fa-circle" aria-hidden="true" style="color: #f0ad4e"></i>#}
-{#                                                {% elif object.status == object.CANCELED_STATUS %}#}
-{#                                                <i class="fa fa-circle" aria-hidden="true" style="color: #d9534f"></i>#}
-{#                                                {% endif %}#}
-{#                                                {{ object.get_status_display|title }}#}
-                                                <i class="fa fa-circle" aria-hidden="true" style="color:#5cb85c"></i>
-                                                Confirmado <small class="text-muted">- 27/05/2018 17h03</small>
-                                            </div>
-                                            <div class="float-right" style="margin-left:10px">
-                                                <button type="button"
-                                                        data-toggle="tooltip"
-                                                        title="Abrir voucher"
-                                                        class="btn btn-default btn-sm btn-trans">voucher</button>
-                                            </div>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="panel">
-                <div class="panel-body" style="padding:0">
-                    <div style="border:1px solid #ddd">
-                        <table class="table table-inbox table-hover" style="margin-bottom:0">
-                            <thead>
-                                <tr>
-                                    <th>Sobre o Pagamento</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="unread">
-                                    <td class="message" style="cursor: default;border-top:0">
-                                        <div>
-                                            <div class="float-left">
-{#                                                <i style="font-size: 40px" class="fas fa-credit-card"></i>#}
-                                                <i style="font-size: 40px" class="fas fa-barcode"></i>
-                                            </div>
-                                            <div class="float-left" style="margin-left:10px">
-                                                <span class="title">Método</span>
-                                                Boleto <strong class="text-warning">(vencido)</strong>
-                                            </div>
-                                            <div class="float-right">
-                                                <button type="button"
-                                                        data-toggle="tooltip"
-                                                        title="Abrir documento"
-                                                        class="btn btn-default btn-sm btn-trans">documento</button>
-                                                <button type="button"
-                                                        data-toggle="tooltip"
-                                                        data-placement="left"
-                                                        title="Ver atualizações do pagamento"
-                                                        class="btn btn-info btn-sm btn-trans">atualizações</button>
-                                            </div>
-                                            <div class="clearfix"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="unread">
-                                    <td class="message">
-                                        <span class="title">Valor</span>
-                                        {{ object.lot.display_publicly }} <strong class="text-danger">(não-pago)</strong>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xl-2 col-lg-3 col-md-3" style="margin-bottom: 4px;">
-            <div class="panel panel-primary" id="block-profile">
-                <div class="panel-body minimal profile-block">
-                    <div class="col-md-12 col-xs-4">
-                        <img src="{% static 'assets/img/user_undefined.jpg' %}" class="img-responsive">
-                    </div>
-                    <div class="col-md-12 col-xs-8">
-                        <div class="profile-info">
-                            <div class="profile-info-label text-muted">Criado em:</div>
-                            <div class="profile-info-value text-muted">{{ object.created|date:"d/m/Y H\hi" }}</div>
-                        </div>
-                        {% if object.person.gender %}
-                        <div class="profile-info">
-                            <div class="profile-info-label text-muted">Sexo:</div>
-                            <div class="profile-info-value text-muted">{{ object.person.get_gender_display }}</div>
-                        </div>
-                        {% endif %}
-                        {% if config.cpf and object.person.cpf %}
-                        <div class="profile-info">
-                            <div class="profile-info-label text-muted">CPF:</div>
-                            <div class="profile-info-value text-muted">{{ object.person.get_cpf_display }}</div>
-                        </div>
-                        {% endif %}
-                        {% if config.birth_date and object.person.birth_date %}
-                        <div class="profile-info">
-                            <div class="profile-info-label text-muted">Dt. de Nascimento:</div>
-                            <div class="profile-info-value text-muted">{{ object.person.get_birth_date_display }}</div>
-                            <div class="profile-info-value text-muted">{{ object.person.age }} anos</div>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-10 col-lg-9 col-md-9">
-            <div class="panel panel-primary" id="block-form-lot">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Categoria / Lote / Ingresso</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        {% if object.lot.category %}
-                        <div class="col-lg-12 col-xl-5">
-                            <div class="form-group">
-                                <label>Categoria:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.lot.category.name }}</div>
-                            </div>
-                        </div>
-                        {% endif %}
-                        <div class="col-lg-12 col-xl-7">
-                            <div class="form-group">
-                                <label>Lote:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.lot.name }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel panel-primary" id="block-form-main">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Campos principais</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Nome completo:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.name }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>E-mail:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.email }}</div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label>Celular:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.phone|default:'-' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% if config.address != config.ADDRESS_SHOW %}
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Cidade:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        {% if config.address == config.ADDRESS_SHOW %}
-        <div class="col-lg-{% if config.institution_show or config.institution_cnpj_show or config.function_show %}6{% else %}12{% endif %}">
-            <div class="panel" id="address-block-hidden">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Endereço <a href="#" onclick="show_block('#address-block-visible', '#address-block-hidden');return false;" class="btn btn-link" style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a></h3>
-                </div>
-            </div>
-            <div class="panel panel-primary" style="display:none" id="address-block-visible">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Endereço <a href="#" onclick="show_block('#address-block-hidden', '#address-block-visible');return false;" class="btn btn-link" style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a></h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Logradouro (Rua/Av.):</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.street|default:'-' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Número:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.number|default:'-' }}</div>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="form-group">
-                                <label>Complemento:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.complemento|default:'-' }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 col-xl-4">
-                            <div class="form-group">
-                                <label>Bairro:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.village|default:'-' }}</div>
-                            </div>
-                        </div>
-                        <div class="col-md-12 col-xl-8">
-                            <div class="form-group">
-                                <label>Cidade:</label>
-                                <div class="well well-sm profile-info-padding">{{ object.person.city.name }}-{{ object.person.city.uf }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        {% if config.institution_show or config.institution_cnpj_show or config.function_show %}
-        <div class="col-lg-{% if config.address == config.ADDRESS_SHOW %}6{% else %}12{% endif %}">
-            <div class="panel" id="institution-block-hidden">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Dados Institucionais <a href="#" onclick="show_block('#institution-block-visible', '#institution-block-hidden');return false;" class="btn btn-link" style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(mostrar)</a></h3>
-                </div>
-            </div>
-            <div class="panel panel-primary" style="display:none" id="institution-block-visible">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Dados Institucionais  <a href="#" onclick="show_block('#institution-block-hidden', '#institution-block-visible');return false;" class="btn btn-link" style="padding:0;margin:0;font-size:10px;text-transform: lowercase">(ocultar)</a></h3>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="row">
-                            {% if config.institution_show %}
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Instituição:</label>
-                                    <div class="well well-sm profile-info-padding">{{ object.person.institution|default:'-' }}</div>
-                                </div>
-                            </div>
-                            {% endif %}
-                            {% if config.institution_cnpj_show %}
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>CNPJ da Instituição:</label>
-                                    <div class="well well-sm profile-info-padding">{{ object.person.get_institution_cnpj_display|default:'-' }}</div>
-                                </div>
-                            </div>
-                            {% endif %}
-                            {% if config.function_show %}
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Cargo:</label>
-                                    <div class="well well-sm profile-info-padding">{{ object.person.function|default:'-' }}</div>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div id="main-profile-content">
+        {% if financial %}
+            {% include 'subscription/includes/profile-financial.html' %}
+        {% else %}
+            {% include 'subscription/includes/profile-subscriber.html' %}
         {% endif %}
     </div>
-
+    <form action="{% url 'subscription:payment-delete' event.pk object.pk %}" method="post" id="payment-delete-form" style="display:none">
+        {% csrf_token %}
+        <input type="hidden" name="transaction_id" id="transaction_id" value="" />
+    </form>
+{% endblock %}
+{% block modals %}
+    {% include 'subscription/includes/modal-manual-payment-form.html' with form=manual_payment_form %}
 {% endblock %}

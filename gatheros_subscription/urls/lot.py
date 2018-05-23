@@ -5,6 +5,11 @@ from gatheros_subscription import views
 
 urls = [
     url(
+        r'^(?P<lot_pk>[\d]+)/survey/$',
+        views.LotSurveyView.as_view(),
+        name='lot-survey'
+    ),
+    url(
         r'^(?P<lot_pk>[\d]+)/delete/$',
         views.LotDeleteView.as_view(),
         name='lot-delete'

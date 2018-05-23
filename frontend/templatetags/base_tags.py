@@ -91,6 +91,8 @@ def money_divide(value):
         return None
 
 
-@register.filter(name='lookup')
-def lookup(value, arg):
+@register.simple_tag(name='filter_lookup')
+def filter_lookup(value, arg):
+    if arg not in value:
+        return None
     return value[arg]

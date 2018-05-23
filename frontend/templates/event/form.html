@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
 {% load static %}
+{% load static i18n queryset_filter %}
 {% load base_tags %}
 {% load widget_tweaks %}
 {% load event_tags %}
@@ -35,6 +36,14 @@
         {{ object.name }} (ID: {{ object.pk }})
     {% endif %}
 {% endblock %}
+
+
+{% block nav_aside_itens %}
+    {% if object %}
+        {% include 'event/event-menu.html' with active='dados-do-evento'%}
+    {% endif %}
+{% endblock %}
+
 
 {% block content %}
     <form action="" method="post" class="form-horizontal form-border"
@@ -111,6 +120,11 @@
                                         {% render_generic_field form.date_end %}
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_switchery_field form.is_scientific %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -170,51 +184,32 @@
 
 {% block scripts %}
     <script src="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.full.min.js" %}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&key={{ google_maps_api_key }}"></script>
-    <script>
-    var MAP_POINTER = "{% static 'hotsite/images/contents/map-1.png'%}";
-    </script>
     <script src="{% static 'assets/js/event.js' %}"></script>
-    <!-- ref: http://maplacejs.com/ -->
-    {% if object.place and object.place.show_location is True %}
-    <script src="{% static 'hotsite/js/maplace-0.1.3.min.js' %}"></script>
-    {% endif %}
     <script>
-    (function($) {
-        $(document).ready(function() {
-            {% if LANGUAGE_CODE == 'pt-br' %}
-            $('#id_date_start_0').mask("99/99/9999");
-            $('#id_date_start_1').mask("99:99");
-            $('#id_date_end_0').mask("99/99/9999");
-            $('#id_date_end_1').mask("99:99");
-            {% elif LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
-            $('#id_date_start_0').mask("99/99/9999");
-            $('#id_date_start_1').mask("99:99");
-            $('#id_date_end_0').mask("99/99/9999");
-            $('#id_date_end_1').mask("99:99");
-            {% else %}
-            $('#id_date_start_0').mask("9999-99-99");
-            $('#id_date_start_1').mask("99:99");
-            $('#id_date_end_0').mask("9999-99-99");
-            $('#id_date_end_1').mask("99:99");
-            {% endif %}
-
-            {% if object.place and object.place.show_location is True %}
-                show_location(true);
-            {% endif %}
-        });
-    })(jQuery);
+        (function ($) {
+            $(document).ready(function () {
+                {% if LANGUAGE_CODE == 'pt-br' %}
+                    $('#id_date_start_0').mask("99/99/9999");
+                    $('#id_date_start_1').mask("99:99");
+                    $('#id_date_end_0').mask("99/99/9999");
+                    $('#id_date_end_1').mask("99:99");
+                {% elif LANGUAGE_CODE == 'en' or LANGUAGE_CODE == 'en-us' %}
+                    $('#id_date_start_0').mask("99/99/9999");
+                    $('#id_date_start_1').mask("99:99");
+                    $('#id_date_end_0').mask("99/99/9999");
+                    $('#id_date_end_1').mask("99:99");
+                {% else %}
+                    $('#id_date_start_0').mask("9999-99-99");
+                    $('#id_date_start_1').mask("99:99");
+                    $('#id_date_end_0').mask("9999-99-99");
+                    $('#id_date_end_1').mask("99:99");
+                {% endif %}
+            });
+        })(jQuery);
     </script>
 {% endblock %}
 
 {% block styles %}
     <link rel="stylesheet"
           href="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.min.css" %}">
-
-<style>
-#gmap {
-    width: 100%;
-    height: 300px;
-}
-</style>
 {% endblock %}

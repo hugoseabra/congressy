@@ -1,6 +1,7 @@
 """
     View usada para verificar o status da sua inscrição
 """
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
@@ -56,11 +57,20 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
+        has_paid_transaction = False
 
         context['person'] = self.get_person()
         context['is_subscribed'] = self.is_subscribed()
-        context['transactions'] = self.get_transactions()
         context['allow_transaction'] = self.get_allowed_transaction()
+        all_transactions = self.get_transactions()
+        context['transactions'] = all_transactions
+        for trans in all_transactions:
+            if trans.status == Transaction.PAID:
+                has_paid_transaction = True
+                break
+
+        context['has_paid_transaction'] = has_paid_transaction
+
         context['pagarme_key'] = settings.PAGARME_ENCRYPTION_KEY
         context['remove_preloader'] = True
         context['subscription'] = self.subscription
@@ -69,16 +79,25 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
 
         lot = self.subscription.lot
 
-        if lot.private is True:
-            
-            if lot.status == lot.LOT_STATUS_RUNNING:
-                context['lot_is_still_valid'] = True
-                self.request.session['exhibition_code'] = lot.exhibition_code
-
-            self.request.session['has_private_subscription'] = \
-                str(self.subscription.pk)
+        if lot.private is True and lot.status == lot.LOT_STATUS_RUNNING:
+            context['lot_is_still_valid'] = True
+            self.request.session['exhibition_code'] = lot.exhibition_code
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get('action')
+
+        if action == 'force-coupon':
+            lot = self.subscription.lot
+
+            if lot.private is True:
+                self.request.session['has_private_subscription'] = \
+                    str(self.subscription.pk)
+
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        return redirect('public:hotsite-status', slug=self.event.slug)
 
     def get_person(self):
         """ Se usuario possui person """
@@ -107,11 +126,18 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
 
     def get_transactions(self):
 
-        try:
-            transactions = Transaction.objects.filter(
-                subscription=self.subscription)
-        except Transaction.DoesNotExist:
-            return False
+        transactions = []
+
+        all_transactions = Transaction.objects.filter(
+            subscription=self.subscription,
+            lot=self.subscription.lot)
+
+        for transaction in all_transactions:
+            if transaction.boleto_expiration_date:
+                if transaction.boleto_expiration_date > datetime.now().date():
+                    transactions.append(transaction)
+            else:
+                transactions.append(transaction)
 
         return transactions
 

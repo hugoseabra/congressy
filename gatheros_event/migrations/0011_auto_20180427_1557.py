@@ -40,6 +40,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='organization',
             name='bank_code',
-            field=models.CharField(blank=True, choices=[('001', 'Banco do Brasil'), ('341', 'Itau'), ('237', 'Bradesco'), ('033', 'Santander'), ('104', 'Caixa Economica'), ('756', 'BANCOOB - Banco Cooperativo do Brasil'), ('756', 'Sicoob')], max_length=3, null=True, validators=[django.core.validators.RegexValidator('^\\d{1,10}$')], verbose_name='Banco'),
+            field=models.CharField(blank=True, choices=[('001', 'Banco do Brasil'), ('341', 'Itau'), ('237', 'Bradesco'), ('033', 'Santander'), ('104', 'Caixa Economica'), ('756', 'BANCOOB - Banco Cooperativo do Brasil'), ('756', 'Sicoob'), ('748', 'BANCO COOPERATIVO SICREDI S.A.')], max_length=3, null=True, validators=[django.core.validators.RegexValidator('^\\d{1,10}$')], verbose_name='Banco'),
         ),
     ]

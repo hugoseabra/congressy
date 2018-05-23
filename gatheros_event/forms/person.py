@@ -77,7 +77,10 @@ class PersonForm(forms.ModelForm):
             # CPF como telefone para aparecer como número no mobile
             'cpf': TelephoneInput(),
             'name': forms.TextInput(attrs={'placeholder': 'Nome completo'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'me@you.com'}),
+            'email': forms.EmailInput(attrs={
+                'placeholder': 'me@you.com',
+                'style': 'text-transform:lowercase'
+            }),
             'phone': TelephoneInput(attrs={'placeholder': '(00) 00000-0000'}),
             'zip_code': TelephoneInput(),
             'city': forms.HiddenInput(),

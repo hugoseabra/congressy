@@ -46,12 +46,12 @@ class SubscriptionManager(models.Manager):
 class Subscription(models.Model, GatherosModelMixin):
     """ Modelo de inscrição """
 
-    DEVICE_ORIGIN_WEB = 'web'
-    DEVICE_ORIGIN_OFFLINE = 'offline'
+    DEVICE_ORIGIN_HOTSITE = 'hotsite'
+    DEVICE_ORIGIN_MANAGE = 'manage'
 
     DEVICE_ORIGINS = (
-        (DEVICE_ORIGIN_WEB, 'WEB'),
-        (DEVICE_ORIGIN_OFFLINE, 'Sincronização Off-line'),
+        (DEVICE_ORIGIN_HOTSITE, 'Hotsite do evento'),
+        (DEVICE_ORIGIN_MANAGE, 'Manage'),
     )
 
     CONFIRMED_STATUS = 'confirmed'
@@ -100,7 +100,7 @@ class Subscription(models.Model, GatherosModelMixin):
     origin = models.CharField(
         max_length=15,
         choices=DEVICE_ORIGINS,
-        default=DEVICE_ORIGIN_WEB,
+        default=DEVICE_ORIGIN_HOTSITE,
         verbose_name='origem'
     )
     created_by = models.PositiveIntegerField(verbose_name='criado por')

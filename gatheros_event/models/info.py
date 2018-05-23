@@ -122,6 +122,18 @@ class Info(models.Model, GatherosModelMixin):
         help_text="Exemplo: https://www.youtube.com/embed/T2oI7M6DE7c"
     )
 
+    scientific_rules = models.TextField(
+        verbose_name="normas de evento cientifico",
+        null=True,
+        blank=True,
+    )
+
+    editorial_body = models.TextField(
+        verbose_name="corpo editorial de evento cientifico",
+        null=True,
+        blank=True,
+    )
+
     @property
     def youtube_image(self):
         if not self.youtube_video:

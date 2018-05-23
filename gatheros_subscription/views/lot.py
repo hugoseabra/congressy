@@ -1,4 +1,5 @@
 from decimal import Decimal
+from gatheros_subscription.forms import SurveyForm
 
 from django.conf import settings
 from django.contrib import messages
@@ -6,12 +7,12 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View, generic
 
+from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Organization
 from gatheros_event.views.mixins import AccountMixin, DeleteViewMixin
 from gatheros_subscription import forms
 from gatheros_subscription.models import Lot, EventSurvey
-from core.views.mixins import TemplateNameableMixin
 
 
 class BaseLotView(AccountMixin, View):
@@ -132,6 +133,8 @@ class LotListView(TemplateNameableMixin, BaseLotView, generic.ListView):
         context = super(LotListView, self).get_context_data(**kwargs)
         context['event'] = self.event
         context['can_add'] = self._can_add
+        context['has_inside_bar'] = True
+        context['active'] = 'lotes-categorias'
         context['subscription_stats'] = self.get_subscription_stats()
         context['full_banking'] = self._get_full_banking()
         context['exhibition_code'] = Lot.objects.generate_exhibition_code()
@@ -196,6 +199,9 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
         context['form_title'] = "Novo lote para '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
+        context['has_inside_bar'] = True
+        context['active'] = 'lote-categorias'
+
         return context
 
     def form_valid(self, form):
@@ -277,6 +283,8 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         context['lot_has_subscriptions'] = self.object.subscriptions.filter(
             completed=True,
         ).count() > 0
+        context['has_inside_bar'] = True
+        context['active'] = 'lotes-categorias'
 
         return context
 
@@ -381,3 +389,31 @@ class LotDeleteView(BaseLotView, DeleteViewMixin):
             )
 
         return can
+
+
+class LotSurveyView(generic.DetailView):
+    template_name = 'lot/survey.html'
+    queryset = Lot.objects.get_queryset()
+    pk_url_kwarg = 'lot_pk'
+    object = None
+    event = None
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.event = self.object.event
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_survey_form(self):
+        if not self.object.event_survey:
+            return None
+
+        return SurveyForm(
+            event_survey=self.object.event_survey,
+            user=self.request.user
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['survey_form'] = self.get_survey_form()
+
+        return context

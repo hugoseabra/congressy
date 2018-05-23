@@ -43,14 +43,31 @@ class InfoForm(BaseModelFileForm):
             'image_main',
             'lead',
             'description_html',
+            'scientific_rules',
+            'editorial_body'
+
         ]
         widgets = {
             'description_html': CKEditorWidget(),
+            'scientific_rules': CKEditorWidget(),
+            'editorial_body': CKEditorWidget(),
+        }
+
+        help_texts = {
+            'editorial_body': 'Corpo editorial que compõem sua organização',
+            'scientific_rules': 'Normas do seu evento científico'
+        }
+        labels = {
+            'editorial_body': "Corpo editorial",
+            'scientific_rules': "Normas do evento"
         }
 
     def __init__(self, event=None, **kwargs):
         self.event = event
         super().__init__(**kwargs)
+
+        if self.event.is_scientific:
+            self.fields['description_html'].label = "Apresentação do evento"
 
     def clean_event(self):
         return self.event

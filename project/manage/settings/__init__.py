@@ -13,10 +13,10 @@ INSTALLED_APPS += [
     'partner',
     'hotsite',
     'survey',
-    'formtools',
     'addon',
-    'associate',
+    # 'associate',
     # 'bitly',
+    'scientific_work',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'

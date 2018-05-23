@@ -1,5 +1,4 @@
 {% extends 'hotsite/base.html' %}
-{% load l10n humanize static form_config_tags user_agents user_agent_tag %}
 
 {% block content %}
 
@@ -12,6 +11,9 @@
             <h2 class="section-heading text-center">Inscrição</h2>
             <div class="about-row row">
                 <div class="col-md-9 col-md-offset-2">
+
+                    {% include "hotsite/includes/greetings.html" %}
+                    {% include "hotsite/includes/selected-lot.html" %}
 
                     <div class="panel panel-default">
 
@@ -129,28 +131,30 @@
                                     <img class="img-responsive"
                                          src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
                                 </button>
-
-                                <br/>
-
-                                <a id="id_remove"
-                                   style="margin-top: 11px; font-size: 12px;display: none">
-                                    Remover
-                                </a>
                             </div>
-                            <div class="text-center">
-                                <button id="id_button_pay"
-                                        class="btn btn-default"
-                                        type="button">
-                                    Escolha meio de pagamento
-                                </button>
-                            </div>
+                            {% if 'boleto' not in allowed_transaction_types %}
+                                {% if has_open_boleto %}
+                                <div class="col-md-12">
+                                    <div class="alert alert-info text-center">
+                                        Somente pagamento com <strong>Cartão de Crédito</strong>
+                                        está disponível, pois você já possui um boleto em aberto.
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="col-md-12">
+                                    <div class="alert alert-info text-center">
+                                        Somente pagamento com <strong>Cartão de Crédito</strong> está disponível.
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endif %}
 
                             <div class="text-center">
                                 <img style="width: 80%; margin-top: 20px"
                                      src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
                             </div>
-
-                            <form action="" method="post" novalidate>
+                            <br/>
+                            <form action="" method="post" id="next_form">
                                 {% csrf_token %}
                                 {{ wizard.management_form }}
 
@@ -158,35 +162,36 @@
                                     {{ hidden }}
                                 {% endfor %}
 
+                            </form>
+
+                            <button type="button"
+                                    class="btn btn-primary pull-right"
+                                    id="id_button_pay">
+                                Realizar pagamento e finalizar
+                                <i class="fas fa-chevron-circle-right"></i>
+                            </button>
+
+                            <form action="" method="post" novalidate>
+                                {{ wizard.management_form }}
+                                {% csrf_token %}
                                 {% if wizard.steps.prev %}
-                                    <button type="button"
-                                            onclick="submit_back_form()"
+                                    <input type="hidden" name="wizard_goto_step"
+                                           value="{{ wizard.steps.prev }}">
+                                    <button type="submit"
                                             class="btn btn-primary">
                                         <i class="fas fa-chevron-circle-left"></i>
                                         Voltar
                                     </button>
                                 {% endif %}
-
-                                <button type="submit"
-                                        class="btn btn-primary pull-right">
-                                    Finalizar
-                                    <i class="fas fa-chevron-circle-right"></i>
-                                </button>
                             </form>
-
-                            <form id="back_form" action="" method="post"
-                                  novalidate>
-
-                                {% csrf_token %}
-                                {{ wizard.management_form }}
-
-                                <input type="hidden"
-                                       name="wizard_goto_step"
-                                       value="{{ wizard.steps.prev }}">
-                            </form>
-
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-9 col-md-offset-2">
+                    <div class="text-right cgsy-footer footer-wrapper text-muted"
+                         style="font-size:12px;color:lightgrey">
+                        {% include "base/footer.html" %}
                     </div>
                 </div>
             </div>
@@ -207,14 +212,16 @@
         }
 
         jQuery(document).ready(function() {
-
             window.setTimeout(function () {
                 $('form').submit(function () {
                     $(this).find(':submit').attr('disabled', 'disabled');
+                    $(this).attr('novalidate', 'novalidate');
                 });
 
                 // disable boleto method
-                //window.cgsy.payment.disable_boleto();
+                {% if 'boleto' not in allow_transactins_type %}
+                window.cgsy.payment.disable_boleto();
+                {% endif %}
 
                 {% if lot.allow_installment is True %}
                 // disable installment
@@ -267,7 +274,6 @@
                  $('#id_button_pay').on('click', function () {
                      window.cgsy.pagarme.process_payment('{{ pagarme_encryption_key }}');
                  });
-
             }, 300);
         });
     </script>

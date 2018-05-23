@@ -1,0 +1,45 @@
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <div class="panel-title">
+            Ingresso selecionado
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-8">
+                    <h4 style="font-weight: bold;padding-bottom:0;margin-bottom:0">{{ selected_lot.name }}</h4>
+                    {% if selected_lot.exhibition_code and selected_lot.private %}
+                        <div class="text-muted"
+                             style="padding-right:20px">{{ selected_lot.exhibition_code }}
+                        </div>
+                    {% endif %}
+                    <div>
+                        <span style="color:darkgreen;font-weight: bold;"
+                              id="lot_display_publicly">
+                            {{ selected_lot.display_price }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    {% if num_lots > 1 and not is_private_event %}
+                        <button type="button" class="btn btn-link btn-block"
+                                style="font-weight: bold;color:#eea236;padding:8px 0"
+                                onclick="window.location.href='{% url 'public:hotsite-subscription' event.slug %}'">
+                            Mudar de ingresso
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% if has_open_boleto %}
+                <div class="col-md-12">
+                    <hr />
+                    <div class="alert alert-warning text-center">
+                        <strong>Atenção: </strong>Você já possui um boleto neste lote que ainda não venceu:
+                        <a href="{{ has_open_boleto.boleto_url }}" target="_blank">Ver boleto</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

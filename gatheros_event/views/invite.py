@@ -34,7 +34,8 @@ class InvitationListView(AccountMixin, ListView):
 
         context['open_invitations'] = open_list
         context['expired_invitations'] = expired_list
-
+        context['has_inside_bar'] = True
+        context['active'] = 'convites'
         context['can_view_members'] = self._can_view_members()
         context['can_manage_members'] = self._can_manage_members()
 
@@ -42,7 +43,7 @@ class InvitationListView(AccountMixin, ListView):
 
     def dispatch(self, request, *args, **kwargs):
         if not self._can_view():
-            if self.organization.internal:
+            if self.organization and self.organization.internal:
                 messages.warning(request, 'Você não pode acessar esta área.')
                 return redirect(reverse_lazy('front:start'))
             else:
@@ -109,7 +110,8 @@ class InvitationCreateView(AccountMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(InvitationCreateView, self).get_context_data(**kwargs)
         context['invitation_organization'] = self.get_invitation_organization()
-
+        context['has_inside_bar'] = True
+        context['active'] = 'convites'
         context['can_view_members'] = self._can_view_members()
         context['can_manage_members'] = self._can_manage_members()
 

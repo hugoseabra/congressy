@@ -16,23 +16,27 @@ class PrivateLotForm(forms.Form):
         lot = None
 
         if self.code is not None:
-            lot = Lot.objects.filter(
-                exhibition_code=self.code.upper())
+            try:
+                lot = Lot.objects.get(exhibition_code=self.code.upper())
+            except Lot.DoesNotExist:
+                pass
 
         super().__init__(**kwargs)
 
+        queryset = Lot.objects.filter(event=self.event)
+
+        available_lots = [
+            lot
+            for lot in queryset
+            if lot.status == lot.LOT_STATUS_RUNNING
+        ]
+
+        self.fields['lots'] = forms.ModelChoiceField(
+            queryset=queryset,
+            widget=forms.HiddenInput(),
+            required=False,
+        )
+        self.fields['lots'].choices = available_lots
+
         if lot:
-
-            self.fields['lots'] = forms.ModelChoiceField(
-                queryset=Lot.objects.filter(event=self.event),
-                widget=forms.HiddenInput(),
-                initial=lot.first(),
-                required=False,
-            )
-        else:
-            self.fields['lots'] = forms.ModelChoiceField(
-                queryset=Lot.objects.filter(event=self.event),
-                widget=forms.HiddenInput(),
-                required=False,
-            )
-
+            self.fields['lots'].initial = lot

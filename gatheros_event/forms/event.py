@@ -26,6 +26,7 @@ class EventForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
+            'is_scientific',
             'rsvp_type',
         ]
 
@@ -42,8 +43,12 @@ class EventForm(forms.ModelForm):
         instance = kwargs.get('instance')
 
         super(EventForm, self).__init__(*args, **kwargs)
+        self.fields['is_scientific'].help_text = 'Trata-se de um evento com ' \
+                                                 'submissão de artigos ' \
+                                                 'cientificos?'
 
-        self._configure_organization_field()
+        if instance is None:
+            self._configure_organization_field()
 
     def _configure_organization_field(self):
         orgs = []
