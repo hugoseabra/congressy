@@ -21,6 +21,7 @@ from .subscription import (
 )
 from .subscription_api import (
     SubscriptionSearchViewSet,
+    SubscriptionUpdateAttendedAPIView,
 )
 from .survey import (
     EventSurveyCreateView,

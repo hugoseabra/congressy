@@ -79,6 +79,8 @@ class CheckInPersonSerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'email',
+            'cpf',
+            'institution_cnpj',
         )
 
 
@@ -89,6 +91,7 @@ class CheckInSubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = [
+            'pk',
             'code',
             'person',
             'lot',

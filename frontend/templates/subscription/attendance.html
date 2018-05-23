@@ -109,6 +109,7 @@
 {% endblock %}
 
 {% block content %}
+
     <div class="row">
         <div class="col-md-12" style="margin-left: 250px">
 
@@ -131,7 +132,6 @@
                 </div>
 
             </div>
-
 
             <div id="results" style="display: none">
                 <button class="btn btn-md btn-primary new_search" style="margin-bottom:
@@ -221,41 +221,114 @@
                 $(title).text('Nome: ' + s['person']['name']);
                 const email = document.createElement('h3');
                 $(email).text('Email: ' + s['person']['email']);
+                const document_id = document.createElement('h3');
+                document_id.className = 'cpf_field';
+                if (s['person']['cpf']) {
+                    $(document_id).text('CPF: ' + s['person']['cpf'].replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4"));
+                } else if (s['person']['institution_cnpj']) {
+                    $(document_id).text('CNPJ: ' + s['person']['institution_cnpj']
+                        .replace(/\D/g, '')
+                        .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5"));
+                }
                 const code = document.createElement('h3');
                 $(code).text('Código: ' + s['code']);
 
                 const check_in = document.createElement('h3s');
+                const subscription_status = document.createElement('h3s');
                 let check_in_html = "";
+                let subscription_status_html = "";
+
+                if (s['status'] === 'canceled') {
+                    subscription_status_html =
+                        "<i class='fas fa-times-circle danger-color'" +
+                        "Inscrição Cancelada: <a href='#'>Ver " +
+                        "detalhes</a><br/>"
+                } else if (s['status'] === 'awaiting') {
+                    subscription_status_html =
+                        "<i class='fas fa-exclamation-triangle " +
+                        "warning-color'>" +
+                        "</i> Inscrição pendente: <a href='#'>Ver " +
+                        "detalhes</a><br/>"
+                }
+
 
                 if (s['attended']) {
                     const attended_on = new Date(Date.parse(s['attended_on']));
-                    console.log(attended_on);
 
                     check_in_html +=
                         "Status de Check-in: <i class='fas fa-check-circle " +
                         "success-color'> " + "</i> <br> Realizado ás: " +
                         attended_on.toLocaleString('pt-BR', {timeZone: 'America/Sao_Paulo'});
                 } else {
+
+                    let formatted_cpf = '';
+                    let formatted_cnpj = '';
+
+                    if (s['person']['cpf']) {
+                        formatted_cpf = s['person']['cpf']
+                            .replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4");
+                    }
+
+                    if (s['person']['institution_cnpj']) {
+                        formatted_cnpj = s['person']['institution_cnpj']
+                            .replace(/\D/g, '')
+                            .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5");
+                    }
+
                     check_in_html +=
                         "Status de Check-in: <i class='fas fa-times-circle" +
-                        " danger-color'></i> Não realizado.";
+                        " danger-color'></i> Não realizado.<br/>" +
+                        "<button " +
+                        "style='margin-top:5px' class='btn btn-md btn-success do-checkin' " +
+                        "data-name='" + s['person']['name'] + "'" +
+                        "data-email='" + s['person']['email'] + "'" +
+                        "data-document_cpf='" + formatted_cpf + "'" +
+                        "data-document_cnpj='" + formatted_cnpj + "'" +
+                        "data-pk='" + s['pk'] + "'" +
+                        "data-code='" + s['code'] + "'>" +
+                        "Realizar Check-in" +
+                        "</button>";
                 }
                 $(check_in).html(check_in_html);
+                $(subscription_status).html(subscription_status_html);
                 panel_body.appendChild(title);
                 panel_body.appendChild(email);
+
+                if (s['person']['cpf'] || s['person']['institution_cnpj']) {
+                    panel_body.appendChild(document_id);
+                }
+
                 panel_body.appendChild(code);
-                panel_body.appendChild(check_in);
+
+                if (s['status'] !== 'confirmed') {
+                    panel_body.appendChild(subscription_status);
+                }
+                if (s['status'] === 'confirmed') {
+                    panel_body.appendChild(check_in);
+                }
                 $('#result_list').append(row);
 
             }
 
+            recreate_events();
+
 
         }
 
-        $(function () {
+        function recreate_events() {
 
+            const searchBtn = $('#searchBtn');
+            const new_search = $('.new_search');
+            const do_checkin = $('.do-checkin');
+            const confirmBtn = $('#confirmBtn');
+            const confirmModal = $('#confirmModal');
 
-            $('#searchBtn').on('click', function () {
+            searchBtn.unbind('click');
+            new_search.unbind('click');
+            do_checkin.unbind('click');
+            confirmBtn.unbind('click');
+
+            searchBtn.on('click', function () {
 
                 const raw_query = $('#searchBarInput').val();
                 var query = '?query=' + raw_query;
@@ -266,7 +339,6 @@
                     url: '{% url 'subscription:subscription-api-attendance-search' event.pk %}' + query,
                     type: 'GET',
                     success: function (res) {
-                        console.log(res);
                         create_result_list(res);
                         $('#searchBar').hide('slow');
                         $('#results').show();
@@ -275,13 +347,127 @@
                     console.error(err);
                 });
             });
-            $('.new_search').on('click', function () {
+            new_search.on('click', function () {
                 $('.res').remove();
                 $('#results').hide();
                 $('#searchBarInput').val("");
                 $('#searchBar').show('slow');
             });
+            do_checkin.on('click', function () {
+
+                $("#confirmName").text("Nome: " + $(this).data('name'));
+                $("#confirmEmail").text("Email: " + $(this).data('email'));
+                $('#confirmPk').val($(this).data('pk'));
+                if ($(this).data('document_cpf') !== '') {
+                    $("#confirmCpf").text("CPF: " + $(this).data('document_cpf'));
+                } else if ($(this).data('document_cnpj') !== '') {
+                    $("#confirmCnpj").text("CNPJ: " + $(this).data('document_cnpj'));
+                }
+
+                $("#confirmCode").text("Código: " + $(this).data('code'));
+                confirmModal.modal('show');
+            });
+            confirmBtn.on('click', function () {
+                console.log('asdasdasd');
+                confirmModal.modal('hide');
+                const formData = new FormData();
+                const pk = $('#confirmPk').val();
+                const current_url = new URL(window.location.href);
+                let url = '';
+
+               url += window.location.origin + '/';
+                url += current_url.pathname.split('/')[1] + '/';
+                url += current_url.pathname.split('/')[2] + '/';
+                url += current_url.pathname.split('/')[3] + '/';
+                url += current_url.pathname.split('/')[4] + '/';
+
+                url +=   pk + '/check-in';
+                console.log(url);
+
+                formData.append('attended', true);
+
+                $.ajax({
+                    url: url,
+                    type: 'PATCH',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function () {
+                        Messenger().post({
+                            message: 'Check-in realizado com sucesso!',
+                            type: 'success'
+                        });
+                        $('.res').remove();
+                        $('#results').hide();
+                        $('#searchBarInput').val("");
+                        $('#searchBar').show('slow');
+
+                    }
+                }).fail(function (err) {
+                    console.error(err);
+                    Messenger().post({
+                        message: 'Não foi possivel realizar o check-in.',
+                        type: 'danger'
+                    });
+                });
+
+            });
+        }
+
+        $(document).ready(function () {
+
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom ' +
+                'messenger-on-right',
+                theme: 'flat'
+            };
+
+            recreate_events();
+
         });
+
     </script>
+
+{% endblock %}
+
+{% block modals %}
+    <div class="modal" id="confirmModal" tabindex="-1" role="dialog"
+         aria-labelledby="confirmModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title"
+                        id="confirmModalLabel">Confirmação de inscrição</h4>
+                </div>
+                <div class="modal-body">
+
+
+                    <h3 style="font-weight: bold" id="confirmName"></h3>
+                    <h3 style="font-weight: bold" id="confirmEmail"></h3>
+                    <h3 style="font-weight: bold" id="confirmCpf"></h3>
+                    <h3 style="font-weight: bold" id="confirmCnpj"></h3>
+                    <h3 style="font-weight: bold" id="confirmCode"></h3>
+                    <input type="hidden" id="confirmPk"/>
+
+
+                    <button type="button" class="btn btn-lg btn-success"
+                            style="margin-top: 15px" id="confirmBtn">
+                        Confirmar!
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
