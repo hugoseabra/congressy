@@ -1,0 +1,88 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+{% load subscription_tags %}
+
+{% block title %}Credenciamento | Congressy{% endblock %}
+
+{% block page_title %}Últimos check-in's{% endblock %}
+{% block page_sub_title %}{{ event.name }}{% endblock %}
+{% block page_description %}
+   Lista dos ultimos inscritos confirmando sua presença no evento.
+{% endblock %}
+
+
+{% block pageheader %}
+    <div class="pageheader">
+        <h1> Últimos check-in's </h1>
+    </div>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    <h5 class="sidebar-header">Configurações</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'event:event-hotsite' event.pk %}"
+               title="Página do evento">
+                <i class="fa  fa-fw fa-rocket"></i> Página do evento
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:form-config' event.pk %}"
+               title="Formulário">
+                <i class="fa  fa-fw fa-rocket"></i> Formulário
+            </a>
+        </li>
+    </ul>
+
+    <h5 class="sidebar-header">Participantes</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li>
+            <a href="{% url 'subscription:lot-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Ingressos
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'subscription:subscription-list' event.pk %}"
+               title="Inscrições">
+                <i class="fa  fa-fw fa-rocket"></i>
+                Inscrições
+            </a>
+        </li>
+        {#        <li class="active">#}
+        {#            <a href="{% url 'subscription:subscription-attendance-search' event.pk %}"#}
+        {#               title="Check-in">#}
+        {#                <i class="fa  fa-fw fa-rocket"></i>#}
+        {#                Check-in#}
+        {#            </a>#}
+        {#        </li>#}
+    </ul>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+
+
+
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script>
+
+        $(document).ready(function () {
+
+            console.log('ready');
+
+        });
+
+    </script>
+
+{% endblock %}
+

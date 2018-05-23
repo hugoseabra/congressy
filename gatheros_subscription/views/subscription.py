@@ -901,3 +901,19 @@ class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
         sub = self.get_object()
         return sub.event.pk == event.pk
 
+
+class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
+    template_name = 'subscription/attendance-list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['attendances'] = self.get_attendances()
+        context['has_inside_bar'] = True
+        context['active'] = 'checkin-list'
+        return context
+
+    def get_attendances(self):
+        return Subscription.objects.filter(
+            attended=True,
+            event=self.get_event(),
+        ).order_by('-attended_on')

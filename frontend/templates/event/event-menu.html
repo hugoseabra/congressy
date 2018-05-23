@@ -47,6 +47,14 @@ Variáveis:
             Check-in
         </a>
     </li>
+    <li>
+        <a {% if active == 'checkin-list' %}class="active"{% endif %}class="sidebar-itens" href=
+                "{% url 'subscription:subscription-attendance-list' event.pk %}"
+           title="Últimos check-in's">
+            <i class="fas fa-calendar-check"></i>
+            Últimos check-in's
+        </a>
+    </li>
 </ul>
 
 {% if event.is_scientific %}

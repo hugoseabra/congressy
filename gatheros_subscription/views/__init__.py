@@ -18,6 +18,7 @@ from .subscription import (
     SubscriptionListView,
     SubscriptionViewFormView,
     VoucherSubscriptionPDFView,
+    SubscriptionAttendanceListView,
 )
 from .subscription_api import (
     SubscriptionSearchViewSet,
