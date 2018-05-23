@@ -187,12 +187,12 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'avatar',
                 'active',
                 'internal',
+                'is_scientific',
             ),
         }),
         ('Inscrições', {
             'fields': (
                 'allow_internal_subscription',
-                'is_scientific',
             ),
         }),
         ('Site e Redes Sociais', {
