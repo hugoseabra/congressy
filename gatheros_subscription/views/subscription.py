@@ -693,21 +693,6 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
     def get_permission_denied_url(self):
         return reverse('event:event-list')
 
-    def get(self, request, *args, **kwargs):
-        self.search_by = request.GET.get('search_by', 'name')
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.search_by = request.POST.get('search_by', 'name')
-        value = request.POST.get('value')
-
-        if value:
-            kwargs.update({
-                'result_by': self.search_by,
-                'result': self.search_subscription(self.search_by, value),
-            })
-
-        return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
@@ -718,7 +703,8 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             'active': 'checkin',
             'confirmed': self.get_number_confirmed(),
             'number_attendances': self.get_number_attendances(),
-            'total_subscriptions': self.get_number_subscription()
+            'total_subscriptions': self.get_number_subscription(),
+            'reports': self.get_report()
         })
         return cxt
 
@@ -742,7 +728,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
             ).count()
 
         except Subscription.DoesNotExist:
-            return []
+            return 0
 
     def get_number_subscription(self):
 
@@ -763,40 +749,9 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
 
         return confirmed
 
-    def search_subscription(self, search_by, value):
-        """ Busca inscrições de acordo com o valor passado. """
-        method_name = 'search_by_{}'.format(search_by)
-        method = getattr(self, method_name)
-        return method(value)
-
-    # noinspection PyMethodMayBeStatic
-    def search_by_name(self, name):
-        """ Busca inscrições por nome. """
-        try:
-            event = self.get_event()
-            return event.subscriptions.filter(
-                person__name__icontains=name.strip()
-            )
-        except Subscription.DoesNotExist:
-            return []
-
-    # noinspection PyMethodMayBeStatic
-    def search_by_code(self, code):
-        """ Busca inscrições por código. """
-        try:
-            event = self.get_event()
-            return event.subscriptions.get(code=code.strip())
-        except Subscription.DoesNotExist:
-            return None
-
-    # noinspection PyMethodMayBeStatic
-    def search_by_email(self, email):
-        """ Busca inscrições por email. """
-        try:
-            event = self.get_event()
-            return event.subscriptions.get(person__email=email.strip())
-        except Subscription.DoesNotExist:
-            return None
+    def get_report(self):
+        """ Resgata informações gerais do evento. """
+        return self.get_event().get_report()
 
 
 class MySubscriptionsListView(AccountMixin, generic.ListView):
