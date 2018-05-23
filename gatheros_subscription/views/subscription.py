@@ -442,90 +442,6 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         return redirect(url + '?details=1')
 
 
-class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
-    form_class = SubscriptionAttendanceForm
-    http_method_names = ['post']
-    search_by = 'name'
-    register_type = None
-    object = None
-
-    def get_object(self):
-        if self.object:
-            return self.object
-
-        try:
-            self.object = Subscription.objects.get(pk=self.kwargs.get('pk'))
-
-        except Subscription.DoesNotExist:
-            return None
-
-        else:
-            return self.object
-
-    def get_success_url(self):
-        url = reverse(
-            'subscription:subscription-attendance-search',
-            kwargs={'event_pk': self.kwargs.get('event_pk')}
-        )
-        if self.search_by is not None and self.search_by != 'name':
-            url += '?search_by=' + str(self.search_by)
-
-        return url
-
-    def get_permission_denied_url(self):
-        return self.get_success_url()
-
-    def get_form_kwargs(self):
-        kwargs = super(SubscriptionAttendanceView, self).get_form_kwargs()
-        kwargs.update({'instance': self.get_object()})
-        return kwargs
-
-    def form_invalid(self, form):
-        messages.error(self.request, form.errors)
-        return super(SubscriptionAttendanceView, self).form_invalid(form)
-
-    def form_valid(self, form):
-        sub = self.get_object()
-
-        try:
-            if self.register_type is None:
-                raise Exception('Nenhuma ação foi informada.')
-
-            register_name = 'Credenciamento' \
-                if self.register_type == 'register' \
-                else 'Cancelamento de credenciamento'
-
-        except Exception as e:
-            form.add_error(None, str(e))
-            return self.form_invalid(form)
-
-        else:
-            messages.success(
-                self.request,
-                '{} de `{}` registrado com sucesso.'.format(
-                    register_name,
-                    sub.person.name
-                )
-            )
-            form.attended(self.register_type == 'register')
-            return super(SubscriptionAttendanceView, self).form_valid(form)
-
-    def post(self, request, *args, **kwargs):
-        self.search_by = request.POST.get('search_by')
-        self.register_type = request.POST.get('action')
-
-        return super(SubscriptionAttendanceView, self).post(
-            request,
-            *args,
-            **kwargs
-        )
-
-    def can_access(self):
-        event = self.get_event()
-        sub = self.get_object()
-        return sub.event.pk == event.pk
-
-
 class SubscriptionAddFormView(SubscriptionFormMixin):
     """ Formulário de inscrição """
     success_message = 'Inscrição criada com sucesso.'
@@ -682,89 +598,6 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
         return reverse('subscription:subscription-list', kwargs={
             'event_pk': self.kwargs.get('event_pk')
         })
-
-
-class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
-    template_name = 'subscription/attendance.html'
-    search_by = 'name'
-
-    def get_permission_denied_url(self):
-        return reverse('event:event-list')
-
-    def get(self, request, *args, **kwargs):
-        self.search_by = request.GET.get('search_by', 'name')
-        return super(SubscriptionAttendanceSearchView, self).get(
-            request,
-            *args,
-            **kwargs
-        )
-
-    def post(self, request, *args, **kwargs):
-        self.search_by = request.POST.get('search_by', 'name')
-        value = request.POST.get('value')
-
-        if value:
-            kwargs.update({
-                'result_by': self.search_by,
-                'result': self.search_subscription(self.search_by, value),
-            })
-
-        return self.get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        cxt = super(SubscriptionAttendanceSearchView, self).get_context_data(
-            **kwargs
-        )
-        cxt.update({
-            'attendances': self.get_attendances(),
-            'search_by': self.search_by,
-        })
-        return cxt
-
-    def get_attendances(self):
-        try:
-            return Subscription.objects.filter(
-                attended=True,
-                event=self.get_event(),
-            ).order_by('-attended_on')
-
-        except Subscription.DoesNotExist:
-            return []
-
-    def search_subscription(self, search_by, value):
-        """ Busca inscrições de acordo com o valor passado. """
-        method_name = 'search_by_{}'.format(search_by)
-        method = getattr(self, method_name)
-        return method(value)
-
-    # noinspection PyMethodMayBeStatic
-    def search_by_name(self, name):
-        """ Busca inscrições por nome. """
-        try:
-            event = self.get_event()
-            return event.subscriptions.filter(
-                person__name__icontains=name.strip()
-            )
-        except Subscription.DoesNotExist:
-            return []
-
-    # noinspection PyMethodMayBeStatic
-    def search_by_code(self, code):
-        """ Busca inscrições por código. """
-        try:
-            event = self.get_event()
-            return event.subscriptions.get(code=code.strip())
-        except Subscription.DoesNotExist:
-            return None
-
-    # noinspection PyMethodMayBeStatic
-    def search_by_email(self, email):
-        """ Busca inscrições por email. """
-        try:
-            event = self.get_event()
-            return event.subscriptions.get(person__email=email.strip())
-        except Subscription.DoesNotExist:
-            return None
 
 
 class MySubscriptionsListView(AccountMixin, generic.ListView):
@@ -973,3 +806,92 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
 
     def can_access(self):
         return self.subscription.confirmed is True
+
+
+class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
+    template_name = 'subscription/attendance.html'
+
+
+class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
+    form_class = SubscriptionAttendanceForm
+    http_method_names = ['post']
+    search_by = 'name'
+    register_type = None
+    object = None
+
+    def get_object(self):
+        if self.object:
+            return self.object
+
+        try:
+            self.object = Subscription.objects.get(pk=self.kwargs.get('pk'))
+
+        except Subscription.DoesNotExist:
+            return None
+
+        else:
+            return self.object
+
+    def get_success_url(self):
+        url = reverse(
+            'subscription:subscription-attendance-search',
+            kwargs={'event_pk': self.kwargs.get('event_pk')}
+        )
+        if self.search_by is not None and self.search_by != 'name':
+            url += '?search_by=' + str(self.search_by)
+
+        return url
+
+    def get_permission_denied_url(self):
+        return self.get_success_url()
+
+    def get_form_kwargs(self):
+        kwargs = super(SubscriptionAttendanceView, self).get_form_kwargs()
+        kwargs.update({'instance': self.get_object()})
+        return kwargs
+
+    def form_invalid(self, form):
+        messages.error(self.request, form.errors)
+        return super(SubscriptionAttendanceView, self).form_invalid(form)
+
+    def form_valid(self, form):
+        sub = self.get_object()
+
+        try:
+            if self.register_type is None:
+                raise Exception('Nenhuma ação foi informada.')
+
+            register_name = 'Credenciamento' \
+                if self.register_type == 'register' \
+                else 'Cancelamento de credenciamento'
+
+        except Exception as e:
+            form.add_error(None, str(e))
+            return self.form_invalid(form)
+
+        else:
+            messages.success(
+                self.request,
+                '{} de `{}` registrado com sucesso.'.format(
+                    register_name,
+                    sub.person.name
+                )
+            )
+            form.attended(self.register_type == 'register')
+            return super(SubscriptionAttendanceView, self).form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        self.search_by = request.POST.get('search_by')
+        self.register_type = request.POST.get('action')
+
+        return super(SubscriptionAttendanceView, self).post(
+            request,
+            *args,
+            **kwargs
+        )
+
+    def can_access(self):
+        event = self.get_event()
+        sub = self.get_object()
+        return sub.event.pk == event.pk
+
