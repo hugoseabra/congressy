@@ -49,6 +49,11 @@ urls = [
         name='subscription-attendance-search'
     ),
     url(
+        r'^api/attendance/search/$',
+        views.SubscriptionSearchViewSet.as_view(),
+        name='subscription-api-attendance-search'
+    ),
+    url(
         r'^export/$',
         views.SubscriptionExportView.as_view(),
         name='subscriptions-export'
