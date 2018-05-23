@@ -9,6 +9,7 @@ from django.views.generic import DetailView
 
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
+from gatheros_subscription.models import Subscription
 from gatheros_event.views.mixins import AccountMixin
 from payment.models import Transaction, TransactionStatus
 
@@ -214,15 +215,10 @@ class EventPanelView(AccountMixin, DetailView):
 
     def _get_number_pending(self):
 
-        pending = 0
-
-        transactions = \
-            Transaction.objects.filter(Q(subscription__event=self.event) & (Q(
-                status=Transaction.PAID) | Q(
-                status=Transaction.WAITING_PAYMENT)))
-
-        for transaction in transactions:
-            if transaction.pending:
-                pending += 1 or 0
+        pending = \
+            Subscription.objects.filter(
+                status=Subscription.AWAITING_STATUS,
+                event=self.event
+            ).count()
 
         return pending
