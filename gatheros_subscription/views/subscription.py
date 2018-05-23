@@ -811,6 +811,12 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
 class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
     template_name = 'subscription/attendance.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['has_inside_bar'] = True
+        context['active'] = 'checkin'
+        return context
+
 
 class SubscriptionAttendanceView(EventViewMixin, generic.FormView):
     form_class = SubscriptionAttendanceForm

@@ -251,30 +251,42 @@
                         "detalhes</a><br/>"
                 }
 
+                let formatted_cpf = '';
+                let formatted_cnpj = '';
 
+                if (s['person']['cpf']) {
+                    formatted_cpf = s['person']['cpf']
+                        .replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4");
+                }
+
+                if (s['person']['institution_cnpj']) {
+                    formatted_cnpj = s['person']['institution_cnpj']
+                        .replace(/\D/g, '')
+                        .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5");
+                }
                 if (s['attended']) {
                     const attended_on = new Date(Date.parse(s['attended_on']));
-
                     check_in_html +=
                         "Status de Check-in: <i class='fas fa-check-circle " +
                         "success-color'> " + "</i> <br> Realizado ás: " +
-                        attended_on.toLocaleString('pt-BR', {timeZone: 'America/Sao_Paulo'});
+                        attended_on.toLocaleString('pt-BR', {
+                            timeZone:
+                                'America/Sao_Paulo'
+                        }) + '<br/>' +
+
+
+                        "<button " +
+                        "style='margin-top:5px' class='btn btn-md btn-danger" +
+                        " undo-checkin' " +
+                        "data-name='" + s['person']['name'] + "'" +
+                        "data-email='" + s['person']['email'] + "'" +
+                        "data-document_cpf='" + formatted_cpf + "'" +
+                        "data-document_cnpj='" + formatted_cnpj + "'" +
+                        "data-pk='" + s['pk'] + "'" +
+                        "data-code='" + s['code'] + "'>" +
+                        "Realizar Check-out" +
+                        "</button>";
                 } else {
-
-                    let formatted_cpf = '';
-                    let formatted_cnpj = '';
-
-                    if (s['person']['cpf']) {
-                        formatted_cpf = s['person']['cpf']
-                            .replace(/^(\d{3})(\d{3})?(\d{3})?(\d{2})?/, "$1.$2.$3-$4");
-                    }
-
-                    if (s['person']['institution_cnpj']) {
-                        formatted_cnpj = s['person']['institution_cnpj']
-                            .replace(/\D/g, '')
-                            .replace(/^(\d{2})(\d{3})?(\d{3})?(\d{4})?(\d{2})?/, "$1.$2.$3/$4-$5");
-                    }
-
                     check_in_html +=
                         "Status de Check-in: <i class='fas fa-times-circle" +
                         " danger-color'></i> Não realizado.<br/>" +
@@ -320,13 +332,18 @@
             const searchBtn = $('#searchBtn');
             const new_search = $('.new_search');
             const do_checkin = $('.do-checkin');
+            const undo_checkin = $('.undo-checkin');
             const confirmBtn = $('#confirmBtn');
+            const unconfirmBtn = $('#unconfirmBtn');
             const confirmModal = $('#confirmModal');
+            const unconfirmModal = $('#unconfirmModal');
 
             searchBtn.unbind('click');
             new_search.unbind('click');
             do_checkin.unbind('click');
+            undo_checkin.unbind('click');
             confirmBtn.unbind('click');
+            unconfirmBtn.unbind('click');
 
             searchBtn.on('click', function () {
 
@@ -367,22 +384,36 @@
                 $("#confirmCode").text("Código: " + $(this).data('code'));
                 confirmModal.modal('show');
             });
+            undo_checkin.on('click', function () {
+
+                $("#unconfirmName").text("Nome: " + $(this).data('name'));
+                $("#unconfirmEmail").text("Email: " + $(this).data('email'));
+                $('#unconfirmPk').val($(this).data('pk'));
+                if ($(this).data('document_cpf') !== '') {
+                    $("#unconfirmCpf").text("CPF: " + $(this).data
+                    ('document_cpf'));
+                } else if ($(this).data('document_cnpj') !== '') {
+                    $("#unconfirmCnpj").text("CNPJ: " + $(this).data
+                    ('document_cnpj'));
+                }
+
+                $("#unconfirmCode").text("Código: " + $(this).data('code'));
+                unconfirmModal.modal('show');
+            });
             confirmBtn.on('click', function () {
-                console.log('asdasdasd');
                 confirmModal.modal('hide');
                 const formData = new FormData();
                 const pk = $('#confirmPk').val();
                 const current_url = new URL(window.location.href);
                 let url = '';
 
-               url += window.location.origin + '/';
+                url += window.location.origin + '/';
                 url += current_url.pathname.split('/')[1] + '/';
                 url += current_url.pathname.split('/')[2] + '/';
                 url += current_url.pathname.split('/')[3] + '/';
                 url += current_url.pathname.split('/')[4] + '/';
 
-                url +=   pk + '/check-in';
-                console.log(url);
+                url += pk + '/check-in';
 
                 formData.append('attended', true);
 
@@ -410,6 +441,52 @@
                     console.error(err);
                     Messenger().post({
                         message: 'Não foi possivel realizar o check-in.',
+                        type: 'danger'
+                    });
+                });
+
+            });
+            unconfirmBtn.on('click', function () {
+                unconfirmModal.modal('hide');
+                const formData = new FormData();
+                const pk = $('#unconfirmPk').val();
+                const current_url = new URL(window.location.href);
+                let url = '';
+
+                url += window.location.origin + '/';
+                url += current_url.pathname.split('/')[1] + '/';
+                url += current_url.pathname.split('/')[2] + '/';
+                url += current_url.pathname.split('/')[3] + '/';
+                url += current_url.pathname.split('/')[4] + '/';
+
+                url += pk + '/check-in';
+
+                formData.append('attended', false);
+
+                $.ajax({
+                    url: url,
+                    type: 'PATCH',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function () {
+                        Messenger().post({
+                            message: 'Check-out realizado com sucesso!',
+                            type: 'success'
+                        });
+                        $('.res').remove();
+                        $('#results').hide();
+                        $('#searchBarInput').val("");
+                        $('#searchBar').show('slow');
+
+                    }
+                }).fail(function (err) {
+                    console.error(err);
+                    Messenger().post({
+                        message: 'Não foi possivel realizar o check-out.',
                         type: 'danger'
                     });
                 });
@@ -443,7 +520,7 @@
                             aria-hidden="true">×
                     </button>
                     <h4 class="modal-title"
-                        id="confirmModalLabel">Confirmação de inscrição</h4>
+                        id="confirmModalLabel">Confirmação de check-in</h4>
                 </div>
                 <div class="modal-body">
 
@@ -458,6 +535,53 @@
 
                     <button type="button" class="btn btn-lg btn-success"
                             style="margin-top: 15px" id="confirmBtn">
+                        Confirmar!
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger"
+                            data-dismiss="modal">Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="unconfirmModal" tabindex="-1" role="dialog"
+         aria-labelledby="unconfirmModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title"
+                        id="confirmModalLabel">Confirmação de check-out</h4>
+                </div>
+                <div class="modal-body">
+
+                    <h2 class="danger-color">
+                        <i class="fas fa-exclamation-triangle
+                        fa-1x"></i> Atenção! <i class="fas
+                        fa-exclamation-triangle
+                        fa-1x"></i>
+                    </h2>
+                    <h2 style="margin-top: 5px" class="danger-color">
+                        Você está prestes a realizar o check-out do
+                        seguinte participante:
+                    </h2>
+
+
+                    <h3 style="font-weight: bold; margin-top: 25px"
+                        id="unconfirmName"></h3>
+                    <h3 style="font-weight: bold" id="unconfirmEmail"></h3>
+                    <h3 style="font-weight: bold" id="unconfirmCpf"></h3>
+                    <h3 style="font-weight: bold" id="unconfirmCnpj"></h3>
+                    <h3 style="font-weight: bold" id="unconfirmCode"></h3>
+                    <input type="hidden" id="unconfirmPk"/>
+
+
+                    <button type="button" class="btn btn-lg btn-success"
+                            style="margin-top: 15px" id="unconfirmBtn">
                         Confirmar!
                     </button>
                 </div>

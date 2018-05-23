@@ -40,7 +40,7 @@ Variáveis:
         </li>
     {% endif %}
     <li>
-        <a class="sidebar-itens" href=
+        <a {% if active == 'checkin' %}class="active"{% endif %}class="sidebar-itens" href=
                 "{% url 'subscription:subscription-attendance-search' event.pk %}"
            title="Check-in">
             <i class="fas fa-calendar-check"></i>
