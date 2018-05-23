@@ -5,11 +5,10 @@ from decimal import Decimal
 import absoluteuri
 from django.conf import settings
 
-from partner import constants as partner_constants
-from payment.helpers.calculator import Calculator
-from gatheros_event.models import Organization
 from addon.models import SubscriptionProduct, SubscriptionService
+from partner import constants as partner_constants
 from payment.exception import TransactionError
+from payment.helpers.calculator import Calculator
 
 CONGRESSY_RECIPIENT_ID = settings.PAGARME_RECIPIENT_ID
 
@@ -63,7 +62,7 @@ class PagarmeTransactionInstanceData:
 
         # Add optionals to items list
         products = SubscriptionProduct.objects.filter(
-                subscription=self.subscription)
+            subscription=self.subscription)
         if products.count() > 0:
             for product in products:
                 self.add_optional_items_list(optional=product.optional,
@@ -390,4 +389,3 @@ class PagarmeTransactionInstanceData:
                 "tangible": False
             }
         )
-

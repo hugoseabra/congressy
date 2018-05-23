@@ -89,20 +89,20 @@ class Transaction(models.Model):
         null=True,
         blank=True,
     )
-    
-    installments = models.PositiveIntegerField(
-        default=1,
-        verbose_name='parcelas',
-        blank=True,
-        null=True,
+
+    subscription = models.ForeignKey(
+        Subscription,
+        on_delete=models.DO_NOTHING,
+        related_name='transactions'
     )
 
-    subscription_amount = models.DecimalField(
-        decimal_places=2,
-        max_digits=11,
+    lot = models.ForeignKey(
+        Lot,
+        on_delete=models.DO_NOTHING,
+        related_name='transactions',
+        editable=False,
         null=True,
         blank=True,
-        verbose_name='valor do pagamento',
     )
 
     lot_price = models.DecimalField(
@@ -110,6 +110,13 @@ class Transaction(models.Model):
         max_digits=11,
         null=True,
         blank=True,
+    )
+
+    installments = models.PositiveIntegerField(
+        default=1,
+        verbose_name='parcelas',
+        blank=True,
+        null=True,
     )
 
     installment_amount = models.DecimalField(
@@ -120,7 +127,15 @@ class Transaction(models.Model):
         null=True,
     )
 
-    subscription_liquid_amount = models.DecimalField(
+    amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=11,
+        null=True,
+        blank=True,
+        verbose_name='valor do pagamento',
+    )
+
+    liquid_amount = models.DecimalField(
         decimal_places=2,
         max_digits=11,
         null=True,
@@ -154,15 +169,6 @@ class Transaction(models.Model):
         blank=True,
     )
 
-    lot = models.ForeignKey(
-        Lot,
-        on_delete=models.DO_NOTHING,
-        related_name='transactions',
-        editable=False,
-        null=True,
-        blank=True,
-    )
-
     credit_card_holder = models.CharField(
         max_length=80,
         null=True,
@@ -179,12 +185,6 @@ class Transaction(models.Model):
         max_length=4,
         null=True,
         blank=True,
-    )
-
-    subscription = models.ForeignKey(
-        Subscription,
-        on_delete=models.DO_NOTHING,
-        related_name='transactions'
     )
 
     manual = models.BooleanField(
@@ -241,7 +241,7 @@ class Transaction(models.Model):
         O valor total pago pelo participante
         :return: DecimalField
         """
-        return self.subscription_amount + self.optional_amount
+        return self.amount + self.optional_amount
 
     @property
     def transaction_liquid_amount(self):
@@ -249,4 +249,4 @@ class Transaction(models.Model):
         O valor total que o organizador irá receber
         :return: DecimalField
         """
-        return self.subscription_liquid_amount + self.optional_liquid_amount
+        return self.liquid_amount + self.optional_liquid_amount

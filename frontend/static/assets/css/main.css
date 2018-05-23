@@ -3457,56 +3457,6 @@ label.valid {
 .table-inbox .fa-star {
   color: #EC971F;
 }
-.theme-cgsy-full .principal_content {
-  padding-left: 51px;
-}
-.theme-cgsy-full .sidebar_divider {
-  height: 1.4px;
-  margin: 9px 0;
-  width: 50px;
-  overflow: hidden;
-  background-color: #144f75;
-}
-.theme-cgsy-full .nav-pills > li.active > a {
-  background-color: #1f7bb6;
-}
-.theme-cgsy-full .brand {
-  margin-left: 50px;
-}
-.theme-cgsy-full .principal_sidebar {
-  height: 100%;
-  position: fixed;
-  width: 50px;
-  z-index: 900;
-  padding-left: 0;
-  padding-right: 0;
-}
-.theme-cgsy-full .manage_sidebar {
-  margin-top: 60px;
-  margin-left: 50px;
-  padding-left: 1px;
-  width: 200px;
-  padding-right: 10px;
-  background-color: #F0F3F3;
-  z-index: 100;
-}
-.theme-cgsy-full .sidebar-itens {
-  color: #4c4c4c;
-}
-.theme-cgsy-full .sidebar-itens:active {
-  color: #F0F3F3;
-  background-color: #1f7bb6;
-}
-.theme-cgsy-full .sidebar-itens:hover {
-  color: #F0F3F3;
-  background-color: #1f7bb6;
-  outline: 0;
-}
-@media only screen and (min-width: 1600px) {
-  .theme-cgsy-full .col-xl-2 {
-    width: auto;
-  }
-}
 .theme-cgsy-full #header {
   background: #000912;
 }
@@ -3585,34 +3535,6 @@ label.valid {
 .theme-cgsy-full .main-content-wrapper {
   padding-bottom: 105px !important;
 }
-@media only screen and (max-width: 768px) {
-  .theme-cgsy-full .brand {
-    margin-left: 0;
-  }
-  .theme-cgsy-full .navbar-collapse {
-    position: absolute;
-  }
-  .theme-cgsy-full .principal_sidebar {
-    top: 0;
-  }
-  .theme-cgsy-full .manage_sidebar {
-    margin-top: 0;
-    position: fixed;
-  }
-  .theme-cgsy-full .main-content-wrapper {
-    padding-top: 0;
-  }
-  .theme-cgsy-full .brand {
-    text-align: left;
-  }
-  .theme-cgsy-full .manage_sidebar {
-    margin-top: 0;
-  }
-  .theme-cgsy-full .principal_content {
-    padding-left: 0;
-    padding-right: 0;
-  }
-}
 .theme-cgsy-full .well.well-info {
   background-color: #238acc;
   color: #fff;
@@ -3679,29 +3601,50 @@ label.valid {
   padding: 0 0 24px 0 !important;
 }
 .theme-cgsy-full #header .dropdown-menu > li:active > .btn-success,
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-success.btn-trans,
 .theme-cgsy-full .dropdown-menu > li.active > .btn-success,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-success.btn-trans,
 .theme-cgsy-full .dropdown-menu > li > .btn-success:focus,
+.theme-cgsy-full .dropdown-menu > li > .btn-success.btn-trans:focus,
 .theme-cgsy-full .dropdown-menu > li > .btn-success:hover,
+.theme-cgsy-full .dropdown-menu > li > .btn-success.btn-trans:hover,
 .theme-cgsy-full .btn-success:link,
+.theme-cgsy-full .btn-success.btn-trans:link,
 .theme-cgsy-full .btn-success:visited,
-.theme-cgsy-full .btn-success:hover {
+.theme-cgsy-full .btn-success.btn-trans:visited,
+.theme-cgsy-full .btn-success:hover,
+.theme-cgsy-full .btn-success.btn-trans:hover {
   color: #FFF;
   background-color: #4caf4c;
 }
 .theme-cgsy-full #header .dropdown-menu > li:active > .btn-success i,
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-success.btn-trans i,
 .theme-cgsy-full .dropdown-menu > li.active > .btn-success i,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-success.btn-trans i,
 .theme-cgsy-full .dropdown-menu > li > .btn-success:focus i,
+.theme-cgsy-full .dropdown-menu > li > .btn-success.btn-trans:focus i,
 .theme-cgsy-full .dropdown-menu > li > .btn-success:hover i,
+.theme-cgsy-full .dropdown-menu > li > .btn-success.btn-trans:hover i,
 .theme-cgsy-full .btn-success:link i,
+.theme-cgsy-full .btn-success.btn-trans:link i,
 .theme-cgsy-full .btn-success:visited i,
+.theme-cgsy-full .btn-success.btn-trans:visited i,
 .theme-cgsy-full .btn-success:hover i,
+.theme-cgsy-full .btn-success.btn-trans:hover i,
 .theme-cgsy-full #header .dropdown-menu > li:active > .btn-success span,
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-success.btn-trans span,
 .theme-cgsy-full .dropdown-menu > li.active > .btn-success span,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-success.btn-trans span,
 .theme-cgsy-full .dropdown-menu > li > .btn-success:focus span,
+.theme-cgsy-full .dropdown-menu > li > .btn-success.btn-trans:focus span,
 .theme-cgsy-full .dropdown-menu > li > .btn-success:hover span,
+.theme-cgsy-full .dropdown-menu > li > .btn-success.btn-trans:hover span,
 .theme-cgsy-full .btn-success:link span,
+.theme-cgsy-full .btn-success.btn-trans:link span,
 .theme-cgsy-full .btn-success:visited span,
-.theme-cgsy-full .btn-success:hover span {
+.theme-cgsy-full .btn-success.btn-trans:visited span,
+.theme-cgsy-full .btn-success:hover span,
+.theme-cgsy-full .btn-success.btn-trans:hover span {
   color: #FFF;
 }
 .theme-cgsy-full #header .dropdown-menu > li:active > .btn-primary,
@@ -3752,58 +3695,97 @@ label.valid {
   color: #FFF !important;
 }
 .theme-cgsy-full #header .dropdown-menu > li:active > .btn-default,
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-default.btn-trans,
 .theme-cgsy-full .dropdown-menu > li.active > .btn-default,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-default.btn-trans,
 .theme-cgsy-full .dropdown-menu > li > .btn-default:focus,
+.theme-cgsy-full .dropdown-menu > li > .btn-default.btn-trans:focus,
 .theme-cgsy-full .dropdown-menu > li > .btn-default:hover,
+.theme-cgsy-full .dropdown-menu > li > .btn-default.btn-trans:hover,
 .theme-cgsy-full .btn-default:link,
+.theme-cgsy-full .btn-default.btn-trans:link,
 .theme-cgsy-full .btn-default:visited,
-.theme-cgsy-full .btn-default:hover {
+.theme-cgsy-full .btn-default.btn-trans:visited,
+.theme-cgsy-full .btn-default:hover,
+.theme-cgsy-full .btn-default.btn-trans:hover {
   color: #FFF;
   background-color: #9ea7ac;
 }
 .theme-cgsy-full #header .dropdown-menu > li:active > .btn-default i,
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-default.btn-trans i,
 .theme-cgsy-full .dropdown-menu > li.active > .btn-default i,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-default.btn-trans i,
 .theme-cgsy-full .dropdown-menu > li > .btn-default:focus i,
+.theme-cgsy-full .dropdown-menu > li > .btn-default.btn-trans:focus i,
 .theme-cgsy-full .dropdown-menu > li > .btn-default:hover i,
+.theme-cgsy-full .dropdown-menu > li > .btn-default.btn-trans:hover i,
 .theme-cgsy-full .btn-default:link i,
+.theme-cgsy-full .btn-default.btn-trans:link i,
 .theme-cgsy-full .btn-default:visited i,
+.theme-cgsy-full .btn-default.btn-trans:visited i,
 .theme-cgsy-full .btn-default:hover i,
+.theme-cgsy-full .btn-default.btn-trans:hover i,
 .theme-cgsy-full #header .dropdown-menu > li:active > .btn-default span,
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-default.btn-trans span,
 .theme-cgsy-full .dropdown-menu > li.active > .btn-default span,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-default.btn-trans span,
 .theme-cgsy-full .dropdown-menu > li > .btn-default:focus span,
+.theme-cgsy-full .dropdown-menu > li > .btn-default.btn-trans:focus span,
 .theme-cgsy-full .dropdown-menu > li > .btn-default:hover span,
+.theme-cgsy-full .dropdown-menu > li > .btn-default.btn-trans:hover span,
 .theme-cgsy-full .btn-default:link span,
+.theme-cgsy-full .btn-default.btn-trans:link span,
 .theme-cgsy-full .btn-default:visited span,
-.theme-cgsy-full .btn-default:hover span {
+.theme-cgsy-full .btn-default.btn-trans:visited span,
+.theme-cgsy-full .btn-default:hover span,
+.theme-cgsy-full .btn-default.btn-trans:hover span {
   color: #FFF;
 }
-.theme-cgsy-full #header .dropdown-menu > li:active > a.btn-danger,
-.theme-cgsy-full .dropdown-menu > li.active > a.btn-danger,
-.theme-cgsy-full .dropdown-menu > li > a.btn-danger:focus,
-.theme-cgsy-full .dropdown-menu > li > a.btn-danger:hover,
-.theme-cgsy-full .btn-danger,
-.theme-cgsy-full a.btn-danger:link,
-.theme-cgsy-full a.btn-danger:visited,
-.theme-cgsy-full a.btn-danger:hover {
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-danger,
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-danger.btn-trans,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-danger,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-danger.btn-trans,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger:focus,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger.btn-trans:focus,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger:hover,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger.btn-trans:hover,
+.theme-cgsy-full .btn-danger:link,
+.theme-cgsy-full .btn-danger.btn-trans:link,
+.theme-cgsy-full .btn-danger:visited,
+.theme-cgsy-full .btn-danger.btn-trans:visited,
+.theme-cgsy-full .btn-danger:hover,
+.theme-cgsy-full .btn-danger.btn-trans:hover {
   color: #FFF;
   background-color: #C9302C;
 }
-.theme-cgsy-full #header .dropdown-menu > li:active > a.btn-danger i,
-.theme-cgsy-full .dropdown-menu > li.active > a.btn-danger i,
-.theme-cgsy-full .dropdown-menu > li > a.btn-danger:focus i,
-.theme-cgsy-full .dropdown-menu > li > a.btn-danger:hover i,
-.theme-cgsy-full .btn-danger i,
-.theme-cgsy-full a.btn-danger:link i,
-.theme-cgsy-full a.btn-danger:visited i,
-.theme-cgsy-full a.btn-danger:hover i,
-.theme-cgsy-full #header .dropdown-menu > li:active > a.btn-danger span,
-.theme-cgsy-full .dropdown-menu > li.active > a.btn-danger span,
-.theme-cgsy-full .dropdown-menu > li > a.btn-danger:focus span,
-.theme-cgsy-full .dropdown-menu > li > a.btn-danger:hover span,
-.theme-cgsy-full .btn-danger span,
-.theme-cgsy-full a.btn-danger:link span,
-.theme-cgsy-full a.btn-danger:visited span,
-.theme-cgsy-full a.btn-danger:hover span {
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-danger i,
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-danger.btn-trans i,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-danger i,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-danger.btn-trans i,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger:focus i,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger.btn-trans:focus i,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger:hover i,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger.btn-trans:hover i,
+.theme-cgsy-full .btn-danger:link i,
+.theme-cgsy-full .btn-danger.btn-trans:link i,
+.theme-cgsy-full .btn-danger:visited i,
+.theme-cgsy-full .btn-danger.btn-trans:visited i,
+.theme-cgsy-full .btn-danger:hover i,
+.theme-cgsy-full .btn-danger.btn-trans:hover i,
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-danger span,
+.theme-cgsy-full #header .dropdown-menu > li:active > .btn-danger.btn-trans span,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-danger span,
+.theme-cgsy-full .dropdown-menu > li.active > .btn-danger.btn-trans span,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger:focus span,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger.btn-trans:focus span,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger:hover span,
+.theme-cgsy-full .dropdown-menu > li > .btn-danger.btn-trans:hover span,
+.theme-cgsy-full .btn-danger:link span,
+.theme-cgsy-full .btn-danger.btn-trans:link span,
+.theme-cgsy-full .btn-danger:visited span,
+.theme-cgsy-full .btn-danger.btn-trans:visited span,
+.theme-cgsy-full .btn-danger:hover span,
+.theme-cgsy-full .btn-danger.btn-trans:hover span {
   color: #FFF;
 }
 .theme-cgsy-full .profile:hover,
@@ -3922,6 +3904,19 @@ label.valid {
   position: fixed;
   bottom: 0;
   z-index: 100;
+}
+.theme-cgsy-full.app-only #header,
+.theme-cgsy-full.app-only .cgsy-footer,
+.theme-cgsy-full.app-only .sidebar {
+  display: none;
+}
+.theme-cgsy-full.app-only .main-content-wrapper {
+  padding-top: 0!important;
+  padding-bottom: 0 !important;
+  margin-left: 0 !important;
+}
+.theme-cgsy-full.app-only.no-app-title .pageheader {
+  display: none;
 }
 .float-left {
   float: left;

@@ -548,7 +548,6 @@ class SubscriptionWizardView(SessionWizardView):
                         transaction_data = PagarmeTransactionInstanceData(
                             subscription=subscription,
                             extra_data=form_data,
-                            event=self.event
                         )
 
                         create_pagarme_transaction(
