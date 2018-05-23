@@ -25,11 +25,11 @@ class SubscriptionSearchViewSet(generics.ListAPIView):
         if self.query is not None:
             queryset = Subscription.objects.filter(event=event_pk)
             name_query = queryset.filter(person__name__icontains=self.query)
-            if name_query.count() >= 15:
+            if name_query.count() > 0:
                 return name_query[:15]
 
             email_query = queryset.filter(person__email__icontains=self.query)
-            if name_query.count() >= 15:
+            if email_query.count() > 0:
                 return email_query[:15]
 
             try:
@@ -42,4 +42,4 @@ class SubscriptionSearchViewSet(generics.ListAPIView):
             except Subscription.DoesNotExist:
                 pass
 
-        return Subscription.objects.filter(event=event_pk)[:15]
+        return []

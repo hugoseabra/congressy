@@ -93,4 +93,6 @@ class CheckInSubscriptionSerializer(serializers.ModelSerializer):
             'person',
             'lot',
             'status',
+            'attended',
+            'attended_on',
         ]

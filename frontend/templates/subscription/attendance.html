@@ -114,28 +114,52 @@
 
             <div id="searchBar">
                 <div class="vertical-align">
-                    <form id="searchForm">
-                        <span style="font-size: 30px"></span>
-                        <input id="searchBarInput" type="text"
-                               style="height: 50px;
+                    <span style="font-size: 30px"></span>
+                    <input id="searchBarInput" type="text"
+                           list="recent_searches"
+                           style="height: 50px;
                     width:
                     500px;
                     font-size:30px ">
+                    <datalist id="recent_searches">
+                    </datalist>
 
-                        <button type="button" class="btn btn-lg btn-success"
-                                id="searchBtn" style="margin-left: 5px">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </form>
+                    <button type="button" class="btn btn-lg btn-success"
+                            id="searchBtn" style="margin-left: 5px">
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
 
             </div>
+
+
+            <div id="results" style="display: none">
+                <button class="btn btn-md btn-primary new_search" style="margin-bottom:
+                15px">
+                    Realizar nova pesquisa
+                </button>
+                <div id="result_list">
+                </div>
+
+                <button class="btn btn-md btn-primary new_search "
+                        style="margin-bottom:
+                15px">
+                    Realizar nova pesquisa
+                </button>
+                <small>Não encontrou o participante? Tente refinar sua
+                    busca.
+                </small>
+
+
+            </div>
+
         </div>
     </div>
 
 {% endblock %}
 
 {% block scripts %}
+
     <script>
 
         // CSRF code
@@ -158,24 +182,104 @@
 
         var csrftoken = getCookie('csrftoken');
 
+        function create_result_list(res) {
+
+            if (res.length === 0) {
+                const row = document.createElement('div');
+                row.className = 'row res';
+                const cols = document.createElement('div');
+                cols.className = 'col-md-8';
+                row.appendChild(cols);
+                const panel = document.createElement('div');
+                panel.className = 'panel panel-primary';
+                cols.appendChild(panel);
+                const panel_body = document.createElement('div');
+                panel_body.className = 'panel-body';
+                panel.appendChild(panel_body);
+
+                const title = document.createElement('h3');
+                $(title).text('Nenhum resultado encontrado.');
+                panel_body.appendChild(title);
+
+                $('#result_list').append(row);
+            }
+
+            for (const s of res) {
+                const row = document.createElement('div');
+                row.className = 'row res';
+                const cols = document.createElement('div');
+                cols.className = 'col-md-8';
+                row.appendChild(cols);
+                const panel = document.createElement('div');
+                panel.className = 'panel panel-primary';
+                cols.appendChild(panel);
+                const panel_body = document.createElement('div');
+                panel_body.className = 'panel-body';
+                panel.appendChild(panel_body);
+
+                const title = document.createElement('h3');
+                $(title).text('Nome: ' + s['person']['name']);
+                const email = document.createElement('h3');
+                $(email).text('Email: ' + s['person']['email']);
+                const code = document.createElement('h3');
+                $(code).text('Código: ' + s['code']);
+
+                const check_in = document.createElement('h3s');
+                let check_in_html = "";
+
+                if (s['attended']) {
+                    const attended_on = new Date(Date.parse(s['attended_on']));
+                    console.log(attended_on);
+
+                    check_in_html +=
+                        "Status de Check-in: <i class='fas fa-check-circle " +
+                        "success-color'> " + "</i> <br> Realizado ás: " +
+                        attended_on.toLocaleString('pt-BR', {timeZone: 'America/Sao_Paulo'});
+                } else {
+                    check_in_html +=
+                        "Status de Check-in: <i class='fas fa-times-circle" +
+                        " danger-color'></i> Não realizado.";
+                }
+                $(check_in).html(check_in_html);
+                panel_body.appendChild(title);
+                panel_body.appendChild(email);
+                panel_body.appendChild(code);
+                panel_body.appendChild(check_in);
+                $('#result_list').append(row);
+
+            }
+
+
+        }
+
         $(function () {
 
 
             $('#searchBtn').on('click', function () {
 
-                var query = '?query=' + $('#searchBarInput').val();
-                console.log('clicked to search');
+                const raw_query = $('#searchBarInput').val();
+                var query = '?query=' + raw_query;
+                const option = document.createElement('option');
+                option.setAttribute('value', raw_query);
+                $('#recent_searches').append(option);
                 $.ajax({
                     url: '{% url 'subscription:subscription-api-attendance-search' event.pk %}' + query,
                     type: 'GET',
                     success: function (res) {
                         console.log(res);
+                        create_result_list(res);
+                        $('#searchBar').hide('slow');
+                        $('#results').show();
                     }
                 }).fail(function (err) {
                     console.error(err);
                 });
-
-
+            });
+            $('.new_search').on('click', function () {
+                $('.res').remove();
+                $('#results').hide();
+                $('#searchBarInput').val("");
+                $('#searchBar').show('slow');
             });
         });
     </script>
