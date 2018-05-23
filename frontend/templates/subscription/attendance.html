@@ -238,16 +238,30 @@
                 let check_in_html = "";
                 let subscription_status_html = "";
 
+                let details_url = '';
+
+                details_url += window.location.origin + '/';
+                const current_url = new URL(window.location.href);
+                details_url += current_url.pathname.split('/')[1] + '/';
+                details_url += current_url.pathname.split('/')[2] + '/';
+                details_url += current_url.pathname.split('/')[3] + '/';
+                details_url += current_url.pathname.split('/')[4] + '/';
+
+                details_url += s['pk'] +
+                    '/payments/?details=1#report_detail_hidden/';
+
+
                 if (s['status'] === 'canceled') {
                     subscription_status_html =
                         "<i class='fas fa-times-circle danger-color'" +
-                        "Inscrição Cancelada: <a href='#'>Ver " +
+                        "Inscrição Cancelada: <a target='_blank' href='" + details_url
+                        +"'>Ver " +
                         "detalhes</a><br/>"
                 } else if (s['status'] === 'awaiting') {
                     subscription_status_html =
                         "<i class='fas fa-exclamation-triangle " +
                         "warning-color'>" +
-                        "</i> Inscrição pendente: <a href='#'>Ver " +
+                        "</i> Inscrição pendente: <a target='_blank' href='"+ details_url+ "'>Ver " +
                         "detalhes</a><br/>"
                 }
 
