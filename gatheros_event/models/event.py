@@ -22,6 +22,7 @@ from gatheros_event.models.constants import (
 )
 from . import Category, Organization
 from .mixins import GatherosModelMixin
+from gatheros_event.helpers import reports
 
 
 def get_image_path(instance, filename):
@@ -321,38 +322,31 @@ class Event(models.Model, GatherosModelMixin):
                 return 0
             return '{0:.2f}%'.format((num * 100) / num_total)
 
-        queryset = self.subscriptions.exclude(status='canceled')
+        queryset = self.subscriptions.filter(attended=True)
         total = queryset.count()
-        subs = queryset.values(
-            'person__pne',
-            'person__gender',
-            'person__city'
-        ).annotate(
-            num_pnes=models.Count('person__pne'),
-            num_gender=models.Count('person__gender')
-        ).order_by()
 
-        men = [
-            sub['num_gender'] for sub in subs if sub['person__gender'] == 'M'
-        ]
-        num_men = sum(men)
+        reports_dict = {}
 
-        women = [
-            sub['num_gender'] for sub in subs if sub['person__gender'] == 'F'
-        ]
-        num_women = sum(women)
+        gender_report = reports.get_report_gender(queryset)
 
-        pnes = [sub['num_pnes'] for sub in subs if sub['person__pne'] is True]
-        num_pnes = sum(pnes)
+        reports_dict.update(gender_report)
+        reports_dict.update({
+            'num_men': '{} ({})'.format(
+                gender_report['men'],
+                perc(gender_report['men'], total)
+            ),
+            'num_women': '{} ({})'.format(
+                gender_report['women'],
+                perc(gender_report['women'], total)
+            ),
+        })
 
-        cities = [sub['person__city'] for sub in subs]
-        num_cities = len(Counter(cities))
+        reports_dict.update({'num_pnes': reports.get_report_gender(queryset)})
+        reports_dict.update({
+            'cities': reports.get_report_cities(queryset)
+        })
+        reports_dict.update({
+            'ages': reports.get_report_age(queryset)
+        })
 
-        return {
-            'men': num_men,
-            'women': num_women,
-            'num_men': '{} ({})'.format(num_men, perc(num_men, total)),
-            'num_women': '{} ({})'.format(num_women, perc(num_women, total)),
-            'num_pnes': '{} ({})'.format(num_pnes, perc(num_pnes, total)),
-            'num_cities': num_cities,
-        }
+        return reports_dict
