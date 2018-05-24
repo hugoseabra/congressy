@@ -12,6 +12,7 @@ from .subscription import (
     SubscriptionAddFormView,
     SubscriptionAttendanceView,
     SubscriptionAttendanceSearchView,
+    SubscriptionAttendanceDashboardView,
     SubscriptionCancelView,
     SubscriptionEditFormView,
     SubscriptionExportView,

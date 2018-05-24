@@ -14,6 +14,8 @@ from django.urls import reverse, reverse_lazy
 from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.views import generic
+from django.db.models import Q
+
 from wkhtmltopdf.views import PDFTemplateView
 
 from core.forms.cleaners import clear_string
@@ -598,6 +600,158 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
         return reverse('subscription:subscription-list', kwargs={
             'event_pk': self.kwargs.get('event_pk')
         })
+
+
+class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
+    template_name = 'subscription/attendance.html'
+    search_by = 'name'
+
+    def get_permission_denied_url(self):
+        return reverse('event:event-list')
+
+    def get(self, request, *args, **kwargs):
+        self.search_by = request.GET.get('search_by', 'name')
+        return super(SubscriptionAttendanceSearchView, self).get(
+            request,
+            *args,
+            **kwargs
+        )
+
+    def post(self, request, *args, **kwargs):
+        self.search_by = request.POST.get('search_by', 'name')
+        value = request.POST.get('value')
+
+        if value:
+            kwargs.update({
+                'result_by': self.search_by,
+                'result': self.search_subscription(self.search_by, value),
+            })
+
+        return self.get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        cxt = super(SubscriptionAttendanceSearchView, self).get_context_data(
+            **kwargs
+        )
+        cxt.update({
+            'attendances': self.get_attendances(),
+            'search_by': self.search_by,
+        })
+        return cxt
+
+    def get_attendances(self):
+        try:
+            return Subscription.objects.filter(
+                attended=True,
+                event=self.get_event(),
+            ).order_by('-attended_on')
+
+        except Subscription.DoesNotExist:
+            return []
+
+    def search_subscription(self, search_by, value):
+        """ Busca inscrições de acordo com o valor passado. """
+        method_name = 'search_by_{}'.format(search_by)
+        method = getattr(self, method_name)
+        return method(value)
+
+    # noinspection PyMethodMayBeStatic
+    def search_by_name(self, name):
+        """ Busca inscrições por nome. """
+        try:
+            event = self.get_event()
+            return event.subscriptions.filter(
+                person__name__icontains=name.strip()
+            )
+        except Subscription.DoesNotExist:
+            return []
+
+    # noinspection PyMethodMayBeStatic
+    def search_by_code(self, code):
+        """ Busca inscrições por código. """
+        try:
+            event = self.get_event()
+            return event.subscriptions.get(code=code.strip())
+        except Subscription.DoesNotExist:
+            return None
+
+    # noinspection PyMethodMayBeStatic
+    def search_by_email(self, email):
+        """ Busca inscrições por email. """
+        try:
+            event = self.get_event()
+            return event.subscriptions.get(person__email=email.strip())
+        except Subscription.DoesNotExist:
+            return None
+
+
+class SubscriptionAttendanceDashboardView(EventViewMixin,
+                                          generic.TemplateView):
+    template_name = 'subscription/attendance-dashboard.html'
+    search_by = 'name'
+
+    def get_permission_denied_url(self):
+        return reverse('event:event-list')
+
+
+    def get_context_data(self, **kwargs):
+        cxt = super().get_context_data(**kwargs)
+        cxt.update({
+            'attendances': self.get_attendances(),
+            'search_by': self.search_by,
+            'has_inside_bar': True,
+            'active': 'checkin-dashboard',
+            'confirmed': self.get_number_confirmed(),
+            'number_attendances': self.get_number_attendances(),
+            'total_subscriptions': self.get_number_subscription(),
+            'reports': self.get_report()
+        })
+        return cxt
+
+    def get_attendances(self):
+        try:
+            list = Subscription.objects.filter(
+                attended=True,
+                event=self.get_event(),
+            ).order_by('-attended_on')
+            return list[0:5]
+
+
+        except Subscription.DoesNotExist:
+            return []
+
+    def get_number_attendances(self):
+        try:
+            return Subscription.objects.filter(
+                attended=True,
+                event=self.get_event(),
+            ).count()
+
+        except Subscription.DoesNotExist:
+            return 0
+
+    def get_number_subscription(self):
+
+        total = \
+            Subscription.objects.filter(
+                event=self.get_event()
+            ).count()
+
+        return total
+
+    def get_number_confirmed(self):
+
+        confirmed = \
+            Subscription.objects.filter(
+                status=Subscription.CONFIRMED_STATUS,
+                event=self.get_event()
+            ).count()
+
+        return confirmed
+
+    def get_report(self):
+        """ Resgata informações gerais do evento. """
+        return self.get_event().get_report()
 
 
 class MySubscriptionsListView(AccountMixin, generic.ListView):

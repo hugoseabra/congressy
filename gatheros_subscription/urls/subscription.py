@@ -49,6 +49,11 @@ urls = [
         name='subscription-view'
     ),
     url(
+        r'^attendance/dashboard/$',
+        views.SubscriptionAttendanceDashboardView.as_view(),
+        name='subscription-attendance-dashboard'
+    ),
+    url(
         r'^attendance/search/$',
         views.SubscriptionAttendanceSearchView.as_view(),
         name='subscription-attendance-search'
