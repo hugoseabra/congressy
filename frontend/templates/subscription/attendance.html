@@ -362,27 +362,19 @@
 
         function recreate_events() {
 
-            const new_search = $('.new_search');
-            const do_checkin = $('.do-checkin');
-            const undo_checkin = $('.undo-checkin');
-            const confirmBtn = $('#confirmBtn');
-            const unconfirmBtn = $('#unconfirmBtn');
-            const confirmModal = $('#confirmModal');
-            const unconfirmModal = $('#unconfirmModal');
+            const check_in_modal_trigger = $('.do-checkin');
+            const check_out_modal_trigger = $('.undo-checkin');
+            const check_in_btn = $('#check_in_btn');
+            const check_out_btn = $('#check_out_btn');
+            const check_in_modal = $('#check_in_modal');
+            const check_out_modal = $('#check_out_modal');
 
-            new_search.unbind('click');
-            do_checkin.unbind('click');
-            undo_checkin.unbind('click');
-            confirmBtn.unbind('click');
-            unconfirmBtn.unbind('click');
+            check_in_modal_trigger.unbind('click');
+            check_out_modal_trigger.unbind('click');
+            check_in_btn.unbind('click');
+            check_out_btn.unbind('click');
 
-            new_search.on('click', function () {
-                $('.res').remove();
-                $('#results').hide();
-                $('#searchBarInput').val("");
-                $('#searchBar').show('slow');
-            });
-            do_checkin.on('click', function () {
+            check_in_modal_trigger.on('click', function () {
 
                 $("#confirmName").text("Nome: " + $(this).data('name'));
                 $("#confirmEmail").text("Email: " + $(this).data('email'));
@@ -394,9 +386,9 @@
                 }
 
                 $("#confirmCode").text("Código: " + $(this).data('code'));
-                confirmModal.modal('show');
+                check_in_modal.modal('show');
             });
-            undo_checkin.on('click', function () {
+            check_out_modal_trigger.on('click', function () {
 
                 $("#unconfirmName").text("Nome: " + $(this).data('name'));
                 $("#unconfirmEmail").text("Email: " + $(this).data('email'));
@@ -410,10 +402,10 @@
                 }
 
                 $("#unconfirmCode").text("Código: " + $(this).data('code'));
-                unconfirmModal.modal('show');
+                check_out_modal.modal('show');
             });
-            confirmBtn.on('click', function () {
-                confirmModal.modal('hide');
+            check_in_btn.on('click', function () {
+                check_in_modal.modal('hide');
                 const formData = new FormData();
                 const pk = $('#confirmPk').val();
                 const current_url = new URL(window.location.href);
@@ -448,8 +440,7 @@
                         });
                         $('.res').remove();
                         $('#results').hide();
-                        $('#searchBarInput').val("");
-                        $('#searchBar').show('slow');
+                        //$('#searchBarInput').val("");
 
                     }
                 }).fail(function (err) {
@@ -461,8 +452,8 @@
                 });
 
             });
-            unconfirmBtn.on('click', function () {
-                unconfirmModal.modal('hide');
+            check_out_btn.on('click', function () {
+                check_out_modal.modal('hide');
                 const formData = new FormData();
                 const pk = $('#unconfirmPk').val();
                 const current_url = new URL(window.location.href);
@@ -494,8 +485,7 @@
                         });
                         $('.res').remove();
                         $('#results').hide();
-                        $('#searchBarInput').val("");
-                        $('#searchBar').show('slow');
+                        //$('#searchBarInput').val("");
 
                     }
                 }).fail(function (err) {
@@ -527,7 +517,7 @@
 {% endblock %}
 
 {% block modals %}
-    <div class="modal" id="confirmModal" tabindex="-1" role="dialog"
+    <div class="modal" id="check_in_modal" tabindex="-1" role="dialog"
          aria-labelledby="confirmModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -550,7 +540,7 @@
 
 
                     <button type="button" class="btn btn-lg btn-success"
-                            style="margin-top: 15px" id="confirmBtn">
+                            style="margin-top: 15px" id="check_in_btn">
                         Confirmar!
                     </button>
                 </div>
@@ -562,7 +552,7 @@
             </div>
         </div>
     </div>
-    <div class="modal" id="unconfirmModal" tabindex="-1" role="dialog"
+    <div class="modal" id="check_out_modal" tabindex="-1" role="dialog"
          aria-labelledby="unconfirmModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -597,7 +587,7 @@
 
 
                     <button type="button" class="btn btn-lg btn-success"
-                            style="margin-top: 15px" id="unconfirmBtn">
+                            style="margin-top: 15px" id="check_out_btn">
                         Confirmar!
                     </button>
                 </div>
