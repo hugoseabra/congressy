@@ -50,6 +50,23 @@ Variáveis:
 
 </ul>
 
+
+<h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
+<ul class="nav nav-pills nav-stacked">
+
+
+    <li {% if active == 'checkin-dashboard' %}class="active"{% endif %}>
+        <a class="sidebar-itens" href=
+                "{% url 'subscription:subscription-attendance-dashboard' event.pk %}"
+           title="Check-in">
+            <i class="fas fa-calendar-check"></i>
+            Painel de Check-in
+        </a>
+    </li>
+
+
+</ul>
+
 {% if event.is_scientific %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Artigos científicos</h5>
     <ul class="nav nav-pills nav-stacked">
