@@ -1,3 +1,4 @@
+import re
 from rest_framework import generics
 from rest_framework.response import Response
 
@@ -22,7 +23,7 @@ class SubscriptionSearchViewSet(generics.ListAPIView):
 
     def get_queryset(self):
         event_pk = self.kwargs.get('event_pk')
-        if self.query is not None:
+        if self.query is not None and self.query != '':
             queryset = Subscription.objects.filter(event=event_pk)
             name_query = queryset.filter(person__name__icontains=self.query)
             if name_query.count() > 0:
@@ -37,10 +38,17 @@ class SubscriptionSearchViewSet(generics.ListAPIView):
             except Subscription.DoesNotExist:
                 pass
 
-            try:
-                return [queryset.get(person__cpf=self.query)]
-            except Subscription.DoesNotExist:
-                pass
+            query = re.sub('\.', '', self.query)
+            query = re.sub('/', '', query)
+            query = re.sub('-', '', query)
+
+            cpf_query = queryset.filter(person__cpf=query)
+            if cpf_query.count() > 0:
+                return cpf_query[:15]
+
+            cnpf_query = queryset.filter(person__institution_cnpj=query)
+            if cnpf_query.count() > 0:
+                return cnpf_query[:15]
 
         return []
 
