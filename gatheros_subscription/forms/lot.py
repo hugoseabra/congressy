@@ -84,9 +84,9 @@ class LotForm(forms.ModelForm):
             self.fields['transfer_tax'].widget.attrs['disabled'] = 'disabled'
             self.fields['transfer_tax'].disabled = True
 
-            self.fields['allow_installment'].widget.attrs['disabled'] = \
-                'disabled'
-            self.fields['allow_installment'].disabled = True
+            # self.fields['allow_installment'].widget.attrs['disabled'] = \
+            #     'disabled'
+            # self.fields['allow_installment'].disabled = True
 
             self.fields['installment_limit'].widget.attrs['disabled'] = \
                 'disabled'

@@ -47,6 +47,7 @@ class EventAdmin(admin.ModelAdmin):
                 'date_end',
                 'congressy_percent',
                 'image_main',
+                'is_scientific',
                 'published',
                 'slug',
             ),
@@ -187,7 +188,6 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'avatar',
                 'active',
                 'internal',
-                'is_scientific',
             ),
         }),
         ('Inscrições', {
