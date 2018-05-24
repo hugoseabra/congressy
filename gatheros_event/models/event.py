@@ -321,7 +321,7 @@ class Event(models.Model, GatherosModelMixin):
                 return 0
             return '{0:.2f}%'.format((num * 100) / num_total)
 
-        queryset = self.subscriptions
+        queryset = self.subscriptions.exclude(status='canceled')
         total = queryset.count()
         subs = queryset.values(
             'person__pne',
