@@ -70,3 +70,32 @@ class SubscriptionExportSerializer(serializers.ModelSerializer):
             'code',
             'person',
         ]
+
+
+class CheckInPersonSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Person
+        fields = (
+            'name',
+            'email',
+            'cpf',
+            'institution_cnpj',
+        )
+
+
+class CheckInSubscriptionSerializer(serializers.ModelSerializer):
+    person = CheckInPersonSerializer()
+    lot = serializers.CharField(source='lot.name')
+
+    class Meta:
+        model = Subscription
+        fields = [
+            'pk',
+            'code',
+            'person',
+            'lot',
+            'status',
+            'attended',
+            'attended_on',
+        ]
