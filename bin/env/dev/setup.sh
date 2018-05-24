@@ -15,7 +15,7 @@ docker-compose -f $BASE_DIR/bin/env/docker-compose.yml down --remove-orphans
 sleep 1
 
 docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
-sleep 25
+sleep 8
 docker logs cgsy-postgres
 
 
