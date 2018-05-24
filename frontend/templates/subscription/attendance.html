@@ -160,6 +160,8 @@
 
 {% block scripts %}
 
+    <script src="{% static 'assets/js/vendor/moment.js' %}"></script>
+
     <script>
 
         // CSRF code
@@ -430,6 +432,9 @@
                 url += pk + '/check-in';
 
                 formData.append('attended', true);
+                let now = moment(new Date()).format('YYYY-MM-DD HH:mm');
+                formData.append('attended_on', now);
+
 
                 $.ajax({
                     url: url,
@@ -509,6 +514,8 @@
         }
 
         $(document).ready(function () {
+
+
 
             Messenger.options = {
                 extraClasses: 'messenger-fixed messenger-on-bottom ' +
