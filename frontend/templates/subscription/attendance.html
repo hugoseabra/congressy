@@ -114,42 +114,32 @@
         <div class="col-md-12" style="margin-left: 250px">
 
             <div id="searchBar">
-                <div class="vertical-align">
-                    <span style="font-size: 30px"></span>
-                    <input id="searchBarInput" type="text"
-                           list="recent_searches"
-                           style="height: 50px;
+                <form onsubmit="search();return false;">
+                    <div class="vertical-align">
+                        <span style="font-size: 30px"></span>
+                        <input id="searchBarInput" type="text"
+                               list="recent_searches"
+                               style="height: 50px;
                     width:
                     500px;
                     font-size:30px ">
-                    <datalist id="recent_searches">
-                    </datalist>
+                        <datalist id="recent_searches">
+                        </datalist>
 
-                    <button type="button" class="btn btn-lg btn-success"
-                            id="searchBtn" style="margin-left: 5px">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
+                        <button type="button" onclick="search()" class="btn
+                        btn-lg btn-success"
+                                id="searchBtn" style="margin-left: 5px">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+
 
             </div>
 
-            <div id="results" style="display: none">
-                <button class="btn btn-md btn-primary new_search" style="margin-bottom:
-                15px">
-                    Realizar nova pesquisa
-                </button>
-                <div id="result_list">
-                </div>
+            <div id="results" style="display: none; margin-top: 25px">
 
-                <button class="btn btn-md btn-primary new_search "
-                        style="margin-bottom:
-                15px">
-                    Realizar nova pesquisa
-                </button>
-                <small>Não encontrou o participante? Tente refinar sua
-                    busca.
-                </small>
-
+                <div id="result_list"></div>
 
             </div>
 
@@ -182,7 +172,7 @@
             return cookieValue;
         }
 
-        var csrftoken = getCookie('csrftoken');
+        let csrftoken = getCookie('csrftoken');
 
         function create_result_list(res) {
 
@@ -257,13 +247,13 @@
                     subscription_status_html =
                         "<i class='fas fa-times-circle danger-color'" +
                         "Inscrição Cancelada: <a target='_blank' href='" + details_url
-                        +"'>Ver " +
+                        + "'>Ver " +
                         "detalhes</a><br/>"
                 } else if (s['status'] === 'awaiting') {
                     subscription_status_html =
                         "<i class='fas fa-exclamation-triangle " +
                         "warning-color'>" +
-                        "</i> Inscrição pendente: <a target='_blank' href='"+ details_url+ "'>Ver " +
+                        "</i> Inscrição pendente: <a target='_blank' href='" + details_url + "'>Ver " +
                         "detalhes</a><br/>"
                 }
 
@@ -343,9 +333,35 @@
 
         }
 
+        function search() {
+
+            $('.res').remove();
+            $('#results').hide();
+
+            const raw_query = $('#searchBarInput').val();
+            let query = '?query=' + raw_query;
+
+            const option = document.createElement('option');
+            option.setAttribute('value', raw_query);
+            $('#recent_searches').append(option);
+
+            $.ajax({
+                url: '{% url 'subscription:subscription-api-attendance-search' event.pk %}' + query,
+                type: 'GET',
+                success: function (res) {
+                    create_result_list(res);
+                    //$('#searchBar').hide('slow');
+                    $('#results').show();
+                }
+            }).fail(function (err) {
+                console.error(err);
+            });
+
+            return
+        }
+
         function recreate_events() {
 
-            const searchBtn = $('#searchBtn');
             const new_search = $('.new_search');
             const do_checkin = $('.do-checkin');
             const undo_checkin = $('.undo-checkin');
@@ -354,32 +370,12 @@
             const confirmModal = $('#confirmModal');
             const unconfirmModal = $('#unconfirmModal');
 
-            searchBtn.unbind('click');
             new_search.unbind('click');
             do_checkin.unbind('click');
             undo_checkin.unbind('click');
             confirmBtn.unbind('click');
             unconfirmBtn.unbind('click');
 
-            searchBtn.on('click', function () {
-
-                const raw_query = $('#searchBarInput').val();
-                var query = '?query=' + raw_query;
-                const option = document.createElement('option');
-                option.setAttribute('value', raw_query);
-                $('#recent_searches').append(option);
-                $.ajax({
-                    url: '{% url 'subscription:subscription-api-attendance-search' event.pk %}' + query,
-                    type: 'GET',
-                    success: function (res) {
-                        create_result_list(res);
-                        $('#searchBar').hide('slow');
-                        $('#results').show();
-                    }
-                }).fail(function (err) {
-                    console.error(err);
-                });
-            });
             new_search.on('click', function () {
                 $('.res').remove();
                 $('#results').hide();
@@ -514,7 +510,6 @@
         }
 
         $(document).ready(function () {
-
 
 
             Messenger.options = {
