@@ -36,7 +36,7 @@
         $('.progress-bar').attr('aria-valuenow', progress);
         $('.progress-bar').css('width', progress + '%');
 
-        invert_progress = 100 - progress;
+        invert_progress = (100 - progress).toFixed(1);
         Morris.Donut({
             element: 'donut_attendances',
             data: [
@@ -63,7 +63,7 @@
         var confirmed_percent = ((parseFloat('{{ confirmed }}') /
             parseFloat('{{total_subscriptions }}')) *
             100).toFixed(1);
-        var invert_confirmed = 100 - confirmed_percent
+        var invert_confirmed = (100 - confirmed_percent).toFixed(1);
         Morris.Donut({
             element: 'donut_confirmed',
             data: [
@@ -297,7 +297,7 @@
              style="padding-bottom: 20px;margin-bottom: 20px ">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Gênero dos participantes</h3>
+                    <h3 class="panel-title">Faixa etária dos participantes</h3>
                 </div>
                 <div class="panel-body">
                     <div class="row">
