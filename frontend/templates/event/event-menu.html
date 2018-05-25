@@ -1,4 +1,4 @@
-{% load queryset_filter %}
+{% load subscription_tags %}
 
 {% comment %}
 Variáveis:
@@ -27,7 +27,9 @@ Variáveis:
            title="Inscrições">
             <i class="fa fa-clipboard"></i>
             Inscrições
-            <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+            <span class="badge float-right">
+                {% event_count_completed_subscriptions event %}
+            </span>
         </a>
     </li>
     {% if has_paid_lots %}

@@ -42,17 +42,20 @@ class WorkConfigViewSet(viewsets.ModelViewSet):
         instance = self.get_instance(request.data)
         if 'date_start_0' not in request.data:
             request.POST._mutable = True
-            request.data['date_start_0'] = instance.date_start.strftime(
-                '%e/%m/%Y')
-            request.data['date_start_1'] = instance.date_start.strftime(
-                '%H:%M')
+            if instance.date_start:
+                request.data['date_start_0'] = \
+                    instance.date_start.strftime('%e/%m/%Y')
+                request.data['date_start_1'] = \
+                    instance.date_start.strftime('%H:%M')
 
         if 'date_end_0' not in request.data:
             if not request.POST._mutable:
                 request.POST._mutable = True
-            request.data['date_end_0'] = instance.date_end.strftime(
-                '%e/%m/%Y')
-            request.data['date_end_1'] = instance.date_end.strftime('%H:%M')
+            if instance.date_end:
+                request.data['date_end_0'] = \
+                    instance.date_end.strftime('%e/%m/%Y')
+                request.data['date_end_1'] = \
+                    instance.date_end.strftime('%H:%M')
 
         model_form = forms.WorkConfigForm(instance=instance, data=request.data)
         if model_form.is_valid():

@@ -1,5 +1,59 @@
 //congressy - dark-blue
 .theme-cgsy-full {
+  .principal_content {
+    padding-left: 51px;
+  }
+
+  .sidebar_divider {
+    height: 1.4px;
+    margin: 9px 0;
+    width: 50px;
+    overflow: hidden;
+    background-color: darken(#1f7bb6, 15%);
+  }
+  .nav-pills > li.active > a {
+    background-color: #1f7bb6;
+  }
+
+  .brand {
+    margin-left: 50px;
+  }
+  .principal_sidebar {
+    height: 100%;
+    position: fixed;
+    width: 50px;
+    z-index: 900;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .manage_sidebar {
+    margin-top: 60px;
+    margin-left: 50px;
+    padding-left: 1px;
+    width: 200px;
+    padding-right: 10px;
+    background-color: #F0F3F3;
+    z-index: 100
+  }
+  .sidebar-itens {
+    color: #4c4c4c;
+  }
+  .sidebar-itens:active {
+    color: #F0F3F3;
+    background-color: #1f7bb6;
+  }
+  .sidebar-itens:hover {
+    color: #F0F3F3;
+    background-color: #1f7bb6;
+    outline: 0;
+  }
+  @media only screen and (min-width: 1600px) {
+    .col-xl-2 {
+      width: auto;
+    }
+  }
+
   #header {
     .brand {
       background: #F0F3F3;
@@ -10,7 +64,7 @@
     button.sidebar-toggle, button#toggle-profile, button#toggle-fullscreen, .nav li.profile > a {
       color: #fff;
     }
-    background: @cgsyPrimary;
+    //background: @cgsyPrimary;
     button.sidebar-toggle:hover,
     button#toggle-profile:hover,
     button#toggle-fullscreen:hover {
@@ -62,6 +116,43 @@
 
   .main-content-wrapper {
     padding-bottom: 105px !important;
+  }
+
+  @media only screen and (max-width: 768px) {
+    .brand {
+      margin-left: 0;
+    }
+
+    .navbar-collapse {
+      position: absolute;
+    }
+
+    .principal_sidebar {
+      top: 0;
+    }
+
+    .manage_sidebar {
+      margin-top: 0;
+      position: fixed;
+    }
+
+    .main-content-wrapper {
+      padding-top: 0;
+    }
+
+    .brand {
+      text-align: left;
+    }
+
+    .manage_sidebar {
+      margin-top: 0;
+    }
+
+    .principal_content {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
   }
 
   //================================ WELL ===================================//
@@ -153,19 +244,10 @@
   }
 
   #header .dropdown-menu > li:active > .btn-success,
-  #header .dropdown-menu > li:active > .btn-success.btn-trans,
   .dropdown-menu > li.active > .btn-success,
-  .dropdown-menu > li.active > .btn-success.btn-trans,
   .dropdown-menu > li > .btn-success:focus,
-  .dropdown-menu > li > .btn-success.btn-trans:focus,
   .dropdown-menu > li > .btn-success:hover,
-  .dropdown-menu > li > .btn-success.btn-trans:hover,
-  .btn-success:link,
-  .btn-success.btn-trans:link,
-  .btn-success:visited,
-  .btn-success.btn-trans:visited,
-  .btn-success:hover,
-  .btn-success.btn-trans:hover {
+  .btn-success:link, .btn-success:visited, .btn-success:hover {
     color: #FFF;
     background-color: @successColorHover;
     i, span {
@@ -195,19 +277,10 @@
   }
 
   #header .dropdown-menu > li:active > .btn-default,
-  #header .dropdown-menu > li:active > .btn-default.btn-trans,
   .dropdown-menu > li.active > .btn-default,
-  .dropdown-menu > li.active > .btn-default.btn-trans,
   .dropdown-menu > li > .btn-default:focus,
-  .dropdown-menu > li > .btn-default.btn-trans:focus,
   .dropdown-menu > li > .btn-default:hover,
-  .dropdown-menu > li > .btn-default.btn-trans:hover,
-  .btn-default:link,
-  .btn-default.btn-trans:link,
-  .btn-default:visited,
-  .btn-default.btn-trans:visited,
-  .btn-default:hover,
-  .btn-default.btn-trans:hover {
+  .btn-default:link, .btn-default:visited, .btn-default:hover {
     color: #FFF;
     background-color: @defaultColorHover;
     i, span {
@@ -215,20 +288,12 @@
     }
   }
 
-  #header .dropdown-menu > li:active > .btn-danger,
-  #header .dropdown-menu > li:active > .btn-danger.btn-trans,
-  .dropdown-menu > li.active > .btn-danger,
-  .dropdown-menu > li.active > .btn-danger.btn-trans,
-  .dropdown-menu > li > .btn-danger:focus,
-  .dropdown-menu > li > .btn-danger.btn-trans:focus,
-  .dropdown-menu > li > .btn-danger:hover,
-  .dropdown-menu > li > .btn-danger.btn-trans:hover,
-  .btn-danger:link,
-  .btn-danger.btn-trans:link,
-  .btn-danger:visited,
-  .btn-danger.btn-trans:visited,
-  .btn-danger:hover,
-  .btn-danger.btn-trans:hover {
+  #header .dropdown-menu > li:active > a.btn-danger,
+  .dropdown-menu > li.active > a.btn-danger,
+  .dropdown-menu > li > a.btn-danger:focus,
+  .dropdown-menu > li > a.btn-danger:hover,
+  .btn-danger, a.btn-danger:link,
+  a.btn-danger:visited, a.btn-danger:hover {
     color: #FFF;
     background-color: @dangerColor;
     i, span {
@@ -393,7 +458,6 @@
 
     }
   }
-
 }
 
 .theme-cgsy-full.app-only {
@@ -402,7 +466,7 @@
   }
 
   .main-content-wrapper {
-    padding-top: 0!important;
+    padding-top: 0 !important;
     padding-bottom: 0 !important;
     margin-left: 0 !important;
   }

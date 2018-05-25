@@ -1,4 +1,10 @@
 from .form_config import FormConfigView
+from .lotcategory import (
+    LotCategoryAddView,
+    LotCategoryDeleteView,
+    LotCategoryEditView,
+    LotCategoryListView,
+)
 from .lot import (
     LotAddFormView,
     LotDeleteView,

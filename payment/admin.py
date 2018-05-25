@@ -21,8 +21,8 @@ class TransactionAdmin(admin.ModelAdmin):
         'status',
         'type',
         'date_created',
-        'subscription_liquid_amount',
-        'subscription_amount',
+        'liquid_amount',
+        'amount',
         'optional_amount',
         'optional_liquid_amount',
     )

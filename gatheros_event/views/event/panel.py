@@ -86,7 +86,11 @@ class EventPanelView(AccountMixin, DetailView):
         return self.event.limit
 
     def _get_total_subscriptions(self):
-        return self.event.subscriptions.count()
+        return self.event.subscriptions.filter(
+            completed=True,
+        ).exclude(
+            status=Subscription.CANCELED_STATUS
+        ).count()
 
     def can_access(self):
         event = self.get_object()
@@ -198,9 +202,14 @@ class EventPanelView(AccountMixin, DetailView):
         }
 
         transactions = \
-            Transaction.objects.filter(Q(subscription__event=self.event) & (Q(
-                status=Transaction.PAID) | Q(
-                status=Transaction.WAITING_PAYMENT)))
+            Transaction.objects.filter(
+                Q(subscription__event=self.event) &
+                Q(subscription__completed=True) &
+                (
+                    Q(status=Transaction.PAID) |
+                    Q(status=Transaction.WAITING_PAYMENT)
+                )
+            ).exclude(subscription__status=Subscription.CANCELED_STATUS)
 
         for transaction in transactions:
             totals['total'] += transaction.liquid_amount or Decimal(0.00)
@@ -218,7 +227,10 @@ class EventPanelView(AccountMixin, DetailView):
         pending = \
             Subscription.objects.filter(
                 status=Subscription.AWAITING_STATUS,
-                event=self.event
+                completed=True,
+                event=self.event,
+            ).exclude(
+                status=Subscription.CANCELED_STATUS
             ).count()
 
         return pending

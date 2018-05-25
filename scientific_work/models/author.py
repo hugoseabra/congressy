@@ -5,10 +5,10 @@ from django.contrib.auth.models import User
 from django.db import models
 
 from .work import Work
-from base.models import Entity
+from base.models import EntityMixin
 
 
-class Author(Entity, models.Model):
+class Author(EntityMixin, models.Model):
     """
         Author domain model implementation.
     """
