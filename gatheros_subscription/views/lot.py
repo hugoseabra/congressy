@@ -288,6 +288,9 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
 
         return context
 
+    def form_invalid(self, form):
+        return super().form_invalid(form)
+
     def post(self, request, *args, **kwargs):
         if 'limit_switch' not in request.POST:
             request.POST = request.POST.copy()

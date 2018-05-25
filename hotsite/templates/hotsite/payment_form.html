@@ -1,4 +1,5 @@
 {% extends 'hotsite/base.html' %}
+{% load static form_config_tags l10n humanize %}
 
 {% block content %}
 
@@ -25,24 +26,17 @@
 
                             {% block messages %}
                                 {% if messages %}
-                                    <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                                    {% for message in messages %}
-                                        {% if message.tags %}
-                                            <div class="alert alert-{{ message.tags }} alert-dismissible"
-                                                 role="alert">
-                                        {% else %}
-                                            <div class="alert alert-warning alert-dismissible"
-                                                 role="alert">
-                                        {% endif %}
-
-                                    <button type="button" class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"><span
-                                            aria-hidden="true">&times;</span>
-                                    </button>
-                                    {{ message|capfirst }}
+                                <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
+                                        <button type="button" class="close"
+                                                data-dismiss="alert"
+                                                aria-label="Close"><span
+                                                aria-hidden="true">&times;</span>
+                                        </button>
+                                        {{ message|capfirst }}
                                     </div>
-                                    {% endfor %}
+                                {% endfor %}
                                 </div>
                                 {% endif %}
                             {% endblock messages %}
@@ -56,8 +50,7 @@
                                     {% render_errors field.error %}
                                 {% endif %}
                             {% endfor %}
-                            <div class="well well-sm"
-                                 style="text-align: justify">
+                            <div class="well well-sm" style="text-align: justify">
                                 <h3>Checkout: {{ subscription.person.name}}</h3>
                                 <div>
                                     <strong>
@@ -66,13 +59,11 @@
                                 </div>
                                 <ul>
                                     {% if lot.price %}
-                                        <ol><strong>R$ {{ lot.price }}</strong>
-                                        </ol>
+                                        <strong>R$ {{ lot.price }}</strong>
                                     {% else %}
-                                        <ol><strong>Grátis</strong></ol>
+                                        <strong>Grátis</strong>
                                     {% endif %}
                                 </ul>
-
                                 {% if products %}
                                     <div><strong>Produtos:</strong></div>
                                     <ul>
@@ -109,8 +100,6 @@
                                 {% endif %}
 
                                 <h4> Total: R$ {{ total }} </h4>
-
-
                             </div>
 
 
@@ -150,8 +139,7 @@
                             {% endif %}
 
                             <div class="text-center">
-                                <img style="width: 80%; margin-top: 20px"
-                                     src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
+                                <img style="width: 80%; margin-top: 20px" src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
                             </div>
                             <br/>
                             <form action="" method="post" id="next_form">
@@ -161,7 +149,6 @@
                                 {% for hidden in form.hidden_fields %}
                                     {{ hidden }}
                                 {% endfor %}
-
                             </form>
 
                             <button type="button"
@@ -184,7 +171,6 @@
                                     </button>
                                 {% endif %}
                             </form>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -195,6 +181,7 @@
                     </div>
                 </div>
             </div>
+        </div>
     </section>
 
 {% endblock %}
@@ -219,7 +206,7 @@
                 });
 
                 // disable boleto method
-                {% if 'boleto' not in allow_transactins_type %}
+                {% if 'boleto' not in allowed_transaction_types %}
                 window.cgsy.payment.disable_boleto();
                 {% endif %}
 
