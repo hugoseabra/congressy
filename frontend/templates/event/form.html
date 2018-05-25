@@ -28,7 +28,18 @@
 {% endblock %}
 
 {% block page_title %}
-    {% if object %}Editar{% else %}Novo{% endif %} Evento
+    {% if object %}
+        Editar Evento
+    {% else %}
+        Novo Evento
+        {% if event_type == 'free' %}
+            Gratuito
+        {% elif event_type == 'paid' %}
+            Pago
+        {% else %}
+            Científico
+        {% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block page_sub_title %}
@@ -47,225 +58,233 @@
 
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-4">
-            <div class="type_event panel panel-primary"
-                 href="javascript:void(0)" onclick="choose_type('free')">
-                <div class="panel-heading">
-                    <h3 class="panel-title" style="text-align: center;">
-                        Evento
-                        Gratuito</h3>
-                </div>
-                <div class="panel-body" style="text-align: center">
-                    <img class="type-image" style="width: 50%; height:
+    {% if not step %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="type_event panel panel-primary"
+                     href="javascript:void(0)" onclick="choose_type('free')">
+                    <div class="panel-heading">
+                        <h3 class="panel-title" style="text-align: center;">
+                            Evento
+                            Gratuito</h3>
+                    </div>
+                    <div class="panel-body" style="text-align: center">
+                        <img class="type-image" style="width: 50%; height:
                     30%;" src=
-                            "{% static "assets/img/free-event.svg" %}"
-                    />
+                                "{% static "assets/img/free-event.svg" %}"
+                        />
+                    </div>
+                    <div class="panel-footer">
+                        <h3> Lorem ipsum iaculis nisi proin primis fusce proin
+                            lacinia volutpat, tempor class orci neque pretium
+                            fames fusce orci diam vitae, nulla nibh ornare
+                            torquent praesent fringilla sapien conubia. curae a
+                            massa tortor accumsan conubia maecenas sagittis
+                            morbi maecenas, luctus tincidunt augue sodales
+                            quam aenean convallis, posuere sit augue hendrerit.
+                        </h3>
+                    </div>
+                    <i class="overlay far fa-check-circle fa-10x"
+                    ></i>
                 </div>
-                <div class="panel-footer">
-                    <h3> Lorem ipsum iaculis nisi proin primis  fusce proin
-                        lacinia volutpat, tempor class orci neque pretium
-                        fames fusce orci diam vitae, nulla nibh ornare
-                        torquent  praesent fringilla sapien conubia. curae a
-                        massa tortor accumsan conubia maecenas sagittis
-                        morbi  maecenas, luctus tincidunt augue sodales
-                         quam aenean convallis, posuere sit augue hendrerit.
-                    </h3>
-                </div>
-                <i class="overlay far fa-check-circle fa-10x"
-                ></i>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="type_event panel panel-primary"
-                 href="javascript:void(0)" onclick="choose_type('paid')">
-                <div class="panel-heading">
-                    <h1 class="panel-title" style="text-align: center;"> Evento
-                        Pago</h1>
-                </div>
-                <div class="panel-body" style="text-align: center">
-                    <img style="width: 50%; height: 30%;" class="type-image"
-                         src=
-                                 "{% static "assets/img/paid-event.svg" %}"
-                    />
-                </div>
-                <div class="panel-footer">
-                    <h3> Lorem ipsum iaculis nisi proin primis  fusce proin
-                        lacinia volutpat, tempor class orci neque pretium
-                        fames fusce orci diam vitae, nulla nibh ornare
-                        torquent  praesent fringilla sapien conubia. curae a
-                        massa tortor accumsan conubia maecenas sagittis
-                        morbi  maecenas, luctus tincidunt augue sodales
-                         quam aenean convallis, posuere sit augue hendrerit.
-                    </h3>
-                </div>
-                <i class="overlay far fa-check-circle fa-10x"
-                ></i>
-
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="type_event panel panel-primary"
-                 href="javascript:void(0)" onclick="choose_type('scientific')">
-                <div class="panel-heading">
-                    <h3 class="panel-title" style="text-align: center;"> Evento
-                        Científico</h3>
-                </div>
-                <div class="panel-body" style="text-align: center">
-                    <img style="width: 50%; height: 30%;"
-                         class="type-image" src=
-                                 "{% static "assets/img/scientific-event.svg" %}"
-                    />
+            <div class="col-md-4">
+                <div class="type_event panel panel-primary"
+                     href="javascript:void(0)" onclick="choose_type('paid')">
+                    <div class="panel-heading">
+                        <h1 class="panel-title" style="text-align: center;">
+                            Evento
+                            Pago</h1>
+                    </div>
+                    <div class="panel-body" style="text-align: center">
+                        <img style="width: 50%; height: 30%;"
+                             class="type-image"
+                             src=
+                                     "{% static "assets/img/paid-event.svg" %}"
+                        />
+                    </div>
+                    <div class="panel-footer">
+                        <h3> Lorem ipsum iaculis nisi proin primis fusce proin
+                            lacinia volutpat, tempor class orci neque pretium
+                            fames fusce orci diam vitae, nulla nibh ornare
+                            torquent praesent fringilla sapien conubia. curae a
+                            massa tortor accumsan conubia maecenas sagittis
+                            morbi maecenas, luctus tincidunt augue sodales
+                            quam aenean convallis, posuere sit augue hendrerit.
+                        </h3>
+                    </div>
+                    <i class="overlay far fa-check-circle fa-10x"
+                    ></i>
 
                 </div>
-                <div class="panel-footer">
-                    <h3> Lorem ipsum iaculis nisi proin primis  fusce proin
-                        lacinia volutpat, tempor class orci neque pretium
-                        fames fusce orci diam vitae, nulla nibh ornare
-                        torquent  praesent fringilla sapien conubia. curae a
-                        massa tortor accumsan conubia maecenas sagittis
-                        morbi  maecenas, luctus tincidunt augue sodales
-                         quam aenean convallis, posuere sit augue hendrerit.
-                    </h3>
-                </div>
-                <i class="overlay far fa-check-circle fa-10x"
-                ></i>
             </div>
-        </div>
+            <div class="col-md-4">
+                <div class="type_event panel panel-primary"
+                     href="javascript:void(0)"
+                     onclick="choose_type('scientific')">
+                    <div class="panel-heading">
+                        <h3 class="panel-title" style="text-align: center;">
+                            Evento
+                            Científico</h3>
+                    </div>
+                    <div class="panel-body" style="text-align: center">
+                        <img style="width: 50%; height: 30%;"
+                             class="type-image" src=
+                                     "{% static "assets/img/scientific-event.svg" %}"
+                        />
 
-    </div>
-    <form action="{% url 'event:event-add'%}"
-          method="post" id="choose-type-form" style="display:none">
+                    </div>
+                    <div class="panel-footer">
+                        <h3> Lorem ipsum iaculis nisi proin primis fusce proin
+                            lacinia volutpat, tempor class orci neque pretium
+                            fames fusce orci diam vitae, nulla nibh ornare
+                            torquent praesent fringilla sapien conubia. curae a
+                            massa tortor accumsan conubia maecenas sagittis
+                            morbi maecenas, luctus tincidunt augue sodales
+                            quam aenean convallis, posuere sit augue hendrerit.
+                        </h3>
+                    </div>
+                    <i class="overlay far fa-check-circle fa-10x"
+                    ></i>
+                </div>
+            </div>
+
+        </div>
+        <form action="" method="GET" id="choose-type-form"
+              style="display:none">
+            <input type="hidden" name="event_type" id="event_type" value=""/>
+            <input type="hidden" name="step" value="step2"/>
+        </form>
+    {% endif %}
+    {% if step == 'step2' %}
+
+    <form action="" method="post" class="form-horizontal form-border"
+          role="form" name="event_form">
         {% csrf_token %}
-        <input type="hidden" name="event_type" id="event_type" value="" />
-    </form>
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar">
+                    <div class="float-left">
+                        <a href="{% url 'event:event-add' %}"
+                               class="btn btn-primary">
+                                <i class="fas fa-arrow-circle-left"></i>
+                                Voltar
+                        </a>
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Campos Principais</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.name autofocus=True %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.organization %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.category %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.date_start %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% render_generic_field form.date_end %}
+                                    </div>
+                                </div>
+                                {% if event_type != 'free' %}
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {% render_switchery_field form.has_optionals %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% render_switchery_field form.has_extra_activities %}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {% render_switchery_field form.has_checkin %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% render_switchery_field form.has_certificate %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                                            <div class="buttonbar bottom">
+                                                <div class="float-right">
+                                                    {% if next_path %}
+                                                        <a href="{{ next_path|urlencode }}"
+                                                           class="btn btn-danger">
+                                                            <i class="fas fa-times-circle"></i>Cancelar</a>
+                                                        <input type="hidden"
+                                                               name="next"
+                                                               value="{{ next_path }}"/>
+                                                    {% else %}
+                                                        <a href="{% url 'event:event-list' %}"
+                                                           class="btn btn-danger">
+                                                            <i class="fas fa-times-circle"></i>Cancelar</a>
+                                                    {% endif %}
+
+
+                                                    <button type="submit"
+                                                            class="btn btn-success">
+                                                        <i class="fa fa-save"></i>
+                                                        Salvar
+                                                    </button>
+                                                </div>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </form>
+                                {% endif %}
 
 {% endblock %}
-
-
-{#{% block content %}#}
-{#    <form action="" method="post" class="form-horizontal form-border"#}
-{#          role="form" name="event_form">#}
-{#        {% csrf_token %}#}
-{##}
-{#        {% if form.non_field_errors %}#}
-{#            {% render_errors form.non_field_errors %}#}
-{#        {% endif %}#}
-{##}
-{#        {% for hidden_field in form.hidden_fields %}#}
-{#            {% if hidden_field.errors %}#}
-{#                {% render_errors hidden_field.errors %}#}
-{#            {% endif %}#}
-{#            {{ hidden_field }}#}
-{#        {% endfor %}#}
-{##}
-{#        <div class="row">#}
-{#            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">#}
-{#                <div class="buttonbar">#}
-{#                    <div class="float-right">#}
-{#                        {% if next_path %}#}
-{#                            <a href="{{ next_path|urlencode }}"#}
-{#                               class="btn btn-danger">#}
-{#                                <i class="fas fa-times-circle"></i>#}
-{#                                Cancelar#}
-{#                            </a>#}
-{#                            <input type="hidden" name="next"#}
-{#                                   value="{{ next_path }}"/>#}
-{#                        {% else %}#}
-{#                            <a href="{% url 'event:event-list' %}"#}
-{#                               class="btn btn-danger">#}
-{#                                <i class="fas fa-times-circle"></i>#}
-{#                                Cancelar#}
-{#                            </a>#}
-{#                        {% endif %}#}
-{##}
-{#                        <button type="submit" class="btn btn-success">#}
-{#                            <i class="fa fa-save"></i>#}
-{#                            Salvar#}
-{#                        </button>#}
-{#                    </div>#}
-{#                    <div class="clearfix"></div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#        <div class="row">#}
-{#            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">#}
-{#                <div class="panel panel-primary">#}
-{#                    <div class="panel-heading">#}
-{#                        <div class="panel-title">Campos Principais</div>#}
-{#                    </div>#}
-{#                    <div class="panel-body">#}
-{#                        <div class="row">#}
-{#                            <div class="col-md-12">#}
-{#                                <div class="row">#}
-{#                                    <div class="col-md-12">#}
-{#                                        {% render_generic_field form.name autofocus=True %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row">#}
-{#                                    <div class="col-md-6">#}
-{#                                        {% render_generic_field form.organization %}#}
-{#                                    </div>#}
-{#                                    <div class="col-md-6">#}
-{#                                        {% render_generic_field form.category %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row">#}
-{#                                    <div class="col-md-6">#}
-{#                                        {% render_generic_field form.date_start %}#}
-{#                                    </div>#}
-{#                                    <div class="col-md-6">#}
-{#                                        {% render_generic_field form.date_end %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <div class="row">#}
-{#                                    <div class="col-md-6">#}
-{#                                        {% render_icheck_field form.payment_type %}#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#        <div class="row">#}
-{#            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">#}
-{#                <div class="buttonbar bottom">#}
-{#                    <div class="float-right">#}
-{#                        {% if next_path %}#}
-{#                            <a href="{{ next_path|urlencode }}"#}
-{#                               class="btn btn-danger">#}
-{#                                <i class="fas fa-times-circle"></i>Cancelar</a>#}
-{#                            <input type="hidden" name="next"#}
-{#                                   value="{{ next_path }}"/>#}
-{#                        {% else %}#}
-{#                            <a href="{% url 'event:event-list' %}"#}
-{#                               class="btn btn-danger">#}
-{#                                <i class="fas fa-times-circle"></i>Cancelar</a>#}
-{#                        {% endif %}#}
-{##}
-{##}
-{#                        <button type="submit" class="btn btn-success">#}
-{#                            <i class="fa fa-save"></i>#}
-{#                            Salvar#}
-{#                        </button>#}
-{#                    </div>#}
-{#                    <div class="clearfix"></div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </form>#}
-{#{% endblock %}#}
 
 {% block scripts %}
     <script src="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.full.min.js" %}"></script>
     <script src="{% static 'assets/js/event.js' %}"></script>
     <script>
         function choose_type(chosen_type) {
-            $('#transaction_id').val(chosen_type);
+            $('#event_type').val(chosen_type);
             $('#choose-type-form').submit();
         }
+
         (function ($) {
             $(document).ready(function () {
                 {% if LANGUAGE_CODE == 'pt-br' %}
@@ -287,7 +306,7 @@
 
 
                 $('.type_event').on('click', function () {
-                    $('.type_event').find('.overlay').each(function() {
+                    $('.type_event').find('.overlay').each(function () {
                         $(this).removeClass('active');
                     });
                     $('.type_event:hover > .overlay').toggleClass('active');
@@ -302,6 +321,10 @@
           href="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.min.css" %}">
 
     <style>
+        .type_event {
+            cursor: pointer;
+        }
+
         .overlay {
             display: none;
         }

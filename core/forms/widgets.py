@@ -52,6 +52,9 @@ class DateInput(forms.DateInput):
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)
 
+        if value is None:
+            return None
+
         lang = get_language()
 
         try:
@@ -77,6 +80,10 @@ class TimeInput(forms.TimeInput):
 
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)
+
+        if value is None:
+            return None
+
         if len(value) == 5:
             value += ':00'
 

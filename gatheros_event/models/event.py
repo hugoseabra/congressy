@@ -58,12 +58,14 @@ class Event(models.Model, GatherosModelMixin):
         (EVENT_STATUS_FINISHED, 'finalizado'),
     )
 
-    PAYMENT_TYPE_FREE = 'free'
-    PAYMENT_TYPE_PAID = 'paid'
+    EVENT_TYPE_FREE = 'free'
+    EVENT_TYPE_PAID = 'paid'
+    EVENT_TYPE_SCIENTIFIC = 'scientific'
 
-    PAYMENT_TYPES = (
-        (PAYMENT_TYPE_FREE, 'Gratuito'),
-        (PAYMENT_TYPE_PAID, 'Pago'),
+    EVENT_TYPES = (
+        (EVENT_TYPE_FREE, 'gratuito'),
+        (EVENT_TYPE_PAID, 'pago'),
+        (EVENT_TYPE_SCIENTIFIC, 'scientific'),
     )
     name = models.CharField(max_length=255, verbose_name='nome')
 
@@ -80,12 +82,37 @@ class Event(models.Model, GatherosModelMixin):
         verbose_name='categoria'
     )
 
-    payment_type = models.CharField(
+    event_type = models.CharField(
         max_length=15,
-        choices=PAYMENT_TYPES,
-        default=PAYMENT_TYPE_FREE,
+        choices=EVENT_TYPES,
+        default=EVENT_TYPE_FREE,
         verbose_name='Tipo de evento',
         help_text="Como será seu evento?"
+    )
+
+    has_optionals = models.BooleanField(
+        default=False,
+        verbose_name='Opcionais',
+        help_text="Você irá vender, opcionais como: hospedagem, alimentação, camisetas?"
+    )
+
+    has_extra_activities = models.BooleanField(
+        default=False,
+        verbose_name='Atividades extras',
+        help_text="Seu evento terá: workshops, minicursos?"
+    )
+
+    has_checkin = models.BooleanField(
+        default=False,
+        verbose_name='Checkin',
+        help_text="Deseja realizar o checkin com nosso App gratuito?"
+    )
+
+    has_certificate = models.BooleanField(
+        default=False,
+        verbose_name='Certificado',
+        help_text="Seu evento terá entrega de Certificados ?"
+
     )
 
     subscription_type = models.CharField(

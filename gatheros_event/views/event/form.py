@@ -128,6 +128,17 @@ class EventAddFormView(BaseEventView, generic.CreateView):
 
         return form_class(user=self.request.user, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        step = self.request.GET.get('step')
+        event_type = self.request.GET.get('event_type')
+        if step and event_type:
+            context['step'] = step
+            context['event_type'] = event_type
+
+        return context
+
     def post(self, request, *args, **kwargs):
         org_pk = request.POST.get('organization')
         try:
@@ -144,14 +155,13 @@ class EventAddFormView(BaseEventView, generic.CreateView):
         else:
             self.object = None
             form = self.get_form()
-            if form.is_valid():
-                self.object = self.event = form.save()
-                return self.form_valid(form)
-
-            else:
+            if not form.is_valid():
                 return self.render_to_response(self.get_context_data(
                     form=form,
                 ))
+
+            self.object = self.event = form.save()
+            return self.form_valid(form)
 
     def get_initial(self):
         initial = super(EventAddFormView, self).get_initial()
