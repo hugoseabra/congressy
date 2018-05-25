@@ -16,8 +16,8 @@ class SubscriptionModelTest(GatherosTestCase):
         '007_organization',
         '009_place',
         '010_event',
-        '006_lot',
-        '007_subscription',
+        '007_lot',
+        '008_subscription',
     ]
 
     def _create_person(self, **kwargs):

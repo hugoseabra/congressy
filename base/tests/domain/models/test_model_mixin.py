@@ -6,7 +6,7 @@ from django.forms import ValidationError
 from test_plus.test import TestCase
 
 from base.models import (
-    Entity,
+    EntityMixin,
     RuleChecker,
     RuleInstanceTypeError,
     RuleIntegrityError,
@@ -26,7 +26,7 @@ class EntityTest(TestCase):
         class NotAChecker:
             pass
 
-        wrong_entity = Entity
+        wrong_entity = EntityMixin
         wrong_entity.rule_instances = [
             NotAChecker(),
         ]
@@ -40,7 +40,7 @@ class EntityTest(TestCase):
             def check(self, entity_instance):
                 pass
 
-        entity = Entity
+        entity = EntityMixin
         entity.rule_instances = [
             TestChecker()
         ]
@@ -59,7 +59,7 @@ class EntityTest(TestCase):
             def check(self, entity_instance):
                 raise RuleIntegrityError('Test error')
 
-        entity_with_errors = Entity
+        entity_with_errors = EntityMixin
 
         entity_with_errors.rule_instances = [
             TestCheckerWithExceptions()

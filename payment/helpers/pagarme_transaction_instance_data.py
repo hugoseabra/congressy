@@ -5,10 +5,10 @@ from decimal import Decimal
 import absoluteuri
 from django.conf import settings
 
+from addon.models import SubscriptionProduct, SubscriptionService
 from partner import constants as partner_constants
-from payment.helpers.calculator import Calculator
-from gatheros_event.models import Organization
 from payment.exception import TransactionError
+from payment.helpers.calculator import Calculator
 
 CONGRESSY_RECIPIENT_ID = settings.PAGARME_RECIPIENT_ID
 
@@ -16,13 +16,15 @@ CONGRESSY_RECIPIENT_ID = settings.PAGARME_RECIPIENT_ID
 class PagarmeTransactionInstanceData:
     # @TODO add international phone number capability
 
-    def __init__(self, subscription, extra_data, event):
+    items_list = []
+
+    def __init__(self, subscription, extra_data):
 
         self.subscription = subscription
         self.lot = subscription.lot
         self.person = subscription.person
+        self.event = subscription.event
         self.extra_data = extra_data
-        self.event = event
 
         self._set_amount()
         self._set_organization()
@@ -54,6 +56,24 @@ class PagarmeTransactionInstanceData:
                 .replace(' ', '')
 
             return string
+
+        # Add subscription to the items list
+        self.add_subscription_to_items_list(self.subscription)
+
+        # Add optionals to items list
+        products = SubscriptionProduct.objects.filter(
+            subscription=self.subscription)
+        if products.count() > 0:
+            for product in products:
+                self.add_optional_items_list(optional=product.optional,
+                                             is_tangible=True)
+
+        services = SubscriptionService.objects.filter(
+            subscription=self.subscription)
+        if services.count() > 0:
+            for service in services:
+                self.add_optional_items_list(optional=service.optional,
+                                             is_tangible=False)
 
         transaction_data = {
 
@@ -90,15 +110,7 @@ class PagarmeTransactionInstanceData:
                 }
             },
 
-            "items": [
-                {
-                    "id": str(transaction_id),
-                    "title": self.event.name,
-                    "unit_price": self.as_payment_format(self.amount),
-                    "quantity": 1,
-                    "tangible": False
-                }
-            ],
+            "items": self.items_list,
 
             "metadata": {
                 "evento": '{} (#{})'.format(
@@ -120,7 +132,8 @@ class PagarmeTransactionInstanceData:
 
         if self.transaction_type == 'credit_card':
             transaction_data['payment_method'] = 'credit_card'
-            transaction_data['card_hash'] = self.extra_data['payment-card_hash']
+            transaction_data['card_hash'] = self.extra_data[
+                'payment-card_hash']
 
             if self.subscription.lot.allow_installment is True \
                     and self.extra_data.get('payment-installments') \
@@ -175,7 +188,8 @@ class PagarmeTransactionInstanceData:
                 and self.lot.allow_installment is True \
                 and self.extra_data.get('payment-installments') \
                 and int(self.extra_data.get('payment-installments')) > 1:
-            self.installments = int(self.extra_data.get('payment-installments'))
+            self.installments = int(
+                self.extra_data.get('payment-installments'))
 
     def _set_organization(self):
 
@@ -326,3 +340,52 @@ class PagarmeTransactionInstanceData:
             split_rules.append(partner_rule)
 
         return split_rules
+
+    def get_calculated_price(self, price, lot):
+        """
+        Resgata o valor calculado do preço do opcional de acordo com as regras
+        da Congressy.
+        """
+        if price is None:
+            return 0
+
+        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent = \
+            Decimal(self.event.congressy_percent) / 100
+
+        congressy_amount = price * congressy_plan_percent
+        if congressy_amount < minimum:
+            congressy_amount = minimum
+
+        if lot.transfer_tax is True:
+            return round(price + congressy_amount, 2)
+
+        return round(price, 2)
+
+    def add_optional_items_list(self, optional, is_tangible=False):
+
+        optional_dict = {
+            "id": str(optional.pk),
+            "title": optional.name,
+            "category": 'opcional',
+            "unit_price": self.as_payment_format(
+                self.get_calculated_price(optional.price, self.lot)),
+            "quantity": 1,
+            "tangible": is_tangible
+        }
+
+        self.items_list.append(optional_dict)
+
+    def add_subscription_to_items_list(self, subscription):
+
+        self.items_list.append(
+            {
+                "id": str(subscription.pk),
+                "title": 'Inscrição ' + self.event.name,
+                "category": "inscrição",
+                "unit_price": self.as_payment_format(
+                    self.lot.get_calculated_price()),
+                "quantity": 1,
+                "tangible": False
+            }
+        )

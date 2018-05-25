@@ -22,7 +22,9 @@ class TransactionAdmin(admin.ModelAdmin):
         'type',
         'date_created',
         'liquid_amount',
-        'amount'
+        'amount',
+        'optional_amount',
+        'optional_liquid_amount',
     )
 
 

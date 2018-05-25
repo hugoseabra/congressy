@@ -1,5 +1,5 @@
 {% extends 'hotsite/base.html' %}
-{% load l10n humanize static form_config_tags user_agents user_agent_tag %}
+{% load static form_config_tags l10n humanize %}
 
 {% block content %}
 
@@ -26,24 +26,17 @@
 
                             {% block messages %}
                                 {% if messages %}
-                                    <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                                    {% for message in messages %}
-                                        {% if message.tags %}
-                                            <div class="alert alert-{{ message.tags }} alert-dismissible"
-                                                 role="alert">
-                                        {% else %}
-                                            <div class="alert alert-warning alert-dismissible"
-                                                 role="alert">
-                                        {% endif %}
-
-                                    <button type="button" class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"><span
-                                            aria-hidden="true">&times;</span>
-                                    </button>
-                                    {{ message|capfirst }}
+                                <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
+                                        <button type="button" class="close"
+                                                data-dismiss="alert"
+                                                aria-label="Close"><span
+                                                aria-hidden="true">&times;</span>
+                                        </button>
+                                        {{ message|capfirst }}
                                     </div>
-                                    {% endfor %}
+                                {% endfor %}
                                 </div>
                                 {% endif %}
                             {% endblock messages %}
@@ -57,6 +50,58 @@
                                     {% render_errors field.error %}
                                 {% endif %}
                             {% endfor %}
+                            <div class="well well-sm" style="text-align: justify">
+                                <h3>Checkout: {{ subscription.person.name}}</h3>
+                                <div>
+                                    <strong>
+                                        Inscrição:
+                                    </strong>
+                                </div>
+                                <ul>
+                                    {% if lot.price %}
+                                        <strong>R$ {{ lot.price }}</strong>
+                                    {% else %}
+                                        <strong>Grátis</strong>
+                                    {% endif %}
+                                </ul>
+                                {% if products %}
+                                    <div><strong>Produtos:</strong></div>
+                                    <ul>
+                                        {% for product in products %}
+                                            <ol>{{ product.optional.name }}:
+                                                <strong>
+                                                    {% if product.optional.price == 0.00 %}
+                                                        Grátis
+                                                    {% else %}
+                                                        {{ product.optional.price }}
+                                                    {% endif %}
+                                                </strong>
+                                            </ol>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                {% if services %}
+                                    <div><strong>Serviços:</strong></div>
+                                    <ul>
+                                        {% for service in services %}
+                                            <ol>{{ service.optional.name }}:
+                                                <strong>
+                                                    {% if service.optional.price == 0.00 %}
+                                                        Grátis
+                                                    {% else %}
+                                                        R$
+                                                        {{ service.optional.price }}
+                                                    {% endif %}
+                                                </strong>
+                                            </ol>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                <h4> Total: R$ {{ total }} </h4>
+                            </div>
+
 
                             <div id="payment_buttons" class="text-center"
                                  style="display: none">
@@ -94,8 +139,7 @@
                             {% endif %}
 
                             <div class="text-center">
-                                <img style="width: 80%; margin-top: 20px"
-                                     src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
+                                <img style="width: 80%; margin-top: 20px" src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
                             </div>
                             <br/>
                             <form action="" method="post" id="next_form">
@@ -105,7 +149,6 @@
                                 {% for hidden in form.hidden_fields %}
                                     {{ hidden }}
                                 {% endfor %}
-
                             </form>
 
                             <button type="button"
@@ -128,7 +171,6 @@
                                     </button>
                                 {% endif %}
                             </form>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,6 +181,7 @@
                     </div>
                 </div>
             </div>
+        </div>
     </section>
 
 {% endblock %}
@@ -149,29 +192,76 @@
     <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
     <script src="{% static "hotsite/js/payment.js" %}"></script>
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
-    <script>
 
-        $(document).ready(function () {
+    <script type="application/javascript">
+        function submit_back_form() {
+            $('#back_form').submit()
+        }
 
-            var payment_btn_el = $('#id_button_pay');
+        jQuery(document).ready(function() {
+            window.setTimeout(function () {
+                $('form').submit(function () {
+                    $(this).find(':submit').attr('disabled', 'disabled');
+                    $(this).attr('novalidate', 'novalidate');
+                });
 
-            $('form').submit(function () {
-                $(this).find(':submit').attr('disabled', 'disabled');
-                $(this).attr('novalidate', 'novalidate');
-            });
+                // disable boleto method
+                {% if 'boleto' not in allowed_transaction_types %}
+                window.cgsy.payment.disable_boleto();
+                {% endif %}
 
-            var lot = JSON.parse($('#id_payment-lot_as_json').val());
+                {% if lot.allow_installment is True %}
+                // disable installment
+                window.cgsy.payment.disable_installment();
+                {% endif %}
 
-            payment_btn_el.on('click', function () {
-                process_single_lot_payment(
-                    '{{ pagarme_encryption_key }}',
-                    2.29,
-                    '{{ event.name }}',
-                    lot,
-                    '{{ allowed_transaction_types }}'
+                window.cgsy.payment.set_interest_rate(2.29);
+                window.cgsy.payment.set_max_installments('{{ lot.installment_limit }}');
+                window.cgsy.payment.set_free_rate_installments('{{ lot.num_install_interest_absortion }}');
+
+                // Adiciona billing de inscrição
+                window.cgsy.payment.add_item(
+                    'subscription',
+                    '{{ subscription.pk }}',
+                    'Inscrição: {{ lot.event.name }}',
+                    1,
+                    parseFloat('{{ lot.price|unlocalize|intcomma }}')
                 );
-            });
-        });
 
+                {% if products %}
+                    // Adiciona billing de opcionais de produtos/serviços
+                    {% for product in products %}
+                        {% if product.optional_price %}
+                        window.cgsy.payment.add_item(
+                            'optional-product',
+                            '{{ subscription.pk }}',
+                            'Produto/Serviço: {{ lot.event.name }}',
+                            1,
+                            parseFloat('{{ product.optional_price|unlocalize|intcomma }}')
+                        );
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if services %}
+                    // Adiciona billing de opcionais de atividades extras
+                    {% for service in services %}
+                        {% if service.optional_price %}
+                        window.cgsy.payment.add_item(
+                            'optional-service',
+                            '{{ subscription.pk }}',
+                            'Atividade extra: {{ lot.event.name }}',
+                            1,
+                            parseFloat('{{ service.optional_price|unlocalize|intcomma }}')
+                        );
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                 $('#id_button_pay').on('click', function () {
+                     window.cgsy.pagarme.process_payment('{{ pagarme_encryption_key }}');
+                 });
+            }, 300);
+        });
     </script>
 {% endblock %}

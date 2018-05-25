@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django import forms
 
 from core.forms import PriceInput, SplitDateTimeWidget
-from gatheros_subscription.models import EventSurvey, Lot
+from gatheros_subscription.models import EventSurvey, LotCategory, Lot
 
 INSTALLMENT_CHOICES = (
     (2, 2),
@@ -28,6 +28,7 @@ class LotForm(forms.ModelForm):
         model = Lot
         fields = [
             'event',
+            'category',
             'name',
             'date_start',
             'date_end',
@@ -55,9 +56,7 @@ class LotForm(forms.ModelForm):
             ),
         }
 
-    def __init__(self, lang='pt-br', **kwargs):
-        self.lang = lang
-
+    def __init__(self,**kwargs):
         self.event = kwargs.get('initial').get('event')
 
         instance = kwargs.get('instance')
@@ -70,6 +69,14 @@ class LotForm(forms.ModelForm):
 
         super(LotForm, self).__init__(**kwargs)
 
+        initial = kwargs.get('initial')
+        event_pk = initial.get('event')
+
+        self.fields['category'] = forms.ModelChoiceField(
+            queryset=LotCategory.objects.filter(event_id=event_pk),
+            label='Categoria',
+        )
+
         self.fields['event_survey'] = forms.ModelChoiceField(
             queryset=EventSurvey.objects.filter(event=self.event),
             label='Selecione um questionário',
@@ -77,7 +84,9 @@ class LotForm(forms.ModelForm):
         )
         self.fields['event_survey'].empty_label = '- Selecione -'
 
-        if self.instance.pk and self.instance.subscriptions.count() > 0:
+        if self.instance.pk and self.instance.subscriptions.filter(
+            completed=True
+        ).count() > 0:
             self.fields['price'].widget.attrs['disabled'] = 'disabled'
             self.fields['price'].disabled = True
 

@@ -1,12 +1,17 @@
 # pylint: disable=C0103
 """Regras de Negócios para lote."""
 
-from datetime import datetime
-
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 
 from gatheros_event.models import Event
+
+
+def rule_1_category_same_event(lot):
+    if lot.category and lot.category.event.pk != lot.event.pk:
+        raise ValidationError({'category': [
+            'A categoria do lote e o lote não estão no mesmo evento.'
+        ]})
 
 
 def rule_2_mais_de_1_lote_evento_inscricao_simples(lot):
@@ -18,7 +23,7 @@ def rule_2_mais_de_1_lote_evento_inscricao_simples(lot):
 
     # Caso não possua, se evento de inscrição simples já possui lote
     error = lot.event.subscription_type == Event.SUBSCRIPTION_SIMPLE \
-        and lot.event.lots.count() > 0
+            and lot.event.lots.count() > 0
 
     if error:
         raise IntegrityError(
@@ -95,9 +100,8 @@ def rule_9_lote_pago_deve_ter_limite(lot):
         ]})
 
 
-def rule_10_lote_privado_deve_ter_codigo_promocional(lot):
+def rule_10_lote_privado_deve_ter_codigo_de_exibicao(lot):
     if lot.private and not lot.promo_code:
-        raise ValidationError({'promo_code': [
+        raise ValidationError({'exhibition_code': [
             'Lotes privados devem possui um código promocional para acessá-lo.'
         ]})
-

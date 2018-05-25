@@ -28,7 +28,10 @@ class SubscriptionForm(forms.ModelForm):
         self.fields['lot'].queryset = event.lots.all()
 
     def clean_lot(self):
-        return Lot.objects.get(pk=self.data['lot'], event=self.event)
+        try:
+            return Lot.objects.get(pk=self.data['lot'], event=self.event)
+        except Lot.DoesNotExist:
+            raise forms.ValidationError('Lote não pertence a este evento.')
 
     def clean(self):
         cleaned_data = super().clean()

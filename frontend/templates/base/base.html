@@ -1,5 +1,4 @@
 {% load i18n static base_tags %}
-
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <!DOCTYPE html>
 <!--[if lt IE 7 ]>
@@ -14,14 +13,13 @@
 <!--[if (gte IE 9)|!(IE)]>
 <html class="no-js" lang="{{ LANGUAGE_CODE|default:"pt-br"}}">
 <!--<![endif]-->
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}Congressy{% endblock %}</title>
     <meta name="description" content="">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    {#    <meta name="viewport"#}
+    {#          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>#}
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet"
@@ -36,6 +34,8 @@
     <!-- Fonts  -->
     <link rel="stylesheet"
           href="{% static "assets/css/fontawesome-all.min.css" %}">
+    <link rel="stylesheet"
+          href="{% static "assets/css/font-awesome-animation.min.css" %}">
     <link rel="stylesheet"
           href="{% static "assets/css/simple-line-icons.css" %}">
     <!-- CSS Animate -->
@@ -57,8 +57,7 @@
     <!-- Custom styles for this theme -->
     <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
 
-    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
-
+    {% block styles %}{% endblock %}
 
     <style>
         input[type="file"] {
@@ -74,13 +73,13 @@
 
     </style>
 
-    {% block styles %}{% endblock %}
-
-    {% block headscripts %}{% endblock %}
+    <script src="{% static "assets/js/vendor/jquery-1.12.3.min.js" %}"></script>
 
     {% if form %}
         {{ form.media.css }}
     {% endif %}
+
+    {% block headscripts %}{% endblock %}
 
     <!-- Feature detection -->
     <script src="{% static "assets/js/vendor/modernizr-2.6.2.min.js" %}"></script>
@@ -93,9 +92,8 @@
 </head>
 <body>
 
-
-<section id="main-wrapper" class="theme-cgsy-full">
-    <header id="header" style="background-color: #F0F3F3">
+<section id="main-wrapper" class="theme-cgsy-full {% if apponly %}app-only{% endif %} {% if notitle %}no-app-title{% endif %}">
+    <header id="header">
 
         <!--logo start-->
         <div class="brand">

@@ -95,12 +95,16 @@ class PersonForm(forms.ModelForm):
         uf = None
 
         instance = kwargs.get('instance')
+        initial = kwargs.get('initial')
+
+        if not initial:
+            initial = {}
+
         if instance:
             if instance.city:
                 uf = instance.city.uf
 
-        if 'initial' in kwargs and uf:
-            initial = kwargs.get('initial')
+        if uf:
             initial.update({'state': uf})
             kwargs.update({'initial': initial})
 

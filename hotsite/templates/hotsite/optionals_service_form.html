@@ -1,0 +1,178 @@
+{% load base_tags static %}
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="panel panel-success">
+            <div class="panel-heading">Selecionados</div>
+            <div class="panel-body">
+
+                <div class="panel-body">
+
+                    <div class="row" style="margin-top: 50px">
+
+                        <div class="col-md-12">
+                            <div id="currently_selected_services"></div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+
+            <div class="panel-heading">Disponiveis</div>
+
+            <div class="panel-body">
+
+                <div class="row" style="margin-top: 50px">
+
+                    <div class="col-md-12">
+                        <div id="available_optional_services">
+                            Nenhuma atividade extra disponivel.
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+    document.addEventListener("DOMContentLoaded", function (event) {
+        window.setTimeout(function () {
+            render_available_optional_services_list();
+            render_currently_selected_service_list();
+        }, 300);
+    });
+
+
+    function render_available_optional_services_list() {
+        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
+
+        send(
+            url,
+            'GET',
+            null,
+            function (response) {
+                $('#available_optional_services').html(response);
+            },
+            null
+        );
+    }
+    function render_currently_selected_service_list() {
+        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
+
+        send(
+            url,
+            'GET',
+            {
+                fetch_in_storage: true
+            },
+            function (response) {
+                $('#currently_selected_services').html(response);
+                render_available_optional_services_list();
+            },
+            null
+        );
+    }
+
+
+    function addOptionalService(service_id) {
+
+        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
+
+        send(
+            url,
+            'POST',
+            {
+                'optional_id': service_id,
+                'action': 'add'
+            },
+            function (res) {
+                console.log(res);
+                render_available_optional_services_list();
+                render_currently_selected_service_list();
+            },
+            function (err) {
+                console.log('err');
+                console.error(err.responseText);
+            }
+        );
+    }
+    function removeOptionalService(service_id) {
+
+        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
+
+        send(
+            url,
+            'POST',
+            {
+                'optional_id': service_id,
+                'action': 'remove'
+            },
+            function (res) {
+                console.log(res);
+                render_available_optional_services_list();
+                render_currently_selected_service_list();
+            },
+            function (err) {
+                console.log('err');
+                console.error(err);
+            }
+        );
+    }
+
+    function send(url, method, data, success_callback, error_callback) {
+        // CSRF code
+        function getCookie(name) {
+            var cookieValue = null;
+            var i = 0;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (i; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        var csrftoken = getCookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: data || {},
+            encode: true,
+            crossDomain: false,
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type)) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            },
+            success: success_callback || function () {
+            },
+            error: error_callback || function (err) {
+                console.log(err.responseText);
+            }
+        });
+    }
+
+</script>

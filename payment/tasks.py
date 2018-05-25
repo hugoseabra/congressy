@@ -18,6 +18,14 @@ pagarme.authentication_key(settings.PAGARME_API_KEY)
 congressy_id = settings.PAGARME_RECIPIENT_ID
 
 
+def separate_amount(amount):
+    amount = str(amount)
+    size = len(amount)
+    cents = amount[-2] + amount[-1]
+    amount = '{}.{}'.format(amount[0:size - 2], cents)
+    return Decimal(amount)
+
+
 # @TODO-low create a mock of the response to use during testing
 def create_pagarme_transaction(transaction_data, subscription=None):
     payment = transaction_data.get_data()
@@ -58,6 +66,13 @@ def create_pagarme_transaction(transaction_data, subscription=None):
         send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
         raise TransactionError(message='Unknown API error')
 
+    items = trx['items'].copy()
+    trx_subscription = None
+
+    for item in items:
+        if item['category'] == 'inscrição':
+            trx_subscription = item
+
     # Separar centavos
     amount = str(trx['amount'])
     size = len(amount)
@@ -72,6 +87,15 @@ def create_pagarme_transaction(transaction_data, subscription=None):
     transaction_instance.amount = amount
     transaction_instance.lot_price = subscription.lot.get_calculated_price()
     transaction_instance.liquid_amount = liquid_amount
+
+    optional_total = 0
+
+    for item in items:
+        if item['category'] == 'opcional':
+            optional_total += separate_amount(item['unit_price'])
+
+    # @TODO add optional liquid amount
+    transaction_instance.optional_amount = optional_total
 
     if 'installments' in trx \
             and trx['installments'] \

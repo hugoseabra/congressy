@@ -1,0 +1,106 @@
+
+{% extends "base/base.html" %}
+{% load l10n static event_tags  base_tags  widget_tweaks form_config_tags %}
+{% load humanize %}
+{% load subscription_tags %}
+
+{% block title %}
+    {% if object %}Editar{% else %}Novo{% endif %} Tema de Opcional | Congressy
+{% endblock %}
+
+{% block page_title %}
+    {% if object %}Editar{% else %}Novo{% endif %} Tema de Opcional
+{% endblock %}
+
+{% block page_sub_title %}
+    {% if form_title %}
+        {{ form_title }}
+    {% endif %}
+{% endblock %}
+
+{% block nav_aside_itens %}
+    {% include 'addon/optional/includes/side-menu.html' %}
+{% endblock %}
+
+{% block content %}
+
+    <form action="" method="post" class="form-horizontal form-border"
+          role="form" name="theme_form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% render_errors form.non_field_errors %}
+        {% endif %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {% if hidden_field.errors %}
+                {% render_errors hidden_field.errors %}
+            {% endif %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <a href="{% url 'addon:theme-list' event.pk %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>
+                            Cancelar
+                        </a>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Dados principais
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xl-10 col-lg-11 col-md-11">
+                                {% render_generic_field form.name autofocus=True %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                {% render_generic_field form.limit %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar bottom">
+                    <div class="float-right">
+                        <a href="{% url 'addon:theme-list' event.pk %}"
+                           class="btn btn-danger">
+                            <i class="fas fa-times-circle"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

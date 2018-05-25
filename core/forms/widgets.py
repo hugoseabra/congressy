@@ -31,7 +31,7 @@ class PriceInput(forms.TextInput):
             return value
 
         value = value.replace('.', '').replace(',', '.')
-        return round(Decimal(value), 2)
+        return round(Decimal(value))
 
 
 class TelephoneInput(forms.TextInput):
@@ -51,6 +51,12 @@ class DateInput(forms.DateInput):
 
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)
+
+        if not value:
+            return value
+
+        if isinstance(value, datetime):
+            return value
 
         lang = get_language()
 
@@ -77,6 +83,13 @@ class TimeInput(forms.TimeInput):
 
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)
+
+        if not value:
+            return value
+
+        if isinstance(value, datetime):
+            return value
+
         if len(value) == 5:
             value += ':00'
 
@@ -91,7 +104,6 @@ class SplitDateTimeWidget(forms.MultiWidget):
     template_name = 'forms/widgets/splitdatetime.html'
 
     def __init__(self, attrs=None, date_format=None, time_format=None):
-        now = datetime.now()
         date = DateInput(attrs=attrs, format=date_format)
         time = TimeInput(attrs=attrs, format=time_format)
 
@@ -144,3 +156,8 @@ class SplitDateTimeWidget(forms.MultiWidget):
 
 class DateTimeInput(forms.DateTimeInput):
     input_type = 'tel'
+
+
+class ManageableSelect(forms.Select):
+    """ Select com ícones de editar e adicionar registros e atualiza-lo. """
+    template_name = 'forms/widgets/manageable-select.html'

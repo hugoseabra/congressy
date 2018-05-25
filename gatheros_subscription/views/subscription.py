@@ -65,6 +65,7 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
             config = event.formconfig
         except AttributeError:
             config = FormConfig()
+            config.event = event
 
         if self.has_paid_lots():
             config.email = True
@@ -266,7 +267,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
         event = self.get_event()
 
-        return query_set.filter(event=event)
+        return query_set.filter(event=event, completed=True)
 
     def get_context_data(self, **kwargs):
         cxt = super(SubscriptionListView, self).get_context_data(**kwargs)
@@ -783,6 +784,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
         return query_set.filter(
             person=person,
+            completed=True,
             # event__published=True,
         )
 

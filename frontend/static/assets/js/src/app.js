@@ -113,7 +113,8 @@
             'setSwitchery': setSwitchery,
             'disableSwitchery': enableDisableSwitchery,
             'switcheryToggle': switcheryToggle,
-            'switcheryElements': switcheryElements
+            'switcheryElements': switcheryElements,
+            'tooltips': tooltips
         };
     }();
 
