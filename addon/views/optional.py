@@ -60,7 +60,10 @@ class OptionalServiceListView(TemplateNameableMixin,
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
-        context['active'] = 'service'
+        context['has_inside_bar'] = True
+        context['active'] = 'addon-atividades-extras'
+
+        context['optional_active'] = 'service'
         context['subscription_stats'] = self.get_subscription_stats()
         return context
 
@@ -101,8 +104,12 @@ class OptionalProductListView(TemplateNameableMixin,
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
-        context['active'] = 'product'
+        context['optional_active'] = 'product'
         context['subscription_stats'] = self.get_subscription_stats()
+
+        context['has_inside_bar'] = True
+        context['active'] = 'addon-opcionais'
+
         return context
 
     def get_subscription_stats(self):
@@ -145,7 +152,7 @@ class OptionalAddProductView(EventViewMixin, generic.CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active'] = 'product'
+        context['optional_active'] = 'product'
         return context
 
     def post(self, request, *args, **kwargs):
@@ -202,7 +209,7 @@ class OptionalAddServiceView(EventViewMixin, generic.CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active'] = 'service'
+        context['optional_active'] = 'service'
         return context
 
     def post(self, request, *args, **kwargs):
@@ -286,7 +293,7 @@ class OptionalProductEditView(EventViewMixin, generic.UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object'] = self.get_object()
-        context['active'] = 'product'
+        context['optional_active'] = 'product'
         context['optonal_has_subscriptions'] = \
             self.object.subscription_products.filter(
                 subscription__completed=True
@@ -316,7 +323,7 @@ class OptionalServiceEditView(EventViewMixin, generic.UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object'] = self.get_object()
-        context['active'] = 'service'
+        context['optional_active'] = 'service'
         context['has_subscriptions'] = \
             self.object.subscription_services.filter(
                 subscription__completed=True

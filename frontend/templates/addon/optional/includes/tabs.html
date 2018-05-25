@@ -2,15 +2,15 @@
     <div class="col-md-12">
         <div class="panel panel-primary">
             <div class="panel-heading">
-                {% if active == 'service' %}
+                {% if optional_active == 'service' %}
                 <h3 class="panel-title">Atividades extras por categoria</h3>
                 {% endif %}
-                {% if active == 'product' %}
+                {% if optional_active == 'product' %}
                 <h3 class="panel-title">Produtos / Serviços por categoria</h3>
                 {% endif %}
             </div>
             <div class="panel-body">
-                {% if active == 'service' %}
+                {% if optional_active == 'service' %}
                 <div class="row">
                     <div class="col-md-12">
                         <div class="row cat-tabs">
@@ -22,7 +22,7 @@
                 </div>
                 {% endif %}
 
-                {% if active == 'product' %}
+                {% if optional_active == 'product' %}
                 <div class="row">
                     <div class="col-md-12">
                         <div class="row cat-tabs">

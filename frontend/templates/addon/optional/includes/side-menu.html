@@ -40,13 +40,13 @@
             <i class="fa  fa-fw fa-rocket"></i> Formulário
         </a>
     </li>
-    <li {% if active == 'service' %}class="active"{% endif %}>
+    <li {% if optional_active == 'service' %}class="active"{% endif %}>
         <a href="{% url 'addon:optional-service-list' event.pk %}"
            title="Atividades Extras">
             <i class="fa  fa-fw fa-rocket"></i> Atividades Extras
         </a>
     </li>
-    <li {% if active == 'product' %}class="active"{% endif %}>
+    <li {% if optional_active == 'product' %}class="active"{% endif %}>
         <a href="{% url 'addon:optional-product-list' event.pk %}"
            title="Produtos / Serviços">
             <i class="fa  fa-fw fa-rocket"></i> Produtos / Serviços

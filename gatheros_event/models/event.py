@@ -346,7 +346,10 @@ class Event(models.Model, GatherosModelMixin):
                 return 0
             return '{0:.2f}%'.format((num * 100) / num_total)
 
-        queryset = self.subscriptions.filter(attended=True)
+        queryset = self.subscriptions \
+            .filter(completed=True) \
+            .exclude(status='canceled')
+
         total = queryset.count()
 
         reports_dict = {}

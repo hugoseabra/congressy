@@ -32,8 +32,10 @@ class ThemeListView(AccountMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         # noinspection PyUnresolvedReferences
         context = super().get_context_data(**kwargs)
+        context['has_inside_bar'] = True
+        context['active'] = 'addon-themes'
+
         context['event'] = self.event
-        context['active'] = 'service'
         context['has_paid_lots'] = self.has_paid_lots()
         return context
 

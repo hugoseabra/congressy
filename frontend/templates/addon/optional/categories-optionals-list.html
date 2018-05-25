@@ -15,12 +15,12 @@
                 <div style="margin-bottom:3px;">
                     <div class="float-left" style="margin-bottom:3px;">
                         <div>
-                            {% if active == 'product' %}Vendas{% else %}Inscrições{% endif %} até:
+                            {% if optional_active == 'product' %}Vendas{% else %}Inscrições{% endif %} até:
                             <span style="font-weight: bold;">
                                 {{ optional.date_end_sub|date:"d/m/Y H\hi" }}
                             </span>
                         </div>
-                        {% if active == 'service' %}
+                        {% if optional_active == 'service' %}
                         <div>
                             <div style="margin-bottom:4px;">Programação:</div>
                             <div style="margin-left:10px;font-size:12px">
@@ -51,7 +51,7 @@
                         <div style="font-size:14px" class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Grupo temático da atividade">{{ optional.theme.name }}</div>
                         {% endif %}
                         {% if optional.price %}
-                        <div style="font-size:14px" class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Preço {% if active == 'product' %}do produto/serviço{% else %}da atividade{% endif %}">R$ {{ optional.price|intcomma|unlocalize }}</div>
+                        <div style="font-size:14px" class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Preço {% if optional_active == 'product' %}do produto/serviço{% else %}da atividade{% endif %}">R$ {{ optional.price|intcomma|unlocalize }}</div>
                         {% endif %}
                     </div>
                     <div class="clearfix"></div>
@@ -68,15 +68,15 @@
 
                 <hr />
                 <div style="margin-bottom:3px;">
-                    {% if active == 'product' %}Vendidos{% else %}Inscrições{% endif %}:
+                    {% if optional_active == 'product' %}Vendidos{% else %}Inscrições{% endif %}:
                     <span style="font-weight: bold;">
-                        {{ subscription_stats.num|lookup:optional.pk }}
+                        {% filter_lookup subscription_stats.num optional.pk %}
                         {% if not optional.quantity %}(ilimitado){% endif %}
                     </span>
                 </div>
                 {% if optional.quantity %}
                 <div style="margin-bottom:3px;">
-                    {% if active == 'product' %}Quantidade disponível{% else %}Vagas disponíveis{% endif %}: <span style="font-weight: bold;"><span style="font-weight: bold;">{{ subscription_stats.remaining|lookup:optional.pk }}</span></span>
+                    {% if optional_active == 'product' %}Quantidade disponível{% else %}Vagas disponíveis{% endif %}: <span style="font-weight: bold;"><span style="font-weight: bold;">{% filter_lookup subscription_stats.remaining optional.pk %}</span></span>
                 </div>
                 {% endif %}
             </div>
@@ -86,8 +86,8 @@
                     data-toggle="tooltip"
                     data-placement="left"
                     title=""
-                    data-original-title="Gerenciar limite de {% if active == 'product' %}estoque{% else %}vagas{% endif %}">
-                    {% if active == 'product' %}
+                    data-original-title="Gerenciar limite de {% if optional_active == 'product' %}estoque{% else %}vagas{% endif %}">
+                    {% if optional_active == 'product' %}
                     <button
                         class="btn btn-sm btn-info btn-block {% if not optional.quantity %}btn-trans{% endif %}"
                         data-toggle="modal"
@@ -109,7 +109,7 @@
                     </button>
                     {% endif %}
                 </div>
-                {% if active == 'service' %}
+                {% if optional_active == 'service' %}
                 <div
                     data-toggle="tooltip"
                     data-placement="left"
@@ -119,7 +119,7 @@
                         class="btn btn-sm btn-info btn-block {% if not optional.restrict_unique %}btn-trans{% endif %}"
                         data-toggle="modal"
                         data-backdrop="static"
-                        onclick="{% if optional.restrict_unique %}unset_restrict_unique('{{ active }}', {{ optional.pk }});{% else %}set_restrict_unique('{{ active }}', {{ optional.pk }}){% endif %}"
+                        onclick="{% if optional.restrict_unique %}unset_restrict_unique('{{ optional_active }}', {{ optional.pk }});{% else %}set_restrict_unique('{{ optional_active }}', {{ optional.pk }}){% endif %}"
                         data-target="#lot-limit-form">
                         <i class="fas fa-user-times"></i>
                         <span class="hidden-md">Restringir vagas</span>
@@ -133,7 +133,7 @@
                     data-placement="left"
                     title=""
                     data-original-title="Editar">
-                    {% if active == 'service' %}
+                    {% if optional_active == 'service' %}
                     <button
                        onclick="window.location.href='{% url 'addon:optional-service-edit' event.pk optional.pk %}'"
                        class="btn btn-sm btn-primary btn-trans btn-block"
@@ -141,7 +141,7 @@
                        <i class="fa fa-pencil-alt"></i>
                     </button>
                     {% endif %}
-                    {% if active == 'product' %}
+                    {% if optional_active == 'product' %}
                     <button
                        onclick="window.location.href='{% url 'addon:optional-product-edit' event.pk optional.pk %}'"
                        class="btn btn-sm btn-primary btn-trans btn-block"
@@ -155,9 +155,9 @@
                     data-toggle="tooltip"
                     data-placement="left"
                     title=""
-                    data-original-title="{% if active == 'product' %}Este produto/serviço está ativo{% else %}Esta  atividade está ativa{% endif %}. Clique para desativá-la.">
+                    data-original-title="{% if optional_active == 'product' %}Este produto/serviço está ativo{% else %}Esta  atividade está ativa{% endif %}. Clique para desativá-la.">
                     <button
-                        onclick="unpublish_optional('{{ active }}', {{ optional.pk }})"
+                        onclick="unpublish_optional('{{ optional_active }}', {{ optional.pk }})"
                         class="btn btn-sm btn-success btn-trans btn-block">
                         <i class="fas fa-check-circle"></i>
                     </button>
@@ -167,9 +167,9 @@
                     data-toggle="tooltip"
                     data-placement="left"
                     title=""
-                    data-original-title="{% if active == 'product' %}Este produto/serviço está inativo{% else %}Esta atividade está inativa{% endif %}. Clique para ativá-la.">
+                    data-original-title="{% if optional_active == 'product' %}Este produto/serviço está inativo{% else %}Esta atividade está inativa{% endif %}. Clique para ativá-la.">
                     <button
-                        onclick="publish_optional('{{ active }}', {{ optional.pk }})"
+                        onclick="publish_optional('{{ optional_active }}', {{ optional.pk }})"
                         class="btn btn-sm btn-warning btn-trans btn-block">
                         <i class="fa fa-exclamation-circle"></i>
                     </button>
@@ -181,13 +181,13 @@
                     data-placement="left"
                     title=""
                     data-original-title="Excluir">
-                    {% if active == 'service' %}
+                    {% if optional_active == 'service' %}
                     <button class="btn btn-sm btn-default btn-trans btn-block"
                         onclick="window.location.href='{% url 'addon:optional-service-delete' event.pk optional.pk %}'">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                     {% endif %}
-                    {% if active == 'product' %}
+                    {% if optional_active == 'product' %}
                     <button class="btn btn-sm btn-default btn-trans btn-block"
                         onclick="window.location.href='{% url 'addon:optional-product-delete' event.pk optional.pk %}'">
                         <i class="fas fa-trash-alt"></i>

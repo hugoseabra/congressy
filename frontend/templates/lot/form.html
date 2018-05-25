@@ -444,31 +444,26 @@
                         </div>
                     </div>
                     <div class="panel-body">
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    {% render_generic_field form.name autofocus=True %}
-                                </div>
-                                <div class="col-md-6">
-                                    {% render_generic_field form.category %}
-                                </div>
+                        <div class="row">
+                            <div class="col-xl-10 col-lg-11 col-md-11">
+                                {% render_generic_field form.name autofocus=True %}
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    {% render_generic_field form.date_start %}
-                                </div>
-                                <div class="col-md-6">
-                                    {% render_generic_field form.date_end %}
-                                </div>
-                            </div>
-                            {% if object.event.rsvp_type != object.event.RSVP_DISABLED and object.event.has_rsvp %}
-                            <div class="row">
-                                <div class="col-xl-10 col-xl-push-1 col-md-12">
-                                    {% render_switchery_field form.rsvp_restrict %}
-                                </div>
-                            </div>
-                            {% endif %}
                         </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                {% render_generic_field form.date_start %}
+                            </div>
+                            <div class="col-md-5">
+                                {% render_generic_field form.date_end %}
+                            </div>
+                        </div>
+                        {% if object.event.rsvp_type != object.event.RSVP_DISABLED and object.event.has_rsvp %}
+                        <div class="row">
+                            <div class="col-xl-10 col-xl-push-1 col-md-12">
+                                {% render_switchery_field form.rsvp_restrict %}
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 

@@ -1,6 +1,6 @@
+import base64
 from datetime import datetime
 
-import base64
 import qrcode
 import qrcode.image.svg
 from django.conf import settings
@@ -14,8 +14,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.views import generic
-from django.db.models import Q
-
 from wkhtmltopdf.views import PDFTemplateView
 
 from core.forms.cleaners import clear_string
@@ -694,7 +692,6 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
     def get_permission_denied_url(self):
         return reverse('event:event-list')
 
-
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
         cxt.update({
@@ -841,7 +838,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                            transaction.type == 'boleto':
+                                    transaction.type == 'boleto':
                         return True
 
         return False
