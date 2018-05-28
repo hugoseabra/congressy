@@ -64,17 +64,16 @@
                                         style="text-align: center;display: none">
                                     Boleto
                                     <br/>
-                                    <img class="img-responsive"
-                                         style="height: 153px; height: 153px"
-                                         src="{% static 'hotsite/logos/boleto.svg' %}">
+                                    <img class="img-responsive" style="height: 153px; height: 153px" src="{% static 'hotsite/logos/boleto.svg' %}">
                                 </button>
                                 <button id="id_credit_card" type="button"
                                         style="display: none">
                                     Cartão de Credito
                                     <br/>
-                                    <img class="img-responsive"
-                                         src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
+                                    <img class="img-responsive" src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
                                 </button>
+                                <br />
+                                <br />
                             </div>
                             {% if 'boleto' not in allowed_transaction_types %}
                                 {% if has_open_boleto %}

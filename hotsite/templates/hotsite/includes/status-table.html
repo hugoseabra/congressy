@@ -53,14 +53,16 @@
                                     Link para boleto
                                 </a>
                             {% elif not transaction.boleto_url %}
-                                <div class="progress">
+                                <div class="progress" style="width:100%;margin-bottom:0">
                                     <div class="progress-bar progress-bar-success progress-bar-striped active"
                                          role="progressbar"
                                          style="width: 100%;background-color:#5cb85c!important;">
                                         <span class="sr-only"></span>
                                     </div>
                                 </div>
-                                Seu link para o boleto estará pronto em breve.
+                                <div style="width:100%">
+                                    Seu link para o boleto estará pronto em breve.
+                                </div>
                             {% endif %}
                         </small>
                     {% elif transaction.data.payment_method == 'credit_card' %}
@@ -71,7 +73,16 @@
                             <div style="float:left;margin: 3px 0 0 4px;">
                                 Cartão de Crédito
                             </div>
-                            <div class="clearfix"></div>
+                            {% if transaction.status == transaction.PROCESSING %}
+                            <div class="progress" style="width:100%;margin-bottom:0">
+                                <div class="progress-bar progress-bar-success progress-bar-striped active"
+                                     role="progressbar"
+                                     style="width: 100%;background-color:#5cb85c!important;">
+                                    <span class="sr-only"></span>
+                                </div>
+                            </div>
+                            <small style="width:100%">Processamento ...</small>
+                            {% endif %}
                         </div>
 
                     {% else %}
