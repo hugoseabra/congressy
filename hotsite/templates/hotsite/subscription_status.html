@@ -105,6 +105,7 @@
                                 {% endif %}
                             {% endif %}
                             {% if event.is_scientific and event.work_config and event.work_config.is_submittable %}
+                                <br>
                                 <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
                                    class="btn btn-primary"
                                    style="margin-top: 15px"
