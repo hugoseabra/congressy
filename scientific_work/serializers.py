@@ -32,6 +32,7 @@ class WorkConfigSerializer(serializers.ModelSerializer):
             'date_end',
             'presenting_type',
             'event',
+            'allow_unconfirmed_subscriptions',
         )
 
 

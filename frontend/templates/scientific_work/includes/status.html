@@ -1,0 +1,71 @@
+{% load i18n static widget_tweaks form_config_tags %}
+
+
+<div class="row">
+
+    <div class="col-md-12">
+        <div class="panel {% if is_submittable %}panel-success{% else %}panel
+         panel-warning{% endif %}">
+
+            <div class="panel-heading">
+                <h3 class="panel-title">Status</h3>
+            </div>
+
+            <div class="panel-body">
+                <div class="col-md-12 col-md-offset-1">
+
+                    <div class="row">
+                        <p style="font-size: 35px">
+                            {% if is_submittable %}
+                                Submissões Ativas <i class="fas fa-check-circle
+            success-color"></i>
+                            {% elif not is_submittable %}
+                                <i class="fas fa-exclamation-triangle
+                                         warning-color"></i>  Submissões
+                                Inativas <i class="fas
+                            fa-exclamation-triangle warning-color"></i>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="row">
+                        {% if is_submittable %}
+                            <strong style="font-size: 20px">
+                                {% if event.work_config.allow_unconfirmed_subscriptions %}
+                                    Permitindo submissão para inscrições
+                                    pendentes e confirmadas.
+                                {% else %}
+                                    Permitindo submissão apenas para inscrições
+                                    confirmadas.
+                                {% endif %}
+                            </strong>
+                        {% else %}
+                            <div class="col-md-11">
+                                <strong style="font-size: 20px">
+                                    Ás inscrições do seu evento estão
+                                    desabilitadas pelo seguinte motivo(s):
+                                </strong>
+                            </div>
+
+                            <div class="col-md-6 " style="margin-top: 10px">
+                                <ul>
+                                    {% for reason in not_submittable_reasons %}
+                                        <li>
+                                            {{ reason }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

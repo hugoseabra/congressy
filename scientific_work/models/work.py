@@ -32,7 +32,8 @@ class Work(models.Model):
 
     area_category = models.ForeignKey(
         AreaCategory,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
+        verbose_name="areas tematicas",
         related_name="works",
     )
 

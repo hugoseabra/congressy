@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from rest_framework import viewsets
-
+from datetime import datetime
 from scientific_work import forms
 from scientific_work.models import Work, Author, AreaCategory, WorkConfig
 from scientific_work.serializers import WorkSerializer, AuthorSerializer, \
@@ -33,41 +33,26 @@ class AreaCategoryViewSet(viewsets.ModelViewSet):
 
 class WorkConfigViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows AreaCategories to be viewed or edited.
+    API endpoint that allows WorkConfigs to be viewed or edited.
     """
     queryset = WorkConfig.objects.all()
     serializer_class = WorkConfigSerializer
 
     def update(self, request, *args, **kwargs):
-        instance = self.get_instance(request.data)
-        if 'date_start_0' not in request.data:
+        if 'date_start_0' in request.data and 'date_start_1':
             request.POST._mutable = True
-            request.data['date_start_0'] = instance.date_start.strftime(
-                '%e/%m/%Y')
-            request.data['date_start_1'] = instance.date_start.strftime(
-                '%H:%M')
+            full_date = request.data['date_start_0'] + ' ' + request.data[
+                'date_start_1']
 
-        if 'date_end_0' not in request.data:
-            if not request.POST._mutable:
-                request.POST._mutable = True
-            request.data['date_end_0'] = instance.date_end.strftime(
-                '%e/%m/%Y')
-            request.data['date_end_1'] = instance.date_end.strftime('%H:%M')
+            start = datetime.strptime(full_date, '%d/%m/%Y %H:%M')
+            request.data['date_start'] = start
 
-        model_form = forms.WorkConfigForm(instance=instance, data=request.data)
-        if model_form.is_valid():
-            saved = model_form.save()
-            serializer_instance = WorkConfigSerializer(instance=saved,
-                                                       data=request.data)
-            if serializer_instance.is_valid():
-                data = serializer_instance.data
-                return JsonResponse(data, status=201)
-            else:
-                return JsonResponse({'errors': serializer_instance.errors},
-                                    status=400)
-        else:
-            return JsonResponse({'errors': model_form.errors}, status=400)
+        if 'date_end_0' in request.data and 'date_end_1':
+            request.POST._mutable = True
+            full_date = request.data['date_end_0'] + ' ' + request.data[
+                'date_end_1']
 
-    @staticmethod
-    def get_instance(data):
-        return WorkConfig.objects.get(event=data.get('event'))
+            end = datetime.strptime(full_date, '%d/%m/%Y %H:%M')
+            request.data['date_end'] = end
+
+        return super().update(request, *args, **kwargs)
