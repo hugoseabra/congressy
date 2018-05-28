@@ -63,7 +63,8 @@ class DateInput(forms.DateInput):
             else:
                 format = '%Y/%m/%d'
 
-            value = datetime.strptime(value, format)
+            if value:
+                value = datetime.strptime(value, format)
 
         except ValueError:
             pass
@@ -77,8 +78,9 @@ class TimeInput(forms.TimeInput):
 
     def value_from_datadict(self, data, files, name):
         value = super().value_from_datadict(data, files, name)
-        if len(value) == 5:
-            value += ':00'
+        if value:
+            if len(value) == 5:
+                value += ':00'
 
         return value
 

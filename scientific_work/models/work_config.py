@@ -38,6 +38,8 @@ class WorkConfig(models.Model):
         verbose_name="tipos de apresentações",
         choices=PRESENTING_TYPES,
         default=ORAL,
+        blank=True,
+        null=True,
     )
 
     @property
