@@ -163,12 +163,18 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
         }
 
         $('#payment_buttons').show();
-        $('#id_button_pay').hide();
         $('#id_remove').show();
+        $('#next_btn').attr("disabled", false);
         $('#id_payment-transaction_type').val(data.payment_method);
         $('#id_payment-amount').val(data.amount);
         $('#id_payment-card_hash').val(data.card_hash);
         $('#id_payment-installments').val(data.installments);
+
+        var payment_btn_el = $('#id_button_pay');
+        payment_btn_el.attr('disabled', 'disabled');
+        payment_btn_el.text('Aguarde...');
+
+        $('#next_form').submit();
     };
 
     payment_form.error = function (data) {

@@ -63,13 +63,13 @@
                                     <div style="margin-bottom:3px;">
                                         Inscrições:
                                         <span style="font-weight: bold;">
-                                            {{ subscription_stats.num|lookup:lot.pk }}
+                                            {% filter_lookup subscription_stats.num lot.pk %}
                                             {% if not lot.limit %}(ilimitado){% endif %}
                                         </span>
                                     </div>
                                     {% if lot.limit %}
                                     <div style="margin-bottom:3px;">
-                                        Vagas disponíveis: <span style="font-weight: bold;"><span style="font-weight: bold;">{{ subscription_stats.remaining|lookup:lot.pk }}</span></span>
+                                        Vagas disponíveis: <span style="font-weight: bold;"><span style="font-weight: bold;">{% filter_lookup subscription_stats.remaining lot.pk %}</span></span>
                                     </div>
                                     {% endif %}
                                     {% if lot.private %}

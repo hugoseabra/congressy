@@ -348,8 +348,7 @@ class Lot(models.Model, GatherosModelMixin):
 
     def clean(self):
         """ Limpa valores dos campos. """
-        if self.private and not self.exhibition_code:
-            self.exhibition_code = Lot.objects.generate_exhibition_code()
+
 
         if self.category and self.category.event.pk != self.event.pk:
             raise ValidationError({'category': [
@@ -358,6 +357,8 @@ class Lot(models.Model, GatherosModelMixin):
 
     def check_rules(self):
         """ Verifica regras de negócio. """
+        if self.private and not self.exhibition_code:
+            self.exhibition_code = Lot.objects.generate_exhibition_code()
 
         rule.rule_2_mais_de_1_lote_evento_inscricao_simples(self)
         rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)

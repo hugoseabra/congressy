@@ -59,7 +59,7 @@
                                 </div>
                                 <ul>
                                     {% if lot.price %}
-                                        <strong>R$ {{ lot.price }}</strong>
+                                        <strong>R$ {{ lot.price|intcomma }}</strong>
                                     {% else %}
                                         <strong>Grátis</strong>
                                     {% endif %}
@@ -73,7 +73,8 @@
                                                     {% if product.optional.price == 0.00 %}
                                                         Grátis
                                                     {% else %}
-                                                        {{ product.optional.price }}
+                                                        R$
+                                                        {{ product.optional.price|intcomma }}
                                                     {% endif %}
                                                 </strong>
                                             </ol>
@@ -91,7 +92,7 @@
                                                         Grátis
                                                     {% else %}
                                                         R$
-                                                        {{ service.optional.price }}
+                                                        {{ service.optional.price|intcomma }}
                                                     {% endif %}
                                                 </strong>
                                             </ol>
@@ -99,7 +100,7 @@
                                     </ul>
                                 {% endif %}
 
-                                <h4> Total: R$ {{ total }} </h4>
+                                <h4> Total: R$ {{ total|intcomma }} </h4>
                             </div>
 
 
@@ -113,13 +114,12 @@
                                          style="height: 153px; height: 153px"
                                          src="{% static 'hotsite/logos/boleto.svg' %}">
                                 </button>
-                                <button id="id_credit_card" type="button"
-                                        style="display: none">
+                                <button id="id_credit_card" type="button" style="display: none">
                                     Cartão de Credito
                                     <br/>
-                                    <img class="img-responsive"
-                                         src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
+                                    <img class="img-responsive" src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
                                 </button>
+                                <br />
                             </div>
                             {% if 'boleto' not in allowed_transaction_types %}
                                 {% if has_open_boleto %}

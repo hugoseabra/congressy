@@ -32,15 +32,16 @@ class LotForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
-            'limit',
+            # 'limit',
             'price',
-            'private',
-            'exhibition_code',
+            # 'private',
+            # 'exhibition_code',
             'transfer_tax',
             'allow_installment',
             'installment_limit',
             'num_install_interest_absortion',
-            'event_survey',
+            'rsvp_restrict',
+            # 'event_survey',
         ]
 
         widgets = {
