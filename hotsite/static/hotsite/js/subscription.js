@@ -253,6 +253,7 @@ function load_coupon() {
             $('#id_coupon').val('');
 
             alert('Cupom inválido.');
+            hide_coupon();
 
             window.setTimeout(function () {
                 start_popover();

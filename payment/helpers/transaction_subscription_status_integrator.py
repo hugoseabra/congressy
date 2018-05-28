@@ -35,15 +35,14 @@ class TransactionSubscriptionStatusIntegrator:
         'chargeback'
         'pending_refund',
         'refused',
+        'refunded',
     ]
 
     confirmed_status = [
         'paid'
     ]
 
-    cancelled_status = [
-        'refunded',
-    ]
+    cancelled_status = []
 
     def __init__(self, transaction_state):
         """

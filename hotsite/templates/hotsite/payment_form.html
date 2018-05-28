@@ -26,17 +26,24 @@
 
                             {% block messages %}
                                 {% if messages %}
-                                <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                                {% for message in messages %}
-                                    <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
-                                        <button type="button" class="close"
-                                                data-dismiss="alert"
-                                                aria-label="Close"><span
-                                                aria-hidden="true">&times;</span>
-                                        </button>
-                                        {{ message|capfirst }}
+                                    <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                                    {% for message in messages %}
+                                        {% if message.tags %}
+                                            <div class="alert alert-{{ message.tags }} alert-dismissible"
+                                                 role="alert">
+                                        {% else %}
+                                            <div class="alert alert-warning alert-dismissible"
+                                                 role="alert">
+                                        {% endif %}
+
+                                    <button type="button" class="close"
+                                            data-dismiss="alert"
+                                            aria-label="Close"><span
+                                            aria-hidden="true">&times;</span>
+                                    </button>
+                                    {{ message|capfirst }}
                                     </div>
-                                {% endfor %}
+                                    {% endfor %}
                                 </div>
                                 {% endif %}
                             {% endblock messages %}
@@ -106,19 +113,17 @@
 
                             <div id="payment_buttons" class="text-center"
                                  style="display: none">
-                                <button id="id_boleto" type="button"
-                                        style="text-align: center;display: none">
+                                <button id="id_boleto" type="button" style="text-align: center;display: none">
                                     Boleto
                                     <br/>
-                                    <img class="img-responsive"
-                                         style="height: 153px; height: 153px"
-                                         src="{% static 'hotsite/logos/boleto.svg' %}">
+                                    <img class="img-responsive" style="height: 153px; height: 153px" src="{% static 'hotsite/logos/boleto.svg' %}">
                                 </button>
                                 <button id="id_credit_card" type="button" style="display: none">
                                     Cartão de Credito
                                     <br/>
                                     <img class="img-responsive" src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
                                 </button>
+                                <br />
                                 <br />
                             </div>
                             {% if 'boleto' not in allowed_transaction_types %}
@@ -181,7 +186,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
 {% endblock %}
@@ -192,7 +196,6 @@
     <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
     <script src="{% static "hotsite/js/payment.js" %}"></script>
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
-
     <script type="application/javascript">
         function submit_back_form() {
             $('#back_form').submit()

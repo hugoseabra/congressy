@@ -24,7 +24,7 @@
             $('.tooltip-wrapper').tooltip({
                 selector: "[data-toggle=tooltip]",
                 container: "body",
-                html:true
+                html: true
             });
         });
     </script>
@@ -65,40 +65,61 @@
                                     {% include 'hotsite/includes/status-table.html' %}
                                 </div>
                             {% endif %}
-                            {% if is_private_event %}
-                                {% if lot_is_still_valid %}
-                                    <a href="{% url 'public:hotsite-subscription' event.slug %}" class="btn btn-success btn-xs"
-                                       data-toggle="tooltip" title="Realize um novo pagamento.">
+                            {% if is_private_event and not has_paid_transaction %}
+                                {% if lot_is_still_valid  %}
+                                    <a href="{% url 'public:hotsite-subscription' event.slug %}"
+                                       class="btn btn-success btn-xs"
+                                       data-toggle="tooltip"
+                                       title="Realize um novo pagamento.">
                                         Novo pagamento
                                     </a>
                                     <a href="#" class="btn btn-primary btn-xs"
-                                       data-toggle="tooltip" title="Entrar com cupom diferente para mudar de lote."
+                                       data-toggle="tooltip"
+                                       title="Entrar com cupom diferente para mudar de lote."
                                        onclick="$('#force-coupon-form').submit();">
                                         Outro Cupom
                                     </a>
                                 {% else %}
-                                    <hr />
-                                    <div class="alert alert-warning alert-dismissible" role="alert">
-                                        O lote que você está inscrito já expirou. Deseja fazer inscrição com novo cupom?
+                                    <hr/>
+                                    <div class="alert alert-warning alert-dismissible"
+                                         role="alert">
+                                        O lote que você está inscrito já
+                                        expirou. Deseja fazer inscrição com novo
+                                        cupom?
                                     </div>
                                     <a href="#" class="btn btn-primary btn-xs"
-                                       data-toggle="tooltip" title="Entrar com cupom diferente para mudar de lote."
+                                       data-toggle="tooltip"
+                                       title="Entrar com cupom diferente para mudar de lote."
                                        onclick="$('#force-coupon-form').submit();">
                                         Inserir Novo cupom
                                     </a>
                                 {% endif %}
                             {% else %}
-                                <a href="{% url 'public:hotsite-subscription' event.slug %}" class="btn btn-success btn-xs"
-                                   data-toggle="tooltip" title="Realize um novo pagamento ou mude de lote quando desejar.">
-                                    Novo pagamento
-                                </a>
+                                {% if not has_paid_transaction %}
+                                    <a href="{% url 'public:hotsite-subscription' event.slug %}"
+                                       class="btn btn-success btn-xs"
+                                       data-toggle="tooltip"
+                                       title="Realize um novo pagamento ou mude de lote quando desejar.">
+                                        Novo pagamento
+                                    </a>
+                                {% endif %}
                             {% endif %}
                             {% if event.is_scientific and event.work_config and event.work_config.is_submittable %}
-                                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}" class="btn btn-primary" style="margin-top: 15px"
-                                   data-toggle="tooltip" title="Submeter artigos científicos para o evento">
+                                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                                   class="btn btn-primary"
+                                   style="margin-top: 15px"
+                                   data-toggle="tooltip"
+                                   title="Submeter artigos científicos para o evento">
                                     Enviar Artigo Certificado
                                 </a>
                             {% endif %}
+                        <br>
+                            <a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}"
+                               class="btn btn-warning"
+                               style="margin-top: 15px"
+                               title="Realizar inscrição de outra pessoa?">
+                                Realizar inscrição de outra pessoa?
+                            </a>
                         </div>
                     </div>
                 </div>
