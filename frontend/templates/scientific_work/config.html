@@ -57,6 +57,19 @@
 
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Criterios para submissões
+                    </div>
+                </div>
+                <div id="presenting_form">
+                    {% include 'scientific_work/includes/allow_unconfirmed_subscriptions.html' %}
+                </div>
+
+            </div>
+        </div>
     </div>
 
 {% endblock %}
@@ -256,12 +269,15 @@
                     var presenting_save_btn = $('.work-config-presenting-save');
                     var date_form = $('#work_config_date_form');
                     var presenting_form = $('#work_config_presenting_type_form');
+                    var unconfirmed_save_btn = $('.work-config-unconfirmed-save');
+                    var unconfirmed_subscription_form = $('#work_config_unconfirmed_subscription_form');
 
                     new_area_category_btn.unbind("click");
                     add_area_category_modal_btn.unbind("click");
                     delete_area_category_btn.unbind("click");
                     date_save_btn.unbind("click");
                     presenting_save_btn.unbind("click");
+                    unconfirmed_save_btn.unbind("click");
 
                     // Triggers
                     new_area_category_btn.on("click", function () {
@@ -318,6 +334,43 @@
                             }
                         }).fail(function (err) {
                             console.error(err.responseText);
+                        });
+
+
+                    });
+                    unconfirmed_save_btn.on("click", function () {
+                        var btn = $('#id_allow_unconfirmed_subscriptions')[0];
+                        var form_data = new FormData(unconfirmed_subscription_form[0]);
+
+                        // ugly hack because switchery can't play nice.
+                        form_data.delete('allow_unconfirmed_subscriptions');
+                        form_data.set('allow_unconfirmed_subscriptions', btn.checked);
+
+                        $.ajax({
+                            url: '{% url 'scientific_work:workconfig-detail' work_config.pk %}',
+                            type: 'PATCH',
+                            processData: false,
+                            data: form_data,
+                            contentType: false,
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                            },
+                            success: function () {
+                                //update_unconfirmed_form();
+                                Messenger().post({
+                                    message: 'Configurações de submissão salvas ' +
+                                    'com sucesso!',
+                                    type: 'success'
+                                });
+                            }
+                        }).fail(function (err) {
+                            console.error(err.responseText);
+                            Messenger().post({
+                                message: 'Não foi possivel alterar as ' +
+                                'configurações para permitir  ' +
+                                'submissões.',
+                                type: 'danger'
+                            });
                         });
 
 

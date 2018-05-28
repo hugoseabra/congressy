@@ -42,6 +42,11 @@ class WorkConfig(models.Model):
         null=True,
     )
 
+    allow_unconfirmed_subscriptions = models.BooleanField(
+        default=False,
+        verbose_name="permitir inscrições não confirmadas",
+    )
+
     @property
     def is_submittable(self):
         now = datetime.now()
