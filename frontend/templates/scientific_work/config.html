@@ -11,6 +11,9 @@
 {% block toptitle %}{% endblock %}
 
 {% block content %}
+    <div id="status">
+        {% include 'scientific_work/includes/status.html' %}
+    </div>
 
     <div class="row">
         <div class="col-md-6">
@@ -134,6 +137,7 @@
                                 type: 'success'
                             });
                             $('#add_area_category').val('');
+                            update_status();
                         }
                     }).fail(function (err) {
                         console.error(err);
@@ -166,6 +170,7 @@
                                 type: 'success'
                             });
                             $('#add_area_category').val('');
+                            update_status();
                         }
                     }).fail(function (err) {
                         console.error(err);
@@ -193,6 +198,7 @@
                         success: function (response) {
                             $('#area_category_list').html(response);
                             recreate_event_triggers();
+                            update_status();
                         }
                     }).fail(function (err) {
                         console.error(err);
@@ -218,6 +224,7 @@
                                 type: 'success'
                             });
                             recreate_event_triggers();
+                            update_status();
                         }
                     }).fail(function (err) {
                         console.error(err);
@@ -248,6 +255,7 @@
                                 type: 'success'
                             });
                             recreate_event_triggers();
+                            update_status();
                         }
                     }).fail(function (err) {
                         console.error(err);
@@ -256,6 +264,21 @@
                             'submissão.',
                             type: 'danger'
                         });
+                    });
+                }
+
+                function update_status(){
+                        $.ajax({
+                        url: '{% url 'scientific_work:scientific_event_config' event.pk %}' +
+                        '?template_name=scientific_work/includes' +
+                        '/status',
+                        type: 'GET',
+                        success: function (response) {
+                            $('#status').html(response);
+                        }
+                    }).fail(function (err) {
+                        console.error(err);
+                        location.reload(true);
                     });
                 }
 
@@ -362,6 +385,7 @@
                                     'com sucesso!',
                                     type: 'success'
                                 });
+                                update_status();
                             }
                         }).fail(function (err) {
                             console.error(err.responseText);
