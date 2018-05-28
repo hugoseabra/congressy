@@ -151,6 +151,44 @@
 
                 }
 
+                function edit_area_category(name, url) {
+                    var formData = new FormData();
+                    formData.append('name', name);
+                    formData.append('event', {{ event.pk }});
+
+                    $.ajax({
+                        url: url,
+                        type: 'PATCH',
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        },
+                        success: function () {
+                            update_area_category_list();
+                            Messenger().post({
+                                message: 'Área temática editada com ' +
+                                'sucesso!',
+                                type: 'success'
+                            });
+                            $('#edit_area_category').val('');
+                            $('#edit_area_category_url').val('');
+                            update_area_category_list();
+                            update_status();
+                        }
+                    }).fail(function (err) {
+                        console.error(err);
+                        Messenger().post({
+                            message: 'Não foi possivel editar essa ' +
+                            'área temática.',
+                            type: 'danger'
+                        });
+                    });
+
+
+                }
+
                 function delete_area_category(url) {
 
 
@@ -267,8 +305,8 @@
                     });
                 }
 
-                function update_status(){
-                        $.ajax({
+                function update_status() {
+                    $.ajax({
                         url: '{% url 'scientific_work:scientific_event_config' event.pk %}' +
                         '?template_name=scientific_work/includes' +
                         '/status',
@@ -285,8 +323,11 @@
                 function recreate_event_triggers() {
 
                     var new_area_category_btn = $('.new-area-category');
+                    var edit_area_category_btn = $('.edit-area-category');
                     var add_area_category_modal_btn = $('#add_area_category_modal_btn');
+                    var edit_area_category_modal_btn = $('#edit_area_category_modal_btn');
                     var add_area_category_modal = $('#add_area_category_modal');
+                    var edit_area_category_modal = $('#edit_area_category_modal');
                     var delete_area_category_btn = $('.delete-area-category');
                     var date_save_btn = $('.work-config-date-save');
                     var presenting_save_btn = $('.work-config-presenting-save');
@@ -296,7 +337,9 @@
                     var unconfirmed_subscription_form = $('#work_config_unconfirmed_subscription_form');
 
                     new_area_category_btn.unbind("click");
+                    edit_area_category_btn.unbind("click");
                     add_area_category_modal_btn.unbind("click");
+                    edit_area_category_modal_btn.unbind("click");
                     delete_area_category_btn.unbind("click");
                     date_save_btn.unbind("click");
                     presenting_save_btn.unbind("click");
@@ -306,11 +349,25 @@
                     new_area_category_btn.on("click", function () {
                         add_area_category_modal.modal('show');
                     });
+                    edit_area_category_btn.on("click", function () {
+                        console.log($(this).data('name'));
+                        $('#edit_area_category').val($(this).data('name'));
+                        $('#edit_area_category_url').val($(this).data('url'));
+                        edit_area_category_modal.modal('show');
+                    });
                     add_area_category_modal_btn.on("click", function () {
                         var category_name = $('#add_area_category').val();
 
                         if (category_name && category_name !== "") {
                             add_area_category(category_name);
+                        }
+                    });
+                    edit_area_category_modal_btn.on("click", function () {
+                        var category_name = $('#edit_area_category').val();
+                        var category_url = $('#edit_area_category_url').val();
+
+                        if (category_name !== "" && category_url !== "") {
+                            edit_area_category(category_name, category_url);
                         }
                     });
                     delete_area_category_btn.on("click", function () {
@@ -440,6 +497,47 @@
                     <button type="button" class="btn btn-md btn-success"
                             data-dismiss="modal"
                             id="add_area_category_modal_btn">
+                        <i class="far fa-save"></i>
+                        Salvar
+                    </button>
+                    <button type="button" class="btn btn-md  btn-danger"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="edit_area_category_modal" tabindex="-1"
+         role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Editar área temática: </h3>
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="edit_area_category">Nome:</label>
+                        <div>
+                            <input name="edit_area_category" maxlength="255"
+                                   class="form-control" id="edit_area_category"
+                                   type="text">
+                            <input id="edit_area_category_url"
+                                   type="hidden">
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-md btn-success"
+                            data-dismiss="modal"
+                            id="edit_area_category_modal_btn">
                         <i class="far fa-save"></i>
                         Salvar
                     </button>
