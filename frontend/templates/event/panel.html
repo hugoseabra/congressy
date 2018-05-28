@@ -48,7 +48,8 @@
             label: "Mulheres"
         }
         ];
-        window.onload = function () {
+
+        $(document).ready(function () {
             var ctx3 = document.getElementById("doughnut");
             if (ctx3 != null) {
                 ctx3 = ctx3.getContext('2d');
@@ -57,6 +58,47 @@
                 });
             }
 
+        });
+
+        window.cgsy = window.cgsy || {};
+        window.cgsy.panel = window.cgsy.panel || {};
+
+        (function ($, cgsy) {
+            "use strict";
+
+
+            cgsy.panel.TodoList = function () {
+                var that = this;
+
+                this.render = function (main_el, callback) {
+                    main_el = $(main_el);
+
+                    var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}?template_name=event/todo_list");
+                    sender.setSuccessCallback(function (response) {
+                        main_el.html(response);
+                        if (callback) {
+                            callback();
+                        }
+                    });
+
+                    sender.send('GET');
+                };
+
+
+                this.update = function (main_el, id_row, callback) {
+                    main_el = $(main_el);
+
+                    var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}");
+                    sender.setSuccessCallback(function () {
+                        that.render(main_el, callback);
+                    });
+                    sender.send('POST', {'id_row': id_row});
+                };
+            };
+
+        })(jQuery, window.cgsy);
+
+        function setProgressBar() {
             var num_todo_elements = $('#todo-list tr').length;
 
             var num_todo_complet = $('#todo-list tr .fa-check-circle ')
@@ -67,10 +109,34 @@
 
             $('.progress-bar').text(progress + '%');
             $('.progress-bar').attr('aria-valuenow', progress);
-            $('.progress-bar').css('width', progress + '%');
-        };
+            setTimeout(function() {
+                $('.progress-bar').css('width', progress + '%');
+            },300);
+        }
 
+        function create_todo_events() {
+            var todo = new window.cgsy.panel.TodoList();
+            $('.add_todo_element').on('click', function () {
+                todo.update(
+                    $('#todo'),
+                    $(this).parent().parent().attr('id'),
+                    function () {
+                        create_todo_events();
+                        setProgressBar()
+
+                    }
+                );
+            });
+        }
+
+
+        $(document).ready(function () {
+            setProgressBar()
+            create_todo_events();
+
+        });
     </script>
+
 {% endblock %}
 {% block styles %}
     <style>
@@ -259,6 +325,7 @@ panel-primary">
         {% endif %}
     </div>
 
+
     <div class="panel panel-primary col-xs-12 col-xl-12 col-sm-12 col-md-12"
          style="padding: 0;margin-left: 25px">
 
@@ -266,88 +333,10 @@ panel-primary">
             <div class="panel-title">Criação do seu evento</div>
         </div>
         <div class="panel-body tooltip-wrapper">
-            <div class="progress">
-                <div class="progress-bar progress-bar-info"
-                     role="progressbar"
-                     aria-valuemin="0" aria-valuemax="100">
-                </div>
+            <div id="todo">
+
+                {% include "event/todo_list.html" %}
             </div>
-
-            <table id="todo-list" class="table table-hover">
-                <tbody>
-                <tr class="todo_list_element" role="presentation">
-                    <td>
-                        <i class="fas fa-check-circle success-color
-                            pull-right fa-2x"></i>
-                        <h1>Criar evento</h1>
-                    </td>
-                </tr>
-                <tr class="todo_list_element" role="presentation">
-                    <td>
-                        {% if info and info.description_html %}
-                            <i class="fas fa-check-circle success-color
-                                pull-right fa-2x"></i>
-                        {% else %}
-                            <i class="fas fa-exclamation-circle warning-color
-                                pull-right fa-2x"></i>
-                        {% endif %}
-                        <h1><a href="{% url 'event:event-hotsite' event.pk %}">
-                            Criar hot-site</a>
-                        </h1>
-                    </td>
-                </tr>
-
-                {% if event.payment_type == 'paid' or has_paid_lots %}
-                    <tr class="todo_list_element {% if not has_paid_lots %}
-                    warning {% endif %}"
-                        role="presentation"
-                            {% if not has_paid_lots %}
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title=""
-                        data-original-title="Para que seu evento seja
-                           efetivamente pago você deve criar um lote pago"
-                            {% endif %}>
-                        <td>
-                            {% if has_paid_lots %}
-                                <i class="fas fa-check-circle success-color
-                                    pull-right fa-2x"></i>
-                            {% else %}
-                                <i class="fas fa-exclamation-circle warning-color
-                                    pull-right fa-2x"></i>
-                            {% endif %}
-                            <h1><a href=
-                                           "{% url 'subscription:lot-list' event.pk %}">Configurar
-                                lote</a></h1>
-                        </td>
-                    </tr>
-                {% endif %}
-
-                {% if event.payment_type == 'paid' or has_paid_lots %}
-                    <tr class="todo_list_element" role="presentation">
-                        <td>
-                            {% if full_banking %}
-                                <i class="fas fa-check-circle success-color
-                                    pull-right fa-2x"></i>
-                            {% else %}
-                                <i class="fas fa-exclamation-circle warning-color
-                                    pull-right fa-2x"></i>
-                            {% endif %}
-                            <h1>
-                                <a href="{% url 'event:organization-edit' organization.pk %}">Configurar
-                                    dados bancários</a></h1>
-                        </td>
-                    </tr>
-                {% endif %}
-                </tbody>
-            </table>
-
-            <table class="table table-hover">
-                <tbody>
-                <tr>
-                </tr>
-                </tbody>
-            </table>
         </div>
     </div>
 {% endblock %}

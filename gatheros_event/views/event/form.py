@@ -179,6 +179,7 @@ class EventAddFormView(BaseEventView, generic.CreateView):
 
 
 class EventEditFormView(BaseSimpleEditlView, generic.UpdateView):
+    template_name = 'event/form-edit-event.html'
     form_class = forms.EventForm
     model = forms.EventForm.Meta.model
     success_url = reverse_lazy('event:event-list')

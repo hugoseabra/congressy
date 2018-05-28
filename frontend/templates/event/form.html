@@ -24,29 +24,20 @@
 {% endblock messages %}
 
 {% block title %}
-    {% if object %}Editar{% else %}Novo{% endif %} Evento | Congressy
+    Novo Evento | Congressy
 {% endblock %}
 
 {% block page_title %}
-    {% if object %}
-        Editar Evento
+    Novo Evento
+    {% if event_type == 'free' %}
+        Gratuito
+    {% elif event_type == 'paid' %}
+        Pago
     {% else %}
-        Novo Evento
-        {% if event_type == 'free' %}
-            Gratuito
-        {% elif event_type == 'paid' %}
-            Pago
-        {% else %}
-            Científico
-        {% endif %}
+        Científico
     {% endif %}
 {% endblock %}
 
-{% block page_sub_title %}
-    {% if object %}
-        {{ object.name }} (ID: {{ object.pk }})
-    {% endif %}
-{% endblock %}
 
 
 
@@ -58,7 +49,7 @@
 
 
 {% block content %}
-    {% if not step %}
+    {% if not step  %}
         <div class="row">
             <div class="col-md-4">
                 <div class="type_event panel panel-primary"
@@ -156,123 +147,125 @@
             <input type="hidden" name="step" value="step2"/>
         </form>
     {% endif %}
-    {% if step == 'step2' %}
+    {% if step == 'step2'%}
 
-    <form action="" method="post" class="form-horizontal form-border"
-          role="form" name="event_form">
-        {% csrf_token %}
+        <form action="" method="post" class="form-horizontal form-border"
+              role="form" name="event_form">
+            {% csrf_token %}
 
-        {% if form.non_field_errors %}
-            {% render_errors form.non_field_errors %}
-        {% endif %}
-
-        {% for hidden_field in form.hidden_fields %}
-            {% if hidden_field.errors %}
-                {% render_errors hidden_field.errors %}
+            {% if form.non_field_errors %}
+                {% render_errors form.non_field_errors %}
             {% endif %}
-            {{ hidden_field }}
-        {% endfor %}
 
-        <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                <div class="buttonbar">
-                    <div class="float-left">
-                        <a href="{% url 'event:event-add' %}"
+            {% for hidden_field in form.hidden_fields %}
+                {% if hidden_field.errors %}
+                    {% render_errors hidden_field.errors %}
+                {% endif %}
+                {{ hidden_field }}
+            {% endfor %}
+
+            <div class="row">
+                <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                    <div class="buttonbar">
+                        <div class="float-left">
+                            <a href="{% url 'event:event-add' %}"
                                class="btn btn-primary">
                                 <i class="fas fa-arrow-circle-left"></i>
                                 Voltar
-                        </a>
-                    </div>
+                            </a>
+                        </div>
 
-                    <div class="clearfix"></div>
+                        <div class="clearfix"></div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">Campos Principais</div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.name autofocus=True %}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.organization %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.category %}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.date_start %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.date_end %}
-                                    </div>
-                                </div>
-                                {% if event_type != 'free' %}
-
+            <div class="row">
+                <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">Campos Principais</div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
                                     <div class="row">
-                                        <div class="col-md-6">
-                                            {% render_switchery_field form.has_optionals %}
-                                        </div>
-                                        <div class="col-md-6">
-                                            {% render_switchery_field form.has_extra_activities %}
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.name autofocus=True %}
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            {% render_switchery_field form.has_checkin %}
+                                            {% render_generic_field form.organization %}
                                         </div>
                                         <div class="col-md-6">
-                                            {% render_switchery_field form.has_certificate %}
+                                            {% render_generic_field form.category %}
                                         </div>
                                     </div>
-                                    {% endif %}
-                                    </div>
-                                    </div>
-                                    </div>
-                                    </div>
-                                    </div>
-                                    </div>
                                     <div class="row">
-                                        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                                            <div class="buttonbar bottom">
-                                                <div class="float-right">
-                                                    {% if next_path %}
-                                                        <a href="{{ next_path|urlencode }}"
-                                                           class="btn btn-danger">
-                                                            <i class="fas fa-times-circle"></i>Cancelar</a>
-                                                        <input type="hidden"
-                                                               name="next"
-                                                               value="{{ next_path }}"/>
-                                                    {% else %}
-                                                        <a href="{% url 'event:event-list' %}"
-                                                           class="btn btn-danger">
-                                                            <i class="fas fa-times-circle"></i>Cancelar</a>
-                                                    {% endif %}
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.date_start %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.date_end %}
+                                        </div>
+                                    </div>
+                                    {% if not object %}
+                                        {% if event_type != 'free' %}
 
-
-                                                    <button type="submit"
-                                                            class="btn btn-success">
-                                                        <i class="fa fa-save"></i>
-                                                        Salvar
-                                                    </button>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    {% render_switchery_field form.has_optionals %}
                                                 </div>
-                                                <div class="clearfix"></div>
+                                                <div class="col-md-6">
+                                                    {% render_switchery_field form.has_extra_activities %}
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    </form>
-                                {% endif %}
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    {% render_switchery_field form.has_checkin %}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    {% render_switchery_field form.has_certificate %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                    <div class="buttonbar bottom">
+                        <div class="float-right">
+                            {% if next_path %}
+                                <a href="{{ next_path|urlencode }}"
+                                   class="btn btn-danger">
+                                    <i class="fas fa-times-circle"></i>Cancelar</a>
+                                <input type="hidden"
+                                       name="next"
+                                       value="{{ next_path }}"/>
+                            {% else %}
+                                <a href="{% url 'event:event-list' %}"
+                                   class="btn btn-danger">
+                                    <i class="fas fa-times-circle"></i>Cancelar</a>
+                            {% endif %}
+
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                <i class="fa fa-save"></i>
+                                Salvar
+                            </button>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% endif %}
 
 {% endblock %}
 

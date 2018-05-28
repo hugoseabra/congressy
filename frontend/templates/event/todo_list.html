@@ -1,0 +1,200 @@
+<div class="progress">
+                    <div class="progress-bar progress-bar-info"
+                         role="progressbar"
+                         aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
+<table id="todo-list" class="table table-hover">
+    <tbody>
+    <tr class="todo_list_element" role="presentation">
+        <td>
+            <i class="fas fa-check-circle success-color
+                            pull-right fa-2x"></i>
+            <h1>Criar evento</h1>
+        </td>
+    </tr>
+    <tr class="todo_list_element" role="presentation">
+        <td>
+            {% if info and info.description_html %}
+                <i class="fas fa-check-circle success-color
+                                pull-right fa-2x"></i>
+            {% else %}
+                <i class="fas fa-exclamation-circle warning-color
+                                pull-right fa-2x"></i>
+            {% endif %}
+            <h1><a href="{% url 'event:event-hotsite' event.pk %}">
+                Criar hot-site</a>
+            </h1>
+        </td>
+    </tr>
+
+    {% if event.payment_type == 'paid' or has_paid_lots %}
+        <tr class="todo_list_element {% if not has_paid_lots %}
+                    warning {% endif %}"
+            role="presentation"
+                {% if not has_paid_lots %}
+            data-toggle="tooltip"
+            data-placement="top"
+            title=""
+            data-original-title="Para que seu evento seja
+                           efetivamente pago você deve criar um lote pago"
+                {% endif %}>
+            <td>
+                {% if has_paid_lots %}
+                    <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
+                                    pull-right fa-2x"></i>
+                {% endif %}
+                <h1><a href=
+                               "{% url 'subscription:lot-list' event.pk %}">Configurar
+                    lote</a></h1>
+            </td>
+        </tr>
+    {% endif %}
+
+    {% if event.payment_type == 'paid' or has_paid_lots %}
+        <tr class="todo_list_element" role="presentation">
+            <td>
+                {% if full_banking %}
+                    <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
+                                    pull-right fa-2x"></i>
+                {% endif %}
+                <h1>
+                    <a href="{% url 'event:organization-edit' organization.pk %}">Configurar
+                        dados bancários</a></h1>
+            </td>
+        </tr>
+    {% endif %}
+    {% if has_addons.checkin == True %}
+        <tr id= del-checkin class="todo_list_element" role="presentation">
+            <td>
+                <a type="button" class="add_todo_element pull-left fas
+            fa-minus warning-color
+                                     fa-3x"></a>
+                <h1>
+                    <a href="
+{% url 'event:organization-edit' organization.pk %}">CheckIn</a></h1>
+                <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+            </td>
+        </tr>
+    {% endif %}
+    {% if has_addons.extra_activities == True %}
+        <tr id = "del-extra_activities" class="todo_list_element"
+            role="presentation">
+            <td>
+                <a type="button" class="add_todo_element pull-left fas
+            fa-minus warning-color
+                                     fa-3x"></a>
+                {% if has_extra_activities %}
+                    <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
+                                    pull-right fa-2x"></i>
+                {% endif %}
+                <h1>
+                    <a href="
+{% url 'event:organization-edit' organization.pk %}">Atividades extras</a></h1>
+            </td>
+        </tr>
+    {% endif %}
+    {% if has_addons.optionals == True %}
+        <tr id="del-optionals"  class="todo_list_element" role="presentation">
+            <td>
+                <a type="button" class="add_todo_element pull-left fas
+            fa-minus warning-color
+                                     fa-3x"></a>
+                {% if has_extra_activities %}
+                    <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
+                                    pull-right fa-2x"></i>
+                {% endif %}
+                <h1>
+                    <a href="
+{% url 'event:organization-edit' organization.pk %}">Opcionais</a></h1>
+            </td>
+        </tr>
+    {% endif %}
+    {% if has_addons.certificate == True %}
+        <tr id="del-certificate" class="todo_list_element" role="presentation">
+            <td>
+                <a type="button" class="add_todo_element pull-left fas fa-minus
+            warning-color
+                                     fa-3x"></a>
+                {% if has_extra_activities %}
+                    <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
+                                    pull-right fa-2x"></i>
+                {% endif %}
+                <h1>
+                    <a>Configurar
+                        Certificados</a></h1>
+            </td>
+        </tr>
+    {% endif %}
+    </tbody>
+</table>
+<br>
+<table id="todo-list-add" class="table table-hover">
+    <tbody>
+
+    {% if has_addons.checkin == False %}
+        <tr id = "add-checkin" class="todo_list_element" role="presentation">
+            <td>
+                <a type="button" class="add_todo_element pull-left fas
+            fa-plus success-color
+                                     fa-3x"></a>
+                <h1>
+                    <a>CheckIn</a></h1>
+            </td>
+        </tr>
+    {% endif %}
+    {% if has_addons.extra_activities == False %}
+        <tr id = "add-extra_activities" class="todo_list_element"
+            role="presentation">
+            <td>
+                <a type="button" class="add_todo_element pull-left fas
+            fa-plus success-color
+                                     fa-3x"></a>
+
+                <h1>
+                    <a>Atividades extras</a></h1>
+            </td>
+        </tr>
+    {% endif %}
+    {% if has_addons.optionals == False %}
+        <tr id = "add-optionals" class="todo_list_element" role="presentation">
+            <td>
+               <a type="button" class="add_todo_element pull-left fas
+            fa-plus success-color
+                                     fa-3x"></a>
+                <h1>
+                    <a>Opcionais</a></h1>
+            </td>
+        </tr>
+    {% endif %}
+    {% if has_addons.certificate == False %}
+        <tr id="add-certificate" class="todo_list_element" role="presentation">
+            <td>
+                 <a type="button" class="add_todo_element pull-left fas
+            fa-plus success-color
+                                     fa-3x"></a>
+                <h1>
+                    <a>Configurar
+                        Certificados</a></h1>
+            </td>
+        </tr>
+    {% endif %}
+    </tbody>
+</table>
+
