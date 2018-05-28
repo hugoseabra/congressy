@@ -143,6 +143,11 @@ class SubscriptionWizardView(SessionWizardView):
             self.clear_session_exhibition_code()
             return redirect('public:hotsite', slug=self.event.slug)
 
+        if self.event.is_scientific:
+            if not self.event.work_config or not \
+                    self.event.work_config.is_submittable:
+                return redirect('public:hotsite', slug=self.event.slug)
+
         try:
             return super().dispatch(request, *args, **kwargs)
         except InvalidStateStepError:
