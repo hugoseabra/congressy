@@ -315,20 +315,7 @@ class SubscriptionWizardView(SessionWizardView):
             return self.initial_dict.get(step, {'event': self.event})
 
         if step == 'survey':
-            lot_pk = None
-            private_lot_data = self.storage.get_step_data('private_lot')
-            lot_data = self.storage.get_step_data('lot')
-
-            if private_lot_data is not None:
-                lot_pk = private_lot_data.get('private_lot-lots')
-            elif lot_data is not None:
-                lot_pk = lot_data.get('lot-lots')
-
-            if not lot_pk:
-                raise AttributeError('Não foi possivel pegar uma referencia '
-                                     'de lote.')
-
-            lot = Lot.objects.get(pk=lot_pk, event=self.event)
+            lot = self.get_lot_from_session()
 
             return self.initial_dict.get(step, {
                 'event_survey': lot.event_survey,
@@ -346,20 +333,7 @@ class SubscriptionWizardView(SessionWizardView):
 
                 self.storage.person = person
 
-            lot_pk = None
-            private_lot_data = self.storage.get_step_data('private_lot')
-            lot_data = self.storage.get_step_data('lot')
-
-            if private_lot_data is not None:
-                lot_pk = private_lot_data.get('private_lot-lots')
-            elif lot_data is not None:
-                lot_pk = lot_data.get('lot-lots')
-
-            if not lot_pk:
-                raise AttributeError('Não foi possivel pegar uma referencia '
-                                     'de lote.')
-
-            lot = Lot.objects.get(pk=lot_pk, event=self.event)
+            lot = self.get_lot_from_session()
 
             return self.initial_dict.get(step, {
                 'choosen_lot': lot,
@@ -393,26 +367,7 @@ class SubscriptionWizardView(SessionWizardView):
             survey_director = SurveyDirector(event=self.event,
                                              user=self.request.user)
 
-            lot_pk = None
-            private_lot_data = self.storage.get_step_data('private_lot')
-            lot_data = self.storage.get_step_data('lot')
-
-            if private_lot_data is not None:
-                lot_pk = private_lot_data.get('private_lot-lots')
-            elif lot_data is not None:
-                lot_pk = lot_data.get('lot-lots')
-
-            if not lot_pk:
-                raise AttributeError('Não foi possivel pegar uma referencia '
-                                     'de lote.')
-
-            try:
-                lot = Lot.objects.get(pk=lot_pk, event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(lot_pk, self.event)
-                raise TypeError(message)
+            lot = self.get_lot_from_session()
 
             survey_response = QueryDict('', mutable=True)
             for form_question, form_response in form_data.items():
