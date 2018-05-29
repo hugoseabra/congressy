@@ -1,0 +1,148 @@
+{% extends 'base/base.html' %}
+{% load static humanize l10n %}
+
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
+
+{% block styles %}
+<style>
+    .resize-container {
+        background: url('{% static "assets/img/certificate-example.jpg" %}');
+    }
+    #titleText{
+        font-size: {{ object.title_font_size }}px;
+    }
+    #text{
+        width: {{ object.text_width }}px;
+        height: {{ object.text_height }}px;
+        font-size: {{ object.text_font_size }}px;
+    }
+    #dateText{
+        font-size: {{ object.date_font_size }}px;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div id="certificate">
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" style="text-align: left" onclick="closeNav()">&times;</a>
+        <ul class="nav nav-pills">
+            <li class="divider btn-block" style="text-align: center">
+                <a>
+                    <label for = "modoEditar"> <h2>movimento</h2> </label>
+                    <label class="switch">
+                        <input type="checkbox" id = 'modoEditar'>
+                        <span class="slider round"></span>
+                    </label>
+                </a>
+            </li>
+             <li role="separator" class="divider"></li>
+            <li class="dropdown btn-block" style="text-align: center;" role="presentation" >
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                   role="button" aria-haspopup="true" aria-expanded="false">
+                    <h2>Título</h2><span class="caret"></span></a>
+                <ul class="dropdown-menu btn-block" aria-labelledby="button_title">
+                    <li><a>
+                        <label for="titleCheckBox"><h3>Esconder título</h3></label>
+                        <input type="checkbox" id = "titleCheckBox">
+                    </a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a>
+                        <label for = "titleFontSize"> <h3>Tamanho da fonte </h3> </label>
+                        <input class="form-control" type="number" id = "titleFontSize" min="1"
+                        value = {{ object.title_font_size }}>
+                    </a></li>
+                </ul>
+            </li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown btn-block" style="text-align: center;" role="presentation" >
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                   role="button" aria-haspopup="true" aria-expanded="false">
+                    <h2>Data</h2><span class="caret"></span></a>
+                <ul class="dropdown-menu btn-block" aria-labelledby="button_date">
+                    <li><a>
+                        <label for="dateCheckBox"> <h3>Esconder data </h3> </label>
+                        <input type="checkbox" id = "dateCheckBox" class = "custom-">
+                    </a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a>
+                        <label for = "dateFontSize"> <h3>Tamanho da fonte </h3> </label>
+                        <input class="form-control" type="number" id = "dateFontSize" min="1"
+                        value = {{ object.date_font_size }}>
+                    </a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a style="display: inline-block; text-align: center; display: flex; justify-content: center">
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn default">
+                                <span class="glyphicon glyphicon-align-left"></span></button>
+                            </div>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn default">
+                                <span class="glyphicon glyphicon-align-center"></span></button>
+                            </div>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn default">
+                                <span class="glyphicon glyphicon-align-right"></span></button>
+                            </div>
+                        </div>
+                    </a></li>
+                </ul>
+            </li>
+            <li role="separator" class="divider"></li>
+                <li class = "dropdown btn-block" style="text-align: center;" role="presentation" >
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+                       role="button" aria-haspopup="true" aria-expanded="false"><h2>Texto</h2>
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu" aria-labelledby="button_text">
+                        <li><a>
+                            <label for = "textFontSize"><h3>Tamanho da fonte</h3></label>
+                            <input class="form-control" type="number" id = "textFontSize" min="1"
+                            value = {{ object.text_font_size }} >
+                        </a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a>
+                            <label for = "textLineHeight"><h3>Espaçamento entre linhas</h3></label>
+                            <input class="form-control" type="number" id = "textLineHeight" min="1"
+                            max="10" step="0.1" value = {{ object.text_line_height}}>
+                        </a></li>
+
+                    </ul>
+                </li>
+            </ul>
+    </div>
+    <div style="text-align: right">
+        <span style="font-size:30px;cursor:pointer;" onclick="openNav()">&#9776; Edição</span>
+    </div>
+    <div class="resize-container">
+        <div style="position:absolute; text-align: justify"  id = "titleText">{{ object.title_content }}</div>
+        <div style="position:absolute; text-align: justify"  id = "dateText">Goiânia, 1 de abril de 2018</div>
+        <div style="position:absolute; text-align: justify"  id = "text" >{{ object.text_content }}</div>
+    </div>
+</div>
+<script>
+function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+}
+</script>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static "assets/plugins/interactjs/dist/interact.min.js" %}"></script>
+<script src="{% static "assets/js/certificado_drag_resize.js" %}"></script>
+
+<script src="{% static "assets/js/certificado.js" %}"></script>
+<script>
+    $(document).ready(function() {
+        window.cert.moveElement($('#text'), {{ object.text_position_x|unlocalize|intcomma }}, {{ object.text_position_y|unlocalize|intcomma }});
+        window.cert.moveElement($('#titleText'), {{ object.title_position_x|unlocalize|intcomma }}, {{ object.title_position_y|unlocalize|intcomma }});
+        window.cert.moveElement($('#dateText'), {{ object.date_position_x|unlocalize|intcomma }}, {{ object.date_position_y|unlocalize|intcomma }});
+    });
+</script>
+{% endblock %}
