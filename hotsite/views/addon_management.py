@@ -124,8 +124,7 @@ class ProductOptionalManagementView(generic.TemplateView):
                 optional=product,
                 subscription=subscription,
                 optional_price=product.price,
-                optional_liquid_price=self.get_calculated_price(
-                    product.price, subscription.lot),
+                optional_liquid_price=product.liquid_price,
             )
 
             if created:
@@ -138,28 +137,6 @@ class ProductOptionalManagementView(generic.TemplateView):
             return HttpResponse('201 OK', status=201)
 
         return HttpResponse('200 OK', status=200)
-
-    @staticmethod
-    def get_calculated_price(price, lot):
-        """
-        Resgata o valor calculado do preço do opcional de acordo com as regras
-        da Congressy.
-        """
-        if price is None:
-            return 0
-
-        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
-        congressy_plan_percent = \
-            Decimal(lot.event.congressy_percent) / 100
-
-        congressy_amount = price * congressy_plan_percent
-        if congressy_amount < minimum:
-            congressy_amount = minimum
-
-        if lot.transfer_tax is True:
-            return round(price + congressy_amount, 2)
-
-        return round(price, 2)
 
 
 class ServiceOptionalManagementView(generic.TemplateView):
@@ -255,8 +232,7 @@ class ServiceOptionalManagementView(generic.TemplateView):
                 optional=service,
                 subscription=subscription,
                 optional_price=service.price,
-                optional_liquid_price=self.get_calculated_price(
-                    service.price, subscription.lot)
+                optional_liquid_price=service.liquid_price,
             )
 
             if created:
@@ -293,25 +269,3 @@ class ServiceOptionalManagementView(generic.TemplateView):
             return True
 
         return False
-
-    @staticmethod
-    def get_calculated_price(price, lot):
-        """
-        Resgata o valor calculado do preço do opcional de acordo com as regras
-        da Congressy.
-        """
-        if price is None:
-            return 0
-
-        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
-        congressy_plan_percent = \
-            Decimal(lot.event.congressy_percent) / 100
-
-        congressy_amount = price * congressy_plan_percent
-        if congressy_amount < minimum:
-            congressy_amount = minimum
-
-        if lot.transfer_tax is True:
-            return round(price + congressy_amount, 2)
-
-        return round(price, 2)

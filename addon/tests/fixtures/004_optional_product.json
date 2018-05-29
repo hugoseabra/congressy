@@ -11,7 +11,7 @@
       "modified": "2018-04-30T11:16:54.129",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "22.00",
+      "liquid_price": "22.00",
       "description": "Camiseta personalizada do evento.",
       "quantity": 5,
       "release_days": 7,
@@ -30,7 +30,7 @@
       "modified": "2018-04-30T11:17:23.887",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "12.00",
+      "liquid_price": "12.00",
       "description": "Caneca personalizada do evento.",
       "quantity": 5,
       "release_days": 7,
@@ -50,7 +50,7 @@
       "modified": "2018-04-30T10:15:56.574",
       "created_by": "Admin",
       "modified_by": "Admin",
-      "price": "828.00",
+      "liquid_price": "828.00",
       "description": "",
       "quantity": 50,
       "release_days": 7
@@ -69,7 +69,7 @@
       "modified": "2018-04-30T10:15:42.031",
       "created_by": "Admin",
       "modified_by": "Admin",
-      "price": "828.00",
+      "liquid_price": "828.00",
       "description": "",
       "quantity": 30,
       "release_days": 7
@@ -88,7 +88,7 @@
       "modified": "2018-04-30T10:15:37.017",
       "created_by": "Admin",
       "modified_by": "Admin",
-      "price": "828.00",
+      "liquid_price": "828.00",
       "description": "",
       "quantity": 20,
       "release_days": 7
@@ -107,7 +107,7 @@
       "modified": "2018-04-30T10:16:28.508",
       "created_by": "Admin",
       "modified_by": "Admin",
-      "price": "1036.20",
+      "liquid_price": "1036.20",
       "description": "",
       "quantity": 10,
       "release_days": 7
@@ -126,7 +126,7 @@
       "modified": "2018-04-30T10:15:46.803",
       "created_by": "Admin",
       "modified_by": "Admin",
-      "price": "1036.20",
+      "liquid_price": "1036.20",
       "description": "",
       "quantity": 30,
       "release_days": 7
@@ -145,7 +145,7 @@
       "modified": "2018-04-30T10:16:21.388",
       "created_by": "Admin",
       "modified_by": "Admin",
-      "price": "1036.20",
+      "liquid_price": "1036.20",
       "description": "",
       "quantity": 20,
       "release_days": 7
@@ -164,7 +164,7 @@
       "modified": "2018-04-30T10:24:20.762",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "780.00",
+      "liquid_price": "780.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -183,7 +183,7 @@
       "modified": "2018-04-30T10:24:51.376",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "780.00",
+      "liquid_price": "780.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -202,7 +202,7 @@
       "modified": "2018-04-30T10:24:58.883",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "780.00",
+      "liquid_price": "780.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -221,7 +221,7 @@
       "modified": "2018-04-30T10:28:17.562",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "828.00",
+      "liquid_price": "828.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -240,7 +240,7 @@
       "modified": "2018-04-30T10:28:58.117",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "828.00",
+      "liquid_price": "828.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -259,7 +259,7 @@
       "modified": "2018-04-30T10:28:58.142",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "828.00",
+      "liquid_price": "828.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -278,7 +278,7 @@
       "modified": "2018-04-30T10:33:56.181",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1036.20",
+      "liquid_price": "1036.20",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -297,7 +297,7 @@
       "modified": "2018-04-30T10:34:15.974",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1036.20",
+      "liquid_price": "1036.20",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -316,7 +316,7 @@
       "modified": "2018-04-30T10:34:15.987",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1036.20",
+      "liquid_price": "1036.20",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -335,7 +335,7 @@
       "modified": "2018-04-30T10:35:30.803",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "780.00",
+      "liquid_price": "780.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -354,7 +354,7 @@
       "modified": "2018-04-30T10:36:12.888",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "780.00",
+      "liquid_price": "780.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -373,7 +373,7 @@
       "modified": "2018-04-30T10:36:12.920",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "780.00",
+      "liquid_price": "780.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -392,7 +392,7 @@
       "modified": "2018-04-30T10:37:04.848",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1158.00",
+      "liquid_price": "1158.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -411,7 +411,7 @@
       "modified": "2018-04-30T10:37:18.333",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1158.00",
+      "liquid_price": "1158.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -430,7 +430,7 @@
       "modified": "2018-04-30T10:37:18.355",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1158.00",
+      "liquid_price": "1158.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -449,7 +449,7 @@
       "modified": "2018-04-30T10:38:08.638",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1152.00",
+      "liquid_price": "1152.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -468,7 +468,7 @@
       "modified": "2018-04-30T10:38:23.411",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1152.00",
+      "liquid_price": "1152.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -487,7 +487,7 @@
       "modified": "2018-04-30T10:38:23.436",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1152.00",
+      "liquid_price": "1152.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -506,7 +506,7 @@
       "modified": "2018-04-30T10:39:17.601",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1092.00",
+      "liquid_price": "1092.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -525,7 +525,7 @@
       "modified": "2018-04-30T10:39:39.010",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1092.00",
+      "liquid_price": "1092.00",
       "description": "",
       "quantity": null,
       "release_days": 7
@@ -544,7 +544,7 @@
       "modified": "2018-04-30T10:39:39.022",
       "created_by": "admin",
       "modified_by": "admin",
-      "price": "1092.00",
+      "liquid_price": "1092.00",
       "description": "",
       "quantity": null,
       "release_days": 7

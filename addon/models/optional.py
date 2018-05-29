@@ -6,18 +6,19 @@
 from datetime import datetime
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 
 from addon import constants, rules
 from base.models import EntityMixin
 from core.model import track_data
 from gatheros_event.models.mixins import GatherosModelMixin
-from gatheros_subscription.models import LotCategory
+from gatheros_subscription.models import LotCategory, Subscription
 from .optional_type import OptionalServiceType, OptionalProductType
 from .theme import Theme
 
 
-@track_data('date_end_sub', 'price')
+@track_data('date_end_sub', 'liquid_price')
 class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
     """
         Opcional é um item adicional (add-on) à inscrição de um evento que
@@ -76,12 +77,14 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         blank=True,
     )
 
-    price = models.DecimalField(
+    liquid_price = models.DecimalField(
         default=Decimal(0.00),
-        verbose_name='preço',
+        verbose_name='preço líquido',
         decimal_places=2,
         max_digits=10,
         blank=True,
+        help_text='Qual o valor liquido que você espera receber pela venda'
+                  ' deste item opcional?'
     )
 
     description = models.TextField(
@@ -150,6 +153,26 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
 
         return False
 
+    @property
+    def price(self):
+        """
+        Resgata o valor calculado do preço do lote de acordo com as regras
+        da Congressy.
+        """
+        if self.liquid_price is None or self.liquid_price == 0:
+            return 0
+
+        event = self.lot_category.event
+
+        # minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
+        congressy_plan_percent = Decimal(event.congressy_percent) / 100
+
+        congressy_amount = self.liquid_price * congressy_plan_percent
+        # if congressy_amount < minimum:
+        #     congressy_amount = minimum
+
+        return round(self.liquid_price + congressy_amount, 2)
+
 
 class Product(AbstractOptional):
     """
@@ -187,9 +210,10 @@ class Product(AbstractOptional):
         :return: número de opcionais vendidos
         :type: bool
         """
-        return self.subscription_products.exclude(
-            subscription__status='canceled'
-        ).count()
+        return self.subscription_products \
+            .filter(subscription__completed=True) \
+            .exclude(subscription__status=Subscription.CANCELED_STATUS) \
+            .count()
 
 
 @track_data('schedule_start', 'schedule_end')
@@ -264,6 +288,7 @@ class Service(AbstractOptional):
         :return: número de opcionais vendidos
         :type: bool
         """
-        return self.subscription_services.exclude(
-            subscription__status='canceled'
-        ).count()
+        return self.subscription_services \
+            .filter(subscription__completed=True) \
+            .exclude(subscription__status=Subscription.CANCELED_STATUS) \
+            .count()

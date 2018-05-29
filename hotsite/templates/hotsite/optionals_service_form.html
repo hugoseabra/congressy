@@ -27,7 +27,7 @@
 
             <div class="panel-body">
 
-                <div class="row" style="margin-top: 50px">
+                <div class="row">
 
                     <div class="col-md-12">
                         <div id="available_optional_services">
@@ -55,7 +55,7 @@
 
 
     function render_available_optional_services_list() {
-        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
+        var url = '{% url 'public:hotsite_services' subscription.pk  %}';
 
         send(
             url,
@@ -68,7 +68,7 @@
         );
     }
     function render_currently_selected_service_list() {
-        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
+        var url = '{% url 'public:hotsite_services' subscription.pk  %}';
 
         send(
             url,
@@ -87,7 +87,7 @@
 
     function addOptionalService(service_id) {
 
-        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
+        var url = '{% url 'public:hotsite_services' subscription.pk %}';
 
         send(
             url,
@@ -109,7 +109,7 @@
     }
     function removeOptionalService(service_id) {
 
-        var url = '{% url 'public:hotsite_services' subscription_pk=subscription  %}';
+        var url = '{% url 'public:hotsite_services' subscription.pk %}';
 
         send(
             url,

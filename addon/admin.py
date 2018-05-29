@@ -30,7 +30,7 @@ class OptionalServiceAdmin(admin.ModelAdmin):
         'theme',
         'lot_category',
         'quantity',
-        'price',
+        'liquid_price',
     )
     fieldsets = (
         (None, {
@@ -50,7 +50,7 @@ class OptionalServiceAdmin(admin.ModelAdmin):
         }),
         ('Preços e Restrições', {
             'fields': (
-                'price',
+                'liquid_price',
                 'restrict_unique',
                 'quantity',
                 'release_days',
@@ -71,7 +71,7 @@ class OptionalProductAdmin(admin.ModelAdmin):
         'name',
         'lot_category',
         'quantity',
-        'price',
+        'liquid_price',
     )
     fieldsets = (
         (None, {
@@ -88,7 +88,7 @@ class OptionalProductAdmin(admin.ModelAdmin):
         }),
         ('Preços e Restrições', {
             'fields': (
-                'price',
+                'liquid_price',
                 'quantity',
                 'release_days',
             ),

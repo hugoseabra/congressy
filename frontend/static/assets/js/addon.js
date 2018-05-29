@@ -66,7 +66,7 @@ window.cgsy.addon = window.cgsy.addon || {};
     addon.show_hide_price_block = function() {
         var has_price = $('#id_has_price');
         var price_block = $('#price-block');
-        var price_el = $('#id_price');
+        var price_el = $('#id_liquid_price');
 
         if (has_price.prop('checked') === true) {
             price_block.fadeIn();
@@ -84,7 +84,7 @@ window.cgsy.addon = window.cgsy.addon || {};
 
     addon.check_uncheck_has_price = function() {
         var has_price = $('#id_has_price');
-        var price_el = $('#id_price');
+        var price_el = $('#id_liquid_price');
 
         if (price_el.val()) {
             var price = price_el.val().replace('.', '').replace(',', '.');

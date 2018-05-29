@@ -45,7 +45,7 @@ class ProductManager(managers.Manager):
         model = Product
         fields = '__all__'
         widgets = {
-            'price': PriceInput,
+            'liquid_price': PriceInput,
             'date_end_sub': SplitDateTimeWidget,
         }
 
@@ -57,22 +57,24 @@ class ProductManager(managers.Manager):
 
         super().__init__(**kwargs)
 
-        if not self.instance.pk or self.instance.price == 0:
-            self.fields['price'].initial = '0.00'
+        if not self.instance.pk or self.instance.liquid_price == 0:
+            self.fields['liquid_price'].initial = '0.00'
 
-    def clean_price(self):
-        price = self.cleaned_data.get('price')
+    def clean_liquid_price(self):
+        liquid_price = self.cleaned_data.get('liquid_price')
 
         # Não é permitido editar preço para opcionais com inscrições.
         if self.instance.pk \
-                and self.instance.has_changed('price') \
-                and self.instance.subscription_products.count() > 0:
+                and self.instance.has_changed('liquid_price') \
+                and self.instance.subscription_products \
+                        .filter(subscription__completed=True) \
+                        .count() > 0:
             raise forms.ValidationError(
                 'Este opcional já possui inscrições. Seu valor não pode ser'
                 ' alterado.'
             )
 
-        return price
+        return liquid_price
 
 
 class ServiceManager(managers.Manager):
@@ -83,7 +85,7 @@ class ServiceManager(managers.Manager):
         fields = '__all__'
         widgets = {
             # 'theme': ManageableSelect,
-            'price': PriceInput,
+            'liquid_price': PriceInput,
             'date_end_sub': SplitDateTimeWidget,
             'schedule_start': SplitDateTimeWidget,
             'schedule_end': SplitDateTimeWidget,
@@ -97,22 +99,24 @@ class ServiceManager(managers.Manager):
 
         super().__init__(**kwargs)
 
-        if not self.instance.pk or self.instance.price == 0:
-            self.fields['price'].initial = '0.00'
+        if not self.instance.pk or self.instance.liquid_price == 0:
+            self.fields['liquid_price'].initial = '0.00'
 
     def clean_price(self):
-        price = self.cleaned_data.get('price')
+        liquid_price = self.cleaned_data.get('liquid_price')
 
         # Não é permitido editar preço para opcionais com inscrições.
         if self.instance.pk \
-                and self.instance.has_changed('price') \
-                and self.instance.subscription_services.count() > 0:
+                and self.instance.has_changed('liquid_price') \
+                and self.instance.subscription_services \
+                        .filter(subscription__completed=True) \
+                        .count() > 0:
             raise forms.ValidationError(
                 'Este opcional já possui inscrições. Seu valor não pode ser'
                 ' alterado.'
             )
 
-        return price
+        return liquid_price
 
 
 class SubscriptionServiceManager(managers.Manager):

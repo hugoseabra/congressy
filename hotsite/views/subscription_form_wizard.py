@@ -373,6 +373,11 @@ class SubscriptionWizardView(SessionWizardView):
         if isinstance(form, forms.PaymentForm):
 
             if form.is_valid():
+                # Assert that we have a person in storage
+                if not hasattr(self.storage, 'person'):
+                    person = Person.objects.get(user=self.request.user)
+                    self.storage.person = person
+
                 lot = self.get_lot_from_session()
                 subscription = self.get_subscription_from_session()
 
@@ -431,18 +436,18 @@ class SubscriptionWizardView(SessionWizardView):
             has_open_boleto = self.get_open_boleto(selected_lot) is not None
             context['has_open_boleto'] = has_open_boleto
 
-            if step == 'private_lot':
-                code = self.request.session.get('exhibition_code')
-                if self.is_valid_exhibition_code(code):
-                    lot = Lot.objects.filter(exhibition_code=code.upper())
+        if step == 'private_lot':
+            code = self.request.session.get('exhibition_code')
+            if self.is_valid_exhibition_code(code):
+                lot = Lot.objects.filter(exhibition_code=code.upper())
+                if lot:
                     context['lot'] = lot.first()
 
-            if step == 'lot':
-                context['has_coupon'] = self.has_coupon()
+        if step == 'lot':
+            context['has_coupon'] = self.has_coupon()
 
         if step in ['product', 'service']:
-            self.get_subscription_from_session()
-            context['subscription'] = self.storage.subscription.pk
+            context['subscription'] = self.get_subscription_from_session()
 
         if step == 'person':
             try:
@@ -486,24 +491,29 @@ class SubscriptionWizardView(SessionWizardView):
 
             context['lot'] = subscription.lot
 
-            total = subscription.lot.price or Decimal(0.00)
+            total = subscription.lot.get_calculated_price() or Decimal(0.00)
 
             for product in products:
-                total += product.optional_liquid_price
+                total += product.optional_price
 
             for service in services:
-                total += service.optional_liquid_price
+                total += service.optional_price
 
             context['total'] = total
 
             now = datetime.now()
             days_boleto = timedelta(days=self.event.boleto_limit_days)
-            diff_days_boleto = now - days_boleto
 
-            if has_open_boleto or self.event.date_start - diff_days_boleto:
-                context['allowed_transaction_types'] = 'credit_card'
-            else:
-                context['allowed_transaction_types'] = 'credit_card,boleto'
+            # Data/hora em que os boletos serão desativados.
+            diff_days_boleto = now - days_boleto
+            boleto_enabled = self.event.date_start >= diff_days_boleto
+
+            payment_types = ['credit_card']
+
+            if boleto_enabled and not has_open_boleto:
+                payment_types.append('boleto')
+
+            context['allowed_transaction_types'] = ','.join(payment_types)
 
         return context
 
@@ -513,9 +523,6 @@ class SubscriptionWizardView(SessionWizardView):
     def done(self, form_list, **kwargs):
         if 'has_private_subscription' in self.request.session:
             del self.request.session['has_private_subscription']
-
-        if not hasattr(self.storage, 'person'):
-            self.storage.person = self.get_person_from_session()
 
         subscription = self.get_subscription_from_session()
         subscription.completed = True
@@ -528,24 +535,35 @@ class SubscriptionWizardView(SessionWizardView):
             subscription.status = Subscription.CONFIRMED_STATUS
             subscription.save()
 
+            notified = False
             if new_account and self.request.session['is_new_subscription']:
                 notify_new_user_and_free_subscription(self.event, subscription)
-            else:
+                notified = True
+
+            elif self.request.session['is_new_subscription']:
                 notify_new_free_subscription(self.event, subscription)
+                notified = True
 
-            msg = 'Inscrição realizada com sucesso!' \
-                  ' Nós lhe enviamos um e-mail de confirmação de sua' \
-                  ' inscrição juntamente com seu voucher.'
+            if notified:
+                msg = 'Inscrição realizada com sucesso!' \
+                      ' Nós lhe enviamos um e-mail de confirmação de sua' \
+                      ' inscrição juntamente com seu voucher.'
 
-            success_url = reverse_lazy(
-                'public:hotsite', kwargs={'slug': self.event.slug, }
-            )
+            else:
+                msg = 'Inscrição salva com sucesso!'
+
+            success_url = reverse_lazy('public:hotsite', kwargs={
+                'slug': self.event.slug,
+            })
 
         else:
-            msg = 'Inscrição realizada com sucesso!' \
-                  ' Nós lhe enviamos um e-mail de confirmação de sua' \
-                  ' inscrição. Porém, o seu voucher estará disponível apenas' \
-                  ' após a confirmação de seu pagamento.'
+            if self.request.session['is_new_subscription']:
+                msg = 'Inscrição realizada com sucesso!' \
+                      ' Nós lhe enviamos um e-mail de confirmação de' \
+                      ' sua inscrição. Porém, o seu voucher estará' \
+                      ' disponível apenas após a confirmação de seu pagamento.'
+            else:
+                msg = 'Inscrição salva com sucesso!'
 
             success_url = reverse_lazy(
                 'public:hotsite-subscription-status',
@@ -608,8 +626,10 @@ class SubscriptionWizardView(SessionWizardView):
         # @TODO: Fix this ugly hack for pre-form cleaning
         # Copy is needed, QueryDict is immutable
         post_data = self.request.POST.copy()
-        post_data = self.clear_string('person-institution_cnpj',
-                                      data=post_data)
+        post_data = self.clear_string(
+            'person-institution_cnpj',
+            data=post_data
+        )
         post_data = self.clear_string('person-cpf', data=post_data)
         post_data = self.clear_string('person-zip_code', data=post_data)
         post_data = self.clear_string('person-phone', data=post_data)

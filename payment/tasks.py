@@ -34,10 +34,7 @@ def create_pagarme_transaction(transaction_data, subscription=None):
     if not payment or not subscription:
         return
 
-    transaction_instance = Transaction(
-        uuid=payment['items'][0]['id'],
-        subscription=subscription
-    )
+    transaction_instance = Transaction(subscription=subscription)
 
     try:
 
@@ -92,6 +89,9 @@ def create_pagarme_transaction(transaction_data, subscription=None):
 
     for item in items:
         if item['category'] == 'opcional':
+            optional_total += separate_amount(item['unit_price'])
+
+        if item['category'] == 'atividade-extra':
             optional_total += separate_amount(item['unit_price'])
 
     # @TODO add optional liquid amount

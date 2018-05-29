@@ -66,7 +66,7 @@
                                 </div>
                                 <ul>
                                     {% if lot.price %}
-                                        <strong>R$ {{ lot.price|intcomma }}</strong>
+                                        <strong>R$ {{ lot.get_calculated_price|intcomma }}</strong>
                                     {% else %}
                                         <strong>Grátis</strong>
                                     {% endif %}
@@ -228,7 +228,7 @@
                     '{{ subscription.pk }}',
                     'Inscrição: {{ lot.event.name }}',
                     1,
-                    parseFloat('{{ lot.price|unlocalize|intcomma }}')
+                    parseFloat('{{ lot.get_calculated_price|unlocalize|intcomma }}')
                 );
 
                 {% if products %}

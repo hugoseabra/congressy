@@ -41,7 +41,7 @@
                 $('#id_date_end_sub_1').mask("99:99");
                 $('#id_schedule_start_1').mask("99:99");
                 $('#id_schedule_end_1').mask("99:99");
-                $('#id_price').mask('#.##0,00', {reverse: true});
+                $('#id_liquid_price').mask('#.##0,00', {reverse: true});
 
                 window.setTimeout(function() {
                     window.cgsy.addon.create_events();
@@ -170,7 +170,7 @@
                         <div class="row">
                             <div class="col-xl-10 col-xl-push-1 col-md-12">
                                 {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
-                                {% if optonal_has_subscriptions and not object.price %}
+                                {% if optonal_has_subscriptions and not object.liquid_price %}
                                 {% else %}
                                     <div class="form-group">
                                         <label for="id_has_price">Cobrar pela atividade?</label>
@@ -183,21 +183,18 @@
                         </div>
                         <div class="row" id="price-block" style="display: none">
                             {% comment %}DJANGO TEMPLATING possui bugs para tratar 'or' {% endcomment %}
-                            {% if optonal_has_subscriptions and not object.price %}
+                            {% if optonal_has_subscriptions and not object.liquid_price %}
                             {% else %}
                                 <div class="col-xl-3 col-xl-push-1 col-md-4">
-                                        {% render_generic_field form.price %}
+                                        {% render_generic_field form.liquid_price %}
                                 </div>
                                 <div class="col-xl-7 col-xl-push-1 col-md-8">
                                     <div class="well well-sm" style="text-align: justify">
                                         <div><strong>Importante:</strong></div>
                                         <small class="help-text text-muted">
-                                            O valor que você receberá por esta atividade será de acordo com o lote/ingresso
-                                            selecionado pelo participante, respeitando as configurações de custos do lote.
-                                            Se o lote for configurado com <u>absorção de taxas</u> você receberá o valor
-                                            com abatimento das taxas. Se o lote for configurado com <u>não absorver taxas</u>,
-                                            você receberá o valor exato configurado aqui, mas o participante pagará pelas
-                                            taxas de transação.
+                                            Este item irá transferir as <strongs>Taxas</strongs> para o participante.
+                                            Então é importante verificar o <span style="text-decoration: underline;">valor final</span>
+                                            do item opcional e informar o valor adequado .
                                         </small>
                                     </div>
                                 </div>

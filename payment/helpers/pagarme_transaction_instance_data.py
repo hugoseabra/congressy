@@ -35,6 +35,7 @@ class PagarmeTransactionInstanceData:
             int(self.installments),
             int(self.lot.num_install_interest_absortion)
         )
+        self.items_list = []
 
     def get_data(self):
 
@@ -62,22 +63,30 @@ class PagarmeTransactionInstanceData:
 
         # Add optionals to items list
         products = SubscriptionProduct.objects.filter(
-            subscription=self.subscription)
+            subscription=self.subscription
+        )
         if products.count() > 0:
             for product in products:
-                self.add_optional_items_list(optional=product.optional,
-                                             is_tangible=True)
+                self.add_optional_items_list(
+                    optional=product.optional,
+                    is_tangible=False
+                )
 
         services = SubscriptionService.objects.filter(
-            subscription=self.subscription)
+            subscription=self.subscription
+        )
         if services.count() > 0:
             for service in services:
-                self.add_optional_items_list(optional=service.optional,
-                                             is_tangible=False)
+                self.add_service_items_list(
+                    optional=service.optional,
+                    is_tangible=False
+                )
 
         transaction_data = {
 
             "api_key": settings.PAGARME_API_KEY,
+            "transaction_id": transaction_id,
+            "postback_url": postback_url,
 
             "customer": {
                 "external_id": str(self.subscription.pk),
@@ -95,8 +104,6 @@ class PagarmeTransactionInstanceData:
                 "birthday": self.person.birth_date.strftime('%Y-%m-%d'),
             },
 
-            "postback_url": postback_url,
-
             "billing": {
                 "name": self.person.name,
                 "address": {
@@ -112,6 +119,9 @@ class PagarmeTransactionInstanceData:
 
             "items": self.items_list,
 
+            "amount": self.as_payment_format(self.amount),
+            "price": self.as_payment_format(self.amount),
+
             "metadata": {
                 "evento": '{} (#{})'.format(
                     self.event.name,
@@ -123,9 +133,6 @@ class PagarmeTransactionInstanceData:
                 ),
                 "inscricao": str(self.subscription.pk)
             },
-
-            "amount": self.as_payment_format(self.amount),
-            "price": self.as_payment_format(self.amount),
 
             "split_rules": self._create_split_rules(),
         }
@@ -177,9 +184,7 @@ class PagarmeTransactionInstanceData:
             self.amount = \
                 round(Decimal(self.extra_data.get('payment-amount')), 2) / 100
         else:
-            raise TransactionError(
-                message="Transação sem valor."
-            )
+            raise TransactionError(message="Transação sem valor.")
 
     def _set_installments(self):
         self.installments = 1
@@ -211,11 +216,12 @@ class PagarmeTransactionInstanceData:
                 message='Nenhum tipo de transação informado.'
             )
 
-        if self.extra_data[
-            'payment-transaction_type'] not in allowed_payment_methods:
+        transaction_type = self.extra_data['payment-transaction_type']
+
+        if transaction_type not in allowed_payment_methods:
             raise TransactionError(message='Tipo de transação não permitido.')
 
-        self.transaction_type = self.extra_data['payment-transaction_type']
+        self.transaction_type = transaction_type
 
     def _create_split_rules(self):
         """
@@ -229,7 +235,7 @@ class PagarmeTransactionInstanceData:
             (100 - float(self.event.congressy_percent)) / 100
         )
 
-        # Com transferência, o valor da transaçaõ está maior do que o valor do
+        # Com transferência, o valor da transação está maior do que o valor do
         # lote.
         #
         # O organizador sempre receberá o valor normal
@@ -243,39 +249,36 @@ class PagarmeTransactionInstanceData:
             # juros de parcelas a partir de uma quantidade de parcelas.
             absorb_num_installment = self.lot.num_install_interest_absortion
 
-            # se não há aborção de juros
-            if not absorb_num_installment:
-                organization_amount = self.as_decimal(self.lot.price)
-            else:
-                # Se há absorção, ver se o número de parcelas da transação
-                # está dentre as parcelas assumids
-                if self.installments <= absorb_num_installment:
-                    # juros de parcelas
-                    interest_price = \
-                        self.calculator.get_installment_interest(
-                            self.amount,
-                            self.installments
-                        )
+            # Se há absorção, ver se o número de parcelas da transação
+            # está dentre as parcelas assumids
+            is_absorbable = self.installments <= absorb_num_installment
 
-                    # adiciona valor de juros assumidas à parte da organização
-                    organization_amount = self.as_decimal(
-                        self.lot.price - interest_price
-                    )
-                else:
-                    organization_amount = self.as_decimal(self.lot.price)
+            if absorb_num_installment and is_absorbable:
+                # juros de parcelas
+                interest_amount = self.calculator.get_installment_interest(
+                    self.amount,
+                    self.installments
+                )
+
+                # adiciona valor de juros assumidas à parte da organização
+                org_amount = self.as_decimal(self.lot.price - interest_amount)
+
+            else:
+                # se não há aborção de juros
+                org_amount = self.as_decimal(self.lot.price)
 
         # Caso contrário, o organizador pagará receberá o valor padrão
         # subtraído das taxas da Congressy, já que não há taxas no valor do
         # lote a ser processado na transação.
         else:
-            organization_amount = self.calculator.get_receiver_amount(
+            org_amount = self.calculator.get_receiver_amount(
                 self.lot.price,
                 org_percent,
                 self.installments
             )
 
         # Congressy receberá o restante
-        congressy_amount = self.amount - organization_amount
+        congressy_amount = self.amount - org_amount
 
         # Valor líquido da congressy direto do valor do lote.
         congressy_amount_liquid = self.lot.price * self.as_decimal(
@@ -286,7 +289,7 @@ class PagarmeTransactionInstanceData:
         minimum = self.as_decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         if congressy_amount < minimum:
             congressy_amount = minimum
-            organization_amount = self.as_decimal(self.amount - minimum)
+            org_amount = self.as_decimal(self.amount - minimum)
 
         # Verifica se há parceiros
         partners = self.event.partner_contracts.filter(
@@ -313,7 +316,8 @@ class PagarmeTransactionInstanceData:
         congressy_rule = {
             "recipient_id": CONGRESSY_RECIPIENT_ID,
             "amount": self.as_payment_format(
-                congressy_amount - partners_amount),
+                congressy_amount - partners_amount
+            ),
             "liable": True,
             "charge_processing_fee": True,
             "charge_remainder_fee": True
@@ -325,11 +329,11 @@ class PagarmeTransactionInstanceData:
         else:
             org_recipient_id = self.organization.recipient_id
 
-        self.liquid_amount = organization_amount
+        self.liquid_amount = org_amount
 
         organization_rule = {
             "recipient_id": org_recipient_id,
-            "amount": self.as_payment_format(organization_amount),
+            "amount": self.as_payment_format(org_amount),
             "liable": True,
             "charge_processing_fee": False
         }
@@ -341,26 +345,18 @@ class PagarmeTransactionInstanceData:
 
         return split_rules
 
-    def get_calculated_price(self, price, lot):
-        """
-        Resgata o valor calculado do preço do opcional de acordo com as regras
-        da Congressy.
-        """
-        if price is None:
-            return 0
+    def add_service_items_list(self, optional, is_tangible=False):
 
-        minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
-        congressy_plan_percent = \
-            Decimal(self.event.congressy_percent) / 100
+        optional_dict = {
+            "id": str(optional.pk),
+            "title": optional.name,
+            "category": 'atividade-extra',
+            "unit_price": self.as_payment_format(optional.price),
+            "quantity": 1,
+            "tangible": is_tangible
+        }
 
-        congressy_amount = price * congressy_plan_percent
-        if congressy_amount < minimum:
-            congressy_amount = minimum
-
-        if lot.transfer_tax is True:
-            return round(price + congressy_amount, 2)
-
-        return round(price, 2)
+        self.items_list.append(optional_dict)
 
     def add_optional_items_list(self, optional, is_tangible=False):
 
@@ -368,8 +364,7 @@ class PagarmeTransactionInstanceData:
             "id": str(optional.pk),
             "title": optional.name,
             "category": 'opcional',
-            "unit_price": self.as_payment_format(
-                self.get_calculated_price(optional.price, self.lot)),
+            "unit_price": self.as_payment_format(optional.price),
             "quantity": 1,
             "tangible": is_tangible
         }
@@ -378,13 +373,14 @@ class PagarmeTransactionInstanceData:
 
     def add_subscription_to_items_list(self, subscription):
 
+        price = subscription.lot.get_calculated_price()
+
         self.items_list.append(
             {
                 "id": str(subscription.pk),
                 "title": 'Inscrição ' + self.event.name,
-                "category": "inscrição",
-                "unit_price": self.as_payment_format(
-                    self.lot.get_calculated_price()),
+                "category": "inscricao",
+                "unit_price": self.as_payment_format(price),
                 "quantity": 1,
                 "tangible": False
             }
