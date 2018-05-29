@@ -8,7 +8,7 @@ from certificate import models
 
 
 class CertificadoView(AccountMixin, generic.DetailView):
-    template_name = 'certificate/certificado.html'
+    template_name = 'certificate/certificado_.html'
     model = models.Certificate
     slug_field = 'event__pk'
     slug_url_kwarg = 'event_pk'

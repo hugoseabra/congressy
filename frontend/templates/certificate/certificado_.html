@@ -8,6 +8,8 @@
 <style>
     .resize-container {
         background: url('{% static "assets/img/certificate-example.jpg" %}');
+        width: 1024px;
+        height: 725px;
     }
     #titleText{
         font-size: {{ object.title_font_size }}px;
@@ -134,7 +136,7 @@ function closeNav() {
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static "assets/plugins/interactjs/dist/interact.min.js" %}"></script>
+<script src="{% static "assets/plugins/interact/interact.min.js" %}"></script>
 <script src="{% static "assets/js/certificado_drag_resize.js" %}"></script>
 
 <script src="{% static "assets/js/certificado.js" %}"></script>
