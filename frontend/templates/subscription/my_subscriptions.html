@@ -169,6 +169,7 @@
                                     <th>Boleto</th>
                                 {% endif %}
                                 <th>Voucher</th>
+                                <th>Certificado</th>
                                 <th></th>
                             </tr>
 
@@ -251,6 +252,17 @@
                                             ---
                                         {% endif %}
 
+                                    </td>
+                                    <td>
+                                        {% if item.status == item.CONFIRMED_STATUS and item.attended is True %}
+                                            <div class="text-center">
+                                                <a href="{% url 'certificate:event-certificate-pdf' item.event.pk item.pk %}">
+                                                    <i class="fas fa-file-pdf"></i>
+                                                </a>
+                                            </div>
+                                        {% else %}
+                                            ---
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if item.event.is_scientific and event.work_config and event.work_config.is_submittable %}

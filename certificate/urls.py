@@ -11,6 +11,13 @@ private_certificate_urls = [
     ),
 ]
 
+private_subscription_certificate_urls = [
+    url(
+        r'^',
+        views.CertificatePDFView.as_view(),
+        name='event-certificate-pdf'
+    ),
+]
 
 router = routers.DefaultRouter()
 router.register(r'certificates', viewsets.CertificateViewSet)
@@ -21,7 +28,11 @@ api_certificate_urls = [
 
 urlpatterns_certificate_urls = [
     url(
+        r'^events/(?P<event_pk>[\d]+)/certificate/subscription/(?P<pk>['r'0-9A-Fa-f-]+)/',
+        include(private_subscription_certificate_urls)
+    ),
+    url(
         r'^events/(?P<event_pk>[\d]+)/certificate/',
         include(private_certificate_urls)
-    )
+    ),
 ]
