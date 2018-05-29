@@ -14,7 +14,7 @@ private_certificate_urls = [
 private_subscription_certificate_urls = [
     url(
         r'^',
-        views.CertificatePDFView.as_view(),
+        views.certificate_pdf_view,
         name='event-certificate-pdf'
     ),
 ]
