@@ -40,6 +40,7 @@ class CertificatePrepareView(EventViewMixin, generic.FormView):
     model = models.Certificate
     slug_field = 'event__pk'
     slug_url_kwarg = 'event_pk'
+    form_class = forms.CertificatePartialForm
     instance = None
 
     def get_context_data(self, **kwargs):
@@ -53,8 +54,6 @@ class CertificatePrepareView(EventViewMixin, generic.FormView):
             'event_pk': self.event.pk,
             'pk': self.instance.pk
         })
-
-    form_class = forms.CertificatePartialForm
 
     def get_form(self, form_class=None):
 

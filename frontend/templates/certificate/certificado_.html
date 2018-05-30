@@ -7,7 +7,7 @@
 {% block styles %}
 <style>
     .resize-container {
-        background: url('{% static "assets/img/certificate-example.jpg" %}');
+        background: url('{{ object.background_image.url }}');
         width: 1024px;
         height: 725px;
     }
@@ -142,6 +142,9 @@ function closeNav() {
 <script src="{% static "assets/js/certificado.js" %}"></script>
 <script>
     $(document).ready(function() {
+        console.log('{% url 'certificate:certificate-detail' event.pk object.pk %}');
+        window.cert.url = '{% url 'certificate:certificate-detail' event.pk object.pk %}';
+        window.cert.event = '{{ event.pk }}';
         window.cert.moveElement($('#text'), {{ object.text_position_x|unlocalize|intcomma }}, {{ object.text_position_y|unlocalize|intcomma }});
         window.cert.moveElement($('#titleText'), {{ object.title_position_x|unlocalize|intcomma }}, {{ object.title_position_y|unlocalize|intcomma }});
         window.cert.moveElement($('#dateText'), {{ object.date_position_x|unlocalize|intcomma }}, {{ object.date_position_y|unlocalize|intcomma }});

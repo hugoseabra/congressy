@@ -14,7 +14,6 @@ class CertificatePartialForm(forms.ModelForm):
 
     def clear_background_image(self):
         """ Limpa campo `image4` """
-        print('sddasdasdas')
         self._clear_file('background_image')
         return self.cleaned_data['background_image']
 

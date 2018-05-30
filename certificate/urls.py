@@ -41,4 +41,8 @@ urlpatterns_certificate_urls = [
         r'^events/(?P<event_pk>[\d]+)/certificate/',
         include(private_certificate_urls)
     ),
+    url(
+        r'^events/(?P<event_pk>[\d]+)/',
+        include(api_certificate_urls)
+    ),
 ]
