@@ -68,7 +68,7 @@ class Event(models.Model, GatherosModelMixin):
         (EVENT_TYPE_PAID, 'pago'),
         (EVENT_TYPE_SCIENTIFIC, 'scientific'),
     )
-    name = models.CharField(max_length=255, verbose_name='nome')
+    name = models.CharField(max_length=255, verbose_name='Nome do evento')
 
     organization = models.ForeignKey(
         Organization,
@@ -139,8 +139,8 @@ class Event(models.Model, GatherosModelMixin):
         verbose_name='permalink'
     )
 
-    date_start = models.DateTimeField(verbose_name='data inicial')
-    date_end = models.DateTimeField(verbose_name='data final')
+    date_start = models.DateTimeField(verbose_name='data de início do evento')
+    date_end = models.DateTimeField(verbose_name='data de término do evento')
 
     banner_small = StdImageField(
         upload_to=get_image_path,

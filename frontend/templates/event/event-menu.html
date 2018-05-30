@@ -43,6 +43,7 @@ Variáveis:
 </ul>
 
 
+{% if event.has_checkin %}
 <h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
 <ul class="nav nav-pills nav-stacked">
 
@@ -74,7 +75,7 @@ Variáveis:
 
 
 </ul>
-
+{% endif %}
 {% if event.is_scientific %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Artigos científicos</h5>
     <ul class="nav nav-pills nav-stacked">
