@@ -1,9 +1,15 @@
 """
 Domínio de controle de pendências financeiras da plataforma.
 """
+from decimal import Decimal
+
+from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from gatheros_subscription.models import Lot, Subscription
+
 
 class Debt(models.Model):
     """
@@ -71,8 +77,8 @@ class Debt(models.Model):
     amount = models.DecimalField(
         decimal_places=2,
         max_digits=11,
-        null=True, # REMOVER
-        blank=True, # REMOVER
+        null=True,  # REMOVER
+        blank=True,  # REMOVER
         verbose_name='valor',
         help_text='valor cobrado ao comprador',
     )
@@ -80,8 +86,8 @@ class Debt(models.Model):
     liquid_amount = models.DecimalField(
         decimal_places=2,
         max_digits=11,
-        null=True, # REMOVER
-        blank=True, # REMOVER
+        null=True,  # REMOVER
+        blank=True,  # REMOVER
         verbose_name='valor líquido',
         help_text='valor que o organizador irá receber',
     )
@@ -104,7 +110,7 @@ class Debt(models.Model):
         decimal_places=2,
         max_digits=11,
         null=True,  # REMOVER
-        blank=True, # REMOVER
+        blank=True,  # REMOVER
         verbose_name='valor dos juros do parcelamento',
     )
 
@@ -119,7 +125,7 @@ class Debt(models.Model):
         if self._state.adding is True:
             self.lot = self.subscription.lot
 
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class DebtConfig(models.Model):
@@ -167,6 +173,22 @@ class DebtConfig(models.Model):
         return '{} - {}'.format(self.debt.type, self.debt.subscription.pk)
 
 
+@receiver(post_save, sender=Debt)
+def _debt_create_config_post_save(instance, created, raw, **_):
+    if raw is True or created is False:
+        return
+
+    lot = instance.lot
+
+    DebtConfig.objects.create(
+        debt=instance,
+        transfer_tax=lot.transfer_tax,
+        interests_rate=Decimal(settings.CONGRESSY_INSTALLMENT_INTERESTS_RATE),
+        total_installments=lot.installment_limit,
+        free_installments=lot.num_install_interest_absortion,
+    )
+
+
 class Payment(models.Model):
     """
     Registro de pagamento para uma determinada inscrição enquanto ela estava
@@ -177,21 +199,21 @@ class Payment(models.Model):
         verbose_name = 'pagamento'
         verbose_name_plural = 'pagamentos'
 
-    CASH_TYPE_MONEY = 'money'
-    CASH_TYPE_PAYCHECK = 'paycheck'
-    CASH_TYPE_DEBIT_CARD = 'debit_card'
-    CASH_TYPE_CREDIT_CARD = 'credit_card'
     CASH_TYPE_BOLETO = 'boleto'
+    CASH_TYPE_CREDIT_CARD = 'credit_card'
+    CASH_TYPE_DEBIT_CARD = 'debit_card'
+    CASH_TYPE_PAYCHECK = 'paycheck'
     CASH_TYPE_BANK_DEPOSIT = 'bank_deposit'
+    CASH_TYPE_MONEY = 'money'
     CASH_TYPE_TRANSFER = 'bank_transfer'
 
     CASH_TYPES = (
-        (CASH_TYPE_MONEY, 'Dinheiro'),
-        (CASH_TYPE_PAYCHECK, 'Cheque'),
-        (CASH_TYPE_DEBIT_CARD, 'Cartão de Débito'),
-        (CASH_TYPE_CREDIT_CARD, 'Cartão de Crédito'),
         (CASH_TYPE_BOLETO, 'Boleto'),
+        (CASH_TYPE_CREDIT_CARD, 'Cartão de Crédito'),
+        (CASH_TYPE_DEBIT_CARD, 'Cartão de Débito'),
+        (CASH_TYPE_PAYCHECK, 'Cheque'),
         (CASH_TYPE_BANK_DEPOSIT, 'Depósito'),
+        (CASH_TYPE_MONEY, 'Dinheiro'),
         (CASH_TYPE_TRANSFER, 'Transferência Bancária'),
     )
 
