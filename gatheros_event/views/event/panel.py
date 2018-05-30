@@ -97,6 +97,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         }
         context['report'] = self._get_report()
         context['full_banking'] = self._get_full_banking()
+        context['number_attendances'] = self.get_number_attendances()
         try:
             context['info'] = self.event.info
         except Info.DoesNotExist:
@@ -104,6 +105,16 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
 
 
         return context
+
+    def get_number_attendances(self):
+        try:
+            return Subscription.objects.filter(
+                attended=True,
+                event=self.get_event(),
+            ).count()
+
+        except Subscription.DoesNotExist:
+            return 0
 
     def get_event(self, **kwargs):
         return get_object_or_404(Event, pk=self.kwargs.get('pk'))

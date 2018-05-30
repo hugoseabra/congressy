@@ -80,7 +80,7 @@ class Event(models.Model, GatherosModelMixin):
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
-        verbose_name='categoria'
+        verbose_name='categoria do evento'
     )
 
     event_type = models.CharField(

@@ -49,7 +49,7 @@
 
 
 {% block content %}
-    {% if not step  %}
+    {% if not step %}
         <div class="row">
             <div class="col-md-4">
                 <div class="type_event panel panel-primary"
@@ -66,14 +66,10 @@
                         />
                     </div>
                     <div class="panel-footer">
-                        <h3> Lorem ipsum iaculis nisi proin primis fusce proin
-                            lacinia volutpat, tempor class orci neque pretium
-                            fames fusce orci diam vitae, nulla nibh ornare
-                            torquent praesent fringilla sapien conubia. curae a
-                            massa tortor accumsan conubia maecenas sagittis
-                            morbi maecenas, luctus tincidunt augue sodales
-                            quam aenean convallis, posuere sit augue hendrerit.
-                        </h3>
+                        <a> Seu evento é com inscrição gratuita.<br/>
+                            Não há pagamentos, nem gestão de recursos
+                            avançados.
+                        </a>
                     </div>
                     <i class="overlay far fa-check-circle fa-10x"
                     ></i>
@@ -95,14 +91,13 @@
                         />
                     </div>
                     <div class="panel-footer">
-                        <h3> Lorem ipsum iaculis nisi proin primis fusce proin
-                            lacinia volutpat, tempor class orci neque pretium
-                            fames fusce orci diam vitae, nulla nibh ornare
-                            torquent praesent fringilla sapien conubia. curae a
-                            massa tortor accumsan conubia maecenas sagittis
-                            morbi maecenas, luctus tincidunt augue sodales
-                            quam aenean convallis, posuere sit augue hendrerit.
-                        </h3>
+                        <a> Seu evento é com inscrição paga.<br/>
+                            Poderá gerenciar vagas de atividades extras
+                            (workshops, minicursos).<br/>
+                            Poderá vender opcionais (hospedagem, alimentação e
+                            outros).<br/>
+                            Módulo de Check-in e Credenciamento.<br/>
+                        </a>
                     </div>
                     <i class="overlay far fa-check-circle fa-10x"
                     ></i>
@@ -126,14 +121,14 @@
 
                     </div>
                     <div class="panel-footer">
-                        <h3> Lorem ipsum iaculis nisi proin primis fusce proin
-                            lacinia volutpat, tempor class orci neque pretium
-                            fames fusce orci diam vitae, nulla nibh ornare
-                            torquent praesent fringilla sapien conubia. curae a
-                            massa tortor accumsan conubia maecenas sagittis
-                            morbi maecenas, luctus tincidunt augue sodales
-                            quam aenean convallis, posuere sit augue hendrerit.
-                        </h3>
+                        <a> Seu evento é científico com inscrição paga.<br/>
+                            Poderá gerenciar vagas de atividades extras
+                            (workshops, minicursos).<br/>
+                            Poderá vender opcionais (hospedagem, alimentação e
+                            outros).<br/>
+                            Módulo de Check-in e Credenciamento.<br/>
+                            Módulo de Submissão.<br/>
+                        </a>
                     </div>
                     <i class="overlay far fa-check-circle fa-10x"
                     ></i>
@@ -147,7 +142,7 @@
             <input type="hidden" name="step" value="step2"/>
         </form>
     {% endif %}
-    {% if step == 'step2'%}
+    {% if step == 'step2' %}
 
         <form action="" method="post" class="form-horizontal form-border"
               role="form" name="event_form">
@@ -314,6 +309,9 @@
           href="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.min.css" %}">
 
     <style>
+        .panel > .panel-footer{
+            text-transform: none;
+        }
         .type_event {
             cursor: pointer;
         }
