@@ -1,9 +1,9 @@
 <div class="progress">
-                    <div class="progress-bar progress-bar-info"
-                         role="progressbar"
-                         aria-valuemin="0" aria-valuemax="100">
-                    </div>
-                </div>
+    <div class="progress-bar progress-bar-info"
+         role="progressbar"
+         aria-valuemin="0" aria-valuemax="100">
+    </div>
+</div>
 <table id="todo-list" class="table table-hover">
     <tbody>
     <tr class="todo_list_element" role="presentation">
@@ -71,21 +71,21 @@
         </tr>
     {% endif %}
     {% if has_addons.checkin == True %}
-        <tr id= del-checkin class="todo_list_element" role="presentation">
+        <tr id=del-checkin class="todo_list_element" role="presentation">
             <td>
                 <a type="button" class="add_todo_element pull-left fas
             fa-minus warning-color
                                      fa-3x"></a>
+                <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
                 <h1>
                     <a href="
 {% url 'event:organization-edit' organization.pk %}">CheckIn</a></h1>
-                <i class="fas fa-check-circle success-color
-                                    pull-right fa-2x"></i>
             </td>
         </tr>
     {% endif %}
     {% if has_addons.extra_activities == True %}
-        <tr id = "del-extra_activities" class="todo_list_element"
+        <tr id="del-extra_activities" class="todo_list_element"
             role="presentation">
             <td>
                 <a type="button" class="add_todo_element pull-left fas
@@ -105,7 +105,7 @@
         </tr>
     {% endif %}
     {% if has_addons.optionals == True %}
-        <tr id="del-optionals"  class="todo_list_element" role="presentation">
+        <tr id="del-optionals" class="todo_list_element" role="presentation">
             <td>
                 <a type="button" class="add_todo_element pull-left fas
             fa-minus warning-color
@@ -146,56 +146,66 @@
 </table>
 <br>
 {% if has_paid_lots %}
-<table id="todo-list-add" class="table table-hover">
-    <tbody>
+    <div id="todo_additional" class="panel panel-primary">
+    <div class="panel-heading">
+            <div class="panel-title">Serviços Adicionais</div>
+        </div>
+        <div class="panel-body">
+        <table id="todo-list-add" class="table table-hover">
+            <tbody>
 
-    {% if has_addons.checkin == False %}
-        <tr id = "add-checkin" class="todo_list_element" role="presentation">
-            <td>
-                <a type="button" class="add_todo_element pull-left fas
+            {% if has_addons.checkin == False %}
+                <tr id="add-checkin" class="todo_list_element"
+                    role="presentation">
+                    <td>
+                        <a type="button" class="add_todo_element pull-left fas
             fa-plus success-color
                                      fa-3x"></a>
-                <h1>
-                    <a>CheckIn</a></h1>
-            </td>
-        </tr>
-    {% endif %}
-    {% if has_addons.extra_activities == False %}
-        <tr id = "add-extra_activities" class="todo_list_element"
-            role="presentation">
-            <td>
-                <a type="button" class="add_todo_element pull-left fas
+                        <h1>
+                            <a>CheckIn</a></h1>
+                    </td>
+                </tr>
+            {% endif %}
+            {% if has_addons.extra_activities == False %}
+                <tr id="add-extra_activities" class="todo_list_element"
+                    role="presentation">
+                    <td>
+                        <a type="button" class="add_todo_element pull-left fas
             fa-plus success-color
                                      fa-3x"></a>
 
-                <h1>
-                    <a>Atividades extras</a></h1>
-            </td>
-        </tr>
-    {% endif %}
-    {% if has_addons.optionals == False %}
-        <tr id = "add-optionals" class="todo_list_element" role="presentation">
-            <td>
-               <a type="button" class="add_todo_element pull-left fas
+                        <h1>
+                            <a>Atividades extras</a></h1>
+                    </td>
+                </tr>
+            {% endif %}
+            {% if has_addons.optionals == False %}
+                <tr id="add-optionals" class="todo_list_element"
+                    role="presentation">
+                    <td>
+                        <a type="button" class="add_todo_element pull-left fas
             fa-plus success-color
                                      fa-3x"></a>
-                <h1>
-                    <a>Opcionais</a></h1>
-            </td>
-        </tr>
-    {% endif %}
-    {% if has_addons.certificate == False %}
-        <tr id="add-certificate" class="todo_list_element" role="presentation">
-            <td>
-                 <a type="button" class="add_todo_element pull-left fas
+                        <h1>
+                            <a>Opcionais</a></h1>
+                    </td>
+                </tr>
+            {% endif %}
+            {% if has_addons.certificate == False %}
+                <tr id="add-certificate" class="todo_list_element"
+                    role="presentation">
+                    <td>
+                        <a type="button" class="add_todo_element pull-left fas
             fa-plus success-color
                                      fa-3x"></a>
-                <h1>
-                    <a>Configurar
-                        Certificados</a></h1>
-            </td>
-        </tr>
-    {% endif %}
-    </tbody>
-</table>
+                        <h1>
+                            <a>Configurar
+                                Certificados</a></h1>
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+        </div>
+    </div>
 {% endif %}
