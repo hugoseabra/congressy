@@ -15,6 +15,9 @@ class Debt(models.Model):
     class Meta:
         verbose_name = 'pendência'
         verbose_name_plural = 'pendências'
+        unique_together = (
+            ('lot', 'subscription'),
+        )
 
     DEBT_TYPE_SUBSCRIPTION = 'subscription'
     DEBT_TYPE_SERVICE = 'service'
@@ -46,7 +49,7 @@ class Debt(models.Model):
     subscription = models.ForeignKey(
         Subscription,
         on_delete=models.CASCADE,
-        related_name='debts'
+        related_name='debts',
     )
 
     type = models.CharField(
@@ -68,8 +71,8 @@ class Debt(models.Model):
     amount = models.DecimalField(
         decimal_places=2,
         max_digits=11,
-        null=True,
-        blank=True,
+        null=True, # REMOVER
+        blank=True, # REMOVER
         verbose_name='valor',
         help_text='valor cobrado ao comprador',
     )
@@ -77,10 +80,16 @@ class Debt(models.Model):
     liquid_amount = models.DecimalField(
         decimal_places=2,
         max_digits=11,
-        null=True,
-        blank=True,
+        null=True, # REMOVER
+        blank=True, # REMOVER
         verbose_name='valor líquido',
         help_text='valor que o organizador irá receber',
+    )
+
+    installments = models.PositiveIntegerField(
+        default=1,
+        verbose_name='número de parcelas',
+        help_text='número de parcelas da compra',
     )
 
     installment_amount = models.DecimalField(
@@ -94,8 +103,8 @@ class Debt(models.Model):
     installment_interests_amount = models.DecimalField(
         decimal_places=2,
         max_digits=11,
-        null=True,
-        blank=True,
+        null=True,  # REMOVER
+        blank=True, # REMOVER
         verbose_name='valor dos juros do parcelamento',
     )
 
@@ -128,10 +137,10 @@ class DebtConfig(models.Model):
         help_text='se taxa foi transferida ao participante',
     )
 
-    installments = models.PositiveIntegerField(
+    total_installments = models.PositiveIntegerField(
         default=1,
-        verbose_name='número de parcelas',
-        help_text='número de parcelas da compra',
+        verbose_name='total de parcelas',
+        help_text='total possível para parcelamento',
     )
 
     free_installments = models.PositiveIntegerField(
@@ -143,7 +152,7 @@ class DebtConfig(models.Model):
     interests_rate = models.DecimalField(
         max_digits=11,
         decimal_places=3,
-        verbose_name='taxa de juros de parcelamento',
+        verbose_name='percentual de taxa de juros de parcelamento',
     )
 
     debt = models.OneToOneField(

@@ -17,12 +17,30 @@ class TransactionAdmin(admin.ModelAdmin):
         'subscription__event__name',
     )
     list_display = (
-        'provider',
+        'subscription',
         'status',
         'type',
         'date_created',
+        'liquid_amount',
         'amount'
     )
+
+# @admin.register(Transaction)
+# class TransactionAdmin(admin.ModelAdmin):
+#     search_fields = (
+#         'uuid',
+#         'subscription__uuid',
+#         'subscription__person__uuid',
+#         'subscription__person__name',
+#         'subscription__event__name',
+#     )
+#     list_display = (
+#         'provider',
+#         'status',
+#         'type',
+#         'date_created',
+#         'amount'
+#     )
 
 
 @admin.register(TransactionStatus)
