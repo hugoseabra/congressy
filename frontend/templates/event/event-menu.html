@@ -40,9 +40,38 @@ Variáveis:
         </li>
     {% endif %}
 
-    <li {% if active == 'certificate' %}class="active"{% endif %}>
+    <li {% if active == 'certificate' %}class=  "active"{% endif %}>
+        <a class="sidebar-itens" href="{% url 'certificate:event-certificate-prepare' event.pk %}"
+           title="Editor de Certificados">
+            <i class="fas fa-graduation-cap"></i>Certificados
+        </a>
+    </li>
+</ul>
+
+<h5 class="sidebar-header" style="color:#4c4c4c;">Certificados</h5>
+<ul class="nav nav-pills nav-stacked">
+
+    <li {% if active == 'inscricoes' %}class="active"{% endif %}>
         <a class="sidebar-itens" href=
-                "{% url 'certificate:event-certificate' event.pk %}"
+                "{% url 'subscription:subscription-list' event.pk %}"
+           title="Inscrições">
+            <i class="fa fa-clipboard"></i>
+            Inscrições
+            <span class="badge float-right">{{ event.subscriptions|queryset_count:"status__in=['confirmed','awaiting']" }}</span>
+        </a>
+    </li>
+    {% if has_paid_lots %}
+        <li {% if active == 'pagamentos' %}class="active"{% endif %}>
+            <a class="sidebar-itens" href=
+                    "{% url 'payment:event-payments' event.pk %}"
+               title="Pagamentos">
+                <i class="fas fa-credit-card"></i> Pagamentos
+            </a>
+        </li>
+    {% endif %}
+
+    <li {% if active == 'certificate' %}class=  "active"{% endif %}>
+        <a class="sidebar-itens" href="{% url 'certificate:event-certificate-prepare' event.pk %}"
            title="Editor de Certificados">
             <i class="fas fa-graduation-cap"></i>Editor de Certificados
         </a>
