@@ -17,11 +17,10 @@ class TransactionAdmin(admin.ModelAdmin):
         'subscription__event__name',
     )
     list_display = (
-        'subscription',
+        'provider',
         'status',
         'type',
         'date_created',
-        'liquid_amount',
         'amount'
     )
 

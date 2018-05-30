@@ -5,8 +5,10 @@ Recebedores de rateamento de itens vendidos na platforma.
 from decimal import Decimal
 
 from partner import constants as partner_constants
-from . import constants
 
+
+RECEIVER_LEVEL0='level0'
+RECEIVER_LEVEL1='level1'
 
 class Receiver(object):
     """
@@ -69,7 +71,7 @@ class CongressyReceiver(Receiver):
     Definição Congressy como Recebedora de um rateamento (split) de itens
     comercializado.
     """
-    level = constants.RECEIVER_LEVEL0
+    level = RECEIVER_LEVEL0
 
     def create_and_publish_partners(self,
                                     receiver_subscriber,
@@ -124,7 +126,7 @@ class CongressyReceiver(Receiver):
 
 
 class OrganizerReceiver(Receiver):
-    level = constants.RECEIVER_LEVEL0
+    level = RECEIVER_LEVEL0
 
     def __init__(self,
                  installment_result,
@@ -153,7 +155,7 @@ class OrganizerReceiver(Receiver):
 
 
 class ComissioningReceiver(Receiver):
-    level = constants.RECEIVER_LEVEL1
+    level = RECEIVER_LEVEL1
 
     def __init__(self, parent_receiver, name, *args, **kwargs):
 

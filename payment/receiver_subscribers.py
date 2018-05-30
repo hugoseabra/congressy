@@ -2,14 +2,19 @@
 Gerenciamento de coleções de Receivers que serão usados para diferentes
 operações de processamento para obter regras de rateamento de pagamento.
 """
-from decimal import Decimal
 from collections import OrderedDict
+from decimal import Decimal
 
 from django.conf import settings
 
-from . import receivers, exceptions, constants
-from .installments import Calculator, InstallmentResult
 from gatheros_subscription.models import Subscription
+from payment.installments import Calculator, InstallmentResult
+from payment import exception, receivers
+
+
+RECEIVER_TYPE_SUBSCRIPTION='receiver_subscription'
+RECEIVER_TYPE_PRODUCT='receiver_product'
+RECEIVER_TYPE_SERVICE='receiver_service'
 
 
 class ReceiverSubscriber(object):
