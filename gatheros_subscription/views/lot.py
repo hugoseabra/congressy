@@ -199,8 +199,6 @@ class LotAddFormView(BaseFormLotView, generic.CreateView):
         context['form_title'] = "Novo lote para '{}'".format(self.event.name)
         context['full_banking'] = self._get_full_banking()
         context['has_surveys'] = self._event_has_surveys()
-        context['has_inside_bar'] = True
-        context['active'] = 'lote-categorias'
 
         return context
 
@@ -283,8 +281,6 @@ class LotEditFormView(BaseFormLotView, generic.UpdateView):
         context['lot_has_subscriptions'] = self.object.subscriptions.filter(
             completed=True,
         ).count() > 0
-        context['has_inside_bar'] = True
-        context['active'] = 'lotes-categorias'
 
         return context
 

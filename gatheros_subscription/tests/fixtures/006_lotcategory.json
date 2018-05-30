@@ -28,5 +28,35 @@
       "active": true,
       "description": ""
     }
+  },
+  {
+    "model": "gatheros_subscription.lotcategory",
+    "pk": 4,
+    "fields": {
+      "event": 8,
+      "name": "Estudantes",
+      "active": true,
+      "description": null
+    }
+  },
+  {
+    "model": "gatheros_subscription.lotcategory",
+    "pk": 5,
+    "fields": {
+      "event": 8,
+      "name": "Parceiros",
+      "active": true,
+      "description": null
+    }
+  },
+  {
+    "model": "gatheros_subscription.lotcategory",
+    "pk": 6,
+    "fields": {
+      "event": 8,
+      "name": "Afiliados",
+      "active": true,
+      "description": null
+    }
   }
 ]

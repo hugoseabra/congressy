@@ -40,6 +40,7 @@ FIXTURE_DIRS += [
     os.path.join(BASE_DIR, 'gatheros_subscription', 'tests', 'fixtures'),
     os.path.join(BASE_DIR, 'payment', 'tests', 'fixtures'),
     os.path.join(BASE_DIR, 'addon', 'tests', 'fixtures'),
+    os.path.join(BASE_DIR, 'survey', 'tests', 'fixtures'),
 ]
 # ============================= TEMPLATES =================================== #
 TEMPLATES[0]['OPTIONS']['context_processors'].append(

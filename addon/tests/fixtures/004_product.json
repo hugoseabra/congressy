@@ -4,7 +4,6 @@
     "pk": 1,
     "fields": {
       "lot_category": 1,
-      "name": "Camiseta",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T11:16:54.129",
@@ -15,6 +14,7 @@
       "description": "Camiseta personalizada do evento.",
       "quantity": 5,
       "release_days": 7,
+      "name": "Camiseta",
       "optional_type": 8
     }
   },
@@ -23,7 +23,6 @@
     "pk": 2,
     "fields": {
       "lot_category": 1,
-      "name": "Caneca",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T11:16:54.146",
@@ -34,6 +33,7 @@
       "description": "Caneca personalizada do evento.",
       "quantity": 5,
       "release_days": 7,
+      "name": "Caneca",
       "optional_type": 8
     }
   },
@@ -41,9 +41,7 @@
     "model": "addon.product",
     "pk": 3,
     "fields": {
-      "optional_type": 2,
       "lot_category": 2,
-      "name": "DiRoma Exclusive - Single - 1 Pessoa - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T12:00:00",
       "published": true,
       "created": "2018-04-27T17:25:13.829",
@@ -53,16 +51,16 @@
       "liquid_price": "828.00",
       "description": "",
       "quantity": 50,
-      "release_days": 7
+      "release_days": 7,
+      "name": "DiRoma Exclusive - Single - 1 Pessoa - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 4,
     "fields": {
-      "optional_type": 2,
       "lot_category": 1,
-      "name": "DiRoma Exclusive - Single - 1 Pessoa - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T12:00:00",
       "published": true,
       "created": "2018-04-27T17:29:14.687",
@@ -72,16 +70,16 @@
       "liquid_price": "828.00",
       "description": "",
       "quantity": 30,
-      "release_days": 7
+      "release_days": 7,
+      "name": "DiRoma Exclusive - Single - 1 Pessoa - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 5,
     "fields": {
-      "optional_type": 2,
       "lot_category": 3,
-      "name": "DiRoma Exclusive - Single - 1 Pessoa - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T12:00:00",
       "published": true,
       "created": "2018-04-27T17:30:02.583",
@@ -91,16 +89,16 @@
       "liquid_price": "828.00",
       "description": "",
       "quantity": 20,
-      "release_days": 7
+      "release_days": 7,
+      "name": "DiRoma Exclusive - Single - 1 Pessoa - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 6,
     "fields": {
-      "optional_type": 2,
       "lot_category": 1,
-      "name": "Termas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T12:00:00",
       "published": true,
       "created": "2018-04-27T17:41:05.822",
@@ -110,16 +108,16 @@
       "liquid_price": "1036.20",
       "description": "",
       "quantity": 10,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Termas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 7,
     "fields": {
-      "optional_type": 2,
       "lot_category": 2,
-      "name": "Termas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-27T17:44:06.915",
@@ -129,16 +127,16 @@
       "liquid_price": "1036.20",
       "description": "",
       "quantity": 30,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Termas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 8,
     "fields": {
-      "optional_type": 2,
       "lot_category": 3,
-      "name": "Termas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-27T17:44:21.122",
@@ -148,16 +146,16 @@
       "liquid_price": "1036.20",
       "description": "",
       "quantity": 20,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Termas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 9,
     "fields": {
-      "optional_type": 2,
       "lot_category": 1,
-      "name": "Vilas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:24:20.762",
@@ -167,16 +165,16 @@
       "liquid_price": "780.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Vilas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 10,
     "fields": {
-      "optional_type": 2,
       "lot_category": 2,
-      "name": "Vilas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:24:51.376",
@@ -186,16 +184,16 @@
       "liquid_price": "780.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Vilas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 11,
     "fields": {
-      "optional_type": 2,
       "lot_category": 3,
-      "name": "Vilas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:24:58.883",
@@ -205,16 +203,16 @@
       "liquid_price": "780.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Vilas DiRoma - Single - 1 Pessoa - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 12,
     "fields": {
-      "optional_type": 2,
       "lot_category": 1,
-      "name": "DiRoma Exclusive - Incluso 2 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:28:17.562",
@@ -224,16 +222,16 @@
       "liquid_price": "828.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "DiRoma Exclusive - Incluso 2 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 13,
     "fields": {
-      "optional_type": 2,
       "lot_category": 2,
-      "name": "DiRoma Exclusive - Incluso 2 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:28:58.117",
@@ -243,16 +241,16 @@
       "liquid_price": "828.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "DiRoma Exclusive - Incluso 2 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 14,
     "fields": {
-      "optional_type": 2,
       "lot_category": 3,
-      "name": "DiRoma Exclusive - Incluso 2 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:28:58.141",
@@ -262,16 +260,16 @@
       "liquid_price": "828.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "DiRoma Exclusive - Incluso 2 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 15,
     "fields": {
-      "optional_type": 2,
       "lot_category": 1,
-      "name": "Termas DiRoma - Single - 2 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:33:56.181",
@@ -281,16 +279,16 @@
       "liquid_price": "1036.20",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Termas DiRoma - Single - 2 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 16,
     "fields": {
-      "optional_type": 2,
       "lot_category": 2,
-      "name": "Termas DiRoma - Single - 2 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:34:15.974",
@@ -300,16 +298,16 @@
       "liquid_price": "1036.20",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Termas DiRoma - Single - 2 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 17,
     "fields": {
-      "optional_type": 2,
       "lot_category": 3,
-      "name": "Termas DiRoma - Single - 2 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:34:15.987",
@@ -319,16 +317,16 @@
       "liquid_price": "1036.20",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Termas DiRoma - Single - 2 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 18,
     "fields": {
-      "optional_type": 2,
       "lot_category": 1,
-      "name": "Vilas DiRoma - Incluso 2 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:35:30.803",
@@ -338,16 +336,16 @@
       "liquid_price": "780.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Vilas DiRoma - Incluso 2 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 19,
     "fields": {
-      "optional_type": 2,
       "lot_category": 2,
-      "name": "Vilas DiRoma - Incluso 2 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:36:12.888",
@@ -357,16 +355,16 @@
       "liquid_price": "780.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Vilas DiRoma - Incluso 2 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 20,
     "fields": {
-      "optional_type": 2,
       "lot_category": 3,
-      "name": "Vilas DiRoma - Incluso 2 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:36:12.920",
@@ -376,16 +374,16 @@
       "liquid_price": "780.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Vilas DiRoma - Incluso 2 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 21,
     "fields": {
-      "optional_type": 2,
       "lot_category": 1,
-      "name": "DiRoma Exclusive - Incluso 3 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:37:04.848",
@@ -395,16 +393,16 @@
       "liquid_price": "1158.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "DiRoma Exclusive - Incluso 3 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 22,
     "fields": {
-      "optional_type": 2,
       "lot_category": 2,
-      "name": "DiRoma Exclusive - Incluso 3 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:37:18.333",
@@ -414,16 +412,16 @@
       "liquid_price": "1158.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "DiRoma Exclusive - Incluso 3 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 23,
     "fields": {
-      "optional_type": 2,
       "lot_category": 3,
-      "name": "DiRoma Exclusive - Incluso 3 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:37:18.355",
@@ -433,16 +431,16 @@
       "liquid_price": "1158.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "DiRoma Exclusive - Incluso 3 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 24,
     "fields": {
-      "optional_type": 2,
       "lot_category": 1,
-      "name": "Termas DiRoma - Single - 3 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:38:08.638",
@@ -452,16 +450,16 @@
       "liquid_price": "1152.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Termas DiRoma - Single - 3 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 25,
     "fields": {
-      "optional_type": 2,
       "lot_category": 2,
-      "name": "Termas DiRoma - Single - 3 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:38:23.411",
@@ -471,16 +469,16 @@
       "liquid_price": "1152.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Termas DiRoma - Single - 3 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 26,
     "fields": {
-      "optional_type": 2,
       "lot_category": 3,
-      "name": "Termas DiRoma - Single - 3 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:38:23.436",
@@ -490,16 +488,16 @@
       "liquid_price": "1152.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Termas DiRoma - Single - 3 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 27,
     "fields": {
-      "optional_type": 2,
       "lot_category": 1,
-      "name": "Vilas DiRoma - Incluso 3 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:39:17.601",
@@ -509,16 +507,16 @@
       "liquid_price": "1092.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Vilas DiRoma - Incluso 3 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 28,
     "fields": {
-      "optional_type": 2,
       "lot_category": 2,
-      "name": "Vilas DiRoma - Incluso 3 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:39:39.010",
@@ -528,16 +526,16 @@
       "liquid_price": "1092.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Vilas DiRoma - Incluso 3 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
     }
   },
   {
     "model": "addon.product",
     "pk": 29,
     "fields": {
-      "optional_type": 2,
       "lot_category": 3,
-      "name": "Vilas DiRoma - Incluso 3 Pessoas - 3 di\u00e1rias",
       "date_end_sub": "2018-05-22T23:59:59",
       "published": true,
       "created": "2018-04-30T10:39:39.022",
@@ -547,7 +545,66 @@
       "liquid_price": "1092.00",
       "description": "",
       "quantity": null,
-      "release_days": 7
+      "release_days": 7,
+      "name": "Vilas DiRoma - Incluso 3 Pessoas - 3 di\u00e1rias",
+      "optional_type": 2
+    }
+  },
+  {
+    "model": "addon.product",
+    "pk": 30,
+    "fields": {
+      "lot_category": 6,
+      "date_end_sub": "2018-12-27T23:59:00",
+      "published": true,
+      "created": "2018-05-29T16:21:34.220",
+      "modified": "2018-05-29T16:21:43.198",
+      "created_by": "Hugo Seabra",
+      "modified_by": "",
+      "liquid_price": "12.00",
+      "description": "",
+      "quantity": 100,
+      "release_days": 7,
+      "name": "Kit de Escrit\u00f3rio",
+      "optional_type": 8
+    }
+  },
+  {
+    "model": "addon.product",
+    "pk": 31,
+    "fields": {
+      "lot_category": 4,
+      "date_end_sub": "2018-12-27T23:59:00",
+      "published": true,
+      "created": "2018-05-29T16:22:45.441",
+      "modified": "2018-05-29T16:22:54.017",
+      "created_by": "Hugo Seabra",
+      "modified_by": "",
+      "liquid_price": "25.00",
+      "description": "",
+      "quantity": 120,
+      "release_days": 7,
+      "name": "Camiseta Descolada (preta)",
+      "optional_type": 4
+    }
+  },
+  {
+    "model": "addon.product",
+    "pk": 32,
+    "fields": {
+      "lot_category": 5,
+      "date_end_sub": "2018-12-27T23:59:00",
+      "published": true,
+      "created": "2018-05-29T16:23:26.324",
+      "modified": "2018-05-29T16:23:33.204",
+      "created_by": "Hugo Seabra",
+      "modified_by": "",
+      "liquid_price": "32.00",
+      "description": "",
+      "quantity": 60,
+      "release_days": 7,
+      "name": "Camiseta Descolada + Caneca",
+      "optional_type": 8
     }
   }
 ]

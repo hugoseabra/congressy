@@ -1,0 +1,74 @@
+[
+  {
+    "model": "addon.service",
+    "pk": 1,
+    "fields": {
+      "lot_category": 5,
+      "date_end_sub": "2018-12-27T23:59:00",
+      "published": true,
+      "created": "2018-05-29T16:05:35.684",
+      "modified": "2018-05-29T16:08:14.746",
+      "created_by": "",
+      "modified_by": "Hugo Seabra",
+      "liquid_price": "25.00",
+      "description": "",
+      "quantity": null,
+      "release_days": 7,
+      "name": "Sua empresa na era digital: como se proteger?",
+      "optional_type": 7,
+      "theme": 5,
+      "schedule_start": "2018-10-25T14:00:00",
+      "schedule_end": "2018-10-25T15:00:00",
+      "place": "BLOCO A - audit\u00f3rio",
+      "restrict_unique": false
+    }
+  },
+  {
+    "model": "addon.service",
+    "pk": 2,
+    "fields": {
+      "lot_category": 4,
+      "date_end_sub": "2018-12-27T23:59:00",
+      "published": true,
+      "created": "2018-05-29T16:07:49.393",
+      "modified": "2018-05-29T16:07:55.590",
+      "created_by": "Hugo Seabra",
+      "modified_by": "",
+      "liquid_price": "80.00",
+      "description": "",
+      "quantity": 15,
+      "release_days": 7,
+      "name": "Programa\u00e7\u00e3o NodeJS: Como ser mais um louco!",
+      "optional_type": 11,
+      "theme": 4,
+      "schedule_start": "2018-10-25T14:00:00",
+      "schedule_end": "2018-10-25T16:00:00",
+      "place": "BLOCO A - Laborat\u00f3rio 01",
+      "restrict_unique": true
+    }
+  },
+  {
+    "model": "addon.service",
+    "pk": 3,
+    "fields": {
+      "lot_category": 6,
+      "date_end_sub": "2018-12-27T23:59:00",
+      "published": true,
+      "created": "2018-05-29T16:09:19.087",
+      "modified": "2018-05-29T16:09:32.214",
+      "created_by": "Hugo Seabra",
+      "modified_by": "",
+      "liquid_price": "65.00",
+      "description": "",
+      "quantity": 50,
+      "release_days": 7,
+      "name": "Estabelecendo uma Cultura de Seguran\u00e7a na Empresa",
+      "optional_type": 14,
+      "theme": 5,
+      "schedule_start": "2018-10-25T14:00:00",
+      "schedule_end": "2018-10-25T16:00:00",
+      "place": "BLOCO A - Laborat\u00f3rio 02",
+      "restrict_unique": true
+    }
+  }
+]
