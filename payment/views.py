@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import ListView
 from rest_framework.decorators import api_view
@@ -40,7 +40,8 @@ from payment.models import Transaction, TransactionStatus
 
 
 class EventPaymentView(AccountMixin, ListView):
-    template_name = 'payments/list.html'
+    # template_name = 'payments/list.html'
+    template_name = 'maintainance.html'
     event = None
 
     def can_access(self):
@@ -53,8 +54,8 @@ class EventPaymentView(AccountMixin, ListView):
         return reverse('event:event-list')
 
     def dispatch(self, request, *args, **kwargs):
-
         self.event = get_object_or_404(Event, pk=self.kwargs.get('pk'))
+
         update_account(
             request=self.request,
             organization=self.event.organization,
