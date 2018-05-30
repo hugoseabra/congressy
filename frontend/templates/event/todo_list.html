@@ -73,13 +73,12 @@
     {% if has_addons.checkin == True %}
         <tr id=del-checkin class="todo_list_element" role="presentation">
             <td>
-                <i class="add_todo_element pull-left fas
-            fa-minus warning-color"></i>
+                <a class="add_todo_element pull-left fas
+            fa-minus warning-color"></a>
                 <i class="fas fa-check-circle success-color
                                     pull-right fa-2x"></i>
                 <h1>
-                    <a href="
-{% url 'event:organization-edit' organization.pk %}">CheckIn</a></h1>
+                    <a href="{% url 'subscription:subscription-attendance-dashboard' event.pk %}">CheckIn</a></h1>
             </td>
         </tr>
     {% endif %}
@@ -98,8 +97,7 @@
                                     pull-right fa-2x"></i>
                 {% endif %}
                 <h1>
-                    <a href="
-{% url 'event:organization-edit' organization.pk %}">Atividades extras</a></h1>
+                    <a>Atividades extras</a></h1>
             </td>
         </tr>
     {% endif %}
@@ -117,8 +115,7 @@
                                     pull-right fa-2x"></i>
                 {% endif %}
                 <h1>
-                    <a href="
-{% url 'event:organization-edit' organization.pk %}">Opcionais</a></h1>
+                    <a>Opcionais</a></h1>
             </td>
         </tr>
     {% endif %}
@@ -145,10 +142,10 @@
 </table>
 <br>
 {% if has_paid_lots %}
-    <div id="todo_additional" class="panel panel-primary">
-    <div class="panel-heading">
+    <div id="todo_additional" class="panel panel-primary" style="box-shadow:
+     0 0 0 0">
+
             <div class="panel-title">Serviços Adicionais</div>
-        </div>
         <div class="panel-body">
         <table id="todo-list-add" class="table table-hover">
             <tbody>

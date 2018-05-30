@@ -6,7 +6,8 @@
 {% block scripts %}
     <script src="{% static "/assets/plugins/gauge/gauge.min.js" %}"></script>
     <script src="{% static "/assets/plugins/chartjs/Chart.min.js" %}"></script>
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto"
+          rel="stylesheet">
     <script>
         //=================Gauge Inscritos=================================
 
@@ -165,11 +166,14 @@
 {% endblock %}
 {% block styles %}
     <style>
-
-        .add_todo_element{
+        .table > tbody > tr > td{
+            border-top: 0 solid;
+        }
+        .add_todo_element {
             padding-right: 10px;
             cursor: pointer;
         }
+
         .todo_list_element {
             padding-left: 10px;
             padding-right: 10px;
