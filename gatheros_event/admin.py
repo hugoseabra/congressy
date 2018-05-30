@@ -47,12 +47,16 @@ class EventAdmin(admin.ModelAdmin):
                 'date_end',
                 'congressy_percent',
                 'image_main',
+                'is_scientific',
                 'published',
                 'slug',
             ),
         }),
         ('Inscrições', {
-            'fields': ('subscription_type', 'subscription_offline'),
+            'fields': (
+                'boleto_limit_days',
+                # 'subscription_offline',
+            ),
         }),
         ('Publicação', {
             'fields': (
@@ -184,6 +188,11 @@ class OrganizationAdmin(admin.ModelAdmin):
                 'avatar',
                 'active',
                 'internal',
+            ),
+        }),
+        ('Inscrições', {
+            'fields': (
+                'allow_internal_subscription',
             ),
         }),
         ('Site e Redes Sociais', {

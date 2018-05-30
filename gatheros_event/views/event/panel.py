@@ -10,6 +10,8 @@ from django.http import HttpResponse
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event, Info, Organization, Member, Person
+from gatheros_event.models import Event
+from gatheros_subscription.models import Subscription
 from gatheros_event.views.mixins import AccountMixin
 from payment.models import Transaction, TransactionStatus
 
@@ -156,7 +158,9 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         return self.event.limit
 
     def _get_total_subscriptions(self):
-        return self.event.subscriptions.count()
+        return self.event.subscriptions \
+            .exclude(status=Subscription.CANCELED_STATUS) \
+            .count()
 
     def can_access(self):
         event = self.get_object()
@@ -268,9 +272,13 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         }
 
         transactions = \
-            Transaction.objects.filter(Q(subscription__event=self.event) & (Q(
-                status=Transaction.PAID) | Q(
-                status=Transaction.WAITING_PAYMENT)))
+            Transaction.objects.filter(
+                Q(subscription__event=self.event) &
+                (
+                    Q(status=Transaction.PAID) |
+                    Q(status=Transaction.WAITING_PAYMENT)
+                )
+            ).exclude(subscription__status=Subscription.CANCELED_STATUS)
 
         for transaction in transactions:
             totals['total'] += transaction.liquid_amount or Decimal(0.00)
@@ -285,15 +293,10 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
 
     def _get_number_pending(self):
 
-        pending = 0
-
-        transactions = \
-            Transaction.objects.filter(Q(subscription__event=self.event) & (Q(
-                status=Transaction.PAID) | Q(
-                status=Transaction.WAITING_PAYMENT)))
-
-        for transaction in transactions:
-            if transaction.pending:
-                pending += 1 or 0
+        pending = \
+            Subscription.objects.filter(
+                status=Subscription.AWAITING_STATUS,
+                event=self.event
+            ).exclude(status=Subscription.CANCELED_STATUS).count()
 
         return pending

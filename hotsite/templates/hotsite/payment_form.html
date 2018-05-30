@@ -64,25 +64,33 @@
                                         style="text-align: center;display: none">
                                     Boleto
                                     <br/>
-                                    <img class="img-responsive"
-                                         style="height: 153px; height: 153px"
-                                         src="{% static 'hotsite/logos/boleto.svg' %}">
+                                    <img class="img-responsive" style="height: 153px; height: 153px" src="{% static 'hotsite/logos/boleto.svg' %}">
                                 </button>
                                 <button id="id_credit_card" type="button"
                                         style="display: none">
                                     Cartão de Credito
                                     <br/>
-                                    <img class="img-responsive"
-                                         src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
+                                    <img class="img-responsive" src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
                                 </button>
-
-                                <br/>
-
-                                <a id="id_remove"
-                                   style="margin-top: 11px; font-size: 12px;display: none">
-                                    Remover
-                                </a>
+                                <br />
+                                <br />
                             </div>
+                            {% if 'boleto' not in allowed_transaction_types %}
+                                {% if has_open_boleto %}
+                                <div class="col-md-12">
+                                    <div class="alert alert-info text-center">
+                                        Somente pagamento com <strong>Cartão de Crédito</strong>
+                                        está disponível, pois você já possui um boleto em aberto.
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="col-md-12">
+                                    <div class="alert alert-info text-center">
+                                        Somente pagamento com <strong>Cartão de Crédito</strong> está disponível.
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endif %}
 
                             <div class="text-center">
                                 <img style="width: 80%; margin-top: 20px"
@@ -159,7 +167,7 @@
                     2.29,
                     '{{ event.name }}',
                     lot,
-                    null
+                    '{{ allowed_transaction_types }}'
                 );
             });
         });

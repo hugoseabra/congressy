@@ -24,6 +24,7 @@ handler500 = 'project.views.handler500'
 admin_urlpatterns = [url(r'^cgsy-admin18/', admin.site.urls)]
 
 private_urlpatterns = [
+    url(r'^manage/', include('scientific_work.urls', 'scientific_work')),
     url(r'^manage/', include('gatheros_subscription.urls', 'subscription')),
     # url(r'^manage/', include('bitly.urls', 'bitly')),
     url(r'^manage/', include('gatheros_event.urls', 'event')),
@@ -92,8 +93,9 @@ if settings.DEBUG:
     if os.environ.get('DJANGO_SETTINGS_MODULE') == 'project.settings.staging':
         urlpatterns += [url(r'^logs/', include('logtailer.urls')), ]
 
-    import debug_toolbar
+    if not hasattr(settings, 'STAGING'):
+        import debug_toolbar
 
-    urlpatterns = [
-                      url(r'^__debug__/', include(debug_toolbar.urls)),
-                  ] + urlpatterns
+        urlpatterns = [
+                          url(r'^__debug__/', include(debug_toolbar.urls)),
+                      ] + urlpatterns

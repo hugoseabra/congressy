@@ -97,165 +97,169 @@
             </div>
         </div>
         <div class="row">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        Dados Principais
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            Dados Principais
+                        </div>
                     </div>
-                </div>
-                <div class="panel-body">
-                    <div class="form-group">
-                        <label for="id_person-city_name">
-                            Lote:
-                            <small style="color:#C9302C">*</small>
-                        </label>
-                        <div>
-                            <select name="subscription-lot" class="form-control" id="id_subscription-lot" required="required" {% if not allow_edit_lot %}disabled=""{% endif %}>
-                                {% for lot in lots %}
-                                <option value="{{ lot.pk }}" {% if subscription and subscription.lot.pk == lot.pk %}selected{% endif %}>
-                                    até: {{ lot.date_end|date:'d/m/Y H\hi' }} - {{ lot.display_publicly }} {% if lot.private  %}<small>(privado)</small>{% endif %}
-                                </option>
-                                {% endfor %}
-                            </select>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="id_person-city_name">
+                                Lote:
+                                <small style="color:#C9302C">*</small>
+                            </label>
+                            <div>
+                                <select name="subscription-lot" class="form-control" id="id_subscription-lot" required="required" {% if not allow_edit_lot %}disabled=""{% endif %}>
+                                    {% for lot in lots %}
+                                    <option value="{{ lot.pk }}" {% if subscription and subscription.lot.pk == lot.pk %}selected{% endif %}>
+                                        até: {{ lot.date_end|date:'d/m/Y H\hi' }} - {{ lot.display_publicly }} {% if lot.private  %}<small>(privado)</small>{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        Dados Principais
-                    </div>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-9">
-                            {% render_generic_field form.name autofocus=True %}
-
-                        </div>
-                        <div class="col-md-3">
-                            {% render_generic_field form.gender required=True %}
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-9">
-                            {% if config %}
-                                {% render_generic_field form.email config.email False %}
-                            {% else %}
-                                {% render_generic_field form.email %}
-                            {% endif %}
-                        </div>
-                        <div class="col-md-3">
-                            {% if config and config.cpf != config.CPF_HIDE %}
-                                {% if config.cpf == config.CPF_REQUIRED %}
-                                    {% render_generic_field form.cpf required=True %}
-                                {% else %}
-                                    {% render_generic_field form.cpf %}
-                                {% endif %}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        {% if config and config.birth_date != config.BIRTH_DATE_HIDE %}
-                            <div class="col-md-6">
-                                {% if config.birth_date == config.BIRTH_DATE_REQUIRED %}
-                                    {% render_generic_field form.birth_date required=True %}
-                                {% else %}
-                                    {% render_generic_field form.birth_date %}
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                        <div class="col-md-6">
-                            {% if config %}
-                                {% render_generic_field form.phone config.phone False %}
-                            {% else %}
-                                {% render_generic_field form.phone %}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            {% if config and config.address == config.ADDRESS_HIDE %}
-                                <div class="row">
-                                    <div class="col-md-3 address-row">
-                                        {% render_generic_field form.state required=config.city %}
-                                    </div>
-                                    <div class="col-md-9 address-row">
-                                        {% render_generic_field form.city_name required=config.city %}
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        {% if config and config.institution_show is True %}
-                            <div class="col-md-4">
-                                {% render_generic_field form.institution required=config.institution_required %}
-                            </div>
-                        {% endif %}
-                        {% if config and config.institution_cnpj_show is True %}
-                            <div class="col-md-4">
-                                {% render_generic_field form.institution_cnpj required=config.institution_cnpj_required %}
-                            </div>
-                        {% endif %}
-                        {% if config and config.function_show is True %}
-                            <div class="col-md-4">
-                                {% render_generic_field form.function required=config.function_required %}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                </div>
-            </div>
-            {% if config and config.address == config.ADDRESS_SHOW %}
+            <div class="col-md-12">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">
-                            Endereço
+                            Dados Principais
                         </div>
                     </div>
                     <div class="panel-body">
                         <div class="row">
+                            <div class="col-md-9">
+                                {% render_generic_field form.name autofocus=True %}
+
+                            </div>
                             <div class="col-md-3">
-                                {% render_generic_field form.zip_code required=True %}
-                                <div id="cep_loader" style="width: 22px;position: absolute;top: 32px;right: 31px;">
-                                    <img src="{% static 'assets/img/loader.gif' %}"/>
+                                {% render_generic_field form.gender required=True %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-9">
+                                {% if config %}
+                                    {% render_generic_field form.email config.email False %}
+                                {% else %}
+                                    {% render_generic_field form.email %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                {% if config and config.cpf != config.CPF_HIDE %}
+                                    {% if config.cpf == config.CPF_REQUIRED %}
+                                        {% render_generic_field form.cpf required=True %}
+                                    {% else %}
+                                        {% render_generic_field form.cpf %}
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            {% if config and config.birth_date != config.BIRTH_DATE_HIDE %}
+                                <div class="col-md-6">
+                                    {% if config.birth_date == config.BIRTH_DATE_REQUIRED %}
+                                        {% render_generic_field form.birth_date required=True %}
+                                    {% else %}
+                                        {% render_generic_field form.birth_date %}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="col-md-6">
+                                {% if config %}
+                                    {% render_generic_field form.phone config.phone False %}
+                                {% else %}
+                                    {% render_generic_field form.phone %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% if config and config.address == config.ADDRESS_HIDE %}
+                                    <div class="row">
+                                        <div class="col-md-3 address-row">
+                                            {% render_generic_field form.state required=config.city %}
+                                        </div>
+                                        <div class="col-md-9 address-row">
+                                            {% render_generic_field form.city_name required=config.city %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            {% if config and config.institution_show is True %}
+                                <div class="col-md-4">
+                                    {% render_generic_field form.institution required=config.institution_required %}
+                                </div>
+                            {% endif %}
+                            {% if config and config.institution_cnpj_show is True %}
+                                <div class="col-md-4">
+                                    {% render_generic_field form.institution_cnpj required=config.institution_cnpj_required %}
+                                </div>
+                            {% endif %}
+                            {% if config and config.function_show is True %}
+                                <div class="col-md-4">
+                                    {% render_generic_field form.function required=config.function_required %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+                {% if config and config.address == config.ADDRESS_SHOW %}
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                Endereço
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    {% render_generic_field form.zip_code required=True %}
+                                    <div id="cep_loader" style="width: 22px;position: absolute;top: 32px;right: 31px;">
+                                        <img src="{% static 'assets/img/loader.gif' %}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row address-row">
+                                <div class="col-md-9">
+                                    {% render_generic_field form.street %}
+                                </div>
+                                <div class="col-md-3 address-row">
+                                    {% render_generic_field form.number %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 address-row">
+                                    {% render_generic_field form.complement %}
+                                </div>
+                                <div class="col-md-6 address-row">
+                                    {% render_generic_field form.village %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 address-row">
+                                    {% render_generic_field form.state required=True %}
+                                </div>
+                                <div class="col-md-9 address-row">
+                                    {% render_generic_field form.city_name required=True %}
                                 </div>
                             </div>
                         </div>
-                        <div class="row address-row">
-                            <div class="col-md-9">
-                                {% render_generic_field form.street %}
-                            </div>
-                            <div class="col-md-3 address-row">
-                                {% render_generic_field form.number %}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 address-row">
-                                {% render_generic_field form.complement %}
-                            </div>
-                            <div class="col-md-6 address-row">
-                                {% render_generic_field form.village %}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3 address-row">
-                                {% render_generic_field form.state required=True %}
-                            </div>
-                            <div class="col-md-9 address-row">
-                                {% render_generic_field form.city_name required=True %}
-                            </div>
-                        </div>
                     </div>
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
         <div class="row">
             <div class="col-md-12">

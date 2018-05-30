@@ -1,209 +1,143 @@
 {% extends 'hotsite/base.html' %}
 {% load static base_tags humanize l10n %}
 
+{% block scripts %}
+    <script src="{% static 'hotsite/js/subscription-status.js' %}"></script>
+    <script>
+        function render_status_table() {
+            var url = window.location.href + '?template_name=hotsite/includes/status-table';
+            var sender = new window.cgsy.AjaxSender(url);
+            sender.setSuccessCallback(function (response) {
+                $('#status-table').html(response);
+                render_status_table();
+            });
+            window.setTimeout(function () {
+                sender.send('GET');
+            }, 3500);
+        }
+
+        $(document).ready(function () {
+            {% if not subscription.confirmed %}
+                render_status_table();
+            {% endif %}
+
+            $('.tooltip-wrapper').tooltip({
+                selector: "[data-toggle=tooltip]",
+                container: "body",
+                html: true
+            });
+        });
+    </script>
+{% endblock %}
 {% block content %}
 
     {% include 'hotsite/includes/2_cover_no_form.html' %}
 
     <!-- FORM
     ================================= -->
-    <section id="owner" class="footer-section section">
+    <section id="owner" class="footer-section section tooltip-wrapper">
         <h2 class="section-heading text-center">Status da Inscrição</h2>
         <div class="container">
             <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-12">
                     <div class="row">
                         <div class="col-md-12" style="text-align: left;">
                             {% block messages %}
                                 {% if messages %}
                                     <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                                    {% for message in messages %}
-
-                                        {% if message.tags %}
-                                            <div class="alert alert-{{ message.tags }} alert-dismissible"
+                                        {% for message in messages %}
+                                            <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible"
                                                  role="alert">
-
-                                        {% else %}
-                                            <div class="alert alert-warning alert-dismissible"
-                                                 role="alert">
-                                        {% endif %}
-
-                                    <button type="button" class="close"
-                                            data-dismiss="alert"
-                                            aria-label="Close"><span
-                                            aria-hidden="true">&times;</span>
-                                    </button>
-                                    {{ message|capfirst }}
+                                                <button type="button"
+                                                        class="close"
+                                                        data-dismiss="alert"
+                                                        aria-label="Close"><span
+                                                        aria-hidden="true">&times;</span>
+                                                </button>
+                                                {{ message|capfirst }}
+                                            </div>
+                                        {% endfor %}
                                     </div>
-
-                                    {% endfor %}
-                                </div>
                                 {% endif %}
                             {% endblock messages %}
                             {% if transactions %}
-                                {#                        <div class="well well-sm col-md-3" style="background-color:rgb(91,192,222); text-align: center">#}
-                                {#                            <p style="color: white; font-weight: bold">#}
-                                {#                                Aguardando pagamento#}
-                                {#                            </p>#}
-                                {#                        </div>#}
-                                {##}
-                                {#                        <div class="progress" style="margin-top:75px">#}
-                                {#                            <div class="progress-bar progress-bar-success progress-bar-striped active"#}
-                                {#                                 role="progressbar"#}
-                                {#                                 style="width: 95%;background-color:#5cb85c!important;">#}
-                                {#                                <span class="sr-only"></span>#}
-                                {#                            </div>#}
-                                {#                        </div>#}
-
-                                <table class="table table-hover">
-                                    <thead>
-                                    <tr>
-                                        <th class="col-xs-1 hidden-xs">Status
-                                        </th>
-                                        <th class="col-xs-2 hidden-xs">Data</th>
-                                        <th class="col-xs-3">Forma de
-                                            Pagamento
-                                        </th>
-                                        <th class="col-xs-2 hidden-xs">
-                                            Valor (R$)
-                                        </th>
-                                        <th class="col-xs-1">Voucher</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% for transaction in transactions %}
-                                        <tr>
-                                            <td class="hidden-xs">
-
-                                                {% if transaction.status == 'processing' or transaction.status == 'waiting_payment' or transaction.status == 'pending_refund' or transaction.status == 'chargedback' %}
-                                                    <i class="fa fa-circle"
-                                                       aria-hidden="true"
-                                                       style="color: #f0ad4e"></i>
-                                                {% elif transaction.status == 'authorized' or transaction.status == 'paid' or transaction.status == 'refunded' %}
-                                                    <i class="fa fa-circle"
-                                                       aria-hidden="true"
-                                                       style="color:#5cb85c"></i>
-                                                {% elif transaction.status == 'refused' %}
-                                                    <i class="fa fa-circle"
-                                                       aria-hidden="true"
-                                                       style="color: #d9534f"></i>
-                                                {% else %}
-                                                    <i class="fa fa-circle"
-                                                       aria-hidden="true"></i>
-                                                {% endif %}
-                                                {{ transaction.get_status_display }}
-                                            </td>
-                                            <td class="hidden-xs">
-                                                {{ transaction.date_created|date:"d/m/Y H\hi" }}
-                                            </td>
-                                            <td>
-                                                {% if transaction.data.payment_method == 'boleto' %}
-                                                    Boleto
-                                                    <br>
-                                                    <small>
-                                                        {% if "None" not in  transaction.data.boleto_url %}
-                                                            <a target="_blank"
-                                                               class="text-muted"
-                                                               href="{{ transaction.data.boleto_url }}">
-                                                                Link para
-                                                                boleto
-                                                            </a>
-                                                        {% else %}
-                                                            Seu link para o
-                                                            boleto estará
-                                                            pronto em breve.
-                                                        {% endif %}
-                                                    </small>
-                                                {% elif transaction.data.payment_method == 'credit_card' %}
-                                                    Cartão de Crédito
-                                                {% else %}
-                                                    Error
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                R$ {{ transaction.amount|money_divide|intcomma }}
-                                            </td>
-                                            <td>
-                                                {% if transaction.status == transaction.PAID %}
-
-                                                    <a href="{% url 'subscription:subscription-voucher' transaction.subscription.event.pk transaction.subscription.pk %}">
-                                                        <i class="fas fa-file-pdf"></i>
-                                                    </a>
-                                                {% else %}
-                                                    ---
-                                                {% endif %}
-
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                </table>
-                                {#                    {% else %}#}
-                                {#                        <div class="well well-sm col-md-4" style="background-color: rgb(92,184,92) ;">#}
-                                {#                            <p style="color: white; font-weight: bold">#}
-                                {#                                Inscrição realizada com sucesso!#}
-                                {#                            </p>#}
-                                {#                        </div>#}
+                                <div id="status-table">
+                                    {% include 'hotsite/includes/status-table.html' %}
+                                </div>
                             {% endif %}
-                            {#                            {% if allow_transaction %}#}
-
-                            {#                                <form action="{% url 'public:hotsite-subscription' event.slug %}"#}
-                            {#                                      name="allowed_transaction"#}
-                            {#                                      method="post">#}
-                            {#                                    {% csrf_token %}#}
-                            {#                                    <input type="hidden"#}
-                            {#                                           name="allowed_transaction"#}
-                            {#                                           id="id_allowed_transaction"#}
-                            {#                                           value="boleto,credit_card"/>#}
-                            {#                                    <input type="hidden" name="subscription"#}
-                            {#                                           id="id_subscription"#}
-                            {#                                           value="{{ subscription.pk }}"/>#}
-                            {#                                    <button type="submit"#}
-                            {#                                            class="btn btn-success btn-xs">Novo#}
-                            {#                                        pagamento#}
-                            {#                                    </button>#}
-                            {#                                </form>#}
-                            {#                            {% endif %}#}
-
-
-                            {% if is_private_event %}
-
-                                {% if lot_is_still_valid %}
-
+                            {% if is_private_event and not has_paid_transaction %}
+                                {% if lot_is_still_valid  %}
                                     <a href="{% url 'public:hotsite-subscription' event.slug %}"
-                                       class="btn btn-success btn-xs">Novo
-                                        pagamento
+                                       class="btn btn-success btn-xs"
+                                       data-toggle="tooltip"
+                                       title="Realize um novo pagamento.">
+                                        Novo pagamento
+                                    </a>
+                                    <a href="#" class="btn btn-primary btn-xs"
+                                       data-toggle="tooltip"
+                                       title="Entrar com cupom diferente para mudar de lote."
+                                       onclick="$('#force-coupon-form').submit();">
+                                        Outro Cupom
                                     </a>
                                 {% else %}
-
-                                    <a href="{% url 'public:hotsite' event.slug %}"
-                                       class="btn btn-success btn-xs">Novo
-                                        pagamento
+                                    <hr/>
+                                    <div class="alert alert-warning alert-dismissible"
+                                         role="alert">
+                                        O lote que você está inscrito já
+                                        expirou. Deseja fazer inscrição com novo
+                                        cupom?
+                                    </div>
+                                    <a href="#" class="btn btn-primary btn-xs"
+                                       data-toggle="tooltip"
+                                       title="Entrar com cupom diferente para mudar de lote."
+                                       onclick="$('#force-coupon-form').submit();">
+                                        Inserir Novo cupom
                                     </a>
-
                                 {% endif %}
-
                             {% else %}
-
-                                <a href="{% url 'public:hotsite-subscription' event.slug %}"
-                                   class="btn btn-success btn-xs">Novo
-                                    pagamento
-                                </a>
-
+                                {% if not has_paid_transaction %}
+                                    <a href="{% url 'public:hotsite-subscription' event.slug %}"
+                                       class="btn btn-success btn-xs"
+                                       data-toggle="tooltip"
+                                       title="Realize um novo pagamento ou mude de lote quando desejar.">
+                                        Novo pagamento
+                                    </a>
+                                {% endif %}
                             {% endif %}
-
-                            </div>
+                            {% if event.is_scientific and event.work_config and event.work_config.is_submittable %}
+                                <br>
+                                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
+                                   class="btn btn-primary"
+                                   style="margin-top: 15px"
+                                   data-toggle="tooltip"
+                                   title="Submeter artigos científicos para o evento">
+                                    Enviar Artigo Certificado
+                                </a>
+                            {% endif %}
+                        <br>
+                            <a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}"
+                               class="btn btn-warning"
+                               style="margin-top: 15px"
+                               title="Realizar inscrição de outra pessoa?">
+                                Realizar inscrição de outra pessoa?
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-10">
-                    <div class="text-right cgsy-footer footer-wrapper text-muted" style="font-size:12px;color:lightgrey">
-                        {% include "base/footer.html" %}
-                    </div>
+            </div>
+            <div class="col-md-12">
+                <div class="text-right cgsy-footer footer-wrapper text-muted"
+                     style="font-size:12px;color:lightgrey">
+                    {% include "base/footer.html" %}
                 </div>
             </div>
-
+        </div>
     </section>
 
-
+    <div style="display:none">
+        <form action="" method="post" id="force-coupon-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="force-coupon">
+        </form>
+    </div>
 {% endblock %}

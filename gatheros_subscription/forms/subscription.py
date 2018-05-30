@@ -1,7 +1,8 @@
 """ Formulários de `Subscription` """
+from datetime import datetime
+
 from django import forms
 
-from gatheros_event.models import Person, Event
 from gatheros_subscription.models import Subscription, Lot
 
 
@@ -32,8 +33,7 @@ class SubscriptionForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
 
-
-        if not self.instance:
+        if not self.instance or not self.instance.pk:
             person = cleaned_data.get('person')
 
             qs = Subscription.objects.filter(person=person, event=self.event)
@@ -48,8 +48,21 @@ class SubscriptionForm(forms.ModelForm):
 
     def save(self, commit=True):
 
-        lot = self.instance.lot
-        if lot.price and lot.price > 0:
+        if self.instance.free is True:
             self.instance.status = Subscription.CONFIRMED_STATUS
 
         return super().save(commit=commit)
+
+
+class SubscriptionAttendanceForm(forms.Form):
+    """ Formulário de credenciamento de Inscrições. """
+
+    def __init__(self, instance=None, *args, **kwargs):
+        self.instance = instance
+        super(SubscriptionAttendanceForm, self).__init__(*args, **kwargs)
+
+    def attended(self, attended):
+        """ Persiste atendimento de acordo com parâmetro. """
+        self.instance.attended_on = datetime.now() if attended else None
+        self.instance.attended = attended
+        self.instance.save()

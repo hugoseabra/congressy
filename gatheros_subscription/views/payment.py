@@ -5,7 +5,7 @@ from django.views import generic
 
 from gatheros_subscription.helpers import report_payment
 from payment.models import Transaction
-from .subscription import EventViewMixin
+from .subscription import EventViewMixin, PermissionDenied
 
 
 class PaymentDeleteView(EventViewMixin, generic.View):
@@ -23,6 +23,17 @@ class PaymentDeleteView(EventViewMixin, generic.View):
         )
         self.subscription = self.object.subscription
         return self.object
+
+    def pre_dispatch(self, request):
+        self.event = self.get_event()
+
+        if self.event.allow_internal_subscription is False:
+            self.permission_denied_url = reverse(
+                'subscription:subscription-list', kwargs={
+                    'event_pk': self.event.pk,
+                }
+            )
+            raise PermissionDenied('Você não pode realizar esta ação.')
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()

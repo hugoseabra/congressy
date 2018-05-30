@@ -5,10 +5,10 @@ feita por um organizador de evento, dono de uma organização, e que deseja
 apresentar informações ligadas a ela a pessoa que possam se interessar em
 participar do evento.
 """
-from datetime import datetime
-
 import os
 from collections import Counter
+from datetime import datetime
+
 from django.db import models
 from django.utils.encoding import force_text
 from stdimage import StdImageField
@@ -22,6 +22,7 @@ from gatheros_event.models.constants import (
 )
 from . import Category, Organization
 from .mixins import GatherosModelMixin
+from gatheros_event.helpers import reports
 
 
 def get_image_path(instance, filename):
@@ -216,7 +217,21 @@ class Event(models.Model, GatherosModelMixin):
         help_text="Valor percentual da congressy caso o evento seja pago."
     )
 
+    boleto_limit_days = models.PositiveSmallIntegerField(
+        default=3,
+        verbose_name='Limite para boleto (dias)',
+        help_text='Limite (em dias) para permissão de pagamento de boleto'
+                  ' do evento.'
+    )
+
     created = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
+
+    is_scientific = models.BooleanField(
+        default=False,
+        verbose_name='evento científico',
+    )
+
+
 
     class Meta:
         verbose_name = 'evento'
@@ -279,6 +294,17 @@ class Event(models.Model, GatherosModelMixin):
 
         return Event.EVENT_STATUS_NOT_STARTED
 
+    @property
+    def running(self):
+        return self.status == Event.EVENT_STATUS_RUNNING
+
+    @property
+    def allow_internal_subscription(self):
+        if self.running is True:
+            return True
+
+        return self.organization.allow_internal_subscription
+
     def get_status_display(self):
         """ Recupera o status do evento de acordo com a propriedade 'status'"""
         return force_text(
@@ -338,38 +364,31 @@ class Event(models.Model, GatherosModelMixin):
                 return 0
             return '{0:.2f}%'.format((num * 100) / num_total)
 
-        queryset = self.subscriptions
+        queryset = self.subscriptions.filter(attended=True)
         total = queryset.count()
-        subs = queryset.values(
-            'person__pne',
-            'person__gender',
-            'person__city'
-        ).annotate(
-            num_pnes=models.Count('person__pne'),
-            num_gender=models.Count('person__gender')
-        ).order_by()
 
-        men = [
-            sub['num_gender'] for sub in subs if sub['person__gender'] == 'M'
-        ]
-        num_men = sum(men)
+        reports_dict = {}
 
-        women = [
-            sub['num_gender'] for sub in subs if sub['person__gender'] == 'F'
-        ]
-        num_women = sum(women)
+        gender_report = reports.get_report_gender(queryset)
 
-        pnes = [sub['num_pnes'] for sub in subs if sub['person__pne'] is True]
-        num_pnes = sum(pnes)
+        reports_dict.update(gender_report)
+        reports_dict.update({
+            'num_men': '{} ({})'.format(
+                gender_report['men'],
+                perc(gender_report['men'], total)
+            ),
+            'num_women': '{} ({})'.format(
+                gender_report['women'],
+                perc(gender_report['women'], total)
+            ),
+        })
 
-        cities = [sub['person__city'] for sub in subs]
-        num_cities = len(Counter(cities))
+        reports_dict.update({'num_pnes': reports.get_report_gender(queryset)})
+        reports_dict.update({
+            'cities': reports.get_report_cities(queryset)
+        })
+        reports_dict.update({
+            'ages': reports.get_report_age(queryset)
+        })
 
-        return {
-            'men': num_men,
-            'women': num_women,
-            'num_men': '{} ({})'.format(num_men, perc(num_men, total)),
-            'num_women': '{} ({})'.format(num_women, perc(num_women, total)),
-            'num_pnes': '{} ({})'.format(num_pnes, perc(num_pnes, total)),
-            'num_cities': num_cities,
-        }
+        return reports_dict

@@ -84,9 +84,9 @@ class LotForm(forms.ModelForm):
             self.fields['transfer_tax'].widget.attrs['disabled'] = 'disabled'
             self.fields['transfer_tax'].disabled = True
 
-            self.fields['allow_installment'].widget.attrs['disabled'] = \
-                'disabled'
-            self.fields['allow_installment'].disabled = True
+            # self.fields['allow_installment'].widget.attrs['disabled'] = \
+            #     'disabled'
+            # self.fields['allow_installment'].disabled = True
 
             self.fields['installment_limit'].widget.attrs['disabled'] = \
                 'disabled'
@@ -132,4 +132,12 @@ class LotForm(forms.ModelForm):
         code = self.cleaned_data.get('exhibition_code')
         if code:
             code = ''.join(code.split()).upper()
+
+        queryset = Lot.objects.filter(exhibition_code=code)
+        if self.instance.pk is not None:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.count() > 0:
+            raise forms.ValidationError('Este código já existe.')
+
         return code

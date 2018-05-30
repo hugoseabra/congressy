@@ -66,7 +66,8 @@ class DateInput(forms.DateInput):
             else:
                 format = '%Y/%m/%d'
 
-            value = datetime.strptime(value, format)
+            if value:
+                value = datetime.strptime(value, format)
 
         except ValueError:
             pass
