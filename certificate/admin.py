@@ -1,8 +1,10 @@
 from django.contrib import admin
 
 from certificate import forms
+from certificate.models import Certificate
 
-@admin.register(forms.Certificate)
+
+@admin.register(Certificate)
 class CertificateAdmin(admin.ModelAdmin):
     form = forms.CertificateForm
 
@@ -10,6 +12,7 @@ class CertificateAdmin(admin.ModelAdmin):
         ('Texto Principal', {
             'fields': (
                 'event',
+                'background_image',
                 'text_content',
                 'text_font_size',
                 'text_position_x',

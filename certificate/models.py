@@ -3,7 +3,16 @@
 Models de certificados
 """
 
+import os
+
 from django.db import models
+from stdimage import StdImageField
+from stdimage.validators import MinSizeValidator
+
+
+def get_image_path(instance, filename):
+    """ Resgata localização onde as imagens serão inseridas. """
+    return os.path.join('event', str(instance.event.id), filename)
 
 
 class Certificate(models.Model):
@@ -18,6 +27,21 @@ class Certificate(models.Model):
         on_delete=models.CASCADE,
         verbose_name='evento',
         related_name='certificate'
+    )
+
+    background_image = StdImageField(
+        upload_to=get_image_path,
+        blank=True,
+        null=True,
+        verbose_name='imagem de fundo do certificado do evento',
+        variations={'default': (595, 842)},
+        validators=[MinSizeValidator(595, 842)],
+        help_text="Imagem de fundo do certificado, mínimo de: "
+                  "595px largura x "
+                  "842 altura.(png/jpg) "
+                  "<a  target='_blank'"
+                  "href='http://via.placeholder.com/595x842'>Exemplo"
+                  "</a>"
     )
 
     text_content = models.TextField(
@@ -147,4 +171,3 @@ class Certificate(models.Model):
 
     def __str__(self):
         return '{}'.format(self.event)
-

@@ -4,10 +4,16 @@ from rest_framework import routers
 from certificate import views, viewsets
 
 private_certificate_urls = [
+
     url(
-        r'^',
-        views.CertificadoView.as_view(),
-        name='event-certificate'
+        r'^prepare/',
+        views.CertificatePrepareView.as_view(),
+        name='event-certificate-prepare'
+    ),
+    url(
+        r'^(?P<pk>[\d]+)/',
+        views.CertificateConfigView.as_view(),
+        name='event-certificate-config'
     ),
 ]
 

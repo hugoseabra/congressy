@@ -1,20 +1,91 @@
+from django import forms as django_forms
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import HttpResponse
+from django.shortcuts import reverse, redirect
 from django.views import generic
 from io import BytesIO
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.pdfgen import canvas
+from django.contrib import messages
 
-from certificate import models
-from gatheros_event.views.mixins import AccountMixin
+from certificate import models, forms
+from gatheros_event.views.mixins import EventViewMixin
 
 
-class CertificadoView(AccountMixin, generic.DetailView):
+class CertificateConfigView(EventViewMixin, generic.DetailView):
     template_name = 'certificate/certificado_.html'
+    model = models.Certificate
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super(CertificateConfigView, self).dispatch(request, *args,
+                                                               **kwargs)
+        if not self.object.background_image:
+            messages.error(request, 'Seu certificado não possui uma imagem '
+                                    'de fundo.')
+            return redirect('certificate:event-certificate-prepare',
+                            event_pk=self.event.pk)
+
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['has_inside_bar'] = True
+        context['active'] = 'certificate'
+        return context
+
+
+class CertificatePrepareView(EventViewMixin, generic.FormView):
+    template_name = 'certificate/certificate_form.html'
     model = models.Certificate
     slug_field = 'event__pk'
     slug_url_kwarg = 'event_pk'
+    instance = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['has_inside_bar'] = True
+        context['active'] = 'certificate'
+        return context
+
+    def get_success_url(self):
+        return reverse('certificate:event-certificate-config', kwargs={
+            'event_pk': self.event.pk,
+            'pk': self.instance.pk
+        })
+
+    form_class = forms.CertificatePartialForm
+
+    def get_form(self, form_class=None):
+
+        if self.event.certificate:
+            form = forms.CertificatePartialForm(
+                instance=self.event.certificate)
+        else:
+            form = super().get_form(form_class)
+            form.initial['event'] = self.event.pk
+
+        form.fields['event'].widget = django_forms.HiddenInput()
+        return form
+
+    def form_valid(self, form):
+        self.instance = form.save()
+        return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+
+        if self.event.certificate:
+            form = forms.CertificatePartialForm(
+                instance=self.event.certificate, data=self.request.POST,
+                files=self.request.FILES)
+        else:
+            form = forms.CertificatePartialForm(data=self.request.POST,
+                                                files=self.request.FILES)
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 
 # class CertificatePDFView(AccountMixin, PDFTemplateView):
@@ -86,11 +157,11 @@ def certificate_pdf_view(request, event_pk, pk):
 
     # Draw things on the PDF. Here's where the PDF generation happens.
     # See the ReportLab documentation for the full list of functionality.
-    # p.drawString(100, 100, "Hello world.")
     uri = staticfiles_storage.url('assets/img/certificate-example.jpg')
     url = settings.BASE_DIR + "/frontend" + uri
 
     p.drawImage(url, 0, 0, height=595, width=842, mask=None)
+    p.drawString(x=300, y=100, text="Hello world.")
 
     # Close the PDF object cleanly.
     p.showPage()
