@@ -1,0 +1,6 @@
+RECEIVER_LEVEL0 = '0'
+RECEIVER_LEVEL1 = '1'
+
+RECEIVER_TYPE_SUBSCRIPTION='receiver_subscription'
+RECEIVER_TYPE_PRODUCT='receiver_product'
+RECEIVER_TYPE_SERVICE='receiver_service'

@@ -50,3 +50,6 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append(
 # devido for menor do que este, o valor da transaçaõ da parte da congressy será
 # este valor.
 CONGRESSY_MINIMUM_AMOUNT = 4.99
+
+# Taxas de juros de parcelamento de valores da Congressy.
+CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29
