@@ -73,13 +73,9 @@ class CertificatePrepareView(EventViewMixin, generic.FormView):
 
     def post(self, request, *args, **kwargs):
 
-        if self.event.certificate:
-            form = forms.CertificatePartialForm(
-                instance=self.event.certificate, data=self.request.POST,
-                files=self.request.FILES)
-        else:
-            form = forms.CertificatePartialForm(data=self.request.POST,
-                                                files=self.request.FILES)
+        form = forms.CertificatePartialForm(
+            instance=self.event.certificate, data=self.request.POST,
+            files=self.request.FILES)
 
         if form.is_valid():
             return self.form_valid(form)
@@ -91,8 +87,6 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     template_name = 'pdf/certificate.html'
     subscription = None
     event = None
-    person = None
-    lot = None
     show_content_in_browser = True
     permission_denied_url = reverse_lazy('front:start')
 
@@ -103,7 +97,7 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     }
 
     def get_filename(self):
-        return "CERTIFICADO--{}-{}.pdf".format(self.person.name,
+        return "CERTIFICADO--{}-{}.pdf".format(self.subscription.person.name,
                                                self.event.name)
 
     def pre_dispatch(self, request):
@@ -119,8 +113,7 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
             **kwargs)
 
         context['event'] = self.event
-        context['person'] = self.person
-        context['lot'] = self.lot
+        context['person'] = self.subscription.person
         context['background_image'] = self.get_background_image()
         context['organization'] = self.event.organization
         context['subscription'] = self.subscription
@@ -129,8 +122,6 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
 
     def get_complementary_data(self):
         self.event = self.subscription.event
-        self.person = self.subscription.person
-        self.lot = self.subscription.lot
 
     def get_background_image(self):
         image_path = self.event.certificate.background_image.path
@@ -143,7 +134,8 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     def get_text(self):
         text = self.event.certificate.text_content
         text_template = Template(text)
-        return text_template.render(nome=self.subscription.person.name)
+        res = text_template.render(NOME=self.subscription.person.name)
+        return res
 
     def can_access(self):
         return self.subscription.confirmed is True and \
