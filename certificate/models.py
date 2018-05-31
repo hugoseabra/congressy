@@ -34,8 +34,8 @@ class Certificate(models.Model):
         blank=True,
         null=True,
         verbose_name='imagem de fundo do certificado do evento',
-        variations={'default': (595, 842)},
-        validators=[MinSizeValidator(595, 842)],
+        variations={'default': (1402, 991)},
+        validators=[MinSizeValidator(1402, 991)],
         help_text="Imagem de fundo do certificado, mínimo de: "
                   "595px largura x "
                   "842 altura.(png/jpg) "

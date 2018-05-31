@@ -3,12 +3,15 @@
 <html lang="en">
 <head>
     <style>
-        body, html {
-            background-image: url("data:image/gif;base64,{{ background_image }}");
+
+        div.background_image {
+            background-image: url("{{ background_image }}");
             background-repeat: no-repeat;
-            height: 100%;
-            width: 100%;
-            text-align: center;
+            height: 990px;
+            width: 1402px;
+            left: 0;
+            top: 0;
+            position: absolute;
         }
 
         div.text_content {
@@ -17,19 +20,29 @@
             left: {{ certificate.text_position_x|stringformat:".2f" }}px;
             width: {{ certificate.text_width|stringformat:".2f" }}px;
             height: {{ certificate.text_height|stringformat:".2f" }}px;
-            border: 1px solid #3247ff;
             font-weight: bolder;
-            bottom:0;
+            bottom: 0;
             font-size: {{ certificate.text_font_size|stringformat:".2f" }}px;
+
+            text-align: center;
         }
+
+        @media print {
+            div.background_image {
+
+            }
+        }
+
     </style>
     <title></title>
 </head>
 <body>
-
-<div class="text_content">
-    <p>{{ text }}</p>
+<div class="background_image">
+    <div class="text_content">
+        <p>{{ text }}</p>
+    </div>
 </div>
+
 
 </body>
 </html>

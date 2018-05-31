@@ -1,4 +1,3 @@
-import base64
 from django import forms as django_forms
 from django.contrib import messages
 from django.shortcuts import reverse, redirect, get_object_or_404
@@ -91,7 +90,11 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     permission_denied_url = reverse_lazy('front:start')
 
     cmd_options = {
-        'dpi': 72,
+        'dpi': 96,
+        'margin-top': 0,
+        'margin-bottom': 0,
+        'margin-left': 0,
+        'margin-right': 0,
         'page-size': 'A4',
         'orientation': 'Landscape',
     }
@@ -109,10 +112,9 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
         return super().pre_dispatch(request)
 
     def get_context_data(self, **kwargs):
-        context = super(CertificatePDFView, self).get_context_data(
-            **kwargs)
-
-        context['background_image'] = self.get_background_image()
+        context = super(CertificatePDFView, self).get_context_data(**kwargs)
+        image_url = self.event.certificate.background_image.default.url
+        context['background_image'] = image_url
         context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
         return context
@@ -120,18 +122,10 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     def get_complementary_data(self):
         self.event = self.subscription.event
 
-    def get_background_image(self):
-        image_path = self.event.certificate.background_image.path
-
-        with open(image_path, 'rb') as f:
-            read_data = f.read()
-            f.close()
-        return base64.b64encode(read_data)
-
     def get_text(self):
         text = self.event.certificate.text_content
         text_template = Template(text)
-        res = text_template.render(NOME=self.subscription.person.name)
+        res = text_template.render(NOME=self.subscription.person.name.upper())
         return res
 
     def can_access(self):
