@@ -4,8 +4,42 @@
  *   Copyright 2014 Authentic Goods Co. http://authenticgoods.co
  *
 */
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700");
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800");
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Montserrat Regular'), local('Montserrat-Regular'), url(https://fonts.gstatic.com/s/montserrat/v12/JTUSjIg1_i6t8kCHKm459Wlhzg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Montserrat Bold'), local('Montserrat-Bold'), url(https://fonts.gstatic.com/s/montserrat/v12/JTURjIg1_i6t8kCHKm45_dJE3gnD-w.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans Regular'), local('OpenSans-Regular'), url(https://fonts.gstatic.com/s/opensans/v15/mem8YaGs126MiZpBA-UFVZ0e.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Open Sans SemiBold'), local('OpenSans-SemiBold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UNirkOUuhs.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UN7rgOUuhs.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 800;
+  src: local('Open Sans ExtraBold'), local('OpenSans-ExtraBold'), url(https://fonts.gstatic.com/s/opensans/v15/mem5YaGs126MiZpBA-UN8rsOUuhs.ttf) format('truetype');
+}
 html {
   height: 100%;
   font-size: 100%;
@@ -4067,4 +4101,51 @@ ul.messenger-theme-flat .messenger-message.alert-warning .messenger-message-inne
     max-width: 120px;
     overflow: hidden;
   }
+}
+#certificate {
+  /*Resize e Drag*/
+  /*==========================================*/
+  /*Container onde fica os elementos (texto, título e data)*/
+  /*==========================================*/
+  /*Elementos de texto (título, texto, data) */
+}
+#certificate .resize-drag,
+#certificate .drag {
+  background-color: transparent;
+  color: black;
+  font-size: 20px;
+  box-sizing: border-box;
+  transition: background-color 1s ease;
+  border: 1px solid darkgray;
+}
+#certificate .certificate-row {
+  overflow-x: auto;
+}
+#certificate .certificate-image {
+  width: 1024px;
+  height: 724px;
+  margin: 0 auto;
+}
+#certificate #text,
+#certificate #dateText,
+#certificate #titleText {
+  color: black;
+  font-size: 20px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: background-color 1s ease;
+}
+#certificate #text {
+  width: 634px;
+  height: 348px;
+}
+#certificate #dateText {
+  min-width: 1014px;
+  height: 44px;
+  left: 0;
+  position: fixed;
+}
+#certificate #titleText {
+  height: 80px;
+  font-size: 60px;
 }
