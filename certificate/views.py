@@ -112,11 +112,8 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
         context = super(CertificatePDFView, self).get_context_data(
             **kwargs)
 
-        context['event'] = self.event
-        context['person'] = self.subscription.person
         context['background_image'] = self.get_background_image()
-        context['organization'] = self.event.organization
-        context['subscription'] = self.subscription
+        context['certificate'] = self.event.certificate
         context['text'] = self.get_text()
         return context
 

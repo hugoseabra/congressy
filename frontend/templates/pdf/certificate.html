@@ -1,22 +1,35 @@
 {% load static l10n humanize %}
 <!doctype html>
 <html lang="en">
-	<head>
-		<style>
-			body, html {
-				background-image: url("data:image/gif;base64,{{ background_image }}");
-				background-repeat: no-repeat;
-                height: 100%;
-                width: 100%;
-			}
-		</style>
-		<title></title>
-	</head>
-	<body>
+<head>
+    <style>
+        body, html {
+            background-image: url("data:image/gif;base64,{{ background_image }}");
+            background-repeat: no-repeat;
+            height: 100%;
+            width: 100%;
+            text-align: center;
+        }
 
-    <code>
-        Text = {{ text }}
-    </code>
+        div.text_content {
+            position: absolute;
+            top: {{ certificate.text_position_y|stringformat:".2f" }}px;
+            left: {{ certificate.text_position_x|stringformat:".2f" }}px;
+            width: {{ certificate.text_width|stringformat:".2f" }}px;
+            height: {{ certificate.text_height|stringformat:".2f" }}px;
+            border: 1px solid #3247ff;
+            font-weight: bolder;
+            bottom:0;
+            font-size: {{ certificate.text_font_size|stringformat:".2f" }}px;
+        }
+    </style>
+    <title></title>
+</head>
+<body>
 
-	</body>
+<div class="text_content">
+    <p>{{ text }}</p>
+</div>
+
+</body>
 </html>
