@@ -40,7 +40,14 @@ Variáveis:
         </li>
     {% endif %}
 
+{#    <li {% if active == 'certificate' %}class=  "active"{% endif %}>#}
+{#        <a class="sidebar-itens" href="{% url 'certificate:event-certificate-prepare' event.pk %}"#}
+{#           title="Editor de Certificados">#}
+{#            <i class="fas fa-graduation-cap"></i>Certificados#}
+{#        </a>#}
+{#    </li>#}
 </ul>
+
 
 
 <h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
@@ -56,21 +63,23 @@ Variáveis:
         </a>
     </li>
     <li>
-        <a {% if active == 'checkin' %}class="active"{% endif %}class="sidebar-itens" href=
-                "{% url 'subscription:subscription-attendance-search' event.pk %}"
+        <a {% if active == 'checkin' %}class="active"{% endif %}class="sidebar-itens"
+           href=
+                   "{% url 'subscription:subscription-attendance-search' event.pk %}"
            title="Check-in">
             <i class="fas fa-calendar-check"></i>
             Check-in
         </a>
     </li>
-    <li>
-        <a {% if active == 'checkin-list' %}class="active"{% endif %}class="sidebar-itens" href=
-                "{% url 'subscription:subscription-attendance-list' event.pk %}"
-           title="Credenciados">
-            <i class="fas fa-clipboard-check"></i>
-           Credenciados
-        </a>
-    </li>
+{#    <li>#}
+{#        <a {% if active == 'checkin-list' %}class="active"{% endif %}class="sidebar-itens"#}
+{#           href=#}
+{#                   "{% url 'subscription:subscription-attendance-list' event.pk %}"#}
+{#           title="Credenciados">#}
+{#            <i class="fas fa-clipboard-check"></i>#}
+{#            Credenciados#}
+{#        </a>#}
+{#    </li>#}
 
 
 </ul>

@@ -1,0 +1,47 @@
+#certificate {
+  /*Resize e Drag*/
+  .resize-drag, .drag {
+    background-color: transparent;
+    color: black;
+    font-size: 20px;
+    box-sizing: border-box;
+    transition: background-color 1s ease;
+    border: 1px solid darkgray;
+  }
+  /*==========================================*/
+  /*Container onde fica os elementos (texto, título e data)*/
+  .certificate-row {
+    overflow-x: auto;
+  }
+  .certificate-image {
+
+    width: 1024px;
+    height: 724px;
+    margin:0 auto;
+  }
+  /*==========================================*/
+  /*Elementos de texto (título, texto, data) */
+  #text, #dateText, #titleText {
+    color: black;
+    font-size: 20px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: background-color 1s ease;
+  }
+  #text {
+    width: 634px;
+    height: 348px;
+  }
+
+  #dateText {
+    min-width:1014px;
+    height: 44px;
+    left:0;
+    position: fixed;
+  }
+
+  #titleText {
+    height: 80px;
+    font-size: 60px;
+  }
+}

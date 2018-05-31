@@ -1,0 +1,30 @@
+.barra_editar{
+    position: absolute;
+    right: 0;
+    top:0;
+}
+.resize-drag,.drag {
+    background-color: transparent;
+    color: black;
+    font-size: 20px;
+    font-family: sans-serif;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 30px 20px;
+    width: 120px;
+    box-sizing: border-box;
+
+}
+.resize-container {
+    display: inline-block;
+    background: url("photo4949530804971743183.jpg") no-repeat;
+    width: 900px;
+    height: 600px;
+}
+
+textarea{
+    border: none;
+    overflow-y: hidden;
+    background: transparent;
+}
+
