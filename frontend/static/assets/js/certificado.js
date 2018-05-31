@@ -98,19 +98,15 @@ window.cert = window.cert || {};
 
         window.clearTimeout(save_title_timer);
         save_title_timer = window.setTimeout(function () {
-            console.log('save_title_timer DATA: ');
 
             var form_data = new FormData();
 
             form_data.append('event', window.cert.event);
-            form_data.append('title_hide', data['hide']);
+            form_data.append('title_font_size', data['title_font_size']);
+            form_data.append('title_position_x', data['title_position_x']);
+            form_data.append('title_position_y', data['title_position_y']);
+            form_data.append('title_hide', data['title_hide']);
 
-
-            for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    console.log(key + " -> " + data[key]);
-                }
-            }
             $.ajax({
                 url: window.cert.url,
                 processData: false,
@@ -199,23 +195,62 @@ window.cert = window.cert || {};
         window.clearTimeout(save_date_timer);
         save_date_timer = window.setTimeout(function () {
 
-            console.log('save_date_timer DATA: ' + data);
+            var form_data = new FormData();
             for (var key in data) {
                 if (data.hasOwnProperty(key)) {
                     console.log(key + " -> " + data[key]);
                 }
             }
+
+            form_data.append('event', window.cert.event);
+            var date_font_size = data['date_font_size'];
+            if (date_font_size !== undefined) {
+                console.log(date_font_size);
+                date_font_size = parseInt(data['date_font_size'].replace("px", ""));
+                console.log(date_font_size);
+                form_data.append('date_font_size', date_font_size);
+            }
+
+            form_data.append('date_position_x', parseInt(data['date_position_x']));
+            form_data.append('date_position_y', parseInt(data['date_position_y']));
+
+            if (data['date_hide']) {
+                form_data.append('date_hide', true);
+            } else {
+                form_data.append('date_hide', false);
+            }
+
+
             $.ajax({
-                url: HOST + resource_name,
+                url: window.cert.url,
+                processData: false,
+                contentType: false,
+                data: form_data,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 },
-                data: data,
                 method: 'PATCH',
                 success: function (data) {
-                    console.log(data);
+                    title = data;
+                    Messenger().post({
+                        message: 'Data atualizada com sucesso!',
+                        type: 'success'
+                    });
+                },
+                error: function (err) {
+                    if (err.responseText !== "") {
+                        console.error(err.responseText)
+                    } else {
+                        console.error(err)
+                    }
+                    Messenger().post({
+                        message: 'Data não foi atualizada!',
+                        type: 'danger'
+                    });
                 }
             });
+
+
         }, 200);
     };
 
@@ -279,24 +314,45 @@ window.cert = window.cert || {};
         }
         window.clearTimeout(save_text_timer);
         save_text_timer = window.setTimeout(function () {
-            console.log('save_text_timer DATA: ' + data);
-            for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    console.log(key + " -> " + data[key]);
-                }
-            }
+
+
+            var form_data = new FormData();
+
+            form_data.append('event', window.cert.event);
+            form_data.append('text_font_size', data['text_font_size']);
+            form_data.append('text_position_x', data['text_position_x']);
+            form_data.append('text_position_y', data['text_position_y']);
+
             $.ajax({
-                url: HOST + resource_name,
-                method: 'PATCH',
+                url: window.cert.url,
+                processData: false,
+                contentType: false,
+                data: form_data,
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 },
-                data: data,
-                crossDomain: true,
+                method: 'PATCH',
                 success: function (data) {
-                    console.log(data);
+                    title = data;
+                    Messenger().post({
+                        message: 'Texto atualizado com sucesso!',
+                        type: 'success'
+                    });
+                },
+                error: function (err) {
+                    if (err.responseText !== "") {
+                        console.error(err.responseText)
+                    } else {
+                        console.error(err)
+                    }
+                    Messenger().post({
+                        message: 'Texto não foi atualizado!',
+                        type: 'danger'
+                    });
                 }
             });
+
+
         }, 200);
     };
 

@@ -1,31 +1,24 @@
 {% load static l10n humanize %}
-<html>
-<head>
-    <style>
-        body {
-            background: url("data:image/gif;base64,{{ background_image }}");
-            width: 1275px;
-            height: 1650px;
+<!doctype html>
+<html lang="en">
+	<head>
+		<style>
+			body, html {
+				background-image: url("data:image/gif;base64,{{ background_image }}");
+				background-repeat: no-repeat;
+                height: 100%;
+                width: 100%;
+                outline-style: solid;
+                outline-color: red;
+			}
+		</style>
+		<title></title>
+	</head>
+	<body>
 
-            -webkit-transform: translateY(1650px) rotate(270deg); /* Chrome, Safari 3.1+ */
-            -moz-transform: translateY(1650px) rotate(270deg); /* Firefox 3.5+ */
-            -o-transform: translateY(1650px) rotate(270deg); /* Opera 10.5-12.0 */
-            -ms-transform: translateY(1650px) rotate(270deg); /* IE 9 */
-            transform: translateY(1650px) rotate(270deg); /* IE 10+, Firefox 16.0+, Opera 12.1+ */
-            filter: progid:DXImageTransform.Microsoft.Matrix(M11=6.123031769111886e-17, M12=1, M21=-1, M22=6.123031769111886e-17, SizingMethod='auto expand'); /* IE 6-7 */
-            -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=6.123031769111886e-17, M12=1, M21=-1, M22=6.123031769111886e-17, SizingMethod='auto expand')"; /* IE 8 */
+    <code>
+        Text = {{ text }}
+    </code>
 
-            -webkit-transform-origin: 0% 0%;
-            -moz-transform-origin: 0% 0%;
-            -o-transform-origin: 0% 0%;
-            -ms-transform-origin: 0% 0%;
-            transform-origin: 0% 0%;
-        }
-    </style>
-</head>
-<body>
-
-</body>
+	</body>
 </html>
-
-

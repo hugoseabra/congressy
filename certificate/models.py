@@ -45,10 +45,16 @@ class Certificate(models.Model):
     )
 
     text_content = models.TextField(
-        default='Certificamos que {{NOME}} participou do evento {{EVENTO}}'
-                ' no dia 1 de abril de 2018, com carga horário de 4 horas.',
+        default='Certificamos que {{NOME}} participou do evento {{EVENTO}}',
         verbose_name='texto',
         help_text='Texto principal do certificado.',
+    )
+
+    date_content = models.TextField(
+        verbose_name='texto',
+        help_text='Texto de data do certificado.',
+        null=True,
+        blank=True,
     )
 
     text_font_size = models.PositiveIntegerField(
