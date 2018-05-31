@@ -86,7 +86,7 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     template_name = 'pdf/certificate.html'
     subscription = None
     event = None
-    show_content_in_browser = True
+    show_content_in_browser = False
     permission_denied_url = reverse_lazy('front:start')
 
     cmd_options = {
