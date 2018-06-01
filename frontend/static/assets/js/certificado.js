@@ -29,6 +29,10 @@ window.cert = window.cert || {};
         return cookieValue;
     }
 
+    function is_defined(x) {
+        return x !== null && typeof(x) !== 'undefined';
+    }
+
     var csrftoken = getCookie('csrftoken');
 
     // Título do certificado
@@ -88,48 +92,101 @@ window.cert = window.cert || {};
         save_title_timer = window.setTimeout(function () {
 
 
+            console.log('-----------saveTitle-raw -----------------');
             for (var key in data) {
                 if (data.hasOwnProperty(key)) {
                     console.log(key + " -> " + data[key]);
                 }
             }
+            console.log('--------------------------------------');
+            var changed = false;
+            var form_data = new FormData();
 
-            // var form_data = new FormData();
-            //
-            // form_data.append('event', window.cert.event);
-            // form_data.append('title_font_size', data['title_font_size']);
-            // form_data.append('title_position_x', data['title_position_x']);
-            // form_data.append('title_position_y', data['title_position_y']);
-            // form_data.append('title_hide', data['title_hide']);
-            //
-            // $.ajax({
-            //     url: window.cert.url,
-            //     processData: false,
-            //     contentType: false,
-            //     data: form_data,
-            //     beforeSend: function (xhr) {
-            //         xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            //     },
-            //     method: 'PATCH',
-            //     success: function (data) {
-            //         title = data;
-            //         Messenger().post({
-            //             message: 'Titulo atualizado com sucesso!',
-            //             type: 'success'
-            //         });
-            //     },
-            //     error: function (err) {
-            //         if (err.responseText !== "") {
-            //             console.error(err.responseText)
-            //         } else {
-            //             console.error(err)
-            //         }
-            //         Messenger().post({
-            //             message: 'Titulo não foi atualizado!',
-            //             type: 'danger'
-            //         });
-            //     }
-            // });
+            form_data.append('event', window.cert.event);
+
+            if (is_defined(data['position_x']) || is_defined(data['title_position_x'])) {
+                if (is_defined(data['position_x'])) {
+                    form_data.append('title_position_x', data['position_x']);
+                    changed = true;
+                } else if (is_defined(['title_position_x'])) {
+                    form_data.append('title_position_x', data['title_position_x']);
+                    changed = true;
+                }
+            }
+            
+            if (is_defined(data['position_y']) || is_defined(data['title_position_y'])) {
+                if (is_defined(data['position_y'])) {
+                    form_data.append('title_position_y', data['position_y']);
+                    changed = true;
+                } else if (is_defined(['title_position_y'])) {
+                    form_data.append('title_position_y', data['title_position_y']);
+                    changed = true;
+                }
+            }
+
+            if (is_defined(data['font_size']) || is_defined(data['title_font_size'])) {
+
+                var font_size = null;
+
+                if (is_defined(data['font_size'])) {
+                    font_size = data['font_size'].replace("px", "");
+                } else if (is_defined(data['title_font_size'])) {
+                    font_size = data['title_font_size'];
+                }
+
+                if (font_size != null) {
+                    form_data.append('title_font_size', font_size);
+                    changed = true;
+                }
+
+            }
+
+            if (is_defined(data['hide']) || is_defined(data['title_hide'])) {
+                if (is_defined(data['hide'])) {
+                    form_data.append('title_hide', data['hide']);
+                    changed = true;
+                } else if (is_defined(data['title_hide'])) {
+                    form_data.append('title_hide', data['title_hide']);
+                    changed = true;
+                }
+            }
+            // Display the key/value pairs
+            console.log('-----------saveTitle-parsed-----------------');
+            for (var pair of form_data.entries()) {
+                console.log(pair[0]+ ', ' + pair[1]);
+            }
+            console.log('------------------------------------------');
+            if (changed) {
+                $.ajax({
+                    url: window.cert.url,
+                    processData: false,
+                    contentType: false,
+                    data: form_data,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    method: 'PATCH',
+                    success: function (data) {
+                        title = data;
+                        Messenger().post({
+                            message: 'Titulo atualizado com sucesso!',
+                            type: 'success'
+                        });
+                    },
+                    error: function (err) {
+                        if (err.responseText !== "") {
+                            console.error(err.responseText)
+                        } else {
+                            console.error(err)
+                        }
+                        Messenger().post({
+                            message: 'Titulo não foi atualizado!',
+                            type: 'danger'
+                        });
+                    }
+                });
+            }
+
         }, 200);
     };
 
