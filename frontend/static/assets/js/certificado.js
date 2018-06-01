@@ -33,6 +33,14 @@ window.cert = window.cert || {};
         return x !== null && typeof(x) !== 'undefined';
     }
 
+    function remove_px(str) {
+        if (is_defined(str) && typeof(str) === "string") {
+            return str.replace("px", "");
+        }
+
+        return str;
+    }
+
     var csrftoken = getCookie('csrftoken');
 
     // Título do certificado
@@ -50,27 +58,14 @@ window.cert = window.cert || {};
         "hide": false
     };
     var text = {
-        "position_x": "0.00",
-        "position_y": "12.2",
+        "position_x": 0.00,
+        "position_y": 0.00,
         "font_size": "12px",
         "width": "340px",
         "height": "300px",
         "line_height": "20px",
         "text": "teste"
     };
-
-    // ====================================
-    // Save data
-    // ====================================
-    // Funcão que analisa os dados recebidos com os dados esperados
-    function check_data(keys, data) {
-        $.each(keys, function (i, key) {
-            if (!key in data) {
-                return false;
-            }
-        });
-        return true;
-    }
 
     // =============TITLE==================
     // Função que solicita um objeto title
@@ -121,7 +116,7 @@ window.cert = window.cert || {};
                 var font_size = null;
 
                 if (is_defined(data['font_size'])) {
-                    font_size = data['font_size'].replace("px", "");
+                    font_size = remove_px(data['font_size']);
                 } else if (is_defined(data['title_font_size'])) {
                     font_size = data['title_font_size'];
                 }
@@ -202,9 +197,9 @@ window.cert = window.cert || {};
         cert.saveTitle(title);
     };
 
-//================= Date====================
+    //================= Date====================
 
-// Função que requisita um objeto do tipo date
+    // Função que requisita um objeto do tipo date
     window.cert.getDate = function () {
         $.ajax({
             url: window.cert.url,
@@ -216,95 +211,81 @@ window.cert = window.cert || {};
         });
     };
 
-// Função que salva um objeto do tipo date
+    // Função que salva um objeto do tipo date
     window.cert.saveDate = function (data) {
         var save_date_timer = null;
         window.clearTimeout(save_date_timer);
         save_date_timer = window.setTimeout(function () {
 
-            console.log('---------- save_date-raw -----------------');
-            for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    console.log(key + " -> " + data[key]);
-                }
-            }
-            console.log('--------------------------------------');
-
             var form_data = new FormData();
 
             form_data.append('event', window.cert.event);
             form_data.append('date_hide', data['hide']);
+
             form_data.append('date_position_x', data['position_x']);
             form_data.append('date_position_y', data['position_y']);
-
-
-
-            console.log('---------- save_date-parsed-----------------');
-            for (var pair of form_data.entries()) {
-                console.log(pair[0] + ', ' + pair[1]);
-            }
-            console.log('------------------------------------------');
+            form_data.append('date_font_size', remove_px(data['font_size']));
 
             $.ajax({
-                    url: window.cert.url,
-                    processData: false,
-                    contentType: false,
-                    data: form_data,
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                    },
-                    method: 'PATCH',
-                    success: function (data) {
-                        title = data;
-                        Messenger().post({
-                            message: 'Data atualizada com sucesso!',
-                            type: 'success'
-                        });
-                    },
-                    error: function (err) {
-                        if (err.responseText !== "") {
-                            console.error(err.responseText)
-                        } else {
-                            console.error(err)
-                        }
-                        Messenger().post({
-                            message: 'Data não foi atualizada!',
-                            type: 'danger'
-                        });
+                url: window.cert.url,
+                processData: false,
+                contentType: false,
+                data: form_data,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                method: 'PATCH',
+                success: function (data) {
+                    title = data;
+                    Messenger().post({
+                        message: 'Data atualizada com sucesso!',
+                        type: 'success'
+                    });
+                },
+                error: function (err) {
+                    if (err.responseText !== "") {
+                        console.error(err.responseText)
+                    } else {
+                        console.error(err)
                     }
-                });
+                    Messenger().post({
+                        message: 'Data não foi atualizada!',
+                        type: 'danger'
+                    });
+                }
+            });
 
         }, 200);
     };
 
-// Função que salva a posição de um objeto date
+    // Função que salva a posição de um objeto date
     window.cert.saveDatePosition = function (x, y) {
         date['position_x'] = x;
         date['position_y'] = y;
         cert.saveDate(date)
     };
 
-// Função que salva o tamanho da fonte de um objeto date
+    // Função que salva o tamanho da fonte de um objeto date
     window.cert.saveDateFontSize = function (font_size) {
         date['font_size'] = font_size;
         cert.saveDate(date);
     };
 
-//Função que muda o estado de hide pra true em date(não deixa visível)
+    //Função que muda o estado de hide pra true em date(não deixa visível)
     window.cert.hideDate = function () {
         date['hide'] = true;
         cert.saveDate(date);
     };
 
-//Função que muda o estado de hide para false em date(deixa visível)
+    //Função que muda o estado de hide para false em date(deixa visível)
     window.cert.showDate = function () {
         date['hide'] = false;
         cert.saveDate(date);
     };
 
-// Text
+    // Text
 
-// Função que requisita um objeto text
+    // Função que requisita um objeto text
     window.cert.getText = function () {
         $.ajax({
             url: window.cert.url,
@@ -317,69 +298,52 @@ window.cert = window.cert || {};
         });
     };
 
-// Função que salva um objeto text
+    // Função que salva um objeto text
     window.cert.saveText = function (data) {
         var save_text_timer = null;
-        var expect_keys = [
-            'position_x',
-            'position_y',
-            'font-size',
-            'width',
-            'height',
-            'line_height',
-            'text'
-        ];
-        var resource_name = 'mock/text.json';
-        if (!check_data(expect_keys, data)) {
-            console.error('Dados errados em "' + resource_name + '"');
-            console.log(data);
-            return;
-        }
         window.clearTimeout(save_text_timer);
         save_text_timer = window.setTimeout(function () {
 
-            for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    console.log(key + " -> " + data[key]);
+            var form_data = new FormData();
+
+            form_data.append('event', window.cert.event);
+            form_data.append('text_position_x', data['position_x'].toFixed(2));
+            form_data.append('text_position_y', data['position_y'].toFixed(2));
+            form_data.append('text_font_size', remove_px(data['font_size']));
+            form_data.append('text_width', remove_px(data['width']));
+            form_data.append('text_height', remove_px(data['height']));
+            form_data.append('text_line_height', remove_px(data['line_height']));
+            form_data.append('text_content', data['text']);
+
+
+            $.ajax({
+                url: window.cert.url,
+                processData: false,
+                contentType: false,
+                data: form_data,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                method: 'PATCH',
+                success: function (data) {
+                    title = data;
+                    Messenger().post({
+                        message: 'Texto atualizado com sucesso!',
+                        type: 'success'
+                    });
+                },
+                error: function (err) {
+                    if (err.responseText !== "") {
+                        console.error(err.responseText)
+                    } else {
+                        console.error(err)
+                    }
+                    Messenger().post({
+                        message: 'Texto não foi atualizado!',
+                        type: 'danger'
+                    });
                 }
-            }
-
-
-            // var form_data = new FormData();
-            //
-            // form_data.append('event', window.cert.event);
-            // form_data.append('text_font_size', data['text_font_size']);
-            // form_data.append('text_position_x', data['text_position_x']);
-            // form_data.append('text_position_y', data['text_position_y']);
-            //
-            // $.ajax({
-            //     url: window.cert.url,
-            //     processData: false,
-            //     contentType: false,
-            //     data: form_data,
-            //     beforeSend: function (xhr) {
-            //         xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            //     },
-            //     method: 'PATCH',
-            //     success: function (data) {
-            //         title = data;
-            //         Messenger().post({
-            //             message: 'Texto atualizado com sucesso!',
-            //             type: 'success'
-            //         });
-            //     },
-            //     error: function (err) {
-            //         if (err.responseText !== "") {
-            //             console.error(err.responseText)
-            //         } else {
-            //             console.error(err)
-            //         }
-            //         Messenger().post({
-            //             message: 'Texto não foi atualizado!',
-            //             type: 'danger'
-            //         });
-            //     }
-            // });
+            });
 
 
         }, 200);
@@ -390,31 +354,31 @@ window.cert = window.cert || {};
         cert.saveText(text);
     };
 
-//Função que salva a posição de um objeto text
+    //Função que salva a posição de um objeto text
     window.cert.saveTextPosition = function (x, y) {
         text['position_x'] = x;
         text['position_y'] = y;
         cert.saveText(text);
     };
 
-//Função que salva o tamanho de um objeto text
+    //Função que salva o tamanho de um objeto text
     window.cert.saveTextSize = function (height, width) {
         text['height'] = height;
         text['width'] = width;
         cert.saveText(text);
     };
 
-//Função que salva o tamanho da fonte de um objeto text
+    //Função que salva o tamanho da fonte de um objeto text
     window.cert.saveTextFontSize = function (font_size) {
         text['font_size'] = font_size;
     };
 
-//Função que salva o espaçamento entre linhas de um objeto text
+    //Função que salva o espaçamento entre linhas de um objeto text
     window.cert.saveTextLineHeight = function (line_height) {
         text['line_height'] = line_height;
     };
 
-// ========================================================
+    // ========================================================
     window.cert.enableDragDrop = function () {
 
     };
@@ -424,7 +388,7 @@ window.cert = window.cert || {};
     };
 
 
-// ====================Title Functions================================
+    // ====================Title Functions================================
     function showHideTitle(show) {
         show = show === true;
         if (show) {
@@ -450,7 +414,7 @@ window.cert = window.cert || {};
         resizeContent('#titleText');
     });
 
-//Funções para redimennsionar o título
+    //Funções para redimennsionar o título
     $('#titleText').on('input', function () {
         cert.saveTextContent($(this).val());
         resizeContent((this));
@@ -459,7 +423,7 @@ window.cert = window.cert || {};
             resizeContent((this));
         });
 
-//Função para esconder o título
+    //Função para esconder o título
     $('#titleCheckBox').on('change', function () {
         if (this.checked === true) {
             $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(3) > a').hide();
@@ -472,7 +436,7 @@ window.cert = window.cert || {};
         }
     });
 
-// ====================Date Functions================================
+    // ====================Date Functions================================
     function showHideDate(show) {
         if (show) {
             $('#dateText').fadeIn();
@@ -500,7 +464,7 @@ window.cert = window.cert || {};
         resizeContent('#dateText');
     });
 
-//Funções alinhamento do texto na data
+    //Funções alinhamento do texto na data
     $('.glyphicon-align-left').on('click', function () {
         $('#dateText').css('text-align', 'left');
         console.log('left');
@@ -516,7 +480,7 @@ window.cert = window.cert || {};
         console.log('right');
     });
 
-//Função para esconder a data
+    //Função para esconder a data
     $('#dateCheckBox').on('change', function () {
         if (this.checked === true) {
             $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(3) > a').hide();
@@ -531,7 +495,7 @@ window.cert = window.cert || {};
         }
     });
 
-// ====================Text Functions================================
+    // ====================Text Functions================================
 
     $('#textFontSize').change(function () {
         $('#text').css('font-size', $(this).val() + 'px');
@@ -545,7 +509,7 @@ window.cert = window.cert || {};
         resizeContent('#text');
     });
 
-//Funções de redimensionar altomaticamente a caixa de texto
+    //Funções de redimensionar altomaticamente a caixa de texto
     $('#text').on('input', function () {
         cert.saveTextContent($(this).val());
         resizeContent((this));
@@ -555,7 +519,7 @@ window.cert = window.cert || {};
         });
 
 
-//Função que faz o redimensionamento
+    //Função que faz o redimensionamento
     function resizeContent(element) {
         element = $(element);
         var offset = element.innerHeight() - element.height();
@@ -570,7 +534,7 @@ window.cert = window.cert || {};
         }
     }
 
-//Funções para ativar e desativar o modo de drag and drop e resize
+    //Funções para ativar e desativar o modo de drag and drop e resize
     $('#modoEditar').on('change', function () {
         if (this.checked === true) {
             addDragResize();
@@ -600,7 +564,7 @@ window.cert = window.cert || {};
     }
 
 
-// Funções que auxiliam a biblioteca de drag and drop e resize
+    // Funções que auxiliam a biblioteca de drag and drop e resize
     window.cert.moveElement = function (element, x, y) {
         element = $(element);
 

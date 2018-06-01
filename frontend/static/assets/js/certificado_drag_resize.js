@@ -1,6 +1,6 @@
 window.cert = window.cert || {};
 (function (window, $) {
-    function dragMoveListener (event) {
+    function dragMoveListener(event) {
         var target = event.target,
             // keep the dragged position in the data-x/data-y attributes
             x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
@@ -17,7 +17,7 @@ window.cert = window.cert || {};
             onmove: window.dragMoveListener,
             restrict: {
                 restriction: 'parent',
-                elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+                elementRect: {top: 0, left: 0, bottom: 1, right: 1}
             },
             onend: savePosition
         });
@@ -26,13 +26,13 @@ window.cert = window.cert || {};
             onmove: window.dragMoveListener,
             restrict: {
                 restriction: 'parent',
-                elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+                elementRect: {top: 0, left: 0, bottom: 1, right: 1}
             },
             onend: savePosition
         })
         .resizable({
             // resize from all edges and corners
-            edges: { left: true, right: true, bottom: true, top: true },
+            edges: {left: true, right: true, bottom: true, top: true},
 
             // keep the edges inside the parent
             restrictEdges: {
@@ -41,7 +41,7 @@ window.cert = window.cert || {};
             },
             // minimum size
             restrictSize: {
-                min: { width: 50, height: 50 }
+                min: {width: 50, height: 50}
             },
 
             inertia: true
@@ -52,7 +52,7 @@ window.cert = window.cert || {};
                 y = (parseFloat(target.getAttribute('data-y')) || 0);
 
             // update the element's style
-            target.style.width  = event.rect.width + 'px';
+            target.style.width = event.rect.width + 'px';
             target.style.height = event.rect.height + 'px';
 
             // translate when resizing from top or left edges
@@ -65,25 +65,26 @@ window.cert = window.cert || {};
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
             cert.saveTextSize(target.style.height, target.style.width);
+            cert.saveTextPosition(x, y);
         });
-function savePosition(event){
-    var target = event.target;
-    var x = $(target).attr('data-x');
-    var y = $(target).attr('data-y');
-    if(target.id === 'text'){
-        cert.saveTextPosition(x,y);
 
+    function savePosition(event) {
+        var target = event.target;
+        var x = $(target).attr('data-x');
+        var y = $(target).attr('data-y');
+        if (target.id === 'text') {
+            cert.saveTextPosition(x, y);
+        }
+        else if (target.id === 'titleText') {
+            cert.saveTitlePosition(x, y);
+        }
+        else if (target.id === 'dateText') {
+            cert.saveDatePosition(x, y);
+        }
     }
-    else if (target.id === 'titleText'){
-        cert.saveTitlePosition(x,y);
-    }
-    else if (target.id === 'dateText'){
-        cert.saveDatePosition(x,y);
-    }
-}
 
-function saveSize(event) {
-    var target = event.target;
-    cert.saveTextSize(target.style.height, target.style.width);
-}
+    function saveSize(event) {
+        var target = event.target;
+        cert.saveTextSize(target.style.height, target.style.width);
+    }
 })(window, jQuery);

@@ -300,7 +300,42 @@
                     </label>
                     <input type="checkbox" class="js-switch" id="dateCheckBox"
                            name="dateCheckBox">
+                    <br/>
 
+                    <label for="titleFontSize" style="margin-top: 20px">
+                        Tamanho do titulo:
+                    </label>
+                    <input class="form-control"
+                           type="number"
+                           id="titleFontSize" min="1"
+                           value= {{ object.title_font_size }}>
+
+
+                    <label for="dateFontSize" style="margin-top: 10px">
+                        Tamanho da data:
+                    </label>
+                    <input class="form-control"
+                           type="number"
+                           id="dateFontSize" min="1"
+                           value= {{ object.date_font_size }}>
+
+
+                    <label for="textFontSize" style="margin-top: 10px">
+                        Tamanho do texto
+                    </label>
+                    <input class="form-control"
+                           type="number"
+                           id="textFontSize" min="1"
+                           value={{ object.text_font_size }}>
+
+                    <label for="textLineHeight" style="margin-top: 10px">
+                        Espaçamento entre linhas do texto
+                    </label>
+                    <input class="form-control"
+                           type="number"
+                           id="textLineHeight" min="1"
+                           max="10" step="0.1"
+                           value= {{ object.text_line_height }}>
 
 
                 </div>
