@@ -1,153 +1,319 @@
 {% extends 'base/base.html' %}
-{% load static humanize l10n %}
+{% load static humanize l10n form_config_tags %}
 
+{% block title %}
+    Certificado | Congressy
+{% endblock %}
+{% block page_title %}
+    Configurações do certificado do seu evento
+{% endblock %}
+{% block page_sub_title %}
+    {{ event.name }}
+{% endblock %}
 {% block sidebar %}{% endblock %}
 {% block sidebar-bars %}{% endblock %}
+{% block toptitle %}{% endblock %}
 
 {% block styles %}
-<style>
-    .resize-container {
-        background: url('{{ object.background_image.url }}');
-        width: 1024px;
-        height: 725px;
-    }
-    #titleText{
-        font-size: {{ object.title_font_size }}px;
-    }
-    #text{
-        width: {{ object.text_width }}px;
-        height: {{ object.text_height }}px;
-        font-size: {{ object.text_font_size }}px;
-    }
-    #dateText{
-        font-size: {{ object.date_font_size }}px;
-    }
+    <style>
+        {% if  object.background_image  %}
+            .resize-container {
+                background: url('{{ object.background_image.regular.url }}');
+                width: 1024px;
+                height: 725px;
+            }
+        {% endif %}
+
+        #titleText {
+            font-size: {{ object.title_font_size }}px;
+        }
+
+        #text {
+            width: {{ object.text_width }}px;
+            height: {{ object.text_height }}px;
+            font-size: {{ object.text_font_size }}px;
+        }
+
+        #dateText {
+            font-size: {{ object.date_font_size }}px;
+        }
     </style>
 {% endblock %}
 
 {% block content %}
-<div id="certificate">
-    <div id="mySidenav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" style="text-align: left" onclick="closeNav()">&times;</a>
-        <ul class="nav nav-pills">
-            <li class="divider btn-block" style="text-align: center">
-                <a>
-                    <label for = "modoEditar"> <h2>movimento</h2> </label>
-                    <label class="switch">
-                        <input type="checkbox" id = 'modoEditar'>
-                        <span class="slider round"></span>
-                    </label>
-                </a>
-            </li>
-             <li role="separator" class="divider"></li>
-            <li class="dropdown btn-block" style="text-align: center;" role="presentation" >
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"
-                   role="button" aria-haspopup="true" aria-expanded="false">
-                    <h2>Título</h2><span class="caret"></span></a>
-                <ul class="dropdown-menu btn-block" aria-labelledby="button_title">
-                    <li><a>
-                        <label for="titleCheckBox"><h3>Esconder título</h3></label>
-                        <input type="checkbox" id = "titleCheckBox">
-                    </a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a>
-                        <label for = "titleFontSize"> <h3>Tamanho da fonte </h3> </label>
-                        <input class="form-control" type="number" id = "titleFontSize" min="1"
-                        value = {{ object.title_font_size }}>
-                    </a></li>
-                </ul>
-            </li>
-            <li role="separator" class="divider"></li>
-            <li class="dropdown btn-block" style="text-align: center;" role="presentation" >
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"
-                   role="button" aria-haspopup="true" aria-expanded="false">
-                    <h2>Data</h2><span class="caret"></span></a>
-                <ul class="dropdown-menu btn-block" aria-labelledby="button_date">
-                    <li><a>
-                        <label for="dateCheckBox"> <h3>Esconder data </h3> </label>
-                        <input type="checkbox" id = "dateCheckBox" class = "custom-">
-                    </a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a>
-                        <label for = "dateFontSize"> <h3>Tamanho da fonte </h3> </label>
-                        <input class="form-control" type="number" id = "dateFontSize" min="1"
-                        value = {{ object.date_font_size }}>
-                    </a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a style="display: inline-block; text-align: center; display: flex; justify-content: center">
-                        <div class="btn-toolbar" role="toolbar">
-                            <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn default">
-                                <span class="glyphicon glyphicon-align-left"></span></button>
-                            </div>
-                            <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn default">
-                                <span class="glyphicon glyphicon-align-center"></span></button>
-                            </div>
-                            <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn default">
-                                <span class="glyphicon glyphicon-align-right"></span></button>
-                            </div>
-                        </div>
-                    </a></li>
-                </ul>
-            </li>
-            <li role="separator" class="divider"></li>
-                <li class = "dropdown btn-block" style="text-align: center;" role="presentation" >
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"
-                       role="button" aria-haspopup="true" aria-expanded="false"><h2>Texto</h2>
-                        <span class="caret"></span></a>
-                    <ul class="dropdown-menu" aria-labelledby="button_text">
-                        <li><a>
-                            <label for = "textFontSize"><h3>Tamanho da fonte</h3></label>
-                            <input class="form-control" type="number" id = "textFontSize" min="1"
-                            value = {{ object.text_font_size }} >
-                        </a></li>
-                        <li role="separator" class="divider"></li>
-                        <li><a>
-                            <label for = "textLineHeight"><h3>Espaçamento entre linhas</h3></label>
-                            <input class="form-control" type="number" id = "textLineHeight" min="1"
-                            max="10" step="0.1" value = {{ object.text_line_height}}>
-                        </a></li>
 
-                    </ul>
-                </li>
-            </ul>
+    <div class="row">
+        <div class="col-lg-9 col-lg-push-3 col-xl-9 col-xl-push-3">
+            <div class="buttonbar">
+                <div class="float-right">
+                    <button class="btn btn-primary open-edit-modal">
+                        <i class="fas fa-pencil-alt"></i>
+                        Conteúdo
+                    </button>
+                    <button class="btn btn-primary open-config-modal"
+                            style="margin-left: 10px">
+                        <i class="fas fa-align-center"></i>
+                        Alinhamento
+                    </button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
     </div>
-    <div style="text-align: right">
-        <span style="font-size:30px;cursor:pointer;" onclick="openNav()">&#9776; Edição</span>
-    </div>
-    <div class="resize-container">
-        <div style="position:absolute; text-align: justify"  id = "titleText">{{ object.title_content }}</div>
-        <div style="position:absolute; text-align: justify"  id = "dateText">Goiânia, 1 de abril de 2018</div>
-        <div style="position:absolute; text-align: justify"  id = "text" >{{ object.text_content }}</div>
-    </div>
-</div>
-<script>
-function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-}
 
-function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-}
-</script>
+    <div class="row">
+        <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+            {% if form.non_field_errors %}
+                {% render_errors form.non_field_errors %}
+            {% endif %}
+            {% for field in form %}
+                {% if field.errors %}
+                    {% render_errors field.errors %}
+                {% endif %}
+            {% endfor %}
+            {% if form.forms %}
+                {% render_errors form.non_field_errors %}
+            {% endif %}
+            {% for hidden_field in form.hidden_fields %}
+                {% if hidden_field.errors %}
+                    {% render_errors hidden_field.errors %}
+                {% endif %}
+                {{ hidden_field }}
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if object.background_image %}
+        <div id="certificate">
+            <div class="resize-container">
+                <div style="position:absolute; text-align: justify"
+                     id="titleText">{{ object.title_content }}</div>
+                <div style="position:absolute; text-align: justify"
+                     id="dateText">
+                    Goiânia, 1 de abril de 2018
+                </div>
+                <div style="position:absolute; text-align: justify"
+                     id="text">{{ object.text_content }}</div>
+            </div>
+        </div>
+    {% else %}
+        <div id="no-background-warning">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Alerta
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <h3>
+                            <strong>
+                                Você ainda não possui nenhuma imagem de fundo
+                                definida
+                                portanto não pode editar seu certificado.
+                            </strong>
+                        </h3>
+                    </div>
+
+                    <div class="row text-center" style="margin-top: 20px">
+                        <button class="btn btn-success open-edit-modal">
+                            Click para configurar
+                        </button>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+    {% endif %}
 
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static "assets/plugins/interact/interact.min.js" %}"></script>
-<script src="{% static "assets/js/certificado_drag_resize.js" %}"></script>
+    <script src="{% static "assets/plugins/interact/interact.min.js" %}"></script>
+    <script src="{% static "assets/js/certificado_drag_resize.js" %}"></script>
 
-<script src="{% static "assets/js/certificado.js" %}"></script>
-<script>
-    $(document).ready(function() {
-        console.log('{% url 'certificate:certificate-detail' event.pk object.pk %}');
-        window.cert.url = '{% url 'certificate:certificate-detail' event.pk object.pk %}';
-        window.cert.event = '{{ event.pk }}';
-        window.cert.moveElement($('#text'), {{ object.text_position_x|unlocalize|intcomma }}, {{ object.text_position_y|unlocalize|intcomma }});
-        window.cert.moveElement($('#titleText'), {{ object.title_position_x|unlocalize|intcomma }}, {{ object.title_position_y|unlocalize|intcomma }});
-        window.cert.moveElement($('#dateText'), {{ object.date_position_x|unlocalize|intcomma }}, {{ object.date_position_y|unlocalize|intcomma }});
-    });
-</script>
+    <script src="{% static "assets/js/certificado.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+
+            window.cert.url = '{% url 'certificate:certificate-detail' event.pk object.pk %}';
+            window.cert.event = '{{ event.pk }}';
+            {% if object.text_position_x %}
+                window.cert.moveElement($('#text'), {{ object.text_position_x|unlocalize|intcomma }}, {{ object.text_position_y|unlocalize|intcomma }});
+            {% endif %}
+
+            {% if object.object.title_position_x %}
+                window.cert.moveElement($('#titleText'), {{ object.title_position_x|unlocalize|intcomma }}, {{ object.title_position_y|unlocalize|intcomma }});
+            {% endif %}
+
+            {% if object.date_position_x %}
+                window.cert.moveElement($('#dateText'), {{ object.date_position_x|unlocalize|intcomma }}, {{ object.date_position_y|unlocalize|intcomma }});
+            {% endif %}
+
+            $('.open-edit-modal').on("click", function () {
+                $('#certificateDataModal').modal('show');
+            });
+
+            $('.open-config-modal').on("click", function () {
+                $('#certificateAlignmentModal').modal('show');
+            });
+
+
+        });
+    </script>
 {% endblock %}
+
+
+{% block modals %}
+
+    <!-- CONTENT MODAL -->
+    <div class="modal fade in" id="certificateDataModal"
+         role="dialog"
+         aria-labelledby="certificateDataModalLabel" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title" id="certificateDataModalLabel">
+                        Editar conteudo do certificado
+                    </h4>
+                </div>
+                <form class="submission_form form-horizontal"
+                      role="form"
+                      method="post"
+                      style="margin-left: 15px"
+                      action="{% url 'certificate:event-certificate-form' event.pk %}"
+                      enctype="multipart/form-data">
+                    <div class="modal-body">
+
+                        {% csrf_token %}
+                        {% render_generic_field form.background_image required=True %}
+                        {% render_generic_field form.text_content help_text=False %}
+                        <div class="well">
+                            <i>
+                                <strong>
+                                    Os valores dentro das chaves {% verbatim %}
+                                    {{
+                                    exemplo }} {% endverbatim %} será
+                                    substituido
+                                    pelo valor correto. Caso não deseja exibir
+                                    esse
+                                    campo basta removê-lo.
+                                </strong>
+                            </i>
+
+
+                            <div style="margin-top: 10px">
+                                <strong>
+                                    Chaves disponiveis no momento:
+                                </strong>
+                            </div>
+                            <div>
+                                <code>
+                                    {% verbatim %}
+                                    {{ NOME }}
+                                    {%endverbatim %}
+                                </code>
+                                = Nome completo do participante
+                            </div>
+
+                            <div>
+                                <code>
+                                    {% verbatim %}
+                                    {{ EVENTO }}
+                                    {%endverbatim %}
+                                </code>
+                                = Nome do seu evento
+                            </div>
+
+
+                            <div>
+                                <code>
+                                    {% verbatim %}
+                                    {{ CPF_CNPJ }}
+                                    {%endverbatim %}
+                                </code>
+                                = Documento identificador CPF/CNPJ
+                            </div>
+
+                        </div>
+                        {{ form.event }}
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger"
+                                data-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="far fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALIGNMENT MODAL -->
+    <div class="modal fade in" id="certificateAlignmentModal"
+         role="dialog"
+         aria-labelledby="certificateAlignmentModalLabel" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title" id="certificateAlignmentModalLabel">
+                        Editar alinhamento do certificado
+                    </h4>
+                </div>
+
+                <div class="modal-body">
+                    <label for="modoEditar">
+                        Arrasta e solta:
+                    </label>
+                    <input class="js-switch" type="checkbox" id='modoEditar'
+                           name="modoEditar">
+
+
+                    <br/>
+
+
+                    <label for="titleCheckBox" style="margin-top: 10px">
+                        Esconder título
+                    </label>
+                    <input class="js-switch" type="checkbox" id="titleCheckBox"
+                           name="titleCheckBox">
+
+                    <br/>
+
+
+                    <label for="dateCheckBox" style="margin-top: 10px">
+                        Esconder data
+                    </label>
+                    <input type="checkbox" class="js-switch" id="dateCheckBox"
+                           name="dateCheckBox">
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+

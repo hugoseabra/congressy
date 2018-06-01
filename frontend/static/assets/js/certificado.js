@@ -11,7 +11,7 @@ window.cert = window.cert || {};
         theme: 'flat'
     };
 
-// CSRF code
+    // CSRF code
     function getCookie(name) {
         var cookieValue = null;
         var i = 0;
@@ -31,7 +31,7 @@ window.cert = window.cert || {};
 
     var csrftoken = getCookie('csrftoken');
 
-// Título do certificado
+    // Título do certificado
     var title = {
         "position_x": 0.00,
         "position_y": 0.00,
@@ -55,10 +55,10 @@ window.cert = window.cert || {};
         "text": "teste"
     };
 
-// ====================================
-// Save data
-// ====================================
-// Funcão que analisa os dados recebidos com os dados esperados
+    // ====================================
+    // Save data
+    // ====================================
+    // Funcão que analisa os dados recebidos com os dados esperados
     function check_data(keys, data) {
         $.each(keys, function (i, key) {
             if (!key in data) {
@@ -68,8 +68,8 @@ window.cert = window.cert || {};
         return true;
     }
 
-// =============TITLE==================
-// Função que solicita um objeto title
+    // =============TITLE==================
+    // Função que solicita um objeto title
     window.cert.getTitle = function () {
         $.ajax({
             url: window.cert.url,
@@ -81,83 +81,78 @@ window.cert = window.cert || {};
         });
     };
 
-// Função que salva um objeto title
+    // Função que salva um objeto title
     var save_title_timer = null;
     window.cert.saveTitle = function (data) {
-        var expected_keys = [
-            'font_size',
-            'position_x',
-            'position_y',
-            'hide'
-        ];
-        if (!check_data(expected_keys, data)) {
-            console.error('Dados errados em "' + resource_name + '"');
-            console.log(data);
-            return;
-        }
-
         window.clearTimeout(save_title_timer);
         save_title_timer = window.setTimeout(function () {
 
-            var form_data = new FormData();
 
-            form_data.append('event', window.cert.event);
-            form_data.append('title_font_size', data['title_font_size']);
-            form_data.append('title_position_x', data['title_position_x']);
-            form_data.append('title_position_y', data['title_position_y']);
-            form_data.append('title_hide', data['title_hide']);
-
-            $.ajax({
-                url: window.cert.url,
-                processData: false,
-                contentType: false,
-                data: form_data,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                },
-                method: 'PATCH',
-                success: function (data) {
-                    title = data;
-                    Messenger().post({
-                        message: 'Titulo atualizado com sucesso!',
-                        type: 'success'
-                    });
-                },
-                error: function (err) {
-                    if (err.responseText !== "") {
-                        console.error(err.responseText)
-                    } else {
-                        console.error(err)
-                    }
-                    Messenger().post({
-                        message: 'Titulo não foi atualizado!',
-                        type: 'danger'
-                    });
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    console.log(key + " -> " + data[key]);
                 }
-            });
+            }
+
+            // var form_data = new FormData();
+            //
+            // form_data.append('event', window.cert.event);
+            // form_data.append('title_font_size', data['title_font_size']);
+            // form_data.append('title_position_x', data['title_position_x']);
+            // form_data.append('title_position_y', data['title_position_y']);
+            // form_data.append('title_hide', data['title_hide']);
+            //
+            // $.ajax({
+            //     url: window.cert.url,
+            //     processData: false,
+            //     contentType: false,
+            //     data: form_data,
+            //     beforeSend: function (xhr) {
+            //         xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            //     },
+            //     method: 'PATCH',
+            //     success: function (data) {
+            //         title = data;
+            //         Messenger().post({
+            //             message: 'Titulo atualizado com sucesso!',
+            //             type: 'success'
+            //         });
+            //     },
+            //     error: function (err) {
+            //         if (err.responseText !== "") {
+            //             console.error(err.responseText)
+            //         } else {
+            //             console.error(err)
+            //         }
+            //         Messenger().post({
+            //             message: 'Titulo não foi atualizado!',
+            //             type: 'danger'
+            //         });
+            //     }
+            // });
         }, 200);
     };
 
-//Função que salva a posição de um objeto title
+    //Função que salva a posição de um objeto title
     window.cert.saveTitlePosition = function (x, y) {
         title['position_x'] = x;
         title['position_y'] = y;
         cert.saveTitle(title);
     };
 
-//Função que salva o tamanha da fonte de um objeto title
+    //Função que salva o tamanha da fonte de um objeto title
     window.cert.saveTitleFontSize = function (font_size) {
         title['font_size'] = font_size;
         cert.saveTitle(title);
     };
 
-//Função que muda o estado de hide pra false em title(deixa visível)
+    //Função que muda o estado de hide pra false em title(deixa visível)
     window.cert.showTitle = function () {
         title['hide'] = false;
         cert.saveTitle(title);
     };
 
-//Função que muda o estado de hide para true em title(não deixa visível)
+    //Função que muda o estado de hide para true em title(não deixa visível)
     window.cert.hideTitle = function () {
         title['hide'] = true;
         cert.saveTitle(title);
@@ -180,75 +175,61 @@ window.cert = window.cert || {};
 // Função que salva um objeto do tipo date
     window.cert.saveDate = function (data) {
         var save_date_timer = null;
-        var expected_keys = [
-            'font_size',
-            'position_x',
-            'position_y',
-            'hide'
-        ];
-        var resource_name = 'mock/date.json';
-        if (!check_data(expected_keys, data)) {
-            console.error('Dados errados em "' + resource_name + '"');
-            console.log(data);
-            return;
-        }
         window.clearTimeout(save_date_timer);
         save_date_timer = window.setTimeout(function () {
-
-            var form_data = new FormData();
             for (var key in data) {
                 if (data.hasOwnProperty(key)) {
                     console.log(key + " -> " + data[key]);
                 }
             }
-
-            form_data.append('event', window.cert.event);
-            var date_font_size = data['date_font_size'];
-            if (date_font_size !== undefined) {
-                console.log(date_font_size);
-                date_font_size = parseInt(data['date_font_size'].replace("px", ""));
-                console.log(date_font_size);
-                form_data.append('date_font_size', date_font_size);
-            }
-
-            form_data.append('date_position_x', parseInt(data['date_position_x']));
-            form_data.append('date_position_y', parseInt(data['date_position_y']));
-
-            if (data['date_hide']) {
-                form_data.append('date_hide', true);
-            } else {
-                form_data.append('date_hide', false);
-            }
-
-
-            $.ajax({
-                url: window.cert.url,
-                processData: false,
-                contentType: false,
-                data: form_data,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                },
-                method: 'PATCH',
-                success: function (data) {
-                    title = data;
-                    Messenger().post({
-                        message: 'Data atualizada com sucesso!',
-                        type: 'success'
-                    });
-                },
-                error: function (err) {
-                    if (err.responseText !== "") {
-                        console.error(err.responseText)
-                    } else {
-                        console.error(err)
-                    }
-                    Messenger().post({
-                        message: 'Data não foi atualizada!',
-                        type: 'danger'
-                    });
-                }
-            });
+            // var form_data = new FormData();
+            // form_data.append('event', window.cert.event);
+            // var date_font_size = data['date_font_size'];
+            // if (date_font_size !== undefined) {
+            //     console.log(date_font_size);
+            //     date_font_size = parseInt(data['date_font_size'].replace("px", ""));
+            //     console.log(date_font_size);
+            //     form_data.append('date_font_size', date_font_size);
+            // }
+            //
+            // form_data.append('date_position_x', parseInt(data['date_position_x']));
+            // form_data.append('date_position_y', parseInt(data['date_position_y']));
+            //
+            // if (data['date_hide']) {
+            //     form_data.append('date_hide', true);
+            // } else {
+            //     form_data.append('date_hide', false);
+            // }
+            //
+            //
+            // $.ajax({
+            //     url: window.cert.url,
+            //     processData: false,
+            //     contentType: false,
+            //     data: form_data,
+            //     beforeSend: function (xhr) {
+            //         xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            //     },
+            //     method: 'PATCH',
+            //     success: function (data) {
+            //         title = data;
+            //         Messenger().post({
+            //             message: 'Data atualizada com sucesso!',
+            //             type: 'success'
+            //         });
+            //     },
+            //     error: function (err) {
+            //         if (err.responseText !== "") {
+            //             console.error(err.responseText)
+            //         } else {
+            //             console.error(err)
+            //         }
+            //         Messenger().post({
+            //             message: 'Data não foi atualizada!',
+            //             type: 'danger'
+            //         });
+            //     }
+            // });
 
 
         }, 200);
@@ -315,42 +296,48 @@ window.cert = window.cert || {};
         window.clearTimeout(save_text_timer);
         save_text_timer = window.setTimeout(function () {
 
-
-            var form_data = new FormData();
-
-            form_data.append('event', window.cert.event);
-            form_data.append('text_font_size', data['text_font_size']);
-            form_data.append('text_position_x', data['text_position_x']);
-            form_data.append('text_position_y', data['text_position_y']);
-
-            $.ajax({
-                url: window.cert.url,
-                processData: false,
-                contentType: false,
-                data: form_data,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                },
-                method: 'PATCH',
-                success: function (data) {
-                    title = data;
-                    Messenger().post({
-                        message: 'Texto atualizado com sucesso!',
-                        type: 'success'
-                    });
-                },
-                error: function (err) {
-                    if (err.responseText !== "") {
-                        console.error(err.responseText)
-                    } else {
-                        console.error(err)
-                    }
-                    Messenger().post({
-                        message: 'Texto não foi atualizado!',
-                        type: 'danger'
-                    });
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    console.log(key + " -> " + data[key]);
                 }
-            });
+            }
+
+
+            // var form_data = new FormData();
+            //
+            // form_data.append('event', window.cert.event);
+            // form_data.append('text_font_size', data['text_font_size']);
+            // form_data.append('text_position_x', data['text_position_x']);
+            // form_data.append('text_position_y', data['text_position_y']);
+            //
+            // $.ajax({
+            //     url: window.cert.url,
+            //     processData: false,
+            //     contentType: false,
+            //     data: form_data,
+            //     beforeSend: function (xhr) {
+            //         xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            //     },
+            //     method: 'PATCH',
+            //     success: function (data) {
+            //         title = data;
+            //         Messenger().post({
+            //             message: 'Texto atualizado com sucesso!',
+            //             type: 'success'
+            //         });
+            //     },
+            //     error: function (err) {
+            //         if (err.responseText !== "") {
+            //             console.error(err.responseText)
+            //         } else {
+            //             console.error(err)
+            //         }
+            //         Messenger().post({
+            //             message: 'Texto não foi atualizado!',
+            //             type: 'danger'
+            //         });
+            //     }
+            // });
 
 
         }, 200);

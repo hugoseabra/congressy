@@ -24,6 +24,8 @@
         <div
                 {% if field.field.widget.input_type == "checkbox" or field.field.widget.input_type == "radio" %}
                     class="row"
+                    {% elif field.field.widget.input_type == "file" %}
+                    class="row" style="margin-left: 15px"
                 {% endif %}>
 
             {% if autofocus %}

@@ -34,13 +34,13 @@ class Certificate(models.Model):
         blank=True,
         null=True,
         verbose_name='imagem de fundo do certificado do evento',
-        variations={'default': (1402, 991)},
+        variations={'default': (1402, 991), 'regular': (1024, 725)},
         validators=[MinSizeValidator(1402, 991)],
         help_text="Imagem de fundo do certificado, mínimo de: "
-                  "595px largura x "
-                  "842 altura.(png/jpg) "
+                  "1402px largura x "
+                  "991px altura.(png/jpg) "
                   "<a  target='_blank'"
-                  "href='http://via.placeholder.com/595x842'>Exemplo"
+                  "href='http://via.placeholder.com/1402x991'>Exemplo"
                   "</a>"
     )
 

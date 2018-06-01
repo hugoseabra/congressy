@@ -40,12 +40,12 @@ Variáveis:
         </li>
     {% endif %}
 
-{#    <li {% if active == 'certificate' %}class=  "active"{% endif %}>#}
-{#        <a class="sidebar-itens" href="{% url 'certificate:event-certificate-prepare' event.pk %}"#}
-{#           title="Editor de Certificados">#}
-{#            <i class="fas fa-graduation-cap"></i>Certificados#}
-{#        </a>#}
-{#    </li>#}
+    <li {% if active == 'certificate' %}class=  "active"{% endif %}>
+        <a class="sidebar-itens" href="{% url 'certificate:event-certificate-config' event.pk %}"
+           title="Editor de Certificados">
+            <i class="fas fa-graduation-cap"></i>Certificado
+        </a>
+    </li>
 </ul>
 
 
