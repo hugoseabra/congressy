@@ -141,6 +141,41 @@
 
             window.cert.url = '{% url 'certificate:certificate-detail' event.pk object.pk %}';
             window.cert.event = '{{ event.pk }}';
+
+            // Título do certificado
+            window.cert.title = {
+                "position_x": 0.00,
+                "position_y": 0.00,
+                {% if  object.title_hide %}
+                    "hide": true,
+                {% else %}
+                    "hide": false,
+                {% endif %}
+                "font_size": "{{ object.title_font_size }}px"
+            };
+
+            window.cert.date = {
+                "position_x": 0.00,
+                "position_y": 0.00,
+                {% if  object.date_hide %}
+                    "hide": true,
+                {% else %}
+                    "hide": false,
+                {% endif %}
+                "font_size": "{{ object.date_font_size }}px"
+            };
+            window.cert.text = {
+                "position_x": 0.00,
+                "position_y": 0.00,
+                "font_size": "{{ object.text_font_size }}px",
+                "width": "{{ object.text_width }}px",
+                "height": "{{ object.height }}px",
+                "line_height": "{{ object.line_height }}px",
+                "text": "{{ object.text_content }}"
+            };
+
+
+
             {% if object.text_position_x %}
                 window.cert.moveElement($('#text'), {{ object.text_position_x|unlocalize|intcomma }}, {{ object.text_position_y|unlocalize|intcomma }});
             {% endif %}

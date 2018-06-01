@@ -43,29 +43,9 @@ window.cert = window.cert || {};
 
     var csrftoken = getCookie('csrftoken');
 
-    // Título do certificado
-    var title = {
-        "position_x": 0.00,
-        "position_y": 0.00,
-        "font_size": "12px",
-        "hide": false
-    };
-
-    var date = {
-        "position_x": 0.00,
-        "position_y": 0.00,
-        "font_size": "12px",
-        "hide": false
-    };
-    var text = {
-        "position_x": 0.00,
-        "position_y": 0.00,
-        "font_size": "12px",
-        "width": "340px",
-        "height": "300px",
-        "line_height": "20px",
-        "text": "teste"
-    };
+    var title = window.cert.title;
+    var date = window.cert.date;
+    var text = window.cert.text;
 
     // =============TITLE==================
     // Função que solicita um objeto title
