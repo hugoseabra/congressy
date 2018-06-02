@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
-from jinja2 import Template
+from django.template import Template
 from wkhtmltopdf.views import PDFTemplateView
 
 from certificate import models, forms

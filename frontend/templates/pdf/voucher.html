@@ -73,17 +73,14 @@
                         </td>
                     </tr>
                 {% endif %}
-                {% if subscription.lot.price and subscription.lot.price > 0 %}
                 <tr style="border-width: 0;">
                     <td class="col-sm-2" style="border-width: 0;">
                         <strong>Tipo de Ingresso</strong>
                     </td>
                     <td class="col-sm-2" style="border-width: 0;">
-                        {{ lot.name }} |
-                        R$ {{ subscription.lot.price|unlocalize|intcomma }}
+                        {{ subscription.lot.display_publicly|intcomma }}
                     </td>
                 </tr>
-                {% endif %}
                 </tbody>
             </table>
 

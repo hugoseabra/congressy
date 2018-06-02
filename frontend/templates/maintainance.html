@@ -1,0 +1,29 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+    <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <div id="error-container" class="block-error animated fadeInUp">
+                    <header>
+                        <h1 class="error">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </h1>
+                        <p class="text-center">Em manutenção.</p>
+                    </header>
+
+
+                    <p style="font-size:18px" class="text-center">
+                        Este recurso está em manutenção e voltará a funcionar em breve!
+                    </p>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a class="btn btn-info btn-block btn-3d"
+                               href="javascript:history.back()">Voltar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

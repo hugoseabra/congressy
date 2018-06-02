@@ -133,7 +133,13 @@ class Subscription(models.Model, GatherosModelMixin):
         auto_now_add=True,
         verbose_name='modificado em'
     )
-    synchronized = models.BooleanField(default=False)
+    synchronized = models.BooleanField(default=False, editable=False,)
+
+    notified = models.BooleanField(
+        default=False,
+        editable=False,
+        help_text='Participante notificado.'
+    )
 
     congressy_percent = models.CharField(
         max_length=5,
