@@ -3,7 +3,9 @@ from decimal import Decimal
 from django import forms
 from django.db.models import Sum
 from django.db.transaction import atomic
+
 from payment.models import Payment
+from payment_debt.models import Debt
 
 
 class PaymentForm(forms.ModelForm):
