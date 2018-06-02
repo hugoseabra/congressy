@@ -32,7 +32,7 @@ class ReceiverSubscriber(object):
                 ' foi publicado anteriormente.'.format(receiver.id)
             )
 
-        self.receivers[receiver.id] = receivers
+        self.receivers[receiver.id] = receiver
 
 class ReceiverPublisher(object):
     """
@@ -56,10 +56,12 @@ class ReceiverPublisher(object):
             float(settings.CONGRESSY_INSTALLMENT_INTERESTS_RATE) / 100
         )
 
+        lot = self.subscription.lot
+
         self.installment_calculator = Calculator(
-            interests_rate=interests_rate,
-            total_installments=int(self.lot.installment_limit),
-            free_installments=int(self.lot.num_install_interest_absortion),
+            interests_rate=self.interests_rate,
+            total_installments=int(lot.installment_limit),
+            free_installments=int(lot.num_install_interest_absortion),
         )
 
 
@@ -85,11 +87,10 @@ class ReceiverPublisher(object):
         if minimum_amount and cgsy_amount < minimum_amount:
             cgsy_amount = minimum_amount
 
-
         # ==== ORGANIZATION AMOUNT
-        org_amount = amount - cgsy_amount
+        org_amount = self.amount - cgsy_amount
 
-        free_installments = self.lot.num_install_interest_absortion
+        free_installments = lot.num_install_interest_absortion
         if self.installments > 1 and self.installments <= free_installments:
             interests_amount = \
                 self.installment_calculator.get_absorbed_interests_amount(
@@ -104,8 +105,8 @@ class ReceiverPublisher(object):
 
         # ==== RECEIVERS
         cgsy_receiver = receivers.CongressyReceiver(
-            type=constants.RECEIVER_TYPE_SUBSCRIPTION,
-            id=settings.CONGRESSY_RECIPIENT_ID,
+            type=RECEIVER_TYPE_SUBSCRIPTION,
+            id=settings.PAGARME_RECIPIENT_ID,
             amount=cgsy_amount,
             chargeback_responsible=True,
             processing_fee_responsible=True,
@@ -114,13 +115,18 @@ class ReceiverPublisher(object):
         self.receiver_subscriber.publish(cgsy_receiver)
 
         # Parceiros irão participar do rateamento de inscrições
-        cgsy_receiver.create_and_publish_partners(self.receiver_subscriber)
+        partner_receivers = \
+            cgsy_receiver.create_and_publish_partners(self.subscription)
+
+        if partner_receivers:
+            for partner_receiver in partner_receivers:
+                self.receiver_subscriber.publish(partner_receiver)
 
         org_receiver = receivers.OrganizerReceiver(
-            type=constants.RECEIVER_TYPE_SUBSCRIPTION,
+            type=RECEIVER_TYPE_SUBSCRIPTION,
             id=self.organization.recipient_id,
-            amount=cgsy_amount,
-            transfer_taxes=self.lot.transfer_tax is True,
+            amount=org_amount,
+            transfer_taxes=lot.transfer_tax is True,
             chargeback_responsible=True,
             processing_fee_responsible=True,
             installment_result=InstallmentResult(
@@ -167,10 +173,10 @@ class ReceiverPublisher(object):
         Verifica todos os critérios para continuidade dos processos do
         publisher.
         """
-        if subscription.free is True:
+        if self.subscription.free is True:
             raise Exception(
                 'A inscrição "{}" é gratuita e não pode possuir um'
-                ' receber.'.format(subscription.pk)
+                ' receber.'.format(self.subscription.pk)
             )
 
         if not hasattr(settings, 'CONGRESSY_INSTALLMENT_INTERESTS_RATE'):

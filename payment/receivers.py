@@ -4,11 +4,13 @@ Recebedores de rateamento de itens vendidos na platforma.
 
 from decimal import Decimal
 
+from django.conf import settings
+
 from partner import constants as partner_constants
 
+RECEIVER_LEVEL0 = 'level0'
+RECEIVER_LEVEL1 = 'level1'
 
-RECEIVER_LEVEL0='level0'
-RECEIVER_LEVEL1='level1'
 
 class Receiver(object):
     """
@@ -35,7 +37,7 @@ class Receiver(object):
 
     @amount.setter
     def amount(self, amount: Decimal) -> None:
-        self.__amount = amount
+        self.__amount = round(amount, 2)
 
     @property
     def chargeback_responsible(self) -> bool:
@@ -73,9 +75,7 @@ class CongressyReceiver(Receiver):
     """
     level = RECEIVER_LEVEL0
 
-    def create_and_publish_partners(self,
-                                    receiver_subscriber,
-                                    subscription) -> None:
+    def create_and_publish_partners(self, subscription) -> list:
         """
         Cria e publica recebedores parceiros que irã participar do rateamente
         de inscrição.
@@ -88,8 +88,8 @@ class CongressyReceiver(Receiver):
             partner__approved=True
         )
 
-        partners_total_amount = 0
-        partner_rules = []
+        cgsy_total_amount = self.amount
+        partner_receivers = []
         for contract in partners:
 
             try:
@@ -110,7 +110,7 @@ class CongressyReceiver(Receiver):
 
             # O parceiro ganha em cima do valor liquido da Congressy.
             partner_amount = self.amount * percent_decimal
-            partners_total_amount += partner_amount
+            cgsy_total_amount -= partner_amount
 
             partner_receiver = ComissioningReceiver(
                 type=self.type,
@@ -120,9 +120,11 @@ class CongressyReceiver(Receiver):
                 processing_fee_responsible=False,
                 parent_receiver=self,
             )
-            receiver_subscriber.publish(partner_receiver)
+            partner_receivers.append(partner_receiver)
 
-        self.amount = partners_total_amount
+        self.amount = cgsy_total_amount
+
+        return partner_receivers
 
 
 class OrganizerReceiver(Receiver):
@@ -136,6 +138,16 @@ class OrganizerReceiver(Receiver):
 
         self.transfer_taxes = transfer_taxes
         self.installment_result = installment_result
+
+        kwargs.update({
+            'processing_fee_responsible': False,
+        })
+
+        if settings.DEBUG is True and \
+                hasattr(settings, 'PAGARME_TEST_RECIPIENT_ID'):
+            kwargs.update({
+                'id': settings.PAGARME_TEST_RECIPIENT_ID,
+            })
 
         super().__init__(*args, **kwargs)
 
