@@ -524,7 +524,5 @@ def postback_url_view(request, uidb64):
             },
             notify_admins=True,
         )
-        return HttpResponseServerError
-
 
     return Response(status=201)
