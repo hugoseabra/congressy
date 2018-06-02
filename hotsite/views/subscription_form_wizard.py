@@ -229,7 +229,7 @@ class SubscriptionWizardView(SessionWizardView):
 
             allowed_types = [Transaction.CREDIT_CARD]
 
-            if is_boleto_allowed(self.event):
+            if is_boleto_allowed(self.event) and has_open_boleto is False:
                 allowed_types.append(Transaction.BOLETO)
 
             context['allowed_transaction_types'] = ','.join(allowed_types)

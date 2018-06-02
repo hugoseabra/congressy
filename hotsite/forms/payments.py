@@ -100,10 +100,6 @@ class PaymentForm(forms.Form):
                 ' gratuitas.'
             )
 
-        cleaned_data['amount'] = payment_helpers.amount_as_decimal(
-            cleaned_data['amount']
-        )
-
         installments = int(cleaned_data['amount'])
         if not installments:
             cleaned_data['amount'] = 1
@@ -145,7 +141,7 @@ class PaymentForm(forms.Form):
 
             # Cria transação.
             create_pagarme_transaction(
-                builder.transaction_id,
+                transaction_id=builder.transaction_id,
                 debt=debt,
                 data=builder.build()
             )
