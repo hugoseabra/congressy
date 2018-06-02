@@ -1,10 +1,9 @@
 from decimal import Decimal
 
 from django import forms
-from django.db.models import Sum
 
-from payment_debt.models import Debt, Payment
-
+from payment_debt.models import Debt
+from payment.helpers import payment_helpers
 
 class DebtForm(forms.ModelForm):
     class Meta:
@@ -13,107 +12,142 @@ class DebtForm(forms.ModelForm):
             'type',
             'status',
             'amount',
-            'liquid_amount',
             'installments',
-            'installment_amount',
-            'installment_interests_amount',
         )
 
     def __init__(self, subscription, *args, **kwargs):
         self.subscription = subscription
+
+        # O valor líquido é quanto o organizador irá receber, que pode variar
+        # de acordo com a configuração do lote da inscrição.
+        self.liquid_amount = None
+
+        # montante a ser pago originalmente. O montante vindo de 'data' pode
+        # não ser o mesmo. Se houver parcelamento, a diferença são dos juros
+        # de parcelamento. Se não houver, o formulári deve ser invalidado.
+        self.original_amount = None
+
+        # Montante a ser pego por parcela;
+        self.installment_amount = Decimal(0)
+
+        # Valor de juros a ser pago ao final das parcelas.
+        self.installment_interests_amount = Decimal(0)
+
         super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if self.subscription.free is True:
+            raise forms.ValidationError(
+                'Pagamentos não podem ser processados para inscrições'
+                ' gratuitas.'
+            )
+
+        # Calcula valor líquido.
+        self._set_lot_amounts()
+        self._set_installments_amount()
+        self._set_installment_interests_amount()
+
+        return cleaned_data
+
+    def clean_installments(self):
+        return int(self.cleaned_data.get('installments', 1) or 1)
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        amount = payment_helpers.amount_as_decimal(amount)
+
+        if self._is_valid_amount() is False:
+            raise forms.ValidationError(
+                'Valor a ser processado no pagamento é diferente do valor'
+                ' esperado.'
+            )
+
+        return amount
 
     def save(self, commit=True):
         self.instance.subscription = self.subscription
+        self.instance.liquid_amount = self.liquid_amount
+        self.instance.installments_amount = self.installment_amount
+        self.instance.installment_interests_amount = \
+            self.installment_interests_amount
+
         return super().save(commit)
 
-
-class PaymentForm(forms.ModelForm):
-    class Meta:
-        model = Payment
-        fields = (
-            'cash_type',
-            'amount',
-        )
-
-    def __init__(self, subscription, *args, **kwargs):
-        self.subscription = subscription
-        super().__init__(*args, **kwargs)
-
-    def save(self, commit=True):
-        self.instance.subscription = self.subscription
-        instance = super().save(commit)
-
-        self._update_debt_statuses()
-
-        return instance
-
-    def _update_debt_statuses(self):
+    def _set_lot_amounts(self):
         """
-        Ao inserir ou atualizar um pagamento, deve-se processar o montante
-        de pagamentos existentes equiparando-os com as pendẽncias existentes
-        e atualizar os status das pendências.
+        Seta valores líquidos e a ser pago esperados de acordo com a
+        configuração do lote.
         """
-        payments_amount = self.subscription.payments.filter(
-            paid=True
-        ).aggregate(total=Sum('amount'))
+        event = self.subscription.event
+        lot = self.subscription.lot
 
-        payments_amount = payments_amount['total'] or Decimal(0)
+        cgsy_percent = Decimal(event.congressy_percent) / 100
+        percent_amount = lot.price * cgsy_percent
 
-        # Se não há pagamentos, ignorar
-        if not payments_amount:
+        if lot.transfer_tax is True:
+            # Se há transferência de taxas ao participante, o valor a ser
+            # recebido pelo organizador será o valor informando em 'price'.
+            # O montante a processar o pagamento possui as taxas adicionais.
+            self.liquid_amount = lot.price
+            self.original_amount = round(lot.price + percent_amount, 2)
+
+        else:
+            # Se não há transferência de taxas ao participante, o valor a ser
+            # recebeido pelo organizador será o valor informado em 'price'
+            # menos as taxas adicionais. O montante a processar é o valor
+            # original de 'price'.
+            self.original_amount = lot.price
+            self.liquid_amount = round(lot.price - percent_amount, 2)
+
+    def _is_valid_amount(self):
+        """ Valida se o montante informado é válido. """
+        amount = payment_helpers.amount_as_decimal(self.data.get('amount'))
+        if not amount:
+            return False
+
+        if not self.original_amount:
+            self._set_lot_amounts()
+
+        installments = self.cleaned_data.get('installments', 1) or 1
+
+        if int(installments) <= 1:
+            return self.original_amount == Decimal(amount)
+
+        return True
+
+    def _set_installments_amount(self):
+        """ Seta montante por parcela. """
+        installments = self.cleaned_data.get('installments', 1)
+
+        if self._is_valid_amount() is False:
+            self.installment_amount = Decimal(0)
             return
 
-        debts_amount = subscription.debts.aggregate(total=Sum('amount'))
-        debts_amount = debts_amount['total'] or Decimal(0)
+        if installments <= 1:
+            self.installment_amount = self.original_amount
+            return
 
-        if payments_amount > debts_amount:
-            # Número de pagamentos é maior do que as pendências. Então, vamos
-            # Atualizar todas pendências como pagas e a pendência de inscrição
-            # como CRÉDITO.
+        self.installment_amount = Decimal(amount) / installments
 
-            # Todas pendências que não de inscrição estarão pagas.
-            debts = subscription.debts.exclude(
-                type=Debt.DEBT_TYPE_SUBSCRIPTION)
-            for debt in debts:
-                debt.status = Debt.DEBT_STATUS_PAID
-                debt.save()
+    def _set_installment_interests_amount(self):
+        """ Seta valor de juros a ser pago ao final de todas as parcelas. """
+        if self._is_valid_amount() is False:
+            self.installment_interests_amount = Decimal(0)
+            return
 
-            # A pendência de inscriçãoe estará com crédito.
-            sub_debt = \
-                subscription.debts.filter(
-                    type=Debt.DEBT_TYPE_SUBSCRIPTION).first()
-            sub_debt.status = Debt.DEBT_STATUS_CREDIT
-            sub_debt.save()
+        amount = payment_helpers.amount_as_decimal(self.data.get('amount'))
+        installments = self.cleaned_data.get('installments', 1)
 
-        if payments_amount == debts_amount:
-            # Todas as pendências estão pagas. Atualiza pendências como PAGAS.
-            for debt in subscription.debts.all():
-                debt.status = Debt.DEBT_STATUS_PAID
-                debt.save()
+        if installments <= 1:
+            # Sem parcelamento, sem juros.
+            self.installment_interests_amount = Decimal(0)
+            return
 
-        if payments_amount < debts_amount:
-            # Se há pagamento, mas as pendências são maiores, verificar se
-            # alguma dos pagamentos cobre alguma das pendências.
-            processed_payment_amount = payments_amount
+        if not self.installment_amount:
+            self._set_installments_amount()
 
-            for debt in subscription.debts.all():
-                if round(processed_payment_amount, 2) >= debt.amount:
-                    debt.status = Debt.DEBT_STATUS_PAID
-                    debt.save()
-                    processed_payment_amount -= debt.amount
+        total_amount = self.installment_amount * installments
 
-
-class ManualPaymentForm(PaymentForm):
-    def __init__(self, user, *args, **kwargs):
-        self.user = user
-        super().__init__(*args, **kwargs)
-
-    def save(self, commit=True):
-        self.instance.paid = True
-        self.instance.manual = True
-        self.instance.manual_author = '{} ({})'.format(
-            self.user.get_full_name(),
-            self.user.email,
-        )
-        return super().save(commit)
+        self.installment_interests_amount = round((amount / total_amount), 2)
