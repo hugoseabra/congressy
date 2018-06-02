@@ -12,13 +12,20 @@ class PaymentForm(forms.ModelForm):
         fields = (
             'cash_type',
             'amount',
-            'paid',
         )
 
     def __init__(self, subscription, transaction=None, *args, **kwargs):
         self.subscription = subscription
         self.transaction = transaction
+
         super().__init__(*args, **kwargs)
+
+    def clean(self):
+        if self.transaction and self.transaction.paid is False:
+            raise forms.ValidationError(
+                'Transações não pagas não podem ser usadas para serem'
+                ' vinculadas a pagamento.'
+            )
 
     def clean_amount(self):
         amount = self.cleaned_data.get('amount')
@@ -33,6 +40,7 @@ class PaymentForm(forms.ModelForm):
         with atomic():
             self.instance.subscription = self.subscription
             self.instance.transaction = self.transaction
+            self.instance.paid = True
 
             instance = super().save(commit)
 
