@@ -250,29 +250,34 @@ def postback_url_view(request, uidb64):
 
         if incoming_status == Transaction.PAID:
 
-            payment_form = PaymentForm(
-                subscription=subscription,
-                transaction=transaction,
-                data={
-                    'cash_type': transaction.type,
-                    'amount': transaction.amount,
-                    'paid': transaction.paid is True,
-                },
-            )
+            try:
+                payment = transaction.payment
+                payment.paid = True
+                payment.save()
 
-            if not payment_form.is_valid():
-                error_msgs = []
-                for field, errs in payment_form.errors.items():
-                    error_msgs.append(str(errs))
-
-                raise Exception(
-                    'Erro ao criar pagamento de uma transação: {}'.format(
-                        "".join(error_msgs)
-                    )
+            except AttributeError:
+                payment_form = PaymentForm(
+                    subscription=subscription,
+                    transaction=transaction,
+                    data={
+                        'cash_type': transaction.type,
+                        'amount': transaction.amount,
+                    },
                 )
 
-            # por agora, não vamos vincular pagamento a nada.
-            payment_form.save()
+                if not payment_form.is_valid():
+                    error_msgs = []
+                    for field, errs in payment_form.errors.items():
+                        error_msgs.append(str(errs))
+
+                    raise Exception(
+                        'Erro ao criar pagamento de uma transação: {}'.format(
+                            "".join(error_msgs)
+                        )
+                    )
+
+                # por agora, não vamos vincular pagamento a nada.
+                payment_form.save()
 
         # Registra status de transação.
         TransactionStatus.objects.create(

@@ -26,7 +26,9 @@ class Command(BaseCommand):
                 if sub.free is True:
                     continue
 
-                transactions = sub.transactions.all()
+                transactions = sub.transactions.filter(
+                    status=Transaction.PAID
+                )
 
                 if not transactions:
                     subs_notransctions.append(sub)
