@@ -252,6 +252,8 @@ def postback_url_view(request, uidb64):
 
             try:
                 payment = transaction.payment
+                transaction.type = transaction.type
+                transaction.amount = transaction.amount
                 payment.paid = True
                 payment.save()
 
