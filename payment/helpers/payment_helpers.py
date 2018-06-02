@@ -32,6 +32,12 @@ def is_boleto_allowed(event):
 
 def amount_as_decimal(amount):
     """ Converte um montante processável com meio de pagamento para Decimal """
+    if not amount:
+        return amount
+
+    if isinstance(amount, Decimal):
+        return amount
+
     # Separar centavos
     amount = str(amount)
     size = len(amount)
@@ -44,6 +50,12 @@ def decimal_processable_amount(value):
     Converte um valor Decimalprocessável para um montante a ser usado por
     meios de pagamento
     """
+    if not value:
+        return value
+
+    if not isinstance(value, Decimal):
+        value = Decimal(value)
+
     value = str(round(value, 2))
     v_split = value.split('.')
     value = v_split[0]

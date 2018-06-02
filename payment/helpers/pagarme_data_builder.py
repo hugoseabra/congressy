@@ -176,7 +176,7 @@ class PagarmeDataBuilder:
         :return:
         """
 
-        subscriber = ReceiverSubscriber()
+        subscriber = ReceiverSubscriber(amount=self.debt.amount)
         publisher = ReceiverPublisher(
             receiver_subscriber=subscriber,
             subscription=self.debt.subscription,

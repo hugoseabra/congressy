@@ -8,13 +8,12 @@ from decimal import Decimal
 from django.conf import settings
 
 from gatheros_subscription.models import Subscription
+from payment import receivers
 from payment.installments import Calculator, InstallmentResult
-from payment import exception, receivers
 
-
-RECEIVER_TYPE_SUBSCRIPTION='receiver_subscription'
-RECEIVER_TYPE_PRODUCT='receiver_product'
-RECEIVER_TYPE_SERVICE='receiver_service'
+RECEIVER_TYPE_SUBSCRIPTION = 'receiver_subscription'
+RECEIVER_TYPE_PRODUCT = 'receiver_product'
+RECEIVER_TYPE_SERVICE = 'receiver_service'
 
 
 class ReceiverSubscriber(object):
@@ -22,8 +21,12 @@ class ReceiverSubscriber(object):
     Receber inscrições de objetos Receiver para operações diversas.
     """
 
-    def __init__(self):
+    def __init__(self, amount: Decimal) -> None:
         self.receivers = OrderedDict()
+
+        assert isinstance(amount, Decimal)
+        self.amount = amount
+        self.added_amount = Decimal(0)
 
     def publish(self, receiver: receivers.Receiver):
         if receiver.id in self.receivers:
@@ -32,12 +35,26 @@ class ReceiverSubscriber(object):
                 ' foi publicado anteriormente.'.format(receiver.id)
             )
 
+        self.added_amount += receiver.amount
+
+        if self.added_amount > self.amount:
+            raise exceptions.ReceiverTotalAmountExceeded(
+                'O valor dos recebedores já ultrapassa o valor a ser'
+                ' transacionado. Valor da transação: {0:.2f}. Valor somado dos '
+                ' recebedores: {0:.2f}.'.format(
+                    self.amount,
+                    self.added_amount,
+                )
+            )
+
         self.receivers[receiver.id] = receiver
+
 
 class ReceiverPublisher(object):
     """
     Publicador de Recebedores de acordo com inscrição informada.
     """
+
     def __init__(self,
                  receiver_subscriber: ReceiverSubscriber,
                  subscription: Subscription,
@@ -63,7 +80,6 @@ class ReceiverPublisher(object):
             total_installments=int(lot.installment_limit),
             free_installments=int(lot.num_install_interest_absortion),
         )
-
 
     def create_and_publish_subscription(self):
         """
@@ -138,7 +154,6 @@ class ReceiverPublisher(object):
 
         self.receiver_subscriber.publish(org_receiver)
 
-
     def create_and_publish_products(self):
         """
         Cria e publica recebedores que irã participar do rateamente de
@@ -166,7 +181,6 @@ class ReceiverPublisher(object):
         atividade extra baseados em informações de inscrição.
         """
         pass
-
 
     def _check_criterias(self):
         """

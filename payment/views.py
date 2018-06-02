@@ -245,46 +245,33 @@ def postback_url_view(request, uidb64):
         transaction.subscription.status = subscription_status
         transaction.subscription.save()
 
-        payment_form = PaymentForm(
-            subscription=subscription,
-            transaction=transaction,
-            data={
-                'cash_type': transaction.type,
-                'amount': transaction.amount,
-            },
-        )
-
-        if not payment_form.is_valid():
-            log(
-                message='Uma transação teve muduança status, mas o'
-                        ' não foi criado: formulário inváliado.'
-                        ' Erro(s): {}'.format(
-                    payment_form.errors
-                ),
-                type='error',
-                extra_data={
-                    'uuid': uidb64,
-                    'transaction': transaction.pk,
-                    'transaction_status': previous_status,
-                    'incoming_status': incoming_status,
-                    'send_data': data,
-                },
-                notify_admins=True,
-            )
-            return HttpResponseServerError
-
         # Persists transaction change
         transaction.save()
 
-        # Se inscrição nunca teve outros pagamentos, esta é a primeira vez
-        # que o registro de pagamento é bem sucedido e acontecerá a
-        # primeira notificação. Isso precisa ser verificado antes de salvar
-        # o pagamento.
-        is_new_subscription = \
-            transaction.subscription.payments.count() == 0
+        if incoming_status == Transaction.PAID:
 
-        # por agora, não vamos vincular pagamento a nada.
-        payment = payment_form.save()
+            payment_form = PaymentForm(
+                subscription=subscription,
+                transaction=transaction,
+                data={
+                    'cash_type': transaction.type,
+                    'amount': transaction.amount,
+                },
+            )
+
+            if not payment_form.is_valid():
+                error_msgs = []
+                for field, errs in payment_form.errors.items():
+                    error_msgs.append(str(errs))
+
+                raise Exception(
+                    'Erro ao criar pagamento de uma transação: {}'.format(
+                        "".join(error_msgs)
+                    )
+                )
+
+            # por agora, não vamos vincular pagamento a nada.
+            payment_form.save()
 
         # Registra status de transação.
         TransactionStatus.objects.create(
@@ -299,6 +286,7 @@ def postback_url_view(request, uidb64):
         subscription = transaction.subscription
         event = subscription.event
 
+        is_new_subscription = subscription.notified is False
         is_paid = incoming_status == Transaction.PAID
         is_refused = incoming_status == Transaction.REFUSED
         is_refunded = incoming_status == Transaction.REFUNDED
@@ -504,6 +492,10 @@ def postback_url_view(request, uidb64):
 
         except mailer_notification.NotifcationError as e:
             return e
+
+        # Registra inscrição como notificada.
+        transaction.subscription.notified = True
+        transaction.subscription.save()
 
     try:
         notify_postback(transaction)

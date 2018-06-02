@@ -76,10 +76,10 @@ class Payment(models.Model):
         verbose_name='pago',
     )
 
-    transaction = models.ForeignKey(
+    transaction = models.OneToOneField(
         to=Transaction,
-        on_delete=models.PROTECT,
-        related_name='payments',
+        on_delete=models.CASCADE,
+        related_name='payment',
         null=True,
         blank=True,
         editable=False,
