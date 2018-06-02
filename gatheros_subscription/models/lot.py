@@ -380,7 +380,7 @@ class Lot(models.Model, GatherosModelMixin):
         da Congressy.
         """
         if self.price is None:
-            return localize(0.00)
+            return Decimal(0.00)
 
         minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         congressy_plan_percent = \
@@ -395,4 +395,4 @@ class Lot(models.Model, GatherosModelMixin):
         if self.transfer_tax is True:
             price += congressy_amount
 
-        return price
+        return round(price, 2)
