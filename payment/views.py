@@ -83,18 +83,18 @@ def notify_postback(transaction, data):
             <hr >
             Data:
             <pre><code>{data}</code></pre>
-    """.format({
-        'type_display': transaction.get_type_display(),
-        'type': transaction.type,
-        'event_name': transaction.subscription.event.name,
-        'event_pk': transaction.subscription.event.pk,
-        'person_name': transaction.subscription.person.name,
-        'sub_pk': transaction.subscription.pk,
-        'amount': localize(transaction.amount),
-        'status_display': transaction.get_status_display(),
-        'status': transaction.status,
-        'data': json.dumps(data),
-    })
+    """.format(
+        type_display=transaction.get_type_display(),
+        type=transaction.type,
+        event_name=transaction.subscription.event.name,
+        event_pk=transaction.subscription.event.pk,
+        person_name=transaction.subscription.person.name,
+        sub_pk=transaction.subscription.pk,
+        amount=localize(transaction.amount),
+        status_display=transaction.get_status_display(),
+        status=transaction.status,
+        data=json.dumps(data),
+    )
 
     send_mail(
         subject="Novo postback",
