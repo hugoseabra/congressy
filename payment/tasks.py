@@ -1,9 +1,11 @@
 import json
+import logging
 from datetime import datetime
 from decimal import Decimal
 
 import pagarme
 from django.conf import settings
+from django.db.transaction import atomic
 
 from mailer.tasks import send_mail
 from payment.exception import (
@@ -18,57 +20,29 @@ pagarme.authentication_key(settings.PAGARME_API_KEY)
 congressy_id = settings.PAGARME_RECIPIENT_ID
 
 
-def separate_amount(amount):
-    amount = str(amount)
-    size = len(amount)
-    cents = amount[-2] + amount[-1]
-    amount = '{}.{}'.format(amount[0:size - 2], cents)
-    return Decimal(amount)
+def __notify_error(message, extra_data=None):
+    logger = logging.getLogger(__name__)
+    logger.error(message, extra=extra_data)
 
 
-# @TODO-low create a mock of the response to use during testing
-def create_pagarme_transaction(transaction_data, subscription=None):
-    payment = transaction_data.get_data()
-    liquid_amount = transaction_data.liquid_amount
-
-    if not payment or not subscription:
-        return
-
-    transaction_instance = Transaction(subscription=subscription)
-
+# @TODO create a mock of the response to use during testing
+def create_pagarme_transaction(transaction_id, debt, data):
     try:
-
-        trx = pagarme.transaction.create(payment)
-
+        trx = pagarme.transaction.create(data)
     except Exception as e:
-        # @TODO add wrapper here to check if its a dict or a list
-        # @TODO trigger do
-        subject = "Erro ao criar transação: Unknown API error"
-        body = """
-            Erro ao criar transação:
-            
-            <br/>
-            
-            Transação: 
-            <br />
-            
-            <pre><code>{0}</code></pre>
-            <br />
-            Erro:
-            <br/> 
-            
-            <pre><code>{1}</code></pre>
-        """.format(json.dumps(payment), str(e))
+        errors = [errors for errors in e.args][0]
+        errors_msg = []
+        for error in errors:
+            errors_msg.append('{}: {}'.format(
+                error.get('parameter_name'),
+                error.get('message'),
+            ))
 
-        send_mail(subject=subject, body=body, to=settings.DEV_ALERT_EMAILS)
-        raise TransactionError(message='Unknown API error')
-
-    items = trx['items'].copy()
-    trx_subscription = None
-
-    for item in items:
-        if item['category'] == 'inscrição':
-            trx_subscription = item
+        msg = 'Pagar.me: erro de transação: {}'.format(";".join(errors_msg))
+        __notify_error(message=msg, extra_data=data)
+        raise TransactionError(
+            'Algo deu errado com a comunicação com o provedor de pagamento.'
+        )
 
     # Separar centavos
     amount = str(trx['amount'])
@@ -77,59 +51,49 @@ def create_pagarme_transaction(transaction_data, subscription=None):
     amount = '{}.{}'.format(amount[0:size - 2], cents)
     amount = Decimal(amount)
 
-    transaction_instance.data = trx
-    transaction_instance.status = trx['status']
-    transaction_instance.type = trx['payment_method']
-    transaction_instance.date_created = trx['date_created']
-    transaction_instance.amount = amount
-    transaction_instance.lot_price = subscription.lot.get_calculated_price()
-    transaction_instance.liquid_amount = liquid_amount
+    with atomic():
 
-    optional_total = 0
+        subscription = debt.subscription
 
-    for item in items:
-        if item['category'] == 'opcional':
-            optional_total += separate_amount(item['unit_price'])
-
-        if item['category'] == 'atividade-extra':
-            optional_total += separate_amount(item['unit_price'])
-
-    # @TODO add optional liquid amount
-    transaction_instance.optional_amount = optional_total
-
-    if 'installments' in trx \
-            and trx['installments'] \
-            and int(trx['installments']):
+        # ============================ TRANSACTION ========================== #
         installments = int(trx['installments'])
-        transaction_instance.installments = installments
-        transaction_instance.installment_amount = \
-            round((amount / installments), 2)
 
-    if transaction_instance.type == Transaction.BOLETO:
-        boleto_exp_date = trx.get('boleto_expiration_date')
-        if boleto_exp_date:
-            transaction_instance.boleto_expiration_date = datetime.strptime(
-                boleto_exp_date,
-                "%Y-%m-%dT%H:%M:%S.%fZ"
-            )
+        transaction = Transaction(
+            uuid=transaction_id,
+            subscription=subscription,
+            data=trx,
+            status=trx['status'],
+            type=trx['payment_method'],
+            date_created=trx['date_created'],
+            amount=amount,
+            lot_price=subscription.lot.price,
+            liquid_amount=debt.liquid_amount,
+            installments=installments,
+            installment_amount=round((amount / installments), 2),
+        )
 
-    if transaction_instance.type == Transaction.CREDIT_CARD:
-        card = trx['card']
-        transaction_instance.credit_card_holder = card['holder_name']
-        transaction_instance.credit_card_first_digits = card['first_digits']
-        transaction_instance.credit_card_last_digits = card['last_digits']
+        if transaction.type == Transaction.BOLETO:
+            boleto_exp_date = trx.get('boleto_expiration_date')
+            if boleto_exp_date:
+                transaction.boleto_expiration_date = datetime.strptime(
+                    boleto_exp_date,
+                    "%Y-%m-%dT%H:%M:%S.%fZ"
+                )
 
-    transaction_instance.save()
+        if transaction.type == Transaction.CREDIT_CARD:
+            card = trx['card']
+            transaction.credit_card_holder = card['holder_name']
+            transaction.credit_card_first_digits = card['first_digits']
+            transaction.credit_card_last_digits = card['last_digits']
 
-    transaction_status = TransactionStatus(
-        transaction=transaction_instance,
-        data=trx
-    )
+        transaction.save()
 
-    transaction_status.data['status'] = trx['status']
-    transaction_status.date_created = trx['date_created']
-    transaction_status.status = trx['status']
-    transaction_status.save()
+        TransactionStatus.objects.create(
+            transaction=transaction,
+            data=trx,
+            status=trx['status'],
+            date_created=trx['date_created'],
+        )
 
 
 # @TODO create a mock of the response to use during testing

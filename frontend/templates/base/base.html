@@ -227,7 +227,7 @@
                 <li role="presentation">
                     <button type="button" id="button-toggle"
                             class="navbar-toggle
-            "style="text-align:
+            " style="text-align:
                     right;width: 50px; ">
                         <i class="fas fa-bars"
                            style="font-size: 30px;"></i>
@@ -280,9 +280,12 @@
 {% block modals %}{% endblock %}
 
 {% include 'sentry-javascript-sdk.html' %}
-{% include 'tawto.html' %}
-{% include 'hotjar.html' %}
-{% include 'smartlook.html' %}
+
+{% block support %}
+    {% include 'tawto.html' %}
+    {% include 'hotjar.html' %}
+    {% include 'smartlook.html' %}
+{% endblock %}
 
 <!--Global JS-->
 <script src="{% static "assets/plugins/bootstrap/js/bootstrap.min.js" %}"></script>

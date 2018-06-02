@@ -1,0 +1,63 @@
+{% extends "base/base.html" %}
+{% load i18n static widget_tweaks form_config_tags %}
+{% block title %}Novo certificado | Congressy{% endblock %}
+{% block page_title %}Nova certificado{% endblock %}
+{% block content %}
+    <form method="POST" class="submission_form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                {% if form.non_field_errors %}
+                    {% render_errors form.non_field_errors %}
+                {% endif %}
+                {% for field in form %}
+                    {% if field.errors %}
+                        {% render_errors field.errors %}
+                    {% endif %}
+                {% endfor %}
+                {% if form.forms %}
+                    {% render_errors form.non_field_errors %}
+                {% endif %}
+                {% for hidden_field in form.hidden_fields %}
+                    {% if hidden_field.errors %}
+                        {% render_errors hidden_field.errors %}
+                    {% endif %}
+                    {{ hidden_field }}
+                {% endfor %}
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Novo certificado</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12" style="margin-top: 20px">
+                                {% render_generic_field form.background_image %}
+                                {% render_generic_field form.text_content %}
+                                {{ form.event }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="buttonbar">
+                    <div class="float-right">
+                        <button type="submit"
+                                class="btn btn-success">
+                            <i class="far fa-save"></i>
+                            Salvar
+                        </button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+{% block sidebar-bars %}{% endblock %}
+{% block toptitle %}{% endblock %}
+

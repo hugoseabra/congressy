@@ -31,7 +31,7 @@ class PriceInput(forms.TextInput):
             return value
 
         value = value.replace('.', '').replace(',', '.')
-        return round(Decimal(value))
+        return round(Decimal(value), 2)
 
 
 class TelephoneInput(forms.TextInput):

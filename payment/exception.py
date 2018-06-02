@@ -3,6 +3,32 @@ class Error(Exception):
     pass
 
 
+# Receivers exception
+class ReceiverAlreadyPublishedError(Error):
+    """
+    Erro: quando um objeto Receiver, com o mesmo recipient_id, é publicado e já
+    existe um outro em seu lugar.
+
+    Isso evitará que haja erros no processamento de recebedores.
+    """
+
+    def __init__(self, message):
+        self.message = message
+
+
+class ReceiverTotalAmountExceeded(Error):
+    """
+    Erro: quando o montante total dos recebedores ultrapassada o montante
+    a ser transacionado.
+
+    Isso evitará que haja erros na transação gerando splti maior que o valor
+    a ser transacionado.
+    """
+
+    def __init__(self, message):
+        self.message = message
+
+
 class TransactionError(Error):
     """Raised when an operation attempts a  transaction that's not allowed.
 

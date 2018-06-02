@@ -29,11 +29,17 @@
                                     {{ category.name }}
                                 </td>
                                 <td class="col-sm-1">
-                                    <i class="fas fa-trash-alt danger-color
-                                delete-area-category"
+                                    <i class="fas fa-pencil-alt edit-area-category"
+                                        data-url="{% url 'scientific_work:areacategory-detail' category.pk %}"
+                                        data-name="{{ category.name }}">
+                                    </i>
+                                </td>
+                                <td class="col-sm-1">
+                                    <i class="fas fa-trash-alt danger-color delete-area-category"
                                        data-url="{% url 'scientific_work:areacategory-detail' category.pk %}">
                                     </i>
                                 </td>
+
                             </tr>
                         {% endfor %}
 
@@ -43,22 +49,11 @@
                     </table>
 
                 {% else %}
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle
-                        warning-color"></i>
-                        <strong>Atenção!</strong>
-                        Seus participantes
-                        não irão
-                        conseguir
-                        submeter
-                        trabalhos até que
-                        seja configurado
-                        pelo menos uma
-                        área temática!
-                    </div>
+                    <h3>Nenhuma área temática criada até o momento.</h3>
                 {% endif %}
                 <button type="button"
-                        class="btn btn-trans btn-success new-area-category">
+                        class="btn btn-trans btn-success new-area-category pull-right"
+                        style="margin-top: 15px">
                     Cadastrar nova área
                     temática
                 </button>

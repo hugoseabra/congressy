@@ -9,6 +9,7 @@ INSTALLED_APPS += [
     'gatheros_subscription',
     'gatheros_front',
     'mailer',
+    'payment_debt',
     'payment',
     'partner',
     'hotsite',
@@ -17,6 +18,7 @@ INSTALLED_APPS += [
     'associate',
     # 'bitly',
     'scientific_work',
+    'certificate',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'
@@ -54,3 +56,6 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append(
 # devido for menor do que este, o valor da transaçaõ da parte da congressy será
 # este valor.
 CONGRESSY_MINIMUM_AMOUNT = 4.99
+
+# Taxas de juros de parcelamento de valores da Congressy.
+CONGRESSY_INSTALLMENT_INTERESTS_RATE = 2.29

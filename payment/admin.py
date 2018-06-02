@@ -27,6 +27,23 @@ class TransactionAdmin(admin.ModelAdmin):
         'optional_liquid_amount',
     )
 
+# @admin.register(Transaction)
+# class TransactionAdmin(admin.ModelAdmin):
+#     search_fields = (
+#         'uuid',
+#         'subscription__uuid',
+#         'subscription__person__uuid',
+#         'subscription__person__name',
+#         'subscription__event__name',
+#     )
+#     list_display = (
+#         'provider',
+#         'status',
+#         'type',
+#         'date_created',
+#         'amount'
+#     )
+
 
 @admin.register(TransactionStatus)
 class TransactionStatusAdmin(admin.ModelAdmin):

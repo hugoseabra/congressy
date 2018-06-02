@@ -296,7 +296,8 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
 
 class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
-    template_name = 'subscription/view.html'
+    # template_name = 'subscription/view.html'
+    template_name = 'maintainance.html'
     object = None
     queryset = Subscription.objects.get_queryset()
     financial = False
@@ -391,8 +392,8 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         if self.request.GET.get('details'):
             ctx['show_details'] = True
 
-        if 'manual_payment_form' not in ctx:
-            ctx['manual_payment_form'] = self.get_form()
+        # if 'manual_payment_form' not in ctx:
+        #     ctx['manual_payment_form'] = self.get_form()
 
         return ctx
 

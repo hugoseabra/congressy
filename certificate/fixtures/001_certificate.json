@@ -1,0 +1,48 @@
+[
+  {
+    "model": "certificate.certificate",
+    "pk": 1,
+    "fields": {
+      "event": 9,
+      "text_content": "Certificamos que {{NOME}} participou do evento {{EVENTO}} no dia 1 de abril de 2018, com carga hor\u00e1rio de 4 horas.",
+      "text_font_size": 20,
+      "text_width": 634,
+      "text_height": 348,
+      "text_line_height": null,
+      "text_position_x": 191.0,
+      "text_position_y": 309.0,
+      "title_content": "Certificado",
+      "title_font_size": 60,
+      "title_position_x": 286.0,
+      "title_position_y": 192.0,
+      "title_hide": false,
+      "date_font_size": 20,
+      "date_position_x": 15.0,
+      "date_position_y": 463.0,
+      "date_hide": false
+    }
+  },
+  {
+    "model": "certificate.certificate",
+    "pk": 2,
+    "fields": {
+      "event": 8,
+      "text_content": "Certificamos que {{NOME}} participou do evento {{EVENTO}} no dia 1 de abril de 2018, com carga hor\u00e1rio de 4 horas.",
+      "text_font_size": 20,
+      "text_width": 634,
+      "text_height": 348,
+      "text_line_height": null,
+      "text_position_x": 191.0,
+      "text_position_y": 309.0,
+      "title_content": "Certificado",
+      "title_font_size": 60,
+      "title_position_x": 286.0,
+      "title_position_y": 192.0,
+      "title_hide": false,
+      "date_font_size": 20,
+      "date_position_x": 15.0,
+      "date_position_y": 463.0,
+      "date_hide": false
+    }
+  }
+]
