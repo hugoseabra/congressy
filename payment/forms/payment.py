@@ -12,6 +12,7 @@ class PaymentForm(forms.ModelForm):
         fields = (
             'cash_type',
             'amount',
+            'paid',
         )
 
     def __init__(self, subscription, transaction=None, *args, **kwargs):

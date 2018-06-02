@@ -104,8 +104,8 @@ def notify_postback(transaction):
 
 
 class EventPaymentView(AccountMixin, ListView):
-    # template_name = 'payments/list.html'
-    template_name = 'maintainance.html'
+    template_name = 'payments/list.html'
+    # template_name = 'maintainance.html'
     event = None
 
     def can_access(self):
@@ -256,6 +256,7 @@ def postback_url_view(request, uidb64):
                 data={
                     'cash_type': transaction.type,
                     'amount': transaction.amount,
+                    'paid': transaction.paid is True,
                 },
             )
 
