@@ -1,10 +1,7 @@
-from decimal import Decimal
-
 from django.core.management.base import BaseCommand
 
 from gatheros_event.models import Event
-from gatheros_subscription.models import Subscription
-from payment_debt.models import Debt, DebtConfig
+from payment_debt.models import Debt
 
 
 class Command(BaseCommand):
@@ -36,14 +33,6 @@ class Command(BaseCommand):
                     subscription=sub,
                     type=Debt.DEBT_TYPE_SUBSCRIPTION,
                     status=Debt.DEBT_STATUS_DEBT,
-                )
-
-                DebtConfig.objects.create(
-                    debt=debt,
-                    transfer_tax=lot.transfer_tax,
-                    interests_rate=Decimal(2.29),
-                    total_installments=lot.installment_limit,
-                    free_installments=lot.num_install_interest_absortion,
                 )
                 debts_created += 1
                 total_subs += 1

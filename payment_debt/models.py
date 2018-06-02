@@ -107,6 +107,11 @@ class Debt(models.Model):
         verbose_name='valor dos juros do parcelamento',
     )
 
+    created = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='criado em'
+    )
+
     def __str__(self):
         return '{} - {} ({})'.format(
             self.get_type_display(),

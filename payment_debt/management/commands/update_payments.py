@@ -1,9 +1,10 @@
 from decimal import Decimal
+
 from django.core.management.base import BaseCommand
 
 from gatheros_event.models import Event
-from payment.models import Transaction
-from payment_debt.models import Debt, Payment
+from payment.models import Payment, Transaction
+from payment_debt.models import Debt
 
 
 class Command(BaseCommand):
@@ -43,7 +44,14 @@ class Command(BaseCommand):
                     lot = transaction.lot
                     cash_type = self._get_cash_type(transaction)
 
-                    payment = Payment.objects.create(
+                    try:
+                        transaction.payment
+                        continue
+
+                    except AttributeError:
+                        pass
+
+                    payment = Payment(
                         lot=lot,
                         subscription=sub,
                         manual=transaction.manual,
@@ -51,7 +59,10 @@ class Command(BaseCommand):
                         cash_type=cash_type,
                         amount=transaction.amount,
                         paid=transaction.paid,
+                        transaction=transaction,
                     )
+
+                    payment.save()
 
                     total_payments += 1
 
@@ -130,6 +141,9 @@ class Command(BaseCommand):
                 continue
 
             debt = debts.first()
+
+            if debt.amount and debt.liquid_amount:
+                continue
 
             amount = lot.get_calculated_price()
             liquid_amount = lot.price

@@ -2,8 +2,9 @@ from decimal import Decimal
 
 from django import forms
 
-from payment_debt.models import Debt
 from payment.helpers import payment_helpers
+from payment_debt.models import Debt
+
 
 class DebtForm(forms.ModelForm):
     class Meta:
@@ -11,8 +12,8 @@ class DebtForm(forms.ModelForm):
         fields = (
             'type',
             'status',
-            'amount',
             'installments',
+            'amount',
         )
 
     def __init__(self, subscription, *args, **kwargs):
@@ -55,21 +56,16 @@ class DebtForm(forms.ModelForm):
         return int(self.cleaned_data.get('installments', 1) or 1)
 
     def clean_amount(self):
-        amount = self.cleaned_data.get('amount')
-        amount = payment_helpers.amount_as_decimal(amount)
+        amount = self.data.get('amount')
+        if not amount:
+            return amount
 
-        if self._is_valid_amount() is False:
-            raise forms.ValidationError(
-                'Valor a ser processado no pagamento é diferente do valor'
-                ' esperado.'
-            )
-
-        return amount
+        return payment_helpers.amount_as_decimal(amount)
 
     def save(self, commit=True):
         self.instance.subscription = self.subscription
         self.instance.liquid_amount = self.liquid_amount
-        self.instance.installments_amount = self.installment_amount
+        self.instance.installment_amount = self.installment_amount
         self.instance.installment_interests_amount = \
             self.installment_interests_amount
 
@@ -101,43 +97,28 @@ class DebtForm(forms.ModelForm):
             self.original_amount = lot.price
             self.liquid_amount = round(lot.price - percent_amount, 2)
 
-    def _is_valid_amount(self):
-        """ Valida se o montante informado é válido. """
-        amount = payment_helpers.amount_as_decimal(self.data.get('amount'))
-        if not amount:
-            return False
-
-        if not self.original_amount:
-            self._set_lot_amounts()
-
-        installments = self.cleaned_data.get('installments', 1) or 1
-
-        if int(installments) <= 1:
-            return self.original_amount == Decimal(amount)
-
-        return True
-
     def _set_installments_amount(self):
         """ Seta montante por parcela. """
-        installments = self.cleaned_data.get('installments', 1)
+        amount = self.cleaned_data.get('amount')
 
-        if self._is_valid_amount() is False:
-            self.installment_amount = Decimal(0)
-            return
+        if not amount:
+            self.installment_amount = Decimal(0.00)
+
+        installments = self.cleaned_data.get('installments', 1)
 
         if installments <= 1:
             self.installment_amount = self.original_amount
             return
 
-        self.installment_amount = Decimal(amount) / installments
+        self.installment_amount = amount / int(installments)
 
     def _set_installment_interests_amount(self):
         """ Seta valor de juros a ser pago ao final de todas as parcelas. """
-        if self._is_valid_amount() is False:
-            self.installment_interests_amount = Decimal(0)
-            return
+        amount = self.cleaned_data.get('amount')
 
-        amount = payment_helpers.amount_as_decimal(self.data.get('amount'))
+        if not amount:
+            self.installment_amount = Decimal(0.00)
+
         installments = self.cleaned_data.get('installments', 1)
 
         if installments <= 1:
@@ -145,9 +126,5 @@ class DebtForm(forms.ModelForm):
             self.installment_interests_amount = Decimal(0)
             return
 
-        if not self.installment_amount:
-            self._set_installments_amount()
-
-        total_amount = self.installment_amount * installments
-
-        self.installment_interests_amount = round((amount / total_amount), 2)
+        self.installment_interests_amount = \
+            round((amount - self.original_amount), 2)
