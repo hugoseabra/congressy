@@ -8,15 +8,15 @@ import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-import locale
 from django.conf import settings
 from django.db import models
 from django.utils.encoding import force_text
+from django.utils.formats import localize
 
 from core.model import track_data
 from gatheros_event.models import Event
-from .event_survey import EventSurvey
 from gatheros_event.models.mixins import GatherosModelMixin
+from .event_survey import EventSurvey
 from .rules import lot as rule
 
 
@@ -235,36 +235,22 @@ class Lot(models.Model, GatherosModelMixin):
         """ Exibição pública de infomações do lote. """
 
         if self.price and self.price > 0:
-            # display = '{} - R$ {} ({} vagas restantes)'.format(
-            display = '{} - R$ {}'.format(
+            return '{} - {}'.format(
                 self.name,
-                locale.format(
-                    percent='%.2f',
-                    value=self.get_calculated_price(),
-                    grouping=True
-                ),
+                self.display_price,
                 self.places_remaining
             )
-        else:
-            # display = '{} vagas restantes'.format(self.places_remaining)
-            display = self.name
 
-        return display
+        return self.name
 
     @property
     def display_price(self):
         """ Exibição pública de infomações do lote. """
 
         if self.price and self.price > 0:
-            return 'R$ {}'.format(
-                locale.format(
-                    percent='%.2f',
-                    value=self.get_calculated_price(),
-                    grouping=True
-                )
-            )
+            return 'R$ {}'.format(localize(self.price))
 
-        return ''
+        return localize(0.00)
 
     @property
     def places_remaining(self):
@@ -394,7 +380,7 @@ class Lot(models.Model, GatherosModelMixin):
         da Congressy.
         """
         if self.price is None:
-            return 0
+            return Decimal(0.00)
 
         minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
         congressy_plan_percent = \
@@ -404,7 +390,9 @@ class Lot(models.Model, GatherosModelMixin):
         if congressy_amount < minimum:
             congressy_amount = minimum
 
-        if self.transfer_tax is True:
-            return round(self.price + congressy_amount, 2)
+        price = self.price
 
-        return round(self.price, 2)
+        if self.transfer_tax is True:
+            price += congressy_amount
+
+        return round(price, 2)
