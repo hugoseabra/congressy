@@ -73,16 +73,26 @@ def log(message, extra_data=None, type='error', notify_admins=False):
 
 def notify_postback(transaction, data):
     body = """
+        <br />
         <strong>NOVO POSTBACK:</strong>
-            <strong>TIPO:</strong> {type_display} ({type})
-            <strong>Evento:</strong> {event_name} ({event_pk})
-            <strong>PESSOA:</strong> {person_name}
-            <strong>Inscrição:</strong> {sub_pk}
-            <strong>VALOR (R$):</strong> R$ {amount}
-            <strong>STATUS:</strong> {status_display} ({status})
-            <hr >
-            Data:
-            <pre><code>{data}</code></pre>
+        <br /><br />
+        <strong>TIPO:</strong> {type_display} ({type})
+        <br />
+        <strong>Evento:</strong> {event_name} ({event_pk})
+        <br />
+        <strong>PESSOA:</strong> {person_name}
+        <br />
+        <strong>Inscrição:</strong> {sub_pk}
+        <br />
+        <strong>VALOR (R$):</strong> R$ {amount}
+        <br />
+        <strong>STATUS:</strong> {status_display} ({status})
+        <br />
+        <hr >
+        <strong>Data:</strong>
+        <br />    
+        <pre><code>{data}</code></pre>
+        <br />
     """.format(
         type_display=transaction.get_type_display(),
         type=transaction.type,
@@ -200,7 +210,7 @@ def postback_url_view(request, uidb64):
             },
             notify_admins=True,
         )
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
     previous_status = transaction.status
     incoming_status = data.get('current_status', '')
