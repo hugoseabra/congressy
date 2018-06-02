@@ -21,7 +21,7 @@ function error_msg() {
 
 docker-compose -f ./bin/env/staging/docker-compose.yml down --remove-orphans
 docker-compose -f ./bin/env/staging/docker-compose.yml up -d
-sleep 10
+sleep 20
 
 echo ;
 docker-compose -f ./bin/env/staging/docker-compose.yml logs manage

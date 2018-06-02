@@ -33,7 +33,7 @@ if [ "$PREVIOUS_VERSION" != "$VERSION" ]; then
     docker exec -i awsecr pull cgsy:latest
     docker exec -i awsecr pull cgsy:${VERSION}
     docker-compose -f ~/cgsy/docker-compose.yml up -d --remove-orphans --force
-    sleep 10
+    sleep 30
 
     echo ;
     docker system prune -f --filter 'label=cgsy.image.name=cgsy-platform-production'
