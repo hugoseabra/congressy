@@ -71,7 +71,7 @@ def log(message, extra_data=None, type='error', notify_admins=False):
             client.captureMessage(message)
 
 
-def notify_postback(transaction):
+def notify_postback(transaction, data):
     body = """
         <strong>NOVO POSTBACK:</strong>
             <strong>TIPO:</strong> {type_display} ({type})
@@ -506,7 +506,7 @@ def postback_url_view(request, uidb64):
         transaction.subscription.save()
 
     try:
-        notify_postback(transaction)
+        notify_postback(transaction, data)
 
     except Exception as e:
         log(
