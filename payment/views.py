@@ -71,30 +71,40 @@ def log(message, extra_data=None, type='error', notify_admins=False):
             client.captureMessage(message)
 
 
-def notify_postback(transaction):
+def notify_postback(transaction, data):
     body = """
+        <br />
         <strong>NOVO POSTBACK:</strong>
-            <strong>TIPO:</strong> {type_display} ({type})
-            <strong>Evento:</strong> {event_name} ({event_pk})
-            <strong>PESSOA:</strong> {person_name}
-            <strong>Inscrição:</strong> {sub_pk}
-            <strong>VALOR (R$):</strong> R$ {amount}
-            <strong>STATUS:</strong> {status_display} ({status})
-            <hr >
-            Data:
-            <pre><code>{data}</code></pre>
-    """.format({
-        'type_display': transaction.get_type_display(),
-        'type': transaction.type,
-        'event_name': transaction.subscription.event.name,
-        'event_pk': transaction.subscription.event.pk,
-        'person_name': transaction.subscription.person.name,
-        'sub_pk': transaction.subscription.pk,
-        'amount': localize(transaction.amount),
-        'status_display': transaction.get_status_display(),
-        'status': transaction.status,
-        'data': json.dumps(request.data),
-    })
+        <br /><br />
+        <strong>TIPO:</strong> {type_display} ({type})
+        <br />
+        <strong>Evento:</strong> {event_name} ({event_pk})
+        <br />
+        <strong>PESSOA:</strong> {person_name}
+        <br />
+        <strong>Inscrição:</strong> {sub_pk}
+        <br />
+        <strong>VALOR (R$):</strong> R$ {amount}
+        <br />
+        <strong>STATUS:</strong> {status_display} ({status})
+        <br />
+        <hr >
+        <strong>Data:</strong>
+        <br />    
+        <pre><code>{data}</code></pre>
+        <br />
+    """.format(
+        type_display=transaction.get_type_display(),
+        type=transaction.type,
+        event_name=transaction.subscription.event.name,
+        event_pk=transaction.subscription.event.pk,
+        person_name=transaction.subscription.person.name,
+        sub_pk=transaction.subscription.pk,
+        amount=localize(transaction.amount),
+        status_display=transaction.get_status_display(),
+        status=transaction.status,
+        data=json.dumps(data),
+    )
 
     send_mail(
         subject="Novo postback",
@@ -200,7 +210,7 @@ def postback_url_view(request, uidb64):
             },
             notify_admins=True,
         )
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
     previous_status = transaction.status
     incoming_status = data.get('current_status', '')
@@ -250,29 +260,36 @@ def postback_url_view(request, uidb64):
 
         if incoming_status == Transaction.PAID:
 
-            payment_form = PaymentForm(
-                subscription=subscription,
-                transaction=transaction,
-                data={
-                    'cash_type': transaction.type,
-                    'amount': transaction.amount,
-                    'paid': transaction.paid is True,
-                },
-            )
+            try:
+                payment = transaction.payment
+                transaction.type = transaction.type
+                transaction.amount = transaction.amount
+                payment.paid = True
+                payment.save()
 
-            if not payment_form.is_valid():
-                error_msgs = []
-                for field, errs in payment_form.errors.items():
-                    error_msgs.append(str(errs))
-
-                raise Exception(
-                    'Erro ao criar pagamento de uma transação: {}'.format(
-                        "".join(error_msgs)
-                    )
+            except AttributeError:
+                payment_form = PaymentForm(
+                    subscription=subscription,
+                    transaction=transaction,
+                    data={
+                        'cash_type': transaction.type,
+                        'amount': transaction.amount,
+                    },
                 )
 
-            # por agora, não vamos vincular pagamento a nada.
-            payment_form.save()
+                if not payment_form.is_valid():
+                    error_msgs = []
+                    for field, errs in payment_form.errors.items():
+                        error_msgs.append(str(errs))
+
+                    raise Exception(
+                        'Erro ao criar pagamento de uma transação: {}'.format(
+                            "".join(error_msgs)
+                        )
+                    )
+
+                # por agora, não vamos vincular pagamento a nada.
+                payment_form.save()
 
         # Registra status de transação.
         TransactionStatus.objects.create(
@@ -499,7 +516,7 @@ def postback_url_view(request, uidb64):
         transaction.subscription.save()
 
     try:
-        notify_postback(transaction)
+        notify_postback(transaction, data)
 
     except Exception as e:
         log(
@@ -517,7 +534,5 @@ def postback_url_view(request, uidb64):
             },
             notify_admins=True,
         )
-        return HttpResponseServerError
-
 
     return Response(status=201)
