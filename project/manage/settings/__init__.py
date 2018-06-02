@@ -16,6 +16,7 @@ INSTALLED_APPS += [
     'survey',
     'bitly',
     'scientific_work',
+    'certificate',
 ]
 # =========================== AUTH BACKENDS ================================= #
 LOGIN_URL = '/login/'
