@@ -93,7 +93,7 @@ def notify_postback(transaction, data):
         'amount': localize(transaction.amount),
         'status_display': transaction.get_status_display(),
         'status': transaction.status,
-        'data': json.dumps(request.data),
+        'data': json.dumps(data),
     })
 
     send_mail(
