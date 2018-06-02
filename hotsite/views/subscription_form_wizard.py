@@ -1,28 +1,28 @@
-from datetime import datetime, timedelta
-
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.db import transaction
 from django.forms import ValidationError
 from django.http import QueryDict
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
-from gatheros_event.models import Person, Event
+from gatheros_event.models import Event, Person
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
+from hotsite.forms import DebtAlreadyPaid
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
 )
 from payment.exception import TransactionError
-from payment.helpers import PagarmeTransactionInstanceData
+from payment.helpers.payment_helpers import (
+    get_opened_boleto_transactions,
+    is_boleto_allowed,
+)
 from payment.models import Transaction
-from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
 FORMS = [
@@ -129,10 +129,12 @@ class SubscriptionWizardView(SessionWizardView):
         if self.has_paid_subscription():
             messages.warning(
                 request,
-                "Atenção! Você já possui uma inscrição paga neste evento."
+                "Você já possui uma inscrição paga neste evento."
             )
-            return redirect('public:hotsite-subscription-status',
-                            slug=self.event.slug)
+            return redirect(
+                'public:hotsite-subscription-status',
+                slug=self.event.slug
+            )
 
         if self.is_private_event() and not self.has_previous_valid_code():
             messages.error(
@@ -170,13 +172,18 @@ class SubscriptionWizardView(SessionWizardView):
         context['event'] = self.event
         context['is_private_event'] = self.is_private_event()
         context['num_lots'] = self.get_num_lots()
+
         has_open_boleto = False
 
         if self.storage.current_step not in ['lot', 'private_lot']:
             selected_lot = self.get_lot_from_session()
             context['selected_lot'] = selected_lot
-            has_open_boleto = self.get_open_boleto(lot=selected_lot)
-            context['has_open_boleto'] = has_open_boleto
+
+            opened_boletos = self.get_open_boleto(lot=selected_lot)
+            has_open_boleto = \
+                opened_boletos.count() > 0 if opened_boletos else False
+
+        context['has_open_boleto'] = has_open_boleto
 
         if self.storage.current_step == 'private_lot':
             code = self.request.session.get('exhibition_code')
@@ -219,13 +226,13 @@ class SubscriptionWizardView(SessionWizardView):
 
         if self.storage.current_step == 'payment':
             context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
-            now = datetime.now()
-            margin = self.event.date_start
 
-            if has_open_boleto or margin - now < timedelta(days=self.event.boleto_limit_days):
-                context['allowed_transaction_types'] = 'credit_card'
-            else:
-                context['allowed_transaction_types'] = 'credit_card,boleto'
+            allowed_types = [Transaction.CREDIT_CARD]
+
+            if is_boleto_allowed(self.event):
+                allowed_types.append(Transaction.BOLETO)
+
+            context['allowed_transaction_types'] = ','.join(allowed_types)
 
         return context
 
@@ -353,17 +360,15 @@ class SubscriptionWizardView(SessionWizardView):
         form_data = self.get_form_step_data(form)
 
         if isinstance(form, forms.LotsForm):
-            lot = form_data.get('lot-lots')
-            self.request.session['lot'] = lot
+            self.request.session['lot_pk'] = form_data.get('lot-lots')
 
         if isinstance(form, forms.PrivateLotForm):
-            lot = form_data.get('private_lot-lots')
-            self.request.session['lot'] = lot
+            self.request.session['lot_pk'] = form_data.get('private_lot-lots')
 
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
             person = form.save()
-            self.request.session['person'] = str(person.pk)
+            self.request.session['person_pk'] = str(person.pk)
             self.storage.person = person
 
         # Persisting survey
@@ -397,59 +402,17 @@ class SubscriptionWizardView(SessionWizardView):
         # Persisting payments:
         if isinstance(form, forms.PaymentForm):
 
-            if form.is_valid():
+            if not form.is_valid():
+                raise ValidationError(form.errors)
 
-                # Assert that we have a person in storage
-                if not hasattr(self.storage, 'person'):
-                    person = Person.objects.get(user=self.request.user)
-                    self.storage.person = person
+            try:
+                form.save()
 
-                lot = self.get_lot_from_session()
+            except DebtAlreadyPaid as e:
+                raise ValidationError(str(e))
 
-                try:
-                    subscription = Subscription.objects.get(
-                        person=self.storage.person,
-                        event=self.event
-                    )
-                except Subscription.DoesNotExist:
-                    subscription = Subscription(
-                        person=self.storage.person,
-                        event=self.event,
-                        created_by=self.storage.person.user.id
-                    )
-
-                try:
-                    with transaction.atomic():
-                        # Insere ou edita lote
-                        subscription.lot = lot
-                        subscription.save()
-
-                        transaction_data = PagarmeTransactionInstanceData(
-                            subscription=subscription,
-                            extra_data=form_data,
-                            event=self.event
-                        )
-
-                        create_pagarme_transaction(
-                            transaction_data=transaction_data,
-                            subscription=subscription
-                        )
-
-                except TransactionError as e:
-                    error_dict = {
-                        'No transaction type': \
-                            'Por favor escolher uma forma de pagamento.',
-                        'Transaction type not allowed': \
-                            'Forma de pagamento não permitida.',
-                        'Organization has no bank account': \
-                            'Organização não está podendo receber pagamentos no'
-                            ' momento.',
-                        'No organization': 'Evento não possui organizador.',
-                    }
-                    if e.message in error_dict:
-                        e.message = error_dict[e.message]
-
-                    raise ValidationError(e.message)
+            except TransactionError as e:
+                raise ValidationError(str(e))
 
         return form_data
 
@@ -486,6 +449,9 @@ class SubscriptionWizardView(SessionWizardView):
         if step == 'survey':
             kwargs.update({'user': self.request.user, 'event': self.event})
 
+        if step == 'payment':
+            kwargs.update({'subscription': self.get_subscription()})
+
         return kwargs
 
     def post(self, *args, **kwargs):
@@ -514,7 +480,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                self.storage.current_step is not None):
+                    self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -632,21 +598,44 @@ class SubscriptionWizardView(SessionWizardView):
 
     def get_person_from_session(self):
 
-        if 'person' not in self.request.session:
-            raise InvalidStateStepError('Não temos uma pessoa na session.')
+        if 'person_pk' not in self.request.session:
+            try:
+                person = Person.objects.get(user=self.request.user)
+                self.request.session['person_pk'] = str(person.pk)
 
-        person_pk = self.request.session['person']
+            except Person.DoesNotExist:
+                raise InvalidStateStepError(
+                    'Usuário não possui pessoa vinculada.'
+                )
 
-        return Person.objects.get(pk=person_pk)
+            return person
+
+        return Person.objects.get(pk=self.request.session['person_pk'])
 
     def get_lot_from_session(self):
 
-        if 'lot' not in self.request.session:
+        if 'lot_pk' not in self.request.session:
             raise InvalidStateStepError('Não temos um lote na session.')
 
-        lot_pk = self.request.session['lot']
+        return Lot.objects.get(pk=self.request.session['lot_pk'])
 
-        return Lot.objects.get(pk=lot_pk)
+    def get_subscription(self):
+        person = self.get_person_from_session()
+
+        try:
+            subscription = Subscription.objects.get(
+                person=person,
+                event=self.event
+            )
+
+        except Subscription.DoesNotExist:
+            subscription = Subscription(
+                person=person,
+                event=self.event,
+                created_by=self.request.user.pk
+            )
+
+        return subscription
 
     def get_num_lots(self):
         lots = [
@@ -657,40 +646,13 @@ class SubscriptionWizardView(SessionWizardView):
         return len(lots)
 
     def get_open_boleto(self, lot):
-
-        now = datetime.now()
-
-        try:
-            subscription = self.event.subscriptions.get(
-                person__user=self.request.user)
-
-            all_transactions = Transaction.objects.filter(
-                subscription=subscription,
-                lot=lot)
-
-            for trans in all_transactions:
-                if trans.boleto_expiration_date:
-                    if trans.boleto_expiration_date > now.date():
-                        return trans
-        except Subscription.DoesNotExist:
-            pass
-
-        return None
+        return get_opened_boleto_transactions(self.get_subscription())
 
     def has_paid_subscription(self):
-
-        try:
-            subscription = self.event.subscriptions.get(
-                person__user=self.request.user)
-
-            for trans in subscription.transactions.all():
-                if trans.status == Transaction.PAID:
-                    return True
-
-        except Subscription.DoesNotExist:
-            pass
-
-        return False
+        subscription = self.get_subscription()
+        return subscription.transactions.filter(
+            status=Transaction.PAID
+        ).count() > 0
 
     @staticmethod
     def is_lot_available(lot):
