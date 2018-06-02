@@ -64,7 +64,7 @@ class PaymentForm(forms.ModelForm):
         if not payments_amount:
             return
 
-        debts_amount = subscription.debts.aggregate(total=Sum('amount'))
+        debts_amount = self.subscription.debts.aggregate(total=Sum('amount'))
         debts_amount = debts_amount['total'] or Decimal(0)
 
         if payments_amount > debts_amount:
@@ -73,22 +73,24 @@ class PaymentForm(forms.ModelForm):
             # como CRÉDITO.
 
             # Todas pendências que não de inscrição estarão pagas.
-            debts = subscription.debts.exclude(
-                type=Debt.DEBT_TYPE_SUBSCRIPTION)
+            debts = self.subscription.debts.exclude(
+                type=Debt.DEBT_TYPE_SUBSCRIPTION
+            )
             for debt in debts:
                 debt.status = Debt.DEBT_STATUS_PAID
                 debt.save()
 
             # A pendência de inscriçãoe estará com crédito.
-            sub_debt = \
-                subscription.debts.filter(
-                    type=Debt.DEBT_TYPE_SUBSCRIPTION).first()
+            sub_debt = self.subscription.debts.filter(
+                    type=Debt.DEBT_TYPE_SUBSCRIPTION
+            ).first()
+
             sub_debt.status = Debt.DEBT_STATUS_CREDIT
             sub_debt.save()
 
         if payments_amount == debts_amount:
             # Todas as pendências estão pagas. Atualiza pendências como PAGAS.
-            for debt in subscription.debts.all():
+            for debt in self.subscription.debts.all():
                 debt.status = Debt.DEBT_STATUS_PAID
                 debt.save()
 
@@ -97,7 +99,7 @@ class PaymentForm(forms.ModelForm):
             # alguma dos pagamentos cobre alguma das pendências.
             processed_payment_amount = payments_amount
 
-            for debt in subscription.debts.all():
+            for debt in self.subscription.debts.all():
                 if round(processed_payment_amount, 2) >= debt.amount:
                     debt.status = Debt.DEBT_STATUS_PAID
                     debt.save()
