@@ -3,6 +3,7 @@
 """
 
 import json
+LOGGER
 
 from django import forms
 from django.core import serializers
@@ -14,6 +15,7 @@ from payment.helpers import (
     payment_helpers,
 )
 from payment.tasks import create_pagarme_transaction
+from payment.exception import TransactionDataError, TransactionError
 from payment_debt.forms import Debt, DebtForm
 
 
@@ -110,7 +112,9 @@ class PaymentForm(forms.Form):
         )
 
         if transaction_type == 'boleto' and boleto_allowed is False:
-            raise Validation('Transação com boleto não é permitida.')
+            raise forms.ValidationError(
+                'Transação com boleto não é permitida.'
+            )
 
         return cleaned_data
 
@@ -121,19 +125,23 @@ class PaymentForm(forms.Form):
             # Novo ou edição de pendência financeira
             debt = self.subscription_debt_form.save()
 
-            # Construção de dados para transaçao do Pagarme
-            builder = PagarmeDataBuilder(
-                debt=debt,
-                transaction_type=self.cleaned_data.get('transaction_type'),
-                card_hash=self.cleaned_data.get('card_hash') or None,
-            )
+            try:
+                # Construção de dados para transaçao do Pagarme
+                builder = PagarmeDataBuilder(subscription=self.subscription,
+                    # transaction_type=self.cleaned_data.get('transaction_type'),
+                    # card_hash=self.cleaned_data.get('card_hash') or None,
+                )
 
-            # Cria transação.
-            create_pagarme_transaction(
-                transaction_id=builder.transaction_id,
-                debt=debt,
-                data=builder.build()
-            )
+            except TransactionDataError as e:
+
+                raise TransactionError()
+
+                # Cria transação.
+                create_pagarme_transaction(
+                    transaction_id=builder.transaction_id,
+                    debt=debt,
+                    data=builder.build()
+                )
 
     def _create_subscription_debt_form(self):
         """ Cria formulário de pendência financeira. """
@@ -146,7 +154,6 @@ class PaymentForm(forms.Form):
                 'amount': self.data.get('payment-amount'),
                 'installments': installments,
                 'status': Debt.DEBT_STATUS_DEBT,
-                # por enquanto, só pendências de inscrição
                 'type': Debt.DEBT_TYPE_SUBSCRIPTION,
             }
         }

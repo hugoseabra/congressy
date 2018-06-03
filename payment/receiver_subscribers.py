@@ -8,7 +8,7 @@ from decimal import Decimal
 from django.conf import settings
 
 from gatheros_subscription.models import Subscription
-from payment import receivers
+from payment import receivers, exception
 from payment.installments import Calculator, InstallmentResult
 
 RECEIVER_TYPE_SUBSCRIPTION = 'receiver_subscription'
@@ -22,15 +22,23 @@ class ReceiverSubscriber(object):
     """
 
     def __init__(self, amount: Decimal) -> None:
+        assert isinstance(amount, Decimal)
+
         self.receivers = OrderedDict()
 
-        assert isinstance(amount, Decimal)
         self.amount = amount
         self.added_amount = Decimal(0)
 
     def publish(self, receiver: receivers.Receiver):
+        if not receiver.id:
+            raise exception.RecipientError(
+                'Um recebedor do tipo "{}" não possui ID.'.format(
+                    receiver.type
+                )
+            )
+
         if receiver.id in self.receivers:
-            raise exceptions.ReceiverAlreadyPublishedError(
+            raise exception.ReceiverAlreadyPublishedError(
                 'Você não pode publicar recebedor com id "{}" porque ele já'
                 ' foi publicado anteriormente.'.format(receiver.id)
             )
@@ -38,10 +46,10 @@ class ReceiverSubscriber(object):
         self.added_amount += receiver.amount
 
         if self.added_amount > self.amount:
-            raise exceptions.ReceiverTotalAmountExceeded(
+            raise exception.ReceiverTotalAmountExceeded(
                 'O valor dos recebedores já ultrapassa o valor a ser'
-                ' transacionado. Valor da transação: {0:.2f}. Valor somado dos '
-                ' recebedores: {0:.2f}.'.format(
+                ' transacionado. Valor da transação: {0:.2f}. Valor somado'
+                ' dos recebedores: {0:.2f}.'.format(
                     self.amount,
                     self.added_amount,
                 )
@@ -63,6 +71,7 @@ class ReceiverPublisher(object):
         self.receiver_subscriber = receiver_subscriber
         self.subscription = subscription
 
+        assert isinstance(amount, Decimal)
         self.amount = amount
         self.installments = installments
         self.organization = subscription.event.organization
@@ -90,24 +99,44 @@ class ReceiverPublisher(object):
         lot = self.subscription.lot
 
         # ==== CONGRESSY AMOUNT
-        cgsy_percent = Decimal(float(event.congressy_percent) / 100)
-
         # Valor proporcional da Congressy, independente de transferência ou
         # não de taxas. O valor é calculado em cima do preço informado pelo
         # organizador ao criar o lote.
+        cgsy_percent = Decimal(float(event.congressy_percent) / 100)
         cgsy_amount = lot.price * cgsy_percent
 
         minimum_amount = Decimal(
             getattr(settings, 'CONGRESSY_MINIMUM_AMOUNT', 0)
         )
+
         if minimum_amount and cgsy_amount < minimum_amount:
             cgsy_amount = minimum_amount
 
         # ==== ORGANIZATION AMOUNT
-        org_amount = self.amount - cgsy_amount
+        # Se houve transferência de taxas, o valor da Congressy já está
+        # no montante da transação.
+        if lot.transfer_tax is True:
+            # Se há transferência, o organizador sempre receberá o valor
+            # informado no lote.
+            org_amount = lot.price
+        else:
+            # Caso, ele assumirá o valor da Congressy e o montante a ser
+            # transacionado já está com o valor sem as taxas da Congressy.
+            org_amount = lot.price - cgsy_amount
 
+        assert org_amount < self.amount
+        diff_amount = self.amount - org_amount
+
+        # A diferença que há no montante a ser transacionado irá para a
+        # Congressy, por já estar embutidas taxas e juros de parcelamento,
+        # se houver.
+        cgsy_amount += diff_amount
+
+        # Se o organizador assumiu juros de parcelamento, o montante a ser
+        # transacionado estará sem o valor de juros de parcelamento. Então,
+        # vamos recalcula-los.
         free_installments = lot.num_install_interest_absortion
-        if self.installments > 1 and self.installments <= free_installments:
+        if 1 < self.installments <= free_installments:
             interests_amount = \
                 self.installment_calculator.get_absorbed_interests_amount(
                     amount=self.amount,

@@ -29,6 +29,18 @@ class ReceiverTotalAmountExceeded(Error):
         self.message = message
 
 
+class TransactionDataError(Error):
+    """
+    Quando a construção dados de transação não são feitas corretamente.
+
+    Isso evitará tentativas de criação de transações de pagamento e possíveis
+    transações incorretas.
+    """
+
+    def __init__(self, message):
+        self.message = message
+
+
 class TransactionError(Error):
     """Raised when an operation attempts a  transaction that's not allowed.
 

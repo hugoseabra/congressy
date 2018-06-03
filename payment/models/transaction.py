@@ -4,6 +4,7 @@ import uuid
 
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.db.utils import models, IntegrityError
 
 from gatheros_subscription.models import Lot, Subscription
 
@@ -142,22 +143,6 @@ class Transaction(models.Model):
         blank=True,
     )
 
-    amount = models.DecimalField(
-        decimal_places=2,
-        max_digits=11,
-        null=True,
-        blank=True,
-        verbose_name = 'valor do pagamento',
-    )
-
-    liquid_amount = models.DecimalField(
-        decimal_places=2,
-        max_digits=11,
-        null=True,
-        blank=True,
-        verbose_name='valor líquido do organizador'
-    )
-
     boleto_url = models.TextField(
         verbose_name='URL do boleto',
         null=True,
@@ -214,7 +199,15 @@ class Transaction(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        self.lot = self.subscription.lot
+        if self._state.adding is True:
+            self.lot = self.subscription.lot
+
+        elif self.lot.event != self.subscription:
+            raise IntegrityError(
+                'O lote informado na edição não pertence à inscrição da'
+                ' transação.'
+            )
+
         return super().save(*args, **kwargs)
 
     @property
