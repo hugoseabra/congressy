@@ -51,23 +51,12 @@ class PaymentForm(forms.Form):
         required=False,
     )
 
-    def __init__(self, subscription, **kwargs):
+    def __init__(self, subscription, selected_lot, **kwargs):
 
         self.subscription = subscription
         self.event = subscription.event
         self.person = subscription.person
-
-        self.lot_instance = kwargs.get('initial').get('choosen_lot')
-
-        if not isinstance(self.lot_instance, Lot):
-            try:
-                self.lot_instance = Lot.objects.get(pk=self.lot_instance,
-                                                    event=self.event)
-            except Lot.DoesNotExist:
-                message = 'Não foi possivel resgatar um Lote ' \
-                          'a partir das referencias: lot<{}> e evento<{}>.' \
-                    .format(self.lot_instance, self.event)
-                raise TypeError(message)
+        self.lot_instance = selected_lot
 
         # Caso a inscrição exista e o lote for diferente, altera o lote.
         self.subscription.lot = self.lot_instance
