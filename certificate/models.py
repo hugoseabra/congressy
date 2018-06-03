@@ -29,12 +29,13 @@ class Certificate(models.Model):
         related_name='certificate'
     )
 
+    # regular 73,03% menor que default
     background_image = StdImageField(
         upload_to=get_image_path,
         blank=True,
         null=True,
         verbose_name='imagem de fundo do certificado do evento',
-        variations={'default': (1402, 991), 'regular': (1024, 725)},
+        variations={'default': (1402, 991), 'regular': (1024, 724)},
         validators=[MinSizeValidator(1402, 991)],
         help_text="Imagem de fundo do certificado, mínimo de: "
                   "1402px largura x "
