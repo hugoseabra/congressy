@@ -89,5 +89,12 @@
     "fields": {
       "name": "Workshop"
     }
+  },
+  {
+    "model": "addon.optionalservicetype",
+    "pk": 14,
+    "fields": {
+      "name": "Serviço de Atendimento"
+    }
   }
 ]

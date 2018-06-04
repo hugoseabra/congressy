@@ -628,6 +628,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         try:
             list = Subscription.objects.filter(
                 attended=True,
+                completed=True,
                 event=self.get_event(),
             ).order_by('-attended_on')
             return list[0:5]
@@ -640,6 +641,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         try:
             return Subscription.objects.filter(
                 attended=True,
+                completed=True,
                 event=self.get_event(),
             ).count()
 
@@ -650,8 +652,9 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
 
         total = \
             Subscription.objects.filter(
-                event=self.get_event()
-            ).count()
+                event=self.get_event(),
+                completed=True,
+            ).exclude(status=Subscription.CANCELED_STATUS).count()
 
         return total
 
@@ -660,6 +663,7 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
         confirmed = \
             Subscription.objects.filter(
                 status=Subscription.CONFIRMED_STATUS,
+                completed=True,
                 event=self.get_event()
             ).count()
 
@@ -986,5 +990,6 @@ class SubscriptionAttendanceListView(EventViewMixin, generic.TemplateView):
     def get_attendances(self):
         return Subscription.objects.filter(
             attended=True,
+            completed=True,
             event=self.get_event(),
-        ).order_by('-attended_on')
+        ).exclude(status=Subscription.CANCELED_STATUS).order_by('-attended_on')
