@@ -52,7 +52,7 @@
                                     {% if lot.event_survey %}
                                         <div class="badge badge-primary" data-toggle="tooltip" title="" data-original-title="Formulário personalizado">{{ lot.event_survey }}</div>
                                     {% endif %}
-                                    {% if not full_banking %}
+                                    {% if lot.price and not full_banking %}
                                     <br />
                                     <a href="{% url 'event:organization-financial-edit' organization.pk %}" class="btn btn-link btn-sm btn-danger">
                                         <i class="fas fa-exclamation-triangle"></i>
