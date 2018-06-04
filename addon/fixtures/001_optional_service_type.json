@@ -3,105 +3,91 @@
     "model": "addon.optionalservicetype",
     "pk": 1,
     "fields": {
-      "name": "Confer\u00eancia"
+      "name": "Grupo Tem\u00e1tico"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 2,
     "fields": {
-      "name": "Congresso"
+      "name": "Grupo de Trabalho"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 3,
     "fields": {
-      "name": "Curso"
+      "name": "Lazer"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 4,
     "fields": {
-      "name": "Grupo Tem\u00e1tico"
+      "name": "Mesa Redonda"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 5,
     "fields": {
-      "name": "Grupo de Trabalho"
+      "name": "Minicurso"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 6,
     "fields": {
-      "name": "Lazer"
+      "name": "Oficina"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 7,
     "fields": {
-      "name": "Mesa Redonda"
+      "name": "Painel"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 8,
     "fields": {
-      "name": "Mincurso"
+      "name": "Palestra"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 9,
     "fields": {
-      "name": "Oficina"
+      "name": "Rodada de Conversa"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 10,
     "fields": {
-      "name": "Painel"
+      "name": "Simp\u00f3sio"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 11,
     "fields": {
-      "name": "Palestra"
+      "name": "Semin\u00e1rio"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 12,
     "fields": {
-      "name": "Rodada de Conversa"
+      "name": "Apresentação artística"
     }
   },
   {
     "model": "addon.optionalservicetype",
     "pk": 13,
     "fields": {
-      "name": "Simp\u00f3sio"
-    }
-  },
-  {
-    "model": "addon.optionalservicetype",
-    "pk": 14,
-    "fields": {
-      "name": "Semin\u00e1rio"
-    }
-  },
-  {
-    "model": "addon.optionalservicetype",
-    "pk": 15,
-    "fields": {
-      "name": "Show"
+      "name": "Workshop"
     }
   }
 ]

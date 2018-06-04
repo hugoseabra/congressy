@@ -78,6 +78,9 @@ def can_process_payment(wizard):
     """ Verifica se pagamento pode ser processado no wizard. """
     subscription = wizard.get_subscription()
 
+    if is_paid_lot(wizard) is False:
+        return False
+
     has_boleto_waiting = False
     has_card_waiting = False
     for transaction in subscription.transactions.all():
@@ -159,7 +162,7 @@ class SubscriptionWizardView(SessionWizardView):
     condition_dict = {
         'private_lot': is_private_event,
         'lot': is_not_private_event,
-        'payment': is_paid_lot and can_process_payment,
+        'payment': can_process_payment,
         'survey': has_survey,
         'service': has_services,
         'product': has_products,
@@ -421,6 +424,7 @@ class SubscriptionWizardView(SessionWizardView):
         context['is_private_event'] = self.is_private_event()
         context['num_lots'] = self.get_num_lots()
         context['subscription'] = self.get_subscription()
+        context['is_last'] = self.steps.current == self.steps.last
 
         has_open_boleto = False
 
@@ -464,10 +468,6 @@ class SubscriptionWizardView(SessionWizardView):
                 config.address = config.ADDRESS_SHOW
 
             context['config'] = config
-            context['is_last'] = self.steps.current == self.steps.last
-
-        if self.storage.current_step == 'survey':
-            context['is_last'] = not is_paid_lot(self)
 
         if self.storage.current_step == 'payment':
             context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
