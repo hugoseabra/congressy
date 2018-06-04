@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 
 from core.forms.widgets import SplitDateTimeWidget
 from gatheros_event.models import Event, Member, Organization
+from gatheros_subscription.models import LotCategory
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -80,6 +81,16 @@ class EventForm(forms.ModelForm):
             )
 
         return date_end
+
+    def save(self, commit=True):
+        instance = super().save(commit)
+        if instance.lot_categories.all().count() <= 0:
+            LotCategory.objects.create(
+                event=instance,
+                name="Geral",
+            )
+
+        return instance
 
 
 class EventEditDatesForm(forms.ModelForm):
