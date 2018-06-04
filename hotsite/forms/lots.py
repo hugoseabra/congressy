@@ -10,6 +10,7 @@ from django.forms import ModelChoiceField
 from gatheros_subscription.models import Lot
 
 
+
 class LotFormModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         if obj.price and obj.price > 0:

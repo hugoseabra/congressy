@@ -124,29 +124,44 @@ class ReceiverPublisher(object):
             # transacionado já está com o valor sem as taxas da Congressy.
             org_amount = lot.price - cgsy_amount
 
-        assert org_amount < self.amount
-        diff_amount = self.amount - org_amount
+        # Soma do montante distribuído entre as partes.
+        total_splitable_amount = round(org_amount + cgsy_amount, 2)
 
-        # A diferença que há no montante a ser transacionado irá para a
-        # Congressy, por já estar embutidas taxas e juros de parcelamento,
-        # se houver.
-        cgsy_amount += diff_amount
+        if self.amount > total_splitable_amount:
+            # A diferença que há no montante a ser transacionado irá para a
+            # Congressy, por já estar embutidas taxas e juros de parcelamento,
+            # se houver.
+            diff_amount = self.amount - total_splitable_amount
+            cgsy_amount += diff_amount
 
-        # Se o organizador assumiu juros de parcelamento, o montante a ser
-        # transacionado estará sem o valor de juros de parcelamento. Então,
-        # vamos recalcula-los.
-        free_installments = lot.num_install_interest_absortion
-        if 1 < self.installments <= free_installments:
-            interests_amount = \
-                self.installment_calculator.get_absorbed_interests_amount(
-                    amount=self.amount,
-                    installments=self.installments,
-                )
+            # Soma do montante distribuído entre as partes.
+            total_splitable_amount = org_amount + cgsy_amount
 
-            # Retira valor e juros assumido e o coloca sob competência da
-            # Congressy.
-            org_amount -= interests_amount
-            cgsy_amount += interests_amount
+            # Se o organizador assumiu juros de parcelamento, o montante a ser
+            # transacionado estará sem o valor de juros de parcelamento. Então,
+            # vamos recalcula-los.
+            free_installments = lot.num_install_interest_absortion
+            if 1 < self.installments <= free_installments:
+                interests_amount = \
+                    self.installment_calculator.get_absorbed_interests_amount(
+                        amount=self.amount,
+                        installments=self.installments,
+                    )
+
+                assert round(diff_amount, 2) == round(interests_amount, 2)
+
+                # Retira valor e juros assumido e o coloca sob competência da
+                # Congressy.
+                org_amount -= interests_amount
+                cgsy_amount += interests_amount
+
+                # Soma do montante distribuído entre as partes.
+                total_splitable_amount = org_amount + cgsy_amount
+
+        # Depois de todos os valores distribuídos, o valor entre a Congressy
+        # e organizador tem de ser de acordo com o montante a ser
+        # transacionado.
+        assert round(total_splitable_amount, 2) == round(self.amount, 2)
 
         # ==== RECEIVERS
         cgsy_receiver = receivers.CongressyReceiver(
