@@ -20,7 +20,7 @@ class Receiver(object):
     level = None
 
     def __init__(self,
-                 type,
+                 type: str,
                  id: str,
                  amount: Decimal,
                  chargeback_responsible=False,
@@ -80,8 +80,6 @@ class CongressyReceiver(Receiver):
         Cria e publica recebedores parceiros que irã participar do rateamente
         de inscrição.
         """
-        event = subscription.event
-
         # Verifica se há parceiros
         partners = subscription.event.partner_contracts.filter(
             partner__status=partner_constants.ACTIVE,
@@ -91,7 +89,6 @@ class CongressyReceiver(Receiver):
         cgsy_total_amount = self.amount
         partner_receivers = []
         for contract in partners:
-
             try:
                 id = contract.partner.bank_account.recipient_id
             except AttributeError:
@@ -101,8 +98,8 @@ class CongressyReceiver(Receiver):
                 raise Exception(
                     'O parceiro "{} (ID: {})" não possui'
                     ' "recipient_id".'.format(
-                        constract.partner.person.name,
-                        constract.partner.pk,
+                        contract.partner.person.name,
+                        contract.partner.pk,
                     )
                 )
 
@@ -113,6 +110,7 @@ class CongressyReceiver(Receiver):
             cgsy_total_amount -= partner_amount
 
             partner_receiver = ComissioningReceiver(
+                name='partner',
                 type=self.type,
                 id=id,
                 amount=partner_amount,
@@ -172,10 +170,10 @@ class ComissioningReceiver(Receiver):
     def __init__(self, parent_receiver, name, *args, **kwargs):
 
         self.parent_receiver = parent_receiver
+        self.name = name
 
         super().__init__(*args, **kwargs)
 
-        self.parent_receiver.percent -= self.percent
         self.parent_receiver.amount -= self.amount
 
     def __iter__(self):
