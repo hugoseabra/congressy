@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -14,7 +16,6 @@ from addon.models import SubscriptionService
 from gatheros_event.models import Event, Person
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
-from hotsite.forms import DebtAlreadyPaid
 from mailer.services import (
     notify_new_free_subscription,
     notify_new_user_and_free_subscription,
@@ -93,7 +94,6 @@ def can_process_payment(wizard):
         # NO caso de cartão de crédito, pode haver um delay no processamento
         if transaction.status == Transaction.PROCESSING and is_cc:
             has_card_waiting = True
-
 
     deny_payment = has_card_waiting is True and has_card_waiting is True
 
@@ -247,7 +247,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                    self.storage.current_step is not None):
+                self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
