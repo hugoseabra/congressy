@@ -72,11 +72,11 @@ class Info(models.Model, GatherosModelMixin):
         verbose_name='imagem principal',
         variations={'default': (480, 638), 'thumbnail': (200, 266, True)},
         validators=[MinSizeValidator(480, 638), MaxSizeValidator(1400, 1861)],
-        help_text="Banner do evento, mínimo de: 480px largura x "
-                  "640px altura.(png/jpg) " 
-                  "<a  target='_blank'"
-                  "href='http://via.placeholder.com/480x638'>Exemplo"
-                  "</a>"
+        help_text="Banner do evento, mínimo de: 480px largura x"
+                  " 640px altura.(png/jpg)" 
+                  " <a target='_blank'"
+                  " href='http://via.placeholder.com/480x638'>Exemplo"
+                  " </a>"
     )
     image1 = StdImageField(
         upload_to=get_image_path,

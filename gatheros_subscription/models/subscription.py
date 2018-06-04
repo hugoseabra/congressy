@@ -133,7 +133,13 @@ class Subscription(models.Model, GatherosModelMixin):
         auto_now_add=True,
         verbose_name='modificado em'
     )
-    synchronized = models.BooleanField(default=False)
+    synchronized = models.BooleanField(default=False, editable=False,)
+
+    notified = models.BooleanField(
+        default=False,
+        editable=False,
+        help_text='Participante notificado.'
+    )
 
     congressy_percent = models.CharField(
         max_length=5,
@@ -150,6 +156,13 @@ class Subscription(models.Model, GatherosModelMixin):
         related_name='subscription',
         blank=True,
         null=True,
+    )
+
+    completed = models.BooleanField(
+        default=False,
+        verbose_name='completa',
+        help_text='Inscrições que passaram por todo o fluxo de inscrições.',
+        editable=False
     )
 
     objects = SubscriptionManager()

@@ -16,9 +16,12 @@ sleep 1
 
 docker-compose -f $BASE_DIR/bin/env/docker-compose.yml up -d
 sleep 8
+docker logs cgsy-postgres
+
 
 # Removes previous media files
 rm -rf $BASE_DIR/media/*
+rm -rf $BASE_DIR/static
 
 python $BASE_DIR/manage.py migrate
 
@@ -27,6 +30,9 @@ python $BASE_DIR/manage.py migrate
 python $BASE_DIR/manage.py loaddata 000_site_dev
 python $BASE_DIR/manage.py loaddata 001_user
 
+# survey
+python $BASE_DIR/manage.py loaddata 001_survey 002_question 003_option
+
 # gatheros_event
 python $BASE_DIR/manage.py loaddata 005_user 006_person 007_organization 008_member
 python $BASE_DIR/manage.py loaddata 009_event
@@ -34,7 +40,12 @@ python $BASE_DIR/manage.py loaddata 010_place 011_info
 python $BASE_DIR/manage.py loaddata 012_invitation
 
 # gatheros_subscription
-python $BASE_DIR/manage.py loaddata 006_lot 007_subscription
+python $BASE_DIR/manage.py loaddata 005_event_survey
+python $BASE_DIR/manage.py loaddata 006_lotcategory 007_lot 008_subscription
+
+# addon
+python $BASE_DIR/manage.py loaddata 001_optional_service_type 002_optional_product_type
+python $BASE_DIR/manage.py loaddata 003_theme 004_product 005_service
 
 # Atualizando a data dos eventos
 python $BASE_DIR/bin/env/dev/update_data.py

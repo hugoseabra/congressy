@@ -14,14 +14,14 @@ function error_msg() {
     local NC='\033[0m' # No Color
     echo ;
     echo ;
-    echo -e "${RED}$RESULT${NC}"
+    echo -e "${RED}$1{NC}"
     echo ;
     echo ;
 }
 
 docker-compose -f ./bin/env/staging/docker-compose.yml down --remove-orphans
 docker-compose -f ./bin/env/staging/docker-compose.yml up -d
-sleep 10
+sleep 20
 
 echo ;
 docker-compose -f ./bin/env/staging/docker-compose.yml logs manage

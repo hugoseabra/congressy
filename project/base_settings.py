@@ -65,6 +65,12 @@ LANGUAGES = (
     ('en-us', _('English (US)')),
     ('pt-br', _('Português')),
 )
+
+USE_THOUSAND_SEPARATOR = False
+
+FORMAT_MODULE_PATH = [
+    'project.currency_formats',
+]
 # ============================= MIDDLEWARES ================================= #
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -147,6 +153,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'project.context_processors.environment_version',
+                'frontend.context_processors.render_app_only',
             ],
             'builtins': [
                 'permission.templatetags.permissionif',
@@ -154,34 +161,6 @@ TEMPLATES = [
         },
     },
 ]
-# ============================== LOGGING ==================================== #
-# Disable
-# LOGGING_CONFIG = None
-#
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': True,
-#     'formatters': {
-#         'verbose': {
-#             'format': '%(levelname)s %(asctime)s %(module)s '
-#                       '%(process)d %(thread)d %(message)s'
-#         },
-#     },
-#     'handlers': {
-#         'console': {
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'verbose'
-#         }
-#     },
-#     'loggers': {
-#         'django.db.backends': {
-#             'level': 'ERROR',
-#             'handlers': ['console'],
-#             'propagate': False,
-#         },
-#     },
-# }
 # ============================== FIXTURES =================================== #
 FIXTURE_DIRS = [
     os.path.join(BASE_DIR, 'fixtures'),

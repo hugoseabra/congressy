@@ -4,7 +4,7 @@ Django Admin para Payments
 """
 from django.contrib import admin
 
-from .models import Transaction, TransactionStatus, BankAccount
+from .models import BankAccount, Transaction, TransactionStatus
 
 
 @admin.register(Transaction)
@@ -22,9 +22,8 @@ class TransactionAdmin(admin.ModelAdmin):
         'type',
         'date_created',
         'liquid_amount',
-        'amount'
+        'amount',
     )
-
 
 @admin.register(TransactionStatus)
 class TransactionStatusAdmin(admin.ModelAdmin):

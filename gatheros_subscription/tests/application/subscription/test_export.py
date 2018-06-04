@@ -21,8 +21,8 @@ class BaseExportViewTest(TestCase):
         '009_place',
         '010_event',
         '003_form',
-        '006_lot',
-        '007_subscription',
+        '007_lot',
+        '008_subscription',
     ]
 
     def setUp(self):
@@ -163,8 +163,8 @@ class ExportHelperTest(BaseExportViewTest):
         '008_member',
         '009_place',
         '010_event',
-        '006_lot',
-        '007_subscription',
+        '007_lot',
+        '008_subscription',
         '008_answer',
         '008_answer',
 
@@ -173,8 +173,8 @@ class ExportHelperTest(BaseExportViewTest):
         '003_form',
         '004_field',
         '005_field_option',
-        '006_lot',
-        '007_subscription',
+        '007_lot',
+        '008_subscription',
         '008_answer',
     ]
 

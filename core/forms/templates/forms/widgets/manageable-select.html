@@ -1,0 +1,16 @@
+<div style="position:relative">
+<div style="position:absolute;right:0;top:-25px">
+    <button title="editar" type="button" class="btn btn-link" style="padding:0;color: #333"><i class="fas fa-pencil-alt"></i></button>
+    <button title="adicionar" type="button" class="btn btn-link" style="padding:0;color: #333"><i class="fa fa-plus"></i></button>
+    <div class="clearfix"></div>
+</div>
+<select name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+    {% for group_name, group_choices, group_index in widget.optgroups %}
+        {% if group_name %}
+            <optgroup label="{{ group_name }}">{% endif %}
+    {% for option in group_choices %}
+        {% include option.template_name with widget=option %}{% endfor %}
+    {% if group_name %}
+        </optgroup>{% endif %}{% endfor %}
+</select>
+</div>

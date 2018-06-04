@@ -7,26 +7,25 @@
 
 {% else %}
 
-    <div class="form-group">
-
-        {{ label_tag|safe|capfirst }}
-        {% if  required  or required == 'True' %}
-            <small style="color:#C9302C">*</small>
-        {% endif %}
-        {% if help_text and 'textarea' in field.field.widget.template_name %}
-            <div style="margin-bottom: 3px">
-                <small class="text-muted help-text">
-                    {{ help_text|safe }}
-                </small>
-            </div>
+    <div class="form-group"
+         {% if hide is True %}style="display:none"{% endif %}>
+        {% if field.label %}
+            <label for="{{ field.id_for_label }}">
+                {{ field.label|safe|capfirst }}
+                {% if  required  or required == 'True' %}
+                    <span style="color:#C9302C">*</span>
+                {% endif %}
+            </label>
         {% endif %}
 
-        <div
-                {% if field.field.widget.input_type == "checkbox" or field.field.widget.input_type == "radio" %}
-                    class="row"
-                    {% elif field.field.widget.input_type == "file" %}
-                    class="row" style="margin-left: 15px"
-                {% endif %}>
+        {% if help_text and 'textarea' not in field.field.widget.template_name %}
+            <small>
+                <i class="fas fa-question-circle" data-toggle="tooltip"
+                   data-placement="right" title="{{ help_text|safe }}"></i>
+            </small>
+        {% endif %}
+
+        <div {% if field.field.widget.input_type == "checkbox" or field.field.widget.input_type == "radio" %}class="row"{% endif %}>
 
             {% if autofocus %}
 
@@ -66,14 +65,6 @@
 
             {% endif %}
 
-
-            {% if help_text and 'textarea' not in field.field.widget.template_name %}
-                <div>
-                    <small class="text-muted help-text">
-                        {{ help_text|safe }}
-                    </small>
-                </div>
-            {% endif %}
             {% if errors %}
                 {% render_field_errors errors %}
             {% endif %}

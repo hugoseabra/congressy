@@ -2,3 +2,4 @@
     <div class="input-group-addon">{% if lang == 'pt-br' %}R${% else %}${% endif %}</div>
     <input class="form-control" type="tel" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value }}"{% endif %}{% include "django/forms/widgets/attrs.html" %} />
 </div>
+

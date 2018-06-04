@@ -2,6 +2,7 @@
 gatheros_subscription templatetags
 """
 from django import template
+from gatheros_subscription.models import Subscription
 
 register = template.Library()
 
@@ -29,3 +30,28 @@ def is_filter_selected(context, filter_name, value):
 
     # All request's querystring data comes as string
     return str(value) in filter_values
+
+
+@register.simple_tag
+def event_count_completed_subscriptions(event):
+    return Subscription.objects.filter(
+        lot__event=event,
+        completed=True,
+        status__in=[
+            Subscription.CONFIRMED_STATUS,
+            Subscription.AWAITING_STATUS
+        ],
+    ).count()
+
+
+@register.simple_tag
+def lot_count_completed_subscriptions(lot):
+    return Subscription.objects.filter(
+        lot=lot,
+        completed=True,
+        status__in=[
+            Subscription.CONFIRMED_STATUS,
+            Subscription.AWAITING_STATUS
+        ],
+    ).count()
+

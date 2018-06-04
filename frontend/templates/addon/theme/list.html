@@ -1,0 +1,168 @@
+{% extends "base/base.html" %}
+{# @TODO Change the icons in nav_aside_itens  #}
+{% load static %}
+{% load event_tags %}
+{% load subscription_tags %}
+
+{% block title %} Temas de Atividades Extras | Congressy{% endblock %}
+
+{% block page_title %}Temas de Atividades Extras{% endblock %}
+
+{% block page_sub_title %}
+    {{ event.name }}
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet"
+          href="{% static 'assets/plugins/dataTables/css/dataTables.css' %}">
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'assets/plugins/dataTables/js/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'assets/plugins/dataTables/js/dataTables.bootstrap.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#category_table').DataTable({
+                "language": {
+                    sEmptyTable: "Nenhum registro encontrado",
+                    sInfo: "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                    sInfoEmpty: "Mostrando 0 até 0 de 0 registros",
+                    sInfoFiltered: "(Filtrados de _MAX_ registros)",
+                    sInfoPostFix: "",
+                    sInfoThousands: ".",
+                    sLengthMenu: "_MENU_ resultados por página",
+                    sLoadingRecords: "Carregando...",
+                    sProcessing: "Processando...",
+                    sZeroRecords: "Nenhum registro encontrado",
+                    sSearch: "Pesquisar",
+                    oPaginate: {
+                        sNext: "Próximo",
+                        sPrevious: "Anterior",
+                        sFirst: "Primeiro",
+                        sLast: "Último"
+                    },
+                    oAria: {
+                        sSortAscending: ": Ordenar colunas de forma ascendente",
+                        sSortDescending: ": Ordenar colunas de forma descendente"
+                    }
+                },
+                "columnDefs": [
+                    // Disable sort in first, last column
+                    {
+                        "searchable": false,
+                        "orderable": false,
+                        "width": "3%",
+                        "className": "text-center",
+                        "targets": [-1]
+                    },
+                    {
+                        "targets": 0,
+                        "className": "nowrap",
+                        "orderable": false
+                    },
+                    {
+                        "targets": 1,
+                        "width": "3%",
+                        "className": "text-center",
+                        "searchable": false,
+                        "orderable": false
+                    }
+                ]
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    {% include 'addon/optional/includes/side-menu.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="buttonbar">
+                <div class="float-left">
+                    <a href="{% url 'addon:optional-service-list' event.pk %}"
+                       class="btn btn-primary">
+                        <i class="fas fa-angle-left"></i>
+                        Atividades Extras
+                    </a>
+                </div>
+                <div class="float-right">
+                    <a href="{% url 'addon:theme-add' event.pk %}"
+                       class="btn btn-success">
+                        <i class="fa fa-plus"></i>
+                        Adicionar
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    {% if object_list %}
+                        <table id="category_table"
+                               class="table table-striped table-bordered dataTable no-footer nowrap"
+                               cellspacing="0"
+                               width="100%">
+                            <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Limite</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for item in object_list %}
+                            <tr>
+                            <td>
+                                <a href="{% url 'addon:theme-edit' event.pk item.pk %}">{{ item.name }}</a>
+                            </td>
+                            <td>
+                                {{ item.limit }}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary btn-trans btn-sm dropdown-toggle"
+                                        data-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <span class="fas fa-cog"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right"
+                                        role="menu">
+                                        <li>
+                                            <a href=" {% url 'addon:theme-edit' event.pk item.pk %}">
+                                                <i class="fas fa-pencil-alt"></i>
+                                                Editar
+                                            </a>
+                                        </li>
+                                        {% if item.is_deletable %}
+                                        <li>
+                                            <a href="{% url 'addon:theme-delete' event.pk item.pk %}">
+                                                <i class="fas fa-trash-alt"></i>
+                                                Excluir
+                                            </a>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h3>Nenhum dado.</h3>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

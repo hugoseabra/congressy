@@ -96,7 +96,8 @@ pipeline:
       sentry_private_dsn
     ]
     commands:
-      - echo "AWS_KEY=$${AWS_KEY}" > ./bin/env/staging/env-manage-staging
+      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.staging" > ./bin/env/staging/env-manage-staging
+      - echo "AWS_KEY=$${AWS_KEY}" >> ./bin/env/staging/env-manage-staging
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ./bin/env/staging/env-manage-staging
       - echo "DOMAIN=$${DOMAIN_STAGING}" >> ./bin/env/staging/env-manage-staging
       - echo "FORCE_HTTPS=$${FORCE_HTTPS_STAGING}" >> ./bin/env/staging/env-manage-staging
@@ -289,7 +290,7 @@ pipeline:
 
       - mkdir -p ~/cgsy
       # env-file do stack de produção - common
-      - echo "AWS_KEY=$${AWS_KEY}" > ~/cgsy/env-file
+      - echo "AWS_KEY=$${AWS_KEY}" >> ~/cgsy/env-file
       - echo "AWS_SECRET=$${AWS_SECRET}" >> ~/cgsy/env-file
       - echo "FORCE_HTTPS=$${FORCE_HTTPS}" >> ~/cgsy/env-file
       - echo "BUCKET_LOCATION=$${BUCKET_LOCATION}" >> ~/cgsy/env-file
@@ -302,9 +303,11 @@ pipeline:
       - echo "SENTRY_PUBLIC_DSN=$${SENTRY_PUBLIC_DSN}" >> ~/cgsy/env-file
       - echo "SENTRY_PRIVATE_DSN=$${SENTRY_PRIVATE_DSN}" >> ~/cgsy/env-file
       # env-file do stack de produção - manage
-      - echo "DOMAIN=$${DOMAIN_MANAGE}" > ~/cgsy/env-manage-file
+      - echo "DJANGO_SETTINGS_MODULE=project.manage.settings.prod" > ~/cgsy/env-manage-file
+      - echo "DOMAIN=$${DOMAIN_MANAGE}" >> ~/cgsy/env-manage-file
       # env-file do stack de produção - partner
-      - echo "DOMAIN=$${DOMAIN_PARTNER}" > ~/cgsy/env-partner-file
+      - echo "DJANGO_SETTINGS_MODULE=project.partner.settings.prod" > ~/cgsy/env-partner-file
+      - echo "DOMAIN=$${DOMAIN_PARTNER}" >> ~/cgsy/env-partner-file
     when:
       branch: [ master ]
 
