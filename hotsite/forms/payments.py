@@ -3,21 +3,27 @@
 """
 
 import json
+import logging
 from copy import copy
-LOGGER
 
 from django import forms
 from django.core import serializers
 from django.db.transaction import atomic
 
-from gatheros_subscription.models import Lot
+from payment.exception import (
+    TransactionApiError,
+    TransactionDataError,
+    TransactionError,
+    TransactionMisconfiguredError,
+)
 from payment.helpers import (
     PagarmeDataBuilder,
     payment_helpers,
 )
 from payment.tasks import create_pagarme_transaction
-from payment.exception import TransactionDataError, TransactionError
 from payment_debt.forms import Debt, DebtForm
+
+LOGGER = logging.getLogger(__name__)
 
 
 class DebtAlreadyPaid(Exception):
@@ -29,6 +35,11 @@ class DebtAlreadyPaid(Exception):
 
 
 class PaymentForm(forms.Form):
+    transaction_type = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=True,
+    )
+
     installments = forms.IntegerField(
         widget=forms.HiddenInput(),
         required=False,
@@ -42,11 +53,6 @@ class PaymentForm(forms.Form):
     card_hash = forms.CharField(
         widget=forms.HiddenInput(),
         required=False,
-    )
-
-    transaction_type = forms.CharField(
-        widget=forms.HiddenInput(),
-        required=True,
     )
 
     lot_as_json = forms.CharField(
@@ -83,6 +89,34 @@ class PaymentForm(forms.Form):
 
         self.fields['lot_as_json'].initial = lot_obj_as_json
 
+    def clean_transaction_type(self):
+        transaction_type = self.cleaned_data['transaction_type']
+
+        boleto_allowed = payment_helpers.is_boleto_allowed(
+            self.subscription.event
+        )
+        if transaction_type == 'boleto' and boleto_allowed is False:
+            raise forms.ValidationError(
+                'Transação com boleto não é permitida.'
+            )
+
+        return transaction_type
+
+    def clean_installments(self):
+        installments = self.cleaned_data['installments']
+        if not installments or int(installments) <= 1:
+            return 1
+
+        return int(installments)
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        return payment_helpers.amount_as_decimal(amount)
+
+    def clean_card_hash(self):
+        card_hash = self.cleaned_data['card_hash']
+        return card_hash or None
+
     def clean(self):
         cleaned_data = super().clean()
 
@@ -92,12 +126,6 @@ class PaymentForm(forms.Form):
                 ' gratuitas.'
             )
 
-        installments = int(cleaned_data['amount'])
-        if not installments:
-            cleaned_data['amount'] = 1
-
-        cleaned_data['card_hash'] = cleaned_data['card_hash'] or None
-
         if not self.subscription_debt_form.is_valid():
             error_msgs = []
             for field, errs in self.subscription_debt_form.errors.items():
@@ -105,16 +133,6 @@ class PaymentForm(forms.Form):
 
             raise forms.ValidationError(
                 'Dados de pendência inválidos: {}'.format("".join(error_msgs))
-            )
-
-        transaction_type = self.cleaned_data.get('transaction_type')
-        boleto_allowed = payment_helpers.is_boleto_allowed(
-            self.subscription.event
-        )
-
-        if transaction_type == 'boleto' and boleto_allowed is False:
-            raise forms.ValidationError(
-                'Transação com boleto não é permitida.'
             )
 
         return cleaned_data
@@ -128,21 +146,63 @@ class PaymentForm(forms.Form):
 
             try:
                 # Construção de dados para transaçao do Pagarme
-                builder = PagarmeDataBuilder(subscription=self.subscription,
-                    # transaction_type=self.cleaned_data.get('transaction_type'),
-                    # card_hash=self.cleaned_data.get('card_hash') or None,
-                )
-
-            except TransactionDataError as e:
-
-                raise TransactionError()
+                builder = PagarmeDataBuilder(subscription=self.subscription)
 
                 # Cria transação.
                 create_pagarme_transaction(
-                    transaction_id=builder.transaction_id,
                     debt=debt,
-                    data=builder.build()
+                    data=builder.build(
+                        amount=self.cleaned_data.get('amount'),
+                        transaction_type=self.cleaned_data.get(
+                            'transaction_type'
+                        ),
+                        installments=self.cleaned_data.get('installments'),
+                        card_hash=self.cleaned_data.get('card_hash'),
+                    )
                 )
+
+            except TransactionDataError as e:
+                LOGGER.error(
+                    'Um erro aconteceu enquanto se tentava construir os dados'
+                    ' de uma transação. Detalhes: {}'.format(e)
+                )
+                raise TransactionError(
+                    'Erro interno ao realizar transação. A equipe técnica já'
+                    ' foi informa e este erro será resolvido dentro de alguns'
+                    ' minutos.'
+                )
+
+            except TransactionMisconfiguredError as e:
+                LOGGER.warning(
+                    'O evento "{}" não pode realizar transações não pode'
+                    ' completar uma transação para a inscrição "{}".'
+                    ' Detalhes: {}'.format(
+                        '{} ({})'.format(
+                            self.subscription.event.name,
+                            self.subscription.event.pk,
+                        ),
+                        '{} ({})'.format(
+                            self.subscription.person.name,
+                            self.subscription.pk,
+                        ),
+                        str(e)
+                    )
+                )
+                raise TransactionError(
+                    'O evento não pode realizar transações. Por favor,'
+                    ' entre em contato com o organizador do evento informando'
+                    ' sobre o ocorrido.'
+                )
+
+            except TransactionApiError as e:
+                LOGGER.error(
+                    'Um erro aconteceu enquanto se tentava realizar uma'
+                    ' transação. Detalhes: {}'.format(e)
+                )
+                raise TransactionError(str(e))
+
+            except TransactionError as e:
+                raise e
 
     def _create_subscription_debt_form(self):
         """ Cria formulário de pendência financeira. """

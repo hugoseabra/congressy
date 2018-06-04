@@ -73,6 +73,32 @@ def is_paid_lot(wizard):
     return False
 
 
+def can_process_payment(wizard):
+    """ Verifica se pagamento pode ser processado no wizard. """
+    subscription = wizard.get_subscription()
+
+    has_boleto_waiting = False
+    has_card_waiting = False
+    for transaction in subscription.transactions.all():
+        is_cc = transaction.type == Transaction.CREDIT_CARD
+        is_boleto = transaction.type == Transaction.BOLETO
+        if transaction.status == Transaction.WAITING_PAYMENT:
+            if is_boleto_allowed():
+                has_boleto_waiting = True
+
+            if is_cc:
+                has_card_waiting = True
+
+        # NO caso de cartão de crédito, pode haver um delay no processamento
+        if transaction.status == Transaction.PROCESSING and is_cc:
+            has_card_waiting = True
+
+
+    deny_payment = has_card_waiting is True and has_card_waiting is True
+
+    return deny_payment is False
+
+
 def has_survey(wizard):
     """ Return true if user opts for a lot with survey"""
 
@@ -133,7 +159,7 @@ class SubscriptionWizardView(SessionWizardView):
     condition_dict = {
         'private_lot': is_private_event,
         'lot': is_not_private_event,
-        'payment': is_paid_lot,
+        'payment': is_paid_lot and can_process_payment,
         'survey': has_survey,
         'service': has_services,
         'product': has_products,
@@ -319,7 +345,6 @@ class SubscriptionWizardView(SessionWizardView):
             lot_pk = None
             if isinstance(form, forms.PrivateLotForm):
                 lot_pk = form_data.get('private_lot-lots')
-                self.request.session['lot'] = lot_pk
 
             elif isinstance(form, forms.LotsForm):
                 lot_pk = form_data.get('lot-lots')
@@ -435,7 +460,7 @@ class SubscriptionWizardView(SessionWizardView):
                 config.address = config.ADDRESS_SHOW
 
             context['config'] = config
-            context['is_last'] = not is_paid_lot(self) and not has_survey(self)
+            context['is_last'] = self.steps.last
 
         if self.storage.current_step == 'survey':
             context['is_last'] = not is_paid_lot(self)
@@ -556,7 +581,6 @@ class SubscriptionWizardView(SessionWizardView):
                     'Algum erro ocorreu: {}'.format(e)
                 )
 
-
     def clear_string(self, field_name, data):
         if data and field_name in data:
 
@@ -638,9 +662,13 @@ class SubscriptionWizardView(SessionWizardView):
         del self.request.session['exhibition_code']
 
     def clear_session(self):
+        def remove_session_key(key):
+            if key in self.request.session:
+                del self.request.session[key]
+
         self.clear_session_exhibition_code()
-        del self.request.session['lot_pk']
-        del self.request.session['has_private_subscription']
+        remove_session_key('has_private_subscription')
+        remove_session_key('lot_pk')
 
     def get_person_from_session(self):
         if not self.person:
