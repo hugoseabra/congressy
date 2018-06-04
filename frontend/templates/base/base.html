@@ -92,7 +92,7 @@
 </head>
 <body>
 
-<section id="main-wrapper" class="theme-cgsy-full {% if apponly %}app-only{% endif %} {% if notitle %}no-app-title{% endif %}">
+<section id="main-wrapper" class="theme-cgsy-full {% if apponly %}app-only{% endif %} {% if notitle %}no-app-title{% endif %} tooltip-wrapper">
     <header id="header">
 
         <!--logo start-->
@@ -308,10 +308,6 @@
     $(document).ready(function () {
         $('.cgsy-date-input').mask("99/99/9999");
         $('.cgsy-time-input').mask("99:99");
-
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        });
     });
 
     $(function () {
