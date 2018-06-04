@@ -9,6 +9,7 @@ INSTALLED_APPS += [
     'gatheros_subscription',
     'payment_debt',
     'payment',
+    'payment_debt',
     'mailer',
     'partner',
     'survey',
