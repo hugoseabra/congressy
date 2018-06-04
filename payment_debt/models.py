@@ -45,6 +45,10 @@ class Debt(models.Model):
         (DEBT_STATUS_CREDIT, 'com crédito'),
     )
 
+    name = models.CharField(max_length=255, verbose_name='nome',)
+    item_id = models.CharField(
+        max_length=255, verbose_name='id do item',)
+
     subscription = models.ForeignKey(
         Subscription,
         on_delete=models.CASCADE,

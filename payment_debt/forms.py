@@ -10,6 +10,8 @@ class DebtForm(forms.ModelForm):
     class Meta:
         model = Debt
         fields = (
+            'name',
+            'item_id',
             'type',
             'status',
             'installments',
@@ -21,12 +23,12 @@ class DebtForm(forms.ModelForm):
 
         # O valor líquido é quanto o organizador irá receber, que pode variar
         # de acordo com a configuração do lote da inscrição.
-        self.liquid_amount = None
+        self.liquid_amount = Decimal(0)
 
         # montante a ser pago originalmente. O montante vindo de 'data' pode
         # não ser o mesmo. Se houver parcelamento, a diferença são dos juros
         # de parcelamento. Se não houver, o formulári deve ser invalidado.
-        self.original_amount = None
+        self.original_amount = Decimal(0)
 
         # Montante a ser pego por parcela;
         self.installment_amount = Decimal(0)
@@ -46,7 +48,16 @@ class DebtForm(forms.ModelForm):
             )
 
         # Calcula valor líquido.
-        self._set_lot_amounts()
+        debt_type = cleaned_data.get('type', Debt.DEBT_TYPE_SUBSCRIPTION)
+        if debt_type == Debt.DEBT_TYPE_SUBSCRIPTION:
+            self._set_lot_amounts()
+
+        elif debt_type == Debt.DEBT_TYPE_SERVICE:
+            self._set_service_amounts()
+
+        elif debt_type == Debt.DEBT_TYPE_PRODUCT:
+            self._set_product_amounts()
+
         self._set_installments_amount()
         self._set_installment_interests_amount()
 
@@ -96,6 +107,28 @@ class DebtForm(forms.ModelForm):
             # original de 'price'.
             self.original_amount = lot.price
             self.liquid_amount = round(lot.price - percent_amount, 2)
+
+    def _set_service_amounts(self):
+        """
+        Seta valores líquidos e a ser pago esperados de acordo com a
+        configuração do lote.
+        """
+        for service in self.subscription.subscription_services.all():
+            self.liquid_amount += service.optional.liquid_price
+            self.original_amount += service.optional.price
+
+    def _set_product_amounts(self):
+        """
+        Seta valores líquidos e a ser pago esperados de acordo com a
+        configuração do lote.
+        """
+        for product in self.subscription.subscription_products.all():
+            self.liquid_amount += product.optional.liquid_price
+            self.original_amount += product.optional.price
+
+        self.liquid_amount = round(self.liquid_amount, 2)
+        self.original_amount = round(self.original_amount, 2)
+
 
     def _set_installments_amount(self):
         """ Seta montante por parcela. """
