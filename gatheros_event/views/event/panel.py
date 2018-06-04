@@ -14,6 +14,7 @@ from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from gatheros_event.views.mixins import AccountMixin
 from payment.models import Transaction, TransactionStatus
+from addon.models import OptionalProductType, OptionalServiceType
 
 
 class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
@@ -98,6 +99,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['report'] = self._get_report()
         context['full_banking'] = self._get_full_banking()
         context['number_attendances'] = self.get_number_attendances()
+        context['status_addons'] = self.get_status_addons()
         try:
             context['info'] = self.event.info
         except Info.DoesNotExist:
@@ -106,6 +108,22 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
 
         return context
 
+    def get_status_addons(self):
+        has_services = False
+        has_products = False
+        for lotcategory in self.event.lot_categories.all():
+            if lotcategory.service_optionals.count():
+                has_services = True
+
+            if lotcategory.product_optionals.count():
+                has_products = True
+
+        status_addons = {
+            'services': has_services,
+            'products': has_products
+        }
+
+        return status_addons
     def get_number_attendances(self):
         try:
             return Subscription.objects.filter(

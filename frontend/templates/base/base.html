@@ -316,14 +316,21 @@
 
     $(function () {
         var button = $("#org-button");
-        var navMain = $(".navbar-collapse"); // avoid dependency on #id
+        var navMain = $(".navbar-collapse");
         button.click(function () {
             navMain.collapse('hide');
         });
     });
+
     $(function () {
         $('#button-toggle').click(function () {
             $('#sidebar').toggle();
+        });
+    });
+
+    $(function () {
+        $('#profile-button').click(function () {
+            $('#profile-navbar').toggle();
         });
     });
 

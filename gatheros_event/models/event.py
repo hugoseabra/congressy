@@ -422,5 +422,5 @@ class Event(models.Model, GatherosModelMixin):
         return reports_dict
 
     @property
-    def has_certificate(self):
+    def has_certificate_config(self):
         return hasattr(self, 'certificate') and self.certificate is not None

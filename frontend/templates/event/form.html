@@ -209,83 +209,56 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            {% if object.has_rsvp %}
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        {% render_switchery_field form.is_scientific %}
+                                    <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                                        <div class="panel panel-primary">
+                                            <div class="panel-heading">
+                                                <div class="panel-title">
+                                                    Restrição de público
+                                                </div>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                {% render_generic_field form.rsvp_type %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% if object.has_rsvp %}
-        <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">Restrição de público</div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.rsvp_type %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                <div class="buttonbar bottom">
-                    <div class="float-right">
-                        {% if next_path %}
-                            <a href="{{ next_path|urlencode }}"
-                               class="btn btn-danger">
-                                <i class="fas fa-times-circle"></i>Cancelar</a>
-                            <input type="hidden" name="next"
-                                   value="{{ next_path }}"/>
-                        {% else %}
-                            <a href="{% url 'event:event-list' %}"
-                               class="btn btn-danger">
-                                <i class="fas fa-times-circle"></i>Cancelar</a>
-                        {% endif %}
-                                    {% if not object %}
-                                        {% if event_type != 'free' %}
+                            {% endif %}
+                            <div class="row">
+                                {% if not object %}
+                                    {% if event_type != 'free' %}
 
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    {% render_switchery_field form.has_optionals %}
-                                                </div>
-                                                <div class="col-md-6">
-                                                    {% render_switchery_field form.has_extra_activities %}
-                                                </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_optionals %}
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    {% render_switchery_field form.has_checkin %}
-                                                </div>
-                                                <div class="col-md-6">
-                                                    {% render_switchery_field form.has_certificate %}
-                                                </div>
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_extra_activities %}
                                             </div>
-                                        {% endif %}
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_checkin %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_certificate %}
+                                            </div>
+                                        </div>
                                     {% endif %}
-                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                     <div class="buttonbar bottom">
                         <div class="float-right">
                             {% if next_path %}
@@ -310,8 +283,10 @@
                         </div>
                         <div class="clearfix"></div>
                     </div>
+
                 </div>
             </div>
+
         </form>
     {% endif %}
 
