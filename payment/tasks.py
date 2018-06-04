@@ -11,7 +11,7 @@ from mailer.tasks import send_mail
 from payment.exception import (
     OrganizerRecipientError,
     RecipientError,
-    TransactionError,
+    TransactionApiError,
 )
 from payment.models import Transaction, TransactionStatus
 
@@ -26,21 +26,24 @@ def __notify_error(message, extra_data=None):
 
 
 # @TODO create a mock of the response to use during testing
-def create_pagarme_transaction(transaction_id, debt, data):
+def create_pagarme_transaction(debt, data):
     try:
         trx = pagarme.transaction.create(data)
     except Exception as e:
-        errors = [errors for errors in e.args][0]
         errors_msg = []
-        for error in errors:
-            errors_msg.append('{}: {}'.format(
-                error.get('parameter_name'),
-                error.get('message'),
-            ))
+        if hasattr(e, 'args'):
+            errors = [errs for errs in e.args]
+            for error in errors[0]:
+                errors_msg.append('{}: {}'.format(
+                    error.get('parameter_name'),
+                    error.get('message'),
+                ))
+        else:
+            errors_msg.append(e)
 
         msg = 'Pagar.me: erro de transação: {}'.format(";".join(errors_msg))
         __notify_error(message=msg, extra_data=data)
-        raise TransactionError(
+        raise TransactionApiError(
             'Algo deu errado com a comunicação com o provedor de pagamento.'
         )
 
@@ -59,7 +62,7 @@ def create_pagarme_transaction(transaction_id, debt, data):
         installments = int(trx['installments'])
 
         transaction = Transaction(
-            uuid=transaction_id,
+            uuid=data['transaction_id'],
             subscription=subscription,
             data=trx,
             status=trx['status'],

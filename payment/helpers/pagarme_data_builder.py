@@ -5,7 +5,10 @@ from decimal import Decimal
 import absoluteuri
 from django.conf import settings
 
-from payment.exception import TransactionDataError
+from payment.exception import (
+    TransactionDataError,
+    TransactionMisconfiguredError,
+)
 from payment.helpers.calculator import Calculator
 from payment.helpers.payment_helpers import (
     amount_as_decimal,
@@ -85,7 +88,7 @@ class PagarmeDataBuilder:
         self._check_transaction_type(transaction_type, card_hash)
         self._check_debts(amount, installments)
 
-        transaction_id = uuid.uuid4()
+        transaction_id = str(uuid.uuid4())
 
         postback_url = absoluteuri.reverse(
             'api:payment:payment_postback_url',
@@ -119,7 +122,7 @@ class PagarmeDataBuilder:
             'documents': [
                 {
                     'type': 'cpf',
-                    'number': person.cpf,
+                    'number': self.clear_string(person.cpf),
                 }
             ],
             'phone_numbers': [self.clear_string(person.get_phone_display())],

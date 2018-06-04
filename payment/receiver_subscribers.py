@@ -141,7 +141,7 @@ class ReceiverPublisher(object):
             # transacionado estará sem o valor de juros de parcelamento. Então,
             # vamos recalcula-los.
             free_installments = lot.num_install_interest_absortion
-            if 1 < self.installments <= free_installments:
+            if 1 < int(self.installments) <= int(free_installments):
                 interests_amount = \
                     self.installment_calculator.get_absorbed_interests_amount(
                         amount=self.amount,
