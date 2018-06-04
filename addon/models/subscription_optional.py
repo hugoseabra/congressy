@@ -27,13 +27,6 @@ class AbstractSubscriptionOptional(EntityMixin, models.Model):
         abstract = True
         ordering = ('subscription__event',)
 
-    subscription = models.ForeignKey(
-        Subscription,
-        on_delete=models.CASCADE,
-        related_name='%(class)s',
-        verbose_name='inscrição',
-    )
-
     created = models.DateTimeField(
         auto_now_add=True,
         verbose_name="data de criação",
@@ -66,6 +59,13 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
         verbose_name_plural = 'inscrições de opcional de produto'
         verbose_name = 'inscrição de opcional de produto'
 
+    subscription = models.ForeignKey(
+        Subscription,
+        on_delete=models.CASCADE,
+        related_name='subscription_products',
+        verbose_name='inscrição',
+    )
+
     optional = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
@@ -95,6 +95,13 @@ class SubscriptionService(AbstractSubscriptionOptional):
     class Meta(AbstractSubscriptionOptional.Meta):
         verbose_name_plural = 'inscrições de opcional de serviço'
         verbose_name = 'inscrição de opcional de serviço'
+
+    subscription = models.ForeignKey(
+        Subscription,
+        on_delete=models.CASCADE,
+        related_name='subscription_services',
+        verbose_name='inscrição',
+    )
 
     optional = models.ForeignKey(
         Service,
@@ -128,7 +135,7 @@ class SubscriptionService(AbstractSubscriptionOptional):
             start = sub_optional.optional.schedule_start
             stop = sub_optional.optional.schedule_end
             is_sub_restricted = \
-                sub_optional.optional.restrict_unique 
+                sub_optional.optional.restrict_unique
 
             session_range = DateTimeRange(start=start, stop=stop)
             has_conflict = (new_start in session_range or new_end in

@@ -160,7 +160,7 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         da Congressy.
         """
         if self.liquid_price is None or self.liquid_price == 0:
-            return 0
+            return Decimal(0)
 
         event = self.lot_category.event
 
