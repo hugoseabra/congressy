@@ -12,7 +12,6 @@ from django.utils.translation import ugettext as _
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
-from addon.models import SubscriptionService
 from gatheros_event.models import Event, Person
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
@@ -95,7 +94,7 @@ def can_process_payment(wizard):
         if transaction.status == Transaction.PROCESSING and is_cc:
             has_card_waiting = True
 
-    deny_payment = has_card_waiting is True and has_card_waiting is True
+    deny_payment = has_card_waiting is True and has_boleto_waiting is True
 
     return deny_payment is False
 
@@ -488,10 +487,6 @@ class SubscriptionWizardView(SessionWizardView):
 
             products = [x for x in subscription.subscription_products.all()]
             context['products'] = products
-
-            services_queryset = SubscriptionService.objects.filter(
-                subscription=subscription
-            )
 
             services = [x for x in subscription.subscription_services.all()]
             context['services'] = services
