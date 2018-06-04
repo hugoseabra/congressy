@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'captcha',
     'wkhtmltopdf',
     'formtools',
+    'bootstrap_datepicker_plus',
+
 
     # KANU_APPS
     'kanu_locations',

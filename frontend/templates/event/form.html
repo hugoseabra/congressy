@@ -60,16 +60,16 @@
                             Gratuito</h3>
                     </div>
                     <div class="panel-body" style="text-align: center">
-                        <img class="type-image" style="width: 50%; height:
-                    30%;" src=
-                                "{% static "assets/img/free-event.svg" %}"
+                        <img class="type-image" style="width: 150px; height:
+                    150px;" src=
+                                "{% static "assets/img/free-event.png" %}"
                         />
                     </div>
-                    <div class="panel-footer">
-                        <a> Seu evento é com inscrição gratuita.<br/>
+                    <div id="free-footer" class="panel-footer">
+                        <h3> Seu evento é com inscrição gratuita.<br/>
                             Não há pagamentos, nem gestão de recursos
                             avançados.
-                        </a>
+                        </h3>
                     </div>
                     <i class="overlay far fa-check-circle fa-10x"
                     ></i>
@@ -84,20 +84,21 @@
                             Pago</h1>
                     </div>
                     <div class="panel-body" style="text-align: center">
-                        <img style="width: 50%; height: 30%;"
+                        <img style="width: 150px; height:
+                    150px;"
                              class="type-image"
                              src=
-                                     "{% static "assets/img/paid-event.svg" %}"
+                                     "{% static "assets/img/paid-event.png" %}"
                         />
                     </div>
-                    <div class="panel-footer">
-                        <a> Seu evento é com inscrição paga.<br/>
-                            Poderá gerenciar vagas de atividades extras
+                    <div id="paid-footer" class="panel-footer">
+                        <h3> Seu evento é com inscrição paga.<br/>
+                            -Poderá gerenciar vagas de atividades extras
                             (workshops, minicursos).<br/>
-                            Poderá vender opcionais (hospedagem, alimentação e
+                            -Poderá vender opcionais (hospedagem, alimentação e
                             outros).<br/>
-                            Módulo de Check-in e Credenciamento.<br/>
-                        </a>
+                            -Módulo de Check-in e Credenciamento.<br/>
+                        </h3>
                     </div>
                     <i class="overlay far fa-check-circle fa-10x"
                     ></i>
@@ -114,21 +115,24 @@
                             Científico</h3>
                     </div>
                     <div class="panel-body" style="text-align: center">
-                        <img style="width: 50%; height: 30%;"
+                        <img style="width: 150px; height:
+                    150px;"
                              class="type-image" src=
-                                     "{% static "assets/img/scientific-event.svg" %}"
+                                     "
+{% static "assets/img/scientific-event.png" %}"
                         />
 
                     </div>
-                    <div class="panel-footer">
-                        <a> Seu evento é científico com inscrição paga.<br/>
-                            Poderá gerenciar vagas de atividades extras
+                    <div id="scientific-footer" class="panel-footer">
+                        <h3> Seu evento é científico com inscrição paga.<br/>
+                            - Poderá gerenciar vagas de atividades extras
                             (workshops, minicursos).<br/>
-                            Poderá vender opcionais (hospedagem, alimentação e
+                            - Poderá vender opcionais (hospedagem,
+                            alimentação e
                             outros).<br/>
-                            Módulo de Check-in e Credenciamento.<br/>
-                            Módulo de Submissão.<br/>
-                        </a>
+                            - Módulo de Check-in e Credenciamento.<br/>
+                            - Módulo de submissão de artigos Científicos.<br/>
+                        </h3>
                     </div>
                     <i class="overlay far fa-check-circle fa-10x"
                     ></i>
@@ -299,6 +303,14 @@
                     });
                     $('.type_event:hover > .overlay').toggleClass('active');
                 });
+
+                function resizePanel() {
+                    var bigFooter = $('#scientific-footer').height();
+                    $('#free-footer').height(bigFooter);
+                    $('#paid-footer').height(bigFooter);
+                }
+
+                resizePanel();
             });
         })(jQuery);
     </script>
@@ -309,9 +321,10 @@
           href="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.min.css" %}">
 
     <style>
-        .panel > .panel-footer{
+        .panel > .panel-footer {
             text-transform: none;
         }
+
         .type_event {
             cursor: pointer;
         }
@@ -332,9 +345,15 @@
             display: block;
         }
 
-        #gmap {
-            width: 100%;
-            height: 300px;
+        .col-md-4 > .panel-primary > .panel-heading {
+            background-color: #1f7bb6;
+            border-color: #1f7bb6;
         }
+
+        .panel-footer {
+            background-color: #fff;
+            border-color: #fff;
+        }
+
     </style>
 {% endblock %}
