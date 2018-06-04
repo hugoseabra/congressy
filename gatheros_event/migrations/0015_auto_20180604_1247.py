@@ -53,4 +53,10 @@ class Migration(migrations.Migration):
             name='date_start',
             field=models.DateTimeField(verbose_name='data de início do evento'),
         ),
+        migrations.AlterField(
+            model_name='event',
+            name='name',
+            field=models.CharField(max_length=255,
+                                   verbose_name='Nome do evento'),
+        ),
     ]
