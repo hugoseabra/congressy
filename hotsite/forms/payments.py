@@ -3,6 +3,7 @@
 """
 
 import json
+from copy import copy
 LOGGER
 
 from django import forms
@@ -67,7 +68,7 @@ class PaymentForm(forms.Form):
 
         self.subscription_debt_form = self._create_subscription_debt_form()
 
-        lot = self.lot_instance
+        lot = copy(self.lot_instance)
         lot.price = lot.get_calculated_price()
 
         lot_obj_as_json = serializers.serialize('json', [lot, ])

@@ -265,7 +265,7 @@ class Lot(models.Model, GatherosModelMixin):
 
             return content.format(
                 self.name,
-                self.display_price,
+                localize(self.get_calculated_price()),
                 self.places_remaining
             )
 
@@ -416,7 +416,7 @@ class Lot(models.Model, GatherosModelMixin):
         Resgata o valor calculado do preço do lote de acordo com as regras
         da Congressy.
         """
-        if self.price is None:
+        if not self.price:
             return Decimal(0.00)
 
         minimum = Decimal(settings.CONGRESSY_MINIMUM_AMOUNT)
@@ -427,9 +427,7 @@ class Lot(models.Model, GatherosModelMixin):
         if congressy_amount < minimum:
             congressy_amount = minimum
 
-        price = self.price
-
         if self.transfer_tax is True:
-            price += congressy_amount
+            return round(self.price + congressy_amount, 2)
 
-        return round(price, 2)
+        return round(self.price, 2)

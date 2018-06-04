@@ -578,11 +578,7 @@ class SubscriptionWizardView(SessionWizardView):
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
         for lot in self.event.lots.all():
-            price = lot.price
-            if price is None:
-                continue
-
-            if lot.price > 0:
+            if lot.price and lot.price > 0:
                 return True
 
         return False
