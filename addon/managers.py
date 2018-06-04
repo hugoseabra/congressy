@@ -51,19 +51,9 @@ class ProductManager(managers.Manager):
 
     def __init__(self, **kwargs):
         initial = kwargs.get('initial', {})
-        instance = kwargs.get('instance')
-
-        if not instance:
-            if initial.get('release_days') is None:
-                initial.update({'release_days': MINIMUM_RELEASE_DAYS})
-                kwargs.update({'initial': initial})
-
-            data = kwargs.get('data')
-
-            if data:
-                data = data.copy()
-                data['published'] = True
-                kwargs['data'] = data
+        if not kwargs.get('instance') and initial.get('release_days') is None:
+            initial.update({'release_days': MINIMUM_RELEASE_DAYS})
+            kwargs.update({'initial': initial})
 
         super().__init__(**kwargs)
 
