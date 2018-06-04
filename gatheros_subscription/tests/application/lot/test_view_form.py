@@ -201,7 +201,7 @@ class LotEditTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
-        '006_lot',
+        '007_lot',
     ]
 
     def setUp(self):
@@ -392,7 +392,7 @@ class LotDeleteTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
-        '006_lot',
+        '007_lot',
     ]
 
     def setUp(self):

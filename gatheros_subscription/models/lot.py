@@ -4,6 +4,7 @@ Lotes são importantes para agrupar as inscrições de um evento, para separar
 os critérios de inscrições: se gratuitas, se limitadas, se privados, etc.
 """
 
+import locale
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -15,9 +16,11 @@ from django.utils.formats import localize
 
 from core.model import track_data
 from gatheros_event.models import Event
+from gatheros_subscription.models import LotCategory
 from gatheros_event.models.mixins import GatherosModelMixin
 from .event_survey import EventSurvey
 from .rules import lot as rule
+from django.core.exceptions import ValidationError
 
 
 class LotManager(models.Manager):
@@ -94,6 +97,15 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='evento',
         related_name='lots'
     )
+    category = models.ForeignKey(
+        LotCategory,
+        on_delete=models.PROTECT,
+        verbose_name='categoria',
+        related_name='lots',
+        null=True,
+        blank=True,
+    )
+
     date_start = models.DateTimeField(verbose_name='data inicial')
     date_end = models.DateTimeField(
         verbose_name='data final',
@@ -166,6 +178,7 @@ class Lot(models.Model, GatherosModelMixin):
         verbose_name='assumir juros de parcelas',
         help_text="Número de parcelas que deseja assumir os juros."
     )
+    # @TODO verificar campo repetido: allow_installment e allow_installments
     allow_installments = models.BooleanField(
         default=False,
         verbose_name='parcelamento',
@@ -202,13 +215,23 @@ class Lot(models.Model, GatherosModelMixin):
         null=True
     )
 
+    rsvp_restrict = models.BooleanField(
+        default=False,
+        verbose_name='restrito a associados',
+        help_text='Somente associados podem se inscrever neste lote.'
+    )
+
+    active = models.BooleanField(
+        default=True,
+        verbose_name='ativo',
+    )
+
     objects = LotManager()
 
     class Meta:
         verbose_name = 'lote'
         verbose_name_plural = 'lotes'
         ordering = ['date_start', 'date_end', 'pk', 'name']
-        unique_together = (("name", "event"),)
 
     @property
     def percent_completed(self):
@@ -235,13 +258,23 @@ class Lot(models.Model, GatherosModelMixin):
         """ Exibição pública de infomações do lote. """
 
         if self.price and self.price > 0:
-            return '{} -R$ {}'.format(
+            if self.rsvp_restrict is True:
+                content = '{} - R$ {} (para convidados)'
+            else:
+                content = '{} - R$ {}'
+
+            return content.format(
                 self.name,
                 localize(self.get_calculated_price()),
                 self.places_remaining
             )
 
-        return self.name
+        if self.rsvp_restrict is True:
+            content = '{} (para convidados)'
+        else:
+            content = '{}'
+
+        return content.format(self.name)
 
     @property
     def display_price(self):
@@ -299,20 +332,24 @@ class Lot(models.Model, GatherosModelMixin):
         self.check_rules()
         super(Lot, self).save(**kwargs)
 
-        rule.rule_10_lote_privado_deve_ter_codigo_promocional(self)
-
     def clean(self):
         """ Limpa valores dos campos. """
-        if self.private and not self.promo_code:
-            self.promo_code = Lot.objects.generate_promo_code()
+
+        if self.category and self.category.event.pk != self.event.pk:
+            raise ValidationError({'category': [
+                'A categoria do lote e o lote não estão no mesmo evento.'
+            ]})
 
     def check_rules(self):
         """ Verifica regras de negócio. """
+        if self.private and not self.exhibition_code:
+            self.exhibition_code = Lot.objects.generate_exhibition_code()
 
         rule.rule_2_mais_de_1_lote_evento_inscricao_simples(self)
         rule.rule_3_evento_inscricao_simples_nao_pode_ter_lot_externo(self)
         rule.rule_4_evento_inscricao_por_lotes_nao_ter_lot_interno(self)
         rule.rule_8_lot_interno_nao_pode_ter_preco(self)
+        rule.rule_10_lote_privado_deve_ter_codigo_de_exibicao(self)
 
     def __str__(self):
         return '{} - {}'.format(self.event.name, self.name)

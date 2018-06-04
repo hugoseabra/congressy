@@ -1,6 +1,6 @@
+import base64
 from datetime import datetime
 
-import base64
 import qrcode
 import qrcode.image.svg
 from django.conf import settings
@@ -14,8 +14,6 @@ from django.urls import reverse, reverse_lazy
 from django.utils import six
 from django.utils.decorators import classonlymethod
 from django.views import generic
-from django.db.models import Q
-
 from wkhtmltopdf.views import PDFTemplateView
 
 from core.forms.cleaners import clear_string
@@ -65,6 +63,7 @@ class EventViewMixin(TemplateNameableMixin, AccountMixin):
             config = event.formconfig
         except AttributeError:
             config = FormConfig()
+            config.event = event
 
         if self.has_paid_lots():
             config.email = True
@@ -266,7 +265,7 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
         event = self.get_event()
 
-        return query_set.filter(event=event)
+        return query_set.filter(event=event, completed=True)
 
     def get_context_data(self, **kwargs):
         cxt = super(SubscriptionListView, self).get_context_data(**kwargs)
@@ -694,7 +693,6 @@ class SubscriptionAttendanceDashboardView(EventViewMixin,
     def get_permission_denied_url(self):
         return reverse('event:event-list')
 
-
     def get_context_data(self, **kwargs):
         cxt = super().get_context_data(**kwargs)
         cxt.update({
@@ -784,6 +782,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
         return query_set.filter(
             person=person,
+            completed=True,
             # event__published=True,
         )
 
@@ -840,7 +839,7 @@ class MySubscriptionsListView(AccountMixin, generic.ListView):
 
                 for transaction in subscription.transactions.all():
                     if transaction.status == transaction.WAITING_PAYMENT and \
-                            transaction.type == 'boleto':
+                                    transaction.type == 'boleto':
                         return True
 
         return False

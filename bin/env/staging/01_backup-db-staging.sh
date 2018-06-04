@@ -24,7 +24,7 @@ function error_msg() {
     local NC='\033[0m' # No Color
     echo ;
     echo ;
-    echo -e "${RED}$RESULT${NC}"
+    echo -e "${RED}$1${NC}"
     echo ;
     echo ;
 }

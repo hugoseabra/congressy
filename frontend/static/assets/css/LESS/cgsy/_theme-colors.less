@@ -64,7 +64,7 @@
     button.sidebar-toggle, button#toggle-profile, button#toggle-fullscreen, .nav li.profile > a {
       color: #fff;
     }
-    background: @cgsyPrimary;
+    //background: @cgsyPrimary;
     button.sidebar-toggle:hover,
     button#toggle-profile:hover,
     button#toggle-fullscreen:hover {
@@ -457,5 +457,23 @@
     .cgsy-footer {
 
     }
+  }
+}
+
+.theme-cgsy-full.app-only {
+  #header, .cgsy-footer, .sidebar {
+    display: none;
+  }
+
+  .main-content-wrapper {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-left: 0 !important;
+  }
+}
+
+.theme-cgsy-full.app-only.no-app-title {
+  .pageheader {
+    display: none;
   }
 }

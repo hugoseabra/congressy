@@ -109,8 +109,19 @@ class ReceiverPublisher(object):
             getattr(settings, 'CONGRESSY_MINIMUM_AMOUNT', 0)
         )
 
+        # Mínimo aplicável apenas para inscrição.
         if minimum_amount and cgsy_amount < minimum_amount:
             cgsy_amount = minimum_amount
+
+        # Verifica se há atividades extras.
+        for service in self.subscription.subscription_services.all():
+            price_diff = service.optional_price - service.optional_liquid_price
+            cgsy_amount += price_diff
+
+        # Verifica se há opcionais.
+        for product in self.subscription.subscription_products.all():
+            price_diff = product.optional_price - product.optional_liquid_price
+            cgsy_amount += price_diff
 
         # ==== ORGANIZATION AMOUNT
         # Se houve transferência de taxas, o valor da Congressy já está
@@ -123,6 +134,14 @@ class ReceiverPublisher(object):
             # Caso, ele assumirá o valor da Congressy e o montante a ser
             # transacionado já está com o valor sem as taxas da Congressy.
             org_amount = lot.price - cgsy_amount
+
+        # Verifica se há atividades extras.
+        for service in self.subscription.subscription_services.all():
+            org_amount += service.optional_liquid_price
+
+        # Verifica se há opcionais.
+        for product in self.subscription.subscription_products.all():
+            org_amount += product.optional_liquid_price
 
         # Soma do montante distribuído entre as partes.
         total_splitable_amount = round(org_amount + cgsy_amount, 2)
@@ -141,7 +160,7 @@ class ReceiverPublisher(object):
             # transacionado estará sem o valor de juros de parcelamento. Então,
             # vamos recalcula-los.
             free_installments = lot.num_install_interest_absortion
-            if 1 < self.installments <= free_installments:
+            if 1 < int(self.installments) <= int(free_installments):
                 interests_amount = \
                     self.installment_calculator.get_absorbed_interests_amount(
                         amount=self.amount,

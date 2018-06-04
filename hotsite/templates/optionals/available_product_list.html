@@ -1,0 +1,51 @@
+{% if  object_list %}
+    <label for="products_table">Produtos</label>
+
+    <div class="table-responsive" id="products_table">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Preço</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for product in object_list %}
+                <tr>
+                    <td>{{ product.optional.name }}</td>
+                    <td>{{ product.optional.optional_type.name }}</td>
+                    <td>
+                        {% if product.optional.price == 0.00 %}
+                            Grátis
+                        {% else %}
+                            R$ {{ product.optional.price }}
+                        {% endif %}
+                    </td>
+                    {% if product.available %}
+                        <td>
+                            <button style="width: 100%"
+                                    onclick="addOptionalProduct({{ product.optional.pk }})"
+                                    class="btn btn-sm btn-success">
+                                Selecionar
+                            </button>
+                        </td>
+                    {% else %}
+                        <td>
+                            <button style="width: 100%"
+                                    disabled="disabled"
+                                    class="btn btn-sm btn-warning">
+                                Esgotado
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </button>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    Nenhum produtos/serviço disponivel.
+{% endif %}

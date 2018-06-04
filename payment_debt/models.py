@@ -8,7 +8,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from gatheros_subscription.models import Lot, Subscription
+from gatheros_subscription.models import Subscription
 
 
 class Debt(models.Model):
@@ -44,6 +44,10 @@ class Debt(models.Model):
         (DEBT_STATUS_PAID, 'pago'),
         (DEBT_STATUS_CREDIT, 'com crédito'),
     )
+
+    name = models.CharField(max_length=255, verbose_name='nome',)
+    item_id = models.CharField(
+        max_length=255, verbose_name='id do item',)
 
     subscription = models.ForeignKey(
         Subscription,
@@ -114,6 +118,7 @@ class Debt(models.Model):
 
     def __str__(self):
         return '{} - {} ({})'.format(
+            self.pk,
             self.get_type_display(),
             self.subscription.pk,
             self.get_status_display(),
@@ -122,6 +127,10 @@ class Debt(models.Model):
     @property
     def paid(self):
         return self.status == self.DEBT_STATUS_PAID
+
+    @property
+    def in_debt(self):
+        return self.status == self.DEBT_STATUS_DEBT
 
     @property
     def has_credit(self):

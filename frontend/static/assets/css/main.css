@@ -3507,9 +3507,6 @@ label.valid {
     width: auto;
   }
 }
-.theme-cgsy-full #header {
-  background: #000912;
-}
 .theme-cgsy-full #header .brand {
   background: #F0F3F3;
 }
@@ -3922,6 +3919,19 @@ label.valid {
   position: fixed;
   bottom: 0;
   z-index: 100;
+}
+.theme-cgsy-full.app-only #header,
+.theme-cgsy-full.app-only .cgsy-footer,
+.theme-cgsy-full.app-only .sidebar {
+  display: none;
+}
+.theme-cgsy-full.app-only .main-content-wrapper {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-left: 0 !important;
+}
+.theme-cgsy-full.app-only.no-app-title .pageheader {
+  display: none;
 }
 .float-left {
   float: left;

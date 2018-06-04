@@ -19,6 +19,7 @@ sleep 10
 
 # Removes previous media files
 rm -rf $BASE_DIR/media/*
+rm -rf $BASE_DIR/static
 
 python $BASE_DIR/manage.py migrate
 

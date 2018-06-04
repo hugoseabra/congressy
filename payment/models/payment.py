@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.utils import IntegrityError
 
 from gatheros_subscription.models import Lot, Subscription
 from payment.models import Transaction
@@ -98,5 +99,11 @@ class Payment(models.Model):
     def save(self, *args, **kwargs):
         if self._state.adding is True:
             self.lot = self.subscription.lot
+
+        elif self.lot.event != self.subscription.event:
+            raise IntegrityError(
+                'O lote informado na edição não pertence à inscrição do'
+                ' pagamento'
+            )
 
         return super().save(*args, **kwargs)

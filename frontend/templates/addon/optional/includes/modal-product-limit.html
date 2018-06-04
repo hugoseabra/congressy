@@ -1,0 +1,35 @@
+<!-- product Limit Modal -->
+<div class="modal fade" id="modal-product-limit-form" tabindex="-1" role="dialog" aria-labelledby="lot-limit-form-title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="lot-limit-form-title">Gerenciar Limite de Vagas</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="save_product_limit();return false;">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <label for="lot-survey">Limite de Vagas:</label>
+                            <div>
+                                <input type="number" min="0" class="form-control" name="product-limit" id="product-limit" value="" />
+                            </div>
+                            <div>
+                                <small class="text-muted help-text">
+                                    Exibir o formulário selecionado para o lote <strong id="product-limit_product-name"></strong>.
+                                    Caso queira deixar ilimitado, informe <strong>0</strong>.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" onclick="save_product_limit();">Salvar Limite de Vagas</button>
+                <input type="hidden" name="product-limit_product-id" id="product-limit_product-id" value="" />
+            </div>
+        </div>
+    </div>
+</div>
+<!-- / product Limit Modal -->

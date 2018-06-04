@@ -1,0 +1,81 @@
+{% extends "base/base.html" %}
+{# @TODO Change the icons in nav_aside_itens  #}
+{% load static %}
+{% load base_tags %}
+{% load subscription_tags %}
+
+{% block title %} Produtos / Serviços | Congressy{% endblock %}
+
+{% block page_title %}Produtos / Serviços{% endblock %}
+
+{% block page_sub_title %}
+    {{ event.name }}
+{% endblock %}
+
+{% block styles %}
+    <style>
+        ul.block-list li:hover {
+            background: #f5f5f5;
+        }
+
+        ul.block-list li.active {
+            background-color: #337ab7;
+        }
+
+        ul.block-list li .list-icons .well {
+            padding: 3px !important;
+            margin-bottom: 0;
+        }
+
+        ul.block-list li .list-icons .well:hover {
+            background-color: #DDD;
+        }
+
+        .tab-wrapper .tab-content div.active {
+            outline: none;
+        }
+    </style>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'assets/js/optional.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            selectFromHash();
+            createAnchorEvents();
+        });
+    </script>
+{% endblock %}
+
+{% block nav_aside_itens %}
+    {% include 'addon/optional/includes/side-menu.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="buttonbar">
+                        <div class="float-left">
+                            <a href="{% url 'addon:optional-product-add' event.pk %}"
+                                class="btn btn-success">
+                                <i class="fa fa-plus"></i>
+                                Novo Produto / Serviço
+                            </a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {% include 'addon/optional/includes/tabs.html' %}
+
+{% endblock %}
+
+{% block modals %}
+    {% include 'addon/optional/includes/modal-product-limit.html' %}
+{% endblock %}

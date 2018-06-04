@@ -64,11 +64,23 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         context['allow_transaction'] = self.get_allowed_transaction()
         all_transactions = self.get_transactions()
         context['transactions'] = all_transactions
+
+        can_reprocess_payment = True
+
         for trans in all_transactions:
+            is_cc = trans.type == Transaction.CREDIT_CARD
+            is_boleto = trans.type == Transaction.BOLETO
             if trans.status == Transaction.PAID:
                 has_paid_transaction = True
-                break
 
+            if is_boleto and trans.status == Transaction.PROCESSING:
+                can_reprocess_payment = False
+
+            if is_cc and trans.status in \
+                    [Transaction.WAITING_PAYMENT, Transaction.PROCESSING]:
+                can_reprocess_payment = False
+
+        context['can_reprocess_payment'] = can_reprocess_payment
         context['has_paid_transaction'] = has_paid_transaction
 
         context['pagarme_key'] = settings.PAGARME_ENCRYPTION_KEY
