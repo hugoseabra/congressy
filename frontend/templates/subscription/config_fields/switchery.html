@@ -1,17 +1,24 @@
 {% load widget_tweaks form_config_tags %}
 
 <div class="form-group" {% if hide is True %}style="display:none"{% endif %}>
-    {%  if field.label %}
-    <label for="{{ field.id_for_label }}">
-    {% if '!?' in field.label %}
-        {{ field.label|safe|capfirst }}
-    {% else %}
-        {{ field.label|safe|capfirst }}:
-    {% endif %}
-    {% if  required  or required == 'True' %}
-        <span style="color:#C9302C">*</span>
-    {% endif %}
-    </label>
+    {% if field.label %}
+        <label for="{{ field.id_for_label }}">
+            {% if '!?' in field.label %}
+                {{ field.label|safe|capfirst }}
+            {% else %}
+                {{ field.label|safe|capfirst }}:
+            {% endif %}
+            {% if  required  or required == 'True' %}
+                <span style="color:#C9302C">*</span>
+            {% endif %}
+
+        {% if help_text %}
+            <small>
+                <i class="fas fa-question-circle" data-toggle="tooltip"
+                   data-placement="right" title="{{ help_text|safe }}"></i>
+            </small>
+        {% endif %}
+        </label>
     {% endif %}
 
     <div>
@@ -30,7 +37,7 @@
             {% if  required  or required == 'True' %}
                 {{ field|add_class:"js-switch"|attr:"style:display:none"|attr:"required:required" }}
             {% else %}
-                {{ field|add_class:"js-switch"|attr:"style:display:none"  }}
+                {{ field|add_class:"js-switch"|attr:"style:display:none" }}
             {% endif %}
 
         {% else %}
@@ -44,11 +51,6 @@
         {% endif %}
 
 
-        {% if help_text %}
-            <div>
-                <small class="text-muted help-text">{{ help_text|safe }}</small>
-            </div>
-        {% endif %}
         {% if errors %}
             {% render_field_errors errors %}
         {% endif %}
