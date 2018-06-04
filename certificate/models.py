@@ -8,6 +8,7 @@ import os
 from django.db import models
 from stdimage import StdImageField
 from stdimage.validators import MinSizeValidator
+from decimal import Decimal
 
 
 def get_image_path(instance, filename):
@@ -17,6 +18,8 @@ def get_image_path(instance, filename):
 
 class Certificate(models.Model):
     """ Certificado de evento."""
+
+    MANAGE_TO_PDF_RATIO = Decimal(73.038516)
 
     class Meta:
         verbose_name = 'certificado'
@@ -29,7 +32,6 @@ class Certificate(models.Model):
         related_name='certificate'
     )
 
-    # regular 73,03% menor que default
     background_image = StdImageField(
         upload_to=get_image_path,
         blank=True,
@@ -178,3 +180,19 @@ class Certificate(models.Model):
 
     def __str__(self):
         return '{}'.format(self.event)
+
+    @property
+    def converted_text_width(self):
+        return (self.text_width * 100) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_text_height(self):
+        return (self.text_height * 100) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_text_position_x(self):
+        return (self.text_position_x * 100) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_text_position_y(self):
+        return (self.text_position_y * 100) / self.MANAGE_TO_PDF_RATIO
