@@ -6,8 +6,12 @@
 {% block scripts %}
     <script src="{% static "/assets/plugins/gauge/gauge.min.js" %}"></script>
     <script src="{% static "/assets/plugins/chartjs/Chart.min.js" %}"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto"
+          rel="stylesheet">
     <script>
         //=================Gauge Inscritos=================================
+
+
         var opts = {
             lines: 12, // The number of lines to draw
             angle: 0, // The length of each line
@@ -46,22 +50,126 @@
             label: "Mulheres"
         }
         ];
-        window.onload = function () {
-            var ctx3 = document.getElementById("doughnut")
+
+        $(document).ready(function () {
+            var ctx3 = document.getElementById("doughnut");
             if (ctx3 != null) {
-                doughnut = ctx3.getContext("2d");
-                window.myDoughnut = new Chart(doughnut).Doughnut(doughnutData, {
+                ctx3 = ctx3.getContext('2d');
+                window.myDoughnut = new Chart(ctx3).Doughnut(doughnutData, {
                     responsive: true
                 });
             }
+
+        });
+
+        window.cgsy = window.cgsy || {};
+        window.cgsy.panel = window.cgsy.panel || {};
+
+        (function ($, cgsy) {
+            "use strict";
+
+
+            cgsy.panel.TodoList = function () {
+                var that = this;
+
+                this.render = function (main_el, callback) {
+                    main_el = $(main_el);
+
+                    var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}?template_name=event/todo_list");
+                    sender.setSuccessCallback(function (response) {
+                        main_el.html(response);
+                        if (callback) {
+                            callback();
+                        }
+                    });
+
+                    sender.send('GET');
+                };
+
+
+                this.update = function (main_el, id_row, callback) {
+                    main_el = $(main_el);
+
+                    var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}");
+                    sender.setSuccessCallback(function () {
+                        that.render(main_el, callback);
+                    });
+                    sender.send('POST', {'id_row': id_row});
+                };
+            };
+
+        })(jQuery, window.cgsy);
+
+        function remove_table_add() {
+            var num_todo_elements = $('#todo-list-add tr').length;
+            if (num_todo_elements === 0) {
+                $('#todo_additional').remove();
+            }
         }
-        ;
+
+        function reoderDivs(progress) {
+            if (progress === '100.0') {
+                var todo_data = $('#todo-data');
+                var event_data = $('#graph-data');
+                todo_data.insertAfter(event_data);
+            }
+        }
+
+        function evaluateProgress() {
+            var num_todo_elements = $('#todo-list tr').length;
+
+            var num_todo_complet = $('#todo-list tr .fa-check-circle ')
+                .length;
+
+            var progress = ((num_todo_complet / num_todo_elements) * 100)
+                .toFixed(1);
+
+            return progress;
+        }
+
+        function setProgressBar() {
+            progress = evaluateProgress()
+            $('.progress-bar').text(progress + '%');
+            $('.progress-bar').attr('aria-valuenow', progress);
+            setTimeout(function () {
+                $('.progress-bar').css('width', progress + '%');
+            }, 300);
+        }
+
+        function create_todo_events() {
+            var todo = new window.cgsy.panel.TodoList();
+            $('.add_todo_element').on('click', function () {
+                todo.update(
+                    $('#todo'),
+                    $(this).parent().parent().attr('id'),
+                    function () {
+                        create_todo_events();
+                        setProgressBar()
+                        remove_table_add()
+
+                    }
+                );
+            });
+        }
 
 
+        $(document).ready(function () {
+            setProgressBar()
+            create_todo_events();
+            reoderDivs(evaluateProgress())
+            remove_table_add()
+        });
+        console.log("{{ get_status_addons.products }}")
     </script>
+
 {% endblock %}
 {% block styles %}
     <style>
+        .add_todo_element {
+            padding-right: 10px;
+            cursor: pointer;
+        }
+
         .todo_list_element {
             padding-left: 10px;
             padding-right: 10px;
@@ -95,28 +203,19 @@
 
 {% block page_title %}{{ object.name }}{% endblock %}
 
-{% block new_nav %}
-    <ul class="nav nav-pills nav-stacked " style="width:70px;font-size: 25px;">
-        <li class="new_nav_items">
-            <a href="{% url 'event:event-list' %}"
-               title="Eventos" class="fa fa-calendar" style="color:white;">
-            </a>
-        </li>
-        <li class="new_nav_items">
-            <a href="#"
-               title="Inscrições" class="fa fa-list" style="color:white;"></a>
-        </li>
-        <li class="new_nav_items">
-            <a href="#"
-               title="Organizações" class="fa fa-sitemap" style="color:white;"
-            ></a>
-        </li>
-    </ul>
-
-{% endblock %}
-
 
 {% block content %}
+    <div id="todo-data" class="panel panel-primary col-xs-12 col-xl-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0;margin-left: 25px">
+        <div class="panel-heading">
+            <div class="panel-title">Etapas de configuração do seu evento</div>
+        </div>
+        <div class="panel-body tooltip-wrapper">
+            <div id="todo">
+                {% include "event/todo_list.html" %}
+            </div>
+        </div>
+    </div>
+
     {% if has_paid_lots %}
         <div class="col-md-12 col-lg-12">
             <div class="col-md-6 col-sm-12 col-xs-12">
@@ -126,8 +225,7 @@
                         <span class="total text-center">
                             R$ {{ totals.paid|intcomma }}
                         </span>
-                        <span class="title text-center">Saldo das
-                            inscrições pagas</span>
+                        <span class="title text-center">Saldo das inscrições pagas</span>
                     </div>
                 </div>
             </div>
@@ -138,8 +236,7 @@
                         <span class="total text-center">
                              R$ {{ totals.pending|intcomma }}
                         </span>
-                        <span class="title text-center">Pendentes de
-                            pagamento</span>
+                        <span class="title text-center">Pendentes de pagamento</span>
                     </div>
                 </div>
             </div>
@@ -150,8 +247,7 @@
                         <span class="total text-center">
                             R$ {{ totals.total|intcomma }}
                         </span>
-                        <span class="title text-center">Potencial de
-                            faturamento atual</span>
+                        <span class="title text-center">Potencial de faturamento atual</span>
                     </div>
                 </div>
             </div>
@@ -169,150 +265,73 @@
             </div>
         </div>
     {% endif %}
-    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
-    <div class=" col-lg-6 col-md-6 col-sm-12 col-xs-12"
-         style="margin-bottom: 15px ">
-        <div class="panel
-{% if limit == 0 or  total_subscriptions  > limit %} widget-mini
-panel-solid-info {% endif %}
-panel-default">
-            {% if limit != 0 and  total_subscriptions  < limit %}
-                <div class="panel-heading">
-                    <h3 class="panel-title">Total de inscritos</h3>
-                </div>
-                {% if limit == 0 or  total_subscriptions  > limit %}
-                    <div class="panel widget-mini">
-                {% endif %}
-            {% endif %}
-
-            <div class="panel-body {% if limit == 0 %} widget-gauge
-{% endif %}">
-                {% if limit == 0 or  total_subscriptions  > limit %}
-                    <i class="icon-user"></i>
-                    <span class="total text-center">
-                            {{ total_subscriptions }}
-                        <span class="title text-center">Inscritos</span>
-                        </span>
-
-
-                {% else %}
-                    <canvas width="200" height="125" id="gauge"
-                            class=""></canvas>
-                    <div class="goal-wrapper">
-                        <span class="gauge-value pull-left"></span>
-                        <span id="gauge-text" class="gauge-value
-                                    pull-left">{{ total_subscriptions }}</span>
-                        <span id="goal-text" class="goal-value
-                                    pull-right">{{ limit }}</span>
-                    </div>
-
-                {% endif %}
-            </div>
-
-            </div>
-        </div>
-        {% if gender.men != 0 or gender.women != 0 %}
-            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
-                 style="padding-bottom: 20px;margin-bottom: 20px ">
-                <div class="panel panel-default">
+    <div id="graph-data" class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+        <div class=" col-lg-6 col-md-6 col-sm-12 col-xs-12" style="margin-bottom: 15px ">
+            <div class="panel {% if limit == 0 or total_subscriptions  > limit %} widget-mini panel-solid-info {% endif %} panel-primary">
+                {% if limit != 0 and  total_subscriptions  < limit %}
                     <div class="panel-heading">
-                        <h3 class="panel-title">Gênero dos participantes</h3>
+                        <h3 class="panel-title">Total de inscritos</h3>
                     </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class=" col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                <ul class="nav nav-pills nav-stacked">
-                                    <li><i class="fa fa-circle"
-                                           style="color: #1F7BB6 "></i>
-                                        Homens
-                                    </li>
-                                    <li><i class="fa fa-circle "
-                                           style="color: #FF80AB;"></i>
-                                        Mulheres
-                                    </li>
+{#                    {% if limit == 0 or  total_subscriptions  > limit %}#}
+{#                        <div class="panel widget-mini">#}
+{#                    {% endif %}#}
+                {% endif %}
 
-                                </ul>
-                            </div>
-                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                <div>
-                                    <canvas id="doughnut" width="100%"
-                                            height="100%"
-                                    ></canvas>
-                                </div>
-                            </div>
+                <div class="panel-body {% if limit == 0 %}widget-gauge{% endif %}">
+                    {% if limit == 0 or  total_subscriptions  > limit %}
+                        <i class="icon-user"></i>
+                        <span class="total text-center">
+                            {{ total_subscriptions }}
+                            <span class="title text-center">Inscritos</span>
+                        </span>
+                    {% else %}
+                        <canvas width="200" height="125" id="gauge" class=""></canvas>
+                        <div class="goal-wrapper">
+                            <span class="gauge-value pull-left"></span>
+                            <span id="gauge-text" class="gauge-value pull-left">
+                                {{ total_subscriptions }}
+                            </span>
+                            <span id="goal-text" class="goal-value pull-right">
+                                {{ limit }}
+                            </span>
                         </div>
-                    </div>
+                    {% endif %}
+{#                </div>#}
                 </div>
             </div>
-        {% endif %}
+{#            {% if gender.men != 0 or gender.women != 0 %}#}
+{#                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" style="padding-bottom: 20px;margin-bottom: 20px ">#}
+{#                    <div class="panel panel-primary">#}
+{#                        <div class="panel-heading">#}
+{#                            <h3 class="panel-title">Gênero dos participantes</h3>#}
+{#                        </div>#}
+{#                        <div class="panel-body">#}
+{#                            <div class="row">#}
+{#                                <div class=" col-xs-6 col-sm-6 col-md-6 col-lg-6">#}
+{#                                    <ul class="nav nav-pills nav-stacked">#}
+{#                                        <li><i class="fa fa-circle"#}
+{#                                               style="color: #1F7BB6 "></i>#}
+{#                                            Homens#}
+{#                                        </li>#}
+{#                                        <li><i class="fa fa-circle "#}
+{#                                               style="color: #FF80AB;"></i>#}
+{#                                            Mulheres#}
+{#                                        </li>#}
+{##}
+{#                                    </ul>#}
+{#                                </div>#}
+{#                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">#}
+{#                                    <div>#}
+{#                                        <canvas id="doughnut" width="100%"#}
+{#                                                height="88%"#}
+{#                                        ></canvas>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            {% endif %}#}
+        </div>
     </div>
-
-    {#    <div class="panel panel-primary col-sm-5 col-md-6"#}
-    {#         style="padding: 0;margin-left: 25px">#}
-    {##}
-    {#        <div class="panel-heading">#}
-    {#            <div class="panel-title">Criação do seu evento</div>#}
-    {#        </div>#}
-    {#        <div class="panel-body">#}
-    {#            <div class="progress">#}
-    {#                <div class="progress-bar progress-bar-info" role="progressbar"#}
-    {#                     aria-valuenow="75"#}
-    {#                     aria-valuemin="0" aria-valuemax="100" style="width: 75%;">#}
-    {#                    75%#}
-    {#                </div>#}
-    {#            </div>#}
-    {#            <ul class="nav nav-pills nav-stacked">#}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-check success-color"></i>#}
-    {#                        <a href="#">Criar evento</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-check"></i>#}
-    {#                        <a href="#">Criar hot-site</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {##}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-check"></i>#}
-    {#                        <a href="#">Configurar lote</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {##}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-check"></i>#}
-    {#                        <a href="#">Configurar dados bancários</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {##}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <a href="#">Configurar#}
-    {#                            cerficados</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {##}
-    {#                <li role="separator" class="divider"></li>#}
-    {##}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-plus"></i>#}
-    {#                        <a href="#">Opicionais</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {#                <li class="todo_list_element" role="presentation">#}
-    {#                    <row>#}
-    {#                        <i class="fas fa-plus"></i>#}
-    {#                        <a href="#">Submissão de artigos científicos</a>#}
-    {#                    </row>#}
-    {#                </li>#}
-    {##}
-    {##}
-    {#            </ul>#}
-    {#        </div>#}
-    {#    </div>#}
 {% endblock %}

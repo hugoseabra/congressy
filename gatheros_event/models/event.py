@@ -59,6 +59,16 @@ class Event(models.Model, GatherosModelMixin):
         (EVENT_STATUS_FINISHED, 'finalizado'),
     )
 
+    EVENT_TYPE_FREE = 'free'
+    EVENT_TYPE_PAID = 'paid'
+    EVENT_TYPE_SCIENTIFIC = 'scientific'
+
+    EVENT_TYPES = (
+        (EVENT_TYPE_FREE, 'gratuito'),
+        (EVENT_TYPE_PAID, 'pago'),
+        (EVENT_TYPE_SCIENTIFIC, 'scientific'),
+    )
+
     RSVP_DISABLED = 'rsvp-disabled'
     RSVP_RESTRICTED = 'rsvp-restricted'
     RSVP_OPEN = 'rsvp-open'
@@ -69,7 +79,7 @@ class Event(models.Model, GatherosModelMixin):
         (RSVP_RESTRICTED, 'Somente associados poderão se inscrever.'),
     )
 
-    name = models.CharField(max_length=255, verbose_name='nome do evento')
+    name = models.CharField(max_length=255, verbose_name='Nome do evento')
 
     organization = models.ForeignKey(
         Organization,
@@ -81,7 +91,40 @@ class Event(models.Model, GatherosModelMixin):
     category = models.ForeignKey(
         Category,
         on_delete=models.PROTECT,
-        verbose_name='categoria'
+        verbose_name='categoria do evento'
+    )
+
+    event_type = models.CharField(
+        max_length=15,
+        choices=EVENT_TYPES,
+        default=EVENT_TYPE_FREE,
+        verbose_name='Tipo de evento',
+        help_text="Como será seu evento?"
+    )
+
+    has_optionals = models.BooleanField(
+        default=False,
+        verbose_name='Opcionais',
+        help_text="Você irá vender, opcionais como: hospedagem, alimentação, camisetas?"
+    )
+
+    has_extra_activities = models.BooleanField(
+        default=False,
+        verbose_name='Atividades extras',
+        help_text="Seu evento terá: workshops, minicursos?"
+    )
+
+    has_checkin = models.BooleanField(
+        default=False,
+        verbose_name='Checkin',
+        help_text="Deseja realizar o checkin com nosso App gratuito?"
+    )
+
+    has_certificate = models.BooleanField(
+        default=False,
+        verbose_name='Certificado',
+        help_text="Seu evento terá entrega de Certificados ?"
+
     )
 
     subscription_type = models.CharField(
@@ -107,8 +150,8 @@ class Event(models.Model, GatherosModelMixin):
         verbose_name='permalink'
     )
 
-    date_start = models.DateTimeField(verbose_name='data de inicio do evento')
-    date_end = models.DateTimeField(verbose_name='data de termino')
+    date_start = models.DateTimeField(verbose_name='data de início do evento')
+    date_end = models.DateTimeField(verbose_name='data de término do evento')
 
     banner_small = StdImageField(
         upload_to=get_image_path,
@@ -381,5 +424,5 @@ class Event(models.Model, GatherosModelMixin):
         return reports_dict
 
     @property
-    def has_certificate(self):
+    def has_certificate_config(self):
         return hasattr(self, 'certificate') and self.certificate is not None

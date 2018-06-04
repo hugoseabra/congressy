@@ -27,6 +27,10 @@ class EventForm(forms.ModelForm):
             'name',
             'date_start',
             'date_end',
+            'has_optionals',
+            'has_extra_activities',
+            'has_checkin',
+            'has_certificate',
             'is_scientific',
             'rsvp_type',
         ]
