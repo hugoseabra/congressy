@@ -85,10 +85,15 @@ class EventForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit)
         if instance.lot_categories.all().count() <= 0:
-            LotCategory.objects.create(
+            general_category = LotCategory.objects.create(
                 event=instance,
                 name="Geral",
             )
+
+            if instance.lots.all().count() == 1:
+                first_lot = instance.lots.all().first()
+                first_lot.category = general_category
+                first_lot.save()
 
         return instance
 
