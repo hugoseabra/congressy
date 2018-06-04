@@ -99,6 +99,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         'event__name',
     )
     list_display = ('person', 'count', 'lot', 'code', 'attended',)
+    list_filter = ('completed',)
     readonly_fields = [
         'event',
         'code',
