@@ -1,0 +1,346 @@
+<div class="progress">
+    <div class="progress-bar progress-bar-info"
+         role="progressbar"
+         aria-valuemin="0" aria-valuemax="100">
+    </div>
+</div>
+<table id="todo-list" class="table table-striped">
+    <tbody>
+    <tr class="todo_list_element" role="presentation">
+        <td>
+            <a>Criar evento</a>
+        </td>
+        <td>
+
+        </td>
+        <td>
+            <i class="fas fa-check-circle success-color
+                            pull-right fa-2x"></i>
+
+        </td>
+    </tr>
+    <tr class="todo_list_element" role="presentation">
+        <td>
+            <a>Criar HotSite </a>
+        </td>
+        <td>
+            <button type="button"
+                    class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                    data-toggle="dropdown"
+                    onclick="location.href='{% url 'event:event-hotsite' event.pk %}'"
+                    aria-expanded="false"
+                    aria-haspopup="true">
+                <span>Acessar</span>
+            </button>
+        </td>
+
+        <td>
+            {% if info and info.description_html %}
+                <i class="fas fa-check-circle success-color
+                                pull-right fa-2x"></i>
+            {% else %}
+                <i class="fas fa-exclamation-circle warning-color
+                                pull-right fa-2x"></i>
+            {% endif %}
+        </td>
+    </tr>
+
+    {% if event.payment_type == 'paid' or has_paid_lots %}
+        <tr class="todo_list_element {% if not has_paid_lots %}
+                    warning {% endif %}"
+            role="presentation"
+                {% if not has_paid_lots %}
+            data-toggle="tooltip"
+            data-placement="top"
+            title=""
+            data-original-title="Para que seu evento seja
+                           efetivamente pago você deve criar um lote pago"
+                {% endif %}>
+            <td>
+                <a>Configurar lote</a>
+            </td>
+            <td>
+                <button type="button"
+                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        onclick="location.href='{% url 'subscription:lot-list' event.pk %}'"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span>Acessar</span>
+                </button>
+            </td>
+            <td>
+                {% if has_paid_lots %}
+                    <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
+                                    pull-right fa-2x"></i>
+                {% endif %}
+
+            </td>
+        </tr>
+    {% endif %}
+
+    {% if event.payment_type == 'paid' or has_paid_lots %}
+        <tr class="todo_list_element" role="presentation">
+            <td>
+                <a href="{% url 'event:organization-edit' organization.pk %}">Configurar
+                    dados bancários</a>
+            </td>
+            <td>
+                <button type="button"
+                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        onclick="location.href='{% url 'event:organization-edit' organization.pk %}'"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span>Acessar</span>
+                </button>
+            </td>
+            <td>
+                {% if full_banking %}
+                    <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
+                                    pull-right fa-2x"></i>
+                {% endif %}
+            </td>
+        </tr>
+    {% endif %}
+    {% if has_addons.checkin == True %}
+        <tr id=del-checkin class="todo_list_element" role="presentation">
+            <td>
+                {% if number_attendances == 0 %}
+                    <button type="button"
+                            class="add_todo_element btn btn-warning btn-trans
+                        btn-sm dropdown-toggle"
+                            data-toggle="dropdown"
+                            aria-expanded="false"
+                            aria-haspopup="true">
+                    <span class="fas
+            fa-minus"></span>
+                    </button>
+                {% endif %}
+                <a>CheckIn</a>
+            </td>
+            <td>
+                <button type="button"
+                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        onclick="location.href='{% url 'subscription:subscription-attendance-dashboard' event.pk %}'"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span>Acessar</span>
+                </button>
+            </td>
+            <td>
+                <i class="fas fa-check-circle success-color
+                                    pull-right fa-2x"></i>
+            </td>
+        </tr>
+    {% endif %}
+    {% if has_addons.extra_activities == True %}
+        <tr id="del-extra_activities" class="todo_list_element"
+            role="presentation">
+            <td>
+                {% if status_addons.services == False %}
+                <button type="button"
+                        class="add_todo_element btn btn-warning btn-trans
+                        btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span class="fas
+            fa-minus"></span>
+                </button>
+                    {% endif %}
+                <a>Atividades extras</a>
+            </td>
+            <td>
+                <button type="button"
+                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        onclick="location.href='{% url 'addon:optional-service-list' event.pk %}'"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span>Acessar</span>
+                </button>
+            </td>
+            <td>
+               {% if status_addons.products == True %}
+                    <i class="fas fa-check-circle success-color
+                                        pull-right fa-2x"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
+                                        pull-right fa-2x"></i>
+                {% endif %}
+            </td>
+        </tr>
+    {% endif %}
+    {% if has_addons.optionals == True %}
+        <tr id="del-optionals" class="todo_list_element" role="presentation">
+            <td>
+                {% if status_addons.products == False %}
+                <button type="button"
+                        class="add_todo_element btn btn-warning btn-trans
+                        btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span class="fas
+            fa-minus"></span>
+                </button>
+                    {% endif %}
+                <a>Opcionais</a>
+            </td>
+            <td>
+                <button type="button"
+                        class="btn btn-success btn-trans btn-sm dropdown-toggle"
+                        data-toggle="dropdown"
+                        onclick="location.href='{%  url 'addon:optional-product-list' event.pk %}'"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <span>Acessar</span>
+                </button>
+            </td>
+
+            <td>
+                {% if status_addons.products == True %}
+                    <i class="fas fa-check-circle success-color
+                                        pull-right fa-2x"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-circle warning-color
+                                        pull-right fa-2x"></i>
+                {% endif %}
+
+            </td>
+        </tr>
+    {% endif %}
+{#    {% if has_addons.certificate == True %}#}
+{#        <tr id="del-certificate" class="todo_list_element" role="presentation">#}
+{#            <td>#}
+{##}
+{#                <button type="button"#}
+{#                        class="add_todo_element btn btn-warning btn-trans#}
+{#                        btn-sm dropdown-toggle"#}
+{#                        data-toggle="dropdown"#}
+{#                        aria-expanded="false"#}
+{#                        aria-haspopup="true">#}
+{#                    <span class="fas#}
+{#            fa-minus"></span>#}
+{#                </button>#}
+{#                <a>Gerar Certificados</a>#}
+{#            </td>#}
+{#            <td>#}
+{#                <button type="button"#}
+{#                        class="btn btn-success btn-trans btn-sm dropdown-toggle"#}
+{#                        data-toggle="dropdown"#}
+{#                        onclick="location.href='{% url 'subscription:subscription-attendance-dashboard' event.pk %}'"#}
+{#                        aria-expanded="false"#}
+{#                        aria-haspopup="true">#}
+{#                    <span>Acessar</span>#}
+{#                </button>#}
+{#            </td>#}
+{##}
+{#            <td>#}
+{#                {% if has_extra_activities %}#}
+{#                    <i class="fas fa-check-circle success-color#}
+{#                                        pull-right fa-2x"></i>#}
+{#                {% else %}#}
+{#                    <i class="fas fa-exclamation-circle warning-color#}
+{#                                        pull-right fa-2x"></i>#}
+{#                {% endif %}#}
+{#            </td>#}
+{#        </tr>#}
+{#    {% endif %}#}
+    </tbody>
+</table>
+<br>
+{% if has_paid_lots %}
+    <div id="todo_additional" class="panel panel-primary" style="box-shadow:
+     0 0 0 0">
+
+        <div class="panel-title">Serviços Adicionais</div>
+        <div class="panel-body">
+            <table id="todo-list-add" class="table-striped table">
+                <tbody>
+
+                {% if has_addons.checkin == False %}
+                    <tr id="add-checkin" class="todo_list_element"
+                        role="presentation">
+                        <td>
+
+                            <button type="button"
+                                    class="add_todo_element btn btn-success btn-trans
+                        btn-sm dropdown-toggle"
+                                    data-toggle="dropdown"
+                                    aria-expanded="false"
+                                    aria-haspopup="true">
+                    <span class="fas
+            fa-plus"></span>
+                            </button>
+                            <a>CheckIn</a>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if has_addons.extra_activities == False %}
+                    <tr id="add-extra_activities" class="todo_list_element"
+                        role="presentation">
+                        <td>
+
+                            <button type="button"
+                                    class="add_todo_element btn btn-success btn-trans
+                        btn-sm dropdown-toggle"
+                                    data-toggle="dropdown"
+                                    aria-expanded="false"
+                                    aria-haspopup="true">
+                    <span class="fas
+            fa-plus"></span>
+                            </button>
+                            <a>Atividades extras</a>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if has_addons.optionals == False %}
+                    <tr id="add-optionals" class="todo_list_element"
+                        role="presentation">
+                        <td>
+
+                            <button type="button"
+                                    class="add_todo_element btn btn-success btn-trans
+                        btn-sm dropdown-toggle"
+                                    data-toggle="dropdown"
+                                    aria-expanded="false"
+                                    aria-haspopup="true">
+                    <span class="fas
+            fa-plus"></span>
+                            </button>
+                            <a>Opcionais</a>
+                        </td>
+                    </tr>
+                {% endif %}
+{#                {% if has_addons.certificate == False %}#}
+{#                    <tr id="add-certificate" class="todo_list_element"#}
+{#                        role="presentation">#}
+{#                        <td>#}
+{##}
+{#                            <button type="button"#}
+{#                                    class="add_todo_element btn btn-success btn-trans#}
+{#                        btn-sm dropdown-toggle"#}
+{#                                    data-toggle="dropdown"#}
+{#                                    aria-expanded="false"#}
+{#                                    aria-haspopup="true">#}
+{#                    <span class="fas#}
+{#            fa-plus"></span>#}
+{#                            </button>#}
+{#                            <a>Gerar Certificados</a>#}
+{#                        </td>#}
+{#                    </tr>#}
+{#                {% endif %}#}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}
