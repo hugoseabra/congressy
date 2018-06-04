@@ -296,8 +296,8 @@ class SubscriptionListView(EventViewMixin, generic.ListView):
 
 
 class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
-    # template_name = 'subscription/view.html'
-    template_name = 'maintainance.html'
+    template_name = 'subscription/view.html'
+    # template_name = 'maintainance.html'
     object = None
     queryset = Subscription.objects.get_queryset()
     financial = False
@@ -392,8 +392,8 @@ class SubscriptionViewFormView(EventViewMixin, generic.DetailView):
         if self.request.GET.get('details'):
             ctx['show_details'] = True
 
-        # if 'manual_payment_form' not in ctx:
-        #     ctx['manual_payment_form'] = self.get_form()
+        if 'manual_payment_form' not in ctx:
+            ctx['manual_payment_form'] = self.get_form()
 
         return ctx
 
@@ -600,89 +600,6 @@ class SubscriptionCancelView(EventViewMixin, generic.DetailView):
         return reverse('subscription:subscription-list', kwargs={
             'event_pk': self.kwargs.get('event_pk')
         })
-
-
-class SubscriptionAttendanceSearchView(EventViewMixin, generic.TemplateView):
-    template_name = 'subscription/attendance.html'
-    search_by = 'name'
-
-    def get_permission_denied_url(self):
-        return reverse('event:event-list')
-
-    def get(self, request, *args, **kwargs):
-        self.search_by = request.GET.get('search_by', 'name')
-        return super(SubscriptionAttendanceSearchView, self).get(
-            request,
-            *args,
-            **kwargs
-        )
-
-    def post(self, request, *args, **kwargs):
-        self.search_by = request.POST.get('search_by', 'name')
-        value = request.POST.get('value')
-
-        if value:
-            kwargs.update({
-                'result_by': self.search_by,
-                'result': self.search_subscription(self.search_by, value),
-            })
-
-        return self.get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        cxt = super(SubscriptionAttendanceSearchView, self).get_context_data(
-            **kwargs
-        )
-        cxt.update({
-            'attendances': self.get_attendances(),
-            'search_by': self.search_by,
-        })
-        return cxt
-
-    def get_attendances(self):
-        try:
-            return Subscription.objects.filter(
-                attended=True,
-                event=self.get_event(),
-            ).order_by('-attended_on')
-
-        except Subscription.DoesNotExist:
-            return []
-
-    def search_subscription(self, search_by, value):
-        """ Busca inscrições de acordo com o valor passado. """
-        method_name = 'search_by_{}'.format(search_by)
-        method = getattr(self, method_name)
-        return method(value)
-
-    # noinspection PyMethodMayBeStatic
-    def search_by_name(self, name):
-        """ Busca inscrições por nome. """
-        try:
-            event = self.get_event()
-            return event.subscriptions.filter(
-                person__name__icontains=name.strip()
-            )
-        except Subscription.DoesNotExist:
-            return []
-
-    # noinspection PyMethodMayBeStatic
-    def search_by_code(self, code):
-        """ Busca inscrições por código. """
-        try:
-            event = self.get_event()
-            return event.subscriptions.get(code=code.strip())
-        except Subscription.DoesNotExist:
-            return None
-
-    # noinspection PyMethodMayBeStatic
-    def search_by_email(self, email):
-        """ Busca inscrições por email. """
-        try:
-            event = self.get_event()
-            return event.subscriptions.get(person__email=email.strip())
-        except Subscription.DoesNotExist:
-            return None
 
 
 class SubscriptionAttendanceDashboardView(EventViewMixin,
