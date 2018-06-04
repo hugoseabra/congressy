@@ -1,18 +1,18 @@
-from datetime import datetime, timedelta
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.db import transaction
+from django.db.transaction import atomic
 from django.forms import ValidationError
 from django.http import QueryDict
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
-from gatheros_event.models import Person, Event
+from gatheros_event.models import Event, Person
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
 from mailer.services import (
@@ -20,9 +20,11 @@ from mailer.services import (
     notify_new_user_and_free_subscription,
 )
 from payment.exception import TransactionError
-from payment.helpers import PagarmeTransactionInstanceData
+from payment.helpers.payment_helpers import (
+    get_opened_boleto_transactions,
+    is_boleto_allowed,
+)
 from payment.models import Transaction
-from payment.tasks import create_pagarme_transaction
 from survey.directors import SurveyDirector
 
 FORMS = [
@@ -30,6 +32,8 @@ FORMS = [
     ("lot", forms.LotsForm),
     ("person", forms.SubscriptionPersonForm),
     ("survey", forms.SurveyForm),
+    ("service", forms.ServiceForm),
+    ("product", forms.ProductForm),
     ("payment", forms.PaymentForm)
 ]
 
@@ -38,6 +42,8 @@ TEMPLATES = {
     "lot": "hotsite/lot_form.html",
     "person": "hotsite/person_form.html",
     "survey": "hotsite/survey_form.html",
+    "service": "hotsite/service_form.html",
+    "product": "hotsite/product_form.html",
     "payment": "hotsite/payment_form.html"
 }
 
@@ -68,6 +74,31 @@ def is_paid_lot(wizard):
     return False
 
 
+def can_process_payment(wizard):
+    """ Verifica se pagamento pode ser processado no wizard. """
+    subscription = wizard.get_subscription()
+
+    has_boleto_waiting = False
+    has_card_waiting = False
+    for transaction in subscription.transactions.all():
+        is_cc = transaction.type == Transaction.CREDIT_CARD
+        is_boleto = transaction.type == Transaction.BOLETO
+        if transaction.status == Transaction.WAITING_PAYMENT:
+            if is_boleto:
+                has_boleto_waiting = True
+
+            if is_cc:
+                has_card_waiting = True
+
+        # NO caso de cartão de crédito, pode haver um delay no processamento
+        if transaction.status == Transaction.PROCESSING and is_cc:
+            has_card_waiting = True
+
+    deny_payment = has_card_waiting is True and has_boleto_waiting is True
+
+    return deny_payment is False
+
+
 def has_survey(wizard):
     """ Return true if user opts for a lot with survey"""
 
@@ -91,27 +122,51 @@ def has_survey(wizard):
 
 
 def is_private_event(wizard):
-    if wizard.is_private_event():
-        return True
+    return wizard.is_private_event()
+
+
+def is_not_private_event(wizard):
+    return not wizard.is_private_event()
+
+
+def has_products(wizard):
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+
+    # Return true if lot has price and price > 0
+    lot = cleaned_data['lots']
+
+    if isinstance(lot, Lot) and lot.category:
+        return lot.category.product_optionals.count() > 0
 
     return False
 
 
-def is_not_private(wizard):
-    if wizard.is_private_event():
-        return False
+def has_services(wizard):
+    # Get cleaned data from lots step
+    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
 
-    return True
+    # Return true if lot has price and price > 0
+    lot = cleaned_data['lots']
+
+    if isinstance(lot, Lot) and lot.category:
+        return lot.category.service_optionals.count() > 0
+
+    return False
 
 
 class SubscriptionWizardView(SessionWizardView):
     condition_dict = {
         'private_lot': is_private_event,
-        'lot': is_not_private,
-        'payment': is_paid_lot,
-        'survey': has_survey
+        'lot': is_not_private_event,
+        'payment': is_paid_lot and can_process_payment,
+        'survey': has_survey,
+        'service': has_services,
+        'product': has_products,
     }
     event = None
+    person = None
+    subscription = None
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -129,10 +184,12 @@ class SubscriptionWizardView(SessionWizardView):
         if self.has_paid_subscription():
             messages.warning(
                 request,
-                "Atenção! Você já possui uma inscrição paga neste evento."
+                "Você já possui uma inscrição paga neste evento."
             )
-            return redirect('public:hotsite-subscription-status',
-                            slug=self.event.slug)
+            return redirect(
+                'public:hotsite-subscription-status',
+                slug=self.event.slug
+            )
 
         if self.is_private_event() and not self.has_previous_valid_code():
             messages.error(
@@ -162,331 +219,6 @@ class SubscriptionWizardView(SessionWizardView):
                 'public:hotsite-subscription',
                 slug=self.event.slug
             )
-
-    def get_context_data(self, **kwargs):
-
-        context = super().get_context_data(**kwargs)
-        context['remove_preloader'] = True
-        context['event'] = self.event
-        context['is_private_event'] = self.is_private_event()
-        context['num_lots'] = self.get_num_lots()
-        has_open_boleto = False
-
-        if self.storage.current_step not in ['lot', 'private_lot']:
-            selected_lot = self.get_lot_from_session()
-            context['selected_lot'] = selected_lot
-            has_open_boleto = self.get_open_boleto(lot=selected_lot)
-            context['has_open_boleto'] = has_open_boleto
-
-        if self.storage.current_step == 'private_lot':
-            code = self.request.session.get('exhibition_code')
-            if self.is_valid_exhibition_code(code):
-                lot = Lot.objects.filter(
-                    exhibition_code=code.upper())
-                context['lot'] = lot.first()
-
-        if self.storage.current_step == 'lot':
-            context['has_coupon'] = self.has_coupon()
-
-        if self.storage.current_step == 'person':
-
-            try:
-                config = self.event.formconfig
-            except AttributeError:
-                config = FormConfig()
-
-            if self.has_paid_lots():
-                config.email = True
-                config.phone = True
-                config.city = True
-
-                config.cpf = config.CPF_REQUIRED
-                config.birth_date = config.BIRTH_DATE_REQUIRED
-                config.address = config.ADDRESS_SHOW
-
-            context['config'] = config
-
-            if not is_paid_lot(self) and not has_survey(self):
-                context['is_last'] = True
-            else:
-                context['is_last'] = False
-
-        if self.storage.current_step == 'survey':
-            if not is_paid_lot(self):
-                context['is_last'] = True
-            else:
-                context['is_last'] = False
-
-        if self.storage.current_step == 'payment':
-            context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
-            now = datetime.now()
-            margin = self.event.date_start
-
-            if has_open_boleto or margin - now < timedelta(days=self.event.boleto_limit_days):
-                context['allowed_transaction_types'] = 'credit_card'
-            else:
-                context['allowed_transaction_types'] = 'credit_card,boleto'
-
-        return context
-
-    def get_template_names(self):
-        return [TEMPLATES[self.steps.current]]
-
-    def done(self, form_list, **kwargs):
-
-        if 'has_private_subscription' in self.request.session:
-            del self.request.session['has_private_subscription']
-
-        if not hasattr(self.storage, 'person'):
-            self.storage.person = self.get_person_from_session()
-
-        lot = self.get_lot_from_session()
-
-        new_subscription = False
-        new_account = self.request.user.last_login is None
-
-        try:
-            subscription = Subscription.objects.get(
-                person=self.storage.person,
-                event=self.event
-            )
-        except Subscription.DoesNotExist:
-            subscription = Subscription(
-                person=self.storage.person,
-                event=self.event,
-                created_by=self.request.user.id
-            )
-            new_subscription = True
-
-        # Insere ou edita lote
-        subscription.lot = lot
-        subscription.save()
-
-        if 'lot' in self.request.session:
-            del self.request.session['lot']
-
-        if 'person' in self.request.session:
-            del self.request.session['person']
-
-        if subscription.free is True:
-
-            subscription.status = Subscription.CONFIRMED_STATUS
-            subscription.save()
-
-            if new_account and new_subscription:
-                notify_new_user_and_free_subscription(self.event, subscription)
-            else:
-                notify_new_free_subscription(self.event, subscription)
-
-            msg = 'Inscrição realizada com sucesso!' \
-                  ' Nós lhe enviamos um e-mail de confirmação de sua' \
-                  ' inscrição juntamente com seu voucher.'
-
-            success_url = reverse_lazy(
-                'public:hotsite', kwargs={'slug': self.event.slug, }
-            )
-
-        else:
-            msg = 'Inscrição realizada com sucesso!' \
-                  ' Nós lhe enviamos um e-mail de confirmação de sua' \
-                  ' inscrição. Porém, o seu voucher estará disponível apenas' \
-                  ' após a confirmação de seu pagamento.'
-
-            success_url = reverse_lazy(
-                'public:hotsite-subscription-status',
-                kwargs={'slug': self.event.slug, }
-            )
-
-        if 'lot' in self.request.session:
-            del self.request.session['lot']
-
-        if 'person' in self.request.session:
-            del self.request.session['person']
-
-        messages.success(self.request, msg)
-        return redirect(success_url)
-
-    def get_form_initial(self, step):
-
-        if is_private_event(self):
-
-            if step == "private_lot":
-                return self.initial_dict.get(step, {
-                    'event': self.event,
-                    'code': self.request.session.get('exhibition_code')
-                })
-
-        if step == 'lot':
-            return self.initial_dict.get(step, {'event': self.event})
-
-        if step == 'survey':
-            lot = self.get_lot_from_session()
-
-            return self.initial_dict.get(step, {
-                'event_survey': lot.event_survey,
-            })
-
-        if step == 'payment':
-            # Assert that we have a person in storage
-            if not hasattr(self.storage, 'person'):
-
-                try:
-                    person = Person.objects.get(user=self.request.user)
-                except Person.DoesNotExist:
-                    raise Exception('User com email {} não possui '
-                                    'person'.format(self.request.user.email))
-
-                self.storage.person = person
-
-            lot = self.get_lot_from_session()
-
-            return self.initial_dict.get(step, {
-                'choosen_lot': lot,
-                'event': self.event,
-                'person': self.storage.person
-            })
-
-        return self.initial_dict.get(step, {})
-
-    def process_step(self, form):
-
-        form_data = self.get_form_step_data(form)
-
-        if isinstance(form, forms.LotsForm):
-            lot = form_data.get('lot-lots')
-            self.request.session['lot'] = lot
-
-        if isinstance(form, forms.PrivateLotForm):
-            lot = form_data.get('private_lot-lots')
-            self.request.session['lot'] = lot
-
-        # Persisting person
-        if isinstance(form, forms.SubscriptionPersonForm):
-            person = form.save()
-            self.request.session['person'] = str(person.pk)
-            self.storage.person = person
-
-        # Persisting survey
-        if isinstance(form, forms.SurveyForm):
-
-            survey_director = SurveyDirector(event=self.event,
-                                             user=self.request.user)
-
-            lot = self.get_lot_from_session()
-
-            survey_response = QueryDict('', mutable=True)
-            for form_question, form_response in form_data.items():
-                if form_question == 'csrfmiddlewaretoken':
-                    survey_response.update({form_question: form_response})
-
-                if 'survey-' in form_question:
-                    survey_response.update(
-                        {form_question.replace('survey-', ''): form_response})
-
-            survey_form = survey_director.get_form(
-                survey=lot.event_survey.survey,
-                data=survey_response
-            )
-
-            if survey_form.is_valid():
-                survey_form.save_answers()
-            else:
-                raise Exception('SurveyForm was invalid: {}'.format(
-                    survey_form.errors))
-
-        # Persisting payments:
-        if isinstance(form, forms.PaymentForm):
-
-            if form.is_valid():
-
-                # Assert that we have a person in storage
-                if not hasattr(self.storage, 'person'):
-                    person = Person.objects.get(user=self.request.user)
-                    self.storage.person = person
-
-                lot = self.get_lot_from_session()
-
-                try:
-                    subscription = Subscription.objects.get(
-                        person=self.storage.person,
-                        event=self.event
-                    )
-                except Subscription.DoesNotExist:
-                    subscription = Subscription(
-                        person=self.storage.person,
-                        event=self.event,
-                        created_by=self.storage.person.user.id
-                    )
-
-                try:
-                    with transaction.atomic():
-                        # Insere ou edita lote
-                        subscription.lot = lot
-                        subscription.save()
-
-                        transaction_data = PagarmeTransactionInstanceData(
-                            subscription=subscription,
-                            extra_data=form_data,
-                            event=self.event
-                        )
-
-                        create_pagarme_transaction(
-                            transaction_data=transaction_data,
-                            subscription=subscription
-                        )
-
-                except TransactionError as e:
-                    error_dict = {
-                        'No transaction type': \
-                            'Por favor escolher uma forma de pagamento.',
-                        'Transaction type not allowed': \
-                            'Forma de pagamento não permitida.',
-                        'Organization has no bank account': \
-                            'Organização não está podendo receber pagamentos no'
-                            ' momento.',
-                        'No organization': 'Evento não possui organizador.',
-                    }
-                    if e.message in error_dict:
-                        e.message = error_dict[e.message]
-
-                    raise ValidationError(e.message)
-
-        return form_data
-
-    def clear_string(self, field_name, data):
-        if data and field_name in data:
-
-            value = data.get(field_name)
-
-            if value:
-                value = value \
-                    .replace('.', '') \
-                    .replace('-', '') \
-                    .replace('/', '') \
-                    .replace('(', '') \
-                    .replace(')', '') \
-                    .replace(' ', '')
-
-                data[field_name] = value
-
-        return data
-
-    def get_form_kwargs(self, step=None):
-        kwargs = super().get_form_kwargs(step)
-
-        if step == 'person':
-            lot = self.get_lot_from_session()
-
-            kwargs.update({
-                'user': self.request.user,
-                'lot': lot,
-                'event': self.event,
-            })
-
-        if step == 'survey':
-            kwargs.update({'user': self.request.user, 'event': self.event})
-
-        return kwargs
 
     def post(self, *args, **kwargs):
         """
@@ -564,14 +296,311 @@ class SubscriptionWizardView(SessionWizardView):
 
         return self.render(form)
 
+    def get_form_kwargs(self, step=None):
+        kwargs = super().get_form_kwargs(step)
+
+        if step == "private_lot":
+            kwargs.update({
+                'event': self.event,
+                'code': self.request.session.get('exhibition_code')
+            })
+
+        if step == 'lot':
+            kwargs.update({'event': self.event, })
+
+        if step == 'person':
+            kwargs.update({
+                'user': self.request.user,
+                'lot': self.get_lot(),
+                'event': self.event,
+            })
+
+        if step == 'survey':
+            lot = self.get_lot()
+            kwargs.update({
+                'user': self.request.user,
+                'event': self.event,
+                'event_survey': lot.event_survey,
+            })
+
+        if step == 'payment':
+            kwargs.update({
+                'selected_lot': self.get_lot(),
+                'subscription': self.get_subscription(),
+            })
+
+        return kwargs
+
+    def process_step(self, form):
+
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+
+        form_data = self.get_form_step_data(form)
+
+        # Creating a subscription.
+        if isinstance(form, forms.LotsForm) or \
+                isinstance(form, forms.PrivateLotForm):
+
+            lot_pk = None
+            if isinstance(form, forms.PrivateLotForm):
+                lot_pk = form_data.get('private_lot-lots')
+
+            elif isinstance(form, forms.LotsForm):
+                lot_pk = form_data.get('lot-lots')
+
+            if not lot_pk:
+                raise InvalidStateStepError(
+                    'Não foi possivel pegar uma referencia de lote.'
+                )
+
+            # persistir lote selecionado para ser usado posteriormente.
+            self.request.session['lot_pk'] = lot_pk
+            subscription = self.get_subscription()
+            subscription.lot_id = lot_pk
+            subscription.save()
+
+        # Persisting person
+        if isinstance(form, forms.SubscriptionPersonForm):
+            if not form.is_valid():
+                raise ValidationError(form.errors)
+
+            self.person = form.save()
+
+        # Persisting survey
+        if isinstance(form, forms.SurveyForm):
+
+            survey_director = SurveyDirector(event=self.event,
+                                             user=self.request.user)
+
+            lot = self.get_lot()
+
+            survey_response = QueryDict('', mutable=True)
+            for form_question, form_response in form_data.items():
+                if form_question == 'csrfmiddlewaretoken':
+                    survey_response.update({form_question: form_response})
+
+                if 'survey-' in form_question:
+                    survey_response.update(
+                        {form_question.replace('survey-', ''): form_response})
+
+            survey_form = survey_director.get_form(
+                survey=lot.event_survey.survey,
+                data=survey_response
+            )
+
+            if survey_form.is_valid():
+                survey_form.save_answers()
+            else:
+                raise Exception('SurveyForm was invalid: {}'.format(
+                    survey_form.errors
+                ))
+
+        # Persisting payments:
+        if isinstance(form, forms.PaymentForm):
+
+            if not form.is_valid():
+                raise ValidationError(form.errors)
+
+            try:
+                form.save()
+
+            # except DebtAlreadyPaid as e:
+            #     raise ValidationError(str(e))
+
+            except TransactionError as e:
+                raise ValidationError(str(e))
+
+        return form_data
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+        context['remove_preloader'] = True
+        context['event'] = self.event
+        context['is_private_event'] = self.is_private_event()
+        context['num_lots'] = self.get_num_lots()
+        context['subscription'] = self.get_subscription()
+
+        has_open_boleto = False
+
+        if self.storage.current_step not in ['lot', 'private_lot']:
+            lot = self.get_lot()
+            context['selected_lot'] = lot
+
+            opened_boletos = self.get_open_boleto(lot=lot)
+            has_open_boleto = \
+                opened_boletos.count() > 0 if opened_boletos else False
+
+        context['has_open_boleto'] = has_open_boleto
+
+        if self.storage.current_step == 'private_lot':
+            code = self.request.session.get('exhibition_code')
+            if self.is_valid_exhibition_code(code):
+                lots = Lot.objects.filter(
+                    private=True,
+                    exhibition_code=code.upper()
+                )
+                if lots:
+                    context['lot'] = lots.first()
+
+        if self.storage.current_step == 'lot':
+            context['has_coupon'] = self.has_coupon()
+
+        if self.storage.current_step == 'person':
+
+            try:
+                config = self.event.formconfig
+            except AttributeError:
+                config = FormConfig()
+
+            if self.has_paid_lots():
+                config.email = True
+                config.phone = True
+                config.city = True
+
+                config.cpf = config.CPF_REQUIRED
+                config.birth_date = config.BIRTH_DATE_REQUIRED
+                config.address = config.ADDRESS_SHOW
+
+            context['config'] = config
+            context['is_last'] = self.steps.current == self.steps.last
+
+        if self.storage.current_step == 'survey':
+            context['is_last'] = not is_paid_lot(self)
+
+        if self.storage.current_step == 'payment':
+            context['pagarme_encryption_key'] = settings.PAGARME_ENCRYPTION_KEY
+            context['lot'] = self.get_lot()
+
+            allowed_types = [Transaction.CREDIT_CARD]
+
+            if is_boleto_allowed(self.event) and has_open_boleto is False:
+                allowed_types.append(Transaction.BOLETO)
+
+            context['allowed_transaction_types'] = ','.join(allowed_types)
+
+            subscription = self.get_subscription()
+            context['subscription'] = subscription
+
+            total = subscription.lot.get_calculated_price() or Decimal(0.00)
+
+            products = [x for x in subscription.subscription_products.all()]
+            context['products'] = products
+
+            services = [x for x in subscription.subscription_services.all()]
+            context['services'] = services
+
+            for product in products:
+                total += product.optional_price
+
+            for service in services:
+                total += service.optional_price
+
+            context['total'] = total
+
+        return context
+
+    def get_template_names(self):
+        return [TEMPLATES[self.steps.current]]
+
+    def done(self, form_list, **kwargs):
+
+        if 'has_private_subscription' in self.request.session:
+            del self.request.session['has_private_subscription']
+
+        subscription = self.get_subscription()
+        subscription.lot = self.get_lot()
+
+        with atomic():
+            try:
+                subscription.completed = True
+                subscription.save()
+
+                new_account = self.request.user.last_login is None
+
+                if subscription.free is True:
+                    subscription.status = Subscription.CONFIRMED_STATUS
+                    subscription.save()
+
+                    notified = False
+
+                    if subscription.is_new is True:
+                        if new_account is True:
+                            notify_new_user_and_free_subscription(
+                                self.event,
+                                subscription
+                            )
+                            notified = True
+
+                        else:
+                            notify_new_free_subscription(
+                                self.event,
+                                subscription
+                            )
+                            notified = True
+
+                    if notified is True:
+                        msg = 'Inscrição realizada com sucesso!' \
+                              ' Nós lhe enviamos um e-mail de confirmação de' \
+                              ' sua inscrição juntamente com seu voucher.'
+
+                    else:
+                        msg = 'Inscrição salva com sucesso!'
+
+                    success_url = reverse_lazy('public:hotsite', kwargs={
+                        'slug': self.event.slug,
+                    })
+
+                else:
+                    if subscription.is_new is True:
+                        msg = 'Inscrição realizada com sucesso!' \
+                              ' Nós lhe enviamos um e-mail de confirmação de' \
+                              ' sua inscrição. Porém, o seu voucher estará' \
+                              ' disponível apenas após a confirmação de seu' \
+                              ' pagamento.'
+                    else:
+                        msg = 'Inscrição salva com sucesso!'
+
+                    success_url = reverse_lazy(
+                        'public:hotsite-subscription-status',
+                        kwargs={'slug': self.event.slug, }
+                    )
+
+                    self.clear_session()
+
+                messages.success(self.request, msg)
+                return redirect(success_url)
+
+            except Exception as e:
+                self.clear_session()
+
+                raise InvalidStateStepError(
+                    'Algum erro ocorreu: {}'.format(e)
+                )
+
+    def clear_string(self, field_name, data):
+        if data and field_name in data:
+
+            value = data.get(field_name)
+
+            if value:
+                value = value \
+                    .replace('.', '') \
+                    .replace('-', '') \
+                    .replace('/', '') \
+                    .replace('(', '') \
+                    .replace(')', '') \
+                    .replace(' ', '')
+
+                data[field_name] = value
+
+        return data
+
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
         for lot in self.event.lots.all():
-            price = lot.price
-            if price is None:
-                continue
-
-            if lot.price > 0:
+            if lot.price and lot.price > 0:
                 return True
 
         return False
@@ -630,23 +659,77 @@ class SubscriptionWizardView(SessionWizardView):
 
         del self.request.session['exhibition_code']
 
+    def clear_session(self):
+        def remove_session_key(key):
+            if key in self.request.session:
+                del self.request.session[key]
+
+        self.clear_session_exhibition_code()
+        remove_session_key('has_private_subscription')
+        remove_session_key('lot_pk')
+
     def get_person_from_session(self):
+        if not self.person:
+            try:
+                self.person = Person.objects.get(user=self.request.user)
 
-        if 'person' not in self.request.session:
-            raise InvalidStateStepError('Não temos uma pessoa na session.')
+            except Person.DoesNotExist:
+                raise InvalidStateStepError(
+                    'Usuário não possui pessoa vinculada.'
+                )
 
-        person_pk = self.request.session['person']
+        return self.person
 
-        return Person.objects.get(pk=person_pk)
+    def get_lot(self):
+        if 'lot_pk' in self.request.session:
+            # se PK de lote existe na sessão, prioriza-lo pois ele pode
+            # ser um lote vindo do primeiro passo.
+            try:
+                return Lot.objects.get(pk=self.request.session['lot_pk'])
 
-    def get_lot_from_session(self):
+            except Lot.DoesNotExist:
+                raise InvalidStateStepError(
+                    'Lote com pk "pk" não encontrado.'.format(
+                        self.request.session['lot_pk']
+                    )
+                )
 
-        if 'lot' not in self.request.session:
-            raise InvalidStateStepError('Não temos um lote na session.')
+        # se não há PK de lote, vamos verificar se usuário já possui inscrição
+        subscription = self.get_subscription()
 
-        lot_pk = self.request.session['lot']
+        if subscription.lot is not None:
+            # Se inscrição é nova, ou seja, não possui lote, voltar.
+            raise InvalidStateStepError(
+                'Usuário sem inscrição e lote selecionado.'
+            )
 
-        return Lot.objects.get(pk=lot_pk)
+        # se inscrição já existia anteriormente, vamos fixar como lote
+        # selecionado o lote da inscrição, que pode ser mudado caso o usurio
+        # vá para o primeiro passo de seleção de lote.
+        self.request.session['lot_pk'] = subscription.lot.pk
+        return subscription.lot
+
+    def get_subscription(self):
+        if not self.subscription:
+            person = self.get_person_from_session()
+
+            try:
+                self.subscription = Subscription.objects.get(
+                    person=person,
+                    event=self.event
+                )
+                self.subscription.is_new = self.subscription.completed
+
+            except Subscription.DoesNotExist:
+                self.subscription = Subscription(
+                    person=person,
+                    event=self.event,
+                    completed=False,
+                    created_by=self.request.user.pk
+                )
+                self.subscription.is_new = self.subscription.completed
+
+        return self.subscription
 
     def get_num_lots(self):
         lots = [
@@ -657,44 +740,14 @@ class SubscriptionWizardView(SessionWizardView):
         return len(lots)
 
     def get_open_boleto(self, lot):
-
-        now = datetime.now()
-
-        try:
-            subscription = self.event.subscriptions.get(
-                person__user=self.request.user)
-
-            all_transactions = Transaction.objects.filter(
-                subscription=subscription,
-                lot=lot)
-
-            for trans in all_transactions:
-                if trans.boleto_expiration_date:
-                    if trans.boleto_expiration_date > now.date():
-                        return trans
-        except Subscription.DoesNotExist:
-            pass
-
-        return None
+        return get_opened_boleto_transactions(self.get_subscription())
 
     def has_paid_subscription(self):
-
-        try:
-            subscription = self.event.subscriptions.get(
-                person__user=self.request.user)
-
-            for trans in subscription.transactions.all():
-                if trans.status == Transaction.PAID:
-                    return True
-
-        except Subscription.DoesNotExist:
-            pass
-
-        return False
+        subscription = self.get_subscription()
+        return subscription.transactions.filter(
+            status=Transaction.PAID
+        ).count() > 0
 
     @staticmethod
     def is_lot_available(lot):
-        if lot.status == lot.LOT_STATUS_RUNNING and not lot.private:
-            return True
-
-        return False
+        return lot.status == lot.LOT_STATUS_RUNNING and not lot.private

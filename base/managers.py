@@ -8,9 +8,15 @@ por:
 
 from django import forms
 
-from base.models import Entity
+from base.models import EntityMixin
 
-__all__ = ['EntityTypeError', 'Manager']
+__all__ = ['ManagerException', 'EntityTypeError', 'Manager']
+
+
+class ManagerException(TypeError):
+    """
+    Exceção quando o manager processo algo inesperado.
+    """
 
 
 class EntityTypeError(TypeError):
@@ -30,10 +36,19 @@ class Manager(forms.ModelForm):
 
     def __init__(self, **kwargs):
         model = self.Meta.model
-        if not issubclass(model, Entity):
+        if not issubclass(model, EntityMixin):
             raise EntityTypeError(model)
 
         super().__init__(**kwargs)
+
+    def hide_field(self, field_name):
+        if field_name not in self.fields:
+            raise ManagerException('O campo "{}" não existe em "{}"'.format(
+                field_name,
+                self.__class__
+            ))
+
+        self.fields[field_name].widget = forms.HiddenInput()
 
     def get(self, pk):
         return self.Meta.model.objects.get(pk=pk)

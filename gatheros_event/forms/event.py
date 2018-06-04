@@ -1,9 +1,9 @@
 """
 Formulários de Event
 """
+import os
 from datetime import datetime, timedelta
 
-import os
 from django import forms
 from django.shortcuts import get_object_or_404
 
@@ -31,6 +31,7 @@ class EventForm(forms.ModelForm):
             'has_checkin',
             'has_certificate',
             'is_scientific',
+            'rsvp_type',
         ]
 
         widgets = {

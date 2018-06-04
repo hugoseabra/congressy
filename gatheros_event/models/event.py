@@ -69,6 +69,17 @@ class Event(models.Model, GatherosModelMixin):
         (EVENT_TYPE_SCIENTIFIC, 'scientific'),
     )
     name = models.CharField(max_length=255, verbose_name='Nome do evento')
+    RSVP_DISABLED = 'rsvp-disabled'
+    RSVP_RESTRICTED = 'rsvp-restricted'
+    RSVP_OPEN = 'rsvp-open'
+
+    RSVP = (
+        (RSVP_DISABLED, 'Aberto'),
+        (RSVP_OPEN, 'Convidados associados terão um lote especial.'),
+        (RSVP_RESTRICTED, 'Somente associados poderão se inscrever.'),
+    )
+
+    name = models.CharField(max_length=255, verbose_name='nome')
 
     organization = models.ForeignKey(
         Organization,
@@ -191,10 +202,10 @@ class Event(models.Model, GatherosModelMixin):
         verbose_name='imagem principal',
         variations={'default': (480, 638), 'thumbnail': (200, 233, True)},
         validators=[MinSizeValidator(480, 638), MaxSizeValidator(1400, 1400)],
-        help_text="Imagem única da descrição do evento: 480px x 638px. "
-                  "<a  target='_blank'"
-                  "href='http://via.placeholder.com/480x638'>Exemplo"
-                  "</a>"
+        help_text="Imagem única da descrição do evento: 480px x 638px."
+                  " <a  target='_blank'"
+                  " href='http://via.placeholder.com/480x638'>Exemplo"
+                  " </a>"
     )
 
     website = models.CharField(max_length=255, null=True, blank=True)
@@ -207,6 +218,17 @@ class Event(models.Model, GatherosModelMixin):
         verbose_name='publicado',
         help_text='Eventos não publicados e com data futura serão considerados'
                   ' rascunhos.'
+    )
+
+    rsvp_type = models.CharField(
+        max_length=20,
+        choices=RSVP,
+        default=RSVP_DISABLED,
+        null=True,
+        blank=True,
+        verbose_name='Distribuição de Público',
+        help_text="Se há associados vinculados à organização, o evento poderá"
+                  " exibir um lote especial para eles, com um valor especial."
     )
 
     congressy_percent = models.CharField(
@@ -230,8 +252,6 @@ class Event(models.Model, GatherosModelMixin):
         default=False,
         verbose_name='evento científico',
     )
-
-
 
     class Meta:
         verbose_name = 'evento'
@@ -293,6 +313,11 @@ class Event(models.Model, GatherosModelMixin):
             return Event.EVENT_STATUS_RUNNING
 
         return Event.EVENT_STATUS_NOT_STARTED
+
+    @property
+    def has_rsvp(self):
+        """ Verifica se organização possui associados. """
+        return self.organization.associates.count() > 0
 
     @property
     def running(self):
@@ -364,7 +389,10 @@ class Event(models.Model, GatherosModelMixin):
                 return 0
             return '{0:.2f}%'.format((num * 100) / num_total)
 
-        queryset = self.subscriptions.filter(attended=True)
+        queryset = self.subscriptions \
+            .filter(completed=True) \
+            .exclude(status='canceled')
+
         total = queryset.count()
 
         reports_dict = {}
@@ -392,3 +420,7 @@ class Event(models.Model, GatherosModelMixin):
         })
 
         return reports_dict
+
+    @property
+    def has_certificate(self):
+        return hasattr(self, 'certificate') and self.certificate is not None

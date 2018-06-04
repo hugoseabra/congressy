@@ -21,8 +21,8 @@ class SubscriptionFormViewTest(TestCase):
         '003_form',
         '004_field',
         '005_field_option',
-        '006_lot',
-        '007_subscription',
+        '007_lot',
+        '008_subscription',
         '008_answer',
     ]
 

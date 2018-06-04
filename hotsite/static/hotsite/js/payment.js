@@ -1,150 +1,149 @@
-function hide_payment_elements() {
-    $('#id_boleto').hide();
-    $('#id_credit_card').hide();
-    $('#id_remove').hide();
-    $('#payment_buttons').hide();
-    $('#next_btn').attr("disabled", true);
+window.cgsy.raven = window.cgsy.raven || {};
+window.cgsy.payment = window.cgsy.payment || {};
+window.cgsy.payment_form = window.cgsy.payment_form || {};
+window.cgsy.pagarme = window.cgsy.pagarme || {};
 
-    $('#id_payment-card_hash').val('');
-    $('#id_payment-installments').val('');
-    $('#id_payment-transaction_type').val('');
-}
+(function(window, raven) {
+    "use strict";
 
-function normalize_amount_as_payment(amount) {
-    amount = String(amount);
-    var len = amount.length;
-    var value = amount.substring(0, len-2);
-    var cents = amount.substr(len-2);
-    value = value.replace('.', '').replace('.', '').replace(',', '');
-    return String(value) + String(cents);
-}
+    var has_raven = window.hasOwnProperty('Raven');
 
-function process_payment(
-    encryption_key,
-    interest_rate,
-    event_name,
-    lots,
-    transactions
-) {
-    if (!interest_rate) {
-        alert('Erro: fale com o suporte.');
-        Raven.captureException(e);
-        return;
-    }
-
-    var billing_title = 'Inscrição do evento: ' + event_name;
-    var amount = normalize_amount_as_payment($('#id_payment-amount').val());
-
-
-    var lot = JSON.parse($('#id_payment-lot_as_json').val());
-    var allow_installment = lot.allow_installment === true;
-    var installment_limit = lot.installment_limit;
-    var free_installment = parseInt(lot.free_installment);
-
-    transactions = transactions || 'credit_card,boleto';
-    allow_installment = allow_installment === true;
-
-    function handleSuccess(data) {
-        hide_payment_elements();
-
-        switch (data.payment_method) {
-            case 'boleto':
-                $('#id_boleto').show();
-                break;
-            case 'credit_card':
-                $('#id_credit_card').show();
-                break;
-            default:
-                var msg = 'Unsupported payment type: ' + data.payment_method;
-                Raven.captureException(msg);
-                alert(
-                    "Ocorreu um erro durante o processamento," +
-                    " tente novamente depois."
-                );
-                Raven.showReportDialog();
+    raven.trigger = function (msg) {
+        console.error(msg);
+        if (has_raven) {
+            window.Raven.captureException(msg);
         }
-
-        $('#payment_buttons').show();
-        $('#id_remove').show();
-        $('#id_payment-transaction_type').val(data.payment_method);
-        $('#id_payment-amount').val(data.amount);
-        $('#id_payment-card_hash').val(data.card_hash);
-        $('#id_payment-installments').val(data.installments);
-    }
-
-    function handleError(data) {
-        if(TRACKER_CAPTURE && Raven){
-            Raven.captureException(JSON.stringify(data));
-            Raven.showReportDialog();
-        } else {
-            alert(
-                "Ocorreu um erro durante o processamento," +
-                " tente novamente depois."
-            );
-        }
-    }
-
-    var checkout = new PagarMeCheckout.Checkout({
-        encryption_key: encryption_key,
-        success: handleSuccess,
-        error: handleError
-    });
-
-    var params = {
-        amount: amount,
-        createToken: 'false',
-        paymentMethods: transactions,
-        customerData: false,
-        interestRate: interest_rate,
-        items: [
-            {
-                id: '1',
-                title: billing_title,
-                unit_price: amount,
-                quantity: 1,
-                tangible: false
-            }
-        ]
     };
 
-    if (allow_installment) {
-        if (parseInt(installment_limit) > 10) {
-            installment_limit = 10;
+    raven.show_report_dialog = function () {
+        if (has_raven) {
+            window.Raven.showReportDialog();
         }
-        params['maxInstallments'] = parseInt(installment_limit) || 10;
+    };
 
-        if (parseInt(free_installment) > 0) {
-            params['freeInstallments'] = parseInt(free_installment);
+})(window, window.cgsy.raven);
+
+(function($, payment, raven) {
+    "use strict";
+
+    const MAX_INSTALLMENTS = 10;
+
+    var allow_installment = true;
+    var interest_rate = 0;
+    var max_installments = 10;
+    var free_rate_installments = 0;
+
+    var total_amount = 0;
+    var items = [];
+    var disable_boleto = false;
+
+    var _amount_as_payment = function(amount) {
+        var split = String(amount).split('.');
+        var cents = String(split[1]);
+        if (split.length === 1) {
+            cents = '00';
         }
-    }
 
-    checkout.open(params);
-}
+        if (cents.length === 1) {
+            cents += 0;
+        }
+        return String(split[0]) + String(cents);
+    };
 
-function process_single_lot_payment(
-    encryption_key,
-    interest_rate,
-    event_name,
-    lot,
-    transactions
-) {
-    if (!interest_rate) {
-        alert('Erro: fale com o suporte.');
-        Raven.captureException(e);
-        return;
-    }
+    payment.disable_boleto = function() { disable_boleto = true; };
 
-    var billing_title = 'Inscrição do evento: ' + event_name;
-    var amount = normalize_amount_as_payment(lot.price);
+    payment.disable_installment = function() { allow_installment = false; };
 
+    payment.set_interest_rate = function(rate) { interest_rate = rate; };
 
-    var allow_installment = lot.allow_installment === true;
-    var installment_limit = lot.installment_limit;
-    var free_installment = parseInt(lot.free_installment);
-    allow_installment = allow_installment === true;
+    payment.set_max_installments = function(num) {
+        num = parseInt(num);
+        if (num > MAX_INSTALLMENTS) { num = MAX_INSTALLMENTS; }
+        max_installments = num;
+    };
 
-    function handleSuccess(data) {
-        hide_payment_elements();
+    payment.set_free_rate_installments = function (num) {
+
+        num = parseInt(num);
+        if (num > MAX_INSTALLMENTS) {
+            num = MAX_INSTALLMENTS;
+        }
+
+        free_rate_installments = num;
+    };
+
+    payment.add_item = function(type, id, title, quantity, amount) {
+        total_amount += amount;
+        items.push({
+            "object": "item",
+            "id": type + "-" + id,
+            "title": title,
+            "unit_price": _amount_as_payment(amount),
+            "quantity": quantity,
+            "tangible": false
+        })
+    };
+
+    payment.get_payment_data = function() {
+
+        if (!interest_rate) {
+            alert('Erro: fale com o suporte.');
+            raven.trigger('Não há taxa de juros no pagamento configurada.');
+            return;
+        }
+
+        var methods = 'credit_card';
+        if (disable_boleto === false) {
+            methods += ',boleto';
+        }
+
+        var params = {
+            amount: _amount_as_payment(total_amount),
+            createToken: 'false',
+            paymentMethods: methods,
+            customerData: false,
+            interestRate: interest_rate,
+            items: items
+        };
+
+        if (allow_installment) {
+
+            var max_installments = parseInt(max_installments);
+
+            if (max_installments > MAX_INSTALLMENTS) {
+                max_installments = MAX_INSTALLMENTS;
+            }
+
+            params['maxInstallments'] = max_installments;
+
+            if (free_rate_installments) {
+                params['freeInstallments'] = parseInt(free_rate_installments);
+            }
+        }
+
+        return params;
+    };
+
+})(jQuery, window.cgsy.payment, window.cgsy.raven);
+
+(function ($, payment_form, raven) {
+    "use strict";
+
+    var _hide_payment_elements = function () {
+        $('#id_boleto').hide();
+        $('#id_credit_card').hide();
+        $('#id_remove').hide();
+        $('#payment_buttons').hide();
+        $('#next_btn').attr("disabled", true);
+        $('#id_button_pay').show();
+
+        $('#id_payment-card_hash').val('');
+        $('#id_payment-installments').val('');
+        $('#id_payment-transaction_type').val('');
+    };
+
+    payment_form.success = function (data) {
+        _hide_payment_elements();
 
         switch (data.payment_method) {
             case 'boleto':
@@ -154,13 +153,13 @@ function process_single_lot_payment(
                 $('#id_credit_card').show();
                 break;
             default:
-                var msg = 'Unsupported payment type: ' + data.payment_method;
-                Raven.captureException(msg);
                 alert(
                     "Ocorreu um erro durante o processamento," +
                     " tente novamente depois."
                 );
-                Raven.showReportDialog();
+                var msg = 'Tipo de pagamento não suportado: ' + data.payment_method;
+                raven.trigger(msg);
+                raven.show_report_dialog();
         }
 
         $('#payment_buttons').show();
@@ -176,57 +175,32 @@ function process_single_lot_payment(
         payment_btn_el.text('Aguarde...');
 
         $('#next_form').submit();
-    }
-
-    function handleError(data) {
-        if(TRACKER_CAPTURE && Raven){
-            Raven.captureException(JSON.stringify(data));
-            Raven.showReportDialog();
-        } else {
-            alert(
-                "Ocorreu um erro durante o processamento," +
-                " tente novamente depois."
-            );
-        }
-    }
-
-    var checkout = new PagarMeCheckout.Checkout({
-        encryption_key: encryption_key,
-        success: handleSuccess,
-        error: handleError
-    });
-
-    var params = {
-        amount: amount,
-        createToken: 'false',
-        paymentMethods: transactions,
-        customerData: false,
-        interestRate: interest_rate,
-        items: [
-            {
-                id: '1',
-                title: billing_title,
-                unit_price: amount,
-                quantity: 1,
-                tangible: false
-            }
-        ]
     };
 
-    if (allow_installment) {
-        if (parseInt(installment_limit) > 10) {
-            installment_limit = 10;
-        }
-        params['maxInstallments'] = parseInt(installment_limit) || 10;
+    payment_form.error = function (data) {
+        alert(
+            "Ocorreu um erro durante o processamento," +
+            " tente novamente depois."
+        );
 
-        if (parseInt(free_installment) > 0) {
-            params['freeInstallments'] = parseInt(free_installment);
-        }
-    }
+        raven.trigger(JSON.stringify(data));
+        raven.show_report_dialog();
+    };
 
-    checkout.open(params);
-}
+})(jQuery, window.cgsy.payment_form, window.cgsy.raven);
 
-$('#id_remove').on('click', function () {
-    hide_payment_elements();
-});
+(function ($, payment, payment_form, pagarme, PagarMeCheckout) {
+    "use strict";
+
+    pagarme.process_payment = function (encryption_key) {
+
+        var checkout = new PagarMeCheckout.Checkout({
+            encryption_key: encryption_key,
+            success: payment_form.success,
+            error: payment_form.error
+        });
+
+        checkout.open(payment.get_payment_data());
+    };
+
+})(jQuery, window.cgsy.payment, window.cgsy.payment_form, window.cgsy.pagarme, PagarMeCheckout);

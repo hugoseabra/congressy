@@ -1,3 +1,4 @@
+{% load humanize %}
 <div class="panel panel-info">
     <div class="panel-heading">
         <div class="panel-title">
@@ -17,7 +18,7 @@
                     <div>
                         <span style="color:darkgreen;font-weight: bold;"
                               id="lot_display_publicly">
-                            {{ selected_lot.display_price }}
+                            R$ {{ selected_lot.get_calculated_price|intcomma }}
                         </span>
                     </div>
                 </div>

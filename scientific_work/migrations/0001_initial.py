@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'autor',
                 'verbose_name_plural': 'autores',
             },
-            bases=(base.models.Entity, models.Model),
+            bases=(base.models.EntityMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Work',
