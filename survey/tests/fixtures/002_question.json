@@ -1,0 +1,77 @@
+[
+  {
+    "model": "survey.question",
+    "pk": 1,
+    "fields": {
+      "survey": 2,
+      "type": "input-date",
+      "name": "alguma-data",
+      "label": "Alguma data",
+      "required": false,
+      "help_text": null,
+      "active": false,
+      "intro": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "survey.question",
+    "pk": 2,
+    "fields": {
+      "survey": 2,
+      "type": "input-text",
+      "name": "algum-texto",
+      "label": "Algum texto",
+      "required": false,
+      "help_text": null,
+      "active": false,
+      "intro": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "survey.question",
+    "pk": 3,
+    "fields": {
+      "survey": 1,
+      "type": "input-date",
+      "name": "inicio-do-curso",
+      "label": "In\u00edcio do curso",
+      "required": false,
+      "help_text": null,
+      "active": false,
+      "intro": false,
+      "order": 1
+    }
+  },
+  {
+    "model": "survey.question",
+    "pk": 5,
+    "fields": {
+      "survey": 1,
+      "type": "textarea",
+      "name": "mini-bio",
+      "label": "Mini-bio",
+      "required": false,
+      "help_text": null,
+      "active": false,
+      "intro": false,
+      "order": 3
+    }
+  },
+  {
+    "model": "survey.question",
+    "pk": 7,
+    "fields": {
+      "survey": 3,
+      "type": "select",
+      "name": "fechou-negocio-recentemente-1",
+      "label": "Fechou Neg\u00f3cio Recentemente?",
+      "required": false,
+      "help_text": null,
+      "active": false,
+      "intro": false,
+      "order": 1
+    }
+  }
+]

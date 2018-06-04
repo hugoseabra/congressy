@@ -1,0 +1,22 @@
+[
+  {
+    "model": "survey.option",
+    "pk": 3,
+    "fields": {
+      "question": 7,
+      "name": "N\u00e3o",
+      "value": "nao",
+      "active": true
+    }
+  },
+  {
+    "model": "survey.option",
+    "pk": 4,
+    "fields": {
+      "question": 7,
+      "name": "Sim",
+      "value": "sim",
+      "active": true
+    }
+  }
+]

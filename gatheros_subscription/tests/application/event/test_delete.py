@@ -16,8 +16,8 @@ class EventDeleteTest(TestCase):
         '008_member',
         '009_place',
         '010_event',
-        '006_lot',
-        '007_subscription',
+        '007_lot',
+        '008_subscription',
     ]
 
     def setUp(self):

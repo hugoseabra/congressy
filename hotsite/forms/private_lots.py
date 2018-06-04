@@ -9,9 +9,9 @@ from gatheros_subscription.models import Lot
 
 class PrivateLotForm(forms.Form):
 
-    def __init__(self, **kwargs):
-        self.event = kwargs.get('initial').get('event')
-        self.code = kwargs.get('initial').get('code')
+    def __init__(self, event, code, **kwargs):
+        self.event = event
+        self.code = code
 
         lot = None
 

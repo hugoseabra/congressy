@@ -38,11 +38,11 @@
 {% endblock %}
 
 
-    {% block nav_aside_itens %}
-        {% if object %}
-            {% include 'event/event-menu.html' with active='dados-do-evento'%}
-        {% endif %}
-    {% endblock %}
+{% block nav_aside_itens %}
+    {% if object %}
+        {% include 'event/event-menu.html' with active='dados-do-evento'%}
+    {% endif %}
+{% endblock %}
 
 
 {% block content %}
@@ -131,6 +131,28 @@
                 </div>
             </div>
         </div>
+        {% if object.has_rsvp %}
+        <div class="row">
+            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="panel-title">Restrição de público</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% render_generic_field form.rsvp_type %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="row">
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
                 <div class="buttonbar bottom">
@@ -190,11 +212,4 @@
 {% block styles %}
     <link rel="stylesheet"
           href="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.min.css" %}">
-
-    <style>
-        #gmap {
-            width: 100%;
-            height: 300px;
-        }
-    </style>
 {% endblock %}

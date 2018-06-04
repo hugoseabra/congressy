@@ -1,5 +1,5 @@
 {% extends 'hotsite/base.html' %}
-{% load l10n humanize static form_config_tags user_agents user_agent_tag %}
+{% load static form_config_tags l10n humanize %}
 
 {% block content %}
 
@@ -49,17 +49,68 @@
                                     {% render_errors field.error %}
                                 {% endif %}
                             {% endfor %}
+                            <div class="well well-sm" style="text-align: justify">
+                                <h3>Checkout: {{ subscription.person.name}}</h3>
+                                <div>
+                                    <strong>
+                                        Inscrição:
+                                    </strong>
+                                </div>
+                                <ul>
+                                    {% if lot.price %}
+                                        <strong>R$ {{ lot.get_calculated_price|intcomma }}</strong>
+                                    {% else %}
+                                        <strong>Grátis</strong>
+                                    {% endif %}
+                                </ul>
+                                {% if products %}
+                                    <div><strong>Produtos:</strong></div>
+                                    <ul>
+                                        {% for product in products %}
+                                            <ol>{{ product.optional.name }}:
+                                                <strong>
+                                                    {% if product.optional.price == 0.00 %}
+                                                        Grátis
+                                                    {% else %}
+                                                        R$
+                                                        {{ product.optional.price|intcomma }}
+                                                    {% endif %}
+                                                </strong>
+                                            </ol>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                {% if services %}
+                                    <div><strong>Serviços:</strong></div>
+                                    <ul>
+                                        {% for service in services %}
+                                            <ol>{{ service.optional.name }}:
+                                                <strong>
+                                                    {% if service.optional.price == 0.00 %}
+                                                        Grátis
+                                                    {% else %}
+                                                        R$
+                                                        {{ service.optional.price|intcomma }}
+                                                    {% endif %}
+                                                </strong>
+                                            </ol>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                <h4> Total: R$ {{ total|intcomma }} </h4>
+                            </div>
+
 
                             <div id="payment_buttons" class="text-center"
                                  style="display: none">
-                                <button id="id_boleto" type="button"
-                                        style="text-align: center;display: none">
+                                <button id="id_boleto" type="button" style="text-align: center;display: none">
                                     Boleto
                                     <br/>
                                     <img class="img-responsive" style="height: 153px; height: 153px" src="{% static 'hotsite/logos/boleto.svg' %}">
                                 </button>
-                                <button id="id_credit_card" type="button"
-                                        style="display: none">
+                                <button id="id_credit_card" type="button" style="display: none">
                                     Cartão de Credito
                                     <br/>
                                     <img class="img-responsive" src="{% static 'hotsite/logos/cartao_de_credito.svg' %}">
@@ -85,8 +136,7 @@
                             {% endif %}
 
                             <div class="text-center">
-                                <img style="width: 80%; margin-top: 20px"
-                                     src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
+                                <img style="width: 80%; margin-top: 20px" src="{% static 'hotsite/images/logos/bandeiras_pagarme.png' %}">
                             </div>
                             <br/>
                             <form action="" method="post" id="next_form">
@@ -96,7 +146,6 @@
                                 {% for hidden in form.hidden_fields %}
                                     {{ hidden }}
                                 {% endfor %}
-
                             </form>
 
                             <button type="button"
@@ -119,7 +168,6 @@
                                     </button>
                                 {% endif %}
                             </form>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -140,29 +188,75 @@
     <script src="https://assets.pagar.me/checkout/1.1.0/checkout.js"></script>
     <script src="{% static "hotsite/js/payment.js" %}"></script>
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
-    <script>
+    <script type="application/javascript">
+        function submit_back_form() {
+            $('#back_form').submit()
+        }
 
-        $(document).ready(function () {
+        jQuery(document).ready(function() {
+            window.setTimeout(function () {
+                $('form').submit(function () {
+                    $(this).find(':submit').attr('disabled', 'disabled');
+                    $(this).attr('novalidate', 'novalidate');
+                });
 
-            var payment_btn_el = $('#id_button_pay');
+                // disable boleto method
+                {% if 'boleto' not in allowed_transaction_types %}
+                window.cgsy.payment.disable_boleto();
+                {% endif %}
 
-            $('form').submit(function () {
-                $(this).find(':submit').attr('disabled', 'disabled');
-                $(this).attr('novalidate', 'novalidate');
-            });
+                {% if lot.allow_installment is True %}
+                // disable installment
+                window.cgsy.payment.disable_installment();
+                {% endif %}
 
-            var lot = JSON.parse($('#id_payment-lot_as_json').val());
+                window.cgsy.payment.set_interest_rate(2.29);
+                window.cgsy.payment.set_max_installments('{{ lot.installment_limit }}');
+                window.cgsy.payment.set_free_rate_installments('{{ lot.num_install_interest_absortion }}');
 
-            payment_btn_el.on('click', function () {
-                process_single_lot_payment(
-                    '{{ pagarme_encryption_key }}',
-                    2.29,
-                    '{{ event.name }}',
-                    lot,
-                    '{{ allowed_transaction_types }}'
+                // Adiciona billing de inscrição
+                window.cgsy.payment.add_item(
+                    'subscription',
+                    '{{ subscription.pk }}',
+                    'Inscrição: {{ lot.event.name }}',
+                    1,
+                    parseFloat('{{ lot.get_calculated_price|unlocalize|intcomma }}')
                 );
-            });
-        });
 
+                {% if products %}
+                    // Adiciona billing de opcionais de produtos/serviços
+                    {% for product in products %}
+                        {% if product.optional_price %}
+                        window.cgsy.payment.add_item(
+                            'optional-product',
+                            '{{ subscription.pk }}',
+                            'Produto/Serviço: {{ lot.event.name }}',
+                            1,
+                            parseFloat('{{ product.optional_price|unlocalize|intcomma }}')
+                        );
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                {% if services %}
+                    // Adiciona billing de opcionais de atividades extras
+                    {% for service in services %}
+                        {% if service.optional_price %}
+                        window.cgsy.payment.add_item(
+                            'optional-service',
+                            '{{ subscription.pk }}',
+                            'Atividade extra: {{ lot.event.name }}',
+                            1,
+                            parseFloat('{{ service.optional_price|unlocalize|intcomma }}')
+                        );
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                 $('#id_button_pay').on('click', function () {
+                     window.cgsy.pagarme.process_payment('{{ pagarme_encryption_key }}');
+                 });
+            }, 300);
+        });
     </script>
 {% endblock %}

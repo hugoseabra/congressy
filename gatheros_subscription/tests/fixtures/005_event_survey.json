@@ -1,0 +1,26 @@
+[
+  {
+    "model": "gatheros_subscription.eventsurvey",
+    "pk": 1,
+    "fields": {
+      "event": 8,
+      "survey": 1
+    }
+  },
+  {
+    "model": "gatheros_subscription.eventsurvey",
+    "pk": 2,
+    "fields": {
+      "event": 8,
+      "survey": 2
+    }
+  },
+  {
+    "model": "gatheros_subscription.eventsurvey",
+    "pk": 3,
+    "fields": {
+      "event": 8,
+      "survey": 3
+    }
+  }
+]

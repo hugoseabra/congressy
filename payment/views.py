@@ -9,7 +9,6 @@ from django.db.transaction import atomic
 from django.http import (
     Http404,
     HttpResponseBadRequest,
-    HttpResponseServerError,
 )
 from django.shortcuts import get_object_or_404
 from django.urls import reverse

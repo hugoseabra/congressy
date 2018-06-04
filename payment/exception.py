@@ -29,8 +29,33 @@ class ReceiverTotalAmountExceeded(Error):
         self.message = message
 
 
+class TransactionDataError(Error):
+    """
+    Quando a construção dados de transação não são feitas corretamente.
+
+    Isso evitará tentativas de criação de transações de pagamento e possíveis
+    transações incorretas.
+    """
+
+    def __init__(self, message):
+        self.message = message
+
+
+class TransactionMisconfiguredError(Error):
+    """
+    Quando há um processo de tentativa de transação, mas, por algum motivo,
+    o evento não está configurado corretamente.
+
+    Isso estabelecerá uma comunicação mais clara com o participante e
+    poderá orientar a plataforma a orientar melhor o organizador.
+    """
+
+    def __init__(self, message):
+        self.message = message
+
+
 class TransactionError(Error):
-    """Raised when an operation attempts a  transaction that's not allowed.
+    """ Raised when an operation attempts a  transaction that's not allowed.
 
     Attributes:
         message -- explanation of why the specific transaction is not allowed
@@ -76,6 +101,10 @@ class StateNotAllowedError(Error):
     def __init__(self, message):
         self.message = message
 
+
+class TransactionApiError(Error):
+    def __init__(self, message):
+        self.message = message
 
 class TransactionStatusError(Error):
     """Raised when an operation when a Status update could not be processed.

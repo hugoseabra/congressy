@@ -153,6 +153,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'project.context_processors.environment_version',
+                'frontend.context_processors.render_app_only',
             ],
             'builtins': [
                 'permission.templatetags.permissionif',
