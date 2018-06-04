@@ -174,7 +174,13 @@
                 "text": "{{ object.text_content }}"
             };
 
+            {% if object.title_hide %}
+                $('#titleCheckBox').click();
+            {% endif %}
 
+            {% if object.date_hide %}
+                $('#dateCheckBox').click();
+            {% endif %}
 
             {% if object.text_position_x %}
                 window.cert.moveElement($('#text'), {{ object.text_position_x|unlocalize|intcomma }}, {{ object.text_position_y|unlocalize|intcomma }});
