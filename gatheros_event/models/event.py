@@ -68,7 +68,7 @@ class Event(models.Model, GatherosModelMixin):
         (EVENT_TYPE_PAID, 'pago'),
         (EVENT_TYPE_SCIENTIFIC, 'scientific'),
     )
-    name = models.CharField(max_length=255, verbose_name='Nome do evento')
+
     RSVP_DISABLED = 'rsvp-disabled'
     RSVP_RESTRICTED = 'rsvp-restricted'
     RSVP_OPEN = 'rsvp-open'
@@ -79,7 +79,7 @@ class Event(models.Model, GatherosModelMixin):
         (RSVP_RESTRICTED, 'Somente associados poderão se inscrever.'),
     )
 
-    name = models.CharField(max_length=255, verbose_name='nome')
+    name = models.CharField(max_length=255, verbose_name='Nome do evento')
 
     organization = models.ForeignKey(
         Organization,
@@ -294,7 +294,9 @@ class Event(models.Model, GatherosModelMixin):
         attended = 0.0
         if hasattr(self, 'subscriptions'):
             queryset = self.subscriptions
-            num = queryset.count()
+            num = queryset.filter(completed=True).exclude(
+                status='canceled'
+            ).count()
 
             if num > 0:
                 num_attended = queryset.filter(attended=True).count()
