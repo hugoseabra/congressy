@@ -147,12 +147,14 @@ def has_products(wizard):
 
 def has_services(wizard):
     # Get cleaned data from lots step
-    cleaned_data = wizard.get_cleaned_data_for_step('lot') or {'lots': 'none'}
+    if is_private_event(wizard):
+        data = wizard.get_cleaned_data_for_step('private_lot') or {}
+    else:
+        data = wizard.get_cleaned_data_for_step('lot') or {}
 
-    # Return true if lot has price and price > 0
-    lot = cleaned_data['lots']
+    lot = data.get('lots')
 
-    if isinstance(lot, Lot) and lot.category:
+    if lot and isinstance(lot, Lot) and lot.category:
         return lot.category.service_optionals.count() > 0
 
     return False

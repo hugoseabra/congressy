@@ -1,6 +1,3 @@
-from decimal import Decimal
-
-from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
@@ -195,7 +192,6 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
         except Subscription.DoesNotExist:
             pass
-
 
         context = self.get_context_data()
         return self.render_to_response(context)
