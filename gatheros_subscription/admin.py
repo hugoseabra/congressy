@@ -105,6 +105,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         'count',
         'attended',
         'attended_on',
+        'completed',
         'synchronized',
         'congressy_percent',
     ]
