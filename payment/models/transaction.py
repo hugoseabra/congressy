@@ -202,7 +202,7 @@ class Transaction(models.Model):
         if self._state.adding is True:
             self.lot = self.subscription.lot
 
-        elif self.lot.event != self.subscription:
+        elif self.lot.event != self.subscription.event:
             raise IntegrityError(
                 'O lote informado na edição não pertence à inscrição da'
                 ' transação.'

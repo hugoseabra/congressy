@@ -84,7 +84,7 @@ def can_process_payment(wizard):
         is_cc = transaction.type == Transaction.CREDIT_CARD
         is_boleto = transaction.type == Transaction.BOLETO
         if transaction.status == Transaction.WAITING_PAYMENT:
-            if is_boleto_allowed():
+            if is_boleto:
                 has_boleto_waiting = True
 
             if is_cc:
@@ -557,7 +557,8 @@ class SubscriptionWizardView(SessionWizardView):
                         msg = 'Inscrição realizada com sucesso!' \
                               ' Nós lhe enviamos um e-mail de confirmação de' \
                               ' sua inscrição. Porém, o seu voucher estará' \
-                              ' disponível apenas após a confirmação de seu pagamento.'
+                              ' disponível apenas após a confirmação de seu' \
+                              ' pagamento.'
                     else:
                         msg = 'Inscrição salva com sucesso!'
 
