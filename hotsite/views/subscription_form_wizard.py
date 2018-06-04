@@ -543,7 +543,10 @@ class SubscriptionWizardView(SessionWizardView):
                     if notified is True:
                         msg = 'Inscrição realizada com sucesso!' \
                               ' Nós lhe enviamos um e-mail de confirmação de' \
-                              ' sua inscrição juntamente com seu voucher.'
+                              ' sua inscrição juntamente com seu voucher.' \
+                              ' Fique atento ao seu email, caso não chegue' \
+                              ' na caixa de entrada, verifique no Lixo' \
+                              ' Eletrônico.'
 
                     else:
                         msg = 'Inscrição salva com sucesso!'
@@ -554,11 +557,13 @@ class SubscriptionWizardView(SessionWizardView):
 
                 else:
                     if subscription.is_new is True:
-                        msg = 'Inscrição realizada com sucesso!' \
-                              ' Nós lhe enviamos um e-mail de confirmação de' \
-                              ' sua inscrição. Porém, o seu voucher estará' \
-                              ' disponível apenas após a confirmação de seu' \
-                              ' pagamento.'
+                        msg = 'Inscrição realizada com sucesso! Nós lhe' \
+                              ' enviamos um e-mail de confirmação de sua' \
+                              ' inscrição. Após a confirmação de seu' \
+                              ' pagamento, você receberá outro email de' \
+                              ' com seu voucher. Fique atento ao seu email,' \
+                              ' caso não chegue na caixa de entrada,' \
+                              ' verifique no Lixo Eletrônico.'
                     else:
                         msg = 'Inscrição salva com sucesso!'
 
