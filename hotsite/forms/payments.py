@@ -73,6 +73,8 @@ class PaymentForm(forms.Form):
         super().__init__(**kwargs)
 
         self.subscription_debt_form = self._create_subscription_debt_form()
+        self.product_debt_forms = self._create_product_debt_forms()
+        self.service_debt_forms = self._create_service_debt_forms()
 
         lot = copy(self.lot_instance)
         lot.price = lot.get_calculated_price()
@@ -135,6 +137,28 @@ class PaymentForm(forms.Form):
                 'Dados de pendência inválidos: {}'.format("".join(error_msgs))
             )
 
+        for debt_form in self.product_debt_forms:
+            if not debt_form.is_valid():
+                error_msgs = []
+                for field, errs in debt_form.items():
+                    error_msgs.append(str(errs))
+
+                raise forms.ValidationError(
+                    'Dados de pendência de opcionais inválidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
+        for debt_form in self.service_debt_forms:
+            if not debt_form.is_valid():
+                error_msgs = []
+                for field, errs in debt_form.items():
+                    error_msgs.append(str(errs))
+
+                raise forms.ValidationError(
+                    'Dados de pendência de atividades extras inválidos:'
+                    ' {}'.format("".join(error_msgs))
+                )
+
         return cleaned_data
 
     def save(self):
@@ -142,15 +166,25 @@ class PaymentForm(forms.Form):
             self.subscription.save()
 
             # Novo ou edição de pendência financeira
-            debt = self.subscription_debt_form.save()
+            sub_debt = self.subscription_debt_form.save()
 
             try:
                 # Construção de dados para transaçao do Pagarme
                 builder = PagarmeDataBuilder(subscription=self.subscription)
 
+                builder.add_debt(sub_debt)
+
+                for debt_form in self.service_debt_forms:
+                    serv_debt = debt_form.save()
+                    builder.add_debt(serv_debt)
+
+                for debt_form in self.product_debt_forms:
+                    prod_debt = debt_form.save()
+                    builder.add_debt(prod_debt)
+
                 # Cria transação.
                 create_pagarme_transaction(
-                    debt=debt,
+                    subscription=self.subscription,
                     data=builder.build(
                         amount=self.cleaned_data.get('amount'),
                         transaction_type=self.cleaned_data.get(
@@ -205,14 +239,20 @@ class PaymentForm(forms.Form):
                 raise e
 
     def _create_subscription_debt_form(self):
-        """ Cria formulário de pendência financeira. """
+        """ Cria formulário de pendência financeira de inscrição. """
 
         installments = self.data.get('payment-installments', 1) or 1
 
         debt_kwargs = {
             'subscription': self.subscription,
             'data': {
-                'amount': self.data.get('payment-amount'),
+                'name': 'Inscrição: {} ({} - {})'.format(
+                    self.subscription.event.name,
+                    self.subscription.code,
+                    self.subscription.pk,
+                ),
+                'item_id': str(self.subscription.pk),
+                'amount': self.subscription.lot.get_calculated_price(),
                 'installments': installments,
                 'status': Debt.DEBT_STATUS_DEBT,
                 'type': Debt.DEBT_TYPE_SUBSCRIPTION,
@@ -228,18 +268,118 @@ class PaymentForm(forms.Form):
 
             debt_kwargs['instance'] = debt
 
-            # Se é possível processar pendência, somente débito não estiver
-            # pago e não possuindo crédito.
-            debt_allowed = debt.paid is False and debt.has_credit is False
-
-            if debt_allowed is False:
-                # Pendência financeira já está paga ou com crédito.
-                raise DebtAlreadyPaid(
-                    'Esta inscrição já está paga. Não é necessário realizar'
-                    ' novo registro de pagamento.'
-                )
+            # # Se é possível processar pendência, somente débito não estiver
+            # # pago e não possuindo crédito.
+            # debt_allowed = debt.paid is False and debt.has_credit is False
+            #
+            # if debt_allowed is False:
+            #     # Pendência financeira já está paga ou com crédito.
+            #     raise DebtAlreadyPaid(
+            #         'Esta pendência já está paga. Não é necessário realizar'
+            #         ' novo registro de pendência.'
+            #     )
 
         except Debt.DoesNotExist:
             pass
 
         return DebtForm(**debt_kwargs)
+
+    def _create_service_debt_forms(self):
+        """ Cria formulário de pendência financeira de atividade extra. """
+
+        services = self.subscription.subscription_services.all()
+
+        forms = []
+        for service in services:
+            debt_kwargs = {
+                'subscription': self.subscription,
+                'data': {
+                    'name': 'Atividade extra: {} ({})'.format(
+                        service.optional.name,
+                        service.optional.pk,
+                    ),
+                    'item_id': str(service.optional.pk),
+                    'amount': service.optional.price,
+                    # parcelamento sempre 1
+                    'installments': 1,
+                    'status': Debt.DEBT_STATUS_DEBT,
+                    'type': Debt.DEBT_TYPE_SERVICE,
+                }
+            }
+
+            try:
+                debt = self.subscription.debts.get(
+                    type=Debt.DEBT_TYPE_SERVICE,
+                    subscription=self.subscription,
+                    status=Debt.DEBT_STATUS_DEBT,
+                )
+
+                debt_kwargs['instance'] = debt
+
+                # Se é possível processar pendência, somente débito não estiver
+                # pago e não possuindo crédito.
+                debt_allowed = debt.paid is False and debt.has_credit is False
+
+                if debt_allowed is False:
+                    # Pendência financeira já está paga ou com crédito.
+                    raise DebtAlreadyPaid(
+                        'Esta inscrição já está paga. Não é necessário'
+                        ' realizar novo registro de pendência.'
+                    )
+
+            except Debt.DoesNotExist:
+                pass
+
+            forms.append(DebtForm(**debt_kwargs))
+
+        return forms
+
+    def _create_product_debt_forms(self):
+        """ Cria formulário de pendência financeira de opcionais. """
+
+        products = self.subscription.subscription_products.all()
+
+        forms = []
+        for product in products:
+            debt_kwargs = {
+                'subscription': self.subscription,
+                'data': {
+                    'name': 'Atividade extra: {} ({})'.format(
+                        product.optional.name,
+                        product.optional.pk,
+                    ),
+                    'item_id': str(product.optional.pk),
+                    'amount': product.optional.price,
+                    # parcelamento sempre 1
+                    'installments': 1,
+                    'status': Debt.DEBT_STATUS_DEBT,
+                    'type': Debt.DEBT_TYPE_PRODUCT,
+                }
+            }
+
+            try:
+                debt = self.subscription.debts.get(
+                    type=Debt.DEBT_TYPE_PRODUCT,
+                    subscription=self.subscription,
+                    status=Debt.DEBT_STATUS_DEBT,
+                )
+
+                debt_kwargs['instance'] = debt
+
+                # Se é possível processar pendência, somente débito não estiver
+                # pago e não possuindo crédito.
+                debt_allowed = debt.paid is False and debt.has_credit is False
+
+                if debt_allowed is False:
+                    # Pendência financeira já está paga ou com crédito.
+                    raise DebtAlreadyPaid(
+                        'Esta inscrição já está paga. Não é necessário'
+                        ' realizar novo registro de pendência.'
+                    )
+
+            except Debt.DoesNotExist:
+                pass
+
+            forms.append(DebtForm(**debt_kwargs))
+
+        return forms

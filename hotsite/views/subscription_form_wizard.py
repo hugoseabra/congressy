@@ -10,6 +10,7 @@ from django.utils.translation import ugettext as _
 from formtools.wizard.forms import ManagementForm
 from formtools.wizard.views import SessionWizardView
 
+from addon.models import SubscriptionService
 from gatheros_event.models import Event, Person
 from gatheros_subscription.models import FormConfig, Lot, Subscription
 from hotsite import forms
@@ -356,6 +357,9 @@ class SubscriptionWizardView(SessionWizardView):
 
             # persistir lote selecionado para ser usado posteriormente.
             self.request.session['lot_pk'] = lot_pk
+            subscription = self.get_subscription()
+            subscription.lot_id = lot_pk
+            subscription.save()
 
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
@@ -402,8 +406,8 @@ class SubscriptionWizardView(SessionWizardView):
             try:
                 form.save()
 
-            except DebtAlreadyPaid as e:
-                raise ValidationError(str(e))
+            # except DebtAlreadyPaid as e:
+            #     raise ValidationError(str(e))
 
             except TransactionError as e:
                 raise ValidationError(str(e))
@@ -417,6 +421,7 @@ class SubscriptionWizardView(SessionWizardView):
         context['event'] = self.event
         context['is_private_event'] = self.is_private_event()
         context['num_lots'] = self.get_num_lots()
+        context['subscription'] = self.get_subscription()
 
         has_open_boleto = False
 
@@ -460,7 +465,7 @@ class SubscriptionWizardView(SessionWizardView):
                 config.address = config.ADDRESS_SHOW
 
             context['config'] = config
-            context['is_last'] = self.steps.last
+            context['is_last'] = self.steps.current == self.steps.last
 
         if self.storage.current_step == 'survey':
             context['is_last'] = not is_paid_lot(self)
@@ -481,26 +486,23 @@ class SubscriptionWizardView(SessionWizardView):
 
             total = subscription.lot.get_calculated_price() or Decimal(0.00)
 
-            # products_queryset = SubscriptionProduct.objects.filter(
-            #     subscription=subscription
-            # )
-            # products = [x for x in products_queryset]
-            # context['products'] = products
-            #
-            # services_queryset = SubscriptionService.objects.filter(
-            #     subscription=subscription
-            # )
-            # services = [x for x in services_queryset]
-            # context['services'] = services
-            #
-            #
-            # for product in products:
-            #     total += product.optional_price
-            #
-            # for service in services:
-            #     total += service.optional_price
+            products = [x for x in subscription.subscription_products.all()]
+            context['products'] = products
 
-            # context['total'] = total
+            services_queryset = SubscriptionService.objects.filter(
+                subscription=subscription
+            )
+
+            services = [x for x in subscription.subscription_services.all()]
+            context['services'] = services
+
+            for product in products:
+                total += product.optional_price
+
+            for service in services:
+                total += service.optional_price
+
+            context['total'] = total
 
         return context
 
@@ -720,7 +722,7 @@ class SubscriptionWizardView(SessionWizardView):
                     person=person,
                     event=self.event
                 )
-                self.subscription.is_new = False
+                self.subscription.is_new = self.subscription.completed
 
             except Subscription.DoesNotExist:
                 self.subscription = Subscription(
@@ -729,7 +731,7 @@ class SubscriptionWizardView(SessionWizardView):
                     completed=False,
                     created_by=self.request.user.pk
                 )
-                self.subscription.is_new = True
+                self.subscription.is_new = self.subscription.completed
 
         return self.subscription
 

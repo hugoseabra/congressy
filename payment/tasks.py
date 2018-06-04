@@ -13,6 +13,7 @@ from payment.exception import (
     RecipientError,
     TransactionApiError,
 )
+from payment.helpers import payment_helpers
 from payment.models import Transaction, TransactionStatus
 
 pagarme.authentication_key(settings.PAGARME_API_KEY)
@@ -26,7 +27,7 @@ def __notify_error(message, extra_data=None):
 
 
 # @TODO create a mock of the response to use during testing
-def create_pagarme_transaction(debt, data):
+def create_pagarme_transaction(subscription, data):
     try:
         trx = pagarme.transaction.create(data)
     except Exception as e:
@@ -47,16 +48,12 @@ def create_pagarme_transaction(debt, data):
             'Algo deu errado com a comunicação com o provedor de pagamento.'
         )
 
-    # Separar centavos
-    amount = str(trx['amount'])
-    size = len(amount)
-    cents = amount[-2] + amount[-1]
-    amount = '{}.{}'.format(amount[0:size - 2], cents)
-    amount = Decimal(amount)
+    amount = payment_helpers.amount_as_decimal(str(trx['amount']))
+    liquid_amount = payment_helpers.amount_as_decimal(
+        str(data['liquid_amount'])
+    )
 
     with atomic():
-
-        subscription = debt.subscription
 
         # ============================ TRANSACTION ========================== #
         installments = int(trx['installments'])
@@ -70,7 +67,7 @@ def create_pagarme_transaction(debt, data):
             date_created=trx['date_created'],
             amount=amount,
             lot_price=subscription.lot.price,
-            liquid_amount=debt.liquid_amount,
+            liquid_amount=liquid_amount,
             installments=installments,
             installment_amount=round((amount / installments), 2),
         )

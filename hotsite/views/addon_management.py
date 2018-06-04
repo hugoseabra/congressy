@@ -71,7 +71,7 @@ class ProductOptionalManagementView(generic.TemplateView):
 
                 contains = False
 
-                for product in subscription.subscriptionproduct.all():
+                for product in subscription.subscription_products.all():
                     if product.optional == optional:
                         contains = True
 
@@ -147,49 +147,55 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        subscription_pk = kwargs.get('subscription_pk')
-        subscription = get_object_or_404(Subscription, pk=subscription_pk)
+        try:
+            subscription_pk = kwargs.get('subscription_pk')
+            subscription = Subscription.objects.get(pk=subscription_pk)
 
-        category = subscription.lot.category
-        self.available_options = []
+            category = subscription.lot.category
+            self.available_options = []
 
-        self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
-        all_selected_services = SubscriptionService.objects.filter(
-            subscription=subscription,
-            optional__lot_category=subscription.lot.category
-        )
-        # @TODO add user validation here, only if request.user == sub.user
+            self.fetch_in_storage = self.request.GET.get('fetch_in_storage')
+            all_selected_services = SubscriptionService.objects.filter(
+                subscription=subscription,
+                optional__lot_category=subscription.lot.category
+            )
+            # @TODO add user validation here, only if request.user == sub.user
 
-        if self.fetch_in_storage:
-            for item in all_selected_services:
-                self.available_options.append({'optional': item.optional})
-        else:
-            event_optionals_services = Service.objects.filter(
-                lot_category=category, published=True)
+            if self.fetch_in_storage:
+                for item in all_selected_services:
+                    self.available_options.append({'optional': item.optional})
+            else:
+                event_optionals_services = Service.objects.filter(
+                    lot_category=category, published=True)
 
-            for optional in event_optionals_services:
+                for optional in event_optionals_services:
 
-                contains = False
+                    contains = False
 
-                for service in subscription.subscriptionservice.all():
-                    if service.optional == optional:
-                        contains = True
+                    for service in subscription.subscription_services.all():
+                        if service.optional == optional:
+                            contains = True
 
-                if not contains:
-                    available = not optional.has_quantity_conflict and \
-                                not optional.has_sub_end_date_conflict
+                    if not contains:
+                        available = not optional.has_quantity_conflict and \
+                                    not optional.has_sub_end_date_conflict
 
-                    if available:
-                        for service in subscription.subscriptionservice.all():
+                        if available:
+                            services = subscription.subscription_services.all()
+                            for service in services:
 
-                            # Exisiting conflicts.
-                            if service.has_schedule_conflicts or \
-                                    self.has_schedule_conflicts(
-                                        service.optional, optional):
-                                available = False
+                                # Exisiting conflicts.
+                                if service.has_schedule_conflicts or \
+                                        self.has_schedule_conflicts(
+                                            service.optional, optional):
+                                    available = False
 
-                    self.available_options.append({'optional': optional,
-                                                   'available': available})
+                        self.available_options.append({'optional': optional,
+                                                       'available': available})
+
+        except Subscription.DoesNotExist:
+            pass
+
 
         context = self.get_context_data()
         return self.render_to_response(context)

@@ -34,14 +34,11 @@ class PagarmeDataBuilder:
         self.debts = []
         self.debt_items = {}
         self.debt_amount = Decimal(0)
+        self.liquid_amount = Decimal(0)
 
         lot = subscription.lot
         self.metadata_items = {
             'lote': '{} ({})'.format(lot.display_publicly, lot.pk),
-            'inscrição': str(subscription.pk),
-            'pendencias': [],
-            'atividades-extras': [],
-            'opcionais': [],
         }
 
         # Estabelecer uma referência de qual o estado sistema houve a transação
@@ -62,19 +59,25 @@ class PagarmeDataBuilder:
                 ' "{}"'.format(debt, self.subscription)
             )
 
+        if debt.type == debt.DEBT_TYPE_SUBSCRIPTION:
+            name = 'Inscrição: {}'.format(self.subscription.event.name)
+
+        elif debt.type == debt.DEBT_TYPE_SERVICE:
+            name = 'Atividade extra: {}'.format(
+                self.subscription.event.name
+            )
+
+
         self.debts.append(debt)
         self.debt_items[debt.id] = {
-            "id": str(self.subscription.event.pk),
-            "title": self.subscription.event.name,
+            "id": debt.item_id,
+            "title": debt.name,
             "unit_price": self.as_payment_format(debt.amount),
             "quantity": 1,
             "tangible": False
         }
         self.debt_amount += debt.amount
-
-        self.metadata_items['pendencias'].append(
-            '{} ({})'.format(debt, debt.pk)
-        )
+        self.liquid_amount += debt.liquid_amount
 
         # lot = subscription.lot
 
@@ -100,6 +103,7 @@ class PagarmeDataBuilder:
             'transaction_id': transaction_id,
             'postback_url': postback_url,
             'amount': self.as_payment_format(amount),
+            'liquid_amount': self.as_payment_format(self.liquid_amount),
             'price': self.as_payment_format(amount),
             'payment_method': transaction_type,
             "installments": installments,
