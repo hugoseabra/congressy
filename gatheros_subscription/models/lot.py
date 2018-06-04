@@ -238,16 +238,22 @@ class Lot(models.Model, GatherosModelMixin):
         """ Resgata percentual de vagas preenchidas no lote. """
         completed = 0.00
         if self.limit:
-            completed = ((self.subscriptions.count() * 100) / self.limit)
+            queryset = self.subscriptions.exclude(
+                completed=False,
+                status='canceled'
+            )
+            completed = ((queryset.count() * 100) / self.limit)
 
         return round(completed, 2)
 
     @property
     def percent_attended(self):
         """ Resgata percentual de inscritos que compareceram no evento. """
-        queryset = self.subscriptions
-        num_subs = queryset.count()
-        if num_subs == 0:
+        queryset = self.subscriptions.exclude(
+            completed=False,
+            status='canceled'
+        )
+        if queryset.count() == 0:
             return 0
 
         attended = queryset.filter(attended=True).count()
@@ -291,7 +297,10 @@ class Lot(models.Model, GatherosModelMixin):
         if not self.limit:
             return self.LOT_LIMIT_UNLIMIED
 
-        num = self.subscriptions.all().count()
+        num = self.subscriptions.exclude(
+            status='canceled',
+            completed=False,
+        ).count()
         return self.limit - num
 
     @property
@@ -301,7 +310,10 @@ class Lot(models.Model, GatherosModelMixin):
         :return: string
         """
         if self.limit and self.limit > 0:
-            queryset = self.subscriptions.exclude(status='canceled')
+            queryset = self.subscriptions.exclude(
+                status='canceled',
+                completed=False
+            )
             num_subs = queryset.count()
 
             if num_subs >= self.limit:

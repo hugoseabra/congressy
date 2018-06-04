@@ -251,7 +251,7 @@ class Event(models.Model, GatherosModelMixin):
         attended = 0.0
         if hasattr(self, 'subscriptions'):
             queryset = self.subscriptions
-            num = queryset.count()
+            num = queryset.exclude(status='canceled', completed=False).count()
 
             if num > 0:
                 num_attended = queryset.filter(attended=True).count()

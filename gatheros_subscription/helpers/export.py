@@ -50,9 +50,7 @@ def export_event_data(event):
     ws1 = wb.active
     ws1.title = clean_sheet_title('Participantes')
 
-    subscriptions = event.subscriptions.all()
-
-    _export_subscriptions(ws1, subscriptions)
+    _export_subscriptions(ws1, event.subscriptions.exclude(completed=False))
 
     has_paid_lots = False
     for lot in event.lots.all():
@@ -193,7 +191,7 @@ def _export_survey_answers(worksheet, event_survey):
     ]
 
     survey = event_survey.survey
-    subscriptions = event_survey.event.subscriptions.all()
+    subscriptions = event_survey.event.subscriptions.exclude(completed=False)
     questions = survey.questions.all().order_by('order')
 
     # Lista a ser consultada para pegar a sequência de colunas de perguntas.
