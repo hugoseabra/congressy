@@ -50,6 +50,8 @@ Variáveis:
     </li>
 </ul>
 
+
+{% if event.has_checkin %}
 <h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
 <ul class="nav nav-pills nav-stacked">
     <li {% if active == 'checkin-dashboard' %}class="active"{% endif %}>
@@ -76,7 +78,7 @@ Variáveis:
         </a>
     </li>
 </ul>
-
+{% endif %}
 {% if event.is_scientific %}
     <h5 class="sidebar-header" style="color:#4c4c4c;">Artigos científicos</h5>
     <ul class="nav nav-pills nav-stacked">
@@ -98,27 +100,30 @@ Variáveis:
     </ul>
 {% endif %}
 
-<h5 class="sidebar-header" style="color:#4c4c4c;">Recursos Extras</h5>
-<ul class="nav nav-pills nav-stacked">
-    <li {% if active == 'addon-themes' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href= "{% url 'addon:theme-list' event.pk %}" title="Temas de Atividades Extras">
-            <i class="fas fa-chart-line"></i>
-            Temas
-        </a>
-    </li>
-    <li {% if active == 'addon-atividades-extras' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href="{% url 'addon:optional-service-list' event.pk %}" title="Atividades Extras">
-            <i class="fas fa-chart-line"></i>
-            Atividades Extras
-        </a>
-    </li>
-    <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href="{% url 'addon:optional-product-list' event.pk %}" title="Opcionais">
-            <i class="fas fa-chart-line"></i>
-            Opcionais
-        </a>
-    </li>
-</ul>
+{% has_paid_lots event as has_paid_lots %}
+{% if has_paid_lots %}
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Recursos Extras</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li {% if active == 'addon-themes' %}class="active"{% endif %}>
+            <a class="sidebar-itens" href= "{% url 'addon:theme-list' event.pk %}" title="Temas de Atividades Extras">
+                <i class="fas fa-chart-line"></i>
+                Temas
+            </a>
+        </li>
+        <li {% if active == 'addon-atividades-extras' %}class="active"{% endif %}>
+            <a class="sidebar-itens" href="{% url 'addon:optional-service-list' event.pk %}" title="Atividades Extras">
+                <i class="fas fa-chart-line"></i>
+                Atividades Extras
+            </a>
+        </li>
+        <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
+            <a class="sidebar-itens" href="{% url 'addon:optional-product-list' event.pk %}" title="Opcionais">
+                <i class="fas fa-chart-line"></i>
+                Opcionais
+            </a>
+        </li>
+    </ul>
+{% endif %}
 
 <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
 <ul class="nav nav-pills nav-stacked">

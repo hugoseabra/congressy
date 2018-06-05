@@ -58,6 +58,7 @@ class SubscriptionProduct(AbstractSubscriptionOptional):
     class Meta(AbstractSubscriptionOptional.Meta):
         verbose_name_plural = 'inscrições de opcional de produto'
         verbose_name = 'inscrição de opcional de produto'
+        unique_together = ('subscription', 'optional',)
 
     subscription = models.ForeignKey(
         Subscription,
@@ -95,6 +96,7 @@ class SubscriptionService(AbstractSubscriptionOptional):
     class Meta(AbstractSubscriptionOptional.Meta):
         verbose_name_plural = 'inscrições de opcional de serviço'
         verbose_name = 'inscrição de opcional de serviço'
+        unique_together = ('subscription', 'optional',)
 
     subscription = models.ForeignKey(
         Subscription,
@@ -130,7 +132,7 @@ class SubscriptionService(AbstractSubscriptionOptional):
 
         is_restricted = self.optional.restrict_unique
 
-        for sub_optional in self.subscription.subscriptionservice.all():
+        for sub_optional in self.subscription.subscription_services.all():
 
             start = sub_optional.optional.schedule_start
             stop = sub_optional.optional.schedule_end
@@ -153,7 +155,7 @@ class SubscriptionService(AbstractSubscriptionOptional):
 
         is_restricted = self.optional.restrict_unique
 
-        for sub_optional in self.subscription.subscriptionservice.all():
+        for sub_optional in self.subscription.subscription_services.all():
 
             start = sub_optional.schedule_start
             stop = sub_optional.schedule_end
