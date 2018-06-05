@@ -170,6 +170,15 @@ class Certificate(models.Model):
     def __str__(self):
         return '{}'.format(self.event)
 
+    # TEXT
+    @property
+    def converted_text_content(self):
+        return (self.text_position_y * 100) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_text_font_size(self):
+        return (self.text_font_size * 100) / self.MANAGE_TO_PDF_RATIO
+
     @property
     def converted_text_width(self):
         return (self.text_width * 100) / self.MANAGE_TO_PDF_RATIO
@@ -179,9 +188,44 @@ class Certificate(models.Model):
         return (self.text_height * 100) / self.MANAGE_TO_PDF_RATIO
 
     @property
+    def converted_text_line_height(self):
+        return (self.text_line_height * 100) / self.MANAGE_TO_PDF_RATIO
+
+    @property
     def converted_text_position_x(self):
         return (self.text_position_x * 100) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_text_position_y(self):
         return (self.text_position_y * 100) / self.MANAGE_TO_PDF_RATIO
+
+    # TITLE
+    @property
+    def converted_title_content(self):
+        return (self.title_content * 100) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_title_font_size(self):
+        return (self.title_font_size * 100) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_title_position_x(self):
+        return (self.title_position_x * 100) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_title_position_y(self):
+        return (self.title_position_y * 100) / self.MANAGE_TO_PDF_RATIO
+
+    # DATE
+    @property
+    def converted_date_font_size(self):
+        return (self.date_font_size * 100) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_date_position_x(self):
+        return (self.date_position_x * 100) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_date_position_y(self):
+        return (self.date_position_y * 100) / self.MANAGE_TO_PDF_RATIO
+
