@@ -67,11 +67,7 @@
     {% block styles %}{% endblock %}
 </head>
 
-{% if remove_preloader %}
-    <body>
-{% else %}
-    <body class="enable-animations enable-preloader preloader-dark">
-{% endif %}
+<body class="tooltip-wrapper {% if remove_preloader %}enable-animations enable-preloader preloader-dark{% endif %}">
 
 <div id="document" class="document">
 
@@ -128,6 +124,11 @@
                 radioClass: 'iradio_flat-grey'
             });
 
+            $('.tooltip-wrapper').tooltip({
+                selector: "[data-toggle=tooltip]",
+                container: "body",
+                html: true
+            });
         });
     });
 </script>
