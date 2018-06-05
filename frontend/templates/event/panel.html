@@ -159,7 +159,6 @@
             reoderDivs(evaluateProgress())
             remove_table_add()
         });
-        console.log("{{ get_status_addons.products }}")
     </script>
 
 {% endblock %}
@@ -299,39 +298,39 @@
 {#                </div>#}
                 </div>
             </div>
-{#            {% if gender.men != 0 or gender.women != 0 %}#}
-{#                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" style="padding-bottom: 20px;margin-bottom: 20px ">#}
-{#                    <div class="panel panel-primary">#}
-{#                        <div class="panel-heading">#}
-{#                            <h3 class="panel-title">Gênero dos participantes</h3>#}
-{#                        </div>#}
-{#                        <div class="panel-body">#}
-{#                            <div class="row">#}
-{#                                <div class=" col-xs-6 col-sm-6 col-md-6 col-lg-6">#}
-{#                                    <ul class="nav nav-pills nav-stacked">#}
-{#                                        <li><i class="fa fa-circle"#}
-{#                                               style="color: #1F7BB6 "></i>#}
-{#                                            Homens#}
-{#                                        </li>#}
-{#                                        <li><i class="fa fa-circle "#}
-{#                                               style="color: #FF80AB;"></i>#}
-{#                                            Mulheres#}
-{#                                        </li>#}
-{##}
-{#                                    </ul>#}
-{#                                </div>#}
-{#                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">#}
-{#                                    <div>#}
-{#                                        <canvas id="doughnut" width="100%"#}
-{#                                                height="88%"#}
-{#                                        ></canvas>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            {% endif %}#}
         </div>
-    </div>
+            {% if gender.men != 0 or gender.women != 0 %}
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" style="padding-bottom: 20px;margin-bottom: 20px ">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Gênero dos participantes</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class=" col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li><i class="fa fa-circle"
+                                               style="color: #1F7BB6 "></i>
+                                            Homens
+                                        </li>
+                                        <li><i class="fa fa-circle "
+                                               style="color: #FF80AB;"></i>
+                                            Mulheres
+                                        </li>
+
+                                    </ul>
+                                </div>
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <div>
+                                        <canvas id="doughnut" width="100%"
+                                                height="88%"
+                                        ></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
 {% endblock %}

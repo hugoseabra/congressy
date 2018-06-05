@@ -45,7 +45,7 @@
         </td>
     </tr>
 
-    {% if event.payment_type == 'paid' or has_paid_lots %}
+    {% if event.event_type == 'paid' or has_paid_lots or event.event_type == 'scientific' %}
         <tr class="todo_list_element {% if not has_paid_lots %}
                     warning {% endif %}"
             role="presentation"
@@ -82,7 +82,7 @@
         </tr>
     {% endif %}
 
-    {% if event.payment_type == 'paid' or has_paid_lots %}
+    {% if event.event_type == 'paid' or has_paid_lots or  event.event_type == 'scientific' %}
         <tr class="todo_list_element" role="presentation">
             <td>
                 <a href="{% url 'event:organization-edit' organization.pk %}">Configurar
@@ -258,7 +258,6 @@
     </tbody>
 </table>
 <br>
-{% if has_paid_lots %}
     <div id="todo_additional" class="panel panel-primary" style="box-shadow:
      0 0 0 0">
 
@@ -285,6 +284,7 @@
                         </td>
                     </tr>
                 {% endif %}
+                {% if has_paid_lots or event.event_type == 'scientific' or event.event_type == 'paid'%}
                 {% if has_addons.extra_activities == False %}
                     <tr id="add-extra_activities" class="todo_list_element"
                         role="presentation">
@@ -339,8 +339,9 @@
 {#                        </td>#}
 {#                    </tr>#}
 {#                {% endif %}#}
+                {% endif %}
+
                 </tbody>
             </table>
         </div>
     </div>
-{% endif %}

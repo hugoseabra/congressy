@@ -92,7 +92,8 @@
 </head>
 <body>
 
-<section id="main-wrapper" class="theme-cgsy-full {% if apponly %}app-only{% endif %} {% if notitle %}no-app-title{% endif %} tooltip-wrapper">
+<section id="main-wrapper"
+         class="theme-cgsy-full {% if apponly %}app-only{% endif %} {% if notitle %}no-app-title{% endif %} tooltip-wrapper">
     <header id="header">
 
         <!--logo start-->
@@ -321,12 +322,6 @@
     $(function () {
         $('#button-toggle').click(function () {
             $('#sidebar').toggle();
-        });
-    });
-
-    $(function () {
-        $('#profile-button').click(function () {
-            $('#profile-navbar').toggle();
         });
     });
 
