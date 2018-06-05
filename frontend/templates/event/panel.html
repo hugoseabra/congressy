@@ -98,6 +98,33 @@
                 };
             };
 
+            {#cgsy.panel.InsideBar = function () {#}
+            {#    var that = this;#}
+            {##}
+            {#    this.render = function (main_el, callback) {#}
+            {#        main_el = $(main_el);#}
+            {##}
+            {#        var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}?template_name=event/event-menu");#}
+            {#        sender.setSuccessCallback(function (response) {#}
+            {#            main_el.html(response);#}
+            {#            if (callback) {#}
+            {#                callback();#}
+            {#            }#}
+            {#        });#}
+            {##}
+            {#        sender.send('GET');#}
+            {#    };#}
+            {##}
+            {##}
+            {#    this.update = function (main_el, callback) {#}
+            {#        main_el = $(main_el);#}
+            {##}
+            {#        var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}");#}
+            {#        sender.setSuccessCallback(function () {#}
+            {#            that.render(main_el, callback);#}
+            {#        });#}
+            {#    };#}
+
         })(jQuery, window.cgsy);
 
         function remove_table_add() {
@@ -151,13 +178,23 @@
                 );
             });
         }
-
+        {##}
+        {#function updateInsideBar() {#}
+        {#    var inside = new window.cgsy.panel.InsideBar();#}
+        {#    $('.update_inside_bar').on('click', function () {#}
+        {#        inside.update(#}
+        {#            $('#event-menu'),#}
+        {#            function () {#}
+        {#                updateInsideBar();#}
+        {#            }#}
+        {#        );#}
+        {#    });#}
 
         $(document).ready(function () {
-            setProgressBar()
+            setProgressBar();
             create_todo_events();
-            reoderDivs(evaluateProgress())
-            remove_table_add()
+            reoderDivs(evaluateProgress());
+            remove_table_add();
         });
         console.log("{{ get_status_addons.products }}")
     </script>
