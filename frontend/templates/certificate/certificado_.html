@@ -375,7 +375,6 @@
 
             };
 
-
             window.cert.is_defined = function is_defined(x) {
                 return x !== null && typeof(x) !== 'undefined';
             };
@@ -520,24 +519,42 @@
                 var text_position_x = cert.hasAttr(['position_x', 'text_position_x'], data, cert.text);
                 var text_position_y = cert.hasAttr(['position_y', 'text_position_y'], data, cert.text);
 
-                var text_font_size = cert.hasAttr(['font_size', 'text_font_size'], data, cert.text);
-                var text_width = cert.hasAttr(['width', 'text_width'], data, cert.text);
-                var text_height = cert.hasAttr(['height', 'text_height'], data, cert.text);
-                var text_line_height = cert.hasAttr(['line_height', 'text_line_height'], data, cert.text);
+                var text_font_size = cert.remove_px(cert.hasAttr(['font_size', 'text_font_size'], data, cert.text));
+                var text_width = cert.remove_px(cert.hasAttr(['width', 'text_width'], data, cert.text));
+                var text_height = cert.remove_px(cert.hasAttr(['height', 'text_height'], data, cert.text));
+                var text_line_height = cert.remove_px(cert.hasAttr(['line_height', 'text_line_height'], data, cert.text));
                 var text_content = cert.hasAttr(['text', 'text_content'], data, cert.text);
 
+                if (text_position_x) {
+                    form_data.append('text_position_x', text_position_x.toFixed(2));
+                }
 
-                form_data.append('text_position_x', text_position_x.toFixed(2));
-                form_data.append('text_position_y', text_position_y.toFixed(2));
+                if (text_position_y) {
+                    form_data.append('text_position_t', text_position_y.toFixed(2));
+                }
 
-                form_data.append('text_font_size', cert.remove_px(text_font_size));
-                form_data.append('text_width', cert.remove_px(text_width));
-                form_data.append('text_height', cert.remove_px(text_height));
-                form_data.append('text_line_height', cert.remove_px(text_line_height));
+                if(text_font_size){
+                    form_data.append('text_font_size', text_font_size);
+                }
 
+                if(text_width){
+                    console.log("text_width => " + text_width);
+                    form_data.append('text_width', text_width);
+                }
 
-                form_data.append('text_content', text_content);
+                if(text_height){
+                    console.log("text_height => " + text_height);
+                    form_data.append('text_height', text_height);
+                }
 
+                if(text_line_height){
+                    console.log("text_line_height => " + text_line_height);
+                    form_data.append('text_line_height', text_line_height);
+                }
+
+                if(text_content){
+                    form_data.append('text_content', text_content);
+                }
 
                 $.ajax({
                     url: cert.url,
@@ -556,16 +573,14 @@
                         });
                     },
                     error: function (err) {
-                        if (typeof (data) === "undefined") {
-                            debugger;
-                        }
-                        cert.log_err(err);
-                        cert.log_err(data);
-                        cert.log_err(form_data);
-                        Messenger().post({
-                            message: 'Texto não foi atualizado!',
-                            type: 'danger'
-                        });
+
+
+
+
+                        //Messenger().post({
+                        //    message: 'Texto não foi atualizado!',
+                        //    type: 'danger'
+                        //});
                     }
                 });
 
