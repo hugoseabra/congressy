@@ -541,9 +541,9 @@ class SubscriptionWizardView(SessionWizardView):
                         msg = 'Inscrição realizada com sucesso!' \
                               ' Nós lhe enviamos um e-mail de confirmação de' \
                               ' sua inscrição juntamente com seu voucher.' \
-                              ' Fique atento ao seu email, caso não chegue' \
-                              ' na caixa de entrada, verifique no Lixo' \
-                              ' Eletrônico.'
+                              ' Fique atento ao seu email, e, caso não' \
+                              ' chegue na caixa de entrada, verifique no' \
+                              ' Lixo Eletrônico.'
 
                         subscription.notified = True
                         subscription.save()
@@ -560,8 +560,8 @@ class SubscriptionWizardView(SessionWizardView):
                         msg = 'Inscrição realizada com sucesso! Nós lhe' \
                               ' enviamos um e-mail de confirmação de sua' \
                               ' inscrição. Após a confirmação de seu' \
-                              ' pagamento, você receberá outro email de' \
-                              ' com seu voucher. Fique atento ao seu email,' \
+                              ' pagamento, você receberá outro email com' \
+                              ' seu voucher. Fique atento ao seu email, e,' \
                               ' caso não chegue na caixa de entrada,' \
                               ' verifique no Lixo Eletrônico.'
                     else:
