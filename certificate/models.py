@@ -53,13 +53,6 @@ class Certificate(models.Model):
         help_text='Texto principal do certificado.',
     )
 
-    date_content = models.TextField(
-        verbose_name='texto',
-        help_text='Texto de data do certificado.',
-        null=True,
-        blank=True,
-    )
-
     text_font_size = models.FloatField(
         default=20,
         verbose_name='tamaho da fonte do texto',
@@ -85,7 +78,7 @@ class Certificate(models.Model):
     )
 
     text_line_height = models.FloatField(
-        max_length=3,
+        default=22,
         verbose_name='espaço entre-linhas do texto',
         help_text='espaço entre-linhas (cm) do conteúdo.',
         null=True,
@@ -102,7 +95,6 @@ class Certificate(models.Model):
 
     text_position_y = models.FloatField(
         default=309,
-        max_length=5,
         verbose_name='posição Y do texto',
         help_text='distância do bloco no eixo Y.',
         null=True,
@@ -135,7 +127,6 @@ class Certificate(models.Model):
 
     title_position_y = models.FloatField(
         default=192,
-        max_length=5,
         verbose_name='posição Y do título',
         help_text='distância do bloco no eixo Y.',
         null=True,
@@ -157,7 +148,6 @@ class Certificate(models.Model):
 
     date_position_x = models.FloatField(
         default=15,
-        max_length=5,
         verbose_name='posição X da data',
         help_text='distância do bloco no eixo X.',
         null=True,
@@ -166,7 +156,6 @@ class Certificate(models.Model):
 
     date_position_y = models.FloatField(
         default=463,
-        max_length=5,
         verbose_name='posição Y da data',
         help_text='distância do bloco no eixo Y.',
         null=True,
