@@ -6,20 +6,50 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView
-
+from django.http import HttpResponse
+from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
+from gatheros_event.models import Event, Info, Organization, Member, Person
 from gatheros_event.models import Event
 from gatheros_subscription.models import Subscription
 from gatheros_event.views.mixins import AccountMixin
 from payment.models import Transaction, TransactionStatus
+from addon.models import OptionalProductType, OptionalServiceType
 
 
-class EventPanelView(AccountMixin, DetailView):
+class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
     model = Event
     # template_name = 'gatheros_event/event/panel.html'
     template_name = 'event/panel.html'
     permission_denied_url = reverse_lazy('event:event-list')
     object = None
+
+    def post(self, request, *args, **kwargs):
+        id_row = request.POST.get('id_row')
+        row_name = id_row[4:]
+        val = True
+        if id_row:
+            if id_row[:3] == 'add':
+                val = True
+
+            elif id_row[:3] == 'del':
+                val = False
+
+            if row_name == 'checkin':
+                self.event.has_checkin = val
+
+            elif row_name == 'extra_activities':
+                self.event.has_extra_activities = val
+
+            elif row_name == 'certificate':
+                self.event.has_certificate = val
+
+            elif row_name == 'optionals':
+                self.event.has_optionals = val
+
+            self.event.save()
+
+        return HttpResponse(status=201)
 
     def pre_dispatch(self, request):
         self.object = self.get_object()
@@ -44,7 +74,9 @@ class EventPanelView(AccountMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        self.event = self.get_event(**kwargs)
         context = super(EventPanelView, self).get_context_data(**kwargs)
+        context['event'] = self.get_event(**kwargs)
         context['status'] = self._get_status()
         context['totals'] = self._get_payables()
         context['limit'] = self._get_limit()
@@ -59,13 +91,61 @@ class EventPanelView(AccountMixin, DetailView):
         context['can_delete'] = self._can_delete
         context['can_view_lots'] = self._can_view_lots
         context['can_manage_subscriptions'] = self.can_manage_subscriptions
+        context['has_addons'] = self.has_addons()
         context['percent_attended'] = {
             'label': round(self.object.percent_attended),
             'number': str(self.object.percent_attended).replace(',', '.'),
         }
         context['report'] = self._get_report()
+        context['full_banking'] = self._get_full_banking()
+        context['number_attendances'] = self.get_number_attendances()
+        context['status_addons'] = self.get_status_addons()
+        try:
+            context['info'] = self.event.info
+        except Info.DoesNotExist:
+            pass
+
 
         return context
+
+    def get_status_addons(self):
+        has_services = False
+        has_products = False
+        for lotcategory in self.event.lot_categories.all():
+            if lotcategory.service_optionals.count():
+                has_services = True
+
+            if lotcategory.product_optionals.count():
+                has_products = True
+
+        status_addons = {
+            'services': has_services,
+            'products': has_products
+        }
+
+        return status_addons
+    def get_number_attendances(self):
+        try:
+            return Subscription.objects.filter(
+                attended=True,
+                event=self.get_event(),
+            ).count()
+
+        except Subscription.DoesNotExist:
+            return 0
+
+    def get_event(self, **kwargs):
+        return get_object_or_404(Event, pk=self.kwargs.get('pk'))
+
+    def has_addons(self):
+        has_addons = {
+            'extra_activities': self.event.has_extra_activities,
+            'optionals': self.event.has_optionals,
+            'checkin': self.event.has_checkin,
+            'certificate': self.event.has_certificate,
+        }
+
+        return has_addons
 
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
@@ -78,6 +158,27 @@ class EventPanelView(AccountMixin, DetailView):
                 return True
 
         return False
+
+
+
+    def _get_full_banking(self):
+
+        if not self.organization:
+            return False
+
+        banking_required_fields = ['bank_code', 'agency', 'account',
+                                   'cnpj_ou_cpf', 'account_type']
+
+        for field in Organization._meta.get_fields():
+
+            for required_field in banking_required_fields:
+
+                if field.name == required_field:
+
+                    if not getattr(self.organization, field.name):
+                        return False
+
+        return True
 
     def _get_gender(self):
         return self.event.get_report()

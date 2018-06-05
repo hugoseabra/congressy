@@ -24,18 +24,21 @@
 {% endblock messages %}
 
 {% block title %}
-    {% if object %}Editar{% else %}Novo{% endif %} Evento | Congressy
+    Novo Evento | Congressy
 {% endblock %}
 
 {% block page_title %}
-    {% if object %}Editar{% else %}Novo{% endif %} Evento
-{% endblock %}
-
-{% block page_sub_title %}
-    {% if object %}
-        {{ object.name }} (ID: {{ object.pk }})
+    Novo Evento
+    {% if event_type == 'free' %}
+        Gratuito
+    {% elif event_type == 'paid' %}
+        Pago
+    {% else %}
+        Científico
     {% endif %}
 {% endblock %}
+
+
 
 
 {% block nav_aside_itens %}
@@ -46,146 +49,258 @@
 
 
 {% block content %}
-    <form action="" method="post" class="form-horizontal form-border"
-          role="form" name="event_form">
-        {% csrf_token %}
+    {% if not step %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="type_event panel panel-primary"
+                     href="javascript:void(0)" onclick="choose_type('free')">
+                    <div class="panel-heading">
+                        <h3 class="panel-title" style="text-align: center;">
+                            Evento
+                            Gratuito</h3>
+                    </div>
+                    <div class="panel-body" style="text-align: center">
+                        <img class="type-image" style="width: 150px; height:
+                    150px;" src=
+                                "{% static "assets/img/free-event.png" %}"
+                        />
+                    </div>
+                    <div id="free-footer" class="panel-footer">
+                        <h3> Seu evento é com inscrição gratuita.<br/>
+                            Não há pagamentos, nem gestão de recursos
+                            avançados.
+                        </h3>
+                    </div>
+                    <i class="overlay far fa-check-circle fa-10x"
+                    ></i>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="type_event panel panel-primary"
+                     href="javascript:void(0)" onclick="choose_type('paid')">
+                    <div class="panel-heading">
+                        <h1 class="panel-title" style="text-align: center;">
+                            Evento
+                            Pago</h1>
+                    </div>
+                    <div class="panel-body" style="text-align: center">
+                        <img style="width: 150px; height:
+                    150px;"
+                             class="type-image"
+                             src=
+                                     "{% static "assets/img/paid-event.png" %}"
+                        />
+                    </div>
+                    <div id="paid-footer" class="panel-footer">
+                        <h3> Seu evento é com inscrição paga.<br/>
+                            -Poderá gerenciar vagas de atividades extras
+                            (workshops, minicursos).<br/>
+                            -Poderá vender opcionais (hospedagem, alimentação e
+                            outros).<br/>
+                            -Módulo de Check-in e Credenciamento.<br/>
+                        </h3>
+                    </div>
+                    <i class="overlay far fa-check-circle fa-10x"
+                    ></i>
 
-        {% if form.non_field_errors %}
-            {% render_errors form.non_field_errors %}
-        {% endif %}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="type_event panel panel-primary"
+                     href="javascript:void(0)"
+                     onclick="choose_type('scientific')">
+                    <div class="panel-heading">
+                        <h3 class="panel-title" style="text-align: center;">
+                            Evento
+                            Científico</h3>
+                    </div>
+                    <div class="panel-body" style="text-align: center">
+                        <img style="width: 150px; height:
+                    150px;"
+                             class="type-image" src=
+                                     "
+{% static "assets/img/scientific-event.png" %}"
+                        />
 
-        {% for hidden_field in form.hidden_fields %}
-            {% if hidden_field.errors %}
-                {% render_errors hidden_field.errors %}
+                    </div>
+                    <div id="scientific-footer" class="panel-footer">
+                        <h3> Seu evento é científico com inscrição paga.<br/>
+                            - Poderá gerenciar vagas de atividades extras
+                            (workshops, minicursos).<br/>
+                            - Poderá vender opcionais (hospedagem,
+                            alimentação e
+                            outros).<br/>
+                            - Módulo de Check-in e Credenciamento.<br/>
+                            - Módulo de submissão de artigos Científicos.<br/>
+                        </h3>
+                    </div>
+                    <i class="overlay far fa-check-circle fa-10x"
+                    ></i>
+                </div>
+            </div>
+
+        </div>
+        <form action="" method="GET" id="choose-type-form"
+              style="display:none">
+            <input type="hidden" name="event_type" id="event_type" value=""/>
+            <input type="hidden" name="step" value="step2"/>
+        </form>
+    {% endif %}
+    {% if step == 'step2' %}
+
+        <form action="" method="post" class="form-horizontal form-border"
+              role="form" name="event_form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                {% render_errors form.non_field_errors %}
             {% endif %}
-            {{ hidden_field }}
-        {% endfor %}
 
-        <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                <div class="buttonbar">
-                    <div class="float-right">
-                        {% if next_path %}
-                            <a href="{{ next_path|urlencode }}"
-                               class="btn btn-danger">
-                                <i class="fas fa-times-circle"></i>
-                                Cancelar
-                            </a>
-                            <input type="hidden" name="next"
-                                   value="{{ next_path }}"/>
-                        {% else %}
-                            <a href="{% url 'event:event-list' %}"
-                               class="btn btn-danger">
-                                <i class="fas fa-times-circle"></i>
-                                Cancelar
-                            </a>
-                        {% endif %}
+            {% for hidden_field in form.hidden_fields %}
+                {% if hidden_field.errors %}
+                    {% render_errors hidden_field.errors %}
+                {% endif %}
+                {{ hidden_field }}
+            {% endfor %}
 
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-save"></i>
-                            Salvar
-                        </button>
+            <div class="row">
+                <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                    <div class="buttonbar">
+                        <div class="float-left">
+                            <a href="{% url 'event:event-add' %}"
+                               class="btn btn-primary">
+                                <i class="fas fa-arrow-circle-left"></i>
+                                Voltar
+                            </a>
+                        </div>
+
+                        <div class="clearfix"></div>
                     </div>
-                    <div class="clearfix"></div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">Campos Principais</div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.name autofocus=True %}
+            <div class="row">
+                <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">Campos Principais</div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.name autofocus=True %}
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.organization %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.organization %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.category %}
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.category %}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.date_start %}
-                                    </div>
-                                    <div class="col-md-6">
-                                        {% render_generic_field form.date_end %}
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        {% render_switchery_field form.is_scientific %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.date_start %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% render_generic_field form.date_end %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% if object.has_rsvp %}
-        <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="panel-title">Restrição de público</div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-md-12">
+                            {% if object.has_rsvp %}
                                 <div class="row">
-                                    <div class="col-md-12">
-                                        {% render_generic_field form.rsvp_type %}
+                                    <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
+                                        <div class="panel panel-primary">
+                                            <div class="panel-heading">
+                                                <div class="panel-title">
+                                                    Restrição de público
+                                                </div>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                {% render_generic_field form.rsvp_type %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                            {% endif %}
+                            <div class="row">
+                                {% if not object %}
+                                    {% if event_type != 'free' %}
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_optionals %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_extra_activities %}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_checkin %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {% render_switchery_field form.has_certificate %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        <div class="row">
-            <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-                <div class="buttonbar bottom">
-                    <div class="float-right">
-                        {% if next_path %}
-                            <a href="{{ next_path|urlencode }}"
-                               class="btn btn-danger">
-                                <i class="fas fa-times-circle"></i>Cancelar</a>
-                            <input type="hidden" name="next"
-                                   value="{{ next_path }}"/>
-                        {% else %}
-                            <a href="{% url 'event:event-list' %}"
-                               class="btn btn-danger">
-                                <i class="fas fa-times-circle"></i>Cancelar</a>
-                        {% endif %}
+                    <div class="buttonbar bottom">
+                        <div class="float-right">
+                            {% if next_path %}
+                                <a href="{{ next_path|urlencode }}"
+                                   class="btn btn-danger">
+                                    <i class="fas fa-times-circle"></i>Cancelar</a>
+                                <input type="hidden"
+                                       name="next"
+                                       value="{{ next_path }}"/>
+                            {% else %}
+                                <a href="{% url 'event:event-list' %}"
+                                   class="btn btn-danger">
+                                    <i class="fas fa-times-circle"></i>Cancelar</a>
+                            {% endif %}
 
 
-                        <button type="submit" class="btn btn-success">
-                            <i class="fa fa-save"></i>
-                            Salvar
-                        </button>
+                            <button type="submit"
+                                    class="btn btn-success">
+                                <i class="fa fa-save"></i>
+                                Salvar
+                            </button>
+                        </div>
+                        <div class="clearfix"></div>
                     </div>
-                    <div class="clearfix"></div>
+
                 </div>
             </div>
-        </div>
-    </form>
+
+        </form>
+    {% endif %}
+
 {% endblock %}
 
 {% block scripts %}
     <script src="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.full.min.js" %}"></script>
     <script src="{% static 'assets/js/event.js' %}"></script>
     <script>
+        function choose_type(chosen_type) {
+            $('#event_type').val(chosen_type);
+            $('#choose-type-form').submit();
+        }
+
         (function ($) {
             $(document).ready(function () {
                 {% if LANGUAGE_CODE == 'pt-br' %}
@@ -204,6 +319,22 @@
                     $('#id_date_end_0').mask("9999-99-99");
                     $('#id_date_end_1').mask("99:99");
                 {% endif %}
+
+
+                $('.type_event').on('click', function () {
+                    $('.type_event').find('.overlay').each(function () {
+                        $(this).removeClass('active');
+                    });
+                    $('.type_event:hover > .overlay').toggleClass('active');
+                });
+
+                function resizePanel() {
+                    var bigFooter = $('#scientific-footer').height();
+                    $('#free-footer').height(bigFooter);
+                    $('#paid-footer').height(bigFooter);
+                }
+
+                resizePanel();
             });
         })(jQuery);
     </script>
@@ -212,4 +343,41 @@
 {% block styles %}
     <link rel="stylesheet"
           href="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.min.css" %}">
+
+    <style>
+        .panel > .panel-footer {
+            text-transform: none;
+        }
+
+        .type_event {
+            cursor: pointer;
+        }
+
+        .overlay {
+            display: none;
+        }
+
+        .active {
+            position: absolute;
+            text-align: center;
+            color: #0e90d2;
+            top: 15%;
+            width: 100%;
+            height: 100%;
+        {#background-color: #000;#} opacity: 1;
+            z-index: 100;
+            display: block;
+        }
+
+        .col-md-4 > .panel-primary > .panel-heading {
+            background-color: #1f7bb6;
+            border-color: #1f7bb6;
+        }
+
+        .panel-footer {
+            background-color: #fff;
+            border-color: #fff;
+        }
+
+    </style>
 {% endblock %}

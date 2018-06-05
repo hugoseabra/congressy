@@ -64,7 +64,10 @@ class SubscriptionUpdateAttendedAPIView(generics.GenericAPIView):
 
     def get_queryset(self):
         event_pk = self.kwargs.get('event_pk')
-        queryset = Subscription.objects.filter(event=event_pk)
+        queryset = Subscription.objects.filter(
+            event=event_pk,
+            completed=True,
+        ).exclude(status=Subscription.CANCELED_STATUS)
         return queryset
 
     def patch(self, request, *args, **kwargs):

@@ -7,7 +7,9 @@ ROOT_URLCONF = 'project.partner.urls'
 INSTALLED_APPS += [
     'gatheros_event',
     'gatheros_subscription',
+    'payment_debt',
     'payment',
+    'payment_debt',
     'mailer',
     'partner',
     'survey',

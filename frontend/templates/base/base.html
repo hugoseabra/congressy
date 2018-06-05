@@ -92,7 +92,8 @@
 </head>
 <body>
 
-<section id="main-wrapper" class="theme-cgsy-full {% if apponly %}app-only{% endif %} {% if notitle %}no-app-title{% endif %}">
+<section id="main-wrapper"
+         class="theme-cgsy-full {% if apponly %}app-only{% endif %} {% if notitle %}no-app-title{% endif %} tooltip-wrapper">
     <header id="header">
 
         <!--logo start-->
@@ -301,25 +302,23 @@
 <script src="{% static "assets/plugins/sortable/js/Sortable.min.js" %}"></script>
 <script src="{% static "assets/js/src/app.js" %}"></script>
 <script src="{% static "assets/js/cgsy.js" %}"></script>
+<script src="{% static "assets/js/ajax.js" %}"></script>
 
 <script type="application/javascript">
 
     $(document).ready(function () {
         $('.cgsy-date-input').mask("99/99/9999");
         $('.cgsy-time-input').mask("99:99");
-
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        });
     });
 
     $(function () {
         var button = $("#org-button");
-        var navMain = $(".navbar-collapse"); // avoid dependency on #id
+        var navMain = $(".navbar-collapse");
         button.click(function () {
             navMain.collapse('hide');
         });
     });
+
     $(function () {
         $('#button-toggle').click(function () {
             $('#sidebar').toggle();

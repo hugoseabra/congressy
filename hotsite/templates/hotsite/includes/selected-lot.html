@@ -18,7 +18,9 @@
                     <div>
                         <span style="color:darkgreen;font-weight: bold;"
                               id="lot_display_publicly">
+                            {% if selected_lot.price %}
                             R$ {{ selected_lot.get_calculated_price|intcomma }}
+                            {% endif %}
                         </span>
                     </div>
                 </div>
