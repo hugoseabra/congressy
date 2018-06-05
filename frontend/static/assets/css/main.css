@@ -4082,17 +4082,13 @@ ul.messenger-theme-flat .messenger-message.alert-warning .messenger-message-inne
   /*Resize e Drag*/
   /*==========================================*/
   /*Container onde fica os elementos (texto, título e data)*/
-  /*==========================================*/
-  /*Elementos de texto (título, texto, data) */
 }
 #certificate .resize-drag,
 #certificate .drag {
   background-color: transparent;
-  color: black;
-  font-size: 20px;
   box-sizing: border-box;
   transition: background-color 1s ease;
-  border: 1px solid darkgray;
+  border: 1px dotted darkgray;
 }
 #certificate .certificate-row {
   overflow-x: auto;
@@ -4101,27 +4097,4 @@ ul.messenger-theme-flat .messenger-message.alert-warning .messenger-message-inne
   width: 1024px;
   height: 724px;
   margin: 0 auto;
-}
-#certificate #text,
-#certificate #dateText,
-#certificate #titleText {
-  color: black;
-  font-size: 20px;
-  border-radius: 8px;
-  box-sizing: border-box;
-  transition: background-color 1s ease;
-}
-#certificate #text {
-  width: 634px;
-  height: 348px;
-}
-#certificate #dateText {
-  min-width: 1014px;
-  height: 44px;
-  left: 0;
-  position: fixed;
-}
-#certificate #titleText {
-  height: 80px;
-  font-size: 60px;
 }

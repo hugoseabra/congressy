@@ -1,551 +1,251 @@
-window.cert = window.cert || {};
+window.cert = window.cgsy || {};
+window.cgsy.cert = window.cgsy.cert || {};
 
-(function (window, $) {
+(function ($, messenger, AjaxSender, cert) {
+    "use strict";
+    // PERSISTÊNCIA DE CERTIFICADO
 
-    window.cert.url = undefined;
-    window.cert.event = undefined;
-
-    Messenger.options = {
-        extraClasses: 'messenger-fixed messenger-on-bottom ' +
-        'messenger-on-right',
-        theme: 'flat'
+    var persistence = {
+        'url': undefined
     };
 
-    // CSRF code
-    function getCookie(name) {
-        var cookieValue = null;
-        var i = 0;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (i; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
+    var save_timer = null;
+
+    var create_sender = function() {
+
+        if (!persistence.hasOwnProperty('url') || !persistence.url) {
+            console.log('Você deve informar a URL do certificado em window.cgsy.cert.persistence.url');
         }
-        return cookieValue;
-    }
 
-    function is_defined(x) {
-        return x !== null && typeof(x) !== 'undefined';
-    }
+        var sender = new AjaxSender(persistence.url);
+            sender.setFailCallback(function (response) {
+                var msg = 'Failure on request to "' + url + '" with method';
+                msg += ' "' + this.method + '".';
 
-    function remove_px(str) {
-        if (is_defined(str) && typeof(str) === "string") {
+                if (response.hasOwnProperty('detail')) {
+                    msg += ' Detalhes: ' + response.detail;
+                }
+                messenger.triggerError(msg);
+            });
+
+        return sender;
+    };
+
+    var setSuccessMessage = function (sender, msg) {
+        if (msg) {
+           var callback = function () {
+                messenger.triggerSuccess(msg);
+            }
+        } else {
+            // limpa mensagem anterior.
+            callback = function() {};
+        }
+        sender.setSuccessCallback(callback);
+    };
+
+    var save = function (data, success_msg) {
+        window.clearTimeout(save_timer);
+        save_timer = window.setTimeout(function() {
+            var sender = create_sender();
+            setSuccessMessage(sender, success_msg);
+            sender.send('PATCH', data);
+        }, 800);
+    };
+
+    var remove_px = function (str) {
+        if (typeof(str) === "string") {
             return str.replace("px", "");
         }
-
         return str;
-    }
-
-    var csrftoken = getCookie('csrftoken');
-
-    var title = window.cert.title;
-    var date = window.cert.date;
-    var text = window.cert.text;
-
-    // =============TITLE==================
-    // Função que solicita um objeto title
-    window.cert.getTitle = function () {
-        $.ajax({
-            url: window.cert.url,
-            method: 'GET',
-            crossDomain: true,
-            success: function (data) {
-                console.log(data);
-            }
-        });
     };
 
-    // Função que salva um objeto title
-    var save_title_timer = null;
-    window.cert.saveTitle = function (data) {
-        window.clearTimeout(save_title_timer);
-        save_title_timer = window.setTimeout(function () {
+    persistence.Title = function () {
+        this.saveContent = function (content) {
+            content = content || 'Certificado';
 
-            var changed = false;
-            var form_data = new FormData();
+            save(
+                {'title_content': content},
+                'Conteúdo do título salvo com sucesso.'
+            );
+        };
 
-            form_data.append('event', window.cert.event);
+        this.saveFontSize = function (size) {
+            size = size || '60';
 
-            if (is_defined(data['position_x']) || is_defined(data['title_position_x'])) {
-                if (is_defined(data['position_x'])) {
-                    form_data.append('title_position_x', data['position_x']);
-                    changed = true;
-                } else if (is_defined(['title_position_x'])) {
-                    form_data.append('title_position_x', data['title_position_x']);
-                    changed = true;
-                }
-            }
+            save(
+                {'title_font_size': remove_px(size)},
+                'Tamanho do título salvo com sucesso.'
+            );
+        };
 
-            if (is_defined(data['position_y']) || is_defined(data['title_position_y'])) {
-                if (is_defined(data['position_y'])) {
-                    form_data.append('title_position_y', data['position_y']);
-                    changed = true;
-                } else if (is_defined(['title_position_y'])) {
-                    form_data.append('title_position_y', data['title_position_y']);
-                    changed = true;
-                }
-            }
+        this.hide = function () {
+            save({'title_hide': true}, 'Título escondido.');
+        };
 
-            if (is_defined(data['font_size']) || is_defined(data['title_font_size'])) {
+        this.show = function () {
+            save({'title_hide': false}, 'Título sendo exibido.');
+        };
 
-                var font_size = null;
-
-                if (is_defined(data['font_size'])) {
-                    font_size = remove_px(data['font_size']);
-                } else if (is_defined(data['title_font_size'])) {
-                    font_size = data['title_font_size'];
-                }
-
-                if (font_size != null) {
-                    form_data.append('title_font_size', font_size);
-                    changed = true;
-                }
-
-            }
-
-            if (is_defined(data['hide']) || is_defined(data['title_hide'])) {
-                if (is_defined(data['hide'])) {
-                    form_data.append('title_hide', data['hide']);
-                    changed = true;
-                } else if (is_defined(data['title_hide'])) {
-                    form_data.append('title_hide', data['title_hide']);
-                    changed = true;
-                }
-            }
-
-            if (changed) {
-                $.ajax({
-                    url: window.cert.url,
-                    processData: false,
-                    contentType: false,
-                    data: form_data,
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                    },
-                    method: 'PATCH',
-                    success: function (data) {
-                        title = data;
-                        Messenger().post({
-                            message: 'Titulo atualizado com sucesso!',
-                            type: 'success'
-                        });
-                    },
-                    error: function (err) {
-                        if (err.responseText !== "") {
-                            console.error(err.responseText)
-                        } else {
-                            console.error(err)
-                        }
-                        Messenger().post({
-                            message: 'Titulo não foi atualizado!',
-                            type: 'danger'
-                        });
-                    }
-                });
-            }
-
-        }, 200);
+        this.savePosition = function (x, y) {
+            save(
+                {'title_position_x': x, 'title_position_y': y},
+                'Posição do título salva com sucesso.'
+            );
+        };
     };
 
-    //Função que salva a posição de um objeto title
-    window.cert.saveTitlePosition = function (x, y) {
-        title['position_x'] = x;
-        title['position_y'] = y;
-        cert.saveTitle(title);
-    };
+    persistence.Text = function () {
+        this.saveContent = function (content) {
+            content = content || '{{NOME}}';
 
-    //Função que salva o tamanha da fonte de um objeto title
-    window.cert.saveTitleFontSize = function (font_size) {
-        title['font_size'] = font_size;
-        cert.saveTitle(title);
-    };
+            save(
+                {'text_content': content},
+                'Conteúdo do texto salvo com sucesso.'
+            );
+        };
 
-    //Função que muda o estado de hide pra false em title(deixa visível)
-    window.cert.showTitle = function () {
-        title['hide'] = false;
-        cert.saveTitle(title);
-    };
+        this.saveFontSize = function (size) {
+            size = size || '20';
+            save(
+                {'text_font_size': remove_px(size)},
+                'Tamanho do texto salvo com sucesso.'
+            );
+        };
 
-    //Função que muda o estado de hide para true em title(não deixa visível)
-    window.cert.hideTitle = function () {
-        title['hide'] = true;
-        cert.saveTitle(title);
-    };
-
-    //================= Date====================
-
-    // Função que requisita um objeto do tipo date
-    window.cert.getDate = function () {
-        $.ajax({
-            url: window.cert.url,
-            method: 'GET',
-            crossDomain: true,
-            success: function (data) {
-                console.log(data);
-            }
-        });
-    };
-
-    // Função que salva um objeto do tipo date
-    window.cert.saveDate = function (data) {
-        var save_date_timer = null;
-        window.clearTimeout(save_date_timer);
-        save_date_timer = window.setTimeout(function () {
-
-            var form_data = new FormData();
-
-            form_data.append('event', window.cert.event);
-            form_data.append('date_hide', data['hide']);
-
-            form_data.append('date_position_x', data['position_x']);
-            form_data.append('date_position_y', data['position_y']);
-            form_data.append('date_font_size', remove_px(data['font_size']));
-
-            $.ajax({
-                url: window.cert.url,
-                processData: false,
-                contentType: false,
-                data: form_data,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        this.saveSize = function (width, height) {
+            width = width || '634';
+            height = height || '348';
+            save(
+                {
+                    'text_width': remove_px(width),
+                    'text_height': remove_px(height)
                 },
-                method: 'PATCH',
-                success: function (data) {
-                    title = data;
-                    Messenger().post({
-                        message: 'Data atualizada com sucesso!',
-                        type: 'success'
-                    });
-                },
-                error: function (err) {
-                    if (err.responseText !== "") {
-                        console.error(err.responseText)
-                    } else {
-                        console.error(err)
-                    }
-                    Messenger().post({
-                        message: 'Data não foi atualizada!',
-                        type: 'danger'
-                    });
-                }
-            });
+                'Tamanho do bloco do texto salvo com sucesso.'
+            );
+        };
 
-        }, 200);
+        this.saveLineHeight = function (size) {
+            size = size || '22';
+            save(
+                {'text_font_size': remove_px(size)},
+                'Espaço entre-linhas do texto salvo com sucesso.'
+            );
+        };
+
+        this.savePosition = function (x, y) {
+            save(
+                {'text_position_x': x, 'text_position_y': y},
+                'Posição do texto salva com sucesso.'
+            );
+        };
     };
 
-    // Função que salva a posição de um objeto date
-    window.cert.saveDatePosition = function (x, y) {
-        date['position_x'] = x;
-        date['position_y'] = y;
-        cert.saveDate(date)
+    persistence.Date = function () {
+        this.saveFontSize = function (size) {
+            size = size || '60';
+            save(
+                {'date_font_size': remove_px(size)},
+                'Tamanho da data salvo com sucesso.'
+            );
+        };
+
+        this.hide = function () {
+            save({'date_hide': true}, 'Data escondida.');
+        };
+
+        this.show = function () {
+            save({'date_hide': false}, 'Data sendo exibido.');
+        };
+
+        this.savePosition = function (x, y) {
+            save(
+                {'date_position_x': x, 'date_position_y': y},
+                'Posição da data salva com sucesso.'
+            );
+        };
     };
 
-    // Função que salva o tamanho da fonte de um objeto date
-    window.cert.saveDateFontSize = function (font_size) {
-        date['font_size'] = font_size;
-        cert.saveDate(date);
-    };
+    cert.persistence = persistence;
 
-    //Função que muda o estado de hide pra true em date(não deixa visível)
-    window.cert.hideDate = function () {
-        date['hide'] = true;
-        cert.saveDate(date);
-    };
+})(jQuery, window.cgsy.messenger, window.cgsy.AjaxSender, window.cgsy.cert);
 
-    //Função que muda o estado de hide para false em date(deixa visível)
-    window.cert.showDate = function () {
-        date['hide'] = false;
-        cert.saveDate(date);
-    };
+(function ($, cert) {
+    "use strict";
+    // GERENCIADOR DE ELEMENTOS DO DOCUMENTO DE CERTIFICADO.
 
-    // Text
+    cert.CertDocument = function (title_el, text_el, date_el) {
+        title_el = $(title_el);
+        text_el = $(text_el);
+        date_el = $(date_el);
 
-    // Função que requisita um objeto text
-    window.cert.getText = function () {
-        $.ajax({
-            url: window.cert.url,
-            method: 'GET',
-            crossDomain: true,
-            success: function (data) {
-                //console.log(data);
-                //return JSON.parse(data);
+        var title_manager = new cert.persistence.Title();
+        var text_manager = new cert.persistence.Text();
+        var date_manager = new cert.persistence.Date();
+
+        var title_id = $(title_el).attr('id');
+        var text_id = $(text_el).attr('id');
+        var date_id = $(date_el).attr('id');
+
+        if (!title_id || !text_id || !date_el) {
+            console.error(
+                'Você deve definir "ID" em todos os elementos que terão' +
+                ' interção "drag and drop".'
+            );
+        }
+
+        this.savePosition = function(element_id, x, y) {
+            if (element_id === title_id) {
+                title_manager.savePosition(x, y);
             }
-        });
+
+            if (element_id === text_id) {
+                text_manager.savePosition(x, y);
+            }
+
+            if (element_id === date_id) {
+                date_manager.savePosition(x, y);
+            }
+        };
+
+        this.saveTextSize = function(width, height) {
+            text_manager.saveSize(width, height);
+        };
+
+        this.hideTitle = function () {
+            title_el.hide();
+            new cert.persistence.Title().hide();
+        };
+
+        this.hideDate = function () {
+            date_el.hide();
+            new cert.persistence.Date().hide();
+        };
     };
 
-    // Função que salva um objeto text
-    window.cert.saveText = function (data) {
-        var save_text_timer = null;
-        window.clearTimeout(save_text_timer);
-        save_text_timer = window.setTimeout(function () {
+})(jQuery, window.cgsy.cert);
 
-            var form_data = new FormData();
+(function ($, interact, cert) {
+    "use strict";
+    // WRAPPER DE INTERACT
 
-            form_data.append('event', window.cert.event);
-            form_data.append('text_position_x', data['position_x'].toFixed(2));
-            form_data.append('text_position_y', data['position_y'].toFixed(2));
-            form_data.append('text_font_size', remove_px(data['font_size']));
-            form_data.append('text_width', remove_px(data['width']));
-            form_data.append('text_height', remove_px(data['height']));
-            form_data.append('text_line_height', remove_px(data['line_height']));
-            form_data.append('text_content', data['text']);
+    var cert_document;
 
+    cert.Interact = function(title_el, text_el, date_el) {
+        cert_document = new cert.CertDocument(title_el, text_el, date_el);
 
-            $.ajax({
-                url: window.cert.url,
-                processData: false,
-                contentType: false,
-                data: form_data,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                },
-                method: 'PATCH',
-                success: function (data) {
-                    title = data;
-                    Messenger().post({
-                        message: 'Texto atualizado com sucesso!',
-                        type: 'success'
-                    });
-                },
-                error: function (err) {
-                    if (err.responseText !== "") {
-                        console.error(err.responseText)
-                    } else {
-                        console.error(err)
-                    }
-                    Messenger().post({
-                        message: 'Texto não foi atualizado!',
-                        type: 'danger'
-                    });
-                }
-            });
+        // Ativar draggable
+        title_el.addClass('drag');
+        date_el.addClass('drag');
 
+        // texto deve ser redimensionável
+        text_el.addClass('resize-drag');
 
-        }, 200);
+        this.moveElement = function(element, x, y) {
+            moveElement(element, x, y)
+        };
     };
 
-    window.cert.saveTextContent = function (textContent) {
-        text['text'] = textContent;
-        cert.saveText(text);
-    };
-
-    //Função que salva a posição de um objeto text
-    window.cert.saveTextPosition = function (x, y) {
-        text['position_x'] = x;
-        text['position_y'] = y;
-        cert.saveText(text);
-    };
-
-    //Função que salva o tamanho de um objeto text
-    window.cert.saveTextSize = function (height, width) {
-        text['height'] = height;
-        text['width'] = width;
-        cert.saveText(text);
-    };
-
-    //Função que salva o tamanho da fonte de um objeto text
-    window.cert.saveTextFontSize = function (font_size) {
-        text['font_size'] = font_size;
-    };
-
-    //Função que salva o espaçamento entre linhas de um objeto text
-    window.cert.saveTextLineHeight = function (line_height) {
-        text['line_height'] = line_height;
-    };
-
-    // ========================================================
-    window.cert.enableDragDrop = function () {
-
-    };
-
-    window.cert.disableDragDrop = function () {
-
-    };
-
-
-    // ====================Title Functions================================
-    function showHideTitle(show) {
-        show = show === true;
-        if (show) {
-            $('#titleText').fadeIn();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li:nth-child(3) > a').show();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li.divider').show();
-            cert.showTitle();
-        } else {
-            $('#titleText').fadeOut();
-            cert.hideTitle();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li:nth-child(3) > a').hide();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li.divider').hide();
-        }
-    }
-
-    $('#titleCheckBox').on('change', function () {
-        showHideTitle(!this.checked);
-    });
-
-    $('#titleFontSize').change(function () {
-        $('#titleText').css('font-size', $(this).val() + 'px');
-        cert.saveTitleFontSize($(this).val());
-        resizeContent('#titleText');
-    });
-
-    //Funções para redimennsionar o título
-    $('#titleText').on('input', function () {
-        cert.saveTextContent($(this).val());
-        resizeContent((this));
-    })
-        .on('mouseup', function () {
-            resizeContent((this));
-        });
-
-    //Função para esconder o título
-    $('#titleCheckBox').on('change', function () {
-        if (this.checked === true) {
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(3) > a').hide();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li.divider').hide();
-        }
-        else {
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(3) > a').show();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li.divider').show();
-
-        }
-    });
-
-    // ====================Date Functions================================
-    function showHideDate(show) {
-        if (show) {
-            $('#dateText').fadeIn();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li:nth-child(3) > a').show();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li.divider').show();
-            console.log('show show');
-            cert.showDate();
-        } else {
-            $('#dateText').fadeOut();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li:nth-child(3) > a').hide();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li.divider').hide();
-            console.log('hide hide');
-            cert.hideDate();
-        }
-        console.log(show);
-    }
-
-    $('#dateCheckBox').on('change', function () {
-        showHideDate(!this.checked);
-    });
-
-    $('#dateFontSize').change(function () {
-        $('#dateText').css('font-size', $(this).val() + 'px');
-        cert.saveDateFontSize($(this).val());
-        resizeContent('#dateText');
-    });
-
-    //Funções alinhamento do texto na data
-    $('.glyphicon-align-left').on('click', function () {
-        $('#dateText').css('text-align', 'left');
-        console.log('left');
-    });
-
-    $('.glyphicon-align-center').on('click', function () {
-        $('#dateText').css('text-align', 'center');
-        console.log('center');
-    });
-
-    $('.glyphicon-align-right').on('click', function () {
-        $('#dateText').css('text-align', 'right');
-        console.log('right');
-    });
-
-    //Função para esconder a data
-    $('#dateCheckBox').on('change', function () {
-        if (this.checked === true) {
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(3) > a').hide();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li.divider').hide();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(5)').hide();
-        }
-        else {
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(3) > a').show();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li.divider').show();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(5)').show();
-
-        }
-    });
-
-    // ====================Text Functions================================
-
-    $('#textFontSize').change(function () {
-        $('#text').css('font-size', $(this).val() + 'px');
-        cert.saveTextFontSize($(this).val());
-        resizeContent('#text');
-    });
-
-    $('#textLineHeight').change(function () {
-        $('#text').css('line-height', $(this).val());
-        cert.saveTextLineHeight($(this).val());
-        resizeContent('#text');
-    });
-
-    //Funções de redimensionar altomaticamente a caixa de texto
-    $('#text').on('input', function () {
-        cert.saveTextContent($(this).val());
-        resizeContent((this));
-    })
-        .on('mouseup', function () {
-            resizeContent((this));
-        });
-
-
-    //Função que faz o redimensionamento
-    function resizeContent(element) {
-        element = $(element);
-        var offset = element.innerHeight() - element.height();
-
-        if (element.innerHeight < element[0].scrollHeight) {
-            //Grow the field if scroll height is smaller
-            element.height(element[0].scrollHeight - offset);
-        } else {
-            //Shrink the field and then re-set it to the scroll height in case it needs to shrink
-            element.height(1);
-            element.height(element[0].scrollHeight - offset);
-        }
-    }
-
-    //Funções para ativar e desativar o modo de drag and drop e resize
-    $('#modoEditar').on('change', function () {
-        if (this.checked === true) {
-            addDragResize();
-        }
-        else {
-            removeDragResize();
-        }
-    });
-
-    function removeDragResize() {
-        $('#text').removeClass('resize-drag');
-        $('#text').css('background-color', 'transparent');
-        $('#dateText').removeClass('drag');
-        $('#dateText').css('background-color', 'transparent');
-        $('#titleText').removeClass('drag');
-        $('#titleText').css('background-color', 'transparent');
-    }
-
-    function addDragResize() {
-        $('#text').addClass('resize-drag');
-        $('#text').css('background-color', 'white');
-        resizeContent($('#text'));
-        $('#dateText').addClass('drag');
-        $('#dateText').css('background-color', 'white');
-        $('#titleText').addClass('drag');
-        $('#titleText').css('background-color', 'white');
-    }
-
-
-    // Funções que auxiliam a biblioteca de drag and drop e resize
-    window.cert.moveElement = function (element, x, y) {
+    var moveElement = function(element, x, y) {
         element = $(element);
 
         // translate the element
@@ -558,5 +258,71 @@ window.cert = window.cert || {};
         element.attr('data-y', y);
     };
 
+    var dragMoveListener = function(event) {
+        var target = event.target,
+            // keep the dragged position in the data-x/data-y attributes
+            x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+            y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-})(window, jQuery);
+        moveElement($(target), x, y)
+    };
+
+    var dragResize = function(event) {
+        var target = event.target;
+        var x = (parseFloat(target.getAttribute('data-x')) || 0);
+        var y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+        // update the element's style
+        target.style.width = event.rect.width + 'px';
+        target.style.height = event.rect.height + 'px';
+
+        // translate when resizing from top or left edges
+        x += event.deltaRect.left;
+        y += event.deltaRect.top;
+
+        target.style.webkitTransform = target.style.transform =
+            'translate(' + x + 'px,' + y + 'px)';
+
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+
+        cert_document.saveTextSize(target.style.width, target.style.height);
+    };
+
+    var draggable_options = {
+        onmove: dragMoveListener,
+        restrict: {
+            restriction: 'parent',
+            elementRect: {top: 0, left: 0, bottom: 1, right: 1}
+        },
+        onend: function(event) {
+            var target = event.target;
+            cert_document.savePosition(
+                target.id,
+                $(target).attr('data-x'),
+                $(target).attr('data-y')
+            );
+        }
+    };
+
+    interact('.drag').draggable(draggable_options);
+    interact('.resize-drag')
+        .draggable(draggable_options)
+        .resizable({
+            // redimensionamento somente os que não afetam a posição do texto.
+            edges: {left: false, right: true, bottom: true, top: false},
+
+            // keep the edges inside the parent
+            restrictEdges: {
+                outer: 'parent',
+                endOnly: true
+            },
+            // minimum size
+            restrictSize: {
+                min: {width: 50, height: 50}
+            },
+            inertia: true
+        })
+        .on('resizemove', dragResize);
+
+})(jQuery, interact, window.cgsy.cert);
