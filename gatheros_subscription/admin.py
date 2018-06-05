@@ -72,12 +72,20 @@ class LotAdmin(admin.ModelAdmin):
         if not instance.limit:
             return 'Livre'
 
-        remaining = instance.limit - instance.subscriptions.count()
+        remaining = instance.limit - instance.subscriptions.filter(
+            completed=True
+        ).exclude(
+            status=Subscription.CANCELED_STATUS,
+        ).count()
         percent = '{0:.2f}'.format(100 - instance.percent_completed)
         return '{} ({}%)'.format(remaining, percent)
 
     def get_percent_attended(self, instance):
-        queryset = instance.subscriptions
+        queryset = instance.subscriptions.filter(
+            completed=True
+        ).exclude(
+            status=Subscription.CANCELED_STATUS,
+        )
         return '{}/{} ({}%)'.format(
             queryset.filter(attended=True).count(),
             queryset.count(),
@@ -99,6 +107,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
         'event__name',
     )
     list_display = ('person', 'count', 'lot', 'code', 'attended',)
+    list_filter = ('completed',)
     readonly_fields = [
         'event',
         'code',

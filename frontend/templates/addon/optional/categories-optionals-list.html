@@ -84,7 +84,6 @@
                 <hr class="hidden-md hidden-lg hidden-xl" />
                 <div
                     data-toggle="tooltip"
-                    data-placement="left"
                     title=""
                     data-original-title="Gerenciar limite de {% if optional_active == 'product' %}estoque{% else %}vagas{% endif %}">
                     {% if optional_active == 'product' %}
@@ -112,7 +111,6 @@
                 {% if optional_active == 'service' %}
                 <div
                     data-toggle="tooltip"
-                    data-placement="left"
                     title=""
                     data-original-title="Restringir vaga de participante exclusivamente para este opcional.">
                     <button
@@ -130,7 +128,6 @@
             <div class="col-md-2">
                 <div
                     data-toggle="tooltip"
-                    data-placement="left"
                     title=""
                     data-original-title="Editar">
                     {% if optional_active == 'service' %}
@@ -153,7 +150,6 @@
                 {% if optional.published %}
                 <div
                     data-toggle="tooltip"
-                    data-placement="left"
                     title=""
                     data-original-title="{% if optional_active == 'product' %}Este produto/serviço está ativo{% else %}Esta  atividade está ativa{% endif %}. Clique para desativá-la.">
                     <button
@@ -165,7 +161,6 @@
                 {% else %}
                 <div
                     data-toggle="tooltip"
-                    data-placement="left"
                     title=""
                     data-original-title="{% if optional_active == 'product' %}Este produto/serviço está inativo{% else %}Esta atividade está inativa{% endif %}. Clique para ativá-la.">
                     <button
@@ -178,7 +173,6 @@
                 {% if optional.is_deletable %}
                 <div
                     data-toggle="tooltip"
-                    data-placement="left"
                     title=""
                     data-original-title="Excluir">
                     {% if optional_active == 'service' %}

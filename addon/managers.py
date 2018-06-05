@@ -174,7 +174,7 @@ class SubscriptionServiceManager(managers.Manager):
 
             total = 0
 
-            for optional in subscription.subscriptionservice.all():
+            for optional in subscription.subscription_services.all():
 
                 if optional.optional.theme == optional_service.theme:
                     total += 1

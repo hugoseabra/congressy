@@ -254,7 +254,7 @@
 
                                     </td>
                                     <td>
-                                        {% if item.status == item.CONFIRMED_STATUS and item.attended is True and item.event.has_certificate %}
+                                        {% if item.status == item.CONFIRMED_STATUS and item.attended is True and item.event.has_certificate_config %}
                                             <div class="text-center">
                                                 <a href="{% url 'certificate:event-certificate-pdf' item.event.pk item.pk %}">
                                                     <i class="fas fa-graduation-cap"></i>

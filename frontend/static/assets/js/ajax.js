@@ -1,31 +1,22 @@
-window.cgsy = window.cgsy || {};
-
 (function ($, cgsy) {
-
-    var log_err = function log_err(err) {
-        if (err.responseText !== "") {
-            console.error(err.responseText)
-        } else {
-            console.error(err)
-        }
-    };
 
     cgsy.AjaxSender = function (url) {
 
         url = url || window.location.href;
 
         var success_callback = function () {};
-        var internal_fail_callback = function (response) {
-            // var msg = 'Failure on request to "' + url + '" with method';
-            //     msg += ' "' + this.method + '".';
-            //
-            // if (response.hasOwnProperty('detail')) {
-            //     msg += ' Detalhes: ' + response.detail;
-            // }
-            log_err(response);
+        var default_fail_callback = function (response) {
+            var msg = 'Failure on request to "' + url + '" with method';
+                msg += ' "' + this.method + '".';
+
+            if (response.hasOwnProperty('detail')) {
+                msg += ' Detalhes: ' + response.detail;
+            }
+
+            console.error(msg);
         };
 
-        var fail_callback = internal_fail_callback;
+        var fail_callback = default_fail_callback;
 
         // CSRF code
         function getCookie(name) {
@@ -59,7 +50,7 @@ window.cgsy = window.cgsy || {};
         this.setFailCallback = function(callback) {
             fail_callback = function(response) {
                 callback(response);
-                internal_fail_callback(response);
+                default_fail_callback(response);
             }
         };
 
