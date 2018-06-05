@@ -60,7 +60,7 @@ class Certificate(models.Model):
         blank=True,
     )
 
-    text_font_size = models.PositiveIntegerField(
+    text_font_size = models.FloatField(
         default=20,
         verbose_name='tamaho da fonte do texto',
         help_text='Tamanho da fonte em (px)',
@@ -68,7 +68,7 @@ class Certificate(models.Model):
         blank=True,
     )
 
-    text_width = models.PositiveIntegerField(
+    text_width = models.FloatField(
         default=634,
         verbose_name='largura do bloco do texto',
         help_text='tamanho (px) da largura do bloco.',
@@ -76,7 +76,7 @@ class Certificate(models.Model):
         blank=True,
     )
 
-    text_height = models.PositiveIntegerField(
+    text_height = models.FloatField(
         default=348,
         verbose_name='altura do bloco do texto',
         help_text='tamanho (px) da altura do bloco.',
@@ -117,7 +117,7 @@ class Certificate(models.Model):
         blank=True,
     )
 
-    title_font_size = models.PositiveIntegerField(
+    title_font_size = models.FloatField(
         default=60,
         verbose_name='tamaho da fonte do título',
         help_text='Tamanho da fonte em (px)',
@@ -147,7 +147,7 @@ class Certificate(models.Model):
         verbose_name='esconder título',
     )
 
-    date_font_size = models.PositiveIntegerField(
+    date_font_size = models.FloatField(
         default=20,
         verbose_name='tamaho da fonte da data',
         help_text='Tamanho da fonte em (px)',
