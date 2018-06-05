@@ -67,7 +67,7 @@
     {% block styles %}{% endblock %}
 </head>
 
-<body class="tooltip-wrapper {% if remove_preloader %}enable-animations enable-preloader preloader-dark{% endif %}">
+<body class="tooltip-wrapper {% if not remove_preloader %}enable-animations enable-preloader preloader-dark{% endif %}">
 
 <div id="document" class="document">
 

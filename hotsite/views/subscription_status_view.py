@@ -44,7 +44,19 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
             )
         try:
             self.subscription = Subscription.objects.get(
-                event=self.event, person=self.person)
+                event=self.event,
+                person=self.person,
+                completed=True,
+            )
+
+            if self.subscription.transactions.count() == 0:
+                messages.error(
+                    message='Por favor, informe um lote para realizar o'
+                            ' pagamento ao final do processo de inscrição.',
+                    request=request
+                )
+                return redirect('public:hotsite', slug=self.event.slug)
+
         except Subscription.DoesNotExist:
             messages.error(
                 message='Você não possui inscrição neste evento.',
