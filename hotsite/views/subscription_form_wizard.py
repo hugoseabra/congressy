@@ -191,10 +191,10 @@ class SubscriptionWizardView(SessionWizardView):
                 request,
                 "Você já possui uma inscrição paga neste evento."
             )
-            return redirect(
-                'public:hotsite-subscription-status',
-                slug=self.event.slug
-            )
+            # return redirect(
+            #     'public:hotsite-subscription-status',
+            #     slug=self.event.slug
+            # )
 
         if self.is_private_event() and not self.has_previous_valid_code():
             messages.error(
