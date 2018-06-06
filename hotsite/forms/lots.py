@@ -5,43 +5,37 @@
 from datetime import datetime
 
 from django import forms
-from django.forms import ModelChoiceField
 
 from gatheros_subscription.models import Lot
 
 
-
-class LotFormModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        if obj.price and obj.price > 0:
-            return "{} - R$ {}".format(obj.name, obj.display_publicly)
-
-        return "{}".format(obj.name)
-
-
 class LotsForm(forms.Form):
+    lots = forms.ModelChoiceField(
+        required=True,
+        label='lote',
+        queryset=Lot.objects.filter(
+            active=True,
+            date_start__lte=datetime.now(),
+            date_end__gte=datetime.now()
+        )
+    )
+
     def __init__(self, event, **kwargs):
         self.event = event
         super().__init__(**kwargs)
 
-        self.fields['lots'] = LotFormModelChoiceField(
-            queryset=Lot.objects.filter(event=self.event,
-                                        active=True,
-                                        date_start__lte=datetime.now(),
-                                        date_end__gte=datetime.now()),
-            required=True,
-            label='lote',
+        self.fields['lots'].queryset = self.fields['lots'].queryset.filter(
+            event=self.event,
+
         )
         self.fields['lots'].choices = self.get_public_lot_choices()
 
     def get_public_lot_choices(self):
-        public_lots = Lot.objects.filter(event=self.event,
-                                         active=True,
-                                         date_start__lte=datetime.now(),
-                                         date_end__gte=datetime.now(),
+        public_lots = self.fields['lots'].queryset.filter(
                                          private=False)
 
         return [
             (lot.id, lot.display_publicly)
             for lot in public_lots
+            if lot.status == Lot.LOT_STATUS_RUNNING
         ]

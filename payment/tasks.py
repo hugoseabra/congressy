@@ -35,10 +35,13 @@ def create_pagarme_transaction(subscription, data):
         if hasattr(e, 'args'):
             errors = [errs for errs in e.args]
             for error in errors[0]:
-                errors_msg.append('{}: {}'.format(
-                    error.get('parameter_name'),
-                    error.get('message'),
-                ))
+                if isinstance(error, dict):
+                    errors_msg.append('{}: {}'.format(
+                        error.get('parameter_name'),
+                        error.get('message'),
+                    ))
+                else:
+                    errors_msg.append(error)
         else:
             errors_msg.append(e)
 

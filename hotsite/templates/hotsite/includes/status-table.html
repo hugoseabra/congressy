@@ -47,25 +47,25 @@
                             <div class="clearfix"></div>
                         </div>
                         {% if not transaction.paid %}
-                        <small>
-                            {% if transaction.boleto_url  and not has_paid_transaction %}
-                                <a target="_blank" class="text-muted"
-                                   href="{{ transaction.boleto_url }}">
-                                    Link para boleto
-                                </a>
-                            {% elif not transaction.boleto_url %}
-                                <div class="progress" style="width:100%;margin-bottom:0">
-                                    <div class="progress-bar progress-bar-success progress-bar-striped active"
-                                         role="progressbar"
-                                         style="width: 100%;background-color:#5cb85c!important;">
-                                        <span class="sr-only"></span>
+                            <small>
+                                {% if transaction.boleto_url %}
+                                    <a target="_blank" class="text-muted"
+                                       href="{{ transaction.boleto_url }}">
+                                        Link para boleto
+                                    </a>
+                                {% else %}
+                                    <div class="progress" style="width:100%;margin-bottom:0">
+                                        <div class="progress-bar progress-bar-success progress-bar-striped active"
+                                             role="progressbar"
+                                             style="width: 100%;background-color:#5cb85c!important;">
+                                            <span class="sr-only"></span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div style="width:100%">
-                                    Seu link para o boleto estará pronto em breve.
-                                </div>
-                            {% endif %}
-                        </small>
+                                    <div style="width:100%">
+                                        Seu link para o boleto estará pronto em breve.
+                                    </div>
+                                {% endif %}
+                            </small>
                         {% endif %}
                     {% elif transaction.data.payment_method == 'credit_card' %}
                         <div>
@@ -108,8 +108,8 @@
         </tbody>
     </table>
 </div>
-<div>
-    {% if can_reprocess_payment %}
+{% if can_reprocess_payment %}
+    <div>
         {% if is_private_event and not has_paid_transaction %}
             {% if lot_is_still_valid  %}
                 <a href="{% url 'public:hotsite-subscription' event.slug %}"
@@ -140,14 +140,14 @@
                 </a>
             {% endif %}
         {% else %}
-            {% if not has_paid_transaction %}
+{#            {% if not has_paid_transaction %}#}
                 <a href="{% url 'public:hotsite-subscription' event.slug %}"
                    class="btn btn-success btn-xs"
                    data-toggle="tooltip"
                    title="Realize um novo pagamento ou mude de lote quando desejar.">
                     Novo pagamento
                 </a>
-            {% endif %}
+{#            {% endif %}#}
         {% endif %}
         {% if event.is_scientific and event.work_config and event.work_config.is_submittable %}
             <br>
@@ -166,5 +166,5 @@
            title="Realizar inscrição de outra pessoa?">
             Realizar inscrição de outra pessoa?
         </a>
-    {% endif %}
-</div>
+    </div>
+{% endif %}

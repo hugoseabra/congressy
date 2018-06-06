@@ -191,10 +191,10 @@ class SubscriptionWizardView(SessionWizardView):
                 request,
                 "Você já possui uma inscrição paga neste evento."
             )
-            return redirect(
-                'public:hotsite-subscription-status',
-                slug=self.event.slug
-            )
+            # return redirect(
+            #     'public:hotsite-subscription-status',
+            #     slug=self.event.slug
+            # )
 
         if self.is_private_event() and not self.has_previous_valid_code():
             messages.error(
@@ -212,7 +212,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         try:
             return super().dispatch(request, *args, **kwargs)
-        except InvalidStateStepError:
+        except InvalidStateStepError as e:
 
             messages.warning(
                 request,
@@ -251,7 +251,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         form_current_step = management_form.cleaned_data['current_step']
         if (form_current_step != self.steps.current and
-                self.storage.current_step is not None):
+                    self.storage.current_step is not None):
             # form refreshed, change current step
             self.storage.current_step = form_current_step
 
@@ -525,30 +525,28 @@ class SubscriptionWizardView(SessionWizardView):
                     subscription.status = Subscription.CONFIRMED_STATUS
                     subscription.save()
 
-                    notified = False
-
-                    if subscription.is_new is True:
+                    if subscription.notified is False:
                         if new_account is True:
                             notify_new_user_and_free_subscription(
                                 self.event,
                                 subscription
                             )
-                            notified = True
 
                         else:
                             notify_new_free_subscription(
                                 self.event,
                                 subscription
                             )
-                            notified = True
 
-                    if notified is True:
                         msg = 'Inscrição realizada com sucesso!' \
                               ' Nós lhe enviamos um e-mail de confirmação de' \
                               ' sua inscrição juntamente com seu voucher.' \
-                              ' Fique atento ao seu email, caso não chegue' \
-                              ' na caixa de entrada, verifique no Lixo' \
-                              ' Eletrônico.'
+                              ' Fique atento ao seu email, e, caso não' \
+                              ' chegue na caixa de entrada, verifique no' \
+                              ' Lixo Eletrônico.'
+
+                        subscription.notified = True
+                        subscription.save()
 
                     else:
                         msg = 'Inscrição salva com sucesso!'
@@ -558,12 +556,12 @@ class SubscriptionWizardView(SessionWizardView):
                     })
 
                 else:
-                    if subscription.is_new is True:
+                    if subscription.notified is False:
                         msg = 'Inscrição realizada com sucesso! Nós lhe' \
                               ' enviamos um e-mail de confirmação de sua' \
                               ' inscrição. Após a confirmação de seu' \
-                              ' pagamento, você receberá outro email de' \
-                              ' com seu voucher. Fique atento ao seu email,' \
+                              ' pagamento, você receberá outro email com' \
+                              ' seu voucher. Fique atento ao seu email, e,' \
                               ' caso não chegue na caixa de entrada,' \
                               ' verifique no Lixo Eletrônico.'
                     else:
@@ -574,7 +572,7 @@ class SubscriptionWizardView(SessionWizardView):
                         kwargs={'slug': self.event.slug, }
                     )
 
-                    self.clear_session()
+                self.clear_session()
 
                 messages.success(self.request, msg)
                 return redirect(success_url)
@@ -582,9 +580,7 @@ class SubscriptionWizardView(SessionWizardView):
             except Exception as e:
                 self.clear_session()
 
-                raise InvalidStateStepError(
-                    'Algum erro ocorreu: {}'.format(e)
-                )
+                raise InvalidStateStepError('Algum erro ocorreu: {}'.format(e))
 
     def clear_string(self, field_name, data):
         if data and field_name in data:

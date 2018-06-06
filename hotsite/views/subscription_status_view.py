@@ -38,13 +38,26 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
 
         # Se  não há lotes pagos, não há o que fazer aqui.
         if not self.has_paid_lots():
-            return redirect(
-                'public:hotsite',
-                slug=self.event.slug
-            )
+            return redirect('public:hotsite', slug=self.event.slug)
+
         try:
             self.subscription = Subscription.objects.get(
-                event=self.event, person=self.person)
+                event=self.event,
+                person=self.person,
+                completed=True,
+            )
+
+            if self.subscription.transactions.count() == 0:
+                messages.warning(
+                    message='Por favor, informe um lote para realizar o'
+                            ' pagamento ao final do processo de inscrição.',
+                    request=request
+                )
+                return redirect(
+                    'public:hotsite-subscription',
+                    slug=self.event.slug
+                )
+
         except Subscription.DoesNotExist:
             messages.error(
                 message='Você não possui inscrição neste evento.',
