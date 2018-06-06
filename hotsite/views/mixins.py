@@ -148,7 +148,9 @@ class EventMixin(TemplateNameableMixin, generic.View):
         return True if len(available_lots) > 0 else False
 
     def get_available_lots(self):
-        all_lots = self.event.lots.filter(private=False, active=True)
+        all_lots = self.event.lots.filter(private=False, active=True).order_by(
+            'date_end', 'name', 'price'
+        )
         available_lots = []
 
         for lot in all_lots:
