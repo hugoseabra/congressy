@@ -3494,6 +3494,9 @@ label.valid {
 .theme-cgsy-full .principal_content {
   padding-left: 51px;
 }
+.theme-cgsy-full .sidebar-section .navbar-collapse {
+  padding-left: 0;
+}
 .theme-cgsy-full .sidebar_divider {
   height: 1.4px;
   margin: 9px 0;
