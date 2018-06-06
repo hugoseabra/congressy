@@ -300,7 +300,7 @@ class SubscriptionWizardView(SessionWizardView):
                 return self.render_done(form, **kwargs)
             else:
                 # proceed to the next step
-                return self.render_next_step(form)
+                return self.render_next_step(form, **kwargs)
 
         return self.render(form)
 
