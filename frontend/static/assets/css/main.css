@@ -3497,6 +3497,9 @@ label.valid {
 .theme-cgsy-full .sidebar-section .navbar-collapse {
   padding-left: 0;
 }
+.theme-cgsy-full .main-page {
+  width: 79%;
+}
 .theme-cgsy-full .sidebar_divider {
   height: 1.4px;
   margin: 9px 0;
@@ -3620,6 +3623,9 @@ label.valid {
   padding-bottom: 105px !important;
 }
 @media only screen and (max-width: 768px) {
+  .theme-cgsy-full .main-page {
+    width: 100%;
+  }
   .theme-cgsy-full .brand {
     margin-left: 0;
   }
