@@ -259,7 +259,7 @@ class Lot(models.Model, GatherosModelMixin):
             return 0
 
         attended = queryset.filter(attended=True).count()
-        return round((attended * 100) / num_subs, 2)
+        return round((attended * 100) / queryset.count(), 2)
 
     @property
     def display_publicly(self):

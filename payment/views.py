@@ -88,6 +88,7 @@ def notify_postback(transaction, data):
         <strong>STATUS:</strong> {status_display} ({status})
         <br />
         <hr >
+        <br />
         <strong>Data:</strong>
         <br />    
         <pre><code>{data}</code></pre>

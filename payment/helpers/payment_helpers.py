@@ -1,5 +1,5 @@
-from decimal import Decimal
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from payment.models import Transaction
 
@@ -30,12 +30,13 @@ def is_boleto_allowed(event):
     # de emissão de boleto configurado em 'boleto_limit_days'
     return event.date_start >= diff_days_boleto
 
+
 def amount_as_decimal(amount):
     """ Converte um montante processável com meio de pagamento para Decimal """
-    if not amount:
+    if isinstance(amount, Decimal):
         return amount
 
-    if isinstance(amount, Decimal):
+    if amount is None:
         return amount
 
     # Separar centavos
@@ -45,14 +46,12 @@ def amount_as_decimal(amount):
     amount = '{}.{}'.format(amount[0:size - 2], cents)
     return round(Decimal(amount), 2)
 
+
 def decimal_processable_amount(value):
     """
     Converte um valor Decimalprocessável para um montante a ser usado por
     meios de pagamento
     """
-    if not value:
-        return value
-
     if not isinstance(value, Decimal):
         value = Decimal(value)
 

@@ -27,7 +27,7 @@
                 Definir minha senha
             </button>
             {% if event.is_scientific and is_subscribed and event.work_config and event.work_config.is_submittable %}
-                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
+                <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
                    class="btn btn-primary" style="margin-top: 15px">
                     Deseja submeter seu artigo cientifico?
                 </a>
@@ -51,16 +51,16 @@
 
         {% block messages %}
             {% if messages %}
-            <div style="width:100%;margin-top:3px;padding-bottom:10px">
-                {% for message in messages %}
-                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}warning{% endif %} alert-dismissible" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        {{ message|capfirst }}
-                    </div>
-                {% endfor %}
-            </div>
+                <div style="width:100%;margin-top:3px;padding-bottom:10px">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            {{ message|capfirst }}
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
         {% endblock messages %}
 
@@ -88,14 +88,14 @@
             <div class="row" style="margin-top:30px;padding: 0 30px">
                 <div class="col-md-12">
                     <button class="btn btn-warning btn-block" style="font-weight: bold"
-                       onclick="window.location.href='{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}'">
+                            onclick="window.location.href='{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}'">
                         Realizar Nova Inscrição
                     </button>
                     <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                         {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                     </div>
                     {% if event.is_scientific and is_subscribed  and event.work_config and event.work_config.is_submittable %}
-                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
+                        <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
                            class="btn btn-success" style="margin-top: 15px">
                             Deseja submeter seu artigo cientifico?
                         </a>
@@ -118,13 +118,14 @@
             <div style="align-items: center;display: flex;justify-content: center;">
                 <i class="fa fa-check-circle fa-5x" style="color: darkgreen" aria-hidden="true"></i>
             </div>
-            <hr />
+            <hr/>
             <p class="text-muted">
                 Preencha os dados seguintes para refazer sua inscrição.
             </p>
             <div class="form-group">
                 <label for="id_exhibition_code">
-                    Novo Cupom: <small style="color:#C9302C">*</small>
+                    Novo Cupom:
+                    <small style="color:#C9302C">*</small>
                 </label>
                 <div>
                     <input type="text" name="exhibition_code"
@@ -143,7 +144,7 @@
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
                 {% if event.is_scientific and is_subscribed and event.work_config and event.work_config.is_submittable %}
-                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
+                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
                        class="btn btn-success" style="margin-top: 15px">
                         Deseja submeter seu artigo cientifico?
                     </a>
@@ -155,7 +156,8 @@
             </p>
             <div class="form-group">
                 <label for="id_exhibition_code">
-                    Cupom: <small style="color:#C9302C">*</small>
+                    Cupom:
+                    <small style="color:#C9302C">*</small>
                 </label>
                 <div>
                     <input type="text" name="exhibition_code"
@@ -176,7 +178,7 @@
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
                 {% if event.is_scientific and is_subscribed %}
-                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
+                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
                        class="btn btn-success" style="margin-top: 15px">
                         Deseja submeter seu artigo cientifico?
                     </a>
@@ -201,10 +203,12 @@
             {% comment %}Possui somente lotes privados{% endcomment %}
             {% if not lots and private_lots %}
                 <div class="form-group">
-                    <label for="id_exhibition_code">Cupom: <small style="color:#C9302C">*</small></label>
+                    <label for="id_exhibition_code">Cupom:
+                        <small style="color:#C9302C">*</small>
+                    </label>
                     <div>
                         <input type="text" name="exhibition_code"
-                           id="id_exhibition_code" style="text-transform: uppercase" maxlength="255" required="" class="form-control placeholder" autofocus="autofocus" placeholder="Informe o código">
+                               id="id_exhibition_code" style="text-transform: uppercase" maxlength="255" required="" class="form-control placeholder" autofocus="autofocus" placeholder="Informe o código">
                     </div>
                 </div>
             {% endif %}
@@ -217,22 +221,21 @@
                 <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>
-                {% if event.is_scientific and is_subscribed  %}
-                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk%}"
+                {% if event.is_scientific and is_subscribed %}
+                    <a href="{% url 'scientific_work:work-add' subscription_pk=subscription.pk %}"
                        class="btn btn-success" style="margin-top: 15px">
                         Deseja submeter seu artigo cientifico?
                     </a>
                 {% endif %}
             </div>
             {% if person %}
-            <div class="row" style="margin-top:30px;padding: 0 30px">
-                <div class="col-md-12">
-                    <button type="button" class="btn btn-link btn-block" style="font-weight: bold;color:#eea236;padding:0"
-                       onclick="window.location.href='{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}'">
-                        Realizar inscrição de outra pessoa?
-                    </button>
+                <div class="form-group">
+                    <div class="text-center">
+                        <a href="{% url 'public:logout' %}?next={% url 'public:hotsite' event.slug %}" style="font-weight: bold;color:#eea236;">
+                             Realizar inscrição de outra pessoa?
+                        </a>
+                    </div>
                 </div>
-            </div>
             {% endif %}
 
         {% endif %}
