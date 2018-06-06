@@ -167,28 +167,19 @@ class ServiceOptionalManagementView(generic.TemplateView):
 
                 for optional in event_optionals_services:
 
-                    contains = False
+                    available = not optional.has_quantity_conflict and \
+                                not optional.has_sub_end_date_conflict
 
-                    for service in subscription.subscription_services.all():
-                        if service.optional == optional:
-                            contains = True
+                    if available:
+                        services = subscription.subscription_services.all()
+                        for service in services:
+                            # Checks for bi-lateral time restrictions.
+                            if self.has_schedule_conflicts(service.optional,
+                                                           optional):
+                                available = False
 
-                    if not contains:
-                        available = not optional.has_quantity_conflict and \
-                                    not optional.has_sub_end_date_conflict
-
-                        if available:
-                            services = subscription.subscription_services.all()
-                            for service in services:
-
-                                # Exisiting conflicts.
-                                if service.has_schedule_conflicts or \
-                                        self.has_schedule_conflicts(
-                                            service.optional, optional):
-                                    available = False
-
-                        self.available_options.append({'optional': optional,
-                                                       'available': available})
+                    self.available_options.append({'optional': optional,
+                                                   'available': available})
 
         except Subscription.DoesNotExist:
             pass
@@ -268,6 +259,18 @@ class ServiceOptionalManagementView(generic.TemplateView):
                         in session_range_two)
 
         if has_conflict is True and (is_restricted or is_sub_restricted):
+
+            log_file = open("/tmp/conflicts.txt", "a")
+
+            msg = "Optional with ID:{} has conflict with ID:{}" \
+                  "\nID:{} starts at {}, ends at {}" \
+                  "\nID:{} starts at {}, ends at {}\n\n". \
+                format(option_one.pk, option_two.pk,
+                       option_one.pk, start_one, stop_one,
+                       option_two.pk, start_two, stop_two)
+            log_file.write(msg)
+            log_file.close()
+
             return True
 
         return False
