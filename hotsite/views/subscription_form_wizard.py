@@ -212,7 +212,7 @@ class SubscriptionWizardView(SessionWizardView):
 
         try:
             return super().dispatch(request, *args, **kwargs)
-        except InvalidStateStepError:
+        except InvalidStateStepError as e:
 
             messages.warning(
                 request,
