@@ -48,8 +48,7 @@ class WorkConfig(models.Model):
     )
 
     @property
-    def is_submittable(self):
-        now = datetime.now()
+    def is_configured(self):
         area_categories = self.event.area_categories.all()
 
         if not self.date_start or not self.date_end:
@@ -58,10 +57,13 @@ class WorkConfig(models.Model):
         if not area_categories.count() > 0:
             return False
 
-        if self.date_end < now or self.date_start > now:
-            return False
-
         return True
+
+    @property
+    def is_submittable(self):
+        now = datetime.now()
+        running = self.date_end < now or self.date_start > now
+        return self.is_configured and running
 
     def __str__(self):
         return "Configurações cientificas do " + self.event.name

@@ -31,12 +31,13 @@ class EventForm(forms.ModelForm):
             'has_extra_activities',
             'has_checkin',
             'has_certificate',
-            'is_scientific',
+            'event_type',
             'rsvp_type',
         ]
 
         widgets = {
             'organization': forms.HiddenInput,
+            'event_type': forms.HiddenInput,
             'subscription_type': forms.RadioSelect,
             'date_start': SplitDateTimeWidget(),
             'date_end': SplitDateTimeWidget(),
@@ -48,9 +49,9 @@ class EventForm(forms.ModelForm):
         instance = kwargs.get('instance')
 
         super(EventForm, self).__init__(*args, **kwargs)
-        self.fields['is_scientific'].help_text = 'Trata-se de um evento com ' \
-                                                 'submissão de artigos ' \
-                                                 'cientificos?'
+        # self.fields['is_scientific'].help_text = 'Trata-se de um evento com ' \
+        #                                          'submissão de artigos ' \
+        #                                          'cientificos?'
 
         if instance is None:
             self._configure_organization_field()
@@ -72,6 +73,12 @@ class EventForm(forms.ModelForm):
         self.fields['organization'].widget = forms.Select()
         self.fields['organization'].choices = orgs
         self.fields['organization'].label = 'Realizador'
+
+    def clean_event_type(self):
+        event_type = self.cleaned_data.get('event_type')
+        self.instance.is_scientific = event_type == Event.EVENT_TYPE_SCIENTIFIC
+
+        return event_type
 
     def clean_date_end(self):
         date_end = self.cleaned_data.get('date_end')

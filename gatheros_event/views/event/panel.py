@@ -100,6 +100,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['full_banking'] = self._get_full_banking()
         context['number_attendances'] = self.get_number_attendances()
         context['status_addons'] = self.get_status_addons()
+        context['is_configured'] = self.event.work_config.is_configured
         try:
             context['info'] = self.event.info
         except Info.DoesNotExist:
