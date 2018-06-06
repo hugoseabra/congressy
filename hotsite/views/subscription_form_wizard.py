@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.transaction import atomic
 from django.forms import ValidationError
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
@@ -184,6 +184,9 @@ class SubscriptionWizardView(SessionWizardView):
 
         user = self.request.user
         if not isinstance(user, User):
+            return redirect('public:hotsite', slug=self.event.slug)
+
+        if not self.subscription_enabled():
             return redirect('public:hotsite', slug=self.event.slug)
 
         if self.has_paid_subscription():
@@ -754,3 +757,19 @@ class SubscriptionWizardView(SessionWizardView):
     @staticmethod
     def is_lot_available(lot):
         return lot.status == lot.LOT_STATUS_RUNNING and not lot.private
+
+    def subscription_enabled(self):
+
+        if self.has_available_lots() is False:
+            return False
+
+        return self.event.status == Event.EVENT_STATUS_NOT_STARTED
+
+    def has_available_lots(self):
+        available_lots = []
+
+        for lot in self.event.lots.filter(active=True):
+            if lot.status == lot.LOT_STATUS_RUNNING:
+                available_lots.append(lot)
+
+        return True if len(available_lots) > 0 else False

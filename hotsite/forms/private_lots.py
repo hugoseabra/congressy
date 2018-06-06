@@ -10,7 +10,6 @@ from gatheros_subscription.models import Lot
 
 
 class PrivateLotForm(forms.Form):
-
     lots = forms.ChoiceField(
         required=False,
         label='lote',
@@ -33,13 +32,14 @@ class PrivateLotForm(forms.Form):
         self.fields['lots'].choices = self.get_lot_choices()
 
         if lot:
-            self.fields['lots'].initial = lot
+            self.fields['lots'].initial = lot.pk
 
     def get_lot_choices(self):
+        now = datetime.now()
         lots = Lot.objects.filter(event=self.event,
-                                         active=True,
-                                         date_start__lte=datetime.now(),
-                                         date_end__gte=datetime.now(),)
+                                  active=True,
+                                  date_start__lte=now,
+                                  date_end__gte=now)
 
         return [
             (lot.id, lot.display_publicly)
