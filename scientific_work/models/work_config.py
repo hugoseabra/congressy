@@ -62,7 +62,11 @@ class WorkConfig(models.Model):
     @property
     def is_submittable(self):
         now = datetime.now()
-        running = self.date_end < now or self.date_start > now
+        running = False
+
+        if self.date_start and self.date_end:
+            running = self.date_end < now or self.date_start > now
+
         return self.is_configured and running
 
     def __str__(self):
