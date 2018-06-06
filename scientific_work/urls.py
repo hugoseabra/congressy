@@ -28,8 +28,8 @@ api_urls = [
 ]
 
 urlpatterns = [
-    url(r'^api/scientific_work/', include(api_urls)),
-    url(r'^subscriptions/(?P<subscription_pk>[0-9A-Fa-f-]+)/scientific_work/',
+    url(r'^api/scientific_works/', include(api_urls)),
+    url(r'^subscriptions/(?P<subscription_pk>[0-9A-Fa-f-]+)/scientific_works/',
         include(subscription_urls)),
-    url(r'^events/(?P<pk>[\d]+)/scientific_work/', include(event_urls)),
+    url(r'^events/(?P<pk>[\d]+)/scientific_works/', include(event_urls)),
 ]

@@ -35,10 +35,10 @@
                             {{ event.get_period }}
                         </p>
                         {% if event.place and event.place.name %}
-                        <p class="hero-tagline">
-                            <i class="fa fa-map-marker"></i>
-                            {{ event.place.name|default_if_none:'' }}
-                        </p>
+                            <p class="hero-tagline">
+                                <i class="fa fa-map-marker"></i>
+                                {{ event.place.name|default_if_none:'' }}
+                            </p>
                         {% endif %}
                     </div>
                 </div>
@@ -163,7 +163,8 @@
                                             Evento está sendo configurado, volte
                                             em
                                             breve para realizar sua
-                                            inscrição!</p>
+                                            inscrições cientificas no
+                                            momento.</p>
                                     {% else %}
                                         {% include 'hotsite/subscription_simple_form.html' %}
                                     {% endif %}
@@ -173,9 +174,10 @@
                             <div class="hero-features-left col-md-7">
 
                                 <p style="font-size: 20px;font-style: italic;">
-                                    Evento não está configurado para
-                                    receber inscrições no momento, volte em
-                                    breve para realizar sua inscrição!
+                                    Evento está sendo configurado, volte em
+                                    breve para realizar sua
+                                    inscrições cientificas no
+                                    momento.
                                 </p>
 
                             </div>
