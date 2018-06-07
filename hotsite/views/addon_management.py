@@ -200,9 +200,8 @@ class ServiceOptionalManagementView(generic.TemplateView):
     def post(self, request, *args, **kwargs):
 
         """
-            @TODO: IMPLEMENT SOME VALIDATION BEFORE CREATING!!!!!!!!
+        @TODO: IMPLEMENT SOME VALIDATION BEFORE CREATING!!!!!!!!
         """
-
         subscription_pk = kwargs.get('subscription_pk')
         optional_id = self.request.POST.get('optional_id')
         action = self.request.POST.get('action')
