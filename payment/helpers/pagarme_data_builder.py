@@ -7,9 +7,7 @@ from django.conf import settings
 
 from payment.exception import (
     TransactionDataError,
-    TransactionMisconfiguredError,
 )
-from payment.helpers.calculator import Calculator
 from payment.helpers.payment_helpers import (
     amount_as_decimal,
     decimal_processable_amount,
@@ -53,20 +51,14 @@ class PagarmeDataBuilder:
         if debt.id in self.debt_items:
             return
 
+        if not debt.amount:
+            return
+
         if debt.subscription != self.subscription:
             raise TransactionDataError(
                 'A pendência financeira "{}" não pertence à inscrição'
                 ' "{}"'.format(debt, self.subscription)
             )
-
-        if debt.type == debt.DEBT_TYPE_SUBSCRIPTION:
-            name = 'Inscrição: {}'.format(self.subscription.event.name)
-
-        elif debt.type == debt.DEBT_TYPE_SERVICE:
-            name = 'Atividade extra: {}'.format(
-                self.subscription.event.name
-            )
-
 
         self.debts.append(debt)
         self.debt_items[debt.id] = {

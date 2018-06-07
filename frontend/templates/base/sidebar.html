@@ -20,6 +20,20 @@
                 </div>
                 <ul id="profile-navbar"
                     class="col nav nav-pills nav-stacked " role="menu"
+                <a id="profile-button"
+                   data-toggle="tooltip"
+                   data-placement="right"
+                   data-original-title="{{ user.get_full_name }}" ;
+                    <span class="meta">
+                       <span style="cursor: pointer;"
+                             class="text">
+<i class="fas fa-user-circle" style=" font-size: 30px"></i>
+
+                       </span>
+                    </span>
+                </a>
+                <ul id="profile-navbar" class="col nav nav-pills nav-stacked
+                                " role="menu"
                     style="display: block;font-size: 20px">
                     <li>
                         <a href="{% url 'event:profile' %}"

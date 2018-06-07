@@ -238,20 +238,28 @@ class Lot(models.Model, GatherosModelMixin):
         """ Resgata percentual de vagas preenchidas no lote. """
         completed = 0.00
         if self.limit:
-            completed = ((self.subscriptions.count() * 100) / self.limit)
+            queryset = self.subscriptions.filter(
+                completed=True
+            ).exclude(
+                status='canceled'
+            )
+            completed = ((queryset.count() * 100) / self.limit)
 
         return round(completed, 2)
 
     @property
     def percent_attended(self):
         """ Resgata percentual de inscritos que compareceram no evento. """
-        queryset = self.subscriptions
-        num_subs = queryset.count()
-        if num_subs == 0:
+        queryset = self.subscriptions.filter(
+            completed=True
+        ).exclude(
+            status='canceled'
+        )
+        if queryset.count() == 0:
             return 0
 
         attended = queryset.filter(attended=True).count()
-        return round((attended * 100) / num_subs, 2)
+        return round((attended * 100) / queryset.count(), 2)
 
     @property
     def display_publicly(self):
@@ -291,7 +299,11 @@ class Lot(models.Model, GatherosModelMixin):
         if not self.limit:
             return self.LOT_LIMIT_UNLIMIED
 
-        num = self.subscriptions.all().count()
+        num = self.subscriptions.filter(
+            completed=True
+        ).exclude(
+            status='canceled',
+        ).count()
         return self.limit - num
 
     @property
@@ -301,10 +313,11 @@ class Lot(models.Model, GatherosModelMixin):
         :return: string
         """
         if self.limit and self.limit > 0:
-            queryset = self.subscriptions.exclude(status='canceled')
-            num_subs = queryset.count()
+            queryset = self.subscriptions.filter(
+                completed=True,
+            ).exclude(status__in=['canceled'],)
 
-            if num_subs >= self.limit:
+            if queryset.count() >= self.limit:
                 return Lot.LOT_STATUS_FINISHED
 
         now = datetime.now()

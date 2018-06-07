@@ -88,6 +88,7 @@ def notify_postback(transaction, data):
         <strong>STATUS:</strong> {status_display} ({status})
         <br />
         <hr >
+        <br />
         <strong>Data:</strong>
         <br />    
         <pre><code>{data}</code></pre>
@@ -252,6 +253,7 @@ def postback_url_view(request, uidb64):
         # novamente.
         subscription_status = trans_sub_status_integrator.integrate()
         transaction.subscription.status = subscription_status
+        transaction.subscription.completed = True
         transaction.subscription.save()
 
         # Persists transaction change
@@ -303,6 +305,8 @@ def postback_url_view(request, uidb64):
         subscription = transaction.subscription
         event = subscription.event
 
+        sub_user = subscription.person.user
+
         is_new_subscription = subscription.notified is False
         is_paid = incoming_status == Transaction.PAID
         is_refused = incoming_status == Transaction.REFUSED
@@ -338,7 +342,7 @@ def postback_url_view(request, uidb64):
                             ' seguinte erro: status desconhecido para'
                             ' notificação - "{}". Evento: {}. Inscrição:'
                             ' {} ({} - {} - {}). Transaction {}: '.format(
-                                new_desired_status,
+                                incoming_status,
                                 event.name,
                                 sub_user.get_full_name(),
                                 sub_user.pk,
@@ -384,7 +388,7 @@ def postback_url_view(request, uidb64):
                             ' seguinte erro: status desconhecido para'
                             ' notificação - "{}". Evento: {}. Inscrição: {}'
                             ' ({} - {} - {}). Transaction {}: '.format(
-                                new_desired_status,
+                                incoming_status,
                                 event.name,
                                 sub_user.get_full_name(),
                                 sub_user.pk,
@@ -401,7 +405,7 @@ def postback_url_view(request, uidb64):
                         ' pagamento desconhecido para notificação - "{}".'
                         ' Evento: {}. Inscrição: {} ({} - {} - {}).'
                         ' Transaction {}: '.format(
-                            new_desired_status,
+                            incoming_status,
                             event.name,
                             sub_user.get_full_name(),
                             sub_user.pk,
@@ -434,7 +438,7 @@ def postback_url_view(request, uidb64):
                             ' status desconhecido para notificação - "{}".'
                             ' Evento: {}. Inscrição: {} ({} - {} - {}).'
                             ' Transaction {}: '.format(
-                                new_desired_status,
+                                incoming_status,
                                 event.name,
                                 sub_user.get_full_name(),
                                 sub_user.pk,
@@ -480,7 +484,7 @@ def postback_url_view(request, uidb64):
                             ' seguinte erro: status desconhecido para'
                             ' notificação - "{}". Evento: {}. Inscrição: {}'
                             ' ({} - {} - {}). Transaction {}: '.format(
-                                new_desired_status,
+                                incoming_status,
                                 event.name,
                                 sub_user.get_full_name(),
                                 sub_user.pk,
@@ -497,7 +501,7 @@ def postback_url_view(request, uidb64):
                         ' pagamento desconhecido para notificação - "{}".'
                         ' Evento: {}. Inscrição: {} ({} - {} - {}).'
                         ' Transaction {}: '.format(
-                            new_desired_status,
+                            incoming_status,
                             event.name,
                             sub_user.get_full_name(),
                             sub_user.pk,

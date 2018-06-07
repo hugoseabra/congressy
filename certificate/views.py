@@ -125,7 +125,8 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     def get_text(self):
         text = self.event.certificate.text_content
         text_template = Template(text)
-        res = text_template.render(NOME=self.subscription.person.name.upper())
+        context = {'NOME': self.subscription.person.name.upper()}
+        res = text_template.render(context)
         return res
 
     def can_access(self):

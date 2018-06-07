@@ -26,9 +26,13 @@ class ProductService(services.ApplicationService):
         self.event = event
 
         data = kwargs.get('data', {})
+        instance = kwargs.get('instance')
         if data:
             data = data.copy()
-            data.update({'event': event.pk})
+            data.update({
+                'event': event.pk,
+                'published': instance.published if instance else True,
+            })
             kwargs['data'] = data
 
         super().__init__(**kwargs)
@@ -48,9 +52,13 @@ class ServiceService(services.ApplicationService):
         self.event = event
 
         data = kwargs.get('data', {})
+        instance = kwargs.get('instance')
         if data:
             data = data.copy()
-            data.update({'event': event.pk})
+            data.update({
+                'event': event.pk,
+                'published': instance.published if instance else True,
+            })
             kwargs['data'] = data
 
         super().__init__(**kwargs)

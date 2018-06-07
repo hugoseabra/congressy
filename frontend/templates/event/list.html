@@ -1,5 +1,5 @@
 {% extends "base/base.html" %}
-{% load static event_tags %}
+{% load static subscription_tags %}
 
 {% block title %} Eventos | Congressy{% endblock %}
 
@@ -184,7 +184,7 @@
                                         </td>
 
                                         <td>
-                                            {{ event.subscriptions.all|length }}
+                                            {% event_count_completed_subscriptions event %}
                                             {% if event.limit %} /
                                                 {{ event.limit }}
                                             {% endif %}

@@ -196,7 +196,6 @@
             reoderDivs(evaluateProgress());
             remove_table_add();
         });
-        console.log("{{ get_status_addons.products }}")
     </script>
 
 {% endblock %}
@@ -246,12 +245,41 @@
     col-sm-12 col-md-12 col-lg-12"
          style="padding: 0;">
 
+    <div class="row">
+        <div class="col-md-3 float-right">
+            <div class="buttonbar">
+                {% if info and info.description_html %}
+                    <a href="{% url 'public:hotsite' info.event.slug %}"
+                       target="_blank"
+                       class="btn btn-success btn-block">
+                        <i class="fa fa-globe"></i>
+                        Link do Evento
+                    </a>
+                {% else %}
+                    <button type="button"
+                            class="btn btn-default btn-trans
+                                            btn-block disabled"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            title=""
+                            data-original-title="Você deve configurar pelo menos a descrição do seu evento.">
+                        <i class="fa fa-globe"></i>
+                        Link do Evento
+                    </button>
+                {% endif %}
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="todo-data"
+         class="panel panel-primary col-xs-12 col-xl-12 col-sm-12 col-md-12 col-lg-12"
+         style="padding: 0;margin-left: 25px">
         <div class="panel-heading">
             <div class="panel-title">Etapas de configuração do seu evento</div>
         </div>
         <div class="panel-body tooltip-wrapper">
             <div id="todo">
-
                 {% include "event/todo_list.html" %}
             </div>
         </div>
@@ -266,8 +294,7 @@
                         <span class="total text-center">
                             R$ {{ totals.paid|intcomma }}
                         </span>
-                        <span class="title text-center">Saldo das
-                            inscrições pagas</span>
+                        <span class="title text-center">Saldo das inscrições pagas</span>
                     </div>
                 </div>
             </div>
@@ -278,8 +305,7 @@
                         <span class="total text-center">
                              R$ {{ totals.pending|intcomma }}
                         </span>
-                        <span class="title text-center">Pendentes de
-                            pagamento</span>
+                        <span class="title text-center">Pendentes de pagamento</span>
                     </div>
                 </div>
             </div>
@@ -290,8 +316,7 @@
                         <span class="total text-center">
                             R$ {{ totals.total|intcomma }}
                         </span>
-                        <span class="title text-center">Potencial de
-                            faturamento atual</span>
+                        <span class="title text-center">Potencial de faturamento atual</span>
                     </div>
                 </div>
             </div>
@@ -312,81 +337,74 @@
     <div id="graph-data" class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
         <div class=" col-lg-6 col-md-6 col-sm-12 col-xs-12"
              style="margin-bottom: 15px ">
-            <div class="panel
-{% if limit == 0 or  total_subscriptions  > limit %} widget-mini
-panel-solid-info {% endif %}
-panel-primary">
+            <div class="panel {% if limit == 0 or total_subscriptions  > limit %} widget-mini panel-solid-info {% endif %} panel-primary">
                 {% if limit != 0 and  total_subscriptions  < limit %}
                     <div class="panel-heading">
                         <h3 class="panel-title">Total de inscritos</h3>
                     </div>
-                    {% if limit == 0 or  total_subscriptions  > limit %}
-                        <div class="panel widget-mini">
-                    {% endif %}
+                    {#                    {% if limit == 0 or  total_subscriptions  > limit %}#}
+                    {#                        <div class="panel widget-mini">#}
+                    {#                    {% endif %}#}
                 {% endif %}
 
-                <div class="panel-body {% if limit == 0 %} widget-gauge
-{% endif %}">
+                <div class="panel-body {% if limit == 0 %}widget-gauge{% endif %}">
                     {% if limit == 0 or  total_subscriptions  > limit %}
                         <i class="icon-user"></i>
                         <span class="total text-center">
                             {{ total_subscriptions }}
-                        <span class="title text-center">Inscritos</span>
+                            <span class="title text-center">Inscritos</span>
                         </span>
-
-
                     {% else %}
                         <canvas width="200" height="125" id="gauge"
                                 class=""></canvas>
                         <div class="goal-wrapper">
                             <span class="gauge-value pull-left"></span>
-                            <span id="gauge-text" class="gauge-value
-                                    pull-left">{{ total_subscriptions }}</span>
-                            <span id="goal-text" class="goal-value
-                                    pull-right">{{ limit }}</span>
+                            <span id="gauge-text"
+                                  class="gauge-value pull-left">
+                                {{ total_subscriptions }}
+                            </span>
+                            <span id="goal-text" class="goal-value pull-right">
+                                {{ limit }}
+                            </span>
                         </div>
-
                     {% endif %}
-                </div>
-
+                    {#                </div>#}
                 </div>
             </div>
-            {% if gender.men != 0 or gender.women != 0 %}
-                <div class="col-lg-6 col-md-6 col-sm-12
-                col-xs-12"
-                     style="padding-bottom: 20px;margin-bottom: 20px ">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Gênero dos
-                                participantes</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class=" col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                    <ul class="nav nav-pills nav-stacked">
-                                        <li><i class="fa fa-circle"
-                                               style="color: #1F7BB6 "></i>
-                                            Homens
-                                        </li>
-                                        <li><i class="fa fa-circle "
-                                               style="color: #FF80AB;"></i>
-                                            Mulheres
-                                        </li>
+        </div>
+        {% if gender.men != 0 or gender.women != 0 %}
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
+                 style="padding-bottom: 20px;margin-bottom: 20px ">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Gênero dos participantes</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class=" col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                <ul class="nav nav-pills nav-stacked">
+                                    <li><i class="fa fa-circle"
+                                           style="color: #1F7BB6 "></i>
+                                        Homens
+                                    </li>
+                                    <li><i class="fa fa-circle "
+                                           style="color: #FF80AB;"></i>
+                                        Mulheres
+                                    </li>
 
-                                    </ul>
-                                </div>
-                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                    <div>
-                                        <canvas id="doughnut" width="100%"
-                                                height="88%"
-                                        ></canvas>
-                                    </div>
+                                </ul>
+                            </div>
+                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                <div>
+                                    <canvas id="doughnut" width="100%"
+                                            height="88%"
+                                    ></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

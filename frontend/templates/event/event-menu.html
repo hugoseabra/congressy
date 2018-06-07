@@ -42,84 +42,12 @@ Variáveis:
         </li>
     {% endif %}
 
-{#    <li {% if active == 'certificate' %}class=  "active"{% endif %}>#}
-{#        <a class="sidebar-itens" href="{% url 'certificate:event-certificate-prepare' event.pk %}"#}
-{#           title="Editor de Certificados">#}
-{#            <i class="fas fa-graduation-cap"></i>Certificados#}
-{#        </a>#}
-{#    </li>#}
-</ul>
-
-
-{% if event.has_checkin %}
-<h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
-<ul class="nav nav-pills nav-stacked">
-    <li {% if active == 'checkin-dashboard' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href=
-                "{% url 'subscription:subscription-attendance-dashboard' event.pk %}"
-           title="Check-in">
-            <i class="fas fa-chart-line"></i>
-            Painel de Check-in
-        </a>
-    </li>
-    <li {% if active == 'checkin' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href="{% url 'subscription:subscription-attendance-search' event.pk %}"
-           title="Check-in">
-            <i class="fas fa-calendar-check"></i>
-            Check-in
-        </a>
-    </li>
-    <li {% if active == 'checkin-list' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href=
-                "{% url 'subscription:subscription-attendance-list' event.pk %}"
-           title="Credenciados">
-            <i class="fas fa-clipboard-check"></i>
-           Credenciados
-        </a>
-    </li>
-</ul>
-{% endif %}
-{% if event.is_scientific %}
-    <h5 class="sidebar-header" style="color:#4c4c4c;">Artigos científicos</h5>
-    <ul class="nav nav-pills nav-stacked">
-        <li {% if active == 'scientific_work_list' %}class="active"{% endif %}>
-            <a class="sidebar-itens"
-               href="{% url 'scientific_work:work-list' event.pk %}"
-               title="Submissão de artigos">
-                <i class="fas fa-newspaper"></i> Ver trabalhos
-            </a>
-        </li>
-        <li {% if active == 'scientific_work' %}class="active"{% endif %}>
-            <a class="sidebar-itens"
-               href="{% url 'scientific_work:scientific_event_config' event.pk %}"
-               title="Submissão de artigos">
-                <i class="fas fa-cog"></i> Configurações
-            </a>
-        </li>
-
-    </ul>
-{% endif %}
-
-<h5 class="sidebar-header" style="color:#4c4c4c;">Recursos Extras</h5>
-<ul class="nav nav-pills nav-stacked">
-    <li {% if active == 'addon-themes' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href= "{% url 'addon:theme-list' event.pk %}" title="Temas de Atividades Extras">
-            <i class="fas fa-chart-line"></i>
-            Temas
-        </a>
-    </li>
-    <li {% if active == 'addon-atividades-extras' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href="{% url 'addon:optional-service-list' event.pk %}" title="Atividades Extras">
-            <i class="fas fa-chart-line"></i>
-            Atividades Extras
-        </a>
-    </li>
-    <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
-        <a class="sidebar-itens" href="{% url 'addon:optional-product-list' event.pk %}" title="Opcionais">
-            <i class="fas fa-chart-line"></i>
-            Opcionais
-        </a>
-    </li>
+    {#    <li {% if active == 'certificate' %}class=  "active"{% endif %}>#}
+    {#        <a class="sidebar-itens" href="{% url 'certificate:event-certificate-prepare' event.pk %}"#}
+    {#           title="Editor de Certificados">#}
+    {#            <i class="fas fa-graduation-cap"></i>Certificados#}
+    {#        </a>#}
+    {#    </li>#}
 </ul>
 
 <h5 class="sidebar-header" style="color:#4c4c4c;">Configurações</h5>
@@ -172,3 +100,89 @@ Variáveis:
     {#        </li>#}
 
 </ul>
+
+{% if event.has_checkin %}
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Credenciamento</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li {% if active == 'checkin-dashboard' %}class="active"{% endif %}>
+            <a class="sidebar-itens" href=
+                    "{% url 'subscription:subscription-attendance-dashboard' event.pk %}"
+               title="Check-in">
+                <i class="fas fa-chart-line"></i>
+                Painel de Check-in
+            </a>
+        </li>
+        <li {% if active == 'checkin' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'subscription:subscription-attendance-search' event.pk %}"
+               title="Check-in">
+                <i class="fas fa-calendar-check"></i>
+                Check-in
+            </a>
+        </li>
+        <li {% if active == 'checkin-list' %}class="active"{% endif %}>
+            <a class="sidebar-itens" href=
+                    "{% url 'subscription:subscription-attendance-list' event.pk %}"
+               title="Credenciados">
+                <i class="fas fa-clipboard-check"></i>
+                Credenciados
+            </a>
+        </li>
+    </ul>
+{% endif %}
+{% if event.is_scientific %}
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Artigos científicos</h5>
+    <ul class="nav nav-pills nav-stacked">
+        <li {% if active == 'scientific_work_list' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'scientific_work:work-list' event.pk %}"
+               title="Submissão de artigos">
+                <i class="fas fa-newspaper"></i> Ver trabalhos
+            </a>
+        </li>
+        <li {% if active == 'scientific_work' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'scientific_work:scientific_event_config' event.pk %}"
+               title="Submissão de artigos">
+                <i class="fas fa-cog"></i> Configurações
+            </a>
+        </li>
+
+    </ul>
+{% endif %}
+
+{% has_paid_lots event as has_paid_lots %}
+{% if event.has_extra_activities or event.has_optionals %}
+    <h5 class="sidebar-header" style="color:#4c4c4c;">Recursos Extras</h5>
+    <ul class="nav nav-pills nav-stacked">
+        {% if event.has_extra_activities %}
+            <li {% if active == 'addon-themes' %}class="active"{% endif %}>
+                <a class="sidebar-itens"
+                   href="{% url 'addon:theme-list' event.pk %}"
+                   title="Temas de Atividades Extras">
+                    <i class="fas fa-chart-line"></i>
+                    Temas
+                </a>
+            </li>
+            <li {% if active == 'addon-atividades-extras' %}class="active"{% endif %}>
+                <a class="sidebar-itens"
+                   href="{% url 'addon:optional-service-list' event.pk %}"
+                   title="Atividades Extras">
+                    <i class="fas fa-chart-line"></i>
+                    Atividades Extras
+                </a>
+            </li>
+        {% endif %}
+    {% if event.has_optionals %}
+        <li {% if active == 'addon-opcionais' %}class="active"{% endif %}>
+            <a class="sidebar-itens"
+               href="{% url 'addon:optional-product-list' event.pk %}"
+               title="Opcionais">
+                <i class="fas fa-chart-line"></i>
+                Opcionais
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+{% endif %}
+

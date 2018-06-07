@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 
 from core.forms.widgets import SplitDateTimeWidget
 from gatheros_event.models import Event, Member, Organization
+from gatheros_subscription.models import LotCategory
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -30,12 +31,13 @@ class EventForm(forms.ModelForm):
             'has_extra_activities',
             'has_checkin',
             'has_certificate',
-            'is_scientific',
+            'event_type',
             'rsvp_type',
         ]
 
         widgets = {
             'organization': forms.HiddenInput,
+            'event_type': forms.HiddenInput,
             'subscription_type': forms.RadioSelect,
             'date_start': SplitDateTimeWidget(),
             'date_end': SplitDateTimeWidget(),
@@ -47,9 +49,9 @@ class EventForm(forms.ModelForm):
         instance = kwargs.get('instance')
 
         super(EventForm, self).__init__(*args, **kwargs)
-        self.fields['is_scientific'].help_text = 'Trata-se de um evento com ' \
-                                                 'submissão de artigos ' \
-                                                 'cientificos?'
+        # self.fields['is_scientific'].help_text = 'Trata-se de um evento com ' \
+        #                                          'submissão de artigos ' \
+        #                                          'cientificos?'
 
         if instance is None:
             self._configure_organization_field()
@@ -72,6 +74,12 @@ class EventForm(forms.ModelForm):
         self.fields['organization'].choices = orgs
         self.fields['organization'].label = 'Realizador'
 
+    def clean_event_type(self):
+        event_type = self.cleaned_data.get('event_type')
+        self.instance.is_scientific = event_type == Event.EVENT_TYPE_SCIENTIFIC
+
+        return event_type
+
     def clean_date_end(self):
         date_end = self.cleaned_data.get('date_end')
         if not date_end:
@@ -84,6 +92,21 @@ class EventForm(forms.ModelForm):
             )
 
         return date_end
+
+    def save(self, commit=True):
+        instance = super().save(commit)
+        if instance.lot_categories.all().count() <= 0:
+            general_category = LotCategory.objects.create(
+                event=instance,
+                name="Geral",
+            )
+
+            if instance.lots.all().count() == 1:
+                first_lot = instance.lots.all().first()
+                first_lot.category = general_category
+                first_lot.save()
+
+        return instance
 
 
 class EventEditDatesForm(forms.ModelForm):

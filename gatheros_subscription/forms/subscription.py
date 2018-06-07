@@ -54,6 +54,9 @@ class SubscriptionForm(forms.ModelForm):
         if self.instance.free is True:
             self.instance.status = Subscription.CONFIRMED_STATUS
 
+        if self.instance.origin == Subscription.DEVICE_ORIGIN_MANAGE:
+            self.instance.completed = True
+
         return super().save(commit=commit)
 
 
