@@ -16,7 +16,7 @@ class LotsForm(forms.Form):
         queryset=Lot.objects.filter(active=True)
     )
 
-    def __init__(self, event, **kwargs):
+    def __init__(self, event, excluded_lot_pk=None, **kwargs):
         self.event = event
         super().__init__(**kwargs)
 
@@ -25,7 +25,15 @@ class LotsForm(forms.Form):
             event=self.event,
             date_start__lte=now,
             date_end__gte=now,
-        ).order_by('name', 'price')
+        )
+
+        if excluded_lot_pk is not None:
+            self.fields['lots'].queryset = \
+                self.fields['lots'].queryset.exclude(id=excluded_lot_pk)
+
+        self.fields['lots'].queryset = \
+            self.fields['lots'].queryset.order_by('name', 'price')
+
         self.fields['lots'].choices = self.get_public_lot_choices()
 
     def get_public_lot_choices(self):

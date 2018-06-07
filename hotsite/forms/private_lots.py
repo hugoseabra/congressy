@@ -16,8 +16,9 @@ class PrivateLotForm(forms.Form):
         widget=forms.HiddenInput(),
     )
 
-    def __init__(self, event, code, **kwargs):
+    def __init__(self, event, code, excluded_lot_pk=None, **kwargs):
         self.event = event
+        self.excluded_lot_pk = excluded_lot_pk
 
         lot = None
 
@@ -40,6 +41,9 @@ class PrivateLotForm(forms.Form):
                                   active=True,
                                   date_start__lte=now,
                                   date_end__gte=now).order_by('name', 'price')
+
+        if self.excluded_lot_pk is not None:
+            lots = lots.exclude(id=self.excluded_lot_pk)
 
         return [
             (lot.id, lot.display_publicly)

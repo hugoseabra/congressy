@@ -17,9 +17,7 @@
         }
 
         $(document).ready(function () {
-            {% if transactions and not subscription.confirmed %}
-                render_status_table();
-            {% endif %}
+            render_status_table();
 
             $('.tooltip-wrapper').tooltip({
                 selector: "[data-toggle=tooltip]",
