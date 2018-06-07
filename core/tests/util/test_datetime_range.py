@@ -11,8 +11,17 @@ class DateTimeRangeTests(TestCase):
         now = datetime.now()
         later = now + timedelta(days=1)
         range_ = DateTimeRange(start=now, stop=later)
-        in_range = now + timedelta(hours=1)
 
+        # In middle of range
+        in_range = now + timedelta(hours=1)
+        self.assertTrue(in_range in range_)
+
+        # In start of range
+        in_range = now
+        self.assertTrue(in_range in range_)
+
+        # In end of range
+        in_range = later
         self.assertTrue(in_range in range_)
 
     def test_failing_example(self):
