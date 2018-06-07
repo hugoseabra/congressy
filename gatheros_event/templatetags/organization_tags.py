@@ -24,3 +24,4 @@ def get_member_group(organization, user):
         return '-'
 
     return member.group
+

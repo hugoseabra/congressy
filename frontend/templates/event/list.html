@@ -66,14 +66,14 @@
                     }
                 ],
                 // Default order
-                "order": [[ 0, 'asc' ]]
+                "order": [[0, 'asc']]
             });
         });
     </script>
 {% endblock %}
 
 {% block nav_aside_itens %}
-    <span class ="visible-xs">
+    <span class="visible-xs">
         <a href="{% url 'event:event-add' %}" class="btn btn-block
     btn-success navbar-btn">
         <i class="fa fa-plus"></i>
@@ -103,9 +103,9 @@
                 Organizações
             </a>
         </li>
-     </ul>
+    </ul>
 
-    {% endblock %}
+{% endblock %}
 
 {% block content %}
 
@@ -131,14 +131,16 @@
                     {% if object_list %}
                         <div class="col-md-12 table-responsive">
                             <table id="event_table"
-                               class="table table-striped table-bordered"
-                               cellspacing="0"
-                               width="100%">
+                                   class="table table-striped table-bordered"
+                                   cellspacing="0"
+                                   width="100%">
 
                                 <thead>
                                 <tr>
                                     <th>Nome</th>
-                                    <th class="hidden-xs hidden-sm">Categoria</th>
+                                    <th class="hidden-xs hidden-sm">Categoria
+                                    </th>
+                                    <th class="hidden-xs hidden-sm">Tipo</th>
                                     <th># Insc.</th>
                                     <th></th>
                                 </tr>
@@ -148,8 +150,8 @@
                                 {% for event in object_list %}
                                     <tr>
                                         <td>
-    {#                                        <a href="{% url 'event:event-panel' event.pk %}">#}
-    {#                                        <a href="{% url 'subscription:subscription-list' event.pk %}">#}
+                                            {#                                        <a href="{% url 'event:event-panel' event.pk %}">#}
+                                            {#                                        <a href="{% url 'subscription:subscription-list' event.pk %}">#}
                                             <a href="
     {% url 'event:event-panel' event.pk %}">
                                                 {{ event.name }}
@@ -159,18 +161,28 @@
                                                 {% endif %}
                                                 <br/>
                                                 <small class="text-muted">{{ event.get_period }}</small>
-    {#                                            <br/>#}
-    {#                                            <small class="text-muted">#}
-    {#                                                {% if event.place %}#}
-    {#                                                    {{ event.place.name }}#}
-    {#                                                {% else %}#}
-    {#                                                    Online#}
-    {#                                                {% endif %}#}
-    {#                                            </small>#}
+                                                {#                                            <br/>#}
+                                                {#                                            <small class="text-muted">#}
+                                                {#                                                {% if event.place %}#}
+                                                {#                                                    {{ event.place.name }}#}
+                                                {#                                                {% else %}#}
+                                                {#                                                    Online#}
+                                                {#                                                {% endif %}#}
+                                                {#                                            </small>#}
 
                                             </a>
                                         </td>
                                         <td class="hidden-xs hidden-sm">{{ event.category.name }}</td>
+                                        <td class="hidden-xs hidden-sm">
+                                            {% if event.event_type == event.EVENT_TYPE_FREE %}
+                                            Gratuito
+                                            {% elif event.event_type == event.EVENT_TYPE_PAID %}
+                                            Pago
+                                            {% elif event.event_type == event.EVENT_TYPE_SCIENTIFIC %}
+                                            Científico
+                                            {% endif %}
+                                        </td>
+
                                         <td>
                                             {{ event.subscriptions.all|length }}
                                             {% if event.limit %} /
@@ -180,34 +192,35 @@
                                         <td>
                                             <div class="btn-group">
                                                 {% if user has 'gatheros_event.change_event' of event or event.is_deletable and user has 'gatheros_event.delete_event' of event %}
-                                                <button
-                                                    type="button"
-                                                    class="btn
+                                                    <button
+                                                            type="button"
+                                                            class="btn
                                                     btn-primary btn-trans
                                                     btn-sm dropdown-toggle"
-                                                    data-toggle="dropdown"
-                                                    aria-expanded="false"
-                                                >
-                                                    <span class="fas fa-cog"></span>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                                                    {% if user has 'gatheros_event.change_event' of event %}
-                                                    <li>
-                                                        <a href="{% url 'event:event-edit' event.pk %}">
-                                                            <i class="fas fa-pencil-alt"></i>
-                                                            Editar
-                                                        </a>
-                                                    </li>
-                                                    {% endif %}
-                                                    {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
-                                                    <li>
-                                                        <a href="{% url 'event:event-delete' event.pk %}">
-                                                            <i class="fas fa-trash-alt"></i>
-                                                            Excluir
-                                                        </a>
-                                                    </li>
-                                                    {% endif %}
-                                                </ul>
+                                                            data-toggle="dropdown"
+                                                            aria-expanded="false"
+                                                    >
+                                                        <span class="fas fa-cog"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-right"
+                                                        role="menu">
+                                                        {% if user has 'gatheros_event.change_event' of event %}
+                                                            <li>
+                                                                <a href="{% url 'event:event-edit' event.pk %}">
+                                                                    <i class="fas fa-pencil-alt"></i>
+                                                                    Editar
+                                                                </a>
+                                                            </li>
+                                                        {% endif %}
+                                                        {% if event.is_deletable and user has 'gatheros_event.delete_event' of event %}
+                                                            <li>
+                                                                <a href="{% url 'event:event-delete' event.pk %}">
+                                                                    <i class="fas fa-trash-alt"></i>
+                                                                    Excluir
+                                                                </a>
+                                                            </li>
+                                                        {% endif %}
+                                                    </ul>
                                                 {% endif %}
                                             </div>
                                         </td>
@@ -215,10 +228,10 @@
                                 {% endfor %}
                                 </tbody>
 
-                                </table>
-                                <br />
-                                <br />
-                            </div>
+                            </table>
+                            <br/>
+                            <br/>
+                        </div>
                     {% else %}
 
                         <h3>Nenhum dado.</h3>

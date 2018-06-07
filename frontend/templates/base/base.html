@@ -240,7 +240,7 @@
         <div class="float-left sidebar-section">
             {% include "base/sidebar.html" %}
         </div>
-        <div class="float-right main-page">
+        <div class="{% if has_inside_bar %}float-right main-page-full {% else %} main-page-sidebar {% endif %}">
             <div class=" main-content-wrapper">
                 <!--main content start-->
                 <section class="main-content-wrapper" style="position:
@@ -269,13 +269,13 @@
 
                     </section>
                     <!-- main content end -->
-
+                    <section class="cgsy-footer footer-wrapper">
+                        {% include "base/footer.html" %}
+                    </section>
                 </section>
             </div>
         </div>
-        <section class="cgsy-footer footer-wrapper">
-            {% include "base/footer.html" %}
-        </section>
+
         <div class="clearfix"></div>
     </section>
 

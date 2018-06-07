@@ -154,7 +154,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             if price is None:
                 continue
 
-            if lot.price > 0:
+            if price > 0:
                 return True
 
         return False

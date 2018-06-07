@@ -3497,8 +3497,15 @@ label.valid {
 .theme-cgsy-full .sidebar-section .navbar-collapse {
   padding-left: 0;
 }
-.theme-cgsy-full .main-page {
+.theme-cgsy-full .main-page-full {
   width: 79%;
+}
+.theme-cgsy-full .main-page-sidebar {
+  width: 100%;
+  padding-left: 50px;
+}
+.theme-cgsy-full .main-page-sidebar .cgsy-footer {
+  padding-left: 0;
 }
 .theme-cgsy-full .sidebar_divider {
   height: 1.4px;
@@ -3623,7 +3630,11 @@ label.valid {
   padding-bottom: 105px !important;
 }
 @media only screen and (max-width: 768px) {
-  .theme-cgsy-full .main-page {
+  .theme-cgsy-full .main-page-sidebar {
+    padding-top: 60px;
+    padding-left: 0;
+  }
+  .theme-cgsy-full .main-page-full {
     width: 100%;
   }
   .theme-cgsy-full .brand {

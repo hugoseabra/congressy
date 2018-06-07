@@ -1,23 +1,26 @@
-{% if has_inside_bar %}
-    <div class="collapse navbar-collapse collapse" id="sidebar" data-animated="fadeInRight">
-{% endif %}
-
-<div {% if has_inside_bar %}style="padding: 0"{% else %}class="FadeInLeft" id="sidebar" style="height:
-                 100%; position: fixed;z-index: 1000;" {% endif %}>
-    <div class="principal_sidebar new_nav  sidebar-left sidebar" style=" padding-top: 0">
+<div class="collapse navbar-collapse collapse" id="sidebar"
+     data-animated="fadeInRight">
+    <div class="principal_sidebar new_nav  sidebar-left sidebar"
+         style=" padding-top: 0">
         <ul class="col nav nav-pills nav-stacked " style="
                             font-size: 25px;text-align: center; margin: 0">
             <li class="dropdown" style="width: 50px;">
-                <div data-toggle="tooltip" data-placement="right" data-original-title="{{ user.get_full_name }}">
-                    <a id="profile-button" class="dropdown-toggle" data-toggle="dropdown">
+                <div data-toggle="tooltip" data-placement="right"
+                     data-original-title="{{ user.get_full_name }}"
+                     style="padding-top: 5px">
+                    <a id="profile-button" class="dropdown-toggle"
+                       data-toggle="dropdown">
                         <span class="meta">
                            <span style="cursor: pointer;" class="text">
-                               <i class="fas fa-user-circle" style=" font-size: 30px"></i>
+                               <i class="fas fa-user-circle"
+                                  style=" font-size: 30px"></i>
                            </span>
                         </span>
                     </a>
                 </div>
-                <ul id="profile-navbar" class="col nav nav-pills nav-stacked " role="menu" style="display: block;font-size: 20px">
+                <ul id="profile-navbar"
+                    class="col nav nav-pills nav-stacked " role="menu"
+                    style="display: block;font-size: 20px">
                     <li>
                         <a href="{% url 'event:profile' %}"
                            data-toggle="tooltip"
@@ -70,7 +73,8 @@
             </li>
             <li class="divider sidebar_divider visible-xs"></li>
         </ul>
-        <ul class="col nav nav-pills nav-stacked visible-xs" style="font-size: 30px;text-align: center;margin: 0;">
+        <ul class="col nav nav-pills nav-stacked visible-xs"
+            style="font-size: 30px;text-align: center;margin: 0;">
             <li>
                 <a href="{% url 'event:event-add' %}" class="btn
                     " style="width: 50px;height:
@@ -84,21 +88,20 @@
             </li>
         </ul>
     </div>
-</div>
 
-{% if has_inside_bar %}
-    <div class="manage_sidebar">
-        <div>
+    {% if has_inside_bar %}
+        <div class="manage_sidebar">
+            <div>
 
-            <nav style="color: #383838">
-                {% if event %}
-                    {% include 'event/event-menu.html' %}
-                {% elif organization %}
-                    {% include 'organization/organization-menu.html' %}
-                {% endif %}
-            </nav>
+                <nav style="color: #383838">
+                    {% if event %}
+                        {% include 'event/event-menu.html' %}
+                    {% elif organization %}
+                        {% include 'organization/organization-menu.html' %}
+                    {% endif %}
+                </nav>
+            </div>
         </div>
-    </div>
-    </div>
-{% endif %}
+    {% endif %}
+</div>
 
