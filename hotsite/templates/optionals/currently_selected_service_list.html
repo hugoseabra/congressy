@@ -9,6 +9,9 @@
                     <th>Nome</th>
                     <th>Tipo</th>
                     <th>Preço</th>
+                    <th>Inicio</th>
+                    <th>Fim</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -16,6 +19,7 @@
                     <tr>
 
                         <td>{{ service.optional.name }}</td>
+
                         <td>{{ service.optional.optional_type.name }}</td>
                         <td>
                             {% if service.optional.price == 0.00 %}
@@ -24,6 +28,8 @@
                                 R$ {{ service.optional.price }}
                             {% endif %}
                         </td>
+                        <td>{{ service.optional.schedule_start|date:"d/m/Y H\hi" }}</td>
+                        <td>{{ service.optional.schedule_end|date:"d/m/Y H\hi" }}</td>
                         <td>
                             <button style="width: 100%"
                                     onclick="removeOptionalService({{ service.optional.pk }})"
