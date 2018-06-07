@@ -155,24 +155,67 @@ class ServiceOptionalManagementView(generic.TemplateView):
             all_selected_services = SubscriptionService.objects.filter(
                 subscription=subscription,
                 optional__lot_category=subscription.lot.category
-            )
+            ).order_by("optional__theme__name",
+                       "optional__optional_type__name")
             # @TODO add user validation here, only if request.user == sub.user
 
             if self.fetch_in_storage:
-                for item in all_selected_services:
-                    self.available_options.append({'optional': item.optional})
+
+                themes = {}
+                for service in all_selected_services:
+                    optional = service.optional
+                    theme = optional.theme
+                    o_type = optional.optional_type
+                    if theme.pk not in themes:
+                        themes[theme.pk] = {
+                            'name': theme.name,
+                            'types': {},
+                        }
+
+                    if o_type.pk not in themes[theme.pk]['types']:
+                        themes[theme.pk]['types'][o_type.pk] = {
+                            'name': o_type.name,
+                            'optionals': [],
+                        }
+
+                    themes[theme.pk]['types'][o_type.pk]['optionals'].append(
+                        service
+                    )
+
+                self.available_options = themes
             else:
 
                 # All service optionals
                 all_services = Service.objects.filter(
-                    lot_category=category, published=True)
+                    lot_category=category, published=True).order_by(
+                    'theme__name', "optional_type__name")
                 pre_selected_services = subscription.subscription_services.all()
 
                 available = get_all_options(all_services,
                                             pre_selected_services,
                                             available_only=False)
+                themes = {}
+                for service in available:
+                    optional = service['optional']
+                    theme = optional.theme
+                    o_type = optional.optional_type
+                    if theme.pk not in themes:
+                        themes[theme.pk] = {
+                            'name': theme.name,
+                            'types': {},
+                        }
 
-                self.available_options = available
+                    if o_type.pk not in themes[theme.pk]['types']:
+                        themes[theme.pk]['types'][o_type.pk] = {
+                            'name': o_type.name,
+                            'optionals': [],
+                        }
+
+                    themes[theme.pk]['types'][o_type.pk]['optionals'].append(
+                        service
+                    )
+
+                self.available_options = themes
 
         except Subscription.DoesNotExist:
             pass
