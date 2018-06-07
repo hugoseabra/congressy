@@ -25,7 +25,7 @@ class LotsForm(forms.Form):
             event=self.event,
             date_start__lte=now,
             date_end__gte=now,
-        )
+        ).order_by('name', 'price')
         self.fields['lots'].choices = self.get_public_lot_choices()
 
     def get_public_lot_choices(self):

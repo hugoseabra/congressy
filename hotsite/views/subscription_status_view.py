@@ -21,6 +21,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
     person = None
     subscription = None
     event = None
+    transactions = None
     restart_private_event = False
 
     def dispatch(self, request, *args, **kwargs):
@@ -47,7 +48,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
                 completed=True,
             )
 
-            if self.subscription.transactions.count() == 0:
+            if not self.get_transactions():
                 messages.warning(
                     message='Por favor, informe um lote para realizar o'
                             ' pagamento ao final do processo de inscrição.',
@@ -150,21 +151,25 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         return False
 
     def get_transactions(self):
+        if self.transactions:
+            return self.transactions
 
-        transactions = []
+        self.transactions = []
 
         all_transactions = Transaction.objects.filter(
             subscription=self.subscription,
             lot=self.subscription.lot)
 
+        now = datetime.now().date()
+
         for transaction in all_transactions:
             if transaction.boleto_expiration_date:
-                if transaction.boleto_expiration_date > datetime.now().date():
-                    transactions.append(transaction)
+                if transaction.boleto_expiration_date > now:
+                    self.transactions.append(transaction)
             else:
-                transactions.append(transaction)
+                self.transactions.append(transaction)
 
-        return transactions
+        return self.transactions
 
     def get_allowed_transaction(self):
 

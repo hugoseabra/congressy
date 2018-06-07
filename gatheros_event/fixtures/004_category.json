@@ -3,7 +3,7 @@
     "model": "gatheros_event.category",
     "pk": 1,
     "fields": {
-      "name": "Cidadania (Esporte, Sa\u00fade, Lazer, Outros)",
+      "name": "Cidadania (Cultura, Sa\u00fade, Lazer, Outros)",
       "active": true,
       "description": null
     }
@@ -12,7 +12,7 @@
     "model": "gatheros_event.category",
     "pk": 2,
     "fields": {
-      "name": "Congresso",
+      "name": "Conferênca, Congresso",
       "active": true,
       "description": null
     }
@@ -57,16 +57,7 @@
     "model": "gatheros_event.category",
     "pk": 7,
     "fields": {
-      "name": "Semin\u00e1rio",
-      "active": true,
-      "description": null
-    }
-  },
-  {
-    "model": "gatheros_event.category",
-    "pk": 8,
-    "fields": {
-      "name": "Show, Musical, Festa",
+      "name": "Semin\u00e1rio, Simpósio",
       "active": true,
       "description": null
     }

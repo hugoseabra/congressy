@@ -39,7 +39,7 @@ class PrivateLotForm(forms.Form):
         lots = Lot.objects.filter(event=self.event,
                                   active=True,
                                   date_start__lte=now,
-                                  date_end__gte=now)
+                                  date_end__gte=now).order_by('name', 'price')
 
         return [
             (lot.id, lot.display_publicly)

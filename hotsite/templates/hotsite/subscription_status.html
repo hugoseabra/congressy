@@ -17,7 +17,7 @@
         }
 
         $(document).ready(function () {
-            {% if not subscription.confirmed %}
+            {% if transactions and not subscription.confirmed %}
                 render_status_table();
             {% endif %}
 
@@ -60,11 +60,15 @@
                                     </div>
                                 {% endif %}
                             {% endblock messages %}
-                            {% if transactions %}
                                 <div id="status-table">
-                                    {% include 'hotsite/includes/status-table.html' %}
+                                    {% if transactions %}
+                                        {% include 'hotsite/includes/status-table.html' %}
+                                    {% else %}
+                                        <div>
+                                            Você não possui transações.
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
