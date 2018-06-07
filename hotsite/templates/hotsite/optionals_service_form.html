@@ -57,11 +57,15 @@
             'GET',
             null,
             function (response) {
+                //console.log(response);
                 $('#available_optional_services').html(response);
             },
-            null
+            function (err) {
+                console.error(err);
+            }
         );
     }
+
     function render_currently_selected_service_list() {
         var url = '{% url 'public:hotsite_services' subscription.pk  %}';
 
@@ -75,7 +79,9 @@
                 $('#currently_selected_services').html(response);
                 render_available_optional_services_list();
             },
-            null
+            function (err) {
+                console.log(err);
+            }
         );
     }
 
@@ -92,15 +98,16 @@
                 'action': 'add'
             },
             function (res) {
-                console.log(res);
+                //console.log(res);
                 render_available_optional_services_list();
                 render_currently_selected_service_list();
             },
             function (err) {
-                console.log('err');
+                console.log(err);
             }
         );
     }
+
     function removeOptionalService(service_id) {
 
         var url = '{% url 'public:hotsite_services' subscription.pk %}';
