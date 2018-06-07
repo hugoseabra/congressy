@@ -120,10 +120,12 @@
                             </button>
                         </span>
                     </li>
-                    {% if organization %}
-                        <li class="dropdown"
-                            style="background-color: #F0F3F3; outline:
+                    {% has_events user as has_events %}
+                    <li class="dropdown"
+                        style="background-color: #F0F3F3; outline:
                             none">
+                        {% if has_events %}
+
                             <a href="javascript:void(0);"
                                class="dropdown-toggle"
                                data-toggle="dropdown" style="outline: none">
@@ -135,6 +137,16 @@
                                             <span class="caret hidden-xs"></span>
                                         </span>
                             </a>
+                        {% else %}
+                            <a style="outline: none">
+                                <span class="meta" style="color: black">
+                                    <span class="text">
+                                        {{ organization.name|truncatechars:20 }}
+                                    </span>
+                                </span>
+                            </a>
+                        {% endif %}
+                        {% if has_events %}
                             <ul class="dropdown-menu animated fadeInRight "
                                 role="menu">
 
@@ -148,30 +160,34 @@
                                         Gerenciar
                                     </a>
                                 </li>
-                                <li class="divider"></li>
-                                <li role="presentation" style="padding-left:
+                                {% has_many_organizations user as has_many_organizations %}
+                                {% if has_many_organizations %}
+                                    <li class="divider"></li>
+                                    <li role="presentation" style="padding-left:
                                  5px; padding-right: 5px;">
-                                    <button type="button"
-                                            class="btn  btn-sm btn-primary
+                                        <button type="button"
+                                                class="btn  btn-sm btn-primary
                                        btn-block"
-                                            tabindex="-1"
-                                            data-toggle="modal"
-                                            data-target="#change_organization">
-                                        <i class="fas fa-exchange-alt"></i>
-                                        Trocar de organização
-                                    </button>
-                                </li>
+                                                tabindex="-1"
+                                                data-toggle="modal"
+                                                data-target="#change_organization">
+                                            <i class="fas fa-exchange-alt"></i>
+                                            Trocar de organização
+                                        </button>
+                                    </li>
+                                {% endif %}
                             </ul>
-                        </li>
-                    {% endif %}
+                            </li>
+                        {% endif %}
                 </ul>
             {% endif %}
 
         {% endblock %}
     </header>
     <div class="float-right navbar-header">
+
         <ul class="nav nav-pills">
-            {% if organization %}
+            {% if has_events %}
                 <li class="dropdown visible-xs"
                     role="presentation"
                     style="background-color: #F0F3F3; outline:
@@ -207,19 +223,21 @@
                                 Gerenciar
                             </a>
                         </li>
-                        <li class="divider"></li>
-                        <li role="presentation" style="padding-left:
+                        {% if has_many_organizations %}
+                            <li class="divider"></li>
+                            <li role="presentation" style="padding-left:
                                  5px; padding-right: 5px;">
-                            <button type="button" id="org-button"
-                                    class="btn  btn-sm btn-primary
+                                <button type="button" id="org-button"
+                                        class="btn  btn-sm btn-primary
                                        btn-block"
-                                    role="menuitem" tabindex="-1"
-                                    data-toggle="modal"
-                                    data-target="#change_organization">
-                                <i class="fas fa-exchange-alt"></i>
-                                Trocar
-                            </button>
-                        </li>
+                                        role="menuitem" tabindex="-1"
+                                        data-toggle="modal"
+                                        data-target="#change_organization">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    Trocar
+                                </button>
+                            </li>
+                        {% endif %}
                     </ul>
                 </li>
             {% endif %}

@@ -5,25 +5,12 @@
         <ul class="col nav nav-pills nav-stacked " style="
                             font-size: 25px;text-align: center; margin: 0">
             <li class="dropdown" style="width: 50px;">
-                <div data-toggle="tooltip" data-placement="right"
-                     data-original-title="{{ user.get_full_name }}"
-                     style="padding-top: 5px">
-                    <a id="profile-button" class="dropdown-toggle"
-                       data-toggle="dropdown">
-                        <span class="meta">
-                           <span style="cursor: pointer;" class="text">
-                               <i class="fas fa-user-circle"
-                                  style=" font-size: 30px"></i>
-                           </span>
-                        </span>
-                    </a>
-                </div>
                 <ul id="profile-navbar"
-                    class="col nav nav-pills nav-stacked " role="menu"
+                    class="col nav nav-pills nav-stacked " role="menu"></ul>
                 <a id="profile-button"
                    data-toggle="tooltip"
                    data-placement="right"
-                   data-original-title="{{ user.get_full_name }}" ;
+                   data-original-title="{{ user.get_full_name }}";>
                     <span class="meta">
                        <span style="cursor: pointer;"
                              class="text">

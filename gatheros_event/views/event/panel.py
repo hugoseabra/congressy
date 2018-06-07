@@ -153,11 +153,11 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
     def has_paid_lots(self):
         """ Retorna se evento possui algum lote pago. """
         for lot in self.event.lots.all():
-            price = lot.price
-            if price is None:
+
+            if lot.price is None:
                 continue
 
-            if price > 0:
+            if lot.price > 0 and lot.active:
                 return True
 
         return False
