@@ -49,11 +49,16 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
             )
 
             if not self.get_transactions():
-                messages.warning(
-                    message='Por favor, informe um lote para realizar o'
-                            ' pagamento ao final do processo de inscrição.',
-                    request=request
-                )
+                if self.is_private_event():
+                    self.request.session['has_private_subscription'] = \
+                        str(self.subscription.pk)
+                else:
+                    messages.warning(
+                        message='Por favor, informe um lote para realizar o'
+                                ' pagamento ao final do processo de inscrição.',
+                        request=request
+                    )
+
                 return redirect(
                     'public:hotsite-subscription',
                     slug=self.event.slug
