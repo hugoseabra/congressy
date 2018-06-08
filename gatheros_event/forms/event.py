@@ -31,6 +31,7 @@ class EventForm(forms.ModelForm):
             'has_extra_activities',
             'has_checkin',
             'has_certificate',
+            'has_survey',
             'event_type',
             'rsvp_type',
         ]

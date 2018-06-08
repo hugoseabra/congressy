@@ -81,6 +81,8 @@
                         if (callback) {
                             callback();
                         }
+                        $('.tooltip').remove();
+                        app.tooltips();
                     });
 
                     sender.send('GET');
@@ -93,6 +95,7 @@
                     var sender = new cgsy.AjaxSender("{% url 'event:event-panel' event.pk %}");
                     sender.setSuccessCallback(function () {
                         that.render(main_el, callback);
+
                     });
                     sender.send('POST', {'id_row': id_row});
                 };
@@ -178,6 +181,7 @@
                 );
             });
         }
+
         {##}
         {#function updateInsideBar() {#}
         {#    var inside = new window.cgsy.panel.InsideBar();#}
@@ -362,7 +366,6 @@
                             </span>
                         </div>
                     {% endif %}
-                    {#                </div>#}
                 </div>
             </div>
         </div>
@@ -400,6 +403,5 @@
                 </div>
             </div>
         {% endif %}
-    </div>
     </div>
 {% endblock %}

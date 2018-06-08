@@ -11,7 +11,7 @@ from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.models import Info, Organization
 from gatheros_event.views.mixins import AccountMixin
-from gatheros_subscription.models import Subscription
+from gatheros_subscription.models import Subscription, EventSurvey
 from payment.models import Transaction
 
 
@@ -96,6 +96,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         }
         context['report'] = self._get_report()
         context['full_banking'] = self._get_full_banking()
+        context['has_survey_create']= self.has_survey_create()
         context['number_attendances'] = self.get_number_attendances()
         context['status_addons'] = self.get_status_addons()
         try:
@@ -146,6 +147,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             'optionals': self.event.has_optionals,
             'checkin': self.event.has_checkin,
             'certificate': self.event.has_certificate,
+            'survey': self.event.has_survey,
         }
 
         return has_addons
@@ -338,3 +340,15 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             ).count()
 
         return pending
+
+    def has_survey_create(self):
+        event_survey_qs = EventSurvey.objects.filter(event=self.event)
+
+        for event_survey in event_survey_qs:
+            survey = event_survey.survey
+            has_questions = survey.questions.count() > 0
+            has_lots = survey.lots.count() > 0
+            if has_questions and has_lots:
+                return True
+
+        return False
