@@ -77,7 +77,7 @@ def _export_subscriptions(worksheet, subscriptions):
 
     worksheet.append([
         'CÓDIGO DA INSCRIÇÃO',
-        'CATEGORIA DE PARTICIPANTES.',
+        'CATEGORIA DE PARTICIPANTE',
         'LOTE',
         'STATUS',
         'NOME',
