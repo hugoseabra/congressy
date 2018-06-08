@@ -42,7 +42,9 @@ class TransactionSubscriptionStatusIntegrator:
         'paid'
     ]
 
-    cancelled_status = []
+    cancelled_status = [
+        'chargeback',
+    ]
 
     def __init__(self, transaction_state):
         """
