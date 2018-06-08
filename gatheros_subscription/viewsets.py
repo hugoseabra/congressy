@@ -4,11 +4,11 @@ from rest_framework.authentication import (
     SessionAuthentication,
 )
 from rest_framework.permissions import IsAuthenticated
+
 from gatheros_subscription.serializers import (
     Lot,
     LotSerializer,
 )
-from gatheros_event.models import Member
 
 
 class RestrictionViewMixin(object):
