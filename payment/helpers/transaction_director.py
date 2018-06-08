@@ -67,7 +67,7 @@ class TransactionDirector:
 
         elif self.old_status == "paid":
 
-            if self.status == "chargeback":
+            if self.status == "chargedback":
                 self.transaction_state_machine.chargeback()
             elif self.status == "pending_refund":
                 self.transaction_state_machine.paid_pending_refund()
@@ -77,7 +77,7 @@ class TransactionDirector:
                 raise StateNotAllowedError(
                     message='State not allowed for paid')
 
-        elif self.old_status == "chargeback":
+        elif self.old_status == "chargedback":
 
             if self.status == "paid":
                 self.transaction_state_machine.paid_chargeback()
