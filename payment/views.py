@@ -512,7 +512,7 @@ def postback_url_view(request, uidb64):
                     )
 
         except mailer_notification.NotifcationError as e:
-            return e
+            raise e
 
         # Registra inscrição como notificada.
         transaction.subscription.notified = True
