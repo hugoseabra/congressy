@@ -28,10 +28,7 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         org_pks = [
             m.organization.pk
-            for m in user.person.members.filter(
-                active=True,
-                group=Member.ADMIN
-            )
+            for m in user.person.members.filter(active=True)
         ]
 
         queryset = super().get_queryset()
