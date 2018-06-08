@@ -3,8 +3,12 @@ from django.shortcuts import get_object_or_404
 from django.views import generic
 
 from addon.helpers import get_all_options
-from addon.models import Product, Service, SubscriptionProduct, \
-    SubscriptionService
+from addon.models import (
+    Product,
+    Service,
+    SubscriptionProduct,
+    SubscriptionService,
+)
 from gatheros_subscription.models import Subscription
 
 """
