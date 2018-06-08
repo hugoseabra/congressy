@@ -86,7 +86,7 @@
     {% if object.background_image %}
         <div id="certificate">
             <div class="resize-container">
-                <div style="position: absolute; text-align: justify; transform: translate({{ object.title_position_x }}px, {{object.title_position_y}}px);" id="cert-title">{{ object.title_content }}</div>
+                <div style="position: absolute; text-align: justify; transform: translate({{ object.title_position_x }}px, {{ object.title_position_y }}px);" id="cert-title">{{ object.title_content }}</div>
                 <div style="position:absolute; text-align: justify" id="cert-date">
                     Goiânia, 1 de abril de 2018
                 </div>
@@ -132,15 +132,56 @@
     <script src="{% static "assets/js/messenger.js" %}"></script>
     <script src="{% static "assets/js/certificado.js" %}"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             window.cgsy.cert.persistence.url = "{% url 'certificate:certificate-detail' event.pk object.pk %}";
-            var title = $('#cert-title');
-            var text = $('#cert-text');
-            var date = $('#cert-date');
-            var interact = new window.cgsy.cert.Interact(title, text, date);
+
+
+            $('.open-edit-modal').on("click", function () {
+                $('#certificateDataModal').modal('show');
+            });
+
+
+
+
+            {% if object.background_image %}
+                var title = $('#cert-title');
+                var text = $('#cert-text');
+                var date = $('#cert-date');
+                var titleCheckBox = $('#titleCheckBox');
+                var dateCheckBox = $('#dateCheckBox');
+
+                var interact = new window.cgsy.cert.Interact(title, text, date);
+                var cert = new cert.CertDocument(title, text, date);
                 interact.moveElement(title, '{{ object.title_position_x|unlocalize }}', '{{ object.title_position_y|unlocalize }}');
                 interact.moveElement(text, '{{ object.text_position_x|unlocalize }}', '{{ object.text_position_y|unlocalize }}');
                 interact.moveElement(date, '{{ object.date_position_x|unlocalize }}', '{{ object.date_position_y|unlocalize }}');
+
+
+                $('.open-config-modal').on("click", function () {
+                    $('#certificateAlignmentModal').modal('show');
+                });
+
+                titleCheckBox.on('change', function () {
+
+                    if (this.checked) {
+                        cert.hideTitle();
+                    } else {
+                        cert.showTitle();
+                    }
+                });
+                dateCheckBox.on('change', function () {
+
+                    if (this.checked) {
+                        cert.hideDate();
+                    } else {
+                        cert.showDate();
+                    }
+
+
+                });
+
+            {% endif %}
+
         });
     </script>
 {% endblock %}
@@ -235,6 +276,99 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALIGNMENT MODAL -->
+    <div class="modal fade in" id="certificateAlignmentModal"
+         role="dialog"
+         aria-labelledby="certificateAlignmentModalLabel" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title" id="certificateAlignmentModalLabel">
+                        Editar alinhamento do certificado
+                    </h4>
+                </div>
+
+                <div class="modal-body">
+                    <label for="modoEditar">
+                        Arrasta e solta:
+                    </label>
+                    <input class="js-switch" type="checkbox" id='modoEditar'
+                           name="modoEditar">
+
+
+                    <br/>
+
+
+                    <label for="titleCheckBox" style="margin-top: 10px">
+                        Esconder título
+                    </label>
+                    <input class="js-switch" type="checkbox"
+                           {% if object.title_hide %}checked{% endif %}
+                           id="titleCheckBox"
+                           name="titleCheckBox">
+
+                    <br/>
+
+
+                    <label for="dateCheckBox" style="margin-top: 10px">
+                        Esconder data
+                    </label>
+                    <input type="checkbox" class="js-switch"
+                           {% if object.date_hide %}checked{% endif %}
+                           id="dateCheckBox"
+                           name="dateCheckBox">
+                    <br/>
+
+                    <label for="titleFontSize" style="margin-top: 20px">
+                        Tamanho do titulo:
+                    </label>
+                    <input class="form-control"
+                           type="number"
+                           id="titleFontSize" min="1"
+                           value= {{ object.title_font_size }}>
+
+
+                    <label for="dateFontSize" style="margin-top: 10px">
+                        Tamanho da data:
+                    </label>
+                    <input class="form-control"
+                           type="number"
+                           id="dateFontSize" min="1"
+                           value= {{ object.date_font_size }}>
+
+
+                    <label for="textFontSize" style="margin-top: 10px">
+                        Tamanho do texto
+                    </label>
+                    <input class="form-control"
+                           type="number"
+                           id="textFontSize" min="1"
+                           value={{ object.text_font_size }}>
+
+                    <label for="textLineHeight" style="margin-top: 10px">
+                        Espaçamento entre linhas do texto
+                    </label>
+                    <input class="form-control"
+                           type="number"
+                           id="textLineHeight" min="1"
+                           max="10" step="0.1"
+                           value= {{ object.text_line_height }}>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">
+                        Fechar
+                    </button>
+                </div>
             </div>
         </div>
     </div>

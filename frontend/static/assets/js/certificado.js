@@ -11,41 +11,42 @@ window.cgsy.cert = window.cgsy.cert || {};
 
     var save_timer = null;
 
-    var create_sender = function() {
+    var create_sender = function () {
 
         if (!persistence.hasOwnProperty('url') || !persistence.url) {
             console.log('Você deve informar a URL do certificado em window.cgsy.cert.persistence.url');
         }
 
         var sender = new AjaxSender(persistence.url);
-            sender.setFailCallback(function (response) {
-                var msg = 'Failure on request to "' + url + '" with method';
-                msg += ' "' + this.method + '".';
+        sender.setFailCallback(function (response) {
+            var msg = 'Failure on request to "' + url + '" with method';
+            msg += ' "' + this.method + '".';
 
-                if (response.hasOwnProperty('detail')) {
-                    msg += ' Detalhes: ' + response.detail;
-                }
-                messenger.triggerError(msg);
-            });
+            if (response.hasOwnProperty('detail')) {
+                msg += ' Detalhes: ' + response.detail;
+            }
+            messenger.triggerError(msg);
+        });
 
         return sender;
     };
 
     var setSuccessMessage = function (sender, msg) {
         if (msg) {
-           var callback = function () {
+            var callback = function () {
                 messenger.triggerSuccess(msg);
             }
         } else {
             // limpa mensagem anterior.
-            callback = function() {};
+            callback = function () {
+            };
         }
         sender.setSuccessCallback(callback);
     };
 
     var save = function (data, success_msg) {
         window.clearTimeout(save_timer);
-        save_timer = window.setTimeout(function() {
+        save_timer = window.setTimeout(function () {
             var sender = create_sender();
             setSuccessMessage(sender, success_msg);
             sender.send('PATCH', data);
@@ -193,7 +194,7 @@ window.cgsy.cert = window.cgsy.cert || {};
             );
         }
 
-        this.savePosition = function(element_id, x, y) {
+        this.savePosition = function (element_id, x, y) {
             if (element_id === title_id) {
                 title_manager.savePosition(x, y);
             }
@@ -207,7 +208,7 @@ window.cgsy.cert = window.cgsy.cert || {};
             }
         };
 
-        this.saveTextSize = function(width, height) {
+        this.saveTextSize = function (width, height) {
             text_manager.saveSize(width, height);
         };
 
@@ -220,6 +221,18 @@ window.cgsy.cert = window.cgsy.cert || {};
             date_el.hide();
             new cert.persistence.Date().hide();
         };
+
+        this.showTitle = function () {
+            title_el.show();
+            new cert.persistence.Title().show();
+        };
+
+        this.showDate = function () {
+            date_el.show();
+            new cert.persistence.Date().show();
+        };
+
+
     };
 
 })(jQuery, window.cgsy.cert);
@@ -230,7 +243,7 @@ window.cgsy.cert = window.cgsy.cert || {};
 
     var cert_document;
 
-    cert.Interact = function(title_el, text_el, date_el) {
+    cert.Interact = function (title_el, text_el, date_el) {
         cert_document = new cert.CertDocument(title_el, text_el, date_el);
 
         // Ativar draggable
@@ -240,12 +253,12 @@ window.cgsy.cert = window.cgsy.cert || {};
         // texto deve ser redimensionável
         text_el.addClass('resize-drag');
 
-        this.moveElement = function(element, x, y) {
+        this.moveElement = function (element, x, y) {
             moveElement(element, x, y)
         };
     };
 
-    var moveElement = function(element, x, y) {
+    var moveElement = function (element, x, y) {
         element = $(element);
 
         // translate the element
@@ -258,7 +271,7 @@ window.cgsy.cert = window.cgsy.cert || {};
         element.attr('data-y', y);
     };
 
-    var dragMoveListener = function(event) {
+    var dragMoveListener = function (event) {
         var target = event.target,
             // keep the dragged position in the data-x/data-y attributes
             x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
@@ -267,7 +280,7 @@ window.cgsy.cert = window.cgsy.cert || {};
         moveElement($(target), x, y)
     };
 
-    var dragResize = function(event) {
+    var dragResize = function (event) {
         var target = event.target;
         var x = (parseFloat(target.getAttribute('data-x')) || 0);
         var y = (parseFloat(target.getAttribute('data-y')) || 0);
@@ -295,7 +308,7 @@ window.cgsy.cert = window.cgsy.cert || {};
             restriction: 'parent',
             elementRect: {top: 0, left: 0, bottom: 1, right: 1}
         },
-        onend: function(event) {
+        onend: function (event) {
             var target = event.target;
             cert_document.savePosition(
                 target.id,
