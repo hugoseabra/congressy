@@ -109,7 +109,11 @@ def _export_subscriptions(worksheet, subscriptions):
         city = person.city
 
         collector[row_idx].append(get_object_value(sub, 'code'))
-        collector[row_idx].append(sub.lot.category.name)
+        try:
+            collector[row_idx].append(sub.lot.category.name)
+        except AttributeError:
+            collector[row_idx].append('')
+
         collector[row_idx].append(get_object_value(sub.lot, 'name'))
         collector[row_idx].append(sub.get_status_display())
         collector[row_idx].append(get_object_value(person, 'name'))
