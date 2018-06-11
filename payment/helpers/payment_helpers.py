@@ -14,6 +14,8 @@ def get_opened_boleto_transactions(subscription):
         lot__event=subscription.event,
         type=Transaction.BOLETO,
         boleto_expiration_date__gt=now.date(),
+    ).exclude(
+        status__in=[Transaction.PAID, Transaction.PROCESSING],
     )
 
 

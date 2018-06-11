@@ -1,0 +1,20 @@
+{% load form_config_tags %}
+<form action="" method="post" class="form-horizontal form-border" role="form" name="raffle_form" onsubmit="false">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        {% render_errors form.non_field_errors %}
+    {% endif %}
+
+    {% for hidden_field in form.hidden_fields %}
+        {% if hidden_field.errors %}
+            {% render_errors hidden_field.errors %}
+        {% endif %}
+        {{ hidden_field }}
+    {% endfor %}
+
+    <button type="button" class="btn btn-success btn-sm" id="winner_form_button">
+        <i class="fas fa-save"></i>
+        Registrar
+    </button>
+</form>

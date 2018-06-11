@@ -25,6 +25,7 @@ class TransactionAdmin(admin.ModelAdmin):
         'amount',
     )
 
+
 @admin.register(TransactionStatus)
 class TransactionStatusAdmin(admin.ModelAdmin):
     search_fields = (

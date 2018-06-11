@@ -19,6 +19,7 @@ from gatheros_front.urls import (
 )
 from hotsite.urls import urlpatterns_public_hotsite
 from payment.urls import private_payment_urls, urlpatterns_public_payments_api
+from raffle.urls import urlpatterns_private_raffles
 
 handler500 = 'project.views.handler500'
 
@@ -29,6 +30,7 @@ private_urlpatterns = [
     url(r'^manage/', include('scientific_work.urls', 'scientific_work')),
     url(r'^manage/', include('gatheros_subscription.urls', 'subscription')),
     url(r'^manage/', include(urlpatterns_certificate_urls, 'certificate')),
+    url(r'^manage/', include(urlpatterns_private_raffles, 'raffle')),
     # url(r'^manage/', include('bitly.urls', 'bitly')),
     url(r'^manage/', include('gatheros_event.urls', 'event')),
     url(r'^manage/', include(gatheros_front_private, 'front')),

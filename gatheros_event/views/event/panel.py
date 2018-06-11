@@ -1,20 +1,18 @@
 from datetime import datetime
 from decimal import Decimal
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
 
-from django.shortcuts import redirect
-from django.urls import reverse_lazy, reverse
-from django.views.generic import DetailView
+from django.db.models import Q
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import DetailView
 from core.views.mixins import TemplateNameableMixin
 from gatheros_event.helpers.account import update_account
-from gatheros_event.models import Event, Info, Organization, Member, Person
 from gatheros_event.models import Event
-from gatheros_subscription.models import Subscription
+from gatheros_event.models import Info, Organization
 from gatheros_event.views.mixins import AccountMixin
-from payment.models import Transaction, TransactionStatus
-from addon.models import OptionalProductType, OptionalServiceType
+from gatheros_subscription.models import Subscription
+from payment.models import Transaction
 
 
 class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
@@ -100,7 +98,11 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         context['full_banking'] = self._get_full_banking()
         context['number_attendances'] = self.get_number_attendances()
         context['status_addons'] = self.get_status_addons()
-        context['is_configured'] = self.event.work_config.is_configured
+        try:
+            context['is_configured'] = self.event.work_config.is_configured
+        except AttributeError:
+            context['is_configured'] = False
+
         try:
             context['info'] = self.event.info
         except Info.DoesNotExist:

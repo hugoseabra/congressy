@@ -2,9 +2,13 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views import generic
 
-from addon.models import Product, Service, SubscriptionProduct, \
-    SubscriptionService
-from core.util.date import DateTimeRange
+from addon.helpers import get_all_options
+from addon.models import (
+    Product,
+    Service,
+    SubscriptionProduct,
+    SubscriptionService,
+)
 from gatheros_subscription.models import Subscription
 
 """
@@ -155,40 +159,67 @@ class ServiceOptionalManagementView(generic.TemplateView):
             all_selected_services = SubscriptionService.objects.filter(
                 subscription=subscription,
                 optional__lot_category=subscription.lot.category
-            )
+            ).order_by("optional__theme__name",
+                       "optional__optional_type__name")
             # @TODO add user validation here, only if request.user == sub.user
 
             if self.fetch_in_storage:
-                for item in all_selected_services:
-                    self.available_options.append({'optional': item.optional})
+
+                themes = {}
+                for service in all_selected_services:
+                    optional = service.optional
+                    theme = optional.theme
+                    o_type = optional.optional_type
+                    if theme.pk not in themes:
+                        themes[theme.pk] = {
+                            'name': theme.name,
+                            'types': {},
+                        }
+
+                    if o_type.pk not in themes[theme.pk]['types']:
+                        themes[theme.pk]['types'][o_type.pk] = {
+                            'name': o_type.name,
+                            'optionals': [],
+                        }
+
+                    themes[theme.pk]['types'][o_type.pk]['optionals'].append(
+                        service
+                    )
+
+                self.available_options = themes
             else:
-                event_optionals_services = Service.objects.filter(
-                    lot_category=category, published=True)
 
-                for optional in event_optionals_services:
+                # All service optionals
+                all_services = Service.objects.filter(
+                    lot_category=category, published=True).order_by(
+                    'theme__name', "optional_type__name")
+                pre_selected_services = subscription.subscription_services.all()
 
-                    contains = False
+                available = get_all_options(all_services,
+                                            pre_selected_services,
+                                            available_only=False)
+                themes = {}
+                for service in available:
+                    optional = service['optional']
+                    theme = optional.theme
+                    o_type = optional.optional_type
+                    if theme.pk not in themes:
+                        themes[theme.pk] = {
+                            'name': theme.name,
+                            'types': {},
+                        }
 
-                    for service in subscription.subscription_services.all():
-                        if service.optional == optional:
-                            contains = True
+                    if o_type.pk not in themes[theme.pk]['types']:
+                        themes[theme.pk]['types'][o_type.pk] = {
+                            'name': o_type.name,
+                            'optionals': [],
+                        }
 
-                    if not contains:
-                        available = not optional.has_quantity_conflict and \
-                                    not optional.has_sub_end_date_conflict
+                    themes[theme.pk]['types'][o_type.pk]['optionals'].append(
+                        service
+                    )
 
-                        if available:
-                            services = subscription.subscription_services.all()
-                            for service in services:
-
-                                # Exisiting conflicts.
-                                if service.has_schedule_conflicts or \
-                                        self.has_schedule_conflicts(
-                                            service.optional, optional):
-                                    available = False
-
-                        self.available_options.append({'optional': optional,
-                                                       'available': available})
+                self.available_options = themes
 
         except Subscription.DoesNotExist:
             pass
@@ -216,9 +247,8 @@ class ServiceOptionalManagementView(generic.TemplateView):
     def post(self, request, *args, **kwargs):
 
         """
-            @TODO: IMPLEMENT SOME VALIDATION BEFORE CREATING!!!!!!!!
+        @TODO: IMPLEMENT SOME VALIDATION BEFORE CREATING!!!!!!!!
         """
-
         subscription_pk = kwargs.get('subscription_pk')
         optional_id = self.request.POST.get('optional_id')
         action = self.request.POST.get('action')
@@ -247,27 +277,3 @@ class ServiceOptionalManagementView(generic.TemplateView):
             return HttpResponse('201 OK', status=201)
 
         return HttpResponse('200 OK', status=200)
-
-    @staticmethod
-    def has_schedule_conflicts(option_one, option_two):
-
-        is_restricted = option_one.restrict_unique
-        is_sub_restricted = option_two.restrict_unique
-
-        start_one = option_one.schedule_start
-        stop_one = option_one.schedule_end
-        start_two = option_two.schedule_start
-        stop_two = option_two.schedule_end
-
-        session_range_one = DateTimeRange(start=start_one, stop=stop_one)
-        session_range_two = DateTimeRange(start=start_two, stop=stop_two)
-
-        has_conflict = (start_one in session_range_one or stop_one in
-                        session_range_one) or \
-                       (start_two in session_range_two or stop_two
-                        in session_range_two)
-
-        if has_conflict is True and (is_restricted or is_sub_restricted):
-            return True
-
-        return False
