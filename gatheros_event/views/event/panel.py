@@ -45,6 +45,11 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
             elif row_name == 'optionals':
                 self.event.has_optionals = val
 
+            elif row_name == 'survey':
+                self.event.has_survey = val
+
+
+
             self.event.save()
 
         return HttpResponse(status=201)
@@ -347,7 +352,7 @@ class EventPanelView(TemplateNameableMixin, AccountMixin, DetailView):
         for event_survey in event_survey_qs:
             survey = event_survey.survey
             has_questions = survey.questions.count() > 0
-            has_lots = survey.lots.count() > 0
+            has_lots = survey.event.lots.count() > 0
             if has_questions and has_lots:
                 return True
 
