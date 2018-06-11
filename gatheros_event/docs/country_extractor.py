@@ -31,13 +31,15 @@ for code in codes:
             dial_code = p['dial_code'].replace(" ", "")
 
             lang = {
-                "langs": {
-                    "pt-br": str(pt_name),
-                    "en-us": en_name,
-                },
-                "phone": {
+                "codes": {
                     "two_digits": two_digit_code,
                     "three_digits": three_digit_code,
+                },
+                "langs": {
+                    "pt-br": str(pt_name).title(),
+                    "en-us": en_name.title(),
+                },
+                "phone": {
                     "prefix": dial_code
                 }
             }
@@ -48,15 +50,16 @@ for code in codes:
             found = True
 
     if not found:
-
         lang = {
+            "codes": {
+                "two_digits": two_digit_code,
+                "three_digits": three_digit_code,
+            },
             "langs": {
-                "pt-br": str(pt_name),
+                "pt-br": str(pt_name).title(),
                 "en-us": "None",
             },
             "phone": {
-                "two_digits": two_digit_code,
-                "three_digits": three_digit_code,
                 "prefix": "None"
             }
         }
