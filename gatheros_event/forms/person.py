@@ -2,13 +2,42 @@
 from django import forms
 from django.db.models.fields import NOT_PROVIDED
 from django.utils import six
-from django.utils.datastructures import MultiValueDictKeyError
 from localflavor.br.forms import BRCPFField, BRCNPJField
 
 from core.forms.cleaners import clear_string, clean_cellphone as phone_cleaner
-from core.forms.widgets import DateInput, AjaxChoiceField, TelephoneInput
+from core.forms.widgets import (
+    AjaxChoiceField,
+    DateInput,
+    TelephoneInput,
+)
 from core.util import create_years_list
 from gatheros_event.models import Occupation, Person
+
+
+# class InternationalTelephoneInput(forms.MultiWidget):
+#     template_name = 'forms/widgets/international_phone.html'
+#
+#     def __init__(self, attrs=None):
+#         if attrs is not None and isinstance(attrs, dict):
+#             ddi_attrs = attrs.get('ddi')
+#             phone_attrs = attrs.get('phone')
+#             country_attrs = attrs.get('country')
+#         else:
+#             ddi_attrs = None
+#             phone_attrs = None
+#             country_attrs = None
+#
+#         ddi = forms.TextInput(attrs=ddi_attrs)
+#         phone = TelephoneInput(attrs=phone_attrs)
+#         country = forms.TextInput(attrs=country_attrs)
+#
+#         super().__init__((ddi, phone, country), attrs)
+#
+#     def decompress(self, value):
+#         if not value:
+#             return [None, None, None]
+#
+#         return [value, value, value]
 
 
 class PersonForm(forms.ModelForm):
@@ -75,14 +104,14 @@ class PersonForm(forms.ModelForm):
 
         widgets = {
             # CPF como telefone para aparecer como número no mobile
-            'cpf': TelephoneInput(),
+            'cpf': TelephoneInput,
             'name': forms.TextInput(attrs={'placeholder': 'Nome completo'}),
             'email': forms.EmailInput(attrs={
                 'placeholder': 'me@you.com',
                 'style': 'text-transform:lowercase'
             }),
-            'phone': TelephoneInput(attrs={'placeholder': '(00) 00000-0000'}),
-            'zip_code': TelephoneInput(),
+            'phone': TelephoneInput,
+            'zip_code': TelephoneInput,
             'city': forms.HiddenInput(),
             'birth_date': forms.SelectDateWidget(
                 attrs=({'style': 'width: 30%; display: inline-block;'}),

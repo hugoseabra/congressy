@@ -66,6 +66,7 @@ class SubscriptionPersonForm(PersonForm):
             required_fields.append('phone')
 
         if has_paid_lots or config.address_show:
+            required_fields.append('country')
             required_fields.append('street')
             required_fields.append('village')
             required_fields.append('zip_code')

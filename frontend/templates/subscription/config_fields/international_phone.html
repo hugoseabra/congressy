@@ -1,0 +1,68 @@
+{% load widget_tweaks form_config_tags %}
+
+{% if phone_field.field.widget.input_type == "hidden" %}
+    {% render_field ddi_field %}
+    {% render_field phone_field %}
+{% else %}
+    <div class="form-group"
+        {% if hide is True %}style="display:none"{% endif %}>
+        {% if phone_field.label %}
+            <label for="{{ phone_field.id_for_label }}">
+                {{ phone_field.label|safe|capfirst }}
+                {% if  required  or required == 'True' %}
+                    <span style="color:#C9302C">*</span>
+                {% endif %}
+            </label>
+        {% endif %}
+
+        {% if help_text and 'textarea' not in phone_field.field.widget.template_name %}
+            <small>
+                <i class="fas fa-question-circle" data-toggle="tooltip" data-placement="right" title="{{ help_text|safe }}"></i>
+            </small>
+        {% endif %}
+        <div>
+            {% if autofocus %}
+                {% if  required  or required == 'True' %}
+                    <div style="float:left;width:20%">
+                        {% render_field ddi_field class="form-control" required="required" autofocus="autofocus" %}
+                    </div>
+                    <div style="float:left;width:80%">
+                        {% render_field phone_field class="form-control" required="required" %}
+                    </div>
+                {% else %}
+                    <div style="float:left;width:20%">
+                        {% render_field ddi_field class="form-control" autofocus="autofocus" %}
+                    </div>
+                    <div style="float:left;width:80%">
+                        {% render_field phone_field class="form-control" %}
+                    </div>
+                {% endif %}
+            {% else %}
+                {% if required is True or required == 'True' %}
+                    <div style="float:left;width:20%">
+                        {% render_field ddi_field class="form-control" required="required" %}
+                    </div>
+                    <div style="float:left;width:80%">
+                        {% render_field phone_field class="form-control" required="required" %}
+                    </div>
+                {% else %}
+                    <div style="float:left;width:20%">
+                        {% render_field ddi_field class="form-control" %}
+                    </div>
+                    <div style="float:left;width:80%">
+                        {% render_field phone_field class="form-control" %}
+                    </div>
+                {% endif %}
+            {% endif %}
+            <div style="width:100%">
+                {% if ddi_field.errors %}
+                    {% render_field_errors ddi_field.errors %}
+                {% endif %}
+                {% if phone_field.errors %}
+                    {% render_field_errors phone_field.errors %}
+                {% endif %}
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+{% endif %}

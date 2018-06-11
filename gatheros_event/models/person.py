@@ -56,6 +56,12 @@ class Person(models.Model, GatherosModelMixin):
         blank=True,
         verbose_name='cidade-UF'
     )
+    city_international = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='Cidade (Fora do Brasil)'
+    )
     zip_code = models.CharField(
         max_length=8,
         blank=True,
@@ -88,13 +94,26 @@ class Person(models.Model, GatherosModelMixin):
         null=True,
         verbose_name='bairro'
     )
+    country = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='país',
+    )
+    ddi = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        verbose_name='DDI',
+        help_text='Código discagem do país.',
+    )
     phone = models.CharField(
         max_length=50,
         blank=True,
         null=True,
         verbose_name='celular',
-    )
 
+    )
     user = models.OneToOneField(
         User,
         on_delete=models.PROTECT,
@@ -115,6 +134,13 @@ class Person(models.Model, GatherosModelMixin):
         null=True,
         verbose_name='CPF',
         validators=[cpf_validator]
+    )
+    international_doc = models.CharField(
+        max_length=11,
+        blank=True,
+        null=True,
+        verbose_name='ID/Passaport',
+        help_text='Número de documento utilizado fora do Brasil.'
     )
     birth_date = models.DateField(
         blank=True,

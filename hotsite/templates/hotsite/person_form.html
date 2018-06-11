@@ -70,7 +70,11 @@
                                     </div>
                                 </div>
                                 <div class="panel-body">
-
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.country %}
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="col-md-9">
                                             {% render_generic_field form.name autofocus=True %}
@@ -93,8 +97,10 @@
                                             {% if config and config.cpf != config.CPF_HIDE %}
                                                 {% if config.cpf == config.CPF_REQUIRED %}
                                                     {% render_generic_field form.cpf required=True %}
+                                                    {% render_generic_field form.international_doc required=True %}
                                                 {% else %}
                                                     {% render_generic_field form.cpf %}
+                                                    {% render_generic_field form.international_doc %}
                                                 {% endif %}
                                             {% endif %}
                                         </div>
@@ -110,15 +116,13 @@
                                                 {% else %}
                                                     {% render_generic_field form.birth_date %}
                                                 {% endif %}
-
-
                                             </div>
                                         {% endif %}
                                         <div class="col-md-6">
                                             {% if config %}
-                                                {% render_generic_field form.phone config.phone False %}
+                                                {% render_international_phone form.ddi form.phone required=config.phone use_required_field=False %}
                                             {% else %}
-                                                {% render_generic_field form.phone %}
+                                                {% render_international_phone form.ddi form.phone %}
                                             {% endif %}
                                         </div>
                                     </div>
