@@ -286,14 +286,14 @@
 			$( 'html, body' ).animate({ scrollTop: Math.max( 0, $target.offset().top - drew.headerFloatingHeight ) }, 1000 );
 		});
 
-		/**
-		 * =======================================
-		 * Google Maps
-		 * =======================================
-		 */
-		if ( typeof Maplace == 'function' && $( '#gmap' ) ) {
-			new Maplace( gmap_options ).Load();
-		};
+		// /**
+		//  * =======================================
+		//  * Google Maps
+		//  * =======================================
+		//  */
+		// if ( typeof Maplace == 'function' && $( '#gmap' ) ) {
+		// 	new Maplace( gmap_options ).Load();
+		// };
 
 		/**
 		 * =======================================

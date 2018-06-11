@@ -27,30 +27,7 @@
                     <div class="col-md-10 col-md-offset-1">
 
                         <h1 class="hero-title">{{ event.name }}</h1>
-
-                        <p class="hero-tagline">
-                        <div>
-                            <i class="fa fa-calendar"></i>
-                            {{ event.get_period }}
-                        </div>
-                        {% if event.place and event.place.name %}
-                            <div>
-                                <i class="fa fa-map-marker"></i>
-                                {{ event.place.name }}
-                            </div>
-                        {% endif %}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="hero-features row">
-
-                    <div class="hero-features-left col-md-7">
-                        {% if info.lead %}
-                            <p class="lead">
-                                {{ info.lead }}
-                            </p>
-                        {% endif %}
+                        <br />
                     </div>
                 </div>
             </div>

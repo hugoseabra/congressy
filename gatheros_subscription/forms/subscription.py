@@ -21,11 +21,21 @@ class SubscriptionForm(forms.ModelForm):
             # 'completed',
         )
 
+    allow_lot_edit = True
+
     def __init__(self, event, **kwargs):
         self.event = event
+
+        is_new = not kwargs.get('instance')
+
         super().__init__(**kwargs)
 
+        origin = self.data.get('origin')
+
         self.fields['lot'].queryset = event.lots.all()
+        if is_new is False and origin != Subscription.DEVICE_ORIGIN_MANAGE:
+            self.fields['lot'].disabled = True
+            self.allow_lot_edit = False
 
     def clean_lot(self):
         try:

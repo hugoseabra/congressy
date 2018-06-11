@@ -225,8 +225,6 @@ function load_coupon() {
 
     common_lots_content = lot_fields.html();
 
-    lot_fields.show();
-
     send(
         url,
         'POST',
@@ -243,6 +241,8 @@ function load_coupon() {
             lot_select.attr("style", "pointer-events: none;");
             $('#lot_display_publicly').text(lot.public_display + lot.is_free);
             $('#lot_exhibition_code').text(lot.exhibition_code);
+
+            lot_fields.show();
 
             window.setTimeout(function () {
                 start_popover();

@@ -22,7 +22,8 @@ services:
       - /services/volume/container-entry.sh
     env_file: ./env-manage-staging
     volumes:
-      - "/media:/var/www/cgsy/media"
+      - /etc/localtime:/etc/localtime
+      - /media:/var/www/cgsy/media
 
   cron:
     image: cgsy-staging
@@ -36,8 +37,8 @@ services:
       - mailhog
     env_file: ./env-manage-staging
     volumes:
-      - "/etc/localtime:/etc/localtime"
-      - "/media:/var/www/cgsy/media"
+      - /etc/localtime:/etc/localtime
+      - /media:/var/www/cgsy/media
 
   manage:
     image: cgsy-staging
@@ -53,8 +54,8 @@ services:
       - "8080:80"
     env_file: ./env-manage-staging
     volumes:
-      - "/etc/localtime:/etc/localtime"
-      - "/media:/var/www/cgsy/media"
+      - /etc/localtime:/etc/localtime
+      - /media:/var/www/cgsy/media
 
 networks:
   postgres:

@@ -6,7 +6,6 @@ from rest_framework.authentication import (
 from rest_framework.permissions import IsAuthenticated
 
 from addon import models, serializers
-from gatheros_event.models import Member
 
 
 class RestrictionViewMixin(object):
@@ -28,10 +27,7 @@ class ServiceViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         org_pks = [
             m.organization.pk
-            for m in user.person.members.filter(
-                active=True,
-                group=Member.ADMIN
-            )
+            for m in user.person.members.filter(active=True)
         ]
 
         queryset = super().get_queryset()
@@ -52,10 +48,7 @@ class ProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         org_pks = [
             m.organization.pk
-            for m in user.person.members.filter(
-                active=True,
-                group=Member.ADMIN
-            )
+            for m in user.person.members.filter(active=True)
         ]
 
         queryset = super().get_queryset()
@@ -84,4 +77,3 @@ class SubscriptionProductViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(subscription=self.kwargs.get('subscription_pk'))
-
