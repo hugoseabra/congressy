@@ -6,12 +6,12 @@ from certificate import views, viewsets
 private_certificate_urls = [
 
     url(
-        r'^prepare/',
-        views.CertificatePrepareView.as_view(),
-        name='event-certificate-prepare'
+        r'^form/',
+        views.CertificateFormView.as_view(),
+        name='event-certificate-form'
     ),
     url(
-        r'^(?P<pk>[\d]+)/',
+        r'^',
         views.CertificateConfigView.as_view(),
         name='event-certificate-config'
     ),
