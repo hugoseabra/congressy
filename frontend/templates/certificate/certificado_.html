@@ -149,7 +149,7 @@
                 var dateCheckBox = $('#dateCheckBox');
 
                 var interact = new window.cgsy.cert.Interact(title, text, date);
-                var cert = new cert.CertDocument(title, text, date);
+                var cert = new window.cgsy.cert.CertDocument(title, text, date);
                 interact.moveElement(title, '{{ object.title_position_x|unlocalize }}', '{{ object.title_position_y|unlocalize }}');
                 interact.moveElement(text, '{{ object.text_position_x|unlocalize }}', '{{ object.text_position_y|unlocalize }}');
                 interact.moveElement(date, '{{ object.date_position_x|unlocalize }}', '{{ object.date_position_y|unlocalize }}');
