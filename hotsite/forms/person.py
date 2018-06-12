@@ -39,12 +39,21 @@ class SubscriptionPersonForm(PersonForm):
                     ' alterado. Caso você deseja fazer alguma alteração,' \
                     ' solicite ao suporte técnico da Congressy.'
 
-            if self.instance.name:
+            if self.instance.email:
                 self.fields['email'].disabled = True
                 self.fields['email'].widget.attrs['data-toggle'] = 'tooltip'
                 self.fields['email'].widget.attrs['title'] = \
                     'Por questões de segurança, o e-mail não pode ser' \
                     ' alterado.'
+
+            if self.instance.international_doc:
+                international_doc_f = self.fields['international_doc']
+                international_doc_f.disabled = True
+                international_doc_f.widget.attrs['data-toggle'] = 'tooltip'
+                international_doc_f.widget.attrs['title'] = \
+                    'Por questões de segurança, o número do documento não' \
+                    ' pode ser alterado.'
+                self.fields['international_doc'] = international_doc_f
 
             if self.instance.cpf:
                 self.fields['cpf'].disabled = True
