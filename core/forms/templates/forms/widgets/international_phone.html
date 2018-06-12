@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col-md-12" style="margin-top: 2px">
+        {% for widget in widget.subwidgets %}
+            {% if forloop.counter0 == 0 %}
+                <div style="float:left;width:20%">
+                    {% include widget.template_name %}
+                </div>
+            {% endif %}
+            {% if forloop.counter0 == 1 %}
+                <div style="float:left;width:80%;">
+                    {% include widget.template_name %}
+                </div>
+            {% endif %}
+            {% if forloop.counter0 == 2 %}
+                {% include widget.template_name %}
+            {% endif %}
+        {% endfor %}
+        <div class="clearfix"></div>
+    </div>
+</div>

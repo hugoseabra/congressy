@@ -246,9 +246,8 @@ class PaymentForm(forms.Form):
         debt_kwargs = {
             'subscription': self.subscription,
             'data': {
-                'name': 'Inscrição: {} ({} - {})'.format(
+                'name': 'Inscrição: {} ({})'.format(
                     self.subscription.event.name,
-                    self.subscription.code,
                     self.subscription.pk,
                 ),
                 'item_id': str(self.subscription.pk),
