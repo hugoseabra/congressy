@@ -1,3 +1,2 @@
 -r requirements_staging.pip
 django-debug-toolbar
-django-bootstrap-datepicker-plus

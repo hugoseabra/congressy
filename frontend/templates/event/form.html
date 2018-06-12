@@ -192,10 +192,42 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            {% render_generic_field form.date_start %}
+                                            <div class="form-group">
+                                                <div id="datepicker-begin"
+                                                     class='input-group date'>
+                                                    <input type='text'
+                                                           class="form-control"/>
+                                                    <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                                <div class='input-group date timepicker'>
+                                                    <input type='text'
+                                                           class="form-control"/>
+                                                    <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-md-6">
-                                            {% render_generic_field form.date_end %}
+                                            <div class="form-group">
+                                                <div id="datepicker-end"
+                                                     class='input-group date'>
+                                                    <input type='text'
+                                                           class="form-control"/>
+                                                    <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                                <div class='input-group date timepicker'>
+                                                    <input type='text'
+                                                           class="form-control"/>
+                                                    <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -272,7 +304,6 @@
                     </div>
 
                 </div>
-            </div>
 
         </form>
     {% endif %}
@@ -280,9 +311,38 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.full.min.js" %}"></script>
+    <script src="{% static "assets/plugins/moment/moment.js" %}"></script>
+    <script src="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}"></script>
     <script src="{% static 'assets/js/event.js' %}"></script>
     <script>
+
+            $('#datepicker-begin').datetimepicker({
+                locale: 'pt-br',
+                format: 'DD/MM/YYYY',
+                allowInputToggle: true,
+                defaultDate: new Date(),
+                minDate: new Date()
+
+            }).on('dp.change', function (e) {
+                $('#datepicker-end').data("DateTimePicker").minDate(e.date)
+            });
+            $('#datepicker-end').datetimepicker({
+                locale: 'pt-br',
+                format: 'DD/MM/YYYY',
+                allowInputToggle: true,
+                defaultDate: new Date(),
+                minDate: new Date()
+            });
+
+
+        $('.timepicker').datetimepicker({
+            locale: 'pt-br',
+            format: 'HH:mm',
+            allowInputToggle: true,
+            defaultDate: new Date(),
+            minDate: new Date()
+        });
+
         function choose_type(chosen_type) {
             $('#event_type').val(chosen_type);
             $('#choose-type-form').submit();
@@ -310,9 +370,9 @@
 
                 $('.type_event').on('click', function () {
                     $('.type_event').find('.overlay').each(function () {
-                        $(this).removeClass('active');
+                        $(this).removeClass('active-type');
                     });
-                    $('.type_event:hover > .overlay').toggleClass('active');
+                    $('.type_event:hover > .overlay').toggleClass('active-type');
                 });
 
                 function resizePanel() {
@@ -329,7 +389,7 @@
 
 {% block styles %}
     <link rel="stylesheet"
-          href="{% static "assets/plugins/jquery-datetime-picker/jquery.datetimepicker.min.css" %}">
+          href="{% static "assets/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css" %}">
 
     <style>
         .panel > .panel-footer {
@@ -344,7 +404,7 @@
             display: none;
         }
 
-        .active {
+        .active-type {
             position: absolute;
             text-align: center;
             color: #0e90d2;
