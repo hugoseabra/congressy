@@ -12,6 +12,7 @@ from core.forms.widgets import (
 )
 from core.util import create_years_list
 from gatheros_event.models import Occupation, Person
+from gatheros_event.locale.phone_choices import get_country_phone_code
 
 
 # class InternationalTelephoneInput(forms.MultiWidget):
@@ -178,9 +179,13 @@ class PersonForm(forms.ModelForm):
         return cnpj
 
     def clean_phone(self):
+        country = self.cleaned_data.get('country')
         phone = self.cleaned_data.get('phone')
-        if phone:
-            phone = phone_cleaner(phone)
+        if country and phone:
+            country = self.cleaned_data.get('country')
+            prefix = get_country_phone_code(country)
+            phone_cleaner('{}{}'.format(prefix, phone), country)
+
         return phone
 
     def clean_email(self):

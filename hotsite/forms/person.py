@@ -58,7 +58,8 @@ class SubscriptionPersonForm(PersonForm):
             config = FormConfig()
             config.event = self.event
 
-        required_fields = ['gender']
+        country = self.data.get('person-country', 'BR')
+        required_fields = ['gender', 'country']
 
         has_paid_lots = self.lot.price > 0 if self.lot.price else False
 
@@ -66,19 +67,33 @@ class SubscriptionPersonForm(PersonForm):
             required_fields.append('phone')
 
         if has_paid_lots or config.address_show:
-            required_fields.append('country')
             required_fields.append('street')
             required_fields.append('village')
-            required_fields.append('zip_code')
-            required_fields.append('city')
+
+            if country == 'BR':
+                required_fields.append('zip_code')
+            else:
+                required_fields.append('zip_code_international')
+
+            if country == 'BR':
+                required_fields.append('city')
+            else:
+                required_fields.append('city_international')
 
         if not has_paid_lots \
                 and not config.address_show \
                 and config.city is True:
-            required_fields.append('city')
+
+            if country == 'BR':
+                required_fields.append('city')
+            else:
+                required_fields.append('city_international')
 
         if has_paid_lots or config.cpf_required:
-            required_fields.append('cpf')
+            if country == 'BR':
+                required_fields.append('cpf')
+            else:
+                required_fields.append('international_doc')
 
         if has_paid_lots or config.birth_date_required:
             required_fields.append('birth_date')

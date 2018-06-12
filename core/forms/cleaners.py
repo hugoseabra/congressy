@@ -38,16 +38,22 @@ def clean_phone(phone_number):
     return dirty_phone
 
 
-def clean_cellphone(phone_number):
+def clean_cellphone(phone_number, country='BR'):
     if not phone_number:
         return ''
 
     dirty_phone = clear_string(phone_number)
 
     if dirty_phone:
-        tmp_dirty_phone = '+55' + clear_string(dirty_phone)
+        # tmp_dirty_phone = '+55' + clear_string(dirty_phone)
+        tmp_dirty_phone = clear_string(dirty_phone)
 
-        is_cellphone = _is_brazilian_cellphone(tmp_dirty_phone)
+        if country == 'BR':
+            is_cellphone = _is_brazilian_cellphone(tmp_dirty_phone)
+        else:
+            # Por enquanto vamos suportar telefones internacionais como
+            # qualquer telefone.
+            is_cellphone = True
 
         phone = phonenumbers.parse(tmp_dirty_phone)
         possible = phonenumbers.is_possible_number(phone)
