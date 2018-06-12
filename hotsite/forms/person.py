@@ -39,12 +39,21 @@ class SubscriptionPersonForm(PersonForm):
                     ' alterado. Caso você deseja fazer alguma alteração,' \
                     ' solicite ao suporte técnico da Congressy.'
 
-            if self.instance.name:
+            if self.instance.email:
                 self.fields['email'].disabled = True
                 self.fields['email'].widget.attrs['data-toggle'] = 'tooltip'
                 self.fields['email'].widget.attrs['title'] = \
                     'Por questões de segurança, o e-mail não pode ser' \
                     ' alterado.'
+
+            if self.instance.international_doc:
+                international_doc_f = self.fields['international_doc']
+                international_doc_f.disabled = True
+                international_doc_f.widget.attrs['data-toggle'] = 'tooltip'
+                international_doc_f.widget.attrs['title'] = \
+                    'Por questões de segurança, o número do documento não' \
+                    ' pode ser alterado.'
+                self.fields['international_doc'] = international_doc_f
 
             if self.instance.cpf:
                 self.fields['cpf'].disabled = True
@@ -58,7 +67,8 @@ class SubscriptionPersonForm(PersonForm):
             config = FormConfig()
             config.event = self.event
 
-        required_fields = ['gender']
+        country = self.data.get('person-country', 'BR')
+        required_fields = ['gender', 'country']
 
         has_paid_lots = self.lot.price > 0 if self.lot.price else False
 
@@ -68,16 +78,33 @@ class SubscriptionPersonForm(PersonForm):
         if has_paid_lots or config.address_show:
             required_fields.append('street')
             required_fields.append('village')
-            required_fields.append('zip_code')
-            required_fields.append('city')
+
+            if country == 'BR':
+                required_fields.append('zip_code')
+            else:
+                required_fields.append('zip_code_international')
+
+            if country == 'BR':
+                required_fields.append('city')
+            else:
+                required_fields.append('city_international')
+                required_fields.append('state_international')
 
         if not has_paid_lots \
                 and not config.address_show \
                 and config.city is True:
-            required_fields.append('city')
+
+            if country == 'BR':
+                required_fields.append('city')
+            else:
+                required_fields.append('city_international')
 
         if has_paid_lots or config.cpf_required:
-            required_fields.append('cpf')
+            if country == 'BR':
+                required_fields.append('cpf')
+            else:
+                required_fields.append('international_doc')
+                required_fields.append('state_international')
 
         if has_paid_lots or config.birth_date_required:
             required_fields.append('birth_date')

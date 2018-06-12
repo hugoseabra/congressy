@@ -63,13 +63,13 @@ class DateInput(forms.DateInput):
         try:
             if lang == 'en' or lang == 'en-us':
                 # format = '%m/%d/%Y'
-                format = '%d/%m/%Y'
+                date_format = '%d/%m/%Y'
             elif lang == 'pt-br':
-                format = '%d/%m/%Y'
+                date_format = '%d/%m/%Y'
             else:
-                format = '%Y/%m/%d'
+                date_format = '%Y/%m/%d'
 
-            value = datetime.strptime(value, format)
+            value = datetime.strptime(value, date_format)
 
         except ValueError:
             pass
@@ -115,21 +115,21 @@ class SplitDateTimeWidget(forms.MultiWidget):
 
         if isinstance(date, datetime):
             date = date.strftime('%Y-%m-%d')
-            format = '%Y-%m-%d %H:%M:%S'
+            date_format = '%Y-%m-%d %H:%M:%S'
 
         else:
             if lang == 'en' or lang == 'en-us':
                 # format = '%m/%d/%Y %H:%M:%S'
-                format = '%d/%m/%Y %H:%M:%S'
+                date_format = '%d/%m/%Y %H:%M:%S'
             elif lang == 'pt-br':
-                format = '%d/%m/%Y %H:%M:%S'
+                date_format = '%d/%m/%Y %H:%M:%S'
             else:
-                format = '%Y-%m-%d %H:%M:%S'
+                date_format = '%Y-%m-%d %H:%M:%S'
 
         dt = '{} {}'.format(date, time)
 
         try:
-            return datetime.strptime(dt, format)
+            return datetime.strptime(dt, date_format)
 
         except ValueError:
             pass

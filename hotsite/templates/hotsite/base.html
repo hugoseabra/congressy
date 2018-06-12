@@ -104,10 +104,6 @@
 <script>
     $(document).ready(function () {
         window.setTimeout(function () {
-            $('input[type=email]').on('keyup', function () {
-                $(this).val($(this).val().toLowerCase());
-            }, 300);
-
             $('.cgsy-date-input').mask("99/99/9999");
             $('.cgsy-time-input').mask("99:99");
 
