@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.shortcuts import reverse, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
-from django.template import Template
+from django.template import Template, Context
 from wkhtmltopdf.views import PDFTemplateView
 
 from certificate import models, forms
@@ -125,7 +125,7 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     def get_text(self):
         text = self.event.certificate.text_content
         text_template = Template(text)
-        context = {'NOME': self.subscription.person.name.upper()}
+        context = Context({'NOME': self.subscription.person.name.upper()})
         res = text_template.render(context)
         return res
 
