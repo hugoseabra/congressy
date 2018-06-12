@@ -271,7 +271,7 @@ class ProfileForm(forms.ModelForm):
             }),
             'phone': TelephoneInput(attrs={'placeholder': '(00) 00000-0000'}),
             'zip_code': TelephoneInput(),
-            'city': forms.HiddenInput(),
+            # 'city': forms.HiddenInput(),
             'birth_date': forms.SelectDateWidget(
                 attrs=({'style': 'width: 30%; display: inline-block;'}),
                 years=create_years_list(), ),
