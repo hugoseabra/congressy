@@ -23,17 +23,15 @@
                 height: 725px;
             }
         {% endif %}
-
-        #cert-title {
-            font-size: {{ object.title_font_size|unlocalize }}px;
-        }
-
         #cert-text {
             width: {{ object.text_width|unlocalize }}px;
             height: {{ object.text_height|unlocalize }}px;
             font-size: {{ object.text_font_size|unlocalize }}px;
+            overflow: hidden;
         }
-
+        #cert-title {
+            font-size: {{ object.title_font_size|unlocalize }}px;
+        }
         #cert-date {
             font-size: {{ object.date_font_size|unlocalize }}px;
         }
@@ -92,13 +90,25 @@
                         transform: translate({{ object.title_position_x }}px, {{ object.title_position_y }}px);
                         {% if object.title_hide %}display: none;{% endif %}
                         " id="cert-title">{{ object.title_content }}</div>
+
+
                 <div style="position:absolute;
-                        text-align: justify;
-                        {% if object.date_hide %}display: none;{% endif %}"
+                        text-align: justify;"
                      id="cert-date">
-                    Goiânia, 1 de abril de 2018
+                        {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F" }} de {{ event.date_end|date:"Y" }}
                 </div>
-                <div style="position:absolute; text-align: justify" id="cert-text">{{ object.text_content }}</div>
+
+                <div style="
+                        position:absolute;
+                        text-align: justify;
+                        "
+                     id="cert-text">
+                    {{ object.text_content }}
+                </div>
+
+
+
+
             </div>
         </div>
     {% else %}
@@ -120,7 +130,6 @@
                             </strong>
                         </h3>
                     </div>
-
                     <div class="row text-center" style="margin-top: 20px">
                         <button class="btn btn-success open-edit-modal">
                             Click para configurar
@@ -186,29 +195,25 @@
 
                 });
 
-
-
                 $('#titleFontSize').bind('click keyup', function () {
-                    console.log("titleFontSize => " + $(this).val());
                     cert.saveTitleFontSize($(this).val());
+                    title.css("font-size", $(this).val() + "px");
                 });
 
                 $('#dateFontSize').bind('click keyup', function () {
-                    console.log("dateFontSize => " + $(this).val());
                     cert.saveDateFontSize($(this).val());
+                    date.css("font-size", $(this).val() + "px");
                 });
 
                 $('#textFontSize').bind('click keyup', function () {
-                    console.log("textFontSize => " + $(this).val());
                     cert.saveTextFontSize($(this).val());
+                    text.css("font-size", $(this).val() + "px");
                 });
 
                 $('#textLineHeight').bind('click keyup', function () {
-                    console.log("textLineHeight => " + $(this).val());
                     cert.saveTextLineHeight($(this).val());
+                    text.css('line-height', $(this).val());
                 });
-
-
 
             {% endif %}
 
@@ -285,10 +290,10 @@
                             <div>
                                 <code>
                                     {% verbatim %}
-                                    {{ CPF_CNPJ }}
+                                    {{ CPF }}
                                     {%endverbatim %}
                                 </code>
-                                = Documento identificador CPF/CNPJ
+                                = Documento identificador CPF
                             </div>
 
                         </div>

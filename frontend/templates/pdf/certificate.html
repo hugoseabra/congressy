@@ -2,11 +2,13 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <style>
+    <link rel="stylesheet"
+          href="{% static "assets/plugins/bootstrap/css/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
 
-        div.background_image {
+    <style>
+        .resize-container {
             background-image: url("{{ background_image }}");
-            background-repeat: no-repeat;
             height: 990px;
             width: 1402px;
             left: 0;
@@ -14,32 +16,49 @@
             position: absolute;
         }
 
-
-        div.text_content {
-            position: absolute;
-            top: {{ certificate.converted_text_position_y|stringformat:".2f" }}px;
-            left: {{ certificate.converted_text_position_x|stringformat:".2f" }}px;
-            width: {{ certificate.converted_text_width|stringformat:".2f" }}px;
-            height: {{ certificate.converted_text_height|stringformat:".2f" }}px;
-            font-weight: bolder;
-            bottom: 0;
-            font-size: {{ certificate.converted_text_font_size|stringformat:".2f" }}px;
-            text-align: center;
+        #cert-text {
+            width: {{ certificate.converted_text_width|unlocalize }}px;
+            height: {{ certificate.converted_text_height|unlocalize }}px;
+            font-size: {{ certificate.converted_text_font_size|unlocalize }}px;
+            -webkit-transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
+            transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
         }
 
-        @media print {
-            div.background_image {
+        #cert-title {
+            font-size: {{ certificate.converted_title_font_size|unlocalize }}px;
+            -webkit-transform: translate({{ certificate.converted_title_position_x|unlocalize}}px,{{ certificate.converted_title_position_y|unlocalize}}px);
+            transform: translate({{ certificate.converted_title_position_x|unlocalize}}px,{{ certificate.converted_title_position_y|unlocalize}}px);
+        }
 
-            }
+        #cert-date {
+            font-size: {{ certificate.converted_date_font_size|unlocalize }}px;
+            -webkit-transform: translate({{ certificate.converted_date_position_x|unlocalize}}px,{{ certificate.converted_date_position_y|unlocalize}}px);
+            transform: translate({{ certificate.converted_date_position_x|unlocalize}}px,{{ certificate.converted_date_position_y|unlocalize}}px);
         }
 
     </style>
     <title></title>
 </head>
 <body>
-<div class="background_image">
-    <div class="text_content">
-        <p>{{ text }}</p>
+
+
+<div class="resize-container">
+
+    <div style="position: absolute;
+            text-align: justify;
+            {% if certificate.title_hide %}display: none;{% endif %}"
+         id="cert-title">
+        {{ title }}
+    </div>
+
+    <div style="position:absolute;
+            text-align: justify;"
+         id="cert-date">
+        {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F" }} de {{ event.date_end|date:"Y" }}
+    </div>
+
+    <div style="position:absolute;text-align: justify;" id="cert-text">
+        {{ text }}
     </div>
 </div>
 
