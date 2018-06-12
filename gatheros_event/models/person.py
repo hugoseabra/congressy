@@ -103,6 +103,12 @@ class Person(models.Model, GatherosModelMixin):
         null=True,
         verbose_name='bairro'
     )
+    state_international = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='estado',
+    )
     country = models.CharField(
         choices=get_country_choices(),
         default='BR',
@@ -305,12 +311,17 @@ class Person(models.Model, GatherosModelMixin):
         phone = str(self.phone)
         if not phone:
             return ''
-        return '+55 ({0}) {1} {2}-{3}'.format(
-            phone[0:2],
-            phone[2],
-            phone[3:7],
-            phone[7:11]
-        )
+
+        if self.country == 'BR':
+            return '{0} ({1}) {2} {3}-{4}'.format(
+                self.get_ddi_display(),
+                phone[0:2],
+                phone[2],
+                phone[3:7],
+                phone[7:11]
+            )
+        else:
+            return '{}{}'.format(self.get_ddi_display(), phone)
 
     def get_zip_code_display(self):
         """

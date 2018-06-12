@@ -79,6 +79,7 @@ class SubscriptionPersonForm(PersonForm):
                 required_fields.append('city')
             else:
                 required_fields.append('city_international')
+                required_fields.append('state_international')
 
         if not has_paid_lots \
                 and not config.address_show \
@@ -94,6 +95,7 @@ class SubscriptionPersonForm(PersonForm):
                 required_fields.append('cpf')
             else:
                 required_fields.append('international_doc')
+                required_fields.append('state_international')
 
         if has_paid_lots or config.birth_date_required:
             required_fields.append('birth_date')

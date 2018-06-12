@@ -255,23 +255,23 @@ class SubscriptionWizardView(SessionWizardView):
                     self.clear_session_exhibition_code()
                     return redirect('public:hotsite', slug=self.event.slug)
 
-                # excluded_lot_pk = self.get_excluded_lot()
-                # code_lot = self.get_exhibition_code_lot(
-                #     self.get_exhibition_code()
-                # )
-                # if subscription.lot and excluded_lot_pk == code_lot.pk:
-                #
-                #     if subscription.is_new is False:
-                #         self.request.session['has_private_subscription'] = \
-                #             str(self.subscription.pk)
-                #
-                #     messages.error(
-                #         request,
-                #         "Você deve informar o cupom outro lote que não seja"
-                #         " da sua inscrição existente."
-                #     )
-                #     self.clear_session_exhibition_code()
-                #     return redirect('public:hotsite', slug=self.event.slug)
+                    # excluded_lot_pk = self.get_excluded_lot()
+                    # code_lot = self.get_exhibition_code_lot(
+                    #     self.get_exhibition_code()
+                    # )
+                    # if subscription.lot and excluded_lot_pk == code_lot.pk:
+                    #
+                    #     if subscription.is_new is False:
+                    #         self.request.session['has_private_subscription'] = \
+                    #             str(self.subscription.pk)
+                    #
+                    #     messages.error(
+                    #         request,
+                    #         "Você deve informar o cupom outro lote que não seja"
+                    #         " da sua inscrição existente."
+                    #     )
+                    #     self.clear_session_exhibition_code()
+                    #     return redirect('public:hotsite', slug=self.event.slug)
 
             if self.event.is_scientific:
                 if not self.event.work_config or not \
@@ -506,6 +506,9 @@ class SubscriptionWizardView(SessionWizardView):
 
         has_open_boleto = False
 
+        person = self.get_person()
+        context['person'] = person
+
         if self.storage.current_step not in ['lot', 'private_lot']:
             lot = self.get_lot()
             context['selected_lot'] = lot
@@ -552,8 +555,11 @@ class SubscriptionWizardView(SessionWizardView):
             context['lot'] = self.get_lot()
 
             allowed_types = [Transaction.CREDIT_CARD]
+            is_brazilian = person.country == 'BR'
 
-            if is_boleto_allowed(self.event) and has_open_boleto is False:
+            if is_boleto_allowed(self.event) \
+                    and has_open_boleto is False \
+                    and is_brazilian is True:
                 allowed_types.append(Transaction.BOLETO)
 
             context['allowed_transaction_types'] = ','.join(allowed_types)

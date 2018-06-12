@@ -139,8 +139,11 @@
                                                     </div>
                                                 </div>
                                                 <div class="row" id="city_international_city_block" style="display:none">
-                                                    <div class="col-md-12">
-                                                        {% render_generic_field form.city_international required=config.city %}
+                                                    <div class="col-md-6">
+                                                        {% render_generic_field form.city_international required=True %}
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        {% render_generic_field form.state_international required=True %}
                                                     </div>
                                                 </div>
                                             {% endif %}
@@ -211,8 +214,11 @@
                                             </div>
                                         </div>
                                         <div class="row" id="city_international_city_block" style="display:none">
-                                            <div class="col-md-12">
+                                            <div class="col-md-6">
                                                 {% render_generic_field form.city_international required=True %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {% render_generic_field form.state_international required=True %}
                                             </div>
                                         </div>
                                         <div class="row" id="zip_code_international_block" style="display:none">
@@ -298,10 +304,10 @@
             city_block.hide();
             city_intern_block.show();
             {% if config and config.city is True %}
+                $('#id_person-city_international').attr('required', 'required');
+                $('#id_person-state_international').attr('required', 'required');
                 $('#id_person-state').removeAttr('required');
                 $('#id_person-city_name').removeAttr('required');
-                city_block.removeAttr('required');
-                city_intern_block.attr('required', 'required');
             {% endif %}
 
             {% if config and config.address == config.ADDRESS_SHOW %}
@@ -345,8 +351,8 @@
             {% if config and config.city is True %}
                 $('#id_person-state').attr('required', 'required');
                 $('#id_person-city_name').attr('required', 'required');
-                city_block.attr('required', 'required');
-                city_intern_block.removeAttr('required');
+                $('#id_person-city_international').removeAttr('required');
+                $('#id_person-state_international').removeAttr('required');
             {% endif %}
 
             {% if config and config.address == config.ADDRESS_SHOW %}

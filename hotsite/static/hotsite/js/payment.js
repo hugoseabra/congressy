@@ -35,7 +35,7 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
 
     var total_amount = 0;
     var items = [];
-    var disable_boleto = false;
+    var enable_boleto = false;
 
     var _amount_as_payment = function(amount) {
         var split = String(amount).split('.');
@@ -50,7 +50,7 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
         return String(split[0]) + String(cents);
     };
 
-    payment.disable_boleto = function() { disable_boleto = true; };
+    payment.enable_boleto = function() { enable_boleto = true; };
 
     payment.disable_installment = function() { allow_installment = false; };
 
@@ -93,7 +93,7 @@ window.cgsy.pagarme = window.cgsy.pagarme || {};
         }
 
         var methods = 'credit_card';
-        if (disable_boleto === false) {
+        if (enable_boleto === true) {
             methods += ',boleto';
         }
 
