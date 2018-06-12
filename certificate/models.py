@@ -3,12 +3,13 @@
 Models de certificados
 """
 
-import os
+from decimal import Decimal
 
+import os
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from stdimage import StdImageField
 from stdimage.validators import MinSizeValidator
-from decimal import Decimal
 
 
 def get_image_path(instance, filename):
@@ -168,6 +169,18 @@ class Certificate(models.Model):
         verbose_name='esconder data',
     )
 
+    event_location = models.CharField(
+        max_length=50,
+        verbose_name='local do evento',
+        null=True,
+        blank=True,
+    )
+
+    text_center = models.BooleanField(
+        default=False,
+        verbose_name='centralizar texto',
+    )
+
     def __str__(self):
         return '{}'.format(self.event)
 
@@ -229,4 +242,26 @@ class Certificate(models.Model):
     @property
     def converted_date_position_y(self):
         return Decimal((self.date_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def is_ready(self):
+
+        if self.background_image is None:
+            return False
+
+        if not self.event_has_city and self.event_location is None:
+            return False
+
+        return True
+
+    @property
+    def event_has_city(self):
+
+        try:
+            _ = self.event.place.city
+            return True
+        except ObjectDoesNotExist:
+            pass
+
+        return False
 

@@ -90,15 +90,8 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     template_name = 'pdf/certificate.html'
     subscription = None
     event = None
-    show_content_in_browser = False
+    show_content_in_browser = True
     permission_denied_url = reverse_lazy('front:start')
-
-    def dispatch(self, request, *args, **kwargs):
-        browser = request.GET.get('browser')
-        if browser and browser == "1":
-            self.show_content_in_browser = True
-        response = super().dispatch(request, *args, **kwargs)
-        return response
 
     cmd_options = {
         'dpi': 96,

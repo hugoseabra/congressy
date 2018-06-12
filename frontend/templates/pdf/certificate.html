@@ -13,13 +13,13 @@
             width: 1402px;
             left: 0;
             top: 0;
-            position: absolute;
-        }
+            position: absolute;}
 
         #cert-text {
             width: {{ certificate.converted_text_width|unlocalize }}px;
             height: {{ certificate.converted_text_height|unlocalize }}px;
             font-size: {{ certificate.converted_text_font_size|unlocalize }}px;
+            text-align:{% if certificare.text_center %}center{% else %}justify{% endif %};
             -webkit-transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
             transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
         }
@@ -43,7 +43,6 @@
 
 
 <div class="resize-container">
-
     <div style="position: absolute;
             text-align: justify;
             {% if certificate.title_hide %}display: none;{% endif %}"
@@ -54,10 +53,14 @@
     <div style="position:absolute;
             text-align: justify;"
          id="cert-date">
-        {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F" }} de {{ event.date_end|date:"Y" }}
+        {% if certificate.has_city %}
+            {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}
+        {% else %}
+            {{ certificate.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}
+        {% endif %}
     </div>
 
-    <div style="position:absolute;text-align: justify;" id="cert-text">
+    <div style="position:absolute;" id="cert-text">
         {{ text }}
     </div>
 </div>

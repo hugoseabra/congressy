@@ -819,7 +819,7 @@ class VoucherSubscriptionPDFView(AccountMixin, PDFTemplateView):
     event = None
     person = None
     lot = None
-    show_content_in_browser = False
+    show_content_in_browser = True
     permission_denied_url = reverse_lazy('front:start')
 
     cmd_options = {

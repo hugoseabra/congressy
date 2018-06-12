@@ -23,15 +23,18 @@
                 height: 725px;
             }
         {% endif %}
+
         #cert-text {
             width: {{ object.text_width|unlocalize }}px;
             height: {{ object.text_height|unlocalize }}px;
             font-size: {{ object.text_font_size|unlocalize }}px;
             overflow: hidden;
         }
+
         #cert-title {
             font-size: {{ object.title_font_size|unlocalize }}px;
         }
+
         #cert-date {
             font-size: {{ object.date_font_size|unlocalize }}px;
         }
@@ -81,7 +84,7 @@
         </div>
     </div>
 
-    {% if object.background_image %}
+    {% if object.is_ready %}
         <div id="certificate">
             <div class="resize-container">
                 <div style="
@@ -91,12 +94,22 @@
                         {% if object.title_hide %}display: none;{% endif %}
                         " id="cert-title">{{ object.title_content }}</div>
 
-
-                <div style="position:absolute;
+                {% if object.is_ready %}
+                    <div style="position:absolute;
                         text-align: justify;"
-                     id="cert-date">
-                        {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F" }} de {{ event.date_end|date:"Y" }}
-                </div>
+                         id="cert-date">
+
+
+                        {% if object.has_city %}
+                            {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}
+                        {% else %}
+                            {{ object.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}
+                        {% endif %}
+
+
+                    </div>
+                {% endif %}
+
 
                 <div style="
                         position:absolute;
@@ -105,10 +118,6 @@
                      id="cert-text">
                     {{ object.text_content }}
                 </div>
-
-
-
-
             </div>
         </div>
     {% else %}
@@ -158,12 +167,13 @@
             });
 
 
-            {% if object.background_image %}
+            {% if object.is_ready %}
                 var title = $('#cert-title');
                 var text = $('#cert-text');
                 var date = $('#cert-date');
                 var titleCheckBox = $('#titleCheckBox');
                 var dateCheckBox = $('#dateCheckBox');
+                var centralizarCheckBox = $('#centralizar');
 
                 var interact = new window.cgsy.cert.Interact(title, text, date);
                 var cert = new window.cgsy.cert.CertDocument(title, text, date);
@@ -191,8 +201,15 @@
                     } else {
                         cert.showDate();
                     }
-
-
+                });
+                centralizarCheckBox.on('change', function () {
+                    if (this.checked) {
+                        cert.centralizeText();
+                        text.css("text-align", "center");
+                    } else {
+                        cert.justifyText();
+                        text.css("text-align", "justify");
+                    }
                 });
 
                 $('#titleFontSize').bind('click keyup', function () {
@@ -248,7 +265,8 @@
 
                         {% csrf_token %}
                         {% render_generic_field form.background_image required=True %}
-                        {% render_generic_field form.text_content help_text=False %}
+                        {% render_generic_field form.text_content required=True %}
+                        {% render_generic_field form.event_location required=True %}
                         <div class="well">
                             <i>
                                 <strong>
@@ -331,6 +349,8 @@
                 </div>
 
                 <div class="modal-body">
+
+
                     <label for="modoEditar">
                         Arrasta e solta:
                     </label>
@@ -355,6 +375,14 @@
                            {% if object.date_hide %}checked{% endif %}
                            id="dateCheckBox"
                            name="dateCheckBox">
+                    <br/>
+                    <br/>
+                    <label for="centralizar">
+                        Centralizar texto:
+                    </label>
+                    <input class="js-switch" type="checkbox" id='centralizar'
+                           name="centralizar">
+                    <br/>
                     <br/>
 
                     <label for="titleFontSize" style="margin-top: 20px">
