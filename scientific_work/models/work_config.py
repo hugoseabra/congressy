@@ -65,7 +65,7 @@ class WorkConfig(models.Model):
         running = False
 
         if self.date_start and self.date_end:
-            running = self.date_end < now or self.date_start > now
+            running = self.date_end > now > self.date_start
 
         return self.is_configured and running
 
