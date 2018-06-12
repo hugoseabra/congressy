@@ -335,7 +335,7 @@ class ProfileForm(forms.ModelForm):
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
         if phone:
-            phone = phone_cleaner(phone)
+            phone = phone_cleaner('+55{}'.format(phone))
         return phone
 
     def save(self, **_):
