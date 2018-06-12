@@ -285,12 +285,14 @@ class ProfileForm(forms.ModelForm):
         self.user = user
 
         if self.instance.pk:
-            self.fields['name'].disabled = True
-            self.fields['name'].widget.attrs['data-toggle'] = 'tooltip'
-            self.fields['name'].widget.attrs['title'] = \
-                'Por questões de segurança, o nome não pode ser alterado.' \
-                ' Caso você deseja fazer alguma alteração, solicite ao' \
-                ' suporte técnico da Congressy.'
+
+            if self.instance.name:
+                self.fields['name'].disabled = True
+                self.fields['name'].widget.attrs['data-toggle'] = 'tooltip'
+                self.fields['name'].widget.attrs['title'] = \
+                    'Por questões de segurança, o nome não pode ser' \
+                    ' alterado. Caso você deseja fazer alguma alteração,' \
+                    ' solicite ao suporte técnico da Congressy.'
 
             self.fields['email'].disabled = True
             self.fields['email'].widget.attrs['data-toggle'] = 'tooltip'
