@@ -93,9 +93,9 @@
                         {% if object.title_hide %}display: none;{% endif %}
                         " id="cert-title">{{ object.title_content }}</div>
                 <div style="position:absolute;
-                            text-align: justify;
-                            {% if object.date_hide %}display: none;{% endif %}"
-                             id="cert-date">
+                        text-align: justify;
+                        {% if object.date_hide %}display: none;{% endif %}"
+                     id="cert-date">
                     Goiânia, 1 de abril de 2018
                 </div>
                 <div style="position:absolute; text-align: justify" id="cert-text">{{ object.text_content }}</div>
@@ -185,6 +185,30 @@
 
 
                 });
+
+
+
+                $('#titleFontSize').bind('click keyup', function () {
+                    console.log("titleFontSize => " + $(this).val());
+                    cert.saveTitleFontSize($(this).val());
+                });
+
+                $('#dateFontSize').bind('click keyup', function () {
+                    console.log("dateFontSize => " + $(this).val());
+                    cert.saveDateFontSize($(this).val());
+                });
+
+                $('#textFontSize').bind('click keyup', function () {
+                    console.log("textFontSize => " + $(this).val());
+                    cert.saveTextFontSize($(this).val());
+                });
+
+                $('#textLineHeight').bind('click keyup', function () {
+                    console.log("textLineHeight => " + $(this).val());
+                    cert.saveTextLineHeight($(this).val());
+                });
+
+
 
             {% endif %}
 

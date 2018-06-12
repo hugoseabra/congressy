@@ -232,6 +232,22 @@ window.cgsy.cert = window.cgsy.cert || {};
             new cert.persistence.Date().show();
         };
 
+        this.saveTitleFontSize = function (size) {
+            new cert.persistence.Title().saveFontSize(size);
+        };
+
+        this.saveDateFontSize = function (size) {
+            new cert.persistence.Date().saveFontSize(size);
+        };
+
+        this.saveTextFontSize = function (size) {
+            new cert.persistence.Text().saveFontSize(size);
+        };
+
+        this.saveTextLineHeight = function (size) {
+            new cert.persistence.Text().saveLineHeight(size);
+        };
+
 
     };
 
