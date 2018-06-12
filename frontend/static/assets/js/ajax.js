@@ -1,3 +1,5 @@
+window.cgsy = window.cgsy || {};
+
 (function ($, cgsy) {
 
     cgsy.AjaxSender = function (url) {

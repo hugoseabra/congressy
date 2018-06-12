@@ -18,7 +18,7 @@
         $(document).ready(function () {
             $('#id_cpf').mask("999.999.999-99");
             $('#id_institution_cnpj').mask("99.999.999/9999-99");
-            $('#id_phone').mask("(99) 99999-9999");
+{#            $('#id_phone').mask("(99) 99999-9999");#}
             $('#id_zip_code').mask("99999-999");
 
             showHideCepLoader();
@@ -90,7 +90,6 @@
         <div class="row">
 
             <div class="col-lg-8 col-lg-push-2 col-xl-8 col-xl-push-2">
-
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title">Dados pessoais</div>
@@ -109,28 +108,14 @@
                         <div class="row">
 
                             <div class="col-md-9">
-                                <div class="form-group">
-                                    <label for="{{ form.email.id_for_label }}">
-                                        {{ form.email.label }}
-                                    </label>
-
-                                    {{ form.email |add_class:"form-control" }}
-                                </div>
-
+                                {% render_generic_field form.email %}
                             </div>
-
                             <div class="col-md-3">
-
                                 {% render_generic_field form.cpf %}
-
                             </div>
-
                         </div>
-
                         <div class="row" style="padding-bottom: 30px">
-
                             <div class="col-md-6">
-
                                 {% render_generic_field form.birth_date %}
 
                             </div>
@@ -153,21 +138,15 @@
 
 
                         <div class="row">
-
                             <div class="col-md-4">
                                 {% render_generic_field form.institution %}
                             </div>
-
-
                             <div class="col-md-4">
                                 {% render_generic_field form.institution_cnpj %}
                             </div>
-
-
                             <div class="col-md-4">
                                 {% render_generic_field form.function %}
                             </div>
-
                         </div>
                     </div>
                 </div>
