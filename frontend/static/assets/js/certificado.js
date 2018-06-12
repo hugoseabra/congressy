@@ -1,576 +1,264 @@
-window.cert = window.cert || {};
+window.cert = window.cgsy || {};
+window.cgsy.cert = window.cgsy.cert || {};
 
-(function (window, $) {
+(function ($, messenger, AjaxSender, cert) {
+    "use strict";
+    // PERSISTÊNCIA DE CERTIFICADO
 
-    window.cert.url = undefined;
-    window.cert.event = undefined;
-
-    Messenger.options = {
-        extraClasses: 'messenger-fixed messenger-on-bottom ' +
-        'messenger-on-right',
-        theme: 'flat'
+    var persistence = {
+        'url': undefined
     };
 
-// CSRF code
-    function getCookie(name) {
-        var cookieValue = null;
-        var i = 0;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (i; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
+    var save_timer = null;
 
-    var csrftoken = getCookie('csrftoken');
+    var create_sender = function () {
 
-// Título do certificado
-    var title = {
-        "position_x": 0.00,
-        "position_y": 0.00,
-        "font_size": "12px",
-        "hide": false
-    };
-
-    var date = {
-        "position_x": 0.00,
-        "position_y": 0.00,
-        "font_size": "12px",
-        "hide": false
-    };
-    var text = {
-        "position_x": "0.00",
-        "position_y": "12.2",
-        "font_size": "12px",
-        "width": "340px",
-        "height": "300px",
-        "line_height": "20px",
-        "text": "teste"
-    };
-
-// ====================================
-// Save data
-// ====================================
-// Funcão que analisa os dados recebidos com os dados esperados
-    function check_data(keys, data) {
-        $.each(keys, function (i, key) {
-            if (!key in data) {
-                return false;
-            }
-        });
-        return true;
-    }
-
-// =============TITLE==================
-// Função que solicita um objeto title
-    window.cert.getTitle = function () {
-        $.ajax({
-            url: window.cert.url,
-            method: 'GET',
-            crossDomain: true,
-            success: function (data) {
-                console.log(data);
-            }
-        });
-    };
-
-// Função que salva um objeto title
-    var save_title_timer = null;
-    window.cert.saveTitle = function (data) {
-        var expected_keys = [
-            'font_size',
-            'position_x',
-            'position_y',
-            'hide'
-        ];
-        if (!check_data(expected_keys, data)) {
-            console.error('Dados errados em "' + resource_name + '"');
-            console.log(data);
-            return;
+        if (!persistence.hasOwnProperty('url') || !persistence.url) {
+            console.log('Você deve informar a URL do certificado em window.cgsy.cert.persistence.url');
         }
 
-        window.clearTimeout(save_title_timer);
-        save_title_timer = window.setTimeout(function () {
+        var sender = new AjaxSender(persistence.url);
+        sender.setFailCallback(function (response) {
+            var msg = 'Failure on request to "' + url + '" with method';
+            msg += ' "' + this.method + '".';
 
-            var form_data = new FormData();
-
-            form_data.append('event', window.cert.event);
-            form_data.append('title_font_size', data['title_font_size']);
-            form_data.append('title_position_x', data['title_position_x']);
-            form_data.append('title_position_y', data['title_position_y']);
-            form_data.append('title_hide', data['title_hide']);
-
-            $.ajax({
-                url: window.cert.url,
-                processData: false,
-                contentType: false,
-                data: form_data,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                },
-                method: 'PATCH',
-                success: function (data) {
-                    title = data;
-                    Messenger().post({
-                        message: 'Titulo atualizado com sucesso!',
-                        type: 'success'
-                    });
-                },
-                error: function (err) {
-                    if (err.responseText !== "") {
-                        console.error(err.responseText)
-                    } else {
-                        console.error(err)
-                    }
-                    Messenger().post({
-                        message: 'Titulo não foi atualizado!',
-                        type: 'danger'
-                    });
-                }
-            });
-        }, 200);
-    };
-
-//Função que salva a posição de um objeto title
-    window.cert.saveTitlePosition = function (x, y) {
-        title['position_x'] = x;
-        title['position_y'] = y;
-        cert.saveTitle(title);
-    };
-
-//Função que salva o tamanha da fonte de um objeto title
-    window.cert.saveTitleFontSize = function (font_size) {
-        title['font_size'] = font_size;
-        cert.saveTitle(title);
-    };
-
-//Função que muda o estado de hide pra false em title(deixa visível)
-    window.cert.showTitle = function () {
-        title['hide'] = false;
-        cert.saveTitle(title);
-    };
-
-//Função que muda o estado de hide para true em title(não deixa visível)
-    window.cert.hideTitle = function () {
-        title['hide'] = true;
-        cert.saveTitle(title);
-    };
-
-//================= Date====================
-
-// Função que requisita um objeto do tipo date
-    window.cert.getDate = function () {
-        $.ajax({
-            url: window.cert.url,
-            method: 'GET',
-            crossDomain: true,
-            success: function (data) {
-                console.log(data);
+            if (response.hasOwnProperty('detail')) {
+                msg += ' Detalhes: ' + response.detail;
             }
+            messenger.triggerError(msg);
         });
+
+        return sender;
     };
 
-// Função que salva um objeto do tipo date
-    window.cert.saveDate = function (data) {
-        var save_date_timer = null;
-        var expected_keys = [
-            'font_size',
-            'position_x',
-            'position_y',
-            'hide'
-        ];
-        var resource_name = 'mock/date.json';
-        if (!check_data(expected_keys, data)) {
-            console.error('Dados errados em "' + resource_name + '"');
-            console.log(data);
-            return;
-        }
-        window.clearTimeout(save_date_timer);
-        save_date_timer = window.setTimeout(function () {
-
-            var form_data = new FormData();
-            for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    console.log(key + " -> " + data[key]);
-                }
+    var setSuccessMessage = function (sender, msg) {
+        if (msg) {
+            var callback = function () {
+                messenger.triggerSuccess(msg);
             }
-
-            form_data.append('event', window.cert.event);
-            var date_font_size = data['date_font_size'];
-            if (date_font_size !== undefined) {
-                console.log(date_font_size);
-                date_font_size = parseInt(data['date_font_size'].replace("px", ""));
-                console.log(date_font_size);
-                form_data.append('date_font_size', date_font_size);
-            }
-
-            form_data.append('date_position_x', parseInt(data['date_position_x']));
-            form_data.append('date_position_y', parseInt(data['date_position_y']));
-
-            if (data['date_hide']) {
-                form_data.append('date_hide', true);
-            } else {
-                form_data.append('date_hide', false);
-            }
-
-
-            $.ajax({
-                url: window.cert.url,
-                processData: false,
-                contentType: false,
-                data: form_data,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                },
-                method: 'PATCH',
-                success: function (data) {
-                    title = data;
-                    Messenger().post({
-                        message: 'Data atualizada com sucesso!',
-                        type: 'success'
-                    });
-                },
-                error: function (err) {
-                    if (err.responseText !== "") {
-                        console.error(err.responseText)
-                    } else {
-                        console.error(err)
-                    }
-                    Messenger().post({
-                        message: 'Data não foi atualizada!',
-                        type: 'danger'
-                    });
-                }
-            });
-
-
-        }, 200);
-    };
-
-// Função que salva a posição de um objeto date
-    window.cert.saveDatePosition = function (x, y) {
-        date['position_x'] = x;
-        date['position_y'] = y;
-        cert.saveDate(date)
-    };
-
-// Função que salva o tamanho da fonte de um objeto date
-    window.cert.saveDateFontSize = function (font_size) {
-        date['font_size'] = font_size;
-        cert.saveDate(date);
-    };
-
-//Função que muda o estado de hide pra true em date(não deixa visível)
-    window.cert.hideDate = function () {
-        date['hide'] = true;
-        cert.saveDate(date);
-    };
-
-//Função que muda o estado de hide para false em date(deixa visível)
-    window.cert.showDate = function () {
-        title['hide'] = false;
-        cert.saveDate(date);
-    };
-
-// Text
-
-// Função que requisita um objeto text
-    window.cert.getText = function () {
-        $.ajax({
-            url: window.cert.url,
-            method: 'GET',
-            crossDomain: true,
-            success: function (data) {
-                //console.log(data);
-                //return JSON.parse(data);
-            }
-        });
-    };
-
-// Função que salva um objeto text
-    window.cert.saveText = function (data) {
-        var save_text_timer = null;
-        var expect_keys = [
-            'position_x',
-            'position_y',
-            'font-size',
-            'width',
-            'height',
-            'line_height',
-            'text'
-        ];
-        var resource_name = 'mock/text.json';
-        if (!check_data(expect_keys, data)) {
-            console.error('Dados errados em "' + resource_name + '"');
-            console.log(data);
-            return;
-        }
-        window.clearTimeout(save_text_timer);
-        save_text_timer = window.setTimeout(function () {
-
-
-            var form_data = new FormData();
-
-            form_data.append('event', window.cert.event);
-            form_data.append('text_font_size', data['text_font_size']);
-            form_data.append('text_position_x', data['text_position_x']);
-            form_data.append('text_position_y', data['text_position_y']);
-
-            $.ajax({
-                url: window.cert.url,
-                processData: false,
-                contentType: false,
-                data: form_data,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                },
-                method: 'PATCH',
-                success: function (data) {
-                    title = data;
-                    Messenger().post({
-                        message: 'Texto atualizado com sucesso!',
-                        type: 'success'
-                    });
-                },
-                error: function (err) {
-                    if (err.responseText !== "") {
-                        console.error(err.responseText)
-                    } else {
-                        console.error(err)
-                    }
-                    Messenger().post({
-                        message: 'Texto não foi atualizado!',
-                        type: 'danger'
-                    });
-                }
-            });
-
-
-        }, 200);
-    };
-
-    window.cert.saveTextContent = function (textContent) {
-        text['text'] = textContent;
-        cert.saveText(text);
-    };
-
-//Função que salva a posição de um objeto text
-    window.cert.saveTextPosition = function (x, y) {
-        text['position_x'] = x;
-        text['position_y'] = y;
-        cert.saveText(text);
-    };
-
-//Função que salva o tamanho de um objeto text
-    window.cert.saveTextSize = function (height, width) {
-        text['height'] = height;
-        text['width'] = width;
-        cert.saveText(text);
-    };
-
-//Função que salva o tamanho da fonte de um objeto text
-    window.cert.saveTextFontSize = function (font_size) {
-        text['font_size'] = font_size;
-    };
-
-//Função que salva o espaçamento entre linhas de um objeto text
-    window.cert.saveTextLineHeight = function (line_height) {
-        text['line_height'] = line_height;
-    };
-
-// ========================================================
-    window.cert.enableDragDrop = function () {
-
-    };
-
-    window.cert.disableDragDrop = function () {
-
-    };
-
-
-// ====================Title Functions================================
-    function showHideTitle(show) {
-        show = show === true;
-        if (show) {
-            $('#titleText').fadeIn();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li:nth-child(3) > a').show();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li.divider').show();
-            cert.showTitle();
         } else {
-            $('#titleText').fadeOut();
-            cert.hideTitle();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li:nth-child(3) > a').hide();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li.divider').hide();
+            // limpa mensagem anterior.
+            callback = function () {
+            };
         }
-    }
+        sender.setSuccessCallback(callback);
+    };
 
-    $('#titleCheckBox').on('change', function () {
-        showHideTitle(!this.checked);
-    });
+    var save = function (data, success_msg) {
+        window.clearTimeout(save_timer);
+        save_timer = window.setTimeout(function () {
+            var sender = create_sender();
+            setSuccessMessage(sender, success_msg);
+            sender.send('PATCH', data);
+        }, 800);
+    };
 
-    $('#titleFontSize').change(function () {
-        $('#titleText').css('font-size', $(this).val() + 'px');
-        cert.saveTitleFontSize($(this).val());
-        resizeContent('#titleText');
-    });
-
-//Funções para redimennsionar o título
-    $('#titleText').on('input', function () {
-        cert.saveTextContent($(this).val());
-        resizeContent((this));
-    })
-        .on('mouseup', function () {
-            resizeContent((this));
-        });
-
-//Função para esconder o título
-    $('#titleCheckBox').on('change', function () {
-        if (this.checked === true) {
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(3) > a').hide();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li.divider').hide();
+    var remove_px = function (str) {
+        if (typeof(str) === "string") {
+            return str.replace("px", "");
         }
-        else {
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(3) > a').show();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li.divider').show();
+        return str;
+    };
 
+    persistence.Title = function () {
+        this.saveContent = function (content) {
+            content = content || 'Certificado';
+
+            save(
+                {'title_content': content},
+                'Conteúdo do título salvo com sucesso.'
+            );
+        };
+
+        this.saveFontSize = function (size) {
+            size = size || '60';
+
+            save(
+                {'title_font_size': remove_px(size)},
+                'Tamanho do título salvo com sucesso.'
+            );
+        };
+
+        this.hide = function () {
+            save({'title_hide': true}, 'Título escondido.');
+        };
+
+        this.show = function () {
+            save({'title_hide': false}, 'Título sendo exibido.');
+        };
+
+        this.savePosition = function (x, y) {
+            save(
+                {'title_position_x': x, 'title_position_y': y},
+                'Posição do título salva com sucesso.'
+            );
+        };
+    };
+
+    persistence.Text = function () {
+        this.saveContent = function (content) {
+            content = content || '{{NOME}}';
+
+            save(
+                {'text_content': content},
+                'Conteúdo do texto salvo com sucesso.'
+            );
+        };
+
+        this.saveFontSize = function (size) {
+            size = size || '20';
+            save(
+                {'text_font_size': remove_px(size)},
+                'Tamanho do texto salvo com sucesso.'
+            );
+        };
+
+        this.saveSize = function (width, height) {
+            width = width || '634';
+            height = height || '348';
+            save(
+                {
+                    'text_width': remove_px(width),
+                    'text_height': remove_px(height)
+                },
+                'Tamanho do bloco do texto salvo com sucesso.'
+            );
+        };
+
+        this.saveLineHeight = function (size) {
+            size = size || '22';
+            save(
+                {'text_font_size': remove_px(size)},
+                'Espaço entre-linhas do texto salvo com sucesso.'
+            );
+        };
+
+        this.savePosition = function (x, y) {
+            save(
+                {'text_position_x': x, 'text_position_y': y},
+                'Posição do texto salva com sucesso.'
+            );
+        };
+    };
+
+    persistence.Date = function () {
+        this.saveFontSize = function (size) {
+            size = size || '60';
+            save(
+                {'date_font_size': remove_px(size)},
+                'Tamanho da data salvo com sucesso.'
+            );
+        };
+
+        this.hide = function () {
+            save({'date_hide': true}, 'Data escondida.');
+        };
+
+        this.show = function () {
+            save({'date_hide': false}, 'Data sendo exibido.');
+        };
+
+        this.savePosition = function (x, y) {
+            save(
+                {'date_position_x': x, 'date_position_y': y},
+                'Posição da data salva com sucesso.'
+            );
+        };
+    };
+
+    cert.persistence = persistence;
+
+})(jQuery, window.cgsy.messenger, window.cgsy.AjaxSender, window.cgsy.cert);
+
+(function ($, cert) {
+    "use strict";
+    // GERENCIADOR DE ELEMENTOS DO DOCUMENTO DE CERTIFICADO.
+
+    cert.CertDocument = function (title_el, text_el, date_el) {
+        title_el = $(title_el);
+        text_el = $(text_el);
+        date_el = $(date_el);
+
+        var title_manager = new cert.persistence.Title();
+        var text_manager = new cert.persistence.Text();
+        var date_manager = new cert.persistence.Date();
+
+        var title_id = $(title_el).attr('id');
+        var text_id = $(text_el).attr('id');
+        var date_id = $(date_el).attr('id');
+
+        if (!title_id || !text_id || !date_el) {
+            console.error(
+                'Você deve definir "ID" em todos os elementos que terão' +
+                ' interção "drag and drop".'
+            );
         }
-    });
 
-// ====================Date Functions================================
-    function showHideDate(show) {
-        show = show === true;
-        if (show) {
-            $('#dateText').fadeIn();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li:nth-child(3) > a').show();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li.divider').show();
-            cert.showDate();
-        } else {
-            $('#dateText').fadeOut();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li:nth-child(3) > a').hide();
-            $('#navbar-collapse > ul > li.dropdown.open > ul > li.divider').hide();
-            cert.hideDate();
-        }
-    }
+        this.savePosition = function (element_id, x, y) {
+            if (element_id === title_id) {
+                title_manager.savePosition(x, y);
+            }
 
-    $('#dateCheckBox').on('change', function () {
-        showHideDate(!this.checked);
-    });
+            if (element_id === text_id) {
+                text_manager.savePosition(x, y);
+            }
 
-    $('#dateFontSize').change(function () {
-        $('#dateText').css('font-size', $(this).val() + 'px');
-        cert.saveDateFontSize($(this).val());
-        resizeContent('#dateText');
-    });
+            if (element_id === date_id) {
+                date_manager.savePosition(x, y);
+            }
+        };
 
-//Funções alinhamento do texto na data
-    $('.glyphicon-align-left').on('click', function () {
-        $('#dateText').css('text-align', 'left');
-        console.log('left');
-    });
+        this.saveTextSize = function (width, height) {
+            text_manager.saveSize(width, height);
+        };
 
-    $('.glyphicon-align-center').on('click', function () {
-        $('#dateText').css('text-align', 'center');
-        console.log('center');
-    });
+        this.hideTitle = function () {
+            title_el.hide();
+            new cert.persistence.Title().hide();
+        };
 
-    $('.glyphicon-align-right').on('click', function () {
-        $('#dateText').css('text-align', 'right');
-        console.log('right');
-    });
+        this.hideDate = function () {
+            date_el.hide();
+            new cert.persistence.Date().hide();
+        };
 
-//Função para esconder a data
-    $('#dateCheckBox').on('change', function () {
-        if (this.checked === true) {
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(3) > a').hide();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li.divider').hide();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(5)').hide();
-        }
-        else {
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(3) > a').show();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li.divider').show();
-            $('#mySidenav > ul > li.dropdown.btn-block.open > ul > li:nth-child(5)').show();
+        this.showTitle = function () {
+            title_el.show();
+            new cert.persistence.Title().show();
+        };
 
-        }
-    });
-
-// ====================Text Functions================================
-
-    $('#textFontSize').change(function () {
-        $('#text').css('font-size', $(this).val() + 'px');
-        cert.saveTextFontSize($(this).val());
-        resizeContent('#text');
-    });
-
-    $('#textLineHeight').change(function () {
-        $('#text').css('line-height', $(this).val());
-        cert.saveTextLineHeight($(this).val());
-        resizeContent('#text');
-    });
-
-//Funções de redimensionar altomaticamente a caixa de texto
-    $('#text').on('input', function () {
-        cert.saveTextContent($(this).val());
-        resizeContent((this));
-    })
-        .on('mouseup', function () {
-            resizeContent((this));
-        });
+        this.showDate = function () {
+            date_el.show();
+            new cert.persistence.Date().show();
+        };
 
 
-//Função que faz o redimensionamento
-    function resizeContent(element) {
-        element = $(element);
-        var offset = element.innerHeight() - element.height();
+    };
 
-        if (element.innerHeight < element[0].scrollHeight) {
-            //Grow the field if scroll height is smaller
-            element.height(element[0].scrollHeight - offset);
-        } else {
-            //Shrink the field and then re-set it to the scroll height in case it needs to shrink
-            element.height(1);
-            element.height(element[0].scrollHeight - offset);
-        }
-    }
+})(jQuery, window.cgsy.cert);
 
-//Funções para ativar e desativar o modo de drag and drop e resize
-    $('#modoEditar').on('change', function () {
-        if (this.checked === true) {
-            addDragResize();
-        }
-        else {
-            removeDragResize();
-        }
-    });
+(function ($, interact, cert) {
+    "use strict";
+    // WRAPPER DE INTERACT
 
-    function removeDragResize() {
-        $('#text').removeClass('resize-drag');
-        $('#text').css('background-color', 'transparent');
-        $('#dateText').removeClass('drag');
-        $('#dateText').css('background-color', 'transparent');
-        $('#titleText').removeClass('drag');
-        $('#titleText').css('background-color', 'transparent');
-    }
+    var cert_document;
 
-    function addDragResize() {
-        $('#text').addClass('resize-drag');
-        $('#text').css('background-color', 'white');
-        resizeContent($('#text'));
-        $('#dateText').addClass('drag');
-        $('#dateText').css('background-color', 'white');
-        $('#titleText').addClass('drag');
-        $('#titleText').css('background-color', 'white');
-    }
+    cert.Interact = function (title_el, text_el, date_el) {
+        cert_document = new cert.CertDocument(title_el, text_el, date_el);
 
+        // Ativar draggable
+        title_el.addClass('drag');
+        date_el.addClass('drag');
 
-// Funções que auxiliam a biblioteca de drag and drop e resize
-    window.cert.moveElement = function (element, x, y) {
+        // texto deve ser redimensionável
+        text_el.addClass('resize-drag');
+
+        this.moveElement = function (element, x, y) {
+            moveElement(element, x, y)
+        };
+    };
+
+    var moveElement = function (element, x, y) {
         element = $(element);
 
         // translate the element
@@ -583,5 +271,71 @@ window.cert = window.cert || {};
         element.attr('data-y', y);
     };
 
+    var dragMoveListener = function (event) {
+        var target = event.target,
+            // keep the dragged position in the data-x/data-y attributes
+            x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+            y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-})(window, jQuery);
+        moveElement($(target), x, y)
+    };
+
+    var dragResize = function (event) {
+        var target = event.target;
+        var x = (parseFloat(target.getAttribute('data-x')) || 0);
+        var y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+        // update the element's style
+        target.style.width = event.rect.width + 'px';
+        target.style.height = event.rect.height + 'px';
+
+        // translate when resizing from top or left edges
+        x += event.deltaRect.left;
+        y += event.deltaRect.top;
+
+        target.style.webkitTransform = target.style.transform =
+            'translate(' + x + 'px,' + y + 'px)';
+
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+
+        cert_document.saveTextSize(target.style.width, target.style.height);
+    };
+
+    var draggable_options = {
+        onmove: dragMoveListener,
+        restrict: {
+            restriction: 'parent',
+            elementRect: {top: 0, left: 0, bottom: 1, right: 1}
+        },
+        onend: function (event) {
+            var target = event.target;
+            cert_document.savePosition(
+                target.id,
+                $(target).attr('data-x'),
+                $(target).attr('data-y')
+            );
+        }
+    };
+
+    interact('.drag').draggable(draggable_options);
+    interact('.resize-drag')
+        .draggable(draggable_options)
+        .resizable({
+            // redimensionamento somente os que não afetam a posição do texto.
+            edges: {left: false, right: true, bottom: true, top: false},
+
+            // keep the edges inside the parent
+            restrictEdges: {
+                outer: 'parent',
+                endOnly: true
+            },
+            // minimum size
+            restrictSize: {
+                min: {width: 50, height: 50}
+            },
+            inertia: true
+        })
+        .on('resizemove', dragResize);
+
+})(jQuery, interact, window.cgsy.cert);

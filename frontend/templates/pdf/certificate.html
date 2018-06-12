@@ -14,16 +14,16 @@
             position: absolute;
         }
 
+
         div.text_content {
             position: absolute;
-            top: {{ certificate.text_position_y|stringformat:".2f" }}px;
-            left: {{ certificate.text_position_x|stringformat:".2f" }}px;
-            width: {{ certificate.text_width|stringformat:".2f" }}px;
-            height: {{ certificate.text_height|stringformat:".2f" }}px;
+            top: {{ certificate.converted_text_position_y|stringformat:".2f" }}px;
+            left: {{ certificate.converted_text_position_x|stringformat:".2f" }}px;
+            width: {{ certificate.converted_text_width|stringformat:".2f" }}px;
+            height: {{ certificate.converted_text_height|stringformat:".2f" }}px;
             font-weight: bolder;
             bottom: 0;
-            font-size: {{ certificate.text_font_size|stringformat:".2f" }}px;
-
+            font-size: {{ certificate.converted_text_font_size|stringformat:".2f" }}px;
             text-align: center;
         }
 
