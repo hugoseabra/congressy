@@ -8,6 +8,7 @@ import os
 from django.db import models
 from stdimage import StdImageField
 from stdimage.validators import MinSizeValidator
+from decimal import Decimal
 
 
 def get_image_path(instance, filename):
@@ -17,6 +18,8 @@ def get_image_path(instance, filename):
 
 class Certificate(models.Model):
     """ Certificado de evento."""
+
+    MANAGE_TO_PDF_RATIO = Decimal(73.038516)
 
     class Meta:
         verbose_name = 'certificado'
@@ -34,13 +37,13 @@ class Certificate(models.Model):
         blank=True,
         null=True,
         verbose_name='imagem de fundo do certificado do evento',
-        variations={'default': (1402, 991)},
+        variations={'default': (1402, 991), 'regular': (1024, 724)},
         validators=[MinSizeValidator(1402, 991)],
         help_text="Imagem de fundo do certificado, mínimo de: "
-                  "595px largura x "
-                  "842 altura.(png/jpg) "
+                  "1402px largura x "
+                  "991px altura.(png/jpg) "
                   "<a  target='_blank'"
-                  "href='http://via.placeholder.com/595x842'>Exemplo"
+                  "href='http://via.placeholder.com/1402x991'>Exemplo"
                   "</a>"
     )
 
@@ -50,41 +53,34 @@ class Certificate(models.Model):
         help_text='Texto principal do certificado.',
     )
 
-    date_content = models.TextField(
-        verbose_name='texto',
-        help_text='Texto de data do certificado.',
-        null=True,
-        blank=True,
-    )
-
-    text_font_size = models.PositiveIntegerField(
+    text_font_size = models.FloatField(
         default=20,
-        verbose_name='tamaho da fonte do texto',
+        verbose_name='tamanho da fonte do texto',
         help_text='Tamanho da fonte em (px)',
         null=True,
         blank=True,
     )
 
-    text_width = models.PositiveIntegerField(
+    text_width = models.FloatField(
         default=634,
         verbose_name='largura do bloco do texto',
-        help_text='tamanho (px) da largura do bloco.',
+        help_text='Tamanho (px) da largura do bloco.',
         null=True,
         blank=True,
     )
 
-    text_height = models.PositiveIntegerField(
+    text_height = models.FloatField(
         default=348,
         verbose_name='altura do bloco do texto',
-        help_text='tamanho (px) da altura do bloco.',
+        help_text='Tamanho (px) da altura do bloco.',
         null=True,
         blank=True,
     )
 
     text_line_height = models.FloatField(
-        max_length=3,
+        default=22,
         verbose_name='espaço entre-linhas do texto',
-        help_text='espaço entre-linhas (cm) do conteúdo.',
+        help_text='Espaço entre-linhas (cm) do conteúdo.',
         null=True,
         blank=True,
     )
@@ -92,16 +88,15 @@ class Certificate(models.Model):
     text_position_x = models.FloatField(
         default=191,
         verbose_name='posição X do texto',
-        help_text='distância do bloco no eixo X.',
+        help_text='Distância do bloco no eixo X.',
         null=True,
         blank=True,
     )
 
     text_position_y = models.FloatField(
         default=309,
-        max_length=5,
         verbose_name='posição Y do texto',
-        help_text='distância do bloco no eixo Y.',
+        help_text='Distância do bloco no eixo Y.',
         null=True,
         blank=True,
     )
@@ -114,9 +109,9 @@ class Certificate(models.Model):
         blank=True,
     )
 
-    title_font_size = models.PositiveIntegerField(
+    title_font_size = models.FloatField(
         default=60,
-        verbose_name='tamaho da fonte do título',
+        verbose_name='tamanho da fonte do título',
         help_text='Tamanho da fonte em (px)',
         null=True,
         blank=True,
@@ -125,7 +120,7 @@ class Certificate(models.Model):
     title_position_x = models.FloatField(
         default=286,
         verbose_name='posição X do título',
-        help_text='distância do bloco no eixo X.',
+        help_text='Distância do bloco no eixo X.',
         null=True,
         blank=True,
     )
@@ -144,9 +139,9 @@ class Certificate(models.Model):
         verbose_name='esconder título',
     )
 
-    date_font_size = models.PositiveIntegerField(
+    date_font_size = models.FloatField(
         default=20,
-        verbose_name='tamaho da fonte da data',
+        verbose_name='tamanho da fonte da data',
         help_text='Tamanho da fonte em (px)',
         null=True,
         blank=True,
@@ -154,18 +149,16 @@ class Certificate(models.Model):
 
     date_position_x = models.FloatField(
         default=15,
-        max_length=5,
         verbose_name='posição X da data',
-        help_text='distância do bloco no eixo X.',
+        help_text='Distância do bloco no eixo X.',
         null=True,
         blank=True,
     )
 
     date_position_y = models.FloatField(
         default=463,
-        max_length=5,
         verbose_name='posição Y da data',
-        help_text='distância do bloco no eixo Y.',
+        help_text='Distância do bloco no eixo Y.',
         null=True,
         blank=True,
     )
@@ -177,3 +170,63 @@ class Certificate(models.Model):
 
     def __str__(self):
         return '{}'.format(self.event)
+
+    # TEXT
+    @property
+    def converted_text_content(self):
+        return Decimal((self.text_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_text_font_size(self):
+        return Decimal((self.text_font_size * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_text_width(self):
+        return Decimal((self.text_width * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_text_height(self):
+        return Decimal((self.text_height * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_text_line_height(self):
+        return Decimal((self.text_line_height * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_text_position_x(self):
+        return Decimal((self.text_position_x * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_text_position_y(self):
+        return Decimal((self.text_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    # TITLE
+    @property
+    def converted_title_content(self):
+        return Decimal((self.title_content * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_title_font_size(self):
+        return Decimal((self.title_font_size * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_title_position_x(self):
+        return Decimal((self.title_position_x * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_title_position_y(self):
+        return Decimal((self.title_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    # DATE
+    @property
+    def converted_date_font_size(self):
+        return Decimal((self.date_font_size * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_date_position_x(self):
+        return Decimal((self.date_position_x * 100)) / self.MANAGE_TO_PDF_RATIO
+
+    @property
+    def converted_date_position_y(self):
+        return Decimal((self.date_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
+

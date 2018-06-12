@@ -436,6 +436,13 @@ class SubscriptionWizardView(SessionWizardView):
             self.subscription = self.get_subscription()
             self.subscription.lot = self.get_lot()
 
+            # Se nova inscrição, não há problemas em setar o lote por aqui.
+            # Se inscrição preexistente, o lote não pode ser setado porque
+            # seria uma edição precoce do processo. O lote deve ser firmado
+            # no 'done'.
+            if self.subscription.is_new is True:
+                self.subscription.save()
+
         # Persisting person
         if isinstance(form, forms.SubscriptionPersonForm):
             # Resgata lote apenas para saber se ele está na session

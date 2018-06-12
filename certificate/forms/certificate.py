@@ -12,6 +12,10 @@ class CertificatePartialForm(forms.ModelForm):
             'text_content',
         ]
 
+        widgets = {
+            'event': forms.HiddenInput()
+        }
+
     def clear_background_image(self):
         """ Limpa campo `image4` """
         self._clear_file('background_image')
