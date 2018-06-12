@@ -21,6 +21,7 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
     person = None
     subscription = None
     event = None
+    transactions = None
     restart_private_event = False
 
     def dispatch(self, request, *args, **kwargs):
@@ -38,13 +39,31 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
 
         # Se  não há lotes pagos, não há o que fazer aqui.
         if not self.has_paid_lots():
-            return redirect(
-                'public:hotsite',
-                slug=self.event.slug
-            )
+            return redirect('public:hotsite', slug=self.event.slug)
+
         try:
             self.subscription = Subscription.objects.get(
-                event=self.event, person=self.person)
+                event=self.event,
+                person=self.person,
+                completed=True,
+            )
+
+            if not self.get_transactions():
+                if self.is_private_event():
+                    self.request.session['has_private_subscription'] = \
+                        str(self.subscription.pk)
+                else:
+                    messages.warning(
+                        message='Por favor, informe um lote para realizar o'
+                                ' pagamento ao final do processo de inscrição.',
+                        request=request
+                    )
+
+                return redirect(
+                    'public:hotsite-subscription',
+                    slug=self.event.slug
+                )
+
         except Subscription.DoesNotExist:
             messages.error(
                 message='Você não possui inscrição neste evento.',
@@ -137,21 +156,25 @@ class SubscriptionStatusView(EventMixin, generic.TemplateView):
         return False
 
     def get_transactions(self):
+        if self.transactions:
+            return self.transactions
 
-        transactions = []
+        self.transactions = []
 
         all_transactions = Transaction.objects.filter(
             subscription=self.subscription,
             lot=self.subscription.lot)
 
+        now = datetime.now().date()
+
         for transaction in all_transactions:
             if transaction.boleto_expiration_date:
-                if transaction.boleto_expiration_date > datetime.now().date():
-                    transactions.append(transaction)
+                if transaction.boleto_expiration_date > now:
+                    self.transactions.append(transaction)
             else:
-                transactions.append(transaction)
+                self.transactions.append(transaction)
 
-        return transactions
+        return self.transactions
 
     def get_allowed_transaction(self):
 

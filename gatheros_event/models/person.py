@@ -8,10 +8,12 @@ from datetime import date
 
 from django.contrib.auth.models import User
 from django.db import models
+from kanu_locations.models import City
 
 from core.model import track_data
-from core.model.validator import cpf_validator, phone_validator
-from kanu_locations.models import City
+from core.model.validator import cpf_validator
+from gatheros_event.locale.country_choices import get_country_choices
+from gatheros_event.locale.phone_choices import get_phone_choices
 from . import Occupation
 from .mixins import GatherosModelMixin
 
@@ -56,8 +58,21 @@ class Person(models.Model, GatherosModelMixin):
         blank=True,
         verbose_name='cidade-UF'
     )
+    city_international = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='Cidade (Fora do Brasil)',
+        help_text='Informe a cidade e estado ou província.',
+    )
     zip_code = models.CharField(
         max_length=8,
+        blank=True,
+        null=True,
+        verbose_name='CEP'
+    )
+    zip_code_international = models.CharField(
+        max_length=50,
         blank=True,
         null=True,
         verbose_name='CEP'
@@ -88,13 +103,35 @@ class Person(models.Model, GatherosModelMixin):
         null=True,
         verbose_name='bairro'
     )
+    state_international = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='estado',
+    )
+    country = models.CharField(
+        choices=get_country_choices(),
+        default='BR',
+        max_length=10,
+        blank=True,
+        null=True,
+        verbose_name='país',
+    )
+    ddi = models.CharField(
+        choices=get_phone_choices(),
+        default='BR',
+        max_length=10,
+        blank=True,
+        null=True,
+        verbose_name='DDI',
+        help_text='Código discagem do país.',
+    )
     phone = models.CharField(
         max_length=50,
         blank=True,
         null=True,
         verbose_name='celular',
     )
-
     user = models.OneToOneField(
         User,
         on_delete=models.PROTECT,
@@ -115,6 +152,13 @@ class Person(models.Model, GatherosModelMixin):
         null=True,
         verbose_name='CPF',
         validators=[cpf_validator]
+    )
+    international_doc = models.CharField(
+        max_length=11,
+        blank=True,
+        null=True,
+        verbose_name='ID/Passaport',
+        help_text='Número de documento utilizado fora do Brasil.'
     )
     birth_date = models.DateField(
         blank=True,
@@ -267,12 +311,17 @@ class Person(models.Model, GatherosModelMixin):
         phone = str(self.phone)
         if not phone:
             return ''
-        return '+55 ({0}) {1} {2}-{3}'.format(
-            phone[0:2],
-            phone[2],
-            phone[3:7],
-            phone[7:11]
-        )
+
+        if self.country == 'BR':
+            return '{0} ({1}) {2} {3}-{4}'.format(
+                self.get_ddi_display(),
+                phone[0:2],
+                phone[2],
+                phone[3:7],
+                phone[7:11]
+            )
+        else:
+            return '{}{}'.format(self.get_ddi_display(), phone)
 
     def get_zip_code_display(self):
         """

@@ -1,0 +1,12 @@
+{% extends 'mailer/subscription/base_notification.html' %}
+{% load humanize %}
+
+{% block introduction %}
+    <p style="text-align: justify;">
+        Informamos que registramos seu pedido de <span style="font-style: italic;">chargedback</span>.
+        O seu pedido já está sendo avaliado pelo <strong>Organizador</strong> e logo você terá uma resposta.</strong>.
+    </p>
+{% endblock %}
+{% block extra_content %}
+    {% include 'mailer/subscription/includes/account.html' %}
+{% endblock %}

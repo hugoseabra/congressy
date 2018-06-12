@@ -21,17 +21,20 @@ from gatheros_event.helpers.account import update_account
 from gatheros_event.models import Event
 from gatheros_event.views.mixins import AccountMixin
 from mailer import exception as mailer_notification
-from mailer.services import notify_new_paid_subscription_credit_card, \
-    notify_new_refused_subscription_credit_card, \
-    notify_new_unpaid_subscription_boleto, \
-    notify_new_unpaid_subscription_credit_card, \
-    notify_new_user_and_paid_subscription_boleto, \
-    notify_new_user_and_paid_subscription_credit_card, \
-    notify_new_user_and_refused_subscription_credit_card, \
-    notify_new_user_and_unpaid_subscription_boleto, \
-    notify_new_user_and_unpaid_subscription_credit_card, \
-    notify_paid_subscription_boleto, notify_refunded_subscription_boleto, \
-    notify_refunded_subscription_credit_card
+from mailer.services import (
+    notify_chargedback_subscription,
+    notify_new_paid_subscription_credit_card,
+    notify_new_refused_subscription_credit_card,
+    notify_new_unpaid_subscription_boleto,
+    notify_new_unpaid_subscription_credit_card,
+    notify_new_user_and_paid_subscription_boleto,
+    notify_new_user_and_paid_subscription_credit_card,
+    notify_new_user_and_refused_subscription_credit_card,
+    notify_new_user_and_unpaid_subscription_boleto,
+    notify_new_user_and_unpaid_subscription_credit_card,
+    notify_paid_subscription_boleto, notify_refunded_subscription_boleto,
+    notify_refunded_subscription_credit_card,
+)
 from mailer.tasks import send_mail
 from payment.forms import PaymentForm
 from payment.helpers import (
@@ -71,6 +74,9 @@ def log(message, extra_data=None, type='error', notify_admins=False):
 
 
 def notify_postback(transaction, data):
+
+    event = transaction.subscription.event
+
     body = """
         <br />
         <strong>NOVO POSTBACK:</strong>
@@ -81,6 +87,8 @@ def notify_postback(transaction, data):
         <br />
         <strong>PESSOA:</strong> {person_name}
         <br />
+        <strong>E-mail:</strong> {person_email}
+        <br />
         <strong>Inscrição:</strong> {sub_pk}
         <br />
         <strong>VALOR (R$):</strong> R$ {amount}
@@ -88,6 +96,7 @@ def notify_postback(transaction, data):
         <strong>STATUS:</strong> {status_display} ({status})
         <br />
         <hr >
+        <br />
         <strong>Data:</strong>
         <br />    
         <pre><code>{data}</code></pre>
@@ -95,9 +104,10 @@ def notify_postback(transaction, data):
     """.format(
         type_display=transaction.get_type_display(),
         type=transaction.type,
-        event_name=transaction.subscription.event.name,
-        event_pk=transaction.subscription.event.pk,
+        event_name=event.name,
+        event_pk=event.pk,
         person_name=transaction.subscription.person.name,
+        person_email=transaction.subscription.person.email,
         sub_pk=transaction.subscription.pk,
         amount=localize(transaction.amount),
         status_display=transaction.get_status_display(),
@@ -106,7 +116,7 @@ def notify_postback(transaction, data):
     )
 
     send_mail(
-        subject="Novo postback",
+        subject="Novo postback: {}".format(event.name),
         body=body,
         to=settings.DEV_ALERT_EMAILS
     )
@@ -311,6 +321,7 @@ def postback_url_view(request, uidb64):
         is_refused = incoming_status == Transaction.REFUSED
         is_refunded = incoming_status == Transaction.REFUNDED
         is_waiting = incoming_status == Transaction.WAITING_PAYMENT
+        is_chargedback = incoming_status == Transaction.CHARGEDBACK
 
         try:
             if is_new_subscription is True:
@@ -333,6 +344,9 @@ def postback_url_view(request, uidb64):
 
                     elif is_refunded:
                         notify_refunded_subscription_boleto(event, transaction)
+
+                    elif is_chargedback:
+                        notify_chargedback_subscription(event, transaction)
 
                     else:
                         raise mailer_notification.NotifcationError(
@@ -379,6 +393,9 @@ def postback_url_view(request, uidb64):
                             event,
                             transaction
                         )
+
+                    elif is_chargedback:
+                        notify_chargedback_subscription(event, transaction)
 
                     else:
                         raise mailer_notification.NotifcationError(
@@ -511,7 +528,7 @@ def postback_url_view(request, uidb64):
                     )
 
         except mailer_notification.NotifcationError as e:
-            return e
+            raise e
 
         # Registra inscrição como notificada.
         transaction.subscription.notified = True

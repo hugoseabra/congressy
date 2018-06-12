@@ -55,7 +55,7 @@ class Certificate(models.Model):
 
     text_font_size = models.FloatField(
         default=20,
-        verbose_name='tamaho da fonte do texto',
+        verbose_name='tamanho da fonte do texto',
         help_text='Tamanho da fonte em (px)',
         null=True,
         blank=True,
@@ -64,7 +64,7 @@ class Certificate(models.Model):
     text_width = models.FloatField(
         default=634,
         verbose_name='largura do bloco do texto',
-        help_text='tamanho (px) da largura do bloco.',
+        help_text='Tamanho (px) da largura do bloco.',
         null=True,
         blank=True,
     )
@@ -72,7 +72,7 @@ class Certificate(models.Model):
     text_height = models.FloatField(
         default=348,
         verbose_name='altura do bloco do texto',
-        help_text='tamanho (px) da altura do bloco.',
+        help_text='Tamanho (px) da altura do bloco.',
         null=True,
         blank=True,
     )
@@ -80,7 +80,7 @@ class Certificate(models.Model):
     text_line_height = models.FloatField(
         default=22,
         verbose_name='espaço entre-linhas do texto',
-        help_text='espaço entre-linhas (cm) do conteúdo.',
+        help_text='Espaço entre-linhas (cm) do conteúdo.',
         null=True,
         blank=True,
     )
@@ -88,7 +88,7 @@ class Certificate(models.Model):
     text_position_x = models.FloatField(
         default=191,
         verbose_name='posição X do texto',
-        help_text='distância do bloco no eixo X.',
+        help_text='Distância do bloco no eixo X.',
         null=True,
         blank=True,
     )
@@ -96,7 +96,7 @@ class Certificate(models.Model):
     text_position_y = models.FloatField(
         default=309,
         verbose_name='posição Y do texto',
-        help_text='distância do bloco no eixo Y.',
+        help_text='Distância do bloco no eixo Y.',
         null=True,
         blank=True,
     )
@@ -111,7 +111,7 @@ class Certificate(models.Model):
 
     title_font_size = models.FloatField(
         default=60,
-        verbose_name='tamaho da fonte do título',
+        verbose_name='tamanho da fonte do título',
         help_text='Tamanho da fonte em (px)',
         null=True,
         blank=True,
@@ -120,13 +120,14 @@ class Certificate(models.Model):
     title_position_x = models.FloatField(
         default=286,
         verbose_name='posição X do título',
-        help_text='distância do bloco no eixo X.',
+        help_text='Distância do bloco no eixo X.',
         null=True,
         blank=True,
     )
 
     title_position_y = models.FloatField(
         default=192,
+        max_length=5,
         verbose_name='posição Y do título',
         help_text='distância do bloco no eixo Y.',
         null=True,
@@ -140,7 +141,7 @@ class Certificate(models.Model):
 
     date_font_size = models.FloatField(
         default=20,
-        verbose_name='tamaho da fonte da data',
+        verbose_name='tamanho da fonte da data',
         help_text='Tamanho da fonte em (px)',
         null=True,
         blank=True,
@@ -149,7 +150,7 @@ class Certificate(models.Model):
     date_position_x = models.FloatField(
         default=15,
         verbose_name='posição X da data',
-        help_text='distância do bloco no eixo X.',
+        help_text='Distância do bloco no eixo X.',
         null=True,
         blank=True,
     )
@@ -157,7 +158,7 @@ class Certificate(models.Model):
     date_position_y = models.FloatField(
         default=463,
         verbose_name='posição Y da data',
-        help_text='distância do bloco no eixo Y.',
+        help_text='Distância do bloco no eixo Y.',
         null=True,
         blank=True,
     )
@@ -173,59 +174,59 @@ class Certificate(models.Model):
     # TEXT
     @property
     def converted_text_content(self):
-        return (self.text_position_y * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.text_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_text_font_size(self):
-        return (self.text_font_size * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.text_font_size * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_text_width(self):
-        return (self.text_width * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.text_width * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_text_height(self):
-        return (self.text_height * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.text_height * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_text_line_height(self):
-        return (self.text_line_height * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.text_line_height * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_text_position_x(self):
-        return (self.text_position_x * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.text_position_x * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_text_position_y(self):
-        return (self.text_position_y * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.text_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
 
     # TITLE
     @property
     def converted_title_content(self):
-        return (self.title_content * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.title_content * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_title_font_size(self):
-        return (self.title_font_size * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.title_font_size * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_title_position_x(self):
-        return (self.title_position_x * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.title_position_x * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_title_position_y(self):
-        return (self.title_position_y * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.title_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
 
     # DATE
     @property
     def converted_date_font_size(self):
-        return (self.date_font_size * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.date_font_size * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_date_position_x(self):
-        return (self.date_position_x * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.date_position_x * 100)) / self.MANAGE_TO_PDF_RATIO
 
     @property
     def converted_date_position_y(self):
-        return (self.date_position_y * 100) / self.MANAGE_TO_PDF_RATIO
+        return Decimal((self.date_position_y * 100)) / self.MANAGE_TO_PDF_RATIO
 

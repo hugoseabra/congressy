@@ -246,9 +246,8 @@ class PaymentForm(forms.Form):
         debt_kwargs = {
             'subscription': self.subscription,
             'data': {
-                'name': 'Inscrição: {} ({} - {})'.format(
+                'name': 'Inscrição: {} ({})'.format(
                     self.subscription.event.name,
-                    self.subscription.code,
                     self.subscription.pk,
                 ),
                 'item_id': str(self.subscription.pk),
@@ -291,6 +290,9 @@ class PaymentForm(forms.Form):
 
         service_forms = []
         for service in services:
+            if not service.optional_price:
+                continue
+
             debt_kwargs = {
                 'subscription': self.subscription,
                 'data': {
@@ -328,8 +330,11 @@ class PaymentForm(forms.Form):
 
         products = self.subscription.subscription_products.all()
 
-        forms = []
+        prod_forms = []
         for product in products:
+            if not product.optional_price:
+                continue
+
             debt_kwargs = {
                 'subscription': self.subscription,
                 'data': {
@@ -358,6 +363,6 @@ class PaymentForm(forms.Form):
             except Debt.DoesNotExist:
                 pass
 
-            forms.append(DebtForm(**debt_kwargs))
+            prod_forms.append(DebtForm(**debt_kwargs))
 
-        return forms
+        return prod_forms

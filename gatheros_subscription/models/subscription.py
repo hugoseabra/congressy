@@ -186,7 +186,7 @@ class Subscription(models.Model, GatherosModelMixin):
 
     @property
     def free(self):
-        return not self.lot.price
+        return self.lot is not None and not self.lot.price
 
     def save(self, *args, **kwargs):
         """ Salva entidade. """

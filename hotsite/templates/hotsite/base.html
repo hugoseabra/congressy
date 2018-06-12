@@ -67,11 +67,7 @@
     {% block styles %}{% endblock %}
 </head>
 
-{% if remove_preloader %}
-    <body>
-{% else %}
-    <body class="enable-animations enable-preloader preloader-dark">
-{% endif %}
+<body class="tooltip-wrapper {% if not remove_preloader %}enable-animations enable-preloader preloader-dark{% endif %}">
 
 <div id="document" class="document">
 
@@ -79,7 +75,7 @@
 
     {% block content %}{% endblock %}
 
-    {% include 'hotsite/includes/7_footer.html' %}
+{#    {% include 'hotsite/includes/7_footer.html' %}#}
 </div>
 
 <!-- LIBRARIES JS
@@ -108,10 +104,6 @@
 <script>
     $(document).ready(function () {
         window.setTimeout(function () {
-            $('input[type=email]').on('keyup', function () {
-                $(this).val($(this).val().toLowerCase());
-            }, 300);
-
             $('.cgsy-date-input').mask("99/99/9999");
             $('.cgsy-time-input').mask("99:99");
 
@@ -128,6 +120,11 @@
                 radioClass: 'iradio_flat-grey'
             });
 
+            $('.tooltip-wrapper').tooltip({
+                selector: "[data-toggle=tooltip]",
+                container: "body",
+                html: true
+            });
         });
     });
 </script>

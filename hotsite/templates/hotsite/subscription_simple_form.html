@@ -53,9 +53,7 @@
             {% if messages %}
                 <div style="width:100%;margin-top:3px;padding-bottom:10px">
                     {% for message in messages %}
-                        <div class="alert alert-
-
-                                {% if message.tags %}{{ message.tags }}{% else %}warning{% endif %} alert-dismissible" role="alert">
+                        <div class="alert alert-{{ message.tags|default:'warning' }} alert-dismissible" role="alert">
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -68,7 +66,6 @@
 
         <div class="form-validation alert"></div>
         {% if is_subscribed and not has_private_subscription %}
-
             <div class="text-center">
                 <p style="font-size: 18px">
                     Você já está inscrito(a) neste evento.
@@ -106,27 +103,12 @@
             </div>
 
         {% elif is_subscribed and has_private_subscription and lot_still_available %}
-            <p style="font-size: 18px">
-                Você já está inscrito(a) neste evento.
-            </p>
-            {% if subscription and subscription.lot.price and subscription.lot.price > 0 %}
-                <p class="text-center" style="font-size: 18px">
-                    <a class="btn btn-success"
-                       href="{% url 'public:hotsite-subscription-status' event.slug %}">
-                        Veja sua inscrição!
-                    </a>
-                </p>
-            {% endif %}
-            <div style="align-items: center;display: flex;justify-content: center;">
-                <i class="fa fa-check-circle fa-5x" style="color: darkgreen" aria-hidden="true"></i>
-            </div>
-            <hr/>
             <p class="text-muted">
                 Preencha os dados seguintes para refazer sua inscrição.
             </p>
             <div class="form-group">
                 <label for="id_exhibition_code">
-                    Novo Cupom:
+                    Cupom:
                     <small style="color:#C9302C">*</small>
                 </label>
                 <div>
@@ -140,8 +122,31 @@
             <div class="form-group form-group-submit">
                 <button class="btn btn-primary btn-lg btn-block"
                         data-loading-text="Quero me inscrever">
+                    {% if subscription.lot.price > 0 %}
+                    Novo pagamento
+                    {% else %}
                     Refazer inscrição
+                    {% endif %}
                 </button>
+            </div>
+            <hr/>
+            {% if not subscription.lot.price or subscription.lot.price and subscription.transactions.count > 0 %}
+                <p style="font-size: 18px">
+                    Você já está inscrito(a) neste evento.
+                </p>
+                {% if subscription and subscription.lot.price and subscription.lot.price > 0 %}
+                    <p class="text-center" style="font-size: 18px">
+                        <a class="btn btn-success"
+                           href="{% url 'public:hotsite-subscription-status' event.slug %}">
+                            Veja sua inscrição!
+                        </a>
+                    </p>
+                {% endif %}
+                <div style="align-items: center;display: flex;justify-content: center;">
+                    <i class="fa fa-check-circle fa-5x" style="color: darkgreen" aria-hidden="true"></i>
+                </div>
+            {% endif %}
+            <div class="form-group form-group-submit">
                 <div class="help-block text-center" style="padding: 0 20px;font-size: 13px;">
                     {% include 'hotsite/includes/termo-de-uso-normas-evento.html' %}
                 </div>

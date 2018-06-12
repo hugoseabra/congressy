@@ -225,8 +225,6 @@ function load_coupon() {
 
     common_lots_content = lot_fields.html();
 
-    lot_fields.show();
-
     send(
         url,
         'POST',
@@ -243,6 +241,8 @@ function load_coupon() {
             lot_select.attr("style", "pointer-events: none;");
             $('#lot_display_publicly').text(lot.public_display + lot.is_free);
             $('#lot_exhibition_code').text(lot.exhibition_code);
+
+            lot_fields.show();
 
             window.setTimeout(function () {
                 start_popover();
@@ -284,9 +284,12 @@ function start_popover() {
 (function ($) {
     $(document).ready(function () {
         window.setTimeout(function () {
-            $('#id_person-phone').mask("(99) 99999-9999");
             $('#id_person-cpf').mask("999.999.999-99");
             start_popover();
+
+            $(document).on("input", ".numeric", function() {
+                this.value = this.value.replace(/\D/g,'');
+            });
 
             var institution_cnpj = $('#id_person-institution_cnpj');
             if (institution_cnpj.length) {
@@ -306,10 +309,6 @@ function start_popover() {
 
             city_el.change(function () {
                 $("#id_person-city").val($(this).val());
-            });
-
-            $('#id_person-zip_code').on('keyup', function () {
-                hotsiteSearchByCep();
             });
 
         }, 350);

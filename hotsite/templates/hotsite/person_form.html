@@ -70,7 +70,11 @@
                                     </div>
                                 </div>
                                 <div class="panel-body">
-
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            {% render_generic_field form.country %}
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="col-md-9">
                                             {% render_generic_field form.name autofocus=True %}
@@ -92,9 +96,11 @@
                                         <div class="col-md-3">
                                             {% if config and config.cpf != config.CPF_HIDE %}
                                                 {% if config.cpf == config.CPF_REQUIRED %}
-                                                    {% render_generic_field form.cpf required=True %}
+                                                    {% render_generic_field form.cpf required=True hide=True %}
+                                                    {% render_generic_field form.international_doc required=True  hide=True %}
                                                 {% else %}
                                                     {% render_generic_field form.cpf %}
+                                                    {% render_generic_field form.international_doc %}
                                                 {% endif %}
                                             {% endif %}
                                         </div>
@@ -110,15 +116,13 @@
                                                 {% else %}
                                                     {% render_generic_field form.birth_date %}
                                                 {% endif %}
-
-
                                             </div>
                                         {% endif %}
                                         <div class="col-md-6">
                                             {% if config %}
-                                                {% render_generic_field form.phone config.phone False %}
+                                                {% render_international_phone form.ddi form.phone required=config.phone use_required_field=False %}
                                             {% else %}
-                                                {% render_generic_field form.phone %}
+                                                {% render_international_phone form.ddi form.phone %}
                                             {% endif %}
                                         </div>
                                     </div>
@@ -126,12 +130,20 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             {% if config and config.address == config.ADDRESS_HIDE %}
-                                                <div class="row">
+                                                <div class="row" id="brazilian_city_block" style="display:none">
                                                     <div class="col-md-3 address-row">
                                                         {% render_generic_field form.state required=config.city %}
                                                     </div>
                                                     <div class="col-md-9 address-row">
                                                         {% render_generic_field form.city_name required=config.city %}
+                                                    </div>
+                                                </div>
+                                                <div class="row" id="city_international_city_block" style="display:none">
+                                                    <div class="col-md-6">
+                                                        {% render_generic_field form.city_international required=True %}
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        {% render_generic_field form.state_international required=True %}
                                                     </div>
                                                 </div>
                                             {% endif %}
@@ -168,7 +180,7 @@
                                     </div>
 
                                     <div class="panel-body">
-                                        <div class="row">
+                                        <div class="row" id="zip_code_block">
                                             <div class="col-md-3">
                                                 {% render_generic_field form.zip_code required=True %}
                                                 <div id="cep_loader"
@@ -193,12 +205,25 @@
                                                 {% render_generic_field form.village %}
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row" id="brazilian_city_block" style="display:none">
                                             <div class="col-md-3 address-row">
                                                 {% render_generic_field form.state required=True %}
                                             </div>
                                             <div class="col-md-9 address-row">
                                                 {% render_generic_field form.city_name required=True %}
+                                            </div>
+                                        </div>
+                                        <div class="row" id="city_international_city_block" style="display:none">
+                                            <div class="col-md-6">
+                                                {% render_generic_field form.city_international required=True %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {% render_generic_field form.state_international required=True %}
+                                            </div>
+                                        </div>
+                                        <div class="row" id="zip_code_international_block" style="display:none">
+                                            <div class="col-md-3">
+                                                {% render_generic_field form.zip_code_international required=True %}
                                             </div>
                                         </div>
                                     </div>
@@ -249,11 +274,110 @@
 
     <!-- SCRIPT Subscription -->
     <script src="{% static "hotsite/js/subscription.js" %}"></script>
-
     <script>
+        function set_form_as_international() {
+            var country = $('#id_person-country');
+            var ddi_el = $('#id_person-ddi');
+            var phone_el = $('#id_person-phone');
+            var cpf = $('#id_person-cpf');
+            var international_doc = $('#id_person-international_doc');
+            var city_block = $('#brazilian_city_block');
+            var city_intern_block = $('#city_international_city_block');
+            var zip_code_el = $('#id_person-zip_code');
+            var zip_code_block_el = $('#zip_code_block');
+            var zip_code_intern_el = $('#id_person-zip_code_international');
+            var zip_code_intern_block_el = $('#zip_code_international_block');
+
+            ddi_el.val(country.val());
+            phone_el.unmask();
+            phone_el.attr('onkeyup', 'this.value = this.value.replace(/\\D/g,\'\');');
+
+            cpf.parent().parent().hide();
+            international_doc.parent().parent().show();
+            {% if config and config.cpf != config.CPF_HIDE %}
+                {% if config.cpf == config.CPF_REQUIRED %}
+                    cpf.removeAttr('required');
+                    international_doc.attr('required', 'required');
+                {% endif %}
+            {% endif %}
+
+            city_block.hide();
+            city_intern_block.show();
+            {% if config and config.city is True %}
+                $('#id_person-city_international').attr('required', 'required');
+                $('#id_person-state_international').attr('required', 'required');
+                $('#id_person-state').removeAttr('required');
+                $('#id_person-city_name').removeAttr('required');
+            {% endif %}
+
+            {% if config and config.address == config.ADDRESS_SHOW %}
+            zip_code_el.unbind('keyup');
+            zip_code_el.unmask();
+            zip_code_el.removeAttr('required');
+            zip_code_block_el.hide();
+            zip_code_intern_block_el.show();
+            zip_code_intern_el.attr('required', 'required');
+            {% endif %}
+        }
+
+        function set_form_as_national() {
+            var country = $('#id_person-country');
+            var ddi_el = $('#id_person-ddi');
+            var phone_el = $('#id_person-phone');
+            var cpf = $('#id_person-cpf');
+            var international_doc = $('#id_person-international_doc');
+            var city_block = $('#brazilian_city_block');
+            var city_intern_block = $('#city_international_city_block');
+            var zip_code_el = $('#id_person-zip_code');
+            var zip_code_block_el = $('#zip_code_block');
+            var zip_code_intern_el = $('#id_person-zip_code_international');
+            var zip_code_intern_block_el = $('#zip_code_international_block');
+
+            ddi_el.val(country.val());
+            phone_el.mask("(99) 99999-9999");
+            phone_el.removeAttr('onkeyup');
+
+            cpf.parent().parent().show();
+            international_doc.parent().parent().hide();
+            {% if config and config.cpf != config.CPF_HIDE %}
+                {% if config.cpf == config.CPF_REQUIRED %}
+                    cpf.attr('required', 'required');
+                    international_doc.removeAttr('required');
+                {% endif %}
+            {% endif %}
+
+            city_block.show();
+            city_intern_block.hide();
+            {% if config and config.city is True %}
+                $('#id_person-state').attr('required', 'required');
+                $('#id_person-city_name').attr('required', 'required');
+                $('#id_person-city_international').removeAttr('required');
+                $('#id_person-state_international').removeAttr('required');
+            {% endif %}
+
+            {% if config and config.address == config.ADDRESS_SHOW %}
+            zip_code_block_el.show();
+            zip_code_el.on('keyup', function () {
+                hotsiteSearchByCep();
+            });
+            zip_code_el.mask("99999-999");
+            zip_code_el.attr('required', 'required');
+
+            zip_code_intern_el.removeAttr('required');
+            zip_code_intern_block_el.hide();
+            {% endif %}
+        }
+
+        function set_if_international() {
+            var country = $('#id_person-country');
+            if (country.val() == 'BR') {
+                set_form_as_national();
+                return;
+            }
+            set_form_as_international();
+        }
 
         $(document).ready(function () {
-
             var back_button = $('#wizard_goto_step');
             var form = $('#person_form');
 
@@ -261,11 +385,16 @@
                 form.attr('novalidate', 'novalidate');
             });
 
+            $('#id_person-country').on('change', function() {
+                set_if_international();
+            });
 
             var id_city = $('#id_person-city');
             window.setTimeout(function () {
+                set_if_international();
+
                 {% if config and config.address == config.ADDRESS_SHOW %}
-                    $('#id_person-zip_code').mask("99999-999");
+
                 {% endif %}
 
                 if (id_city.val()) {
