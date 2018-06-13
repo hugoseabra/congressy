@@ -33,14 +33,16 @@ class CertificateConfigView(EventViewMixin, generic.TemplateView):
                 event=self.event
             )
 
-        if "{{NOME}}" in self.object.text_content:
-            long_div = self.really_long_name
-            self.object.text_content = self.object.text_content.replace(
-                "{{NOME}}", long_div)
+        if self.request.GET.get('eventName'):
+            if "{{EVENTO}}" in self.object.text_content:
+                self.object.text_content = self.object.text_content. \
+                    replace("{{""EVENTO}}", self.event.name)
 
-        if "{{EVENTO}}" in self.object.text_content:
-            self.object.text_content = self.object.text_content. \
-                replace("{{""EVENTO}}", self.event.name)
+        if self.request.GET.get('longName'):
+            if "{{NOME}}" in self.object.text_content:
+                long_div = self.really_long_name
+                self.object.text_content = self.object.text_content.replace(
+                    "{{NOME}}", long_div)
 
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
