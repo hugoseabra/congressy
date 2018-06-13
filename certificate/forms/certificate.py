@@ -1,8 +1,12 @@
 from django import forms
+from django.core.exceptions import ObjectDoesNotExist
+
 from certificate.models import Certificate
+from gatheros_event.models import Event
 
 
 class CertificatePartialForm(forms.ModelForm):
+    event = None
 
     class Meta:
         model = Certificate
@@ -10,38 +14,55 @@ class CertificatePartialForm(forms.ModelForm):
             'event',
             'background_image',
             'text_content',
+            'event_location'
         ]
 
         widgets = {
             'event': forms.HiddenInput()
         }
 
-    def clear_background_image(self):
-        """ Limpa campo `image4` """
-        self._clear_file('background_image')
-        return self.cleaned_data['background_image']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def _clear_file(self, field_name):
-        """Removes files from model"""
+        # Esse get está fora do bloco de try por que se não achar, é pra dar
+        # pau mesmo.
+        self.event = Event.objects.get(pk=self.initial.get('event'))
+        try:
+            if self.event.place.city:
+                self.initial[
+                    'event_location'] = self.event.place.city.name.title()
+                self.fields['event_location'].disabled = True
+        except ObjectDoesNotExist:
+            pass
 
-        if field_name not in self.changed_data:
-            return
 
-        file = getattr(self.instance, field_name)
-        if not file:
-            return
+def clear_background_image(self):
+    """ Limpa campo `image4` """
+    self._clear_file('background_image')
+    return self.cleaned_data['background_image']
 
-        storage = file.storage
-        path = file.path
-        storage.delete(path)
 
-        storage = file.default.storage
-        path = file.default.path
-        storage.delete(path)
+def _clear_file(self, field_name):
+    """Removes files from model"""
 
-        storage = file.thumbnail.storage
-        path = file.thumbnail.path
-        storage.delete(path)
+    if field_name not in self.changed_data:
+        return
+
+    file = getattr(self.instance, field_name)
+    if not file:
+        return
+
+    storage = file.storage
+    path = file.path
+    storage.delete(path)
+
+    storage = file.default.storage
+    path = file.default.path
+    storage.delete(path)
+
+    storage = file.thumbnail.storage
+    path = file.thumbnail.path
+    storage.delete(path)
 
 
 class CertificateForm(forms.ModelForm):

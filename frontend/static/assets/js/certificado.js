@@ -87,6 +87,14 @@ window.cgsy.cert = window.cgsy.cert || {};
             save({'title_hide': false}, 'Título sendo exibido.');
         };
 
+        this.centralize = function () {
+            save({'text_center': true}, 'Texto centralizado');
+        };
+
+        this.justify = function () {
+            save({'text_center': false}, 'Texto justificado');
+        };
+
         this.savePosition = function (x, y) {
             save(
                 {'title_position_x': x, 'title_position_y': y},
@@ -248,6 +256,13 @@ window.cgsy.cert = window.cgsy.cert || {};
             new cert.persistence.Text().saveLineHeight(size);
         };
 
+        this.centralizeText = function () {
+            new cert.persistence.Title().centralize();
+        };
+
+        this.justifyText = function () {
+            new cert.persistence.Title().justify();
+        };
 
     };
 
