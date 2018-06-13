@@ -102,21 +102,21 @@
                         {% if object.title_hide %}display: none;{% endif %}
                         " id="cert-title">{{ object.title_content }}</div>
 
-                {% if object.is_ready %}
+                {% if object.is_ready and object.event_has_any_type_of_location %}
                     <div style="position:absolute;
                             {% if object.date_hide %}
                                 display: none;
                             {% endif %}
                             text-align: justify;"
                          id="cert-date">
+                        {% localize off %}
 
-
-                        {% if object.has_city %}
-                            {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}
-                        {% else %}
-                            {{ object.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}
-                        {% endif %}
-
+                            {% if object.has_city %}
+                                {{ event.place.city.name.title }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
+                            {% else %}
+                                {{ object.event_location }}, {{ event.date_end|date:"d" }} de {{ event.date_end|date:"F"|lower }} de {{ event.date_end|date:"Y" }}.
+                            {% endif %}
+                        {% endlocalize %}
 
                     </div>
                 {% endif %}
@@ -130,7 +130,7 @@
                             text-align:justify;
                         {% endif %}"
                      id="cert-text">
-                    {{ object.text_content }}
+                    {{ object.text_content|safe }}
                 </div>
             </div>
         </div>
@@ -226,11 +226,19 @@
                 });
                 dateCheckBox.on('change', function () {
 
-                    if (this.checked) {
-                        cert.hideDate();
-                    } else {
-                        cert.showDate();
-                    }
+
+                    {% if  object.event_has_any_type_of_location %}
+                        if (this.checked) {
+                            cert.hideDate();
+                        } else {
+                            cert.showDate();
+                        }
+                    {% else %}
+                        alert("Você não pode habilitar esse recurso sem antes" +
+                            " configurar sua localização, veja o 'Conteudo' ");
+                    {% endif %}
+
+
                 });
                 centralizarCheckBox.on('change', function () {
                     if (this.checked) {
@@ -299,17 +307,16 @@
 {% block modals %}
 
     <!-- CONTENT MODAL -->
-    <div class="modal fade in"
-         id="certificateDataModal"
+    <div class="modal fade in" id="certificateDataModal"
          role="dialog"
-         aria-labelledby="certificateDataModalLabel" aria-hidden="false">
+         aria-labelledby="certificateDataModal" aria-hidden="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"
                             aria-hidden="true">×
                     </button>
-                    <h4 class="modal-title" id="certificateDataModalLabel">
+                    <h4 class="modal-title" id="certificateAlignmentModalLabel">
                         Editar conteudo do certificado
                     </h4>
                 </div>
@@ -319,12 +326,23 @@
                       style="margin-left: 15px"
                       action="{% url 'certificate:event-certificate-form' event.pk %}"
                       enctype="multipart/form-data">
-                    <div class="modal-body">
+                    <div class="modal-body" style="margin-right: 15px">
 
                         {% csrf_token %}
                         {% render_generic_field form.background_image required=True %}
                         {% render_generic_field form.text_content required=True %}
                         {% render_generic_field form.event_location required=True %}
+                        {% if not object.event_has_any_type_of_location %}
+                            <div class="alert alert-warning">
+                                <strong>
+                                    <i class="fas fa-exclamation-triangle warning-color"></i>
+                                    Atenção!
+                                </strong>
+                                Você não possui nenhuma localização para seu
+                                evento, portanto não podera usar o atributo
+                                de data até que ele seja informado.
+                            </div>
+                        {% endif %}
                         <div class="well">
                             <i>
                                 <strong>
@@ -332,12 +350,9 @@
                                     {{
                                     exemplo }} {% endverbatim %} será
                                     substituido
-                                    pelo valor correto. Caso não deseja exibir
-                                    esse
-                                    campo basta removê-lo.
+                                    pelo valor correto.
                                 </strong>
                             </i>
-
 
                             <div style="margin-top: 10px">
                                 <strong>
@@ -392,17 +407,18 @@
                         <input class="js-switch" type="checkbox"
                                id="showLongNameCheckBox"
                                name="showLongNameCheckBox">
-                        <br/>
+
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger"
-                                data-dismiss="modal">
-                            Cancelar
-                        </button>
+
                         <button type="submit" class="btn btn-success">
                             <i class="far fa-save"></i>
                             Salvar
+                        </button>
+                        <button type="button" class="btn btn-danger"
+                                data-dismiss="modal">
+                            Fechar
                         </button>
                     </div>
                 </form>
@@ -424,17 +440,7 @@
                         Editar alinhamento do certificado
                     </h4>
                 </div>
-
                 <div class="modal-body">
-
-
-                    <label for="modoEditar">
-                        Arrasta e solta:
-                    </label>
-                    <input class="js-switch" type="checkbox" id='modoEditar'
-                           name="modoEditar">
-                    <br/>
-
 
                     <label for="titleCheckBox" style="margin-top: 10px">
                         Esconder título

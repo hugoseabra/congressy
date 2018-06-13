@@ -265,3 +265,7 @@ class Certificate(models.Model):
 
         return False
 
+    def event_has_any_type_of_location(self):
+        return self.event_has_city or bool(self.event_location)
+
+
