@@ -13,13 +13,14 @@
             width: 1402px;
             left: 0;
             top: 0;
-            position: absolute;}
+            position: absolute;
+        }
 
         #cert-text {
             width: {{ certificate.converted_text_width|unlocalize }}px;
             height: {{ certificate.converted_text_height|unlocalize }}px;
             font-size: {{ certificate.converted_text_font_size|unlocalize }}px;
-            text-align:{% if certificare.text_center %}center{% else %}justify{% endif %};
+            text-align: {% if certificare.text_center %}center{% else %}justify{% endif %};
             -webkit-transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
             transform: translate({{ certificate.converted_text_position_x|unlocalize}}px,{{ certificate.converted_text_position_y|unlocalize}}px);
         }
@@ -51,6 +52,7 @@
     </div>
 
     <div style="position:absolute;
+            {% if certificate.date_hide %}display: none;{% endif %}
             text-align: justify;"
          id="cert-date">
         {% if certificate.has_city %}
