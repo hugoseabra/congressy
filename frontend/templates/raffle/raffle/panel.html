@@ -1,0 +1,139 @@
+{% extends "base/base.html" %}
+
+{% load i18n static %}
+{% load event_tags %}
+{% block title %}Sorteio | Congressy{% endblock %}
+{% block page_title %}
+    <div style="padding-bottom:10px">Sorteio</div>
+    <div style="color:#666">{{ object.product_name }}</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'assets/js/ajax.js' %}"></script>
+    <script src="{% static 'assets/js/raffle.js' %}"></script>
+    <script>
+
+    function load_winners() {
+        var winners = new window.cgsy.raffle.Winners();
+            winners.render(
+                '{% url 'raffle:winner-list' event.pk object.pk %}',
+                $('#winner-list')
+            );
+        create_events();
+    }
+
+    function load_form() {
+        var winners = new window.cgsy.raffle.Winners();
+            winners.render(
+                '{% url 'raffle:winner-register' event.pk object.pk %}',
+                $('#winner-form')
+            );
+        create_events();
+    }
+
+    function register() {
+        var sub_pk = $('#id_subscription').val();
+        if (!sub_pk) {
+            alert('Inscrição não informada.');
+            create_events();
+            return;
+        }
+        var winners = new window.cgsy.raffle.Winners();
+            winners.register(
+                '{% url 'raffle:winner-register' event.pk object.pk %}',
+                $('#winner-form'),
+                sub_pk,
+                function() {
+                    load_winners()
+                    $('#winner_form_button').attr('disabled', 'disabled');
+                    window.setTimeout(function() {
+                        $('#winner_form_button').removeAttr('disabled');
+                    }, 1000);
+                }
+            );
+        create_events();
+    }
+
+    function run() {
+        var raffle = new window.cgsy.raffle.Raffle();
+            raffle.run(
+                $('#result'),
+                $('#id_subscription'),
+                function() {
+                    $('#shuffle_button').attr('disabled', 'disabled');
+                    window.setTimeout(function() {
+                        $('#result').html('');
+                        $('#id_subscription').val('');
+                        $('#shuffle_button').removeAttr('disabled');
+                    }, 3000);
+                }
+            );
+    }
+
+    var create_event_timer = null;
+    function create_events() {
+        window.clearTimeout(create_event_timer);
+        create_event_timer = window.setTimeout(function() {
+            $('#winner_form_button').on('click', function() { register(); });
+        }, 500);
+    }
+
+    $(document).ready(function() {
+        window.setTimeout(function() {
+            create_events();
+            load_winners();
+            load_form();
+
+            var raffle = new window.cgsy.raffle.Raffle();
+            {% for sub in subscriptions %}
+            raffle.addSubscriber('{{ sub.pk }}', '{{ sub.person.name }}');
+            {% endfor %}
+        }, 300);
+    });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            {% if object.winner_out %}
+            <i class="fas fa-check-circle text-success"></i>
+            {% else %}
+            <i class="fas fa-times-circle text-danger"></i>
+            {% endif %}
+            <strong>Retirar vencedores</strong>
+        </div>
+        <div class="col-md-6 text-right">
+            <a href="{% url 'raffle:raffle-edit' event.pk object.pk %}" class="btn btn-primary">
+                <i class="fas fa-pencil-alt"></i>
+                Editar
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">Realizar Sorteio</div>
+                </div>
+                <div class="panel-body text-center">
+                    <button type="button" class="btn btn-info btn-sm" id="shuffle_button" onclick="run()">
+                        <i class="fas fa-stroopwafel"></i>
+                        Sortear
+                    </button>
+                    <div class="well well-lg text-center" id="result"></div>
+                    <div id="winner-form" class="text-center"></div>
+                </div>
+            </div>
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">Sorteados</div>
+                </div>
+                <div class="panel-body" id="winner-list">
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

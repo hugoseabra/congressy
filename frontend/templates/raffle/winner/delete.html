@@ -1,0 +1,36 @@
+{% extends "base/base.html" %}
+
+{% load static %}{% load i18n static %}
+{% load event_tags %}
+{% block title %}Deletar sorteio | Congressy{% endblock %}
+{% block page_title %}Deletar sorteio{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+
+                <div class="panel-body">
+
+                    Tem certeza que deseja excluir este <strong>Sorteio</strong>?
+                    <br/>
+                    <br/>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div>
+                            <!--suppress HtmlUnknownAttribute -->
+                            <input class="btn btn-danger" type="submit"
+                                   value="Sim, tenho certeza"/>
+                            <a class="btn btn-default" href="{% url 'raffle:raffle-list' event.pk %}">Não, leve-me de volta</a>
+                        </div>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

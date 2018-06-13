@@ -37,6 +37,7 @@ class PagarmeDataBuilder:
         lot = subscription.lot
         self.metadata_items = {
             'lote': '{} ({})'.format(lot.display_publicly, lot.pk),
+            'código': subscription.code,
         }
 
         # Estabelecer uma referência de qual o estado sistema houve a transação
@@ -71,13 +72,6 @@ class PagarmeDataBuilder:
         self.debt_amount += debt.amount
         self.liquid_amount += debt.liquid_amount
 
-        # lot = subscription.lot
-
-        # if debt.type == debt.DEBT_TYPE_SUBSCRIPTION:
-        #     self.metadata_items['lotes'].append(
-        #         '{} ({})'.format(lot.name, lot.pk)
-        #     )
-
     def build(self, amount, transaction_type, installments=1, card_hash=None):
 
         self._check_transaction_type(transaction_type, card_hash)
@@ -108,35 +102,68 @@ class PagarmeDataBuilder:
             data['card_hash'] = card_hash
 
         person = self.subscription.person
+        is_brazil = person.country == 'BR'
 
         data['customer'] = {
             'external_id': str(self.subscription.pk),
             'name': person.name,
             'type': 'individual',
-            'country': 'br',
             'email': person.email,
-            'documents': [
-                {
-                    'type': 'cpf',
-                    'number': self.clear_string(person.cpf),
-                }
-            ],
-            'phone_numbers': [self.clear_string(person.get_phone_display())],
             'birthday': person.birth_date.strftime('%Y-%m-%d'),
         }
+
+        if is_brazil is True:
+            data['customer'].update({
+                'country': 'br',
+                'documents': [
+                    {
+                        'type': 'cpf',
+                        'number': self.clear_string(person.cpf),
+                    }
+                ],
+                'phone_numbers': [
+                    self.clear_string(person.get_phone_display())
+                ],
+            })
+
+        else:
+            data['customer'].update({
+                'country': person.country.lower(),
+                'documents': [
+                    {
+                        'type': 'ID/PASSPORT',
+                        'number': person.international_doc,
+                    }
+                ],
+                'phone_numbers': [
+                    self.clear_string(person.get_phone_display())
+                ],
+            })
 
         data['billing'] = {
             "name": person.name,
             "address": {
-                "country": "br",
-                "state": person.city.uf.lower(),
-                "city": person.city.name.lower().capitalize(),
-                "neighborhood": person.village,
-                "street": person.street,
-                "street_number": str(person.number),
-                "zipcode": person.zip_code
+                "neighborhood": person.village or '',
+                "street": person.street or '',
+                "street_number": person.number or 'S/N',
             }
         }
+
+        if is_brazil is True:
+            data['billing']['address'].update({
+                "country": "br",
+                "city": person.city.name.lower().capitalize(),
+                "state": person.city.uf.lower(),
+                "zipcode": person.zip_code,
+            })
+
+        else:
+            data['billing']['address'].update({
+                "country": person.country.lower(),
+                "city": person.city_international.lower().capitalize(),
+                "state": person.state_international.lower().capitalize(),
+                "zipcode": person.zip_code_international,
+            })
 
         return data
 

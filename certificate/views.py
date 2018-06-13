@@ -1,9 +1,8 @@
 from django import forms as django_forms
-from django.contrib import messages
-from django.shortcuts import reverse, redirect, get_object_or_404
+from django.shortcuts import reverse, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
-from django.template import Template
+from django.template import Template, Context
 from wkhtmltopdf.views import PDFTemplateView
 
 from certificate import models, forms
@@ -11,29 +10,35 @@ from gatheros_event.views.mixins import EventViewMixin, AccountMixin
 from gatheros_subscription.models import Subscription
 
 
-class CertificateConfigView(EventViewMixin, generic.DetailView):
+class CertificateConfigView(EventViewMixin, generic.TemplateView):
     template_name = 'certificate/certificado_.html'
-    model = models.Certificate
+    object = None
 
     def dispatch(self, request, *args, **kwargs):
         response = super(CertificateConfigView, self).dispatch(request, *args,
                                                                **kwargs)
-        if not self.object.background_image:
-            messages.error(request, 'Seu certificado não possui uma imagem '
-                                    'de fundo.')
-            return redirect('certificate:event-certificate-prepare',
-                            event_pk=self.event.pk)
+        self.object = models.Certificate.objects.get_or_create(
+            event=self.event
+        )
 
         return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        if not self.object:
+            self.object, _ = models.Certificate.objects.get_or_create(
+                event=self.event
+            )
+
         context['has_inside_bar'] = True
         context['active'] = 'certificate'
+        context['object'] = self.object
+        context['form'] = forms.CertificatePartialForm(instance=self.object)
         return context
 
 
-class CertificatePrepareView(EventViewMixin, generic.FormView):
+class CertificateFormView(EventViewMixin, generic.FormView):
     template_name = 'certificate/certificate_form.html'
     model = models.Certificate
     slug_field = 'event__pk'
@@ -50,7 +55,6 @@ class CertificatePrepareView(EventViewMixin, generic.FormView):
     def get_success_url(self):
         return reverse('certificate:event-certificate-config', kwargs={
             'event_pk': self.event.pk,
-            'pk': self.instance.pk
         })
 
     def get_form(self, form_class=None):
@@ -125,13 +129,23 @@ class CertificatePDFView(AccountMixin, PDFTemplateView):
     def get_text(self):
         text = self.event.certificate.text_content
         text_template = Template(text)
-        context = {'NOME': self.subscription.person.name.upper()}
+        context = Context({'NOME': self.subscription.person.name.upper()})
         res = text_template.render(context)
         return res
 
     def can_access(self):
         return self.subscription.confirmed is True and \
                self.subscription.attended is True
+
+    def get_document_number(self):
+        person = self.subscription.person
+
+        if person.cpf:
+            return person.cpf
+        elif person.institution_cnpj:
+            return person.institution_cnpj
+        else:
+            return ''
 
 # def certificate_pdf_view(request, event_pk, pk):
 #     # Create the HttpResponse object with the appropriate PDF headers.

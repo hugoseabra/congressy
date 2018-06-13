@@ -57,6 +57,8 @@ class EventForm(forms.ModelForm):
         if instance is None:
             self._configure_organization_field()
 
+        self._hide_todo_config_fields()
+
     def _configure_organization_field(self):
         orgs = []
         for member in self.user.person.members.filter():
@@ -108,6 +110,17 @@ class EventForm(forms.ModelForm):
                 first_lot.save()
 
         return instance
+
+    def _hide_todo_config_fields(self):
+        todo_config_fields = (
+            'has_optionals',
+            'has_extra_activities',
+            'has_checkin',
+            'has_certificate',
+        )
+        if self.instance.pk is not None:
+            for f_name in todo_config_fields:
+                self[f_name].field.widget = forms.HiddenInput()
 
 
 class EventEditDatesForm(forms.ModelForm):

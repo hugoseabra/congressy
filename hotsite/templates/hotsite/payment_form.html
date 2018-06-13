@@ -201,8 +201,8 @@
                 });
 
                 // disable boleto method
-                {% if 'boleto' not in allowed_transaction_types %}
-                window.cgsy.payment.disable_boleto();
+                {% if 'boleto' in allowed_transaction_types %}
+                window.cgsy.payment.enable_boleto();
                 {% endif %}
 
                 {% if lot.allow_installment is True %}

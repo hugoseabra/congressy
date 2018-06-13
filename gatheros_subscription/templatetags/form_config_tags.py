@@ -34,7 +34,7 @@ def render_generic_field(
             label=label
         )
 
-    if not help_text and hasattr(field, 'help_text'):
+    if help_text and hasattr(field, 'help_text'):
         help_text = field.help_text
 
     return {
@@ -150,3 +150,38 @@ def render_multiselect_field(
         'help_text': help_text,
         'hide': hide,
     })
+
+
+@register.inclusion_tag('subscription/config_fields/international_phone.html')
+def render_international_phone(
+        ddi_field,
+        phone_field,
+        required=False,
+        use_required_field=True,
+        autofocus=False,
+        label=None,
+        help_text=None,
+        hide=False):
+    if required is False and use_required_field is True:
+        required = phone_field.field.required
+
+    if label is not None:
+        phone_field.label_tag = \
+            "<label for='id_{name}'>{label}:</label>".format(
+                name=phone_field.name,
+                label=label
+            )
+
+    if not help_text:
+        help_text = phone_field.help_text
+
+    return {
+        'ddi_field': ddi_field,
+        'phone_field': phone_field,
+        'label_tag': phone_field.label_tag,
+        'name': phone_field.name,
+        'help_text': help_text,
+        'required': required,
+        'autofocus': autofocus,
+        'hide': hide,
+    }

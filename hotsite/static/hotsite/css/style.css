@@ -78,6 +78,10 @@ iframe {
 	border: none;
 }
 
+.text-bold {
+	font-weight: bold;
+}
+
 /**
  * ========================================
  * COMMON CLASSES

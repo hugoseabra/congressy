@@ -33,7 +33,7 @@ def clean_sheet_title(title):
     for char in invalid_chars:
         title = title.replace(char, '_')
 
-    return title
+    return title[0:30]
 
 
 def export_event_data(event):
@@ -77,7 +77,7 @@ def _export_subscriptions(worksheet, subscriptions):
 
     worksheet.append([
         'CÓDIGO DA INSCRIÇÃO',
-        'CATEGORIA',
+        'CATEGORIA DE PARTICIPANTE',
         'LOTE',
         'STATUS',
         'NOME',
@@ -109,7 +109,11 @@ def _export_subscriptions(worksheet, subscriptions):
         city = person.city
 
         collector[row_idx].append(get_object_value(sub, 'code'))
-        collector[row_idx].append(get_object_value(sub.lot, 'lot_category'))
+        try:
+            collector[row_idx].append(sub.lot.category.name)
+        except AttributeError:
+            collector[row_idx].append('')
+
         collector[row_idx].append(get_object_value(sub.lot, 'name'))
         collector[row_idx].append(sub.get_status_display())
         collector[row_idx].append(get_object_value(person, 'name'))

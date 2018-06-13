@@ -153,6 +153,10 @@ class SubscriptionFormMixin(EventViewMixin, generic.FormView):
             )
             self.object = self.subscription.person
 
+            origin = self.subscription.origin
+            self.allow_edit_lot = \
+                origin == self.subscription.DEVICE_ORIGIN_MANAGE
+
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):

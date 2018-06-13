@@ -271,7 +271,7 @@ class ProfileForm(forms.ModelForm):
             }),
             'phone': TelephoneInput(attrs={'placeholder': '(00) 00000-0000'}),
             'zip_code': TelephoneInput(),
-            'city': forms.HiddenInput(),
+            # 'city': forms.HiddenInput(),
             'birth_date': forms.SelectDateWidget(
                 attrs=({'style': 'width: 30%; display: inline-block;'}),
                 years=create_years_list(), ),
@@ -284,8 +284,26 @@ class ProfileForm(forms.ModelForm):
         super(ProfileForm, self).__init__(*args, **kwargs)
         self.user = user
 
-        self.fields['email'].widget.attrs['disabled'] = 'disabled'
-        self.fields['email'].disabled = True
+        if self.instance.pk:
+
+            if self.instance.name:
+                self.fields['name'].disabled = True
+                self.fields['name'].widget.attrs['data-toggle'] = 'tooltip'
+                self.fields['name'].widget.attrs['title'] = \
+                    'Por questões de segurança, o nome não pode ser' \
+                    ' alterado. Caso você deseja fazer alguma alteração,' \
+                    ' solicite ao suporte técnico da Congressy.'
+
+            self.fields['email'].disabled = True
+            self.fields['email'].widget.attrs['data-toggle'] = 'tooltip'
+            self.fields['email'].widget.attrs['title'] = \
+                'Por questões de segurança, o e-mail não pode ser alterado.'
+
+            if self.instance.cpf:
+                self.fields['cpf'].disabled = True
+                self.fields['cpf'].widget.attrs['data-toggle'] = 'tooltip'
+                self.fields['cpf'].widget.attrs['title'] = \
+                    'Por questões de segurança, o CPF não pode ser alterado.'
 
         self.fields['new_password1'].required = password_required
         self.fields['new_password2'].required = password_required
@@ -319,7 +337,7 @@ class ProfileForm(forms.ModelForm):
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
         if phone:
-            phone = phone_cleaner(phone)
+            phone = phone_cleaner('+55{}'.format(phone))
         return phone
 
     def save(self, **_):

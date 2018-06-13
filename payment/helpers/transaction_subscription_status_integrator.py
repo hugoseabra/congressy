@@ -32,14 +32,14 @@ class TransactionSubscriptionStatusIntegrator:
     awaiting_status = [
         'processing',
         'waiting_payment',
-        'chargeback'
         'pending_refund',
         'refused',
         'refunded',
     ]
 
     confirmed_status = [
-        'paid'
+        'paid',
+        'chargeback',
     ]
 
     cancelled_status = []

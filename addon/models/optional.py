@@ -171,6 +171,7 @@ class AbstractOptional(GatherosModelMixin, EntityMixin, models.Model):
         # if congressy_amount < minimum:
         #     congressy_amount = minimum
 
+
         return round(self.liquid_price + congressy_amount, 2)
 
 

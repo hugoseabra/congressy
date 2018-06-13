@@ -134,12 +134,14 @@ class HotsiteView(SubscriptionFormMixin, generic.View):
                     "Você deve informar um código válido para se inscrever"
                     " neste evento."
                 )
+                if 'exhibition_code' in request.session:
+                    del request.session['exhibition_code']
 
                 context['exhibition_code'] = exihibition_code
                 return self.render_to_response(context)
-            else:
-                # Registra código para verificação mais adiante
-                request.session['exhibition_code'] = exihibition_code
+
+            # Registra código para verificação mais adiante
+            request.session['exhibition_code'] = exihibition_code
 
             return redirect(
                 'public:hotsite-subscription',

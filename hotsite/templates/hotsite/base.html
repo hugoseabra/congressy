@@ -75,7 +75,7 @@
 
     {% block content %}{% endblock %}
 
-    {% include 'hotsite/includes/7_footer.html' %}
+{#    {% include 'hotsite/includes/7_footer.html' %}#}
 </div>
 
 <!-- LIBRARIES JS
@@ -104,10 +104,6 @@
 <script>
     $(document).ready(function () {
         window.setTimeout(function () {
-            $('input[type=email]').on('keyup', function () {
-                $(this).val($(this).val().toLowerCase());
-            }, 300);
-
             $('.cgsy-date-input').mask("99/99/9999");
             $('.cgsy-time-input').mask("99:99");
 

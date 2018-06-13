@@ -4,11 +4,11 @@ from rest_framework.authentication import (
     SessionAuthentication,
 )
 from rest_framework.permissions import IsAuthenticated
+
 from gatheros_subscription.serializers import (
     Lot,
     LotSerializer,
 )
-from gatheros_event.models import Member
 
 
 class RestrictionViewMixin(object):
@@ -28,10 +28,7 @@ class LotViewSet(RestrictionViewMixin, viewsets.ModelViewSet):
 
         org_pks = [
             m.organization.pk
-            for m in user.person.members.filter(
-                active=True,
-                group=Member.ADMIN
-            )
+            for m in user.person.members.filter(active=True)
         ]
 
         queryset = super().get_queryset()
